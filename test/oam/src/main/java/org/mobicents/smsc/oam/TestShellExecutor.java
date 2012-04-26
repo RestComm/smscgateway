@@ -22,9 +22,9 @@ import org.mobicents.ss7.management.transceiver.ShellServerChannel;
 /**
  * @author amit bhayani
  */
-public class ShellExecutor implements Runnable {
+public class TestShellExecutor implements Runnable {
 
-	Logger logger = Logger.getLogger(ShellExecutor.class);
+	Logger logger = Logger.getLogger(TestShellExecutor.class);
 
 	private ChannelProvider provider;
 	private ShellServerChannel serverChannel;
@@ -49,7 +49,7 @@ public class ShellExecutor implements Runnable {
 
 	private volatile SccpExecutor sccpExecutor = null;
 
-	public ShellExecutor() throws IOException {
+	public TestShellExecutor() throws IOException {
 
 	}
 

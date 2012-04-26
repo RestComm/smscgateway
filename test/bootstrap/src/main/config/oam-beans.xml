@@ -6,7 +6,7 @@
 	<!-- Shell Service -->
 	<!-- ==================================================================== -->
 	<!-- Define Shell Executor -->
-	<bean name="ShellExecutor" class="org.mobicents.smsc.oam.ShellExecutor">
+	<bean name="ShellExecutor" class="org.mobicents.smsc.oam.TestShellExecutor">
 		<property name="address">${smsc.bind.address}</property>
 		<property name="port">3436</property>
 
