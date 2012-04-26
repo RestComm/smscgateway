@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="urn:jboss:bean-deployer:2.0">
+
+	<!-- ==================================================================== -->
+	<!-- Shell Service -->
+	<!-- ==================================================================== -->
+	<!-- Define Shell Executor -->
+	<bean name="ShellExecutor" class="org.mobicents.smsc.oam.ShellExecutor">
+		<property name="address">${smsc.bind.address}</property>
+		<property name="port">3436</property>
+
+		<property name="sccpExecutor">
+			<inject bean="SccpExecutor" />
+		</property>
+		<property name="m3UAShellExecutor">
+			<inject bean="M3UAShellExecutor" />
+		</property>
+	</bean>
+</deployment>

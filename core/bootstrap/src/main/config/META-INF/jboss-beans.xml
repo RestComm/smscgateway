@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="urn:jboss:bean-deployer:2.0">
+
+
+	<bean name="SCTPManagement" class="org.mobicents.protocols.sctp.ManagementImpl">
+		<constructor>
+			<parameter>SCTPManagement</parameter>
+		</constructor>
+		<property name="persistDir">${jboss.server.data.dir}</property>
+		<property name="singleThread">true</property>
+		<property name="connectDelay">30000</property>
+	</bean>
+
+	<!-- ==================================================================== -->
+	<!-- M3UA -->
+	<!-- M3UAManagement is managing the m3ua side commands -->
+	<!-- ==================================================================== -->
+	<!-- -->
+	<bean name="Mtp3UserPart" class="org.mobicents.protocols.ss7.m3ua.impl.M3UAManagement">
+		<constructor>
+			<parameter>Mtp3UserPart</parameter>
+		</constructor>
+		<property name="maxSequenceNumber">256</property>
+		<property name="persistDir">${jboss.server.data.dir}</property>
+		<property name="transportManagement">
+			<inject bean="SCTPManagement" />
+		</property>
+	</bean>
+
+	<bean name="M3UAShellExecutor"
+		class="org.mobicents.protocols.ss7.m3ua.impl.oam.M3UAShellExecutor">
+		<property name="m3uaManagement">
+			<inject bean="Mtp3UserPart" />
+		</property>
+		<property name="sctpManagement">
+			<inject bean="SCTPManagement" />
+		</property>
+	</bean>
+
+	<!-- ==================================================================== -->
+	<!-- Dialogic Mtp3UserPart -->
+	<!-- ==================================================================== -->
+	<!-- <bean name="Mtp3UserPart" class="org.mobicents.ss7.hardware.dialogic.DialogicMtp3UserPart"> 
+		<property name="sourceModuleId">61</property> <property name="destinationModuleId">34</property> 
+		</bean> -->
+
+	<!-- ==================================================================== -->
+	<!-- SCCP Service -->
+	<!-- ==================================================================== -->
+	<bean name="SccpStack" class="org.mobicents.protocols.ss7.sccp.impl.SccpStackImpl">
+		<constructor>
+			<parameter>SccpStack</parameter>
+		</constructor>
+		<property name="persistDir">${jboss.server.data.dir}</property>
+		<property name="removeSpc">true</property>
+		<property name="mtp3UserParts">
+			<map keyClass="java.lang.Integer" valueClass="org.mobicents.protocols.ss7.mtp.Mtp3UserPart">
+				<entry>
+					<key>1</key>
+					<value>
+						<inject bean="Mtp3UserPart" />
+					</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean name="SccpExecutor"
+		class="org.mobicents.protocols.ss7.sccp.impl.oam.SccpExecutor">
+		<property name="sccpStack">
+			<inject bean="SccpStack" />
+		</property>
+	</bean>
+	
+	<!-- ==================================================================== -->
+	<!-- TCAP Service -->
+	<!-- ==================================================================== -->	
+	<bean name="TcapStack" class="org.mobicents.protocols.ss7.tcap.TCAPStackImpl">
+		<constructor>
+			<parameter><inject bean="SccpStack" property="sccpProvider" /></parameter>
+			<parameter>8</parameter>
+			<parameter>5000</parameter>
+		</constructor>
+		<property name="dialogIdleTimeout">60000</property>
+		<property name="invokeTimeout">30000</property>
+	</bean>
+	
+	<!-- ==================================================================== -->
+	<!-- MAP Service -->
+	<!-- ==================================================================== -->	
+	<bean name="MapStack" class="org.mobicents.protocols.ss7.map.MAPStackImpl">
+		<constructor>
+			<parameter><inject bean="TcapStack" property="provider" /></parameter>
+		</constructor>
+	</bean>		
+
+	<!-- ==================================================================== -->
+	<!-- Shell Service -->
+	<!-- ==================================================================== -->
+	<!-- Define Shell Executor -->
+	<bean name="ShellExecutor" class="org.mobicents.smsc.oam.ShellExecutor">
+		<property name="address">${jboss.bind.address}</property>
+		<property name="port">3435</property>
+
+		<property name="sccpExecutor">
+			<inject bean="SccpExecutor" />
+		</property>
+		<property name="m3UAShellExecutor">
+			<inject bean="M3UAShellExecutor" />
+		</property>
+	</bean>
+
+	<!-- ==================================================================== -->
+	<!-- Mobicents SS7 Service -->
+	<!-- ==================================================================== -->
+	<bean name="SS7Service" class="org.mobicents.smsc.server.bootstrap.SS7Service">
+		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.ss7:service=SS7Service",exposedInterface=org.mobicents.smsc.server.bootstrap.SS7ServiceMBean.class,registerDirectly=true)
+		</annotation>
+		<property name="jndiName">java:/mobicents/ss7/map</property>
+		<property name="stack">
+			<inject bean="MapStack" property="MAPProvider" />
+		</property>
+	</bean>
+
+	<!-- ==================================================================== -->
+	<!-- SMPP Server Stack -->
+	<!-- ==================================================================== -->
+	<bean name="SMPPServer" class="org.mobicents.smsc.smpp.SmppServer">
+		<!-- the name of the server that is used for some logging and naming of 
+			threads -->
+		<property name="name">SmppServer</property>
+
+		<!-- Port where server socket is bound -->
+		<property name="port">2776</property>
+
+		<!-- Set the amount of time to allow a connection to finish binding into 
+			the server before the server automatically closes the connection. -->
+		<property name="bindTimeout">5000</property>
+
+		<!-- Set the system id that will be returned in a bind response. -->
+		<property name="systemId">MobicentsSMSC</property>
+
+		<!-- Enables or disables auto sc_interface_version negotiation. If the 
+			version from the client <= 3.3 then the client version is 3.3. If the version 
+			from the client >= 3.4 then the client version will be 3.4 and the prepared 
+			bind response will include the optional parameter sc_interface_version. -->
+		<property name="autoNegotiateInterfaceVersion">true</property>
+
+		<!-- SMPP version supported by SMSC. Only 3.4 or 3.3 -->
+		<property name="interfaceVersion">3.4</property>
+
+		<!-- Set the maximum number of connections this server is configured to 
+			handle. -->
+		<property name="maxConnectionSize">10</property>
+
+		<!-- The window "size" is the amount of unacknowledged requests that are 
+			permitted to be outstanding/unacknowledged at any given time. -->
+		<property name="defaultWindowSize">100</property>
+
+		<!-- Set the amount of time to wait until a slot opens up in the sendWindow -->
+		<property name="defaultWindowWaitTimeout">30000</property>
+
+		<!-- Set the amount of time to wait for an endpoint to respond to a request 
+			before it expires. Defaults to disabled (-1). -->
+		<property name="defaultRequestExpiryTimeout">30000</property>
+
+		<!-- Sets the amount of time between executions of monitoring the window 
+			for requests that expire. It's recommended that this generally either matches 
+			or is half the value of requestExpiryTimeout. Therefore, at worst a request 
+			would could take up 1.5X the requestExpiryTimeout to clear out. -->
+		<property name="defaultWindowMonitorInterval">15000</property>
+
+		<!-- Tracks counters for SMPP operations -->
+		<property name="defaultSessionCountersEnabled">true</property>
+	</bean>
+
+	<!-- ==================================================================== -->
+	<!-- SMPP Server Service -->
+	<!-- ==================================================================== -->
+	<bean name="SMPPServerService" class="org.mobicents.smsc.smpp.SMPPServerService">
+		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.smsc:service=SMPPServerService",exposedInterface=org.mobicents.smsc.smpp.SMPPServerServiceMBean.class,registerDirectly=true)
+		</annotation>
+		<property name="jndiName">java:/mobicents/smsc/smpphandler</property>
+		<property name="defaultSmppServerHandler">
+			<inject bean="SMPPServer" property="defaultSmppServerHandler" />
+		</property>
+	</bean>
+
+
+</deployment>

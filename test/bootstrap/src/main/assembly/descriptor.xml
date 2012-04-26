@@ -1,0 +1,98 @@
+<assembly>
+	<id>server</id>
+	<formats>
+		<format>dir</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<files>
+		<file>
+			<source>src/main/config/run.bat</source>
+			<destName>bin/run.bat</destName>
+		</file>
+		<file>
+			<source>src/main/config/run.sh</source>
+			<destName>bin/run.sh</destName>
+		</file>
+		<file>
+			<source>src/main/config/ss7-run.bat</source>
+			<destName>bin/ss7-run.bat</destName>
+		</file>
+		<file>
+			<source>src/main/config/ss7-run.sh</source>
+			<destName>bin/ss7-run.sh</destName>
+		</file>
+	</files>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>/bin</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
+			</outputFileNameMapping>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<includes>
+				<include>org.mobicents.protocols.ss7.management:shell</include>
+			</includes>
+		</dependencySet>
+
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<includes>
+				<!-- SMSC libraris -->
+				<include>org.mobicents.smsc:test-mapmodule</include>
+				<include>org.mobicents.smsc:test-oam</include>
+
+				<!-- Common libraries -->
+				<include>log4j:log4j</include>
+
+				<!-- Jboss Micro container libraries -->
+				<include>org.jboss.microcontainer:jboss-kernel</include>
+				<include>org.jboss.microcontainer:jboss-dependency</include>
+				<include>org.jboss.microcontainer:jboss-aop-mc-int</include>
+				<include>org.jboss.aop:jboss-aop</include>
+				<include>org.jboss:jboss-common-core</include>
+				<include>urbanophile:java-getopt</include>
+				<include>org.jboss.logging:jboss-logging-spi</include>
+				<include>org.jboss:jboss-reflect</include>
+				<include>org.jboss:jboss-mdr</include>
+				<include>org.jboss:jbossxb</include>
+				<include>trove:trove</include>
+				<include>javassist:javassist</include>
+
+				<!-- Not strictly SS7, But needed by SS7 -->
+				<include>javolution:javolution</include>
+				<include>org.mobicents.protocols.sctp:sctp-api</include>
+				<include>org.mobicents.protocols.sctp:sctp-impl</include>
+				<include>org.mobicents.commons:commons</include>
+				<include>org.mobicents.protocols.stream:stream</include>
+				<include>org.mobicents.protocols.asn:asn</include>
+
+				<!-- SS7 Libraries -->
+				<include>org.mobicents.protocols.ss7.sccp:sccp-api</include>
+				<include>org.mobicents.protocols.ss7.sccp:sccp-impl</include>
+				<include>org.mobicents.protocols.ss7.tcap:tcap-api</include>
+				<include>org.mobicents.protocols.ss7.tcap:tcap-impl</include>
+				<include>org.mobicents.protocols.ss7.map:map-api</include>
+				<include>org.mobicents.protocols.ss7.map:map-impl</include>
+				<include>org.mobicents.protocols.ss7.m3ua:m3ua-api</include>
+				<include>org.mobicents.protocols.ss7.m3ua:m3ua-impl</include>
+				<include>org.mobicents.protocols.ss7.mtp:mtp</include>
+				<include>org.mobicents.protocols.ss7.mtp:mtp-api</include>
+				<include>org.mobicents.protocols.ss7.management:linkset</include>
+				<include>org.mobicents.protocols.ss7.management:shell</include>
+				<!-- <include>org.mobicents.protocols.ss7.hardware:mobicents-dahdi</include> -->
+				<include>org.mobicents.protocols.ss7.hardware:mobicents-dialogic
+				</include>
+				<include>org.mobicents.protocols.ss7.congestion:congestion</include>
+
+			</includes>
+		</dependencySet>
+	</dependencySets>
+	<componentDescriptors>
+		<componentDescriptor>
+			src/main/assembly/common.xml
+		</componentDescriptor>
+	</componentDescriptors>
+</assembly>

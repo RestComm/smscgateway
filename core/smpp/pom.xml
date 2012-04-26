@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>org.mobicents.smsc</groupId>
+		<artifactId>core</artifactId>
+		<version>1.0.0.ALPHA-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>smpp</artifactId>
+	<name>Core : SMPP Server</name>
+
+	<dependencies>
+		<!-- cloudhopper smpp -->
+		<dependency>
+			<groupId>cloudhopper</groupId>
+			<artifactId>ch-smpp</artifactId>
+			<version>${ch.smpp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<!-- This comes in container. -->
+			<groupId>org.jboss.jbossas</groupId>
+			<artifactId>jboss-as-system-jmx</artifactId>
+			<version>${jboss.version}</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+</project>

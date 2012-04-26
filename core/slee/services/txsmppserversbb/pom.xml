@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.mobicents.smsc</groupId>
+		<artifactId>services-parent</artifactId>
+		<version>1.0.0.ALPHA-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>tx-smppserver-sbb</artifactId>
+	<name>Core : SLEE : Services Tx SMPP Server SBB</name>
+	<dependencies>
+		<dependency>
+			<artifactId>smsc-events</artifactId>
+			<groupId>${pom.groupId}</groupId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>smpp-server-ra-ratype</artifactId>
+			<groupId>${pom.groupId}</groupId>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servers.jainslee.api</groupId>
+			<artifactId>jain-slee-11-ext</artifactId>
+			<version>${jslee.ext.version}</version>
+		</dependency>
+	</dependencies>
+</project>

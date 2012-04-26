@@ -1,0 +1,11 @@
+<component>
+	<fileSets>
+		<fileSet>
+			<directory>src/main/config/META-INF</directory>
+			<outputDirectory>META-INF</outputDirectory>
+			<includes>
+				<include>*.*</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+</component>

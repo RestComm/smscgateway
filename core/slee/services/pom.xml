@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+
+	<parent>
+		<groupId>org.mobicents.smsc</groupId>
+		<artifactId>slee</artifactId>
+		<version>1.0.0.ALPHA-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>services-parent</artifactId>
+	<name>Core : SLEE : Services Parent</name>
+
+	<modules>
+		<module>events</module>
+		<module>txsmppserversbb</module>
+		<module>mtsbb</module>
+		<module>du</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>			
+				<artifactId>smpp-server-ra-ratype</artifactId>
+				<groupId>${pom.groupId}</groupId>
+				<version>${pom.version}</version>					
+			</dependency>
+			<dependency>
+				<groupId>org.mobicents.resources</groupId>
+				<artifactId>mobicents-slee-ra-map-ratype</artifactId>
+				<version>${mobicents.resources.map.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>

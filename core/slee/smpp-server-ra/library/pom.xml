@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.smsc</groupId>
+		<artifactId>smpp-server-ra</artifactId>
+		<version>1.0.0.ALPHA-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>smpp-server-ra-library</artifactId>
+	<name>Core : SLEE : SMPP Server RA Library</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>cloudhopper</groupId>
+			<artifactId>ch-smpp</artifactId>
+			<version>${ch.smpp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.smsc</groupId>
+			<artifactId>smpp</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
+		<!-- javolution -->
+		<dependency>
+			<groupId>javolution</groupId>
+			<artifactId>javolution</artifactId>
+			<version>${javolution.version}</version>
+		</dependency>
+	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mobicents.tools</groupId>
+				<artifactId>maven-library-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>copy-dependencies</goal>
+							<goal>generate-descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<library-name>library-smpp-server</library-name>
+					<library-vendor>library-smpp-server</library-vendor>
+					<library-version>1.0</library-version>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

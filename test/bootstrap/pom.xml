@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>org.mobicents.smsc</groupId>
+		<artifactId>test</artifactId>
+		<version>1.0.0.ALPHA-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>test-bootstrap</artifactId>
+	<name>Test : Bootstrap</name>
+
+	<dependencies>
+		<!-- SMSC Dependency -->
+		<dependency>
+			<groupId>org.mobicents.smsc</groupId>
+			<artifactId>test-mapmodule</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.smsc</groupId>
+			<artifactId>test-oam</artifactId>
+			<version>${pom.version}</version>
+		</dependency>		
+
+		<dependency>
+			<groupId>urbanophile</groupId>
+			<artifactId>java-getopt</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.microcontainer</groupId>
+			<artifactId>jboss-dependency</artifactId>
+			<version>2.0.6.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.microcontainer</groupId>
+			<artifactId>jboss-kernel</artifactId>
+			<version>${version.jboss.microcontainer}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.microcontainer</groupId>
+			<artifactId>jboss-aop-mc-int</artifactId>
+			<version>${version.jboss.microcontainer}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.aop</groupId>
+			<artifactId>jboss-aop</artifactId>
+		</dependency>
+	</dependencies>
+
+	<!-- -->
+	<build>
+		<finalName>run</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/descriptor.xml</descriptor>
+					</descriptors>
+					<finalName>smsc</finalName>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>directory-inline</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

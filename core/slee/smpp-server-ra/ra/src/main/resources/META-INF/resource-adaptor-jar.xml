@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE resource-adaptor-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE Resource Adaptor 1.1//EN" "http://java.sun.com/dtd/slee-resource-adaptor-jar_1_1.dtd">
+<resource-adaptor-jar>
+	<resource-adaptor id="smpp_server_ra">
+		<description>SMPP Server Resource Adaptor</description>
+		<resource-adaptor-name>
+			SMPPServerResourceAdaptor
+		</resource-adaptor-name>
+		<resource-adaptor-vendor>org.mobicents</resource-adaptor-vendor>
+		<resource-adaptor-version>1.0</resource-adaptor-version>
+
+		<resource-adaptor-type-ref>
+			<resource-adaptor-type-name>SMPPServerResourceAdaptorType</resource-adaptor-type-name>
+			<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+			<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+		</resource-adaptor-type-ref>
+
+		<library-ref>
+			<library-name>library-smpp-server</library-name>
+			<library-vendor>library-smpp-server</library-vendor>
+			<library-version>1.0</library-version>
+		</library-ref>
+
+		<resource-adaptor-classes>
+			<resource-adaptor-class>
+				<resource-adaptor-class-name>
+					org.mobicents.smsc.slee.resources.smpp.server.SmppServerResourceAdaptor
+				</resource-adaptor-class-name>
+			</resource-adaptor-class>
+		</resource-adaptor-classes>
+		<config-property>
+			<description>
+				Configures the type of the connection to SMSC. Can be
+				RECEIVER, TRANSMITTER or TRANSCEIVER
+			</description>
+			<config-property-name>jndiName</config-property-name>
+			<config-property-type>
+				java.lang.String
+			</config-property-type>
+			<config-property-value>java:/mobicents/smsc/smpphandler</config-property-value>
+		</config-property>
+	</resource-adaptor>
+</resource-adaptor-jar>
