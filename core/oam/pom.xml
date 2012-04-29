@@ -14,6 +14,12 @@
 	<name>Core : Operations and Management</name>
 
 	<dependencies>
+		<!-- SMSC SMPP -->
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>smpp</artifactId>
+			<version>${pom.version}</version>
+		</dependency>		
 		<!-- javolution -->
 		<dependency>
 			<groupId>javolution</groupId>

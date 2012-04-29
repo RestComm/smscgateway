@@ -72,28 +72,32 @@
 			<inject bean="SccpStack" />
 		</property>
 	</bean>
-	
+
 	<!-- ==================================================================== -->
 	<!-- TCAP Service -->
-	<!-- ==================================================================== -->	
+	<!-- ==================================================================== -->
 	<bean name="TcapStack" class="org.mobicents.protocols.ss7.tcap.TCAPStackImpl">
 		<constructor>
-			<parameter><inject bean="SccpStack" property="sccpProvider" /></parameter>
+			<parameter>
+				<inject bean="SccpStack" property="sccpProvider" />
+			</parameter>
 			<parameter>8</parameter>
 			<parameter>5000</parameter>
 		</constructor>
 		<property name="dialogIdleTimeout">60000</property>
 		<property name="invokeTimeout">30000</property>
 	</bean>
-	
+
 	<!-- ==================================================================== -->
 	<!-- MAP Service -->
-	<!-- ==================================================================== -->	
+	<!-- ==================================================================== -->
 	<bean name="MapStack" class="org.mobicents.protocols.ss7.map.MAPStackImpl">
 		<constructor>
-			<parameter><inject bean="TcapStack" property="provider" /></parameter>
+			<parameter>
+				<inject bean="TcapStack" property="provider" />
+			</parameter>
 		</constructor>
-	</bean>		
+	</bean>
 
 	<!-- ==================================================================== -->
 	<!-- Shell Service -->
@@ -108,6 +112,10 @@
 		</property>
 		<property name="m3UAShellExecutor">
 			<inject bean="M3UAShellExecutor" />
+		</property>
+
+		<property name="sMSCShellExecutor">
+			<inject bean="SMSCShellExecutor" />
 		</property>
 	</bean>
 
@@ -187,5 +195,24 @@
 		</property>
 	</bean>
 
+	<!-- ==================================================================== -->
+	<!-- SMSC -->
+	<!-- SmscManagement is managing the all Smsc server commands -->
+	<!-- ==================================================================== -->
+	<bean name="SmscManagement" class="org.mobicents.smsc.smpp.SmscManagement">
+		<constructor>
+			<parameter>SmscManagement</parameter>
+		</constructor>
+		<property name="persistDir">${jboss.server.data.dir}</property>
+		<property name="smppServer">
+			<inject bean="SMPPServer" />
+		</property>
+	</bean>
+
+	<bean name="SMSCShellExecutor" class="org.mobicents.smsc.smpp.SMSCShellExecutor">
+		<property name="smscManagement">
+			<inject bean="SmscManagement" />
+		</property>
+	</bean>
 
 </deployment>

@@ -19,6 +19,15 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 
 	private transient SmppSessionHandlerInterface smppSessionHandlerInterface = null;
 
+	private transient SmscManagement smscManagement = null;
+
+	public DefaultSmppServerHandler() {
+	}
+
+	public void setSmscManagement(SmscManagement smscManagement) {
+		this.smscManagement = smscManagement;
+	}
+
 	public SmppSessionHandlerInterface getSmppSessionHandlerInterface() {
 		return smppSessionHandlerInterface;
 	}
@@ -30,6 +39,26 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 	@Override
 	public void sessionBindRequested(Long sessionId, SmppSessionConfiguration sessionConfiguration,
 			final BaseBind bindRequest) throws SmppProcessingException {
+
+		if (this.smppSessionHandlerInterface == null) {
+			logger.error("No SmppSessionHandlerInterface registered yet! Will close SmppServerSession");
+			throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
+		}
+		
+		Esme esme = this.smscManagement.getEsme(bindRequest.getSystemId());
+
+		if (esme == null) {
+			logger.error(String.format("No ESME configured for SystemId=%s", bindRequest.getSystemId()));
+			throw new SmppProcessingException(SmppConstants.STATUS_INVSYSID);
+		}
+
+		if (!(esme.getPassword().equals(bindRequest.getPassword()))) {
+			logger.error(String.format("Invalid password for SystemId=%s", bindRequest.getSystemId()));
+			throw new SmppProcessingException(SmppConstants.STATUS_INVPASWD);
+		}
+		
+		//TODO More parameters to compare
+
 		// test name change of sessions
 		// this name actually shows up as thread context....
 		sessionConfiguration.setName("Application.SMPP." + sessionConfiguration.getSystemId());
@@ -45,6 +74,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 			logger.info(String.format("Session created: %s", session.getConfiguration().getSystemId()));
 		}
 
+		//TODO smppSessionHandlerInterface should also expose boolean indicating listener is ready to process the request
 		if (this.smppSessionHandlerInterface == null) {
 			logger.error("No SmppSessionHandlerInterface registered yet! Will close SmppServerSession");
 			throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
@@ -70,12 +100,12 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 		if (this.smppSessionHandlerInterface != null) {
 			this.smppSessionHandlerInterface.sessionDestroyed(sessionId, session);
 		}
-		
+
 		// print out final stats
 		if (session.hasCounters()) {
 			logger.info(String.format("final session rx-submitSM: %s", session.getCounters().getRxSubmitSM()));
 		}
-		
+
 		// make sure it's really shutdown
 		session.destroy();
 	}

@@ -9,8 +9,8 @@ import javolution.util.FastSet;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.m3ua.impl.oam.M3UAShellExecutor;
 import org.mobicents.protocols.ss7.sccp.impl.oam.SccpExecutor;
+import org.mobicents.smsc.smpp.SMSCShellExecutor;
 import org.mobicents.ss7.linkset.oam.LinksetExecutor;
-import org.mobicents.ss7.management.console.Subject;
 import org.mobicents.ss7.management.transceiver.ChannelProvider;
 import org.mobicents.ss7.management.transceiver.ChannelSelectionKey;
 import org.mobicents.ss7.management.transceiver.ChannelSelector;
@@ -49,6 +49,8 @@ public class ShellExecutor implements Runnable {
 
 	private volatile SccpExecutor sccpExecutor = null;
 
+	private volatile SMSCShellExecutor sMSCShellExecutor = null;
+
 	public ShellExecutor() throws IOException {
 
 	}
@@ -81,8 +83,7 @@ public class ShellExecutor implements Runnable {
 		logger.info("Starting SS7 management shell environment");
 		provider = ChannelProvider.provider();
 		serverChannel = provider.openServerChannel();
-		InetSocketAddress inetSocketAddress = new InetSocketAddress(address,
-				port);
+		InetSocketAddress inetSocketAddress = new InetSocketAddress(address, port);
 		serverChannel.bind(inetSocketAddress);
 
 		selector = provider.openSelector();
@@ -90,8 +91,7 @@ public class ShellExecutor implements Runnable {
 
 		messageFactory = ChannelProvider.provider().getMessageFactory();
 
-		this.logger.info(String.format("ShellExecutor listening at %s",
-				inetSocketAddress));
+		this.logger.info(String.format("ShellExecutor listening at %s", inetSocketAddress));
 
 		this.started = true;
 		new Thread(this).start();
@@ -117,16 +117,22 @@ public class ShellExecutor implements Runnable {
 		m3UAShellExecutor = shellExecutor;
 	}
 
+	public SMSCShellExecutor getsMSCShellExecutor() {
+		return sMSCShellExecutor;
+	}
+
+	public void setsMSCShellExecutor(SMSCShellExecutor sMSCShellExecutor) {
+		this.sMSCShellExecutor = sMSCShellExecutor;
+	}
+
 	public void run() {
 
 		while (started) {
 			try {
 				FastSet<ChannelSelectionKey> keys = selector.selectNow();
 
-				for (FastSet.Record record = keys.head(), end = keys.tail(); (record = record
-						.getNext()) != end;) {
-					ChannelSelectionKey key = (ChannelSelectionKey) keys
-							.valueOf(record);
+				for (FastSet.Record record = keys.head(), end = keys.tail(); (record = record.getNext()) != end;) {
+					ChannelSelectionKey key = (ChannelSelectionKey) keys.valueOf(record);
 
 					if (key.isAcceptable()) {
 						accept();
@@ -139,16 +145,13 @@ public class ShellExecutor implements Runnable {
 							System.out.println("received " + rxMessage);
 							if (rxMessage.compareTo("disconnect") == 0) {
 								this.txMessage = "Bye";
-								chan.send(messageFactory
-										.createMessage(txMessage));
+								chan.send(messageFactory.createMessage(txMessage));
 
 							} else {
 								String[] options = rxMessage.split(" ");
-								Subject subject = Subject
-										.getSubject(options[0]);
+								Subject subject = Subject.getSubject(options[0]);
 								if (subject == null) {
-									chan.send(messageFactory
-											.createMessage("Invalid Subject"));
+									chan.send(messageFactory.createMessage("Invalid Subject"));
 								} else {
 									// Nullify examined options
 									// options[0] = null;
@@ -158,8 +161,7 @@ public class ShellExecutor implements Runnable {
 										if (this.linksetExecutor == null) {
 											this.txMessage = "Error! LinksetExecutor is null";
 										} else {
-											this.txMessage = this.linksetExecutor
-													.execute(options);
+											this.txMessage = this.linksetExecutor.execute(options);
 										}
 										break;
 									case SCTP:
@@ -167,24 +169,28 @@ public class ShellExecutor implements Runnable {
 										if (this.m3UAShellExecutor == null) {
 											this.txMessage = "Error! M3UAShellExecutor is null";
 										} else {
-											this.txMessage = this.m3UAShellExecutor
-													.execute(options);
+											this.txMessage = this.m3UAShellExecutor.execute(options);
 										}
 										break;
 									case SCCP:
 										if (this.sccpExecutor == null) {
 											this.txMessage = "Error! SccpExecutor is null";
 										} else {
-											this.txMessage = this.sccpExecutor
-													.execute(options);
+											this.txMessage = this.sccpExecutor.execute(options);
+										}
+										break;
+									case SMSC:
+										if (this.sMSCShellExecutor == null) {
+											this.txMessage = "Error! SMSCShellExecutor is null";
+										} else {
+											this.txMessage = this.sMSCShellExecutor.execute(options);
 										}
 										break;
 									default:
 										this.txMessage = "Invalid Subject";
 										break;
 									}
-									chan.send(messageFactory
-											.createMessage(this.txMessage));
+									chan.send(messageFactory.createMessage(this.txMessage));
 								}
 							} // if (rxMessage.compareTo("disconnect")
 						} // if (msg != null)
@@ -220,8 +226,7 @@ public class ShellExecutor implements Runnable {
 				}
 			} catch (Exception e) {
 				logger.error(
-						"Exception while operating on ChannelSelectionKey. Client CLI connection will be closed now",
-						e);
+						"Exception while operating on ChannelSelectionKey. Client CLI connection will be closed now", e);
 				try {
 					this.closeChannel();
 				} catch (IOException e1) {
@@ -252,8 +257,7 @@ public class ShellExecutor implements Runnable {
 	private void accept() throws IOException {
 		channel = serverChannel.accept();
 		skey.cancel();
-		skey = channel.register(selector, SelectionKey.OP_READ
-				| SelectionKey.OP_WRITE);
+		skey = channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
 	}
 
 	private void closeChannel() throws IOException {

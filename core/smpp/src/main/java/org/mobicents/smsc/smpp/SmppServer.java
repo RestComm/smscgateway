@@ -6,16 +6,22 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.StandardMBean;
+
 import org.apache.log4j.Logger;
+import org.jboss.mx.util.MBeanServerLocator;
 
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.SmppServerConfiguration;
 import com.cloudhopper.smpp.SmppServerHandler;
 import com.cloudhopper.smpp.impl.DefaultSmppServer;
+import com.cloudhopper.smpp.jmx.DefaultSmppServerMXBean;
 import com.cloudhopper.smpp.type.SmppChannelException;
 
 public class SmppServer {
-
+	private static final String JMX_DOMAIN = "org.mobicents.smsc";
 	private static final Logger logger = Logger.getLogger(SmppServer.class);
 
 	private String name = "SmppServer";
@@ -44,8 +50,17 @@ public class SmppServer {
 
 	private SmppServerHandler smppServerHandler = null;
 
+	private MBeanServer mbeanServer = null;
+	
+	private SmscManagement smscManagement = null;
+
 	public SmppServer() {
 
+	}
+
+	public void setSmscManagement(SmscManagement smscManagement) {
+		this.smscManagement = smscManagement;
+		((DefaultSmppServerHandler)this.smppServerHandler).setSmscManagement(smscManagement);
 	}
 
 	public void setName(String name) {
@@ -153,13 +168,15 @@ public class SmppServer {
 		// sendWindow.
 		configuration.setDefaultWindowWaitTimeout(this.defaultWindowWaitTimeout);
 		configuration.setDefaultSessionCountersEnabled(this.defaultSessionCountersEnabled);
+
+		// We bind to JBoss MBean
 		configuration.setJmxEnabled(false);
 
 		this.smppServerHandler = new DefaultSmppServerHandler();
 
 		// create a server, start it up
 		this.defaultSmppServer = new DefaultSmppServer(configuration, smppServerHandler, executor, monitorExecutor);
-
+		this.registerMBean();
 		logger.info("Starting SMPP server...");
 		this.defaultSmppServer.start();
 		logger.info("SMPP server started");
@@ -170,6 +187,35 @@ public class SmppServer {
 		this.defaultSmppServer.stop();
 		logger.info("SMPP server stopped");
 		logger.info(String.format("Server counters: %s", this.defaultSmppServer.getCounters()));
+	}
+
+	public void destroy() {
+		this.unregisterMBean();
+	}
+
+	private void registerMBean() {
+
+		try {
+			this.mbeanServer = MBeanServerLocator.locateJBoss();
+			ObjectName name = new ObjectName(JMX_DOMAIN + ":name=" + this.name);
+			final StandardMBean mxBean = new StandardMBean(this.defaultSmppServer, DefaultSmppServerMXBean.class, true);
+			this.mbeanServer.registerMBean(mxBean, name);
+
+		} catch (Exception e) {
+			// log the error, but don't throw an exception for this datasource
+			logger.error(String.format("Unable to register DefaultSmppServerMXBean %s", this.name), e);
+		}
+	}
+
+	private void unregisterMBean() {
+		try {
+			if (this.mbeanServer != null) {
+				ObjectName name = new ObjectName(JMX_DOMAIN + ":name=" + this.name);
+				this.mbeanServer.unregisterMBean(name);
+			}
+		} catch (Exception e) {
+			logger.error(String.format("Unable to unregister DefaultSmppServerMXBean %s", this.name), e);
+		}
 	}
 
 	public DefaultSmppServerHandler getDefaultSmppServerHandler() {
