@@ -42,11 +42,11 @@
 		<event event-direction="Receive" initial-event="True">
 			<event-name>Sms</event-name>
 			<event-type-ref>
-				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SMS</event-type-name>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.MT_SMS</event-type-name>
 				<event-type-vendor>org.mobicents</event-type-vendor>
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
-			<initial-event-select variable="ActivityContext"/>
+			<initial-event-select variable="ActivityContext" />
 		</event>
 
 		<!-- MAP Dialog Events -->
@@ -58,19 +58,13 @@
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
 		</event>
-		
-		<!-- SRI Sbb should not care for new dialogs 
-		<event event-direction="Receive" initial-event="True">
-			<event-name>DialogRequest</event-name>
-			<event-type-ref>
-				<event-type-name>ss7.map.DIALOG_REQUEST</event-type-name>
-				<event-type-vendor>org.mobicents</event-type-vendor>
-				<event-type-version>1.0</event-type-version>
-			</event-type-ref>
-			<initial-event-select variable="ActivityContext" />
-		</event>
-		 -->
-		
+
+		<!-- SRI Sbb should not care for new dialogs <event event-direction="Receive" 
+			initial-event="True"> <event-name>DialogRequest</event-name> <event-type-ref> 
+			<event-type-name>ss7.map.DIALOG_REQUEST</event-type-name> <event-type-vendor>org.mobicents</event-type-vendor> 
+			<event-type-version>1.0</event-type-version> </event-type-ref> <initial-event-select 
+			variable="ActivityContext" /> </event> -->
+
 		<event event-direction="Receive" initial-event="False">
 			<event-name>DialogAccept</event-name>
 			<event-type-ref>
@@ -242,6 +236,15 @@
 			</sbb-activity-context-interface>
 		</sbb-classes>
 
+		<event event-direction="Fire">
+			<event-name>SendDeliveryReportSms</event-name>
+			<event-type-ref>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SMPP_DELIVERY_REPORT_SMS</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
 		<!-- MAP Dialog Events -->
 		<event event-direction="Receive" initial-event="False">
 			<event-name>DialogDelimiter</event-name>
@@ -252,18 +255,12 @@
 			</event-type-ref>
 		</event>
 
-		<!-- Mt Sbb should not care for new dialogs 
-		<event event-direction="Receive" initial-event="True">
-			<event-name>DialogRequest</event-name>
-			<event-type-ref>
-				<event-type-name>ss7.map.DIALOG_REQUEST</event-type-name>
-				<event-type-vendor>org.mobicents</event-type-vendor>
-				<event-type-version>1.0</event-type-version>
-			</event-type-ref>
-			<initial-event-select variable="ActivityContext" />
-		</event>
-		-->
-		
+		<!-- Mt Sbb should not care for new dialogs <event event-direction="Receive" 
+			initial-event="True"> <event-name>DialogRequest</event-name> <event-type-ref> 
+			<event-type-name>ss7.map.DIALOG_REQUEST</event-type-name> <event-type-vendor>org.mobicents</event-type-vendor> 
+			<event-type-version>1.0</event-type-version> </event-type-ref> <initial-event-select 
+			variable="ActivityContext" /> </event> -->
+
 		<event event-direction="Receive" initial-event="False">
 			<event-name>DialogAccept</event-name>
 			<event-type-ref>

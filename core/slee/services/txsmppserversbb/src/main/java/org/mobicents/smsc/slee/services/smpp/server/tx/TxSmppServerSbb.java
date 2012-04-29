@@ -1,5 +1,7 @@
 package org.mobicents.smsc.slee.services.smpp.server.tx;
 
+import java.sql.Timestamp;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.slee.ActivityContextInterface;
@@ -44,6 +46,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 		}
 
 		SmsEvent smsEvent = new SmsEvent();
+		smsEvent.setSubmitDate(new Timestamp(System.currentTimeMillis()));
 		smsEvent.setMessageId((Long) event.getReferenceObject());
 		smsEvent.setSystemId(systemId);
 

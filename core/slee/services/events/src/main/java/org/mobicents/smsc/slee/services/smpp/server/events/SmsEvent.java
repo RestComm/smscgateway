@@ -1,6 +1,7 @@
 package org.mobicents.smsc.slee.services.smpp.server.events;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 public class SmsEvent implements Serializable {
 
@@ -14,6 +15,11 @@ public class SmsEvent implements Serializable {
 	 * System ID is the ESME System ID. Used only when SMS is coming from ESME
 	 */
 	private String systemId;
+	
+	/**
+	 * Time when this SMS was received
+	 */
+	private Timestamp submitDate;
 
 	/**
 	 * From SUBMIT_SM
@@ -192,6 +198,14 @@ public class SmsEvent implements Serializable {
 		this.shortMessage = shortMessage;
 	}
 
+	public Timestamp getSubmitDate() {
+		return submitDate;
+	}
+
+	public void setSubmitDate(Timestamp submitDate) {
+		this.submitDate = submitDate;
+	}
+
 	@Override
 	public String toString() {
 		return "SmsEvent [messageId=" + messageId + ", systemId=" + systemId + ", sourceAddrTon=" + sourceAddrTon
@@ -203,26 +217,26 @@ public class SmsEvent implements Serializable {
 				+ ", defaultMsgId=" + defaultMsgId + "]";
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 71;
-		int result = 1;
-		result = prime * result + (int) (messageId ^ (messageId >>> 32));
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SmsEvent other = (SmsEvent) obj;
-		if (messageId != other.messageId)
-			return false;
-		return true;
-	}
+//	@Override
+//	public int hashCode() {
+//		final int prime = 71;
+//		int result = 1;
+//		result = prime * result + (int) (messageId ^ (messageId >>> 32));
+//		return result;
+//	}
+//
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (obj == null)
+//			return false;
+//		if (getClass() != obj.getClass())
+//			return false;
+//		SmsEvent other = (SmsEvent) obj;
+//		if (messageId != other.messageId)
+//			return false;
+//		return true;
+//	}
 
 }

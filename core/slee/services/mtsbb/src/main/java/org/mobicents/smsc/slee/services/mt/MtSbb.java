@@ -2,6 +2,7 @@ package org.mobicents.smsc.slee.services.mt;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.EventContext;
+import javax.slee.nullactivity.NullActivity;
 
 import org.mobicents.protocols.ss7.indicator.NatureOfAddress;
 import org.mobicents.protocols.ss7.indicator.NumberingPlan;
@@ -89,7 +90,7 @@ public abstract class MtSbb extends MtCommonSbb {
 	@Override
 	public void onDialogTimeout(DialogTimeout evt, ActivityContextInterface aci) {
 		super.onDialogTimeout(evt, aci);
-		
+
 		// Some error. Lets detach from this ACI.
 		aci.detach(this.sbbContext.getSbbLocalObject());
 
@@ -129,6 +130,20 @@ public abstract class MtSbb extends MtCommonSbb {
 			ActivityContextInterface aci) {
 		if (this.logger.isInfoEnabled()) {
 			this.logger.info("Received MT_FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
+		}
+
+		EventContext nullActivityEventContext = this.getNullActivityEventContext();
+		SmsEvent smsEvent = null;
+		try {
+			smsEvent = (SmsEvent) nullActivityEventContext.getEvent();
+
+			// TODO : check for ESME or Mt delivery Ack. Is this best way?
+			if (smsEvent.getSystemId() != null) {
+				handleDeliveryReportSms(smsEvent);
+			}
+		} catch (Exception e) {
+			this.logger.severe(String
+					.format("Exception while trying to send Delivery Report for SmsEvent=%s", smsEvent));
 		}
 
 		aci.detach(this.sbbContext.getSbbLocalObject());
@@ -190,7 +205,7 @@ public abstract class MtSbb extends MtCommonSbb {
 			// TODO : Take care of error
 			logger.severe("Error while trying to send MtForwardShortMessageRequestIndication", e);
 			// something horrible, release MAPDialog and free resources
-			if(mapDialogSms != null){
+			if (mapDialogSms != null) {
 				mapDialogSms.release();
 			}
 
@@ -212,6 +227,9 @@ public abstract class MtSbb extends MtCommonSbb {
 	 * Sbb ACI
 	 */
 	public abstract MtActivityContextInterface asSbbActivityContextInterface(ActivityContextInterface aci);
+
+	public abstract void fireSendDeliveryReportSms(SmsEvent event, ActivityContextInterface aci,
+			javax.slee.Address address);
 
 	/**
 	 * Private Methods
@@ -237,6 +255,33 @@ public abstract class MtSbb extends MtCommonSbb {
 	private AddressField getSmsTpduOriginatingAddress(byte ton, byte npi, String address) {
 		return new AddressFieldImpl(TypeOfNumber.getInstance(ton), NumberingPlanIdentification.getInstance(npi),
 				address);
+	}
+
+	private void handleDeliveryReportSms(SmsEvent original) {
+		// TODO check if SmppSession available for this SystemId, if not send to
+		// SnF module
+		SmsEvent deliveryReport = new SmsEvent();
+		deliveryReport.setSourceAddr(original.getDestAddr());
+		deliveryReport.setSourceAddrNpi(original.getDestAddrNpi());
+		deliveryReport.setSourceAddrTon(original.getDestAddrTon());
+
+		deliveryReport.setDestAddr(original.getSourceAddr());
+		deliveryReport.setDestAddrNpi(original.getSourceAddrNpi());
+		deliveryReport.setDestAddrTon(original.getSourceAddrTon());
+
+		deliveryReport.setSystemId(original.getSystemId());
+
+		deliveryReport.setSubmitDate(original.getSubmitDate());
+
+		deliveryReport.setMessageId(original.getMessageId());
+
+		deliveryReport.setShortMessage(original.getShortMessage());
+
+		NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
+		ActivityContextInterface nullActivityContextInterface = this.sbbContext
+				.getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
+
+		this.fireSendDeliveryReportSms(deliveryReport, nullActivityContextInterface, null);
 	}
 
 }

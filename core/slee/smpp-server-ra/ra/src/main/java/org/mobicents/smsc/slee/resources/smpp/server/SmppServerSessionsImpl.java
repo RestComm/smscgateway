@@ -33,7 +33,7 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 	private FastMap<String, SmppSession> smppServerSessions = new FastMap<String, SmppSession>().shared();
 
 	protected SmppSessionHandlerInterfaceImpl smppSessionHandlerInterfaceImpl = null;
-	
+
 	private final AtomicLong messageIdGenerator = new AtomicLong(0);
 
 	public SmppServerSessionsImpl(SmppServerResourceAdaptor smppServerResourceAdaptor) {
@@ -44,6 +44,10 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 		}
 		this.smppSessionHandlerInterfaceImpl = new SmppSessionHandlerInterfaceImpl();
 
+	}
+
+	public SmppSession getSmppSession(String systemId) {
+		return this.smppServerSessions.get(systemId);
 	}
 
 	protected SmppSessionHandlerInterface getSmppSessionHandlerInterface() {
@@ -78,6 +82,10 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 		public SmppSessionHandler sessionCreated(Long sessionId, SmppServerSession session,
 				BaseBindResp preparedBindResponse) throws SmppProcessingException {
 			smppServerSessions.put(session.getConfiguration().getSystemId(), session);
+			if (tracer.isInfoEnabled()) {
+				tracer.info(String.format("Added Session=%s to list of maintained sessions", session.getConfiguration()
+						.getSystemId()));
+			}
 			return new SmppSessionHandlerImpl(session);
 		}
 
@@ -88,10 +96,10 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 				if (tracer.isInfoEnabled()) {
 					tracer.info(String.format("Removed Session=%s from list of maintained sessions", session
 							.getConfiguration().getSystemId()));
-				} else {
-					tracer.warning(String.format("Session destroyed for=%, but was not maintained in list of sessions",
-							session.getConfiguration().getSystemId()));
 				}
+			} else {
+				tracer.warning(String.format("Session destroyed for=%, but was not maintained in list of sessions",
+						session.getConfiguration().getSystemId()));
 			}
 		}
 

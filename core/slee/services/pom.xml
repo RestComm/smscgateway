@@ -16,6 +16,7 @@
 	<modules>
 		<module>events</module>
 		<module>txsmppserversbb</module>
+		<module>rxsmppserversbb</module>
 		<module>mtsbb</module>
 		<module>du</module>
 	</modules>

@@ -3,10 +3,17 @@
                            "http://java.sun.com/dtd/slee-event-jar_1_0.dtd">
 <event-jar>
 	<event-definition>
-		<description>SMS event</description>
-		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SMS</event-type-name>
+		<description>SMS event fired to Mt Service to send SMS to Mobile User</description>
+		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.MT_SMS</event-type-name>
 		<event-type-vendor>org.mobicents</event-type-vendor>
 		<event-type-version>1.0</event-type-version>
 		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent</event-class-name>
 	</event-definition>
+	<event-definition>
+		<description>SMS event fired to Rx SMPP module to be delivered to ESME</description>
+		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SMPP_DELIVERY_REPORT_SMS</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent</event-class-name>
+	</event-definition>	
 </event-jar>
