@@ -15,8 +15,8 @@ import org.mobicents.protocols.ss7.map.api.MAPException;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
-import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMRequestIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponseIndication;
+import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMRequest;
+import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
 import org.mobicents.protocols.ss7.sccp.parameter.GT0100;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
 import org.mobicents.slee.resource.map.events.DialogProviderAbort;
@@ -76,12 +76,6 @@ public abstract class SriSbb extends MtCommonSbb {
 	public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
 		super.onErrorComponent(event, aci);
 		// TODO : Take care of error condition and marking status for MSISDN
-
-		aci.detach(this.sbbContext.getSbbLocalObject());
-
-		MtActivityContextInterface mtSbbActivityContextInterface = this.asSbbActivityContextInterface(this
-				.getNullActivityEventContext().getActivityContextInterface());
-		this.resumeNullActivityEventDelivery(mtSbbActivityContextInterface, this.getNullActivityEventContext());
 	}
 
 	/**
@@ -91,37 +85,21 @@ public abstract class SriSbb extends MtCommonSbb {
 	public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
 		super.onDialogProviderAbort(evt, aci);
 
-		// Some error. Lets detach from this ACI.
-		aci.detach(this.sbbContext.getSbbLocalObject());
-
 		// TODO : SmsEvent should now be handed to StoreAndForwardSbb to store
 		// this event.
 
 		// TODO : Set flag for this MSISDN so no more Mt process is tried,
 		// rather handed to Mt directly
-
-		MtActivityContextInterface mtSbbActivityContextInterface = this.asSbbActivityContextInterface(this
-				.getNullActivityEventContext().getActivityContextInterface());
-		this.resumeNullActivityEventDelivery(mtSbbActivityContextInterface, this.getNullActivityEventContext());
 	}
 
 	@Override
 	public void onDialogTimeout(DialogTimeout evt, ActivityContextInterface aci) {
 		super.onDialogTimeout(evt, aci);
-
-		// Some error. Lets detach from this ACI.
-		aci.detach(this.sbbContext.getSbbLocalObject());
-
 		// TODO : SmsEvent should now be handed to StoreAndForwardSbb to store
 		// this event.
 
 		// TODO : Set flag for this MSISDN so no more Mt process is tried,
 		// rather handed to Mt directly
-
-		MtActivityContextInterface mtSbbActivityContextInterface = this.asSbbActivityContextInterface(this
-				.getNullActivityEventContext().getActivityContextInterface());
-		this.resumeNullActivityEventDelivery(mtSbbActivityContextInterface, this.getNullActivityEventContext());
-
 	}
 
 	/**
@@ -135,7 +113,7 @@ public abstract class SriSbb extends MtCommonSbb {
 	 * @param evt
 	 * @param aci
 	 */
-	public void onSendRoutingInfoForSMRequest(SendRoutingInfoForSMRequestIndication evt, ActivityContextInterface aci) {
+	public void onSendRoutingInfoForSMRequest(SendRoutingInfoForSMRequest evt, ActivityContextInterface aci) {
 		this.logger.severe("Received SEND_ROUTING_INFO_FOR_SM_REQUEST = " + evt);
 	}
 
@@ -145,7 +123,7 @@ public abstract class SriSbb extends MtCommonSbb {
 	 * @param evt
 	 * @param aci
 	 */
-	public void onSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponseIndication evt, ActivityContextInterface aci) {
+	public void onSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse evt, ActivityContextInterface aci) {
 		if (this.logger.isInfoEnabled()) {
 			this.logger.info("Received SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt + " Dialog=" + evt.getMAPDialog());
 		}
@@ -175,23 +153,11 @@ public abstract class SriSbb extends MtCommonSbb {
 	}
 
 	/**
-	 * CMPs
-	 */
-	public abstract void setNullActivityEventContext(EventContext eventContext);
-
-	public abstract EventContext getNullActivityEventContext();
-
-	/**
 	 * Get Mt child SBB
 	 * 
 	 * @return
 	 */
 	public abstract ChildRelation getMtSbb();
-
-	/**
-	 * Sbb ACI
-	 */
-	public abstract MtActivityContextInterface asSbbActivityContextInterface(ActivityContextInterface aci);
 
 	/**
 	 * Private methods

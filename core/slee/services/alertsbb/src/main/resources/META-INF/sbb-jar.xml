@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE sbb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE SBB 1.1//EN"
+                         "http://java.sun.com/dtd/slee-sbb-jar_1_1.dtd">
+<sbb-jar>
+	<sbb id="alertSbb">
+		<description>SBB listening for AlertServiceCentreRequest</description>
+		<sbb-name>AlertSbb</sbb-name>
+		<sbb-vendor>org.mobicents</sbb-vendor>
+		<sbb-version>1.0</sbb-version>
+		<sbb-alias>AlertSbb</sbb-alias>
+
+		<sbb-classes>
+			<sbb-abstract-class>
+				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.alert.AlertSbb</sbb-abstract-class-name>
+			</sbb-abstract-class>
+		</sbb-classes>
+
+		<!-- MAP Dialog Events -->
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogDelimiter</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_DELIMITER</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<!-- SRI Sbb should not care for new dialogs -->
+		<event event-direction="Receive" initial-event="True">
+			<event-name>DialogRequest</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_REQUEST</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-selector-method-name>initialEventSelect</initial-event-selector-method-name>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogAccept</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_ACCEPT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogReject</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_REJECT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogUserAbort</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_USERABORT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogProviderAbort</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_PROVIDERABORT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogClose</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_CLOSE</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogNotice</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_NOTICE</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogTimeout</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_TIMEOUT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogRelease</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_RELEASE</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<!-- MAP SMS Events -->
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>AlertServiceCentreRequest</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.service.sms.ALERT_SERVICE_CENTER_REQUEST</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<!-- Component events -->
+		<event event-direction="Receive" initial-event="False">
+			<event-name>InvokeTimeout</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.INVOKE_TIMEOUT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>ErrorComponent</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.ERROR_COMPONENT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>ProviderErrorComponent</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.PROVIDER_ERROR_COMPONENT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>RejectComponent</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.REJECT_COMPONENT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>MAPResourceAdaptorType</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>2.0</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			<activity-context-interface-factory-name>slee/resources/map/2.0/acifactory</activity-context-interface-factory-name>
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>slee/resources/map/2.0/provider</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>MAPRA</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>
+	</sbb>
+</sbb-jar>

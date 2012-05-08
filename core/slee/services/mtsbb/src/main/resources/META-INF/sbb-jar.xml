@@ -127,6 +127,15 @@
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
 		</event>
+		
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogRelease</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_RELEASE</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>		
 
 		<!-- MAP SMS Events -->
 
@@ -323,6 +332,15 @@
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
 		</event>
+		
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DialogRelease</event-name>
+			<event-type-ref>
+				<event-type-name>ss7.map.DIALOG_RELEASE</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>		
 
 		<!-- MAP SMS Events -->
 		<event event-direction="Receive" initial-event="False">

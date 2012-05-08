@@ -18,6 +18,7 @@ import com.cloudhopper.smpp.SmppServerSession;
 import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.SmppSessionHandler;
 import com.cloudhopper.smpp.pdu.BaseBindResp;
+import com.cloudhopper.smpp.pdu.BaseSmResp;
 import com.cloudhopper.smpp.pdu.DataSm;
 import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;
@@ -127,7 +128,9 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 				case SmppConstants.CMD_ID_UNBIND:
 					break;
 				case SmppConstants.CMD_ID_SUBMIT_SM:
-					pduRequest.setReferenceObject(messageIdGenerator.incrementAndGet());
+					long messageId = messageIdGenerator.incrementAndGet();
+					pduRequest.setReferenceObject(messageId);
+					((BaseSmResp)response).setMessageId(Long.toString(messageId));
 					smppServerTransaction = getSmppServerTransaction(pduRequest, session);
 					smppServerResourceAdaptor.fireEvent(EventsType.SUBMIT_SM, smppServerTransaction.getHandle(),
 							(SubmitSm) pduRequest);

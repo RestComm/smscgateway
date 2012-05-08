@@ -16,25 +16,24 @@ import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
-import org.mobicents.protocols.ss7.map.api.primitives.LMSI;
 import org.mobicents.protocols.ss7.map.api.primitives.MAPExtensionContainer;
 import org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan;
-import org.mobicents.protocols.ss7.map.api.service.sms.AlertServiceCentreRequestIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.AlertServiceCentreResponseIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.ForwardShortMessageRequestIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.ForwardShortMessageResponseIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.InformServiceCentreRequestIndication;
+import org.mobicents.protocols.ss7.map.api.service.sms.AlertServiceCentreRequest;
+import org.mobicents.protocols.ss7.map.api.service.sms.AlertServiceCentreResponse;
+import org.mobicents.protocols.ss7.map.api.service.sms.ForwardShortMessageRequest;
+import org.mobicents.protocols.ss7.map.api.service.sms.ForwardShortMessageResponse;
+import org.mobicents.protocols.ss7.map.api.service.sms.InformServiceCentreRequest;
 import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
 import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
 import org.mobicents.protocols.ss7.map.api.service.sms.MAPServiceSmsListener;
-import org.mobicents.protocols.ss7.map.api.service.sms.MoForwardShortMessageRequestIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.MoForwardShortMessageResponseIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.MtForwardShortMessageRequestIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.MtForwardShortMessageResponseIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.ReportSMDeliveryStatusRequestIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.ReportSMDeliveryStatusResponseIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMRequestIndication;
-import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponseIndication;
+import org.mobicents.protocols.ss7.map.api.service.sms.MoForwardShortMessageRequest;
+import org.mobicents.protocols.ss7.map.api.service.sms.MoForwardShortMessageResponse;
+import org.mobicents.protocols.ss7.map.api.service.sms.MtForwardShortMessageRequest;
+import org.mobicents.protocols.ss7.map.api.service.sms.MtForwardShortMessageResponse;
+import org.mobicents.protocols.ss7.map.api.service.sms.ReportSMDeliveryStatusRequest;
+import org.mobicents.protocols.ss7.map.api.service.sms.ReportSMDeliveryStatusResponse;
+import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMRequest;
+import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
 import org.mobicents.protocols.ss7.map.api.service.sms.SmsSignalInfo;
 import org.mobicents.protocols.ss7.map.api.smstpdu.AddressField;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsSubmitTpdu;
@@ -42,9 +41,7 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.SmsTpdu;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsTpduType;
 import org.mobicents.protocols.ss7.map.primitives.IMSIImpl;
 import org.mobicents.protocols.ss7.map.primitives.ISDNAddressStringImpl;
-import org.mobicents.protocols.ss7.map.primitives.LMSIImpl;
 import org.mobicents.protocols.ss7.map.service.sms.LocationInfoWithLMSIImpl;
-import org.mobicents.protocols.ss7.map.service.sms.SendRoutingInfoForSMResponseIndicationImpl;
 import org.mobicents.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.mobicents.protocols.ss7.tcap.asn.comp.Problem;
 
@@ -170,37 +167,37 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 	 */
 
 	@Override
-	public void onAlertServiceCentreIndication(AlertServiceCentreRequestIndication arg0) {
+	public void onAlertServiceCentreRequest(AlertServiceCentreRequest arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onAlertServiceCentreRespIndication(AlertServiceCentreResponseIndication arg0) {
+	public void onAlertServiceCentreResponse(AlertServiceCentreResponse arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onForwardShortMessageIndication(ForwardShortMessageRequestIndication arg0) {
+	public void onForwardShortMessageRequest(ForwardShortMessageRequest arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onForwardShortMessageRespIndication(ForwardShortMessageResponseIndication arg0) {
+	public void onForwardShortMessageResponse(ForwardShortMessageResponse arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onInformServiceCentreIndication(InformServiceCentreRequestIndication arg0) {
+	public void onInformServiceCentreRequest(InformServiceCentreRequest arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onMoForwardShortMessageIndication(MoForwardShortMessageRequestIndication request) {
+	public void onMoForwardShortMessageRequest(MoForwardShortMessageRequest request) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Rx : MoForwardShortMessageRequestIndication=" + request);
 		}
@@ -238,17 +235,17 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 	}
 
 	@Override
-	public void onMoForwardShortMessageRespIndication(MoForwardShortMessageResponseIndication arg0) {
+	public void onMoForwardShortMessageResponse(MoForwardShortMessageResponse arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onMtForwardShortMessageIndication(MtForwardShortMessageRequestIndication event) {
+	public void onMtForwardShortMessageRequest(MtForwardShortMessageRequest event) {
 		if (logger.isInfoEnabled()) {
 			logger.info("Rx : onMtForwardShortMessageIndication=" + event);
 		}
-		
+
 		MAPDialogSms mapDialogSms = event.getMAPDialog();
 		try {
 			mapDialogSms.addMtForwardShortMessageResponse(event.getInvokeId(), null, null);
@@ -260,25 +257,25 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 	}
 
 	@Override
-	public void onMtForwardShortMessageRespIndication(MtForwardShortMessageResponseIndication arg0) {
+	public void onMtForwardShortMessageResponse(MtForwardShortMessageResponse arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onReportSMDeliveryStatusIndication(ReportSMDeliveryStatusRequestIndication arg0) {
+	public void onReportSMDeliveryStatusRequest(ReportSMDeliveryStatusRequest arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onReportSMDeliveryStatusRespIndication(ReportSMDeliveryStatusResponseIndication arg0) {
+	public void onReportSMDeliveryStatusResponse(ReportSMDeliveryStatusResponse arg0) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onSendRoutingInfoForSMIndication(SendRoutingInfoForSMRequestIndication event) {
+	public void onSendRoutingInfoForSMRequest(SendRoutingInfoForSMRequest event) {
 		if (logger.isInfoEnabled()) {
 			logger.info("Rx : SendRoutingInfoForSMRequestIndication=" + event);
 		}
@@ -288,7 +285,6 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 				"923330052001");
 
 		LocationInfoWithLMSI li = new LocationInfoWithLMSIImpl(nnn, null, null, null, null);
-		SendRoutingInfoForSMResponseIndicationImpl ind = new SendRoutingInfoForSMResponseIndicationImpl(imsi, li, null);
 
 		MAPDialogSms mapDialogSms = event.getMAPDialog();
 
@@ -301,7 +297,7 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 	}
 
 	@Override
-	public void onSendRoutingInfoForSMRespIndication(SendRoutingInfoForSMResponseIndication arg0) {
+	public void onSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse arg0) {
 		// TODO Auto-generated method stub
 
 	}

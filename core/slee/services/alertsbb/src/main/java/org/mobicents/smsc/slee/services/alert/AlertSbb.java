@@ -1,30 +1,22 @@
-package org.mobicents.smsc.slee.services.mt;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.URL;
-import java.util.Properties;
+package org.mobicents.smsc.slee.services.alert;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.slee.ActivityContextInterface;
 import javax.slee.CreateException;
-import javax.slee.EventContext;
+import javax.slee.InitialEventSelector;
 import javax.slee.RolledBackContext;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
 import javax.slee.facilities.Tracer;
-import javax.slee.nullactivity.NullActivity;
 
-import org.mobicents.protocols.ss7.indicator.NatureOfAddress;
-import org.mobicents.protocols.ss7.indicator.NumberingPlan;
-import org.mobicents.protocols.ss7.indicator.RoutingIndicator;
+import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
+import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
+import org.mobicents.protocols.ss7.map.api.MAPException;
 import org.mobicents.protocols.ss7.map.api.MAPParameterFactory;
 import org.mobicents.protocols.ss7.map.api.MAPProvider;
-import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
-import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
-import org.mobicents.protocols.ss7.sccp.parameter.GT0100;
-import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
+import org.mobicents.protocols.ss7.map.api.service.sms.AlertServiceCentreRequest;
+import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.slee.resource.map.MAPContextInterfaceFactory;
 import org.mobicents.slee.resource.map.events.DialogAccept;
@@ -42,20 +34,7 @@ import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.ProviderErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
 
-public abstract class MtCommonSbb implements Sbb {
-
-	private static final String SMSC_PROPERTIES = "smsc.properties";
-	private static final String SC_GT_KEY = "service.center.gt";
-	private static final String SC_SSN_KEY = "service.center.ssn";
-	private static final String HLR_SSN_KEY = "hlr.ssn";
-	private static final String MSC_SSN_KEY = "msc.ssn";
-
-	protected String SC_GT = null;
-	protected int SC_SSN = 0;
-	protected int HLR_SSN = 0;
-	protected int MSC_SSN = 0;
-
-	private final String className;
+public abstract class AlertSbb implements Sbb {
 
 	protected Tracer logger;
 	protected SbbContextExt sbbContext;
@@ -64,13 +43,9 @@ public abstract class MtCommonSbb implements Sbb {
 	protected MAPProvider mapProvider;
 	protected MAPParameterFactory mapParameterFactory;
 
-	private AddressString serviceCenterAddress;
-	private SccpAddress serviceCenterSCCPAddress = null;
+	private MAPApplicationContext shortMsgAlertContext = null;
 
-	protected Properties smscProperteis = null;
-
-	public MtCommonSbb(String className) {
-		this.className = className;
+	public AlertSbb() {
 	}
 
 	/**
@@ -85,12 +60,9 @@ public abstract class MtCommonSbb implements Sbb {
 
 	public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
 
-		if(this.logger.isInfoEnabled()){
+		if (this.logger.isInfoEnabled()) {
 			this.logger.info("Rx :  onErrorComponent " + event + " Dialog=" + event.getMAPDialog());
 		}
-		// if (mapErrorMessage.isEmAbsentSubscriberSM()) {
-		// this.sendReportSMDeliveryStatusRequest(SMDeliveryOutcome.absentSubscriber);
-		// }
 	}
 
 	public void onProviderErrorComponent(ProviderErrorComponent event, ActivityContextInterface aci) {
@@ -121,14 +93,10 @@ public abstract class MtCommonSbb implements Sbb {
 		if (logger.isWarningEnabled()) {
 			this.logger.warning("Rx :  onDialogReject=" + evt);
 		}
-
-		// TODO : Error condition. Take care
 	}
 
 	public void onDialogUserAbort(DialogUserAbort evt, ActivityContextInterface aci) {
 		this.logger.severe("Rx :  onDialogUserAbort=" + evt);
-
-		// TODO : Error condition. Take care
 	}
 
 	public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
@@ -156,20 +124,27 @@ public abstract class MtCommonSbb implements Sbb {
 			this.logger.fine("Rx :  onDialogRequest" + evt);
 		}
 	}
-	
+
 	public void onDialogRelease(DialogRelease evt, ActivityContextInterface aci) {
 		if (logger.isInfoEnabled()) {
-			//TODO : Should be fine
+			// TODO : Should be fine
 			this.logger.info("Rx :  DialogRelease" + evt);
 		}
-		
-		MtActivityContextInterface mtSbbActivityContextInterface = this.asSbbActivityContextInterface(this
-				.getNullActivityEventContext().getActivityContextInterface());
-		this.resumeNullActivityEventDelivery(mtSbbActivityContextInterface, this.getNullActivityEventContext());
+	}
+
+	public void onAlertServiceCentreRequest(AlertServiceCentreRequest evt, ActivityContextInterface aci) {
+		try {
+			MAPDialogSms mapDialogSms = evt.getMAPDialog();
+			mapDialogSms.addAlertServiceCentreResponse(evt.getInvokeId());
+
+			mapDialogSms.close(false);
+		} catch (MAPException e) {
+			logger.severe("Exception while trying to send back AlertServiceCentreResponse", e);
+		}
 	}
 
 	/**
-	 * Life cycle methods
+	 * Life cycle
 	 */
 
 	@Override
@@ -229,110 +204,45 @@ public abstract class MtCommonSbb implements Sbb {
 	@Override
 	public void setSbbContext(SbbContext sbbContext) {
 		this.sbbContext = (SbbContextExt) sbbContext;
-
 		try {
 			Context ctx = (Context) new InitialContext().lookup("java:comp/env");
 			this.mapAcif = (MAPContextInterfaceFactory) ctx.lookup("slee/resources/map/2.0/acifactory");
 			this.mapProvider = (MAPProvider) ctx.lookup("slee/resources/map/2.0/provider");
 			this.mapParameterFactory = this.mapProvider.getMAPParameterFactory();
 
-			this.logger = this.sbbContext.getTracer(this.className);
+			this.logger = this.sbbContext.getTracer(AlertSbb.class.getSimpleName());
 
-			if (this.smscProperteis == null) {
-				String path = System.getProperty("jboss.server.config.url") + SMSC_PROPERTIES;
-				URL url = new URL(path);
-
-				if (new File(url.toURI()).exists()) {
-					this.smscProperteis = new Properties();
-					this.smscProperteis.load(url.openStream());
-					logger.info("loaded application properties from file: " + path + " SBB=" + this);
-				} else {
-					throw new FileNotFoundException(String.format("File %s not found", path));
-				}
-
-				this.SC_GT = this.smscProperteis.getProperty(SC_GT_KEY);
-
-				if (this.SC_GT == null) {
-					throw new RuntimeException(String.format("No value defined for key=%s in %s file", SC_GT_KEY,
-							SMSC_PROPERTIES));
-				}
-
-				this.SC_SSN = Integer.parseInt(this.smscProperteis.getProperty(SC_SSN_KEY));
-				this.HLR_SSN = Integer.parseInt(this.smscProperteis.getProperty(HLR_SSN_KEY));
-				this.MSC_SSN = Integer.parseInt(this.smscProperteis.getProperty(MSC_SSN_KEY));
-			}
 		} catch (Exception ne) {
 			logger.severe("Could not set SBB context:", ne);
 		}
-		// TODO : Handle proper error
-
 	}
 
 	@Override
 	public void unsetSbbContext() {
+		// TODO Auto-generated method stub
 
 	}
-	
-	/**
-	 * CMPs
-	 */
-	public abstract void setNullActivityEventContext(EventContext eventContext);
-
-	public abstract EventContext getNullActivityEventContext();
-	
-	/**
-	 * Sbb ACI
-	 */
-	public abstract MtActivityContextInterface asSbbActivityContextInterface(ActivityContextInterface aci);
 
 	/**
-	 * TODO : This is repetitive in each Sbb. Find way to make it static
-	 * probably?
-	 * 
-	 * This is our own number. We are Service Center.
-	 * 
-	 * @return
+	 * Initial event selector method to check if the Event should initalize the
 	 */
-	protected AddressString getServiceCenterAddressString() {
+	public InitialEventSelector initialEventSelect(InitialEventSelector ies) {
+		Object event = ies.getEvent();
+		DialogRequest dialogRequest = null;
 
-		if (this.serviceCenterAddress == null) {
-			this.serviceCenterAddress = this.mapParameterFactory.createAddressString(
-					AddressNature.international_number,
-					org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, this.SC_GT);
-		}
-		return this.serviceCenterAddress;
-	}
+		if (event instanceof DialogRequest) {
+			dialogRequest = (DialogRequest) event;
 
-	/**
-	 * TODO: This should be configurable and static as well
-	 * 
-	 * This is our (Service Center) SCCP Address for GT
-	 * 
-	 * @return
-	 */
-	protected SccpAddress getServiceCenterSccpAddress() {
-		if (this.serviceCenterSCCPAddress == null) {
-			GT0100 gt = new GT0100(0, NumberingPlan.ISDN_TELEPHONY, NatureOfAddress.INTERNATIONAL, this.SC_GT);
-			this.serviceCenterSCCPAddress = new SccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, 0, gt,
-					this.SC_SSN);
-		}
-		return this.serviceCenterSCCPAddress;
-	}
-
-	protected void resumeNullActivityEventDelivery(MtActivityContextInterface mtSbbActivityContextInterface,
-			EventContext nullActivityEventContext) {
-		if (mtSbbActivityContextInterface.getPendingEventsOnNullActivity() == 0) {
-			// If no more events pending, lets end NullActivity
-			NullActivity nullActivity = (NullActivity) nullActivityEventContext.getActivityContextInterface()
-					.getActivity();
-			nullActivity.endActivity();
-			if (logger.isInfoEnabled()) {
-				this.logger.info(String.format("No more events to be fired on NullActivity=%s:  Ended", nullActivity));
+			if (MAPApplicationContextName.shortMsgAlertContext == dialogRequest.getMAPDialog().getApplicationContext()
+					.getApplicationContextName()) {
+				ies.setInitialEvent(true);
+				ies.setActivityContextSelected(true);
+			} else {
+				ies.setInitialEvent(false);
 			}
 		}
-		// Resume delivery for rest of the SMS's for this MSISDN
-		if(nullActivityEventContext.isSuspended()){
-			nullActivityEventContext.resumeDelivery();
-		}
+
+		return ies;
 	}
+
 }
