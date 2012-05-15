@@ -41,16 +41,46 @@
 
 		<!-- SMPP Requests -->
 		<event-type-ref>
-			<event-type-name>
-				org.mobicents.resources.smpp.server.SUBMIT_SM
-			</event-type-name>
+			<event-type-name>org.mobicents.resources.smpp.server.SUBMIT_SM</event-type-name>
 			<event-type-vendor>org.mobicents</event-type-vendor>
 			<event-type-version>1.0</event-type-version>
 		</event-type-ref>
 		<event-type-ref>
-			<event-type-name>
-				org.mobicents.resources.smpp.server.DATA_SM
-			</event-type-name>
+			<event-type-name>org.mobicents.resources.smpp.server.DATA_SM</event-type-name>
+			<event-type-vendor>org.mobicents</event-type-vendor>
+			<event-type-version>1.0</event-type-version>
+		</event-type-ref>
+		<event-type-ref>
+			<event-type-name>org.mobicents.resources.smpp.server.DELIVER_SM</event-type-name>
+			<event-type-vendor>org.mobicents</event-type-vendor>
+			<event-type-version>1.0</event-type-version>
+		</event-type-ref>		
+		
+		<!-- SMPP Response -->
+		<event-type-ref>
+			<event-type-name>org.mobicents.resources.smpp.server.SUBMIT_SM_RESP</event-type-name>
+			<event-type-vendor>org.mobicents</event-type-vendor>
+			<event-type-version>1.0</event-type-version>
+		</event-type-ref>
+		<event-type-ref>
+			<event-type-name>org.mobicents.resources.smpp.server.DATA_SM_RESP</event-type-name>
+			<event-type-vendor>org.mobicents</event-type-vendor>
+			<event-type-version>1.0</event-type-version>
+		</event-type-ref>
+		<event-type-ref>
+			<event-type-name>org.mobicents.resources.smpp.server.DELIVER_SM_RESP</event-type-name>
+			<event-type-vendor>org.mobicents</event-type-vendor>
+			<event-type-version>1.0</event-type-version>
+		</event-type-ref>		
+		
+		<!-- SMPP Error -->
+		<event-type-ref>
+			<event-type-name>org.mobicents.resources.smpp.server.REQUEST_TIMEOUT</event-type-name>
+			<event-type-vendor>org.mobicents</event-type-vendor>
+			<event-type-version>1.0</event-type-version>
+		</event-type-ref>
+		<event-type-ref>
+			<event-type-name>org.mobicents.resources.smpp.server.RECOVERABLE_PDU_EXCEPTION</event-type-name>
 			<event-type-vendor>org.mobicents</event-type-vendor>
 			<event-type-version>1.0</event-type-version>
 		</event-type-ref>

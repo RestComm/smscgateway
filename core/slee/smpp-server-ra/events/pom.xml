@@ -12,4 +12,12 @@
 
 	<artifactId>smpp-server-ra-events</artifactId>
 	<name>Core : SLEE : SMPP Server RA Events</name>
+	
+	<dependencies>
+		<dependency>
+			<groupId>cloudhopper</groupId>
+			<artifactId>ch-smpp</artifactId>
+			<version>${ch.smpp.version}</version>
+		</dependency>
+	</dependencies>	
 </project>

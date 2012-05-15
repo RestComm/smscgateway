@@ -6,6 +6,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.slee.ActivityContextInterface;
 import javax.slee.CreateException;
+import javax.slee.EventContext;
 import javax.slee.RolledBackContext;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
@@ -15,10 +16,16 @@ import javax.slee.facilities.Tracer;
 import javax.slee.nullactivity.NullActivity;
 
 import org.mobicents.slee.SbbContextExt;
+import org.mobicents.smsc.slee.resources.smpp.server.SmppServerSession;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppServerSessions;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppServerTransaction;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppServerTransactionACIFactory;
+import org.mobicents.smsc.slee.resources.smpp.server.events.PduRequestTimeout;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
+
+import com.cloudhopper.smpp.pdu.DataSmResp;
+import com.cloudhopper.smpp.pdu.SubmitSmResp;
+import com.cloudhopper.smpp.type.RecoverablePduException;
 
 public abstract class TxSmppServerSbb implements Sbb {
 
@@ -39,15 +46,18 @@ public abstract class TxSmppServerSbb implements Sbb {
 	public void onSubmitSm(com.cloudhopper.smpp.pdu.SubmitSm event, ActivityContextInterface aci) {
 
 		SmppServerTransaction smppServerTransaction = (SmppServerTransaction) aci.getActivity();
-		String systemId = smppServerTransaction.getSmppSession().getConfiguration().getSystemId();
+		SmppServerSession smppServerSession = smppServerTransaction.getSmppSession();
+		String systemId = smppServerSession.getSystemId();
 
 		if (this.logger.isInfoEnabled()) {
 			this.logger.info("Received SUBMIT_SM = " + event + " from SystemId=" + systemId);
 		}
+		
+		String messageId = this.smppServerSessions.getNextMessageId();
 
 		SmsEvent smsEvent = new SmsEvent();
 		smsEvent.setSubmitDate(new Timestamp(System.currentTimeMillis()));
-		smsEvent.setMessageId((Long) event.getReferenceObject());
+		smsEvent.setMessageId(messageId);
 		smsEvent.setSystemId(systemId);
 
 		smsEvent.setSourceAddrTon(event.getSourceAddress().getTon());
@@ -79,16 +89,43 @@ public abstract class TxSmppServerSbb implements Sbb {
 
 		this.processSms(smsEvent);
 
+		// Lets send the Response here
+		SubmitSmResp response = event.createResponse();
+		response.setMessageId(messageId);
+		try {
+			smppServerSession.sendResponsePdu(event, response);
+		} catch (Exception e) {
+			this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+		}
 	}
 
 	public void onDataSm(com.cloudhopper.smpp.pdu.DataSm event, ActivityContextInterface aci) {
 		SmppServerTransaction smppServerTransaction = (SmppServerTransaction) aci.getActivity();
-		String sysId = smppServerTransaction.getSmppSession().getConfiguration().getSystemId();
+		SmppServerSession smppServerSession = smppServerTransaction.getSmppSession();
+		String systemId = smppServerSession.getSystemId();
 
 		if (this.logger.isInfoEnabled()) {
-			this.logger.info("Received DATA_SM = " + event + " from SystemId=" + sysId);
+			this.logger.info("Received DATA_SM = " + event + " from SystemId=" + systemId);
+		}
+
+		DataSmResp response = event.createResponse();
+		// Lets send the Response here
+		try {
+			smppServerSession.sendResponsePdu(event, response);
+		} catch (Exception e) {
+			this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
 		}
 	}
+	
+	public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
+		logger.severe(String.format("onPduRequestTimeout : PduRequestTimeout=%s", event));
+		//TODO : Handle this
+	}
+	
+	public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci, EventContext eventContext) {
+		logger.severe(String.format("onRecoverablePduException : RecoverablePduException=%s", event));
+		//TODO : Handle this
+	}	
 
 	public abstract void fireSms(SmsEvent event, ActivityContextInterface aci, javax.slee.Address address);
 
@@ -244,7 +281,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 		TxSmppServerSbbActivityContextInterface txSmppServerSbbActivityContextInterface = this
 				.asSbbActivityContextInterface(nullActivityContextInterface);
 		int pendingEventsOnNullActivity = txSmppServerSbbActivityContextInterface.getPendingEventsOnNullActivity();
-		pendingEventsOnNullActivity = pendingEventsOnNullActivity+1;
+		pendingEventsOnNullActivity = pendingEventsOnNullActivity + 1;
 
 		this.logger.info(String.format("pendingEventsOnNullActivity = %d", pendingEventsOnNullActivity));
 

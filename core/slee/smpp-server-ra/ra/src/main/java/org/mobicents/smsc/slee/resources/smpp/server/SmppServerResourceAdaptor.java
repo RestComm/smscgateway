@@ -1,7 +1,5 @@
 package org.mobicents.smsc.slee.resources.smpp.server;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.naming.InitialContext;
 import javax.slee.Address;
 import javax.slee.AddressPlan;
@@ -43,8 +41,6 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 
 	private transient static final Address address = new Address(AddressPlan.IP, "localhost");
 
-	protected ConcurrentHashMap<SmppServerTransactionHandle, SmppServerTransaction> activities = new ConcurrentHashMap<SmppServerTransactionHandle, SmppServerTransaction>();
-
 	private String jndiName = null;
 
 	public SmppServerResourceAdaptor() {
@@ -53,7 +49,16 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 
 	@Override
 	public void activityEnded(ActivityHandle activityHandle) {
-		this.activities.remove(activityHandle);
+		if (this.tracer.isFineEnabled()) {
+			this.tracer.fine("Activity with handle " + activityHandle + " ended");
+		}
+		SmppServerTransactionHandle serverTxHandle = (SmppServerTransactionHandle) activityHandle;
+		final SmppServerTransactionImpl serverTx = serverTxHandle.getActivity();
+		serverTxHandle.setActivity(null);
+
+		if (serverTx != null) {
+			serverTx.clear();
+		}
 	}
 
 	@Override
@@ -91,12 +96,20 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 
 	@Override
 	public Object getActivity(ActivityHandle activityHandle) {
-		return this.activities.get(activityHandle);
+		SmppServerTransactionHandle serverTxHandle = (SmppServerTransactionHandle) activityHandle;
+		return serverTxHandle.getActivity();
 	}
 
 	@Override
-	public ActivityHandle getActivityHandle(Object obj) {
-		return ((SmppServerTransactionImpl) obj).getHandle();
+	public ActivityHandle getActivityHandle(Object activity) {
+		if (activity instanceof SmppServerTransactionImpl) {
+			final SmppServerTransactionImpl wrapper = ((SmppServerTransactionImpl) activity);
+			if (wrapper.getRa() == this) {
+				return wrapper.getActivityHandle();
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -112,10 +125,12 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 
 	@Override
 	public void queryLiveness(ActivityHandle activityHandle) {
-		if (getActivity(activityHandle) == null) {
-			this.tracer.warning("The queryLiveness failed for activity " + activityHandle + " Ending this activity");
-			this.sleeEndpoint.endActivity(activityHandle);
+		final SmppServerTransactionHandle handle = (SmppServerTransactionHandle) activityHandle;
+		final SmppServerTransactionImpl smppServerTxActivity = handle.getActivity();
+		if (smppServerTxActivity == null || smppServerTxActivity.getWrappedPduRequest() == null) {
+			sleeEndpoint.endActivity(handle);
 		}
+		
 	}
 
 	@Override
@@ -157,7 +172,7 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 		this.smppServerSession.closeSmppSessions();
 		this.defaultSmppServerHandler.setSmppSessionHandlerInterface(null);
 		this.defaultSmppServerHandler = null;
-		
+
 		if (tracer.isInfoEnabled()) {
 			tracer.info("Inactivated RA Entity " + this.raContext.getEntityName());
 		}
@@ -231,13 +246,18 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 	protected void startNewSmppServerTransactionActivity(SmppServerTransactionImpl txImpl)
 			throws ActivityAlreadyExistsException, NullPointerException, IllegalStateException, SLEEException,
 			StartActivityException {
-		sleeEndpoint.startActivity(txImpl.getHandle(), txImpl, ActivityFlags.REQUEST_ENDED_CALLBACK);
-		this.activities.put(txImpl.getHandle(), txImpl);
+		sleeEndpoint.startActivity(txImpl.getActivityHandle(), txImpl, ActivityFlags.REQUEST_ENDED_CALLBACK);
+	}
+
+	protected void startNewSmppTransactionSuspendedActivity(SmppServerTransactionImpl txImpl)
+			throws ActivityAlreadyExistsException, NullPointerException, IllegalStateException, SLEEException,
+			StartActivityException {
+		sleeEndpoint.startActivitySuspended(txImpl.getActivityHandle(), txImpl, ActivityFlags.REQUEST_ENDED_CALLBACK);
 	}
 
 	protected void endActivity(SmppServerTransactionImpl txImpl) {
 		try {
-			this.sleeEndpoint.endActivity(txImpl.getHandle());
+			this.sleeEndpoint.endActivity(txImpl.getActivityHandle());
 		} catch (Exception e) {
 			this.tracer.severe("Error while Ending Activity " + txImpl, e);
 		}

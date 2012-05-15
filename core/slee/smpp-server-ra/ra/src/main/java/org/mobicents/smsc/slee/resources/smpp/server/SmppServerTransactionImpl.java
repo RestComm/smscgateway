@@ -1,55 +1,52 @@
 package org.mobicents.smsc.slee.resources.smpp.server;
 
-import com.cloudhopper.smpp.SmppSession;
+import com.cloudhopper.smpp.pdu.PduRequest;
 
 public class SmppServerTransactionImpl implements SmppServerTransaction {
 
-	private final String id;
-	private final SmppSession smppSession;
-	private final SmppServerTransactionHandle smppServerTransactionHandle;
+	private final SmppServerSessionImpl smppSession;
+	private final SmppServerResourceAdaptor ra;
 
-	protected SmppServerTransactionImpl(String systemId, int seqNumnber, SmppSession smppSession,
-			SmppServerTransactionHandle smppServerTransactionHandle) {
-		this.id = systemId + seqNumnber;
+	private SmppServerTransactionHandle activityHandle;
+	private PduRequest wrappedPduRequest;
+
+	protected SmppServerTransactionImpl(PduRequest wrappedPduRequest, SmppServerSessionImpl smppSession,
+			SmppServerTransactionHandle smppServerTransactionHandle, SmppServerResourceAdaptor ra) {
+		this.wrappedPduRequest = wrappedPduRequest;
+		this.wrappedPduRequest.setReferenceObject(this);
 		this.smppSession = smppSession;
-		this.smppServerTransactionHandle = smppServerTransactionHandle;
+		this.activityHandle = smppServerTransactionHandle;
+		this.activityHandle.setActivity(this);
+		this.ra = ra;
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public SmppSession getSmppSession() {
+	public SmppServerSession getSmppSession() {
 		return smppSession;
 	}
-	
-	public SmppServerTransactionHandle getHandle(){
-		return this.smppServerTransactionHandle;
+
+	public SmppServerTransactionHandle getActivityHandle() {
+		return this.activityHandle;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+	public PduRequest getWrappedPduRequest() {
+		return this.wrappedPduRequest;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SmppServerTransactionImpl other = (SmppServerTransactionImpl) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+	protected SmppServerResourceAdaptor getRa() {
+		return ra;
+	}
+
+	public void clear() {
+		// TODO Any more cleaning here?
+		if (this.activityHandle != null) {
+			this.activityHandle.setActivity(null);
+			this.activityHandle = null;
+		}
+
+		if (this.wrappedPduRequest != null) {
+			this.wrappedPduRequest.setReferenceObject(null);
+			this.wrappedPduRequest = null;
+		}
 	}
 
 }

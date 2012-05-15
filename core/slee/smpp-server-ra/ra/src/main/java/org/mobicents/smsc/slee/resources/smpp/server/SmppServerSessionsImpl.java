@@ -1,29 +1,29 @@
 package org.mobicents.smsc.slee.resources.smpp.server;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.slee.SLEEException;
 import javax.slee.facilities.Tracer;
-import javax.slee.resource.ActivityAlreadyExistsException;
-import javax.slee.resource.StartActivityException;
 
 import javolution.util.FastMap;
 
 import org.mobicents.smsc.slee.resources.smpp.server.events.EventsType;
+import org.mobicents.smsc.slee.resources.smpp.server.events.PduRequestTimeout;
 import org.mobicents.smsc.smpp.SmppSessionHandlerInterface;
 
+import com.cloudhopper.smpp.PduAsyncResponse;
 import com.cloudhopper.smpp.SmppConstants;
-import com.cloudhopper.smpp.SmppServerSession;
-import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.SmppSessionHandler;
 import com.cloudhopper.smpp.pdu.BaseBindResp;
-import com.cloudhopper.smpp.pdu.BaseSmResp;
 import com.cloudhopper.smpp.pdu.DataSm;
+import com.cloudhopper.smpp.pdu.DataSmResp;
+import com.cloudhopper.smpp.pdu.DeliverSmResp;
+import com.cloudhopper.smpp.pdu.Pdu;
 import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;
 import com.cloudhopper.smpp.pdu.SubmitSm;
+import com.cloudhopper.smpp.type.RecoverablePduException;
 import com.cloudhopper.smpp.type.SmppProcessingException;
+import com.cloudhopper.smpp.type.UnrecoverablePduException;
 
 public class SmppServerSessionsImpl implements SmppServerSessions {
 
@@ -31,7 +31,8 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 
 	private SmppServerResourceAdaptor smppServerResourceAdaptor = null;
 
-	private FastMap<String, SmppSession> smppServerSessions = new FastMap<String, SmppSession>().shared();
+	private FastMap<String, SmppServerSessionImpl> smppServerSessions = new FastMap<String, SmppServerSessionImpl>()
+			.shared();
 
 	protected SmppSessionHandlerInterfaceImpl smppSessionHandlerInterfaceImpl = null;
 
@@ -47,7 +48,7 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 
 	}
 
-	public SmppSession getSmppSession(String systemId) {
+	public SmppServerSession getSmppSession(String systemId) {
 		return this.smppServerSessions.get(systemId);
 	}
 
@@ -59,12 +60,12 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 
 		tracer.info(String.format("smppServerSessions.size()=%d", smppServerSessions.size()));
 
-		for (FastMap.Entry<String, SmppSession> e = smppServerSessions.head(), end = smppServerSessions.tail(); (e = e
-				.getNext()) != end;) {
+		for (FastMap.Entry<String, SmppServerSessionImpl> e = smppServerSessions.head(), end = smppServerSessions
+				.tail(); (e = e.getNext()) != end;) {
 
 			String key = e.getKey();
-			SmppSession session = e.getValue();
-			session.close();
+			SmppServerSessionImpl session = e.getValue();
+			session.getWrappedSmppServerSession().close();
 			if (tracer.isInfoEnabled()) {
 				tracer.info(String.format("Closed Session=%s", key));
 			}
@@ -80,19 +81,20 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 		}
 
 		@Override
-		public SmppSessionHandler sessionCreated(Long sessionId, SmppServerSession session,
+		public SmppSessionHandler sessionCreated(Long sessionId, com.cloudhopper.smpp.SmppServerSession session,
 				BaseBindResp preparedBindResponse) throws SmppProcessingException {
-			smppServerSessions.put(session.getConfiguration().getSystemId(), session);
+			SmppServerSessionImpl smppServerSessionImpl = new SmppServerSessionImpl(session, smppServerResourceAdaptor);
+			smppServerSessions.put(session.getConfiguration().getSystemId(), smppServerSessionImpl);
 			if (tracer.isInfoEnabled()) {
 				tracer.info(String.format("Added Session=%s to list of maintained sessions", session.getConfiguration()
 						.getSystemId()));
 			}
-			return new SmppSessionHandlerImpl(session);
+			return new SmppSessionHandlerImpl(smppServerSessionImpl);
 		}
 
 		@Override
-		public void sessionDestroyed(Long sessionId, SmppServerSession session) {
-			SmppSession smppSession = smppServerSessions.remove(session.getConfiguration().getSystemId());
+		public void sessionDestroyed(Long sessionId, com.cloudhopper.smpp.SmppServerSession session) {
+			SmppServerSessionImpl smppSession = smppServerSessions.remove(session.getConfiguration().getSystemId());
 			if (smppSession != null) {
 				if (tracer.isInfoEnabled()) {
 					tracer.info(String.format("Removed Session=%s from list of maintained sessions", session
@@ -106,13 +108,11 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 
 	}
 
-	protected class SmppSessionHandlerImpl extends com.cloudhopper.smpp.impl.DefaultSmppSessionHandler {
-		private WeakReference<SmppSession> sessionRef;
-		private String systemId;
+	protected class SmppSessionHandlerImpl implements SmppSessionHandler {
+		private SmppServerSessionImpl smppServerSessionImpl;
 
-		public SmppSessionHandlerImpl(SmppSession session) {
-			this.sessionRef = new WeakReference<SmppSession>(session);
-			this.systemId = session.getConfiguration().getSystemId();
+		public SmppSessionHandlerImpl(SmppServerSessionImpl smppServerSessionImpl) {
+			this.smppServerSessionImpl = smppServerSessionImpl;
 		}
 
 		@Override
@@ -120,29 +120,38 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 
 			PduResponse response = pduRequest.createResponse();
 			try {
-				SmppSession session = sessionRef.get();
 				SmppServerTransactionImpl smppServerTransaction = null;
+				SmppServerTransactionHandle smppServerTransactionHandle = null;
 				switch (pduRequest.getCommandId()) {
 				case SmppConstants.CMD_ID_ENQUIRE_LINK:
 					break;
 				case SmppConstants.CMD_ID_UNBIND:
 					break;
 				case SmppConstants.CMD_ID_SUBMIT_SM:
-					long messageId = messageIdGenerator.incrementAndGet();
-					pduRequest.setReferenceObject(messageId);
-					((BaseSmResp)response).setMessageId(Long.toString(messageId));
-					smppServerTransaction = getSmppServerTransaction(pduRequest, session);
-					smppServerResourceAdaptor.fireEvent(EventsType.SUBMIT_SM, smppServerTransaction.getHandle(),
-							(SubmitSm) pduRequest);
-					smppServerResourceAdaptor.endActivity(smppServerTransaction);
-					break;
+					smppServerTransactionHandle = new SmppServerTransactionHandle(
+							this.smppServerSessionImpl.getSystemId(), pduRequest.getSequenceNumber(),
+							SmppTransactionType.INCOMING);
+					smppServerTransaction = new SmppServerTransactionImpl(pduRequest, this.smppServerSessionImpl,
+							smppServerTransactionHandle, smppServerResourceAdaptor);
+
+					smppServerResourceAdaptor.startNewSmppServerTransactionActivity(smppServerTransaction);
+					smppServerResourceAdaptor.fireEvent(EventsType.SUBMIT_SM,
+							smppServerTransaction.getActivityHandle(), (SubmitSm) pduRequest);
+
+					// Return null. Let SBB send response back
+					return null;
 				case SmppConstants.CMD_ID_DATA_SM:
-					pduRequest.setReferenceObject(messageIdGenerator.incrementAndGet());
-					smppServerTransaction = getSmppServerTransaction(pduRequest, session);
-					smppServerResourceAdaptor.fireEvent(EventsType.DATA_SM, smppServerTransaction.getHandle(),
+					smppServerTransactionHandle = new SmppServerTransactionHandle(
+							this.smppServerSessionImpl.getSystemId(), pduRequest.getSequenceNumber(),
+							SmppTransactionType.INCOMING);
+					smppServerTransaction = new SmppServerTransactionImpl(pduRequest, this.smppServerSessionImpl,
+							smppServerTransactionHandle, smppServerResourceAdaptor);
+					smppServerResourceAdaptor.startNewSmppServerTransactionActivity(smppServerTransaction);
+					smppServerResourceAdaptor.fireEvent(EventsType.DATA_SM, smppServerTransaction.getActivityHandle(),
 							(DataSm) pduRequest);
-					smppServerResourceAdaptor.endActivity(smppServerTransaction);
-					break;
+
+					// Return null. Let SBB send response back
+					return null;
 				default:
 					tracer.severe(String.format("Rx : Non supported PduRequest=%s. Will not fire event", pduRequest));
 					break;
@@ -155,24 +164,149 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 			return response;
 		}
 
-		private SmppServerTransactionImpl getSmppServerTransaction(PduRequest pduRequest, SmppSession session)
-				throws ActivityAlreadyExistsException, NullPointerException, IllegalStateException, SLEEException,
-				StartActivityException {
-			SmppServerTransactionHandle smppServerTransactionHandle = new SmppServerTransactionHandle(this.systemId,
-					pduRequest.getSequenceNumber());
+		@Override
+		public String lookupResultMessage(int arg0) {
+			return null;
+		}
 
-			SmppServerTransaction smppServerTransaction = smppServerResourceAdaptor.activities
-					.get(smppServerTransactionHandle);
+		@Override
+		public String lookupTlvTagName(short arg0) {
+			return null;
+		}
+
+		@Override
+		public void fireChannelUnexpectedlyClosed() {
+			tracer.severe(String
+					.format("Rx : fireChannelUnexpectedlyClosed for SmppServerSessionImpl=%s Default handling is to discard an unexpected channel closed",
+							this.smppServerSessionImpl.getSystemId()));
+		}
+
+		@Override
+		public void fireExpectedPduResponseReceived(PduAsyncResponse pduAsyncResponse) {
+
+			PduRequest pduRequest = pduAsyncResponse.getRequest();
+			PduResponse pduResponse = pduAsyncResponse.getResponse();
+
+			SmppServerTransactionImpl smppServerTransaction = (SmppServerTransactionImpl) pduRequest
+					.getReferenceObject();
 
 			if (smppServerTransaction == null) {
-				smppServerTransaction = new SmppServerTransactionImpl(this.systemId, pduRequest.getSequenceNumber(),
-						session, smppServerTransactionHandle);
-				smppServerResourceAdaptor
-						.startNewSmppServerTransactionActivity((SmppServerTransactionImpl) smppServerTransaction);
+				tracer.severe(String
+						.format("Rx : fireExpectedPduResponseReceived for SmppServerSessionImpl=%s PduAsyncResponse=%s but SmppServerTransactionImpl is null",
+								this.smppServerSessionImpl.getSystemId(), pduAsyncResponse));
+				return;
 			}
 
-			return (SmppServerTransactionImpl) smppServerTransaction;
+			try {
+				switch (pduResponse.getCommandId()) {
+				case SmppConstants.CMD_ID_DELIVER_SM_RESP:
+					smppServerResourceAdaptor.fireEvent(EventsType.DELIVER_SM_RESP,
+							smppServerTransaction.getActivityHandle(), (DeliverSmResp) pduResponse);
+					break;
+				case SmppConstants.CMD_ID_DATA_SM_RESP:
+					smppServerResourceAdaptor.fireEvent(EventsType.DATA_SM_RESP,
+							smppServerTransaction.getActivityHandle(), (DataSmResp) pduResponse);
+					break;
+				default:
+					tracer.severe(String
+							.format("Rx : fireExpectedPduResponseReceived for SmppServerSessionImpl=%s PduAsyncResponse=%s but PduResponse is unidentified. Event will not be fired ",
+									this.smppServerSessionImpl.getSystemId(), pduAsyncResponse));
+					break;
+				}
+
+			} catch (Exception e) {
+				tracer.severe(String.format("Error while processing PduAsyncResponse=%s", pduAsyncResponse), e);
+			} finally {
+				if (smppServerTransaction != null) {
+					smppServerResourceAdaptor.endActivity(smppServerTransaction);
+				}
+			}
 		}
+
+		@Override
+		public void firePduRequestExpired(PduRequest pduRequest) {
+			tracer.warning(String.format("PduRequestExpired=%s", pduRequest));
+
+			SmppServerTransactionImpl smppServerTransaction = (SmppServerTransactionImpl) pduRequest
+					.getReferenceObject();
+
+			if (smppServerTransaction == null) {
+				tracer.severe(String
+						.format("Rx : firePduRequestExpired for SmppServerSessionImpl=%s PduRequest=%s but SmppServerTransactionImpl is null",
+								this.smppServerSessionImpl.getSystemId(), pduRequest));
+				return;
+			}
+
+			PduRequestTimeout event = new PduRequestTimeout(pduRequest, this.smppServerSessionImpl.getSystemId());
+
+			try {
+				smppServerResourceAdaptor.fireEvent(EventsType.REQUEST_TIMEOUT,
+						smppServerTransaction.getActivityHandle(), event);
+			} catch (Exception e) {
+				tracer.severe(String.format("Received firePduRequestExpired. Error while processing PduRequest=%s",
+						pduRequest), e);
+			} finally {
+				if (smppServerTransaction != null) {
+					smppServerResourceAdaptor.endActivity(smppServerTransaction);
+				}
+			}
+		}
+
+		@Override
+		public void fireRecoverablePduException(RecoverablePduException recoverablePduException) {
+			tracer.warning("Received fireRecoverablePduException", recoverablePduException);
+
+			Pdu partialPdu = recoverablePduException.getPartialPdu();
+
+			SmppServerTransactionImpl smppServerTransaction = (SmppServerTransactionImpl) partialPdu
+					.getReferenceObject();
+
+			if (smppServerTransaction == null) {
+				tracer.severe(
+						String.format(
+								"Rx : fireRecoverablePduException for SmppServerSessionImpl=%s but SmppServerTransactionImpl is null",
+								this.smppServerSessionImpl.getSystemId()), recoverablePduException);
+				return;
+			}
+
+			try {
+				smppServerResourceAdaptor.fireEvent(EventsType.RECOVERABLE_PDU_EXCEPTION,
+						smppServerTransaction.getActivityHandle(), recoverablePduException);
+			} catch (Exception e) {
+				tracer.severe(String.format(
+						"Received fireRecoverablePduException. Error while processing RecoverablePduException=%s",
+						recoverablePduException), e);
+			} finally {
+				if (smppServerTransaction != null) {
+					smppServerResourceAdaptor.endActivity(smppServerTransaction);
+				}
+			}
+
+		}
+
+		@Override
+		public void fireUnrecoverablePduException(UnrecoverablePduException unrecoverablePduException) {
+			tracer.severe("Received fireUnrecoverablePduException", unrecoverablePduException);
+
+			// TODO : recommendation is to close session
+		}
+
+		@Override
+		public void fireUnexpectedPduResponseReceived(PduResponse pduResponse) {
+			tracer.severe("Received fireUnexpectedPduResponseReceived PduResponse=" + pduResponse);
+		}
+
+		@Override
+		public void fireUnknownThrowable(Throwable throwable) {
+			tracer.severe("Received fireUnknownThrowable", throwable);
+			// TODO what here?
+		}
+
+	}
+
+	@Override
+	public String getNextMessageId() {
+		return Long.toString(this.messageIdGenerator.incrementAndGet());
 	}
 
 }

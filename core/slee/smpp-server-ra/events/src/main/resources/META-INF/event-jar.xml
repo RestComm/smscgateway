@@ -5,7 +5,7 @@
 <event-jar>
 	<description>Event definitions SMPP Server RA events</description>
 
-	<!-- transaction events -->
+	<!-- transaction Request events -->
 
 	<event-definition>
 		<description>This operation is used by an ESME to submit a short
@@ -41,4 +41,91 @@
 			com.cloudhopper.smpp.pdu.DataSm
 		</event-class-name>
 	</event-definition>
+
+	<event-definition>
+		<description>The deliver_sm is issued by the SMSC to send a message to
+			an ESME. Using this command,
+			the SMSC may route a short message to the
+			ESME for delivery.
+		</description>
+		<event-type-name>
+			org.mobicents.resources.smpp.server.DELIVER_SM
+		</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>
+			com.cloudhopper.smpp.pdu.DeliverSm
+		</event-class-name>
+	</event-definition>
+
+
+	<!-- transaction Response events -->
+
+	<event-definition>
+		<description>This operation is used by an SMSC to respond to SUBMIT_SM
+			request received
+		</description>
+		<event-type-name>
+			org.mobicents.resources.smpp.server.SUBMIT_SM_RESP
+		</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>
+			com.cloudhopper.smpp.pdu.SubmitSmResp
+		</event-class-name>
+	</event-definition>
+
+	<event-definition>
+		<description>This operation is used by an SMSC to respond to SUBMIT_SM
+			request received</description>
+		<event-type-name>
+			org.mobicents.resources.smpp.server.DATA_SM_RESP
+		</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>
+			com.cloudhopper.smpp.pdu.DataSmResp
+		</event-class-name>
+	</event-definition>
+
+	<event-definition>
+		<description>This operation is used by an SMSC to respond to SUBMIT_SM
+			request received</description>
+		<event-type-name>
+			org.mobicents.resources.smpp.server.DELIVER_SM_RESP
+		</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>
+			com.cloudhopper.smpp.pdu.DeliverSmResp
+		</event-class-name>
+	</event-definition>
+
+	<!-- transaction Error events -->
+
+	<event-definition>
+		<description>This operation is used by an SMSC to respond to SUBMIT_SM
+			request received
+		</description>
+		<event-type-name>org.mobicents.resources.smpp.server.REQUEST_TIMEOUT</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>
+			org.mobicents.smsc.slee.resources.smpp.server.events.PduRequestTimeout
+		</event-class-name>
+	</event-definition>
+
+	<event-definition>
+		<description>Thrown when a recoverable PDU decoding error occurs. A
+			recoverable PDU rror includes the partially decoded PDU in order to
+			generate a negative acknowledgement response (if needed).
+		</description>
+		<event-type-name>org.mobicents.resources.smpp.server.RECOVERABLE_PDU_EXCEPTION</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>
+			com.cloudhopper.smpp.type.RecoverablePduException
+		</event-class-name>
+	</event-definition>
+
 </event-jar>

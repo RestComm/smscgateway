@@ -15,18 +15,18 @@ import javax.slee.facilities.Tracer;
 import javax.slee.nullactivity.NullActivity;
 
 import org.mobicents.slee.SbbContextExt;
+import org.mobicents.smsc.slee.resources.smpp.server.SmppServerSession;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppServerSessions;
+import org.mobicents.smsc.slee.resources.smpp.server.SmppServerTransaction;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppServerTransactionACIFactory;
+import org.mobicents.smsc.slee.resources.smpp.server.events.PduRequestTimeout;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
 
 import com.cloudhopper.commons.charset.CharsetUtil;
-import com.cloudhopper.commons.util.windowing.WindowFuture;
-import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.pdu.DeliverSm;
 import com.cloudhopper.smpp.pdu.DeliverSmResp;
-import com.cloudhopper.smpp.pdu.PduRequest;
-import com.cloudhopper.smpp.pdu.PduResponse;
 import com.cloudhopper.smpp.type.Address;
+import com.cloudhopper.smpp.type.RecoverablePduException;
 
 public abstract class RxSmppServerSbb implements Sbb {
 
@@ -64,10 +64,11 @@ public abstract class RxSmppServerSbb implements Sbb {
 	public void onSendDeliveryReportSms(SmsEvent event, ActivityContextInterface aci, EventContext eventContext) {
 
 		try {
-			SmppSession smppSession = smppServerSessions.getSmppSession(event.getSystemId());
+			SmppServerSession smppSession = smppServerSessions.getSmppSession(event.getSystemId());
 
 			if (smppSession == null) {
-				this.logger.severe(String.format("Received Delivery Report SmsEvent=%s but no SmppSession found for SystemId", event));
+				this.logger.severe(String.format(
+						"Received Delivery Report SmsEvent=%s but no SmppSession found for SystemId", event));
 				return;
 			}
 
@@ -89,25 +90,11 @@ public abstract class RxSmppServerSbb implements Sbb {
 
 			deliverSm.setShortMessage(textBytes);
 
-			// TODO : we are sending synchronous, is it good?
-			WindowFuture<Integer, PduRequest, PduResponse> future0 = smppSession.sendRequestPdu(deliverSm, 10000, true);
-
-			if (!future0.await()) {
-				logger.severe(String
-						.format("Failed to receive DELIVERY_SM_RESP for submitted Delivery Ack request=%s within specified time",
-								event));
-			} else if (future0.isSuccess()) {
-				// TODO : What about GENERIC_NACK PDU received?
-
-				if (this.logger.isInfoEnabled()) {
-					DeliverSmResp deliverSmResp = (DeliverSmResp) future0.getResponse();
-					logger.info(String.format("Received DeliverSmResp: commandStatus=%d for MessageId=%d",
-							deliverSmResp.getCommandStatus(), event.getMessageId()));
-				}
-			} else {
-				logger.severe(String.format("Failed to properly receive DeliverSmResp for SmsEvent=%s", event),
-						future0.getCause());
-			}
+			// TODO : waiting for 2 secs for window to accept our request, is it good? Should time be more here?
+			SmppServerTransaction smppServerTransaction = smppSession.sendRequestPdu(deliverSm, 2000);
+			ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
+					.getActivityContextInterface(smppServerTransaction);
+			smppTxaci.attach(this.sbbContext.getSbbLocalObject());
 
 		} catch (Exception e) {
 			logger.severe(
@@ -118,6 +105,21 @@ public abstract class RxSmppServerSbb implements Sbb {
 		}
 
 	}
+	
+	public void onDeliverSmResp(DeliverSmResp event, ActivityContextInterface aci, EventContext eventContext) {
+		logger.info(String.format("onDeliverSmResp : DeliverSmResp=%s", event));
+		//TODO : Handle this
+	}
+
+	public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
+		logger.severe(String.format("onPduRequestTimeout : PduRequestTimeout=%s", event));
+		//TODO : Handle this
+	}
+	
+	public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci, EventContext eventContext) {
+		logger.severe(String.format("onRecoverablePduException : RecoverablePduException=%s", event));
+		//TODO : Handle this
+	}	
 
 	@Override
 	public void sbbActivate() {

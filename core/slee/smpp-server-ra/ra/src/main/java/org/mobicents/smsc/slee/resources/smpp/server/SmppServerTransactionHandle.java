@@ -4,17 +4,32 @@ import javax.slee.resource.ActivityHandle;
 
 public class SmppServerTransactionHandle implements ActivityHandle {
 
-	private final String id;
+	private final String systemId;
+	private final SmppTransactionType smppTransactionType;
+	private final int seqNumnber;
+	private transient SmppServerTransactionImpl activity;
 
-	public SmppServerTransactionHandle(String systemId, int seqNumnber) {
-		this.id = systemId + seqNumnber;
+	public SmppServerTransactionHandle(String systemId, int seqNumnber, SmppTransactionType smppTransactionType) {
+		this.systemId = systemId;
+		this.seqNumnber = seqNumnber;
+		this.smppTransactionType = smppTransactionType;
+	}
+
+	public SmppServerTransactionImpl getActivity() {
+		return activity;
+	}
+
+	public void setActivity(SmppServerTransactionImpl activity) {
+		this.activity = activity;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 29;
+		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + seqNumnber;
+		result = prime * result + smppTransactionType.hashCode();
+		result = prime * result + systemId.hashCode();
 		return result;
 	}
 
@@ -27,12 +42,19 @@ public class SmppServerTransactionHandle implements ActivityHandle {
 		if (getClass() != obj.getClass())
 			return false;
 		SmppServerTransactionHandle other = (SmppServerTransactionHandle) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
+		if (seqNumnber != other.seqNumnber)
+			return false;
+		if (smppTransactionType != other.smppTransactionType)
+			return false;
+		if (!systemId.equals(other.systemId))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "SmppServerTransactionHandle [systemId=" + systemId + ", smppTransactionType=" + smppTransactionType
+				+ ", seqNumnber=" + seqNumnber + "]";
 	}
 
 }

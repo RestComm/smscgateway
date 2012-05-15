@@ -21,7 +21,7 @@ import com.cloudhopper.smpp.jmx.DefaultSmppServerMXBean;
 import com.cloudhopper.smpp.type.SmppChannelException;
 
 public class SmppServer {
-	private static final String JMX_DOMAIN = "org.mobicents.smsc";
+	
 	private static final Logger logger = Logger.getLogger(SmppServer.class);
 
 	private String name = "SmppServer";
@@ -65,6 +65,10 @@ public class SmppServer {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	protected String getName() {
+		return name;
 	}
 
 	public void setPort(int port) {
@@ -197,7 +201,7 @@ public class SmppServer {
 
 		try {
 			this.mbeanServer = MBeanServerLocator.locateJBoss();
-			ObjectName name = new ObjectName(JMX_DOMAIN + ":name=" + this.name);
+			ObjectName name = new ObjectName(SmscManagement.JMX_DOMAIN + ":name=" + this.name);
 			final StandardMBean mxBean = new StandardMBean(this.defaultSmppServer, DefaultSmppServerMXBean.class, true);
 			this.mbeanServer.registerMBean(mxBean, name);
 
@@ -210,7 +214,7 @@ public class SmppServer {
 	private void unregisterMBean() {
 		try {
 			if (this.mbeanServer != null) {
-				ObjectName name = new ObjectName(JMX_DOMAIN + ":name=" + this.name);
+				ObjectName name = new ObjectName(SmscManagement.JMX_DOMAIN + ":name=" + this.name);
 				this.mbeanServer.unregisterMBean(name);
 			}
 		} catch (Exception e) {

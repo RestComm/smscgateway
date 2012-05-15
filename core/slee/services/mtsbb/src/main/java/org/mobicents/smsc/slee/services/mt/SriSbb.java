@@ -183,7 +183,7 @@ public abstract class SriSbb extends MtCommonSbb {
 			// 3. Finally send the request
 			mapDialogSms.send();
 		} catch (MAPException e) {
-			logger.severe("Error while trying to send RoutingInfoForSMRequestIndication", e);
+			logger.severe("Error while trying to send SendRoutingInfoForSMRequest", e);
 			// something horrible, release MAPDialog and free resources
 
 			if (mapDialogSms != null) {

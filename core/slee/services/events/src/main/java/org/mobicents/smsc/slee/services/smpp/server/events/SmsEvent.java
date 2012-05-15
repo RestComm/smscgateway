@@ -9,7 +9,7 @@ public class SmsEvent implements Serializable {
 	 * Mobicents SMSC variables
 	 */
 
-	private long messageId;
+	private String messageId;
 
 	/**
 	 * System ID is the ESME System ID. Used only when SMS is coming from ESME
@@ -54,11 +54,11 @@ public class SmsEvent implements Serializable {
 	public SmsEvent() {
 	}
 
-	public long getMessageId() {
+	public String getMessageId() {
 		return messageId;
 	}
 
-	public void setMessageId(long messageId) {
+	public void setMessageId(String messageId) {
 		this.messageId = messageId;
 	}
 

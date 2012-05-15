@@ -42,6 +42,9 @@ import org.apache.log4j.Logger;
  */
 public class SmscManagement {
 	private static final Logger logger = Logger.getLogger(SmscManagement.class);
+	
+	public static final String JMX_DOMAIN = "org.mobicents.smsc";
+	
 	private static final String ESME_LIST = "esmeList";
 	private static final String ROUTING_RULE_LIST = "routingRuleList";
 
