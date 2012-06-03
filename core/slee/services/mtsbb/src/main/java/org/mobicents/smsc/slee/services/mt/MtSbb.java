@@ -37,6 +37,8 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
 
+import com.cloudhopper.smpp.SmppConstants;
+
 public abstract class MtSbb extends MtCommonSbb {
 
 	private static final String className = "MtSbb";
@@ -238,28 +240,34 @@ public abstract class MtSbb extends MtCommonSbb {
 	private void handleDeliveryReportSms(SmsEvent original) {
 		// TODO check if SmppSession available for this SystemId, if not send to
 		// SnF module
-		SmsEvent deliveryReport = new SmsEvent();
-		deliveryReport.setSourceAddr(original.getDestAddr());
-		deliveryReport.setSourceAddrNpi(original.getDestAddrNpi());
-		deliveryReport.setSourceAddrTon(original.getDestAddrTon());
 
-		deliveryReport.setDestAddr(original.getSourceAddr());
-		deliveryReport.setDestAddrNpi(original.getSourceAddrNpi());
-		deliveryReport.setDestAddrTon(original.getSourceAddrTon());
+		byte registeredDelivery = original.getRegisteredDelivery();
 
-		deliveryReport.setSystemId(original.getSystemId());
+		// Send Delivery Receipt only if requested
+		if ((registeredDelivery & SmppConstants.REGISTERED_DELIVERY_SMSC_RECEIPT_MASK) == SmppConstants.REGISTERED_DELIVERY_SMSC_RECEIPT_REQUESTED) {
+			SmsEvent deliveryReport = new SmsEvent();
+			deliveryReport.setSourceAddr(original.getDestAddr());
+			deliveryReport.setSourceAddrNpi(original.getDestAddrNpi());
+			deliveryReport.setSourceAddrTon(original.getDestAddrTon());
 
-		deliveryReport.setSubmitDate(original.getSubmitDate());
+			deliveryReport.setDestAddr(original.getSourceAddr());
+			deliveryReport.setDestAddrNpi(original.getSourceAddrNpi());
+			deliveryReport.setDestAddrTon(original.getSourceAddrTon());
 
-		deliveryReport.setMessageId(original.getMessageId());
+			deliveryReport.setSystemId(original.getSystemId());
 
-		deliveryReport.setShortMessage(original.getShortMessage());
+			deliveryReport.setSubmitDate(original.getSubmitDate());
 
-		NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
-		ActivityContextInterface nullActivityContextInterface = this.sbbContext
-				.getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
+			deliveryReport.setMessageId(original.getMessageId());
 
-		this.fireSendDeliveryReportSms(deliveryReport, nullActivityContextInterface, null);
+			deliveryReport.setShortMessage(original.getShortMessage());
+
+			NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
+			ActivityContextInterface nullActivityContextInterface = this.sbbContext
+					.getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
+
+			this.fireSendDeliveryReportSms(deliveryReport, nullActivityContextInterface, null);
+		}
 	}
 
 }
