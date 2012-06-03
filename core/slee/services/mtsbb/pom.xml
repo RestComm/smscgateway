@@ -27,5 +27,9 @@
 			<artifactId>jain-slee-11-ext</artifactId>
 			<version>${jslee.ext.version}</version>
 		</dependency>
+		<dependency>
+			<artifactId>smpp-server-ra-ratype</artifactId>
+			<groupId>${pom.groupId}</groupId>
+		</dependency>		
 	</dependencies>
 </project>
