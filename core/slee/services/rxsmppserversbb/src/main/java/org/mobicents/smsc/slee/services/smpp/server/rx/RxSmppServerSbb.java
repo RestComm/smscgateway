@@ -72,6 +72,14 @@ public abstract class RxSmppServerSbb implements Sbb {
 				return;
 			}
 
+			if (!smppSession.isBound()) {
+				this.logger.severe(String.format(
+						"Received Delivery Report SmsEvent=%s but no SmppSession=%s is not BOUND", event,
+						event.getSystemId()));
+				//TODO : Add to SnF module
+				return;
+			}
+
 			DeliverSm deliverSm = new DeliverSm();
 			deliverSm.setSourceAddress(new Address(event.getSourceAddrTon(), event.getSourceAddrNpi(), event
 					.getSourceAddr()));
@@ -90,7 +98,8 @@ public abstract class RxSmppServerSbb implements Sbb {
 
 			deliverSm.setShortMessage(textBytes);
 
-			// TODO : waiting for 2 secs for window to accept our request, is it good? Should time be more here?
+			// TODO : waiting for 2 secs for window to accept our request, is it
+			// good? Should time be more here?
 			SmppServerTransaction smppServerTransaction = smppSession.sendRequestPdu(deliverSm, 2000);
 			ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
 					.getActivityContextInterface(smppServerTransaction);
@@ -105,21 +114,22 @@ public abstract class RxSmppServerSbb implements Sbb {
 		}
 
 	}
-	
+
 	public void onDeliverSmResp(DeliverSmResp event, ActivityContextInterface aci, EventContext eventContext) {
 		logger.info(String.format("onDeliverSmResp : DeliverSmResp=%s", event));
-		//TODO : Handle this
+		// TODO : Handle this
 	}
 
 	public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
 		logger.severe(String.format("onPduRequestTimeout : PduRequestTimeout=%s", event));
-		//TODO : Handle this
+		// TODO : Handle this
 	}
-	
-	public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci, EventContext eventContext) {
+
+	public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
+			EventContext eventContext) {
 		logger.severe(String.format("onRecoverablePduException : RecoverablePduException=%s", event));
-		//TODO : Handle this
-	}	
+		// TODO : Handle this
+	}
 
 	@Override
 	public void sbbActivate() {
