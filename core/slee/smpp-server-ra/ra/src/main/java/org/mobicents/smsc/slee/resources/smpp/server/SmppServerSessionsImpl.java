@@ -129,8 +129,8 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 					break;
 				case SmppConstants.CMD_ID_SUBMIT_SM:
 					smppServerTransactionHandle = new SmppServerTransactionHandle(
-							this.smppServerSessionImpl.getSystemId(), pduRequest.getSequenceNumber(),
-							SmppTransactionType.INCOMING);
+							this.smppServerSessionImpl.getSmppSessionConfigurationName(),
+							pduRequest.getSequenceNumber(), SmppTransactionType.INCOMING);
 					smppServerTransaction = new SmppServerTransactionImpl(pduRequest, this.smppServerSessionImpl,
 							smppServerTransactionHandle, smppServerResourceAdaptor);
 

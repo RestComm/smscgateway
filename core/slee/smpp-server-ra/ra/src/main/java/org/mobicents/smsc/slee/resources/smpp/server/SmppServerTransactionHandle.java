@@ -4,13 +4,14 @@ import javax.slee.resource.ActivityHandle;
 
 public class SmppServerTransactionHandle implements ActivityHandle {
 
-	private final String systemId;
+	private final String smppSessionConfigurationName;
 	private final SmppTransactionType smppTransactionType;
 	private final int seqNumnber;
 	private transient SmppServerTransactionImpl activity;
 
-	public SmppServerTransactionHandle(String systemId, int seqNumnber, SmppTransactionType smppTransactionType) {
-		this.systemId = systemId;
+	public SmppServerTransactionHandle(String smppSessionConfigurationName, int seqNumnber,
+			SmppTransactionType smppTransactionType) {
+		this.smppSessionConfigurationName = smppSessionConfigurationName;
 		this.seqNumnber = seqNumnber;
 		this.smppTransactionType = smppTransactionType;
 	}
@@ -29,7 +30,7 @@ public class SmppServerTransactionHandle implements ActivityHandle {
 		int result = 1;
 		result = prime * result + seqNumnber;
 		result = prime * result + smppTransactionType.hashCode();
-		result = prime * result + systemId.hashCode();
+		result = prime * result + smppSessionConfigurationName.hashCode();
 		return result;
 	}
 
@@ -46,15 +47,15 @@ public class SmppServerTransactionHandle implements ActivityHandle {
 			return false;
 		if (smppTransactionType != other.smppTransactionType)
 			return false;
-		if (!systemId.equals(other.systemId))
+		if (!smppSessionConfigurationName.equals(other.smppSessionConfigurationName))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "SmppServerTransactionHandle [systemId=" + systemId + ", smppTransactionType=" + smppTransactionType
-				+ ", seqNumnber=" + seqNumnber + "]";
+		return "SmppServerTransactionHandle [smppSessionConfigurationName=" + smppSessionConfigurationName
+				+ ", smppTransactionType=" + smppTransactionType + ", seqNumnber=" + seqNumnber + "]";
 	}
 
 }

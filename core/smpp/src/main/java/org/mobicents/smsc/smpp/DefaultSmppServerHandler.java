@@ -22,6 +22,8 @@ import com.cloudhopper.smpp.type.SmppProcessingException;
 
 public class DefaultSmppServerHandler implements SmppServerHandler, Serializable {
 
+	private static int SESSION_INDEX = 0;
+
 	private static final Logger logger = Logger.getLogger(DefaultSmppServerHandler.class);
 
 	private transient SmppSessionHandlerInterface smppSessionHandlerInterface = null;
@@ -70,7 +72,8 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 
 		// test name change of sessions
 		// this name actually shows up as thread context....
-		sessionConfiguration.setName("Application.SMPP." + sessionConfiguration.getSystemId());
+		sessionConfiguration
+				.setName("Application.SMPP." + (SESSION_INDEX++) + "." + sessionConfiguration.getSystemId());
 
 		// throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL,
 		// null);

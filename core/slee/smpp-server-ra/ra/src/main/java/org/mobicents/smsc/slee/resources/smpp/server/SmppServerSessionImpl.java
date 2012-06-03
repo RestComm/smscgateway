@@ -35,6 +35,10 @@ public class SmppServerSessionImpl implements org.mobicents.smsc.slee.resources.
 		return this.wrappedSmppServerSession;
 	}
 
+	public String getSmppSessionConfigurationName() {
+		return this.wrappedSmppServerSession.getConfiguration().getName();
+	}
+
 	@Override
 	public String getSystemId() {
 		return this.wrappedSmppServerSession.getConfiguration().getSystemId();
@@ -111,8 +115,8 @@ public class SmppServerSessionImpl implements org.mobicents.smsc.slee.resources.
 			request.setSequenceNumber(((DefaultSmppSession) this.wrappedSmppServerSession).getSequenceNumber().next());
 		}
 
-		SmppServerTransactionHandle smppServerTransactionHandle = new SmppServerTransactionHandle(this.getSystemId(),
-				request.getSequenceNumber(), SmppTransactionType.OUTGOING);
+		SmppServerTransactionHandle smppServerTransactionHandle = new SmppServerTransactionHandle(
+				this.getSmppSessionConfigurationName(), request.getSequenceNumber(), SmppTransactionType.OUTGOING);
 
 		SmppServerTransactionImpl smppServerTransaction = new SmppServerTransactionImpl(request, this,
 				smppServerTransactionHandle, smppServerResourceAdaptor);
