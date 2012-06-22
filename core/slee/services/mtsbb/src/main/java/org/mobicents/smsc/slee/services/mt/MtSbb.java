@@ -161,7 +161,7 @@ public abstract class MtSbb extends MtCommonSbb {
 			SM_RP_OA sm_RP_OA = this.mapParameterFactory.createSM_RP_OA_ServiceCentreAddressOA(this
 					.getServiceCenterAddressString());
 
-			UserDataImpl ud = new UserDataImpl(new String(smsEvent.getShortMessage()), new DataCodingSchemeImpl(0),
+			UserDataImpl ud = new UserDataImpl(new String(smsEvent.getShortMessage()), new DataCodingSchemeImpl(smsEvent.getDataCoding()),
 					null, null);
 
 			// TODO : Should this be SubmitDate or currentDate?
@@ -172,6 +172,8 @@ public abstract class MtSbb extends MtCommonSbb {
 
 			// TODO : Can this be constant?
 			ProtocolIdentifierImpl pi = new ProtocolIdentifierImpl(0);
+			
+			//TODO : Take care of esm_class to include UDHI. See SMPP specs
 
 			SmsDeliverTpduImpl smsDeliverTpduImpl = new SmsDeliverTpduImpl(false, false, false, true,
 					this.getSmsTpduOriginatingAddress(smsEvent.getSourceAddrTon(), smsEvent.getSourceAddrNpi(),
