@@ -66,10 +66,10 @@
 			<version>${ss7.version}</version>
 		</dependency>
 
-		<!-- Clock -->
+		<!-- Scheduler -->
 		<dependency>
-			<groupId>org.mobicents.protocols.ss7.clock</groupId>
-			<artifactId>clock</artifactId>
+			<groupId>org.mobicents.protocols.ss7.scheduler</groupId>
+			<artifactId>scheduler</artifactId>
 			<version>${ss7.version}</version>
 		</dependency>
 		<!-- Management Shell -->
@@ -82,7 +82,7 @@
 		<!-- Management linkset -->
 		<dependency>
 			<artifactId>linkset</artifactId>
-			<groupId>org.mobicents.protocols.ss7.management</groupId>
+			<groupId>org.mobicents.protocols.ss7.hardware</groupId>
 			<version>${ss7.version}</version>
 		</dependency>
 

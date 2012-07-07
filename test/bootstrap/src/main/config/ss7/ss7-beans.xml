@@ -11,6 +11,13 @@
 		<property name="singleThread">true</property>
 		<property name="connectDelay">30000</property>
 	</bean>
+	
+	<bean name="SCTPShellExecutor"
+		class="org.mobicents.protocols.ss7.m3ua.impl.oam.SCTPShellExecutor">
+		<property name="sctpManagement">
+			<inject bean="SCTPManagement" />
+		</property>
+	</bean>		
 
 	<!-- ==================================================================== -->
 	<!-- M3UA -->
@@ -32,10 +39,21 @@
 		<property name="m3uaManagement">
 			<inject bean="Mtp3UserPart" />
 		</property>
-		<property name="sctpManagement">
-			<inject bean="SCTPManagement" />
-		</property>
 	</bean>
+	
+	<!-- ==================================================================== -->
+	<!-- Scheduler -->
+	<!-- Scheduler for ss7 stack -->
+	<!-- ==================================================================== -->
+	<!-- -->
+	<bean name="SS7Clock" class="org.mobicents.protocols.ss7.scheduler.DefaultClock">
+	</bean>
+
+	<bean name="SS7Scheduler" class="org.mobicents.protocols.ss7.scheduler.Scheduler">
+		<property name="clock">
+			<inject bean="SS7Clock" />
+		</property>
+	</bean>	
 
 	<!-- ==================================================================== -->
 	<!-- Dialogic Mtp3UserPart -->

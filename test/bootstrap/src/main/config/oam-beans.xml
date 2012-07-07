@@ -6,15 +6,22 @@
 	<!-- Shell Service -->
 	<!-- ==================================================================== -->
 	<!-- Define Shell Executor -->
-	<bean name="ShellExecutor" class="org.mobicents.smsc.oam.TestShellExecutor">
+	<bean name="ShellExecutor" class="org.mobicents.ss7.management.console.ShellServer">
+		<constructor>
+			<parameter>
+				<inject bean="SS7Scheduler" />
+			</parameter>
+			<parameter>
+				<list class="javolution.util.FastList"
+					elementClass="org.mobicents.ss7.management.console.ShellExecutor">
+					<inject bean="SccpExecutor" />
+					<inject bean="M3UAShellExecutor" />
+					<inject bean="SCTPShellExecutor" />
+				</list>
+			</parameter>
+		</constructor>
+
 		<property name="address">${smsc.bind.address}</property>
 		<property name="port">3436</property>
-
-		<property name="sccpExecutor">
-			<inject bean="SccpExecutor" />
-		</property>
-		<property name="m3UAShellExecutor">
-			<inject bean="M3UAShellExecutor" />
-		</property>
 	</bean>
 </deployment>

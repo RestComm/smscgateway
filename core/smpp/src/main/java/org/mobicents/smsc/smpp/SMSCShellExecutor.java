@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.mobicents.ss7.management.console.ShellExecutor;
 
 /**
- * 
+ * @author amit bhayani
  * @author zaheer abbas
  * 
  */
@@ -192,7 +192,7 @@ public class SMSCShellExecutor implements ShellExecutor {
 
 				if (rasCmd.equals("create")) {
 					return this.createEsme(args);
-				} else if (rasCmd.equals("destroy")) {
+				} else if (rasCmd.equals("delete")) {
 					return this.destroyEsme(args);
 				} else if (rasCmd.equals("show")) {
 					return this.showEsme();
@@ -268,6 +268,11 @@ public class SMSCShellExecutor implements ShellExecutor {
 			return this.executeSmsc(args);
 		}
 		return SMSCOAMMessages.INVALID_COMMAND;
+	}
+
+	@Override
+	public boolean handles(String command) {
+		return "sccp".equals(command);
 	}
 
 }

@@ -84,6 +84,14 @@
 			<artifactId>clock</artifactId>
 			<version>${ss7.version}</version>
 		</dependency>
+
+		<!-- Scheduler -->
+		<dependency>
+			<artifactId>scheduler</artifactId>
+			<groupId>org.mobicents.protocols.ss7.scheduler</groupId>
+			<version>${ss7.version}</version>
+		</dependency>
+
 		<!-- Management Shell -->
 		<dependency>
 			<artifactId>shell</artifactId>
@@ -94,9 +102,7 @@
 		<!-- Management linkset -->
 		<dependency>
 			<artifactId>linkset</artifactId>
-			<groupId>
-					org.mobicents.protocols.ss7.management
-				</groupId>
+			<groupId>org.mobicents.protocols.ss7.hardware</groupId>
 			<version>${ss7.version}</version>
 		</dependency>
 
@@ -142,7 +148,7 @@
 			<groupId>org.mobicents.protocols.ss7.sccp</groupId>
 			<version>${ss7.version}</version>
 		</dependency>
-		
+
 		<!-- MAP -->
 		<dependency>
 			<artifactId>map-api</artifactId>
@@ -166,7 +172,7 @@
 			<groupId>org.mobicents.protocols.ss7.tcap</groupId>
 			<version>${ss7.version}</version>
 		</dependency>
-		
+
 		<!-- ISUP -->
 		<dependency>
 			<artifactId>isup-api</artifactId>
@@ -177,8 +183,8 @@
 			<artifactId>isup-impl</artifactId>
 			<groupId>org.mobicents.protocols.ss7.isup</groupId>
 			<version>${ss7.version}</version>
-		</dependency>		
-				
+		</dependency>
+
 	</dependencies>
 
 	<!-- -->
@@ -231,7 +237,8 @@
 
 									</fileset>
 								</copy>
-								<copy file="${basedir}/src/main/config/smsc.properties" tofile="${jboss.home}/server/${node}/conf/smsc.properties">
+								<copy file="${basedir}/src/main/config/smsc.properties"
+									tofile="${jboss.home}/server/${node}/conf/smsc.properties">
 								</copy>
 							</tasks>
 						</configuration>
@@ -248,7 +255,7 @@
 									<fileset
 										dir="${jboss.home}/server/${node}/deploy/mobicents-smsc-server" />
 								</delete>
-								<delete file="${jboss.home}/server/${node}/conf/smsc.properties"/>
+								<delete file="${jboss.home}/server/${node}/conf/smsc.properties" />
 							</tasks>
 						</configuration>
 					</execution>
