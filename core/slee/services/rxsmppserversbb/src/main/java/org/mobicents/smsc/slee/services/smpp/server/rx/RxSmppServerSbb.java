@@ -64,7 +64,8 @@ public abstract class RxSmppServerSbb implements Sbb {
 	public void onSendDeliveryReportSms(SmsEvent event, ActivityContextInterface aci, EventContext eventContext) {
 
 		try {
-			SmppServerSession smppSession = smppServerSessions.getSmppSession(event.getSystemId());
+			SmppServerSession smppSession = smppServerSessions.getSmppSession(event.getDestAddrTon(),
+					event.getDestAddrNpi(), event.getDestAddr());
 
 			if (smppSession == null) {
 				this.logger.severe(String.format(
@@ -76,7 +77,7 @@ public abstract class RxSmppServerSbb implements Sbb {
 				this.logger.severe(String.format(
 						"Received Delivery Report SmsEvent=%s but no SmppSession=%s is not BOUND", event,
 						event.getSystemId()));
-				//TODO : Add to SnF module
+				// TODO : Add to SnF module
 				return;
 			}
 

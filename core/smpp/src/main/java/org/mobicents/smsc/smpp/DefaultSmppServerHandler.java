@@ -9,6 +9,7 @@ import javax.management.StandardMBean;
 import org.apache.log4j.Logger;
 import org.jboss.mx.util.MBeanServerLocator;
 
+import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.SmppServerHandler;
 import com.cloudhopper.smpp.SmppServerSession;
@@ -66,6 +67,24 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 		if (!(esme.getPassword().equals(bindRequest.getPassword()))) {
 			logger.error(String.format("Invalid password for SystemId=%s", bindRequest.getSystemId()));
 			throw new SmppProcessingException(SmppConstants.STATUS_INVPASWD);
+		}
+
+		// Check of BIND is correct?
+		if ((bindRequest.getCommandId() == SmppConstants.CMD_ID_BIND_RECEIVER)
+				&& esme.getSmppBindType() != SmppBindType.RECEIVER) {
+			logger.error(String.format("Received BIND_RECEIVER for SystemId=%s but configured=%s",
+					bindRequest.getSystemId(), esme.getSmppBindType()));
+			throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
+		} else if ((bindRequest.getCommandId() == SmppConstants.CMD_ID_BIND_TRANSMITTER)
+				&& esme.getSmppBindType() != SmppBindType.TRANSMITTER) {
+			logger.error(String.format("Received BIND_TRANSMITTER for SystemId=%s but configured=%s",
+					bindRequest.getSystemId(), esme.getSmppBindType()));
+			throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
+		} else if ((bindRequest.getCommandId() == SmppConstants.CMD_ID_BIND_TRANSCEIVER)
+				&& esme.getSmppBindType() != SmppBindType.TRANSCEIVER) {
+			logger.error(String.format("Received BIND_TRANSCEIVER for SystemId=%s but configured=%s",
+					bindRequest.getSystemId(), esme.getSmppBindType()));
+			throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
 		}
 
 		// TODO More parameters to compare

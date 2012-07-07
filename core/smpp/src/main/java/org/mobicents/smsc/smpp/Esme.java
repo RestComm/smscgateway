@@ -28,8 +28,11 @@ import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 
+import com.cloudhopper.smpp.SmppBindType;
+import com.cloudhopper.smpp.type.Address;
+
 /**
- * 
+ * @author amit bhayani
  * @author zaheer abbas
  * 
  */
@@ -46,22 +49,21 @@ public class Esme implements XMLSerializable {
 	private static final String ESME_PASSWORD = "password";
 	private static final String REMOTE_HOST_IP = "host";
 	private static final String REMOTE_HOST_PORT = "port";
+	private static final String SMPP_BIND_TYPE = "smppBindType";
 	private static final String ESME_SYSTEM_TYPE = "systemType";
 	private static final String ESME_INTERFACE_VERSION = "smppVersion";
 	private static final String ESME_TON = "ton";
 	private static final String ESME_NPI = "npi";
 	private static final String ESME_ADDRESS_RANGE = "addressRange";
-	
+
 	private String systemId;
 	private String password;
 	private String host;
 	private String port;
 	private String systemType;
 	private SmppInterfaceVersionType smppVersion = null;
-	private AddressTONType ton = null;
-	private AddressNPIType npi = null;
-	private String addressRange;
-	
+	private Address address = null;
+	private SmppBindType smppBindType;
 
 	protected SmscManagement smscManagement = null;
 
@@ -69,20 +71,16 @@ public class Esme implements XMLSerializable {
 
 	}
 
-	public Esme(String systemId, String pwd, String host, String port, String systemType, SmppInterfaceVersionType version,
-			AddressTONType ton, AddressNPIType npi, String address) {
+	public Esme(String systemId, String pwd, String host, String port, SmppBindType smppBindType, String systemType,
+			SmppInterfaceVersionType version, Address address) {
 		this.systemId = systemId;
 		this.password = pwd;
 		this.host = host;
 		this.port = port;
 		this.systemType = systemType;
 		this.smppVersion = version;
-		this.ton = ton;
-		this.npi = npi;
-		this.addressRange = address;
+		this.address = address;
 	}
-
-
 
 	/**
 	 * Every As has unique name
@@ -93,63 +91,20 @@ public class Esme implements XMLSerializable {
 		return this.systemId;
 	}
 
+	/**
+	 * @param systemId
+	 *            the systemId to set
+	 */
+	public void setSystemId(String systemId) {
+		this.systemId = systemId;
+	}
+
 	public void setSmscManagement(SmscManagement smscManagement) {
-		smscManagement = smscManagement;
+		this.smscManagement = smscManagement;
 	}
 
 	public SmscManagement getSmscManagement() {
 		return smscManagement;
-	}
-
-	/**
-	 * XML Serialization/Deserialization
-	 */
-	protected static final XMLFormat<Esme> ESME_XML = new XMLFormat<Esme>(Esme.class) {
-
-		@Override
-		public void read(javolution.xml.XMLFormat.InputElement xml, Esme esme) throws XMLStreamException {
-			esme.systemId = xml.getAttribute(ESME_SYSTEM_ID, "");
-			esme.password = xml.getAttribute(ESME_PASSWORD, "");
-			esme.host = xml.getAttribute(REMOTE_HOST_IP, "");
-			esme.port = xml.getAttribute(REMOTE_HOST_PORT, "");
-			esme.systemType = xml.getAttribute(ESME_SYSTEM_TYPE, "");
-			esme.smppVersion = SmppInterfaceVersionType.getInterfaceVersionType(xml.getAttribute(ESME_INTERFACE_VERSION, ""));
-			esme.ton = AddressTONType.getAddressTONType(xml.getAttribute(ESME_TON, ""));
-			esme.npi = AddressNPIType.getAddressNPIType(xml.getAttribute(ESME_NPI, ""));
-			esme.addressRange = xml.getAttribute(ESME_ADDRESS_RANGE, "");
-			
-		}
-
-		@Override
-		public void write(Esme esme, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-			xml.setAttribute(ESME_SYSTEM_ID, esme.systemId);
-			xml.setAttribute(ESME_PASSWORD, esme.password);
-			xml.setAttribute(REMOTE_HOST_IP, esme.host);
-			xml.setAttribute(REMOTE_HOST_PORT, esme.port);
-			xml.setAttribute(ESME_INTERFACE_VERSION, esme.smppVersion.getType());
-			if (esme.systemType != null) {
-				xml.setAttribute(ESME_SYSTEM_TYPE, esme.systemType);
-			}
-			if (esme.ton != null) {
-				xml.setAttribute(ESME_TON, esme.ton.getType());
-			}
-			if (esme.npi != null) {
-				xml.setAttribute(ESME_NPI, esme.ton.getType());
-			}
-			if (esme.addressRange != null) {
-				xml.setAttribute(ESME_ADDRESS_RANGE, esme.addressRange);
-			}
-		}
-	};
-
-	public void show(StringBuffer sb) {
-		sb.append(SMSCOAMMessages.SHOW_ESME_SYSTEM_ID).append(this.systemId).append(SMSCOAMMessages.SHOW_ESME_PASSWORD).append(this.password)
-		.append(SMSCOAMMessages.SHOW_ESME_HOST).append(this.host).append(SMSCOAMMessages.SHOW_ESME_PORT).append(this.port)
-		.append(SMSCOAMMessages.SHOW_ESME_SYSTEM_TYPE).append(this.systemType).append(SMSCOAMMessages.SHOW_ESME_INTERFACE_VERSION).append(this.smppVersion)
-		.append(SMSCOAMMessages.SHOW_ESME_TON).append(this.ton).append(SMSCOAMMessages.SHOW_ESME_NPI).append(this.npi)
-		.append(SMSCOAMMessages.SHOW_ESME_ADDRESS_RANGE).append(this.addressRange);
-
-		sb.append(SMSCOAMMessages.NEW_LINE);
 	}
 
 	/**
@@ -160,7 +115,8 @@ public class Esme implements XMLSerializable {
 	}
 
 	/**
-	 * @param password the password to set
+	 * @param password
+	 *            the password to set
 	 */
 	public void setPassword(String password) {
 		this.password = password;
@@ -174,7 +130,8 @@ public class Esme implements XMLSerializable {
 	}
 
 	/**
-	 * @param host the host to set
+	 * @param host
+	 *            the host to set
 	 */
 	public void setHost(String host) {
 		this.host = host;
@@ -188,10 +145,19 @@ public class Esme implements XMLSerializable {
 	}
 
 	/**
-	 * @param port the port to set
+	 * @param port
+	 *            the port to set
 	 */
 	public void setPort(String port) {
 		this.port = port;
+	}
+
+	protected SmppBindType getSmppBindType() {
+		return smppBindType;
+	}
+
+	protected void setSmppBindType(SmppBindType smppBindType) {
+		this.smppBindType = smppBindType;
 	}
 
 	/**
@@ -202,7 +168,8 @@ public class Esme implements XMLSerializable {
 	}
 
 	/**
-	 * @param systemType the systemType to set
+	 * @param systemType
+	 *            the systemType to set
 	 */
 	public void setSystemType(String systemType) {
 		this.systemType = systemType;
@@ -216,58 +183,71 @@ public class Esme implements XMLSerializable {
 	}
 
 	/**
-	 * @param smppVersion the smppVersion to set
+	 * @param smppVersion
+	 *            the smppVersion to set
 	 */
 	public void setSmppVersion(SmppInterfaceVersionType smppVersion) {
 		this.smppVersion = smppVersion;
 	}
 
 	/**
-	 * @return the ton
+	 * XML Serialization/Deserialization
 	 */
-	public AddressTONType getTon() {
-		return ton;
-	}
+	protected static final XMLFormat<Esme> ESME_XML = new XMLFormat<Esme>(Esme.class) {
 
-	/**
-	 * @param ton the ton to set
-	 */
-	public void setTon(AddressTONType ton) {
-		this.ton = ton;
-	}
+		@Override
+		public void read(javolution.xml.XMLFormat.InputElement xml, Esme esme) throws XMLStreamException {
+			esme.systemId = xml.getAttribute(ESME_SYSTEM_ID, "");
+			esme.password = xml.getAttribute(ESME_PASSWORD, "");
+			esme.host = xml.getAttribute(REMOTE_HOST_IP, "");
+			esme.port = xml.getAttribute(REMOTE_HOST_PORT, "");
+			
+			String smppBindTypeStr = xml.getAttribute(SMPP_BIND_TYPE, "TRANSCEIVER");
+			
+			if (SmppBindType.TRANSCEIVER.toString().equals(smppBindTypeStr)) {
+				esme.smppBindType = SmppBindType.TRANSCEIVER;
+			} else if (SmppBindType.TRANSMITTER.toString().equals(smppBindTypeStr)) {
+				esme.smppBindType = SmppBindType.TRANSMITTER;
+			} else if (SmppBindType.RECEIVER.toString().equals(smppBindTypeStr)) {
+				esme.smppBindType = SmppBindType.RECEIVER;
+			} 
+			
+			esme.systemType = xml.getAttribute(ESME_SYSTEM_TYPE, "");
+			esme.smppVersion = SmppInterfaceVersionType.getInterfaceVersionType(xml.getAttribute(
+					ESME_INTERFACE_VERSION, ""));
 
-	/**
-	 * @return the npi
-	 */
-	public AddressNPIType getNpi() {
-		return npi;
-	}
+			byte ton = xml.getAttribute(ESME_TON, (byte) 0);
+			byte npi = xml.getAttribute(ESME_NPI, (byte) 0);
+			String addressRange = xml.getAttribute(ESME_ADDRESS_RANGE, null);
 
-	/**
-	 * @param npi the npi to set
-	 */
-	public void setNpi(AddressNPIType npi) {
-		this.npi = npi;
-	}
+			esme.address = new Address(ton, npi, addressRange);
 
-	/**
-	 * @return the addressRange
-	 */
-	public String getAddressRange() {
-		return addressRange;
-	}
+		}
 
-	/**
-	 * @param addressRange the addressRange to set
-	 */
-	public void setAddressRange(String addressRange) {
-		this.addressRange = addressRange;
-	}
+		@Override
+		public void write(Esme esme, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
+			xml.setAttribute(ESME_SYSTEM_ID, esme.systemId);
+			xml.setAttribute(ESME_PASSWORD, esme.password);
+			xml.setAttribute(REMOTE_HOST_IP, esme.host);
+			xml.setAttribute(REMOTE_HOST_PORT, esme.port);
+			xml.setAttribute(SMPP_BIND_TYPE, esme.smppBindType.toString());
+			xml.setAttribute(ESME_INTERFACE_VERSION, esme.smppVersion.getType());
+			if (esme.systemType != null) {
+				xml.setAttribute(ESME_SYSTEM_TYPE, esme.systemType);
+			}
+			xml.setAttribute(ESME_TON, esme.address.getTon());
+			xml.setAttribute(ESME_NPI, esme.address.getNpi());
+			xml.setAttribute(ESME_ADDRESS_RANGE, esme.address.getAddress());
+		}
+	};
 
-	/**
-	 * @param systemId the systemId to set
-	 */
-	public void setSystemId(String systemId) {
-		this.systemId = systemId;
+	public void show(StringBuffer sb) {
+		sb.append(SMSCOAMMessages.SHOW_ESME_SYSTEM_ID).append(this.systemId).append(SMSCOAMMessages.SHOW_ESME_PASSWORD)
+				.append(this.password).append(SMSCOAMMessages.SHOW_ESME_HOST).append(this.host)
+				.append(SMSCOAMMessages.SHOW_ESME_PORT).append(this.port).append(SMSCOAMMessages.SHOW_ESME_SYSTEM_TYPE)
+				.append(this.systemType).append(SMSCOAMMessages.SHOW_ESME_INTERFACE_VERSION).append(this.smppVersion)
+				.append(SMSCOAMMessages.SHOW_ADDRESS).append(this.address);
+
+		sb.append(SMSCOAMMessages.NEW_LINE);
 	}
 }

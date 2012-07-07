@@ -8,6 +8,7 @@ import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppSession.Type;
 import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;
+import com.cloudhopper.smpp.type.Address;
 import com.cloudhopper.smpp.type.RecoverablePduException;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.cloudhopper.smpp.type.SmppTimeoutException;
@@ -130,6 +131,12 @@ public interface SmppServerSession {
 	 * @return The System.currentTimeMillis() value when the session was bound.
 	 */
 	public long getBoundTime();
+	
+	/**
+	 * ESME Address
+	 * @return
+	 */
+	public Address getAddress();
 
 	/**
 	 * Main underlying method for sending a request PDU to the remote endpoint.

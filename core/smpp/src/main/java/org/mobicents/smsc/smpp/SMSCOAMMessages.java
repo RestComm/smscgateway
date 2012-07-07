@@ -95,4 +95,6 @@ public interface SMSCOAMMessages {
 	
 	public static final String SHOW_STARTED = " started=";
 	
+	public static final String SHOW_ADDRESS = " address=";
+	
 }

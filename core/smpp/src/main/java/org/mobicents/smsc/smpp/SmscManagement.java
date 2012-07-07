@@ -36,6 +36,9 @@ import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 
+import com.cloudhopper.smpp.SmppBindType;
+import com.cloudhopper.smpp.type.Address;
+
 /**
  * @author zaheer abbas
  * 
@@ -160,8 +163,8 @@ public class SmscManagement {
 	 * @return
 	 * @throws Exception
 	 */
-	public Esme createEsme(String systemId, String password, String host, String port, String systemType,
-			SmppInterfaceVersionType smppIntVersion, AddressTONType ton, AddressNPIType npi, String addressRange)
+	public Esme createEsme(String systemId, String password, String host, String port, SmppBindType smppBindType, String systemType,
+			SmppInterfaceVersionType smppIntVersion, Address address)
 			throws Exception {
 
 		/* Esme system id should be unique and mandatory for each esme */
@@ -175,7 +178,7 @@ public class SmscManagement {
 			smppIntVersion = SmppInterfaceVersionType.SMPP34;
 		}
 
-		esme = new Esme(systemId, password, host, port, systemType, smppIntVersion, ton, npi, addressRange);
+		esme = new Esme(systemId, password, host, port, smppBindType, systemType, smppIntVersion, address);
 		esme.setSmscManagement(this);
 		esmes.add(esme);
 

@@ -29,6 +29,9 @@ import javolution.util.FastList;
 import org.apache.log4j.Logger;
 import org.mobicents.ss7.management.console.ShellExecutor;
 
+import com.cloudhopper.smpp.SmppBindType;
+import com.cloudhopper.smpp.type.Address;
+
 /**
  * @author amit bhayani
  * @author zaheer abbas
@@ -39,11 +42,11 @@ public class SMSCShellExecutor implements ShellExecutor {
 	private static final Logger logger = Logger.getLogger(SMSCShellExecutor.class);
 
 	private SmscManagement smscManagement;
-	
+
 	public SMSCShellExecutor() {
 
 	}
-	
+
 	/**
 	 * @return the m3uaManagement
 	 */
@@ -52,18 +55,18 @@ public class SMSCShellExecutor implements ShellExecutor {
 	}
 
 	/**
-	 * @param m3uaManagement the m3uaManagement to set
+	 * @param m3uaManagement
+	 *            the m3uaManagement to set
 	 */
 	public void setSmscManagement(SmscManagement smscManagement) {
 		this.smscManagement = smscManagement;
 	}
 
-
 	/**
-	 * smsc esme create <Any 4/5 digit number> <Specify password> 
-	 * <host-ip> <port> system-type <sms | vms | ota >
-	 * interface-version <3.3 | 3.4 | 5.0> esme-ton <esme address ton>
-	 * esme-npi <esme address npi> esme-range <esme address range>
+	 * smsc esme create <Any 4/5 digit number> <Specify password> <host-ip>
+	 * <port> <TRANSCEIVER|TRANSMITTER|RECEIVER> system-type <sms | vms | ota >
+	 * interface-version <3.3 | 3.4 | 5.0> esme-ton <esme address ton> esme-npi
+	 * <esme address npi> esme-range <esme address range>
 	 * 
 	 * @param args
 	 * @return
@@ -90,25 +93,41 @@ public class SMSCShellExecutor implements ShellExecutor {
 		int intPort = -1;
 		if (strPort == null) {
 			return SMSCOAMMessages.INVALID_COMMAND;
-		}else{
-			try{
+		} else {
+			try {
 				intPort = Integer.parseInt(strPort);
-				}catch(Exception e){
-					return SMSCOAMMessages.INVALID_COMMAND;
-				}
+			} catch (Exception e) {
+				return SMSCOAMMessages.INVALID_COMMAND;
+			}
 		}
 
-		
+		SmppBindType smppBindType = null;
+		String smppBindTypeStr = args[7];
+
+		if (smppBindTypeStr == null) {
+			return SMSCOAMMessages.INVALID_COMMAND;
+		}
+
+		if (SmppBindType.TRANSCEIVER.toString().equals(smppBindTypeStr)) {
+			smppBindType = SmppBindType.TRANSCEIVER;
+		} else if (SmppBindType.TRANSMITTER.toString().equals(smppBindTypeStr)) {
+			smppBindType = SmppBindType.TRANSMITTER;
+		} else if (SmppBindType.RECEIVER.toString().equals(smppBindTypeStr)) {
+			smppBindType = SmppBindType.RECEIVER;
+		} else {
+			return SMSCOAMMessages.INVALID_COMMAND;
+		}
+
 		String systemType = null;
 		SmppInterfaceVersionType smppVersionType = null;
-		AddressTONType esmeTonType = null;
-		AddressNPIType esmeNpiType = null;
+		byte esmeTonType = 0;
+		byte esmeNpiType = 0;
 		String esmeAddrRange = null;
-		
-		int count = 7;
+
+		int count = 8;
 
 		while (count < args.length) {
-			//These are all optional parameters for a Tx/Rx/Trx binds
+			// These are all optional parameters for a Tx/Rx/Trx binds
 			String key = args[count++];
 			if (key == null) {
 				return SMSCOAMMessages.INVALID_COMMAND;
@@ -116,23 +135,25 @@ public class SMSCShellExecutor implements ShellExecutor {
 
 			if (key.equals("system-type")) {
 				systemType = args[count++];
-		    } else if (key.equals("interface-version")) {
+			} else if (key.equals("interface-version")) {
 				smppVersionType = SmppInterfaceVersionType.getInterfaceVersionType(args[count++]);
 				if (smppVersionType == null) {
 					smppVersionType = SmppInterfaceVersionType.SMPP34;
-			}
+				}
 			} else if (key.equals("esme-ton")) {
-				esmeTonType = AddressTONType.getAddressTONType(args[count++]);
+				esmeTonType = Byte.parseByte(args[count++]);
 			} else if (key.equals("esme-npi")) {
-				esmeNpiType = AddressNPIType.getAddressNPIType(args[count++]);
+				esmeNpiType = Byte.parseByte(args[count++]);
 			} else if (key.equals("esme-range")) {
-				esmeAddrRange = /*Regex*/args[count++];
+				esmeAddrRange = /* Regex */args[count++];
 			} else {
 				return SMSCOAMMessages.INVALID_COMMAND;
 			}
-		}
 
-		Esme esme = this.smscManagement.createEsme(systemId, password, host, strPort, systemType, smppVersionType, esmeTonType, esmeNpiType, esmeAddrRange);
+		}
+		Address address = new Address(esmeTonType, esmeNpiType, esmeAddrRange);
+		Esme esme = this.smscManagement.createEsme(systemId, password, host, strPort, smppBindType, systemType, smppVersionType,
+				address);
 		return String.format(SMSCOAMMessages.CREATE_ESME_SUCCESSFULL, esme.getSystemId());
 	}
 
@@ -199,63 +220,89 @@ public class SMSCShellExecutor implements ShellExecutor {
 				}
 				return SMSCOAMMessages.INVALID_COMMAND;
 			} else if (args[1].equals("rule")) {/*
-
-				if (args.length > 5) {
-					return SMSCOAMMessages.INVALID_COMMAND;
-				}
-
-				// related to rem AS for SigGatewayImpl
-				String raspCmd = args[2];
-
-				if (raspCmd == null) {
-					return SMSCOAMMessages.INVALID_COMMAND;
-				} else if (raspCmd.equals("create")) {
-					// Create new rule
-					if (args.length < 5) {
-						return SMSCOAMMessages.INVALID_COMMAND;
-					}
-
-					String aspname = args[3];
-					String assocName = args[4];
-
-					if (aspname == null || assocName == null) {
-						return SMSCOAMMessages.INVALID_COMMAND;
-					}
-
-					AspFactory factory = this.m3uaManagement.createAspFactory(aspname, assocName);
-					return String.format(SMSCOAMMessages.CREATE_ASP_SUCESSFULL, factory.getName());
-				} else if (raspCmd.equals("destroy")) {
-					if (args.length < 4) {
-						return SMSCOAMMessages.INVALID_COMMAND;
-					}
-
-					String aspName = args[3];
-					this.m3uaManagement.destroyAspFactory(aspName);
-					return String.format("Successfully destroyed ASP name=%s", aspName);
-
-				} else if (raspCmd.equals("show")) {
-					return this.showAspFactories();
-
-				} else if (raspCmd.equals("start")) {
-					if (args.length < 4) {
-						return SMSCOAMMessages.INVALID_COMMAND;
-					}
-
-					String aspName = args[3];
-					this.m3uaManagement.startAsp(aspName);
-					return String.format(SMSCOAMMessages.ASP_START_SUCESSFULL, aspName);
-				} else if (raspCmd.equals("stop")) {
-					if (args.length < 4) {
-						return SMSCOAMMessages.INVALID_COMMAND;
-					}
-
-					String aspName = args[3];
-					this.m3uaManagement.stopAsp(aspName);
-					return String.format(SMSCOAMMessages.ASP_STOP_SUCESSFULL, aspName);
-				}
-
-				return SMSCOAMMessages.INVALID_COMMAND;
-			*/}
+												 * 
+												 * if (args.length > 5) { return
+												 * SMSCOAMMessages
+												 * .INVALID_COMMAND; }
+												 * 
+												 * // related to rem AS for
+												 * SigGatewayImpl String raspCmd
+												 * = args[2];
+												 * 
+												 * if (raspCmd == null) { return
+												 * SMSCOAMMessages
+												 * .INVALID_COMMAND; } else if
+												 * (raspCmd.equals("create")) {
+												 * // Create new rule if
+												 * (args.length < 5) { return
+												 * SMSCOAMMessages
+												 * .INVALID_COMMAND; }
+												 * 
+												 * String aspname = args[3];
+												 * String assocName = args[4];
+												 * 
+												 * if (aspname == null ||
+												 * assocName == null) { return
+												 * SMSCOAMMessages
+												 * .INVALID_COMMAND; }
+												 * 
+												 * AspFactory factory =
+												 * this.m3uaManagement
+												 * .createAspFactory(aspname,
+												 * assocName); return
+												 * String.format
+												 * (SMSCOAMMessages.
+												 * CREATE_ASP_SUCESSFULL,
+												 * factory.getName()); } else if
+												 * (raspCmd.equals("destroy")) {
+												 * if (args.length < 4) { return
+												 * SMSCOAMMessages
+												 * .INVALID_COMMAND; }
+												 * 
+												 * String aspName = args[3];
+												 * this
+												 * .m3uaManagement.destroyAspFactory
+												 * (aspName); return
+												 * String.format(
+												 * "Successfully destroyed ASP name=%s"
+												 * , aspName);
+												 * 
+												 * } else if
+												 * (raspCmd.equals("show")) {
+												 * return
+												 * this.showAspFactories();
+												 * 
+												 * } else if
+												 * (raspCmd.equals("start")) {
+												 * if (args.length < 4) { return
+												 * SMSCOAMMessages
+												 * .INVALID_COMMAND; }
+												 * 
+												 * String aspName = args[3];
+												 * this
+												 * .m3uaManagement.startAsp(
+												 * aspName ); return
+												 * String.format(SMSCOAMMessages
+												 * .ASP_START_SUCESSFULL,
+												 * aspName); } else if
+												 * (raspCmd.equals("stop")) { if
+												 * (args.length < 4) { return
+												 * SMSCOAMMessages
+												 * .INVALID_COMMAND; }
+												 * 
+												 * String aspName = args[3];
+												 * this
+												 * .m3uaManagement.stopAsp(aspName
+												 * ); return
+												 * String.format(SMSCOAMMessages
+												 * .ASP_STOP_SUCESSFULL,
+												 * aspName); }
+												 * 
+												 * return
+												 * SMSCOAMMessages.INVALID_COMMAND
+												 * ;
+												 */
+			}
 			return SMSCOAMMessages.INVALID_COMMAND;
 		} catch (Exception e) {
 			logger.error(String.format("Error while executing comand %s", Arrays.toString(args)), e);
@@ -272,7 +319,7 @@ public class SMSCShellExecutor implements ShellExecutor {
 
 	@Override
 	public boolean handles(String command) {
-		return "sccp".equals(command);
+		return "smsc".equals(command);
 	}
 
 }

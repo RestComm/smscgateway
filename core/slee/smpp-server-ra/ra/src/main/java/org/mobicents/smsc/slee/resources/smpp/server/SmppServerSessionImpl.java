@@ -1,5 +1,7 @@
 package org.mobicents.smsc.slee.resources.smpp.server;
 
+import java.util.regex.Pattern;
+
 import javax.slee.SLEEException;
 import javax.slee.resource.ActivityAlreadyExistsException;
 import javax.slee.resource.StartActivityException;
@@ -13,6 +15,7 @@ import com.cloudhopper.smpp.SmppSession.Type;
 import com.cloudhopper.smpp.impl.DefaultSmppSession;
 import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;
+import com.cloudhopper.smpp.type.Address;
 import com.cloudhopper.smpp.type.RecoverablePduException;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.cloudhopper.smpp.type.SmppTimeoutException;
@@ -25,10 +28,18 @@ public class SmppServerSessionImpl implements org.mobicents.smsc.slee.resources.
 	private final SmppServerSession wrappedSmppServerSession;
 	private SmppServerResourceAdaptor smppServerResourceAdaptor = null;
 
+	private final Pattern pattern;
+
 	public SmppServerSessionImpl(SmppServerSession wrappedSmppServerSession,
 			SmppServerResourceAdaptor smppServerResourceAdaptor) {
 		this.wrappedSmppServerSession = wrappedSmppServerSession;
 		this.smppServerResourceAdaptor = smppServerResourceAdaptor;
+
+		this.pattern = Pattern.compile(this.wrappedSmppServerSession.getConfiguration().getAddressRange().getAddress());
+	}
+
+	protected Pattern getAddressRangePattern() {
+		return this.pattern;
 	}
 
 	protected SmppServerSession getWrappedSmppServerSession() {
@@ -102,6 +113,11 @@ public class SmppServerSessionImpl implements org.mobicents.smsc.slee.resources.
 	@Override
 	public long getBoundTime() {
 		return this.wrappedSmppServerSession.getBoundTime();
+	}
+
+	@Override
+	public Address getAddress() {
+		return this.wrappedSmppServerSession.getConfiguration().getAddressRange();
 	}
 
 	@Override
