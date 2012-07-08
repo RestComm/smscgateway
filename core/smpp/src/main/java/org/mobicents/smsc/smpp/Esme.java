@@ -80,6 +80,7 @@ public class Esme implements XMLSerializable {
 		this.systemType = systemType;
 		this.smppVersion = version;
 		this.address = address;
+		this.smppBindType = smppBindType;
 	}
 
 	/**
