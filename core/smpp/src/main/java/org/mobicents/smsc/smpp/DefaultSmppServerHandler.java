@@ -19,6 +19,7 @@ import com.cloudhopper.smpp.impl.DefaultSmppSession;
 import com.cloudhopper.smpp.jmx.DefaultSmppSessionMXBean;
 import com.cloudhopper.smpp.pdu.BaseBind;
 import com.cloudhopper.smpp.pdu.BaseBindResp;
+import com.cloudhopper.smpp.type.Address;
 import com.cloudhopper.smpp.type.SmppProcessingException;
 
 public class DefaultSmppServerHandler implements SmppServerHandler, Serializable {
@@ -84,6 +85,30 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 				&& esme.getSmppBindType() != SmppBindType.TRANSCEIVER) {
 			logger.error(String.format("Received BIND_TRANSCEIVER for SystemId=%s but configured=%s",
 					bindRequest.getSystemId(), esme.getSmppBindType()));
+			throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
+		}
+
+		// Check if TON, NPI and Address Range matches
+		Address esmeAddressRange = esme.getAddress();
+		Address bindRequestAddressRange = bindRequest.getAddressRange();
+
+		if (esmeAddressRange.getTon() != bindRequestAddressRange.getTon()) {
+			logger.error(String.format("Received BIND request with TON=%d but configured TON=%d",
+					bindRequestAddressRange.getTon(), esmeAddressRange.getTon()));
+			throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
+		}
+
+		if (esmeAddressRange.getNpi() != bindRequestAddressRange.getNpi()) {
+			logger.error(String.format("Received BIND request with NPI=%d but configured NPI=%d",
+					bindRequestAddressRange.getNpi(), esmeAddressRange.getNpi()));
+			throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
+		}
+
+		if ((esmeAddressRange.getAddress() == null && bindRequestAddressRange.getAddress() != null)
+				|| (esmeAddressRange.getAddress() != null && bindRequestAddressRange.getAddress() == null)
+				|| !(esmeAddressRange.getAddress().equals(bindRequestAddressRange.getAddress()))) {
+			logger.error(String.format("Received BIND request with Address_Range=%s but configured Address_Range=%s",
+					bindRequestAddressRange.getAddress(), esmeAddressRange.getAddress()));
 			throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
 		}
 
