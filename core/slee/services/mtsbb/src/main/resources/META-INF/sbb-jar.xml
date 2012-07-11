@@ -42,7 +42,7 @@
 		<event event-direction="Receive" initial-event="True">
 			<event-name>Sms</event-name>
 			<event-type-ref>
-				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.MT_SMS</event-type-name>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SUBMIT_SM</event-type-name>
 				<event-type-vendor>org.mobicents</event-type-vendor>
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
@@ -248,7 +248,7 @@
 		<event event-direction="Fire">
 			<event-name>SendDeliveryReportSms</event-name>
 			<event-type-ref>
-				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SMPP_DELIVERY_REPORT_SMS</event-type-name>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVER_SM</event-type-name>
 				<event-type-vendor>org.mobicents</event-type-vendor>
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
