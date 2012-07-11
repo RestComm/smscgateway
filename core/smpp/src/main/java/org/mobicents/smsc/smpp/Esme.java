@@ -29,6 +29,7 @@ import javolution.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
 
 import com.cloudhopper.smpp.SmppBindType;
+import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.type.Address;
 
 /**
@@ -66,6 +67,8 @@ public class Esme implements XMLSerializable {
 	private SmppBindType smppBindType;
 
 	protected SmscManagement smscManagement = null;
+
+	private String state = SmppSession.STATES[SmppSession.STATE_CLOSED];
 
 	public Esme() {
 
@@ -199,6 +202,14 @@ public class Esme implements XMLSerializable {
 		this.address = address;
 	}
 
+	protected String getState() {
+		return state;
+	}
+
+	protected void setState(String state) {
+		this.state = state;
+	}
+
 	/**
 	 * XML Serialization/Deserialization
 	 */
@@ -210,17 +221,17 @@ public class Esme implements XMLSerializable {
 			esme.password = xml.getAttribute(ESME_PASSWORD, "");
 			esme.host = xml.getAttribute(REMOTE_HOST_IP, "");
 			esme.port = xml.getAttribute(REMOTE_HOST_PORT, "");
-			
+
 			String smppBindTypeStr = xml.getAttribute(SMPP_BIND_TYPE, "TRANSCEIVER");
-			
+
 			if (SmppBindType.TRANSCEIVER.toString().equals(smppBindTypeStr)) {
 				esme.smppBindType = SmppBindType.TRANSCEIVER;
 			} else if (SmppBindType.TRANSMITTER.toString().equals(smppBindTypeStr)) {
 				esme.smppBindType = SmppBindType.TRANSMITTER;
 			} else if (SmppBindType.RECEIVER.toString().equals(smppBindTypeStr)) {
 				esme.smppBindType = SmppBindType.RECEIVER;
-			} 
-			
+			}
+
 			esme.systemType = xml.getAttribute(ESME_SYSTEM_TYPE, "");
 			esme.smppVersion = SmppInterfaceVersionType.getInterfaceVersionType(xml.getAttribute(
 					ESME_INTERFACE_VERSION, ""));
@@ -251,10 +262,12 @@ public class Esme implements XMLSerializable {
 	};
 
 	public void show(StringBuffer sb) {
-		sb.append(SMSCOAMMessages.SHOW_ESME_SYSTEM_ID).append(this.systemId).append(SMSCOAMMessages.SHOW_ESME_PASSWORD)
-				.append(this.password).append(SMSCOAMMessages.SHOW_ESME_HOST).append(this.host)
-				.append(SMSCOAMMessages.SHOW_ESME_PORT).append(this.port).append(SMSCOAMMessages.SHOW_ESME_SYSTEM_TYPE)
-				.append(this.systemType).append(SMSCOAMMessages.SHOW_ESME_INTERFACE_VERSION).append(this.smppVersion)
+		sb.append(SMSCOAMMessages.SHOW_ESME_SYSTEM_ID).append(this.systemId).append(SMSCOAMMessages.SHOW_ESME_STATE)
+				.append(this.state).append(SMSCOAMMessages.SHOW_ESME_PASSWORD).append(this.password)
+				.append(SMSCOAMMessages.SHOW_ESME_HOST).append(this.host).append(SMSCOAMMessages.SHOW_ESME_PORT)
+				.append(this.port).append(SMSCOAMMessages.SHOW_ESME_BIND_TYPE).append(this.smppBindType)
+				.append(SMSCOAMMessages.SHOW_ESME_SYSTEM_TYPE).append(this.systemType)
+				.append(SMSCOAMMessages.SHOW_ESME_INTERFACE_VERSION).append(this.smppVersion)
 				.append(SMSCOAMMessages.SHOW_ADDRESS).append(this.address);
 
 		sb.append(SMSCOAMMessages.NEW_LINE);

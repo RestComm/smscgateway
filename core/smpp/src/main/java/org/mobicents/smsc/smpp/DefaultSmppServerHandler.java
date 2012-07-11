@@ -155,6 +155,9 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 		session.serverReady(smppSessionHandler);
 
 		this.registerMBean(sessionId, session);
+		
+		Esme esme = this.smscManagement.getEsme(session.getConfiguration().getSystemId());
+		esme.setState(session.getStateName());
 	}
 
 	@Override
@@ -176,6 +179,9 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 		session.destroy();
 
 		this.unregisterMBean(sessionId, session);
+		
+		Esme esme = this.smscManagement.getEsme(session.getConfiguration().getSystemId());
+		esme.setState(session.getStateName());
 	}
 
 	private void registerMBean(Long sessionId, SmppServerSession session) {

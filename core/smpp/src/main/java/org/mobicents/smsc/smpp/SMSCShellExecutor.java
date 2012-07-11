@@ -194,7 +194,6 @@ public class SMSCShellExecutor implements ShellExecutor {
 			Esme esme = n.getValue();
 			sb.append(SMSCOAMMessages.NEW_LINE);
 			esme.show(sb);
-			sb.append(SMSCOAMMessages.NEW_LINE);
 		}
 		return sb.toString();
 	}
