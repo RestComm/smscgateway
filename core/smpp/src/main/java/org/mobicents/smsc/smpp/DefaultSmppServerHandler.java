@@ -104,13 +104,20 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 			throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
 		}
 
-		if ((esmeAddressRange.getAddress() == null && bindRequestAddressRange.getAddress() != null)
-				|| (esmeAddressRange.getAddress() != null && bindRequestAddressRange.getAddress() == null)
-				|| !(esmeAddressRange.getAddress().equals(bindRequestAddressRange.getAddress()))) {
+		//TODO : we are checking with empty String, is this correct?
+		
+		System.err.println("bindRequestAddressRange.getAddress()="+bindRequestAddressRange.getAddress()+"=");
+		
+		if (bindRequestAddressRange.getAddress() == null || bindRequestAddressRange.getAddress() == "") {
+			// If ESME doesn't know we set it up from our config
+			bindRequestAddressRange.setAddress(esmeAddressRange.getAddress());
+		} else if (!bindRequestAddressRange.getAddress().equals(esmeAddressRange.getAddress())) {
 			logger.error(String.format("Received BIND request with Address_Range=%s but configured Address_Range=%s",
 					bindRequestAddressRange.getAddress(), esmeAddressRange.getAddress()));
 			throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
 		}
+
+		sessionConfiguration.setAddressRange(bindRequestAddressRange);
 
 		// TODO More parameters to compare
 

@@ -151,9 +151,14 @@ public class SMSCShellExecutor implements ShellExecutor {
 			}
 
 		}
+
+		if ((SmppBindType.TRANSCEIVER == smppBindType || SmppBindType.RECEIVER == smppBindType)
+				&& esmeAddrRange == null) {
+			return SMSCOAMMessages.NULL_ESME_ADDRESS_RANGE;
+		}
 		Address address = new Address(esmeTonType, esmeNpiType, esmeAddrRange);
-		Esme esme = this.smscManagement.createEsme(systemId, password, host, strPort, smppBindType, systemType, smppVersionType,
-				address);
+		Esme esme = this.smscManagement.createEsme(systemId, password, host, strPort, smppBindType, systemType,
+				smppVersionType, address);
 		return String.format(SMSCOAMMessages.CREATE_ESME_SUCCESSFULL, esme.getSystemId());
 	}
 

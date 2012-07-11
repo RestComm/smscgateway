@@ -59,6 +59,8 @@ public interface SMSCOAMMessages {
 	public static final String DELETE_ESME_FAILED_NO_ESME_FOUND = "No Esme found with given systemId %s";
 	
 	public static final String DELETE_ESME_SUCCESSFUL = "Successfully deleted Esme with given systemId %s";
+	
+	public static final String NULL_ESME_ADDRESS_RANGE = "esme-range is compulsory for TRANSCEIVER and RECEIVER";
 	/**
 	 * Generic constants
 	 */
