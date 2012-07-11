@@ -17,7 +17,7 @@
 		</sbb-classes>
 
 		<event event-direction="Receive" initial-event="True">
-			<event-name>SendDeliveryReportSms</event-name>
+			<event-name>DeliverSm</event-name>
 			<event-type-ref>
 				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVER_SM</event-type-name>
 				<event-type-vendor>org.mobicents</event-type-vendor>

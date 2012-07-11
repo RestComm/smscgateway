@@ -1,6 +1,7 @@
 package org.mobicents.smsc.slee.services.mt;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.EventContext;
@@ -37,11 +38,33 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
 
+import com.cloudhopper.commons.charset.CharsetUtil;
 import com.cloudhopper.smpp.SmppConstants;
 
 public abstract class MtSbb extends MtCommonSbb {
 
 	private static final String className = "MtSbb";
+
+	private static final byte ESME_DELIVERY_ACK = 0x08;
+
+	private static final String DELIVERY_ACK_ID = "id:";
+	private static final String DELIVERY_ACK_SUB = " sub:";
+	private static final String DELIVERY_ACK_DLVRD = " dlvrd:";
+	private static final String DELIVERY_ACK_SUBMIT_DATE = " submit date:";
+	private static final String DELIVERY_ACK_DONE_DATE = " done date:";
+	private static final String DELIVERY_ACK_STAT = " stat:";
+	private static final String DELIVERY_ACK_ERR = " err:";
+	private static final String DELIVERY_ACK_TEXT = " text:";
+
+	private static final String DELIVERY_ACK_STATE_DELIVERED = "DELIVRD";
+	private static final String DELIVERY_ACK_STATE_EXPIRED = "EXPIRED";
+	private static final String DELIVERY_ACK_STATE_DELETED = "DELETED";
+	private static final String DELIVERY_ACK_STATE_UNDELIVERABLE = "UNDELIV";
+	private static final String DELIVERY_ACK_STATE_ACCEPTED = "ACCEPTD";
+	private static final String DELIVERY_ACK_STATE_UNKNOWN = "UNKNOWN";
+	private static final String DELIVERY_ACK_STATE_REJECTED = "REJECTD";
+
+	private final SimpleDateFormat DELIVERY_ACK_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmm");
 
 	private MAPApplicationContext mtFoSMSMAPApplicationContext = null;
 
@@ -161,8 +184,8 @@ public abstract class MtSbb extends MtCommonSbb {
 			SM_RP_OA sm_RP_OA = this.mapParameterFactory.createSM_RP_OA_ServiceCentreAddressOA(this
 					.getServiceCenterAddressString());
 
-			UserDataImpl ud = new UserDataImpl(new String(smsEvent.getShortMessage()), new DataCodingSchemeImpl(smsEvent.getDataCoding()),
-					null, null);
+			UserDataImpl ud = new UserDataImpl(new String(smsEvent.getShortMessage()), new DataCodingSchemeImpl(
+					smsEvent.getDataCoding()), null, null);
 
 			// TODO : Should this be SubmitDate or currentDate?
 			Timestamp submitDate = smsEvent.getSubmitDate();
@@ -172,8 +195,8 @@ public abstract class MtSbb extends MtCommonSbb {
 
 			// TODO : Can this be constant?
 			ProtocolIdentifierImpl pi = new ProtocolIdentifierImpl(0);
-			
-			//TODO : Take care of esm_class to include UDHI. See SMPP specs
+
+			// TODO : Take care of esm_class to include UDHI. See SMPP specs
 
 			SmsDeliverTpduImpl smsDeliverTpduImpl = new SmsDeliverTpduImpl(false, false, false, true,
 					this.getSmsTpduOriginatingAddress(smsEvent.getSourceAddrTon(), smsEvent.getSourceAddrNpi(),
@@ -262,7 +285,19 @@ public abstract class MtSbb extends MtCommonSbb {
 
 			deliveryReport.setMessageId(original.getMessageId());
 
-			deliveryReport.setShortMessage(original.getShortMessage());
+			StringBuffer sb = new StringBuffer();
+			sb.append(DELIVERY_ACK_ID).append(original.getMessageId()).append(DELIVERY_ACK_SUB).append("001")
+					.append(DELIVERY_ACK_DLVRD).append("001").append(DELIVERY_ACK_SUBMIT_DATE)
+					.append(DELIVERY_ACK_DATE_FORMAT.format(original.getSubmitDate())).append(DELIVERY_ACK_DONE_DATE)
+					.append(DELIVERY_ACK_DATE_FORMAT.format(new Timestamp(System.currentTimeMillis())))
+					.append(DELIVERY_ACK_STAT).append(DELIVERY_ACK_STATE_DELIVERED).append(DELIVERY_ACK_ERR)
+					.append("000").append(DELIVERY_ACK_TEXT)
+					.append(this.getFirst20CharOfSMS(original.getShortMessage()));
+
+			byte[] textBytes = CharsetUtil.encode(sb.toString(), CharsetUtil.CHARSET_GSM);
+
+			deliveryReport.setShortMessage(textBytes);
+			deliveryReport.setEsmClass(ESME_DELIVERY_ACK);
 
 			NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
 			ActivityContextInterface nullActivityContextInterface = this.sbbContext
@@ -270,6 +305,14 @@ public abstract class MtSbb extends MtCommonSbb {
 
 			this.fireSendDeliveryReportSms(deliveryReport, nullActivityContextInterface, null);
 		}
+	}
+
+	String getFirst20CharOfSMS(byte[] rawSms) {
+		String first20CharOfSms = new String(rawSms);
+		if (first20CharOfSms.length() > 20) {
+			first20CharOfSms = first20CharOfSms.substring(0, 20);
+		}
+		return first20CharOfSms;
 	}
 
 }

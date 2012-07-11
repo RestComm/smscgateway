@@ -1,8 +1,5 @@
 package org.mobicents.smsc.slee.services.smpp.server.rx;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.slee.ActivityContextInterface;
@@ -22,34 +19,12 @@ import org.mobicents.smsc.slee.resources.smpp.server.SmppServerTransactionACIFac
 import org.mobicents.smsc.slee.resources.smpp.server.events.PduRequestTimeout;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
 
-import com.cloudhopper.commons.charset.CharsetUtil;
 import com.cloudhopper.smpp.pdu.DeliverSm;
 import com.cloudhopper.smpp.pdu.DeliverSmResp;
 import com.cloudhopper.smpp.type.Address;
 import com.cloudhopper.smpp.type.RecoverablePduException;
 
 public abstract class RxSmppServerSbb implements Sbb {
-
-	private static final byte ESME_DELIVERY_ACK = 0x08;
-
-	private static final String DELIVERY_ACK_ID = "id:";
-	private static final String DELIVERY_ACK_SUB = " sub:";
-	private static final String DELIVERY_ACK_DLVRD = " dlvrd:";
-	private static final String DELIVERY_ACK_SUBMIT_DATE = " submit date:";
-	private static final String DELIVERY_ACK_DONE_DATE = " done date:";
-	private static final String DELIVERY_ACK_STAT = " stat:";
-	private static final String DELIVERY_ACK_ERR = " err:";
-	private static final String DELIVERY_ACK_TEXT = " text:";
-
-	private static final String DELIVERY_ACK_STATE_DELIVERED = "DELIVRD";
-	private static final String DELIVERY_ACK_STATE_EXPIRED = "EXPIRED";
-	private static final String DELIVERY_ACK_STATE_DELETED = "DELETED";
-	private static final String DELIVERY_ACK_STATE_UNDELIVERABLE = "UNDELIV";
-	private static final String DELIVERY_ACK_STATE_ACCEPTED = "ACCEPTD";
-	private static final String DELIVERY_ACK_STATE_UNKNOWN = "UNKNOWN";
-	private static final String DELIVERY_ACK_STATE_REJECTED = "REJECTD";
-
-	private final SimpleDateFormat DELIVERY_ACK_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmm");
 
 	private Tracer logger;
 	private SbbContextExt sbbContext;
@@ -61,7 +36,7 @@ public abstract class RxSmppServerSbb implements Sbb {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void onSendDeliveryReportSms(SmsEvent event, ActivityContextInterface aci, EventContext eventContext) {
+	public void onDeliverSm(SmsEvent event, ActivityContextInterface aci, EventContext eventContext) {
 
 		try {
 			SmppServerSession smppSession = smppServerSessions.getSmppSession(event.getDestAddrTon(),
@@ -85,19 +60,8 @@ public abstract class RxSmppServerSbb implements Sbb {
 			deliverSm.setSourceAddress(new Address(event.getSourceAddrTon(), event.getSourceAddrNpi(), event
 					.getSourceAddr()));
 			deliverSm.setDestAddress(new Address(event.getDestAddrTon(), event.getDestAddrNpi(), event.getDestAddr()));
-			deliverSm.setEsmClass(ESME_DELIVERY_ACK);
-
-			StringBuffer sb = new StringBuffer();
-			sb.append(DELIVERY_ACK_ID).append(event.getMessageId()).append(DELIVERY_ACK_SUB).append("001")
-					.append(DELIVERY_ACK_DLVRD).append("001").append(DELIVERY_ACK_SUBMIT_DATE)
-					.append(DELIVERY_ACK_DATE_FORMAT.format(event.getSubmitDate())).append(DELIVERY_ACK_DONE_DATE)
-					.append(DELIVERY_ACK_DATE_FORMAT.format(new Timestamp(System.currentTimeMillis())))
-					.append(DELIVERY_ACK_STAT).append(DELIVERY_ACK_STATE_DELIVERED).append(DELIVERY_ACK_ERR)
-					.append("000").append(DELIVERY_ACK_TEXT).append(this.getFirst20CharOfSMS(event.getShortMessage()));
-
-			byte[] textBytes = CharsetUtil.encode(sb.toString(), CharsetUtil.CHARSET_GSM);
-
-			deliverSm.setShortMessage(textBytes);
+			deliverSm.setEsmClass(event.getEsmClass());
+			deliverSm.setShortMessage(event.getShortMessage());
 
 			// TODO : waiting for 2 secs for window to accept our request, is it
 			// good? Should time be more here?
@@ -117,7 +81,9 @@ public abstract class RxSmppServerSbb implements Sbb {
 	}
 
 	public void onDeliverSmResp(DeliverSmResp event, ActivityContextInterface aci, EventContext eventContext) {
-		logger.info(String.format("onDeliverSmResp : DeliverSmResp=%s", event));
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("onDeliverSmResp : DeliverSmResp=%s", event));
+		}
 		// TODO : Handle this
 	}
 
@@ -208,17 +174,4 @@ public abstract class RxSmppServerSbb implements Sbb {
 		// TODO Auto-generated method stub
 
 	}
-
-	/**
-	 * Private
-	 */
-
-	String getFirst20CharOfSMS(byte[] rawSms) {
-		String first20CharOfSms = new String(rawSms);
-		if (first20CharOfSms.length() > 20) {
-			first20CharOfSms = first20CharOfSms.substring(0, 20);
-		}
-		return first20CharOfSms;
-	}
-
 }
