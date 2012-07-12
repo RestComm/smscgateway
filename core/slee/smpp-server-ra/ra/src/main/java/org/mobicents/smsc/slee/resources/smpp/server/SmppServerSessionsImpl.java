@@ -59,6 +59,9 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 
 			if (sessionBindType == SmppBindType.TRANSCEIVER || sessionBindType == SmppBindType.RECEIVER) {
 				Pattern p = smppServerSessionImpl.getAddressRangePattern();
+				if(p == null){
+					continue;
+				}
 				Matcher m = p.matcher(address);
 				if (m.matches()) {
 					return smppServerSessionImpl;

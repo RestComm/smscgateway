@@ -35,7 +35,12 @@ public class SmppServerSessionImpl implements org.mobicents.smsc.slee.resources.
 		this.wrappedSmppServerSession = wrappedSmppServerSession;
 		this.smppServerResourceAdaptor = smppServerResourceAdaptor;
 
-		this.pattern = Pattern.compile(this.wrappedSmppServerSession.getConfiguration().getAddressRange().getAddress());
+		if (this.wrappedSmppServerSession.getConfiguration().getAddressRange().getAddress() != null) {
+			this.pattern = Pattern.compile(this.wrappedSmppServerSession.getConfiguration().getAddressRange()
+					.getAddress());
+		} else {
+			this.pattern = null;
+		}
 	}
 
 	protected Pattern getAddressRangePattern() {

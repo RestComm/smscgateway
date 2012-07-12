@@ -106,8 +106,6 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 
 		//TODO : we are checking with empty String, is this correct?
 		
-		System.err.println("bindRequestAddressRange.getAddress()="+bindRequestAddressRange.getAddress()+"=");
-		
 		if (bindRequestAddressRange.getAddress() == null || bindRequestAddressRange.getAddress() == "") {
 			// If ESME doesn't know we set it up from our config
 			bindRequestAddressRange.setAddress(esmeAddressRange.getAddress());
