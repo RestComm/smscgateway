@@ -30,7 +30,12 @@
 			<artifactId>mt-sbb</artifactId>
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<artifactId>mo-sbb</artifactId>
+			<groupId>${pom.groupId}</groupId>
+			<version>${pom.version}</version>
+		</dependency>				
 		<dependency>
 			<artifactId>smsc-events</artifactId>
 			<groupId>${pom.groupId}</groupId>
