@@ -52,7 +52,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 		if (this.logger.isInfoEnabled()) {
 			this.logger.info("Received SUBMIT_SM = " + event + " from SystemId=" + systemId);
 		}
-		
+
 		String messageId = this.smppServerSessions.getNextMessageId();
 
 		SmsEvent smsEvent = new SmsEvent();
@@ -116,16 +116,17 @@ public abstract class TxSmppServerSbb implements Sbb {
 			this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
 		}
 	}
-	
+
 	public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
 		logger.severe(String.format("onPduRequestTimeout : PduRequestTimeout=%s", event));
-		//TODO : Handle this
+		// TODO : Handle this
 	}
-	
-	public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci, EventContext eventContext) {
+
+	public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
+			EventContext eventContext) {
 		logger.severe(String.format("onRecoverablePduException : RecoverablePduException=%s", event));
-		//TODO : Handle this
-	}	
+		// TODO : Handle this
+	}
 
 	public abstract void fireSms(SmsEvent event, ActivityContextInterface aci, javax.slee.Address address);
 
@@ -236,9 +237,10 @@ public abstract class TxSmppServerSbb implements Sbb {
 			// If null means there are no SMS handled by Mt for this destination
 			// address. Lets create new NullActivity and bind it to
 			// naming-facility
-
-			this.logger.info(String
-					.format("lookup of NullActivityContextInterface returned null, create new NullActivity"));
+			if (this.logger.isInfoEnabled()) {
+				this.logger.info(String
+						.format("lookup of NullActivityContextInterface returned null, create new NullActivity"));
+			}
 
 			nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
 			nullActivityContextInterface = this.sbbContext.getNullActivityContextInterfaceFactory()
@@ -283,7 +285,9 @@ public abstract class TxSmppServerSbb implements Sbb {
 		int pendingEventsOnNullActivity = txSmppServerSbbActivityContextInterface.getPendingEventsOnNullActivity();
 		pendingEventsOnNullActivity = pendingEventsOnNullActivity + 1;
 
-		this.logger.info(String.format("pendingEventsOnNullActivity = %d", pendingEventsOnNullActivity));
+		if (this.logger.isInfoEnabled()) {
+			this.logger.info(String.format("pendingEventsOnNullActivity = %d", pendingEventsOnNullActivity));
+		}
 
 		txSmppServerSbbActivityContextInterface.setPendingEventsOnNullActivity(pendingEventsOnNullActivity);
 		// We have NullActivityContextInterface, lets fire SmsEvent on this

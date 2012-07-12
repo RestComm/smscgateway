@@ -279,7 +279,10 @@ public abstract class MtSbb extends MtCommonSbb {
 			deliveryReport.setDestAddrNpi(original.getSourceAddrNpi());
 			deliveryReport.setDestAddrTon(original.getSourceAddrTon());
 
-			deliveryReport.setSystemId(original.getSystemId());
+			// Setting SystemId as null, so RxSmppServerSbb actually tries to
+			// find real SmppServerSession from Destination TON, NPI and address
+			// range
+			deliveryReport.setSystemId(null);
 
 			deliveryReport.setSubmitDate(original.getSubmitDate());
 

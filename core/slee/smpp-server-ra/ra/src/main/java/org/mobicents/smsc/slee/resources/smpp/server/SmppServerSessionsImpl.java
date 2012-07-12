@@ -1,13 +1,12 @@
 package org.mobicents.smsc.slee.resources.smpp.server;
 
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.slee.facilities.Tracer;
 
-import javolution.util.FastList;
+import javolution.util.FastMap;
 
 import org.mobicents.smsc.slee.resources.smpp.server.events.EventsType;
 import org.mobicents.smsc.slee.resources.smpp.server.events.PduRequestTimeout;
@@ -35,7 +34,8 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 
 	private SmppServerResourceAdaptor smppServerResourceAdaptor = null;
 
-	private Collection<SmppServerSessionImpl> smppServerSessions = new FastList<SmppServerSessionImpl>().shared();
+	private FastMap<String, SmppServerSessionImpl> smppServerSessions = new FastMap<String, SmppServerSessionImpl>()
+			.shared();
 
 	protected SmppSessionHandlerInterfaceImpl smppSessionHandlerInterfaceImpl = null;
 
@@ -52,7 +52,9 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 	}
 
 	public SmppServerSession getSmppSession(byte ton, byte npi, String address) {
-		for (SmppServerSessionImpl smppServerSessionImpl : smppServerSessions) {
+		for (FastMap.Entry<String, SmppServerSessionImpl> e = smppServerSessions.head(), end = smppServerSessions
+				.tail(); (e = e.getNext()) != end;) {
+			SmppServerSessionImpl smppServerSessionImpl = e.getValue();
 			SmppBindType sessionBindType = smppServerSessionImpl.getBindType();
 
 			if (sessionBindType == SmppBindType.TRANSCEIVER || sessionBindType == SmppBindType.RECEIVER) {
@@ -62,9 +64,13 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 					return smppServerSessionImpl;
 				}
 			}
-		}// for
+		}
 		tracer.warning(String.format("No SmppServerSession found for address range=%s", address));
 		return null;
+	}
+
+	public SmppServerSession getSmppSession(String systemId) {
+		return this.smppServerSessions.get(systemId);
 	}
 
 	protected SmppSessionHandlerInterface getSmppSessionHandlerInterface() {
@@ -75,10 +81,14 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 
 		tracer.info(String.format("smppServerSessions.size()=%d", smppServerSessions.size()));
 
-		for (SmppServerSessionImpl session : smppServerSessions) {
+		for (FastMap.Entry<String, SmppServerSessionImpl> e = smppServerSessions.head(), end = smppServerSessions
+				.tail(); (e = e.getNext()) != end;) {
+
+			String key = e.getKey();
+			SmppServerSessionImpl session = e.getValue();
 			session.getWrappedSmppServerSession().close();
 			if (tracer.isInfoEnabled()) {
-				tracer.info(String.format("Closed Session=%s", session.getSystemId()));
+				tracer.info(String.format("Closed Session=%s", key));
 			}
 		}
 
@@ -95,7 +105,7 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 		public SmppSessionHandler sessionCreated(Long sessionId, com.cloudhopper.smpp.SmppServerSession session,
 				BaseBindResp preparedBindResponse) throws SmppProcessingException {
 			SmppServerSessionImpl smppServerSessionImpl = new SmppServerSessionImpl(session, smppServerResourceAdaptor);
-			smppServerSessions.add(smppServerSessionImpl);
+			smppServerSessions.put(session.getConfiguration().getSystemId(), smppServerSessionImpl);
 			if (tracer.isInfoEnabled()) {
 				tracer.info(String.format("Added Session=%s to list of maintained sessions", session.getConfiguration()
 						.getSystemId()));
@@ -105,24 +115,18 @@ public class SmppServerSessionsImpl implements SmppServerSessions {
 
 		@Override
 		public void sessionDestroyed(Long sessionId, com.cloudhopper.smpp.SmppServerSession session) {
-			boolean destroyed = false;
-			for (SmppServerSessionImpl smppServerSessionImpl : smppServerSessions) {
-				if (smppServerSessionImpl.getSystemId().equals(session.getConfiguration().getSystemId())) {
-					smppServerSessions.remove(smppServerSessionImpl);
-					if (tracer.isInfoEnabled()) {
-						tracer.info(String.format("Removed Session=%s from list of maintained sessions", session
-								.getConfiguration().getSystemId()));
-					}
-					destroyed = true;
-					break;
+			SmppServerSessionImpl smppSession = smppServerSessions.remove(session.getConfiguration().getSystemId());
+			if (smppSession != null) {
+				if (tracer.isInfoEnabled()) {
+					tracer.info(String.format("Removed Session=%s from list of maintained sessions", session
+							.getConfiguration().getSystemId()));
 				}
-			}
-
-			if (!destroyed) {
+			} else {
 				tracer.warning(String.format("Session destroyed for=%, but was not maintained in list of sessions",
 						session.getConfiguration().getSystemId()));
 			}
 		}
+
 	}
 
 	protected class SmppSessionHandlerImpl implements SmppSessionHandler {

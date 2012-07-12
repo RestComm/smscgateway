@@ -39,19 +39,26 @@ public abstract class RxSmppServerSbb implements Sbb {
 	public void onDeliverSm(SmsEvent event, ActivityContextInterface aci, EventContext eventContext) {
 
 		try {
-			SmppServerSession smppSession = smppServerSessions.getSmppSession(event.getDestAddrTon(),
-					event.getDestAddrNpi(), event.getDestAddr());
+			String systemId = event.getSystemId();
+			SmppServerSession smppServerSession = null;
+			if (systemId == null) {
+				//Try to find SmppServerSession from dest TON, NPI and Range
+				smppServerSession = smppServerSessions.getSmppSession(event.getDestAddrTon(), event.getDestAddrNpi(),
+						event.getDestAddr());
+			} else {
+				smppServerSession = smppServerSessions.getSmppSession(systemId);
+			}
 
-			if (smppSession == null) {
-				this.logger.severe(String.format(
-						"Received Delivery Report SmsEvent=%s but no SmppSession found for SystemId", event));
+			if (smppServerSession == null) {
+				this.logger.severe(String.format("Received DELIVER_SM SmsEvent=%s but no SmppServerSession found",
+						event));
 				return;
 			}
 
-			if (!smppSession.isBound()) {
+			if (!smppServerSession.isBound()) {
 				this.logger.severe(String.format(
-						"Received Delivery Report SmsEvent=%s but no SmppSession=%s is not BOUND", event,
-						event.getSystemId()));
+						"Received DELIVER_SM SmsEvent=%s but SmppServerSession=%s is not BOUND", event,
+						smppServerSession.getSystemId()));
 				// TODO : Add to SnF module
 				return;
 			}
@@ -65,7 +72,7 @@ public abstract class RxSmppServerSbb implements Sbb {
 
 			// TODO : waiting for 2 secs for window to accept our request, is it
 			// good? Should time be more here?
-			SmppServerTransaction smppServerTransaction = smppSession.sendRequestPdu(deliverSm, 2000);
+			SmppServerTransaction smppServerTransaction = smppServerSession.sendRequestPdu(deliverSm, 2000);
 			ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
 					.getActivityContextInterface(smppServerTransaction);
 			smppTxaci.attach(this.sbbContext.getSbbLocalObject());
