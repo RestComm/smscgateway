@@ -44,6 +44,12 @@ sccp dest create 1 1 2 2 0 255 0 255 255
 
 m3ua asp start ASP1
 
+
+//Create ESME
+smsc esme create 1234567890 password 127.0.0.1 2775 TRANSCEIVER esme-ton 0 esme-npi 0 esme-range [0-9a-zA-Z]
+
+
+
 //Test SMSC
 sctp server create SCTPServer1 127.0.0.1 2775
 sctp server start SCTPServer1
