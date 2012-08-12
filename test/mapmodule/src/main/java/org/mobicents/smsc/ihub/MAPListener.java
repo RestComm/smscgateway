@@ -1,5 +1,7 @@
 package org.mobicents.smsc.ihub;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.map.api.MAPDialog;
 import org.mobicents.protocols.ss7.map.api.MAPDialogListener;
@@ -12,6 +14,7 @@ import org.mobicents.protocols.ss7.map.api.dialog.MAPProviderError;
 import org.mobicents.protocols.ss7.map.api.dialog.MAPRefuseReason;
 import org.mobicents.protocols.ss7.map.api.dialog.MAPUserAbortChoice;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageFactory;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
@@ -51,8 +54,14 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 
 	private MAPSimulator iHubManagement = null;
 
+	private final AtomicLong mapMessagesReceivedCounter = new AtomicLong(0);
+	private long currentMapMessageCount = 0;
+
+	private final MAPErrorMessageFactory mAPErrorMessageFactory;
+
 	protected MAPListener(MAPSimulator iHubManagement) {
 		this.iHubManagement = iHubManagement;
+		this.mAPErrorMessageFactory = this.iHubManagement.getMapProvider().getMAPErrorMessageFactory();
 	}
 
 	/**
@@ -106,7 +115,7 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 	@Override
 	public void onDialogRequest(MAPDialog arg0, AddressString arg1, AddressString arg2, MAPExtensionContainer arg3) {
 		// TODO Auto-generated method stub
-
+		this.currentMapMessageCount = this.mapMessagesReceivedCounter.incrementAndGet();
 	}
 
 	@Override
@@ -201,9 +210,9 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Rx : MoForwardShortMessageRequestIndication=" + request);
 		}
-
-		// Lets first close the Dialog
+		
 		MAPDialogSms dialog = request.getMAPDialog();
+
 		try {
 			// TODO Should we add PENDING SMS TPDU here itself?
 			dialog.addMoForwardShortMessageResponse(request.getInvokeId(), null, null);
@@ -246,13 +255,30 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 			logger.info("Rx : onMtForwardShortMessageIndication=" + event);
 		}
 
+		// Lets first close the Dialog
 		MAPDialogSms mapDialogSms = event.getMAPDialog();
-		try {
-			mapDialogSms.addMtForwardShortMessageResponse(event.getInvokeId(), null, null);
-			mapDialogSms.close(false);
-		} catch (MAPException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+		System.err.println("\n" + this.currentMapMessageCount + "\n");
+
+		if (this.currentMapMessageCount % 7 == 0) {
+			// Send back AbsentSubscriber for every 7th MtSMS
+			try {
+				MAPErrorMessage mapErrorMessage = mAPErrorMessageFactory.createMAPErrorMessageAbsentSubscriberSM(1,
+						null, null);
+				mapDialogSms.sendErrorComponent(event.getInvokeId(), mapErrorMessage);
+				mapDialogSms.close(false);
+			} catch (MAPException e) {
+				logger.error("Error while sending MAPErrorMessageAbsentSubscriberSM ", e);
+			}
+		} else {
+
+			try {
+				mapDialogSms.addMtForwardShortMessageResponse(event.getInvokeId(), null, null);
+				mapDialogSms.close(false);
+			} catch (MAPException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

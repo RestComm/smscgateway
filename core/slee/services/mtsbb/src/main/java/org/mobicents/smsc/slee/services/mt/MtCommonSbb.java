@@ -3,6 +3,8 @@ package org.mobicents.smsc.slee.services.mt;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -41,8 +43,33 @@ import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.ProviderErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
+
+import com.cloudhopper.commons.charset.CharsetUtil;
+import com.cloudhopper.smpp.util.SmppUtil;
 
 public abstract class MtCommonSbb implements Sbb {
+
+	private static final byte ESME_DELIVERY_ACK = 0x08;
+
+	private static final String DELIVERY_ACK_ID = "id:";
+	private static final String DELIVERY_ACK_SUB = " sub:";
+	private static final String DELIVERY_ACK_DLVRD = " dlvrd:";
+	private static final String DELIVERY_ACK_SUBMIT_DATE = " submit date:";
+	private static final String DELIVERY_ACK_DONE_DATE = " done date:";
+	private static final String DELIVERY_ACK_STAT = " stat:";
+	private static final String DELIVERY_ACK_ERR = " err:";
+	private static final String DELIVERY_ACK_TEXT = " text:";
+
+	private static final String DELIVERY_ACK_STATE_DELIVERED = "DELIVRD";
+	private static final String DELIVERY_ACK_STATE_EXPIRED = "EXPIRED";
+	private static final String DELIVERY_ACK_STATE_DELETED = "DELETED";
+	private static final String DELIVERY_ACK_STATE_UNDELIVERABLE = "UNDELIV";
+	private static final String DELIVERY_ACK_STATE_ACCEPTED = "ACCEPTD";
+	private static final String DELIVERY_ACK_STATE_UNKNOWN = "UNKNOWN";
+	private static final String DELIVERY_ACK_STATE_REJECTED = "REJECTD";
+
+	private final SimpleDateFormat DELIVERY_ACK_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmm");
 
 	private static final String SMSC_PROPERTIES = "smsc.properties";
 	private static final String SC_GT_KEY = "service.center.gt";
@@ -85,20 +112,44 @@ public abstract class MtCommonSbb implements Sbb {
 
 	public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
 
-		if(this.logger.isInfoEnabled()){
+		if (this.logger.isInfoEnabled()) {
 			this.logger.info("Rx :  onErrorComponent " + event + " Dialog=" + event.getMAPDialog());
 		}
 		// if (mapErrorMessage.isEmAbsentSubscriberSM()) {
 		// this.sendReportSMDeliveryStatusRequest(SMDeliveryOutcome.absentSubscriber);
 		// }
+
+		SmsEvent original = this.getOriginalSmsEvent();
+
+		if (original != null) {
+			if (original.getSystemId() != null) {
+				this.sendFailureDeliverSmToEsms(original);
+			}	
+		}
 	}
 
 	public void onProviderErrorComponent(ProviderErrorComponent event, ActivityContextInterface aci) {
 		this.logger.severe("Rx :  onProviderErrorComponent" + event);
+		
+		SmsEvent original = this.getOriginalSmsEvent();
+
+		if (original != null) {
+			if (original.getSystemId() != null) {
+				this.sendFailureDeliverSmToEsms(original);
+			}	
+		}
 	}
 
 	public void onRejectComponent(RejectComponent event, ActivityContextInterface aci) {
 		this.logger.severe("Rx :  onRejectComponent" + event);
+		
+		SmsEvent original = this.getOriginalSmsEvent();
+
+		if (original != null) {
+			if (original.getSystemId() != null) {
+				this.sendFailureDeliverSmToEsms(original);
+			}	
+		}
 	}
 
 	/**
@@ -123,16 +174,40 @@ public abstract class MtCommonSbb implements Sbb {
 		}
 
 		// TODO : Error condition. Take care
+		
+		SmsEvent original = this.getOriginalSmsEvent();
+
+		if (original != null) {
+			if (original.getSystemId() != null) {
+				this.sendFailureDeliverSmToEsms(original);
+			}	
+		}
 	}
 
 	public void onDialogUserAbort(DialogUserAbort evt, ActivityContextInterface aci) {
 		this.logger.severe("Rx :  onDialogUserAbort=" + evt);
 
 		// TODO : Error condition. Take care
+		
+		SmsEvent original = this.getOriginalSmsEvent();
+
+		if (original != null) {
+			if (original.getSystemId() != null) {
+				this.sendFailureDeliverSmToEsms(original);
+			}	
+		}
 	}
 
 	public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
 		this.logger.severe("Rx :  onDialogProviderAbort=" + evt);
+		
+		SmsEvent original = this.getOriginalSmsEvent();
+
+		if (original != null) {
+			if (original.getSystemId() != null) {
+				this.sendFailureDeliverSmToEsms(original);
+			}	
+		}
 	}
 
 	public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
@@ -156,13 +231,13 @@ public abstract class MtCommonSbb implements Sbb {
 			this.logger.fine("Rx :  onDialogRequest" + evt);
 		}
 	}
-	
+
 	public void onDialogRelease(DialogRelease evt, ActivityContextInterface aci) {
 		if (logger.isInfoEnabled()) {
-			//TODO : Should be fine
+			// TODO : Should be fine
 			this.logger.info("Rx :  DialogRelease" + evt);
 		}
-		
+
 		MtActivityContextInterface mtSbbActivityContextInterface = this.asSbbActivityContextInterface(this
 				.getNullActivityEventContext().getActivityContextInterface());
 		this.resumeNullActivityEventDelivery(mtSbbActivityContextInterface, this.getNullActivityEventContext());
@@ -272,14 +347,24 @@ public abstract class MtCommonSbb implements Sbb {
 	public void unsetSbbContext() {
 
 	}
-	
+
+	/**
+	 * Fire SmsEvent
+	 * 
+	 * @param event
+	 * @param aci
+	 * @param address
+	 */
+	public abstract void fireSendDeliveryReportSms(SmsEvent event, ActivityContextInterface aci,
+			javax.slee.Address address);
+
 	/**
 	 * CMPs
 	 */
 	public abstract void setNullActivityEventContext(EventContext eventContext);
 
 	public abstract EventContext getNullActivityEventContext();
-	
+
 	/**
 	 * Sbb ACI
 	 */
@@ -331,8 +416,127 @@ public abstract class MtCommonSbb implements Sbb {
 			}
 		}
 		// Resume delivery for rest of the SMS's for this MSISDN
-		if(nullActivityEventContext.isSuspended()){
+		if (nullActivityEventContext.isSuspended()) {
 			nullActivityEventContext.resumeDelivery();
 		}
+	}
+
+	protected SmsEvent getOriginalSmsEvent() {
+		EventContext nullActivityEventContext = this.getNullActivityEventContext();
+		SmsEvent smsEvent = null;
+		try {
+			smsEvent = (SmsEvent) nullActivityEventContext.getEvent();
+		} catch (Exception e) {
+			this.logger.severe(
+					String.format("Exception while trying to retrieve SmsEvent from NullActivity EventContext"), e);
+		}
+
+		return smsEvent;
+	}
+
+	protected void sendFailureDeliverSmToEsms(SmsEvent original) {
+		// TODO check if SmppSession available for this SystemId, if not send to
+		// SnF module
+
+		byte registeredDelivery = original.getRegisteredDelivery();
+
+		// Send Delivery Receipt only if requested
+		if (SmppUtil.isSmscDeliveryReceiptRequested(registeredDelivery)
+				|| SmppUtil.isSmscDeliveryReceiptOnFailureRequested(registeredDelivery)) {
+			SmsEvent deliveryReport = new SmsEvent();
+			deliveryReport.setSourceAddr(original.getDestAddr());
+			deliveryReport.setSourceAddrNpi(original.getDestAddrNpi());
+			deliveryReport.setSourceAddrTon(original.getDestAddrTon());
+
+			deliveryReport.setDestAddr(original.getSourceAddr());
+			deliveryReport.setDestAddrNpi(original.getSourceAddrNpi());
+			deliveryReport.setDestAddrTon(original.getSourceAddrTon());
+
+			// Setting SystemId as null, so RxSmppServerSbb actually tries to
+			// find real SmppServerSession from Destination TON, NPI and address
+			// range
+			deliveryReport.setSystemId(null);
+
+			deliveryReport.setSubmitDate(original.getSubmitDate());
+
+			deliveryReport.setMessageId(original.getMessageId());
+
+			// TODO : Set appropriate error code in err:
+			StringBuffer sb = new StringBuffer();
+			sb.append(DELIVERY_ACK_ID).append(original.getMessageId()).append(DELIVERY_ACK_SUB).append("001")
+					.append(DELIVERY_ACK_DLVRD).append("001").append(DELIVERY_ACK_SUBMIT_DATE)
+					.append(DELIVERY_ACK_DATE_FORMAT.format(original.getSubmitDate())).append(DELIVERY_ACK_DONE_DATE)
+					.append(DELIVERY_ACK_DATE_FORMAT.format(new Timestamp(System.currentTimeMillis())))
+					.append(DELIVERY_ACK_STAT).append(DELIVERY_ACK_STATE_UNDELIVERABLE).append(DELIVERY_ACK_ERR)
+					.append("001").append(DELIVERY_ACK_TEXT)
+					.append(this.getFirst20CharOfSMS(original.getShortMessage()));
+
+			byte[] textBytes = CharsetUtil.encode(sb.toString(), CharsetUtil.CHARSET_GSM);
+
+			deliveryReport.setShortMessage(textBytes);
+			deliveryReport.setEsmClass(ESME_DELIVERY_ACK);
+
+			NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
+			ActivityContextInterface nullActivityContextInterface = this.sbbContext
+					.getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
+
+			this.fireSendDeliveryReportSms(deliveryReport, nullActivityContextInterface, null);
+		}
+	}
+
+	protected void sendSuccessDeliverSmToEsms(SmsEvent original) {
+		// TODO check if SmppSession available for this SystemId, if not send to
+		// SnF module
+
+		byte registeredDelivery = original.getRegisteredDelivery();
+
+		// Send Delivery Receipt only if requested
+		if (SmppUtil.isSmscDeliveryReceiptRequested(registeredDelivery)) {
+			SmsEvent deliveryReport = new SmsEvent();
+			deliveryReport.setSourceAddr(original.getDestAddr());
+			deliveryReport.setSourceAddrNpi(original.getDestAddrNpi());
+			deliveryReport.setSourceAddrTon(original.getDestAddrTon());
+
+			deliveryReport.setDestAddr(original.getSourceAddr());
+			deliveryReport.setDestAddrNpi(original.getSourceAddrNpi());
+			deliveryReport.setDestAddrTon(original.getSourceAddrTon());
+
+			// Setting SystemId as null, so RxSmppServerSbb actually tries to
+			// find real SmppServerSession from Destination TON, NPI and address
+			// range
+			deliveryReport.setSystemId(null);
+
+			deliveryReport.setSubmitDate(original.getSubmitDate());
+
+			deliveryReport.setMessageId(original.getMessageId());
+
+			StringBuffer sb = new StringBuffer();
+			sb.append(DELIVERY_ACK_ID).append(original.getMessageId()).append(DELIVERY_ACK_SUB).append("001")
+					.append(DELIVERY_ACK_DLVRD).append("001").append(DELIVERY_ACK_SUBMIT_DATE)
+					.append(DELIVERY_ACK_DATE_FORMAT.format(original.getSubmitDate())).append(DELIVERY_ACK_DONE_DATE)
+					.append(DELIVERY_ACK_DATE_FORMAT.format(new Timestamp(System.currentTimeMillis())))
+					.append(DELIVERY_ACK_STAT).append(DELIVERY_ACK_STATE_DELIVERED).append(DELIVERY_ACK_ERR)
+					.append("000").append(DELIVERY_ACK_TEXT)
+					.append(this.getFirst20CharOfSMS(original.getShortMessage()));
+
+			byte[] textBytes = CharsetUtil.encode(sb.toString(), CharsetUtil.CHARSET_GSM);
+
+			deliveryReport.setShortMessage(textBytes);
+			deliveryReport.setEsmClass(ESME_DELIVERY_ACK);
+
+			NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
+			ActivityContextInterface nullActivityContextInterface = this.sbbContext
+					.getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
+
+			this.fireSendDeliveryReportSms(deliveryReport, nullActivityContextInterface, null);
+		}
+	}
+
+	private String getFirst20CharOfSMS(byte[] rawSms) {
+		String first20CharOfSms = new String(rawSms);
+		if (first20CharOfSms.length() > 20) {
+			first20CharOfSms = first20CharOfSms.substring(0, 20);
+		}
+		return first20CharOfSms;
 	}
 }

@@ -98,12 +98,13 @@ if [ "x$JAVA" = "x" ]; then
 fi
 
 # Setup the classpath
-runjar="$SHELL_HOME/bin/shell.jar"
+runjar="$SHELL_HOME/lib/mobicents-ss7-shell.jar"
 if [ ! -f "$runjar" ]; then
     die "Missing required file: $runjar"
 fi
 
 SHELL_BOOT_CLASSPATH="$runjar"
+SHELL_CLASSPATH="$SHELL_HOME/lib/*"
 
 if [ "x$SHELL_CLASSPATH" = "x" ]; then
     SHELL_CLASSPATH="$SHELL_BOOT_CLASSPATH"
@@ -135,7 +136,7 @@ JAVA_OPTS="-Dprogram.name=$PROGNAME $JAVA_OPTS"
 JAVA_OPTS="$JAVA_OPTS -Xms64m -Xmx64m -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000"
 #JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
 # Setup the java endorsed dirs
-SHELL_ENDORSED_DIRS="$SHELL_HOME/lib"
+SHELL_ENDORSED_DIRS="$SHELL_HOME/bin/lib"
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
@@ -146,20 +147,20 @@ if $cygwin; then
 fi
 
 # Display our environment
-echo "========================================================================="
-echo ""
-echo "  Mobicents SS7 Management Shell Bootstrap Environment"
-echo ""
-echo "  SHELL_HOME: $SHELL_HOME"
-echo ""
-echo "  JAVA: $JAVA"
-echo ""
-echo "  JAVA_OPTS: $JAVA_OPTS"
-echo ""
-echo "  CLASSPATH: $SHELL_CLASSPATH"
-echo ""
-echo "========================================================================="
-echo ""
+#echo "========================================================================="
+#echo ""
+#echo "  Mobicents SS7 Management Shell Bootstrap Environment"
+#echo ""
+#echo "  SHELL_HOME: $SHELL_HOME"
+#echo ""
+#echo "  JAVA: $JAVA"
+#echo ""
+#echo "  JAVA_OPTS: $JAVA_OPTS"
+#echo ""
+#echo "  CLASSPATH: $SHELL_CLASSPATH"
+#echo ""
+#echo "========================================================================="
+#echo ""
 
       "$JAVA" $JAVA_OPTS \
          -Djava.ext.dirs="$SHELL_ENDORSED_DIRS" \

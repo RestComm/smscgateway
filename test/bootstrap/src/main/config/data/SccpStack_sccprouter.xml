@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rule>
+	<Key type="java.lang.Integer" value="1"/>
+	<Value type="rule" ruleType="Solitary" loadSharingAlgo="Undefined" mask="K" paddress="1" saddress="-1">
+		<pattern type="org.mobicents.protocols.ss7.sccp.parameter.SccpAddress" pc="0" ssn="8">
+			<ai type="org.mobicents.protocols.ss7.indicator.AddressIndicator" ai="18"/>
+			<gt type="org.mobicents.protocols.ss7.sccp.parameter.GT0100" tt="0" es="2" np="1" nai="4" digits="923330053058"/>
+		</pattern>
+	</Value>
+	<Key type="java.lang.Integer" value="2"/>
+	<Value type="rule" ruleType="Solitary" loadSharingAlgo="Undefined" mask="K" paddress="2" saddress="-1">
+		<pattern type="org.mobicents.protocols.ss7.sccp.parameter.SccpAddress" pc="0" ssn="0">
+			<ai type="org.mobicents.protocols.ss7.indicator.AddressIndicator" ai="16"/>
+			<gt type="org.mobicents.protocols.ss7.sccp.parameter.GT0100" tt="0" es="1" np="1" nai="4" digits="*"/>
+		</pattern>
+	</Value>
+</rule>
+<primaryAddress>
+	<Key type="java.lang.Integer" value="1"/>
+	<Value type="org.mobicents.protocols.ss7.sccp.parameter.SccpAddress" pc="1" ssn="8">
+		<ai type="org.mobicents.protocols.ss7.indicator.AddressIndicator" ai="19"/>
+		<gt type="org.mobicents.protocols.ss7.sccp.parameter.GT0100" tt="0" es="2" np="1" nai="4" digits="923330053058"/>
+	</Value>
+	<Key type="java.lang.Integer" value="2"/>
+	<Value type="org.mobicents.protocols.ss7.sccp.parameter.SccpAddress" pc="2" ssn="0">
+		<ai type="org.mobicents.protocols.ss7.indicator.AddressIndicator" ai="17"/>
+		<gt type="org.mobicents.protocols.ss7.sccp.parameter.GT0100" tt="0" es="1" np="1" nai="4" digits="-"/>
+	</Value>
+</primaryAddress>
+<backupAddress/>
+<longMessageRule/>
+<sap>
+	<Key type="java.lang.Integer" value="1"/>
+	<Value type="org.mobicents.protocols.ss7.sccp.impl.router.Mtp3ServiceAccessPoint" mtp3Id="1" opc="2" ni="2">
+		<javolution.util.FastMap>
+			<Key type="java.lang.Integer" value="1"/>
+			<Value type="org.mobicents.protocols.ss7.sccp.impl.router.Mtp3Destination" firstDpc="1" lastDpc="1" firstSls="0" lastSls="255" slsMask="255"/>
+		</javolution.util.FastMap>
+	</Value>
+</sap>

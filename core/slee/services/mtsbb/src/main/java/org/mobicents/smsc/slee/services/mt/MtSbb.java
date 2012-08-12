@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.EventContext;
-import javax.slee.nullactivity.NullActivity;
 
 import org.mobicents.protocols.ss7.indicator.NatureOfAddress;
 import org.mobicents.protocols.ss7.indicator.NumberingPlan;
@@ -38,33 +37,9 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
 
-import com.cloudhopper.commons.charset.CharsetUtil;
-import com.cloudhopper.smpp.SmppConstants;
-
 public abstract class MtSbb extends MtCommonSbb {
 
 	private static final String className = "MtSbb";
-
-	private static final byte ESME_DELIVERY_ACK = 0x08;
-
-	private static final String DELIVERY_ACK_ID = "id:";
-	private static final String DELIVERY_ACK_SUB = " sub:";
-	private static final String DELIVERY_ACK_DLVRD = " dlvrd:";
-	private static final String DELIVERY_ACK_SUBMIT_DATE = " submit date:";
-	private static final String DELIVERY_ACK_DONE_DATE = " done date:";
-	private static final String DELIVERY_ACK_STAT = " stat:";
-	private static final String DELIVERY_ACK_ERR = " err:";
-	private static final String DELIVERY_ACK_TEXT = " text:";
-
-	private static final String DELIVERY_ACK_STATE_DELIVERED = "DELIVRD";
-	private static final String DELIVERY_ACK_STATE_EXPIRED = "EXPIRED";
-	private static final String DELIVERY_ACK_STATE_DELETED = "DELETED";
-	private static final String DELIVERY_ACK_STATE_UNDELIVERABLE = "UNDELIV";
-	private static final String DELIVERY_ACK_STATE_ACCEPTED = "ACCEPTD";
-	private static final String DELIVERY_ACK_STATE_UNKNOWN = "UNKNOWN";
-	private static final String DELIVERY_ACK_STATE_REJECTED = "REJECTD";
-
-	private final SimpleDateFormat DELIVERY_ACK_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmm");
 
 	private MAPApplicationContext mtFoSMSMAPApplicationContext = null;
 
@@ -136,25 +111,30 @@ public abstract class MtSbb extends MtCommonSbb {
 			this.logger.info("Received MT_FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
 		}
 
-		EventContext nullActivityEventContext = this.getNullActivityEventContext();
-		SmsEvent smsEvent = null;
-		try {
-			smsEvent = (SmsEvent) nullActivityEventContext.getEvent();
-
-			// TODO : check for ESME or Mt delivery Ack. Is this best way?
-			if (smsEvent.getSystemId() != null) {
-				handleDeliveryReportSms(smsEvent);
+		SmsEvent smsEvent = this.getOriginalSmsEvent();
+		if (smsEvent != null) {
+			try {
+				if (smsEvent.getSystemId() != null) {
+					sendSuccessDeliverSmToEsms(smsEvent);
+				} else {
+					//TODO : This is destined for Mobile user, send SMS-STATUS-REPORT
+				}
+			} catch (Exception e) {
+				this.logger.severe(
+						String.format("Exception while trying to send Delivery Report for SmsEvent=%s", smsEvent), e);
 			}
-		} catch (Exception e) {
-			this.logger.severe(
-					String.format("Exception while trying to send Delivery Report for SmsEvent=%s", smsEvent), e);
 		}
 
-		aci.detach(this.sbbContext.getSbbLocalObject());
-
-		MtActivityContextInterface mtSbbActivityContextInterface = this.asSbbActivityContextInterface(this
-				.getNullActivityEventContext().getActivityContextInterface());
-		this.resumeNullActivityEventDelivery(mtSbbActivityContextInterface, this.getNullActivityEventContext());
+		// Amit (12 Aug 2012): this is also done in onDialogRelease why repeat
+		// here?
+		
+		//aci.detach(this.sbbContext.getSbbLocalObject());
+		
+		// MtActivityContextInterface mtSbbActivityContextInterface =
+		// this.asSbbActivityContextInterface(this
+		// .getNullActivityEventContext().getActivityContextInterface());
+		// this.resumeNullActivityEventDelivery(mtSbbActivityContextInterface,
+		// this.getNullActivityEventContext());
 	}
 
 	/**
@@ -227,16 +207,6 @@ public abstract class MtSbb extends MtCommonSbb {
 	}
 
 	/**
-	 * Fire SmsEvent
-	 * 
-	 * @param event
-	 * @param aci
-	 * @param address
-	 */
-	public abstract void fireSendDeliveryReportSms(SmsEvent event, ActivityContextInterface aci,
-			javax.slee.Address address);
-
-	/**
 	 * Private Methods
 	 */
 
@@ -260,62 +230,6 @@ public abstract class MtSbb extends MtCommonSbb {
 	private AddressField getSmsTpduOriginatingAddress(byte ton, byte npi, String address) {
 		return new AddressFieldImpl(TypeOfNumber.getInstance(ton), NumberingPlanIdentification.getInstance(npi),
 				address);
-	}
-
-	private void handleDeliveryReportSms(SmsEvent original) {
-		// TODO check if SmppSession available for this SystemId, if not send to
-		// SnF module
-
-		byte registeredDelivery = original.getRegisteredDelivery();
-
-		// Send Delivery Receipt only if requested
-		if ((registeredDelivery & SmppConstants.REGISTERED_DELIVERY_SMSC_RECEIPT_MASK) == SmppConstants.REGISTERED_DELIVERY_SMSC_RECEIPT_REQUESTED) {
-			SmsEvent deliveryReport = new SmsEvent();
-			deliveryReport.setSourceAddr(original.getDestAddr());
-			deliveryReport.setSourceAddrNpi(original.getDestAddrNpi());
-			deliveryReport.setSourceAddrTon(original.getDestAddrTon());
-
-			deliveryReport.setDestAddr(original.getSourceAddr());
-			deliveryReport.setDestAddrNpi(original.getSourceAddrNpi());
-			deliveryReport.setDestAddrTon(original.getSourceAddrTon());
-
-			// Setting SystemId as null, so RxSmppServerSbb actually tries to
-			// find real SmppServerSession from Destination TON, NPI and address
-			// range
-			deliveryReport.setSystemId(null);
-
-			deliveryReport.setSubmitDate(original.getSubmitDate());
-
-			deliveryReport.setMessageId(original.getMessageId());
-
-			StringBuffer sb = new StringBuffer();
-			sb.append(DELIVERY_ACK_ID).append(original.getMessageId()).append(DELIVERY_ACK_SUB).append("001")
-					.append(DELIVERY_ACK_DLVRD).append("001").append(DELIVERY_ACK_SUBMIT_DATE)
-					.append(DELIVERY_ACK_DATE_FORMAT.format(original.getSubmitDate())).append(DELIVERY_ACK_DONE_DATE)
-					.append(DELIVERY_ACK_DATE_FORMAT.format(new Timestamp(System.currentTimeMillis())))
-					.append(DELIVERY_ACK_STAT).append(DELIVERY_ACK_STATE_DELIVERED).append(DELIVERY_ACK_ERR)
-					.append("000").append(DELIVERY_ACK_TEXT)
-					.append(this.getFirst20CharOfSMS(original.getShortMessage()));
-
-			byte[] textBytes = CharsetUtil.encode(sb.toString(), CharsetUtil.CHARSET_GSM);
-
-			deliveryReport.setShortMessage(textBytes);
-			deliveryReport.setEsmClass(ESME_DELIVERY_ACK);
-
-			NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
-			ActivityContextInterface nullActivityContextInterface = this.sbbContext
-					.getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
-
-			this.fireSendDeliveryReportSms(deliveryReport, nullActivityContextInterface, null);
-		}
-	}
-
-	String getFirst20CharOfSMS(byte[] rawSms) {
-		String first20CharOfSms = new String(rawSms);
-		if (first20CharOfSms.length() > 20) {
-			first20CharOfSms = first20CharOfSms.substring(0, 20);
-		}
-		return first20CharOfSms;
 	}
 
 }

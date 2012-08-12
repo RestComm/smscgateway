@@ -5,40 +5,54 @@
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 
+	<fileSets>
+		<fileSet>
+			<directory>src/main/config/data</directory>
+			<outputDirectory>data</outputDirectory>
+			<includes>
+				<include>*.xml</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+
 	<files>
 		<file>
 			<source>src/main/config/run.bat</source>
+			<fileMode>0744</fileMode>
 			<destName>bin/run.bat</destName>
 		</file>
 		<file>
 			<source>src/main/config/run.sh</source>
+			<fileMode>0744</fileMode>
 			<destName>bin/run.sh</destName>
 		</file>
 		<file>
-			<source>src/main/config/ss7-run.bat</source>
-			<destName>bin/ss7-run.bat</destName>
+			<source>src/main/config/ss7-cli.bat</source>
+			<fileMode>0744</fileMode>
+			<destName>bin/ss7-cli.bat</destName>
 		</file>
 		<file>
-			<source>src/main/config/ss7-run.sh</source>
-			<destName>bin/ss7-run.sh</destName>
+			<source>src/main/config/ss7-cli.sh</source>
+			<fileMode>0744</fileMode>
+			<destName>bin/ss7-cli.sh</destName>
 		</file>
 	</files>
 	<dependencySets>
 		<dependencySet>
-			<outputDirectory>/bin</outputDirectory>
-			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
+			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>mobicents-ss7-shell.jar
 			</outputFileNameMapping>
-			<unpack>false</unpack>
-			<scope>runtime</scope>
 			<includes>
 				<include>org.mobicents.protocols.ss7.management:shell</include>
 			</includes>
 		</dependencySet>
-
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
 			<unpack>false</unpack>
 			<scope>runtime</scope>
+			<excludes>
+				<exclude>org.mobicents.protocols.ss7.management:shell</exclude>
+			</excludes>
 			<includes>
 				<!-- SMSC libraris -->
 				<include>org.mobicents.smsc:test-mapmodule</include>
@@ -86,8 +100,13 @@
 				<!-- <include>org.mobicents.protocols.ss7.hardware:mobicents-dahdi</include> -->
 				<include>org.mobicents.protocols.ss7.hardware:mobicents-dialogic
 				</include>
-				<include>org.mobicents.protocols.ss7.congestion:congestion</include>
-
+				<include>org.mobicents.protocols.ss7.congestion:congestion
+				</include>
+				<!-- SS7 OAM Cli Libraries -->
+				<include>org.jboss.jreadline:jreadline</include>
+				<include>org.mobicents.protocols.ss7.m3ua:m3ua-cli-sctp</include>
+				<include>org.mobicents.protocols.ss7.m3ua:m3ua-cli-m3ua</include>
+				<include>org.mobicents.protocols.ss7.sccp:sccp-cli</include>
 			</includes>
 		</dependencySet>
 	</dependencySets>

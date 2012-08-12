@@ -5,7 +5,7 @@ import org.mobicents.protocols.ss7.map.api.MAPProvider;
 import org.mobicents.protocols.ss7.sccp.impl.SccpStackImpl;
 
 public class MAPSimulator {
-
+	
 	// MAP
 	private MAPStackImpl mapStack;
 	private MAPProvider mapProvider;
@@ -56,6 +56,10 @@ public class MAPSimulator {
 
 	public void stop() {
 		this.mapStack.stop();
+	}
+
+	protected MAPProvider getMapProvider() {
+		return mapProvider;
 	}
 
 }
