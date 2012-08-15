@@ -17,11 +17,6 @@
 		<!-- SMSC Dependency -->
 		<dependency>
 			<groupId>org.mobicents.smsc</groupId>
-			<artifactId>oam</artifactId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.smsc</groupId>
 			<artifactId>smpp</artifactId>
 			<version>${pom.version}</version>
 		</dependency>
