@@ -1,3 +1,24 @@
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.mobicents.smsc.smpp;
 
 import java.io.Serializable;
@@ -30,15 +51,15 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 
 	private transient SmppSessionHandlerInterface smppSessionHandlerInterface = null;
 
-	private transient SmscManagement smscManagement = null;
+	private transient EsmeManagement esmeManagement = null;
 
 	private MBeanServer mbeanServer = null;
 
 	public DefaultSmppServerHandler() {
 	}
 
-	public void setSmscManagement(SmscManagement smscManagement) {
-		this.smscManagement = smscManagement;
+	public void setEsmeManagement(EsmeManagement esmeManagement) {
+		this.esmeManagement = esmeManagement;
 	}
 
 	public SmppSessionHandlerInterface getSmppSessionHandlerInterface() {
@@ -58,7 +79,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 			throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
 		}
 
-		Esme esme = this.smscManagement.getEsme(bindRequest.getSystemId());
+		Esme esme = this.esmeManagement.getEsme(bindRequest.getSystemId());
 
 		if (esme == null) {
 			logger.error(String.format("No ESME configured for SystemId=%s", bindRequest.getSystemId()));
@@ -154,7 +175,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 
 		this.registerMBean(sessionId, session);
 		
-		Esme esme = this.smscManagement.getEsme(session.getConfiguration().getSystemId());
+		Esme esme = this.esmeManagement.getEsme(session.getConfiguration().getSystemId());
 		esme.setState(session.getStateName());
 	}
 
@@ -178,7 +199,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler, Serializable
 
 		this.unregisterMBean(sessionId, session);
 		
-		Esme esme = this.smscManagement.getEsme(session.getConfiguration().getSystemId());
+		Esme esme = this.esmeManagement.getEsme(session.getConfiguration().getSystemId());
 		esme.setState(session.getStateName());
 	}
 

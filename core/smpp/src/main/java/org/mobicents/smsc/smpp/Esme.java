@@ -103,14 +103,6 @@ public class Esme implements XMLSerializable {
 		this.systemId = systemId;
 	}
 
-	public void setSmscManagement(SmscManagement smscManagement) {
-		this.smscManagement = smscManagement;
-	}
-
-	public SmscManagement getSmscManagement() {
-		return smscManagement;
-	}
-
 	/**
 	 * @return the password
 	 */

@@ -23,8 +23,7 @@
 package org.mobicents.smsc.smpp;
 
 import java.util.Arrays;
-
-import javolution.util.FastList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mobicents.ss7.management.console.ShellExecutor;
@@ -157,8 +156,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 			return SMSCOAMMessages.NULL_ESME_ADDRESS_RANGE;
 		}
 		Address address = new Address(esmeTonType, esmeNpiType, esmeAddrRange);
-		Esme esme = this.smscManagement.createEsme(systemId, password, host, strPort, smppBindType, systemType,
-				smppVersionType, address);
+		Esme esme = this.smscManagement.getEsmeManagement().createEsme(systemId, password, host, strPort, smppBindType,
+				systemType, smppVersionType, address);
 		return String.format(SMSCOAMMessages.CREATE_ESME_SUCCESSFULL, esme.getSystemId());
 	}
 
@@ -179,19 +178,18 @@ public class SMSCShellExecutor implements ShellExecutor {
 			return SMSCOAMMessages.INVALID_COMMAND;
 		}
 
-		Esme esme = this.smscManagement.destroyEsme(systemId);
+		Esme esme = this.smscManagement.getEsmeManagement().destroyEsme(systemId);
 
 		return String.format(SMSCOAMMessages.DELETE_ESME_SUCCESSFUL, systemId);
 	}
 
 	private String showEsme() {
-		FastList<Esme> esmes = this.smscManagement.getEsmes();
+		List<Esme> esmes = this.smscManagement.getEsmeManagement().getEsmes();
 		if (esmes.size() == 0) {
 			return SMSCOAMMessages.NO_ESME_DEFINED_YET;
 		}
 		StringBuffer sb = new StringBuffer();
-		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
-			Esme esme = n.getValue();
+		for (Esme esme : esmes) {
 			sb.append(SMSCOAMMessages.NEW_LINE);
 			esme.show(sb);
 		}

@@ -1,7 +1,27 @@
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.mobicents.smsc.slee.services.mt;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.EventContext;
@@ -117,7 +137,8 @@ public abstract class MtSbb extends MtCommonSbb {
 				if (smsEvent.getSystemId() != null) {
 					sendSuccessDeliverSmToEsms(smsEvent);
 				} else {
-					//TODO : This is destined for Mobile user, send SMS-STATUS-REPORT
+					// TODO : This is destined for Mobile user, send
+					// SMS-STATUS-REPORT
 				}
 			} catch (Exception e) {
 				this.logger.severe(
@@ -127,9 +148,9 @@ public abstract class MtSbb extends MtCommonSbb {
 
 		// Amit (12 Aug 2012): this is also done in onDialogRelease why repeat
 		// here?
-		
-		//aci.detach(this.sbbContext.getSbbLocalObject());
-		
+
+		// aci.detach(this.sbbContext.getSbbLocalObject());
+
 		// MtActivityContextInterface mtSbbActivityContextInterface =
 		// this.asSbbActivityContextInterface(this
 		// .getNullActivityEventContext().getActivityContextInterface());
@@ -224,7 +245,8 @@ public abstract class MtSbb extends MtCommonSbb {
 		// International / ISDN?
 		GT0100 gt = new GT0100(0, NumberingPlan.ISDN_TELEPHONY, NatureOfAddress.INTERNATIONAL,
 				networkNodeNumber.getAddress());
-		return new SccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, 0, gt, this.MSC_SSN);
+		return new SccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, 0, gt,
+				smscPropertiesManagement.getMscSsn());
 	}
 
 	private AddressField getSmsTpduOriginatingAddress(byte ton, byte npi, String address) {

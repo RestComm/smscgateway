@@ -1,11 +1,28 @@
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.mobicents.smsc.slee.services.mt;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.URL;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -44,6 +61,7 @@ import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.ProviderErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
+import org.mobicents.smsc.smpp.SmscPropertiesManagement;
 
 import com.cloudhopper.commons.charset.CharsetUtil;
 import com.cloudhopper.smpp.util.SmppUtil;
@@ -69,18 +87,9 @@ public abstract class MtCommonSbb implements Sbb {
 	private static final String DELIVERY_ACK_STATE_UNKNOWN = "UNKNOWN";
 	private static final String DELIVERY_ACK_STATE_REJECTED = "REJECTD";
 
+	protected static final SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+
 	private final SimpleDateFormat DELIVERY_ACK_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmm");
-
-	private static final String SMSC_PROPERTIES = "smsc.properties";
-	private static final String SC_GT_KEY = "service.center.gt";
-	private static final String SC_SSN_KEY = "service.center.ssn";
-	private static final String HLR_SSN_KEY = "hlr.ssn";
-	private static final String MSC_SSN_KEY = "msc.ssn";
-
-	protected String SC_GT = null;
-	protected int SC_SSN = 0;
-	protected int HLR_SSN = 0;
-	protected int MSC_SSN = 0;
 
 	private final String className;
 
@@ -93,8 +102,6 @@ public abstract class MtCommonSbb implements Sbb {
 
 	private AddressString serviceCenterAddress;
 	private SccpAddress serviceCenterSCCPAddress = null;
-
-	protected Properties smscProperteis = null;
 
 	public MtCommonSbb(String className) {
 		this.className = className;
@@ -124,31 +131,31 @@ public abstract class MtCommonSbb implements Sbb {
 		if (original != null) {
 			if (original.getSystemId() != null) {
 				this.sendFailureDeliverSmToEsms(original);
-			}	
+			}
 		}
 	}
 
 	public void onProviderErrorComponent(ProviderErrorComponent event, ActivityContextInterface aci) {
 		this.logger.severe("Rx :  onProviderErrorComponent" + event);
-		
+
 		SmsEvent original = this.getOriginalSmsEvent();
 
 		if (original != null) {
 			if (original.getSystemId() != null) {
 				this.sendFailureDeliverSmToEsms(original);
-			}	
+			}
 		}
 	}
 
 	public void onRejectComponent(RejectComponent event, ActivityContextInterface aci) {
 		this.logger.severe("Rx :  onRejectComponent" + event);
-		
+
 		SmsEvent original = this.getOriginalSmsEvent();
 
 		if (original != null) {
 			if (original.getSystemId() != null) {
 				this.sendFailureDeliverSmToEsms(original);
-			}	
+			}
 		}
 	}
 
@@ -174,13 +181,13 @@ public abstract class MtCommonSbb implements Sbb {
 		}
 
 		// TODO : Error condition. Take care
-		
+
 		SmsEvent original = this.getOriginalSmsEvent();
 
 		if (original != null) {
 			if (original.getSystemId() != null) {
 				this.sendFailureDeliverSmToEsms(original);
-			}	
+			}
 		}
 	}
 
@@ -188,25 +195,25 @@ public abstract class MtCommonSbb implements Sbb {
 		this.logger.severe("Rx :  onDialogUserAbort=" + evt);
 
 		// TODO : Error condition. Take care
-		
+
 		SmsEvent original = this.getOriginalSmsEvent();
 
 		if (original != null) {
 			if (original.getSystemId() != null) {
 				this.sendFailureDeliverSmToEsms(original);
-			}	
+			}
 		}
 	}
 
 	public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
 		this.logger.severe("Rx :  onDialogProviderAbort=" + evt);
-		
+
 		SmsEvent original = this.getOriginalSmsEvent();
 
 		if (original != null) {
 			if (original.getSystemId() != null) {
 				this.sendFailureDeliverSmToEsms(original);
-			}	
+			}
 		}
 	}
 
@@ -312,30 +319,6 @@ public abstract class MtCommonSbb implements Sbb {
 			this.mapParameterFactory = this.mapProvider.getMAPParameterFactory();
 
 			this.logger = this.sbbContext.getTracer(this.className);
-
-			if (this.smscProperteis == null) {
-				String path = System.getProperty("jboss.server.config.url") + SMSC_PROPERTIES;
-				URL url = new URL(path);
-
-				if (new File(url.toURI()).exists()) {
-					this.smscProperteis = new Properties();
-					this.smscProperteis.load(url.openStream());
-					logger.info("loaded application properties from file: " + path + " SBB=" + this);
-				} else {
-					throw new FileNotFoundException(String.format("File %s not found", path));
-				}
-
-				this.SC_GT = this.smscProperteis.getProperty(SC_GT_KEY);
-
-				if (this.SC_GT == null) {
-					throw new RuntimeException(String.format("No value defined for key=%s in %s file", SC_GT_KEY,
-							SMSC_PROPERTIES));
-				}
-
-				this.SC_SSN = Integer.parseInt(this.smscProperteis.getProperty(SC_SSN_KEY));
-				this.HLR_SSN = Integer.parseInt(this.smscProperteis.getProperty(HLR_SSN_KEY));
-				this.MSC_SSN = Integer.parseInt(this.smscProperteis.getProperty(MSC_SSN_KEY));
-			}
 		} catch (Exception ne) {
 			logger.severe("Could not set SBB context:", ne);
 		}
@@ -383,7 +366,8 @@ public abstract class MtCommonSbb implements Sbb {
 		if (this.serviceCenterAddress == null) {
 			this.serviceCenterAddress = this.mapParameterFactory.createAddressString(
 					AddressNature.international_number,
-					org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, this.SC_GT);
+					org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN,
+					smscPropertiesManagement.getServiceCenterGt());
 		}
 		return this.serviceCenterAddress;
 	}
@@ -397,9 +381,10 @@ public abstract class MtCommonSbb implements Sbb {
 	 */
 	protected SccpAddress getServiceCenterSccpAddress() {
 		if (this.serviceCenterSCCPAddress == null) {
-			GT0100 gt = new GT0100(0, NumberingPlan.ISDN_TELEPHONY, NatureOfAddress.INTERNATIONAL, this.SC_GT);
+			GT0100 gt = new GT0100(0, NumberingPlan.ISDN_TELEPHONY, NatureOfAddress.INTERNATIONAL,
+					smscPropertiesManagement.getServiceCenterGt());
 			this.serviceCenterSCCPAddress = new SccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, 0, gt,
-					this.SC_SSN);
+					smscPropertiesManagement.getServiceCenterSsn());
 		}
 		return this.serviceCenterSCCPAddress;
 	}

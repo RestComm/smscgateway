@@ -23,51 +23,50 @@
 package org.mobicents.smsc.smpp;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.StandardMBean;
 
 import javolution.text.TextBuilder;
-import javolution.util.FastList;
 import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
-
-import com.cloudhopper.smpp.SmppBindType;
-import com.cloudhopper.smpp.type.Address;
+import org.jboss.mx.util.MBeanServerLocator;
 
 /**
- * @author zaheer abbas
+ * @author Amit Bhayani
  * 
  */
 public class SmscManagement {
 	private static final Logger logger = Logger.getLogger(SmscManagement.class);
-	
+
 	public static final String JMX_DOMAIN = "org.mobicents.smsc";
-	
-	private static final String ESME_LIST = "esmeList";
+
 	private static final String ROUTING_RULE_LIST = "routingRuleList";
 
-	private static final String SMSC_PERSIST_DIR_KEY = "smsc.persist.dir";
-	private static final String USER_DIR_KEY = "user.dir";
+	protected static final String SMSC_PERSIST_DIR_KEY = "smsc.persist.dir";
+	protected static final String USER_DIR_KEY = "user.dir";
+
 	private static final String PERSIST_FILE_NAME = "smsc.xml";
 
 	private static final XMLBinding binding = new XMLBinding();
 	private static final String TAB_INDENT = "\t";
 	private static final String CLASS_ATTRIBUTE = "type";
 
-	protected FastList<Esme> esmes = new FastList<Esme>();
-
 	private final TextBuilder persistFile = TextBuilder.newInstance();
 
 	private final String name;
 
 	private String persistDir = null;
-	
+
 	private SmppServer smppServer = null;
+
+	private EsmeManagement esmeManagement = null;
+	private SmscPropertiesManagement smscPropertiesManagement = null;
+
+	private MBeanServer mbeanServer = null;
 
 	public SmscManagement(String name) {
 		this.name = name;
@@ -95,12 +94,35 @@ public class SmscManagement {
 		this.smppServer = smppServer;
 	}
 
+	public EsmeManagement getEsmeManagement() {
+		return esmeManagement;
+	}
+
 	public void start() throws Exception {
-		
-		if(this.smppServer == null){
+		if (this.smppServer == null) {
 			throw new Exception("SmppServer not set");
 		}
-		
+
+		this.esmeManagement = new EsmeManagement(this.name);
+		this.esmeManagement.setPersistDir(this.persistDir);
+		this.esmeManagement.start();
+
+		this.smscPropertiesManagement = SmscPropertiesManagement.getInstance(this.name);
+		this.smscPropertiesManagement.setPersistDir(this.persistDir);
+		this.smscPropertiesManagement.start();
+
+		// Register the MBeans
+		this.mbeanServer = MBeanServerLocator.locateJBoss();
+
+		ObjectName esmeObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":name=EsmeManagement");
+		StandardMBean esmeMxBean = new StandardMBean(this.esmeManagement, EsmeManagementMBean.class, true);
+		this.mbeanServer.registerMBean(esmeMxBean, esmeObjNname);
+
+		ObjectName smscObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":name=SmscPropertiesManagement");
+		StandardMBean smscMxBean = new StandardMBean(this.smscPropertiesManagement,
+				SmscPropertiesManagementMBean.class, true);
+		this.mbeanServer.registerMBean(smscMxBean, smscObjNname);
+
 		this.persistFile.clear();
 
 		if (persistDir != null) {
@@ -119,85 +141,23 @@ public class SmscManagement {
 			logger.warn(String.format("Failed to load the SS7 configuration file. \n%s", e.getMessage()));
 		}
 
-		this.smppServer.setSmscManagement(this);
-		
+		this.smppServer.setEsmeManagement(this.esmeManagement);
+
 		logger.info("Started SmscManagement");
 	}
 
 	public void stop() throws Exception {
-
-		this.store();
-	}
-
-	public FastList<Esme> getEsmes() {
-		return esmes;
-	}
-
-	protected Esme getEsme(String systemId) {
-		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
-			Esme esme = n.getValue();
-			if (esme.getSystemId().equals(systemId)) {
-				return esme;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * <p>
-	 * Create new {@link Esme}
-	 * </p>
-	 * <p>
-	 * Command is smsc esme create <Any 4/5 digit number> <Specify password>
-	 * <host-ip> <port> system-type <sms | vms | ota > interface-version <3.3 |
-	 * 3.4 | 5.0> esme-ton <esme address ton> esme-npi <esme address npi>
-	 * esme-range <esme address range>
-	 * </p>
-	 * <p>
-	 * where system-type, interface-version, esme-ton, esme-npi, esme-range are
-	 * optional, by default interface-version is 3.4.
-	 * 
-	 * </p>
-	 * 
-	 * @param args
-	 * @return
-	 * @throws Exception
-	 */
-	public Esme createEsme(String systemId, String password, String host, String port, SmppBindType smppBindType, String systemType,
-			SmppInterfaceVersionType smppIntVersion, Address address)
-			throws Exception {
-
-		/* Esme system id should be unique and mandatory for each esme */
-		Esme esme = this.getEsme(systemId);
-		if (esme != null) {
-			throw new Exception(String.format(SMSCOAMMessages.CREATE_EMSE_FAIL_ALREADY_EXIST, systemId));
-		}
-
-		// TODO check if RC is already taken?
-		if (smppIntVersion == null) {
-			smppIntVersion = SmppInterfaceVersionType.SMPP34;
-		}
-
-		esme = new Esme(systemId, password, host, port, smppBindType, systemType, smppIntVersion, address);
-		esme.setSmscManagement(this);
-		esmes.add(esme);
-
+		this.esmeManagement.stop();
+		this.smscPropertiesManagement.stop();
 		this.store();
 
-		return esme;
-	}
+		if (this.mbeanServer != null) {
+			ObjectName esmeObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":name=EsmeManagement");
+			this.mbeanServer.unregisterMBean(esmeObjNname);
 
-	public Esme destroyEsme(String systemId) throws Exception {
-		Esme esme = this.getEsme(systemId);
-		if (esme == null) {
-			throw new Exception(String.format(SMSCOAMMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, systemId));
+			ObjectName smscObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":name=SmscPropertiesManagement");
+			this.mbeanServer.unregisterMBean(smscObjNname);
 		}
-
-		esmes.remove(esme);
-
-		this.store();
-
-		return esme;
 	}
 
 	/**
@@ -207,18 +167,19 @@ public class SmscManagement {
 
 		// TODO : Should we keep reference to Objects rather than recreating
 		// everytime?
-		try {
-			XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-			writer.setBinding(binding);
-			// Enables cross-references.
-			// writer.setReferenceResolver(new XMLReferenceResolver());
-			writer.setIndentation(TAB_INDENT);
-			writer.write(esmes, ESME_LIST, FastList.class);
-
-			writer.close();
-		} catch (Exception e) {
-			logger.error("Error while persisting the Rule state in file", e);
-		}
+		// try {
+		// XMLObjectWriter writer = XMLObjectWriter.newInstance(new
+		// FileOutputStream(persistFile.toString()));
+		// writer.setBinding(binding);
+		// // Enables cross-references.
+		// // writer.setReferenceResolver(new XMLReferenceResolver());
+		// writer.setIndentation(TAB_INDENT);
+		// writer.write(esmes, ESME_LIST, FastList.class);
+		//
+		// writer.close();
+		// } catch (Exception e) {
+		// logger.error("Error while persisting the Rule state in file", e);
+		// }
 	}
 
 	/**
@@ -228,16 +189,17 @@ public class SmscManagement {
 	 */
 	public void load() throws FileNotFoundException {
 
-		XMLObjectReader reader = null;
-		try {
-			reader = XMLObjectReader.newInstance(new FileInputStream(persistFile.toString()));
-
-			reader.setBinding(binding);
-			esmes = reader.read(ESME_LIST, FastList.class);
-
-		} catch (XMLStreamException ex) {
-			// this.logger.info(
-			// "Error while re-creating Linksets from persisted file", ex);
-		}
+		// XMLObjectReader reader = null;
+		// try {
+		// reader = XMLObjectReader.newInstance(new
+		// FileInputStream(persistFile.toString()));
+		//
+		// reader.setBinding(binding);
+		// esmes = reader.read(ESME_LIST, FastList.class);
+		//
+		// } catch (XMLStreamException ex) {
+		// // this.logger.info(
+		// // "Error while re-creating Linksets from persisted file", ex);
+		// }
 	}
 }

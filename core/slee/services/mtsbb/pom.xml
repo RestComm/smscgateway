@@ -9,9 +9,9 @@
 		<version>1.0.0.ALPHA-SNAPSHOT</version>
 	</parent>
 	<artifactId>mt-sbb</artifactId>
-	
+
 	<name>Core : SLEE : Services Mt SBB</name>
-	
+
 	<dependencies>
 		<dependency>
 			<artifactId>smsc-events</artifactId>
@@ -30,6 +30,13 @@
 		<dependency>
 			<artifactId>smpp-server-ra-ratype</artifactId>
 			<groupId>${pom.groupId}</groupId>
-		</dependency>		
+		</dependency>
+
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>smpp</artifactId>
+			<version>${pom.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>

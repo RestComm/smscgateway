@@ -237,9 +237,6 @@
 
 									</fileset>
 								</copy>
-								<copy file="${basedir}/src/main/config/smsc.properties"
-									tofile="${jboss.home}/server/${node}/conf/smsc.properties">
-								</copy>
 							</tasks>
 						</configuration>
 					</execution>
@@ -255,7 +252,6 @@
 									<fileset
 										dir="${jboss.home}/server/${node}/deploy/mobicents-smsc-server" />
 								</delete>
-								<delete file="${jboss.home}/server/${node}/conf/smsc.properties" />
 							</tasks>
 						</configuration>
 					</execution>
