@@ -70,6 +70,8 @@ public interface SMSCOAMMessages {
 	public static final String DELETE_ESME_SUCCESSFUL = "Successfully deleted Esme with given systemId %s";
 
 	public static final String NULL_ESME_ADDRESS_RANGE = "esme-range is compulsory for TRANSCEIVER and RECEIVER";
+	
+	public static final String PARAMETER_SUCCESSFULLY_SET = "Parameter has been successfully set";
 	/**
 	 * Generic constants
 	 */

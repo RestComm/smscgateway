@@ -42,6 +42,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 
 	private SmscManagement smscManagement;
 
+	private static final SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+
 	public SMSCShellExecutor() {
 
 	}
@@ -198,7 +200,7 @@ public class SMSCShellExecutor implements ShellExecutor {
 
 	private String executeSmsc(String[] args) {
 		try {
-			if (args.length < 3 || args.length > 20) {
+			if (args.length < 2 || args.length > 20) {
 				// any command will have atleast 3 args
 				return SMSCOAMMessages.INVALID_COMMAND;
 			}
@@ -221,94 +223,90 @@ public class SMSCShellExecutor implements ShellExecutor {
 					return this.showEsme();
 				}
 				return SMSCOAMMessages.INVALID_COMMAND;
-			} else if (args[1].equals("rule")) {/*
-												 * 
-												 * if (args.length > 5) { return
-												 * SMSCOAMMessages
-												 * .INVALID_COMMAND; }
-												 * 
-												 * // related to rem AS for
-												 * SigGatewayImpl String raspCmd
-												 * = args[2];
-												 * 
-												 * if (raspCmd == null) { return
-												 * SMSCOAMMessages
-												 * .INVALID_COMMAND; } else if
-												 * (raspCmd.equals("create")) {
-												 * // Create new rule if
-												 * (args.length < 5) { return
-												 * SMSCOAMMessages
-												 * .INVALID_COMMAND; }
-												 * 
-												 * String aspname = args[3];
-												 * String assocName = args[4];
-												 * 
-												 * if (aspname == null ||
-												 * assocName == null) { return
-												 * SMSCOAMMessages
-												 * .INVALID_COMMAND; }
-												 * 
-												 * AspFactory factory =
-												 * this.m3uaManagement
-												 * .createAspFactory(aspname,
-												 * assocName); return
-												 * String.format
-												 * (SMSCOAMMessages.
-												 * CREATE_ASP_SUCESSFULL,
-												 * factory.getName()); } else if
-												 * (raspCmd.equals("destroy")) {
-												 * if (args.length < 4) { return
-												 * SMSCOAMMessages
-												 * .INVALID_COMMAND; }
-												 * 
-												 * String aspName = args[3];
-												 * this
-												 * .m3uaManagement.destroyAspFactory
-												 * (aspName); return
-												 * String.format(
-												 * "Successfully destroyed ASP name=%s"
-												 * , aspName);
-												 * 
-												 * } else if
-												 * (raspCmd.equals("show")) {
-												 * return
-												 * this.showAspFactories();
-												 * 
-												 * } else if
-												 * (raspCmd.equals("start")) {
-												 * if (args.length < 4) { return
-												 * SMSCOAMMessages
-												 * .INVALID_COMMAND; }
-												 * 
-												 * String aspName = args[3];
-												 * this
-												 * .m3uaManagement.startAsp(
-												 * aspName ); return
-												 * String.format(SMSCOAMMessages
-												 * .ASP_START_SUCESSFULL,
-												 * aspName); } else if
-												 * (raspCmd.equals("stop")) { if
-												 * (args.length < 4) { return
-												 * SMSCOAMMessages
-												 * .INVALID_COMMAND; }
-												 * 
-												 * String aspName = args[3];
-												 * this
-												 * .m3uaManagement.stopAsp(aspName
-												 * ); return
-												 * String.format(SMSCOAMMessages
-												 * .ASP_STOP_SUCESSFULL,
-												 * aspName); }
-												 * 
-												 * return
-												 * SMSCOAMMessages.INVALID_COMMAND
-												 * ;
-												 */
+			} else if (args[1].equals("set")) {
+				return this.manageSet(args);
+			} else if (args[1].equals("get")) {
+				return this.manageGet(args);
 			}
 			return SMSCOAMMessages.INVALID_COMMAND;
 		} catch (Exception e) {
 			logger.error(String.format("Error while executing comand %s", Arrays.toString(args)), e);
 			return e.getMessage();
+		}
+	}
+
+	private String manageSet(String[] options) throws Exception {
+		if (options.length < 4) {
+			return SMSCOAMMessages.INVALID_COMMAND;
+		}
+
+		String parName = options[2].toLowerCase();
+		if (parName.equals("scgt")) {
+			smscPropertiesManagement.setServiceCenterGt(options[3]);
+		} else if (parName.equals("scssn")) {
+			int val = Integer.parseInt(options[3]);
+			smscPropertiesManagement.setServiceCenterSsn(val);
+		} else if (parName.equals("hlrssn")) {
+			int val = Integer.parseInt(options[3]);
+			smscPropertiesManagement.setHlrSsn(val);
+		} else if (parName.equals("mscssn")) {
+			int val = Integer.parseInt(options[3]);
+			smscPropertiesManagement.setMscSsn(val);
+		} else if (parName.equals("maxmapv")) {
+			int val = Integer.parseInt(options[3]);
+			smscPropertiesManagement.setMaxMapVersion(val);
+		} else {
+			return SMSCOAMMessages.INVALID_COMMAND;
+		}
+
+		return SMSCOAMMessages.PARAMETER_SUCCESSFULLY_SET;
+	}
+
+	private String manageGet(String[] options) throws Exception {
+		if (options.length == 3) {
+			String parName = options[2].toLowerCase();
+
+			StringBuilder sb = new StringBuilder();
+			sb.append(options[2]);
+			sb.append(" = ");
+			if (parName.equals("scgt")) {
+				sb.append(smscPropertiesManagement.getServiceCenterGt());
+			} else if (parName.equals("scssn")) {
+				sb.append(smscPropertiesManagement.getServiceCenterSsn());
+			} else if (parName.equals("hlrssn")) {
+				sb.append(smscPropertiesManagement.getHlrSsn());
+			} else if (parName.equals("mscssn")) {
+				sb.append(smscPropertiesManagement.getMscSsn());
+			} else if (parName.equals("maxmapv")) {
+				sb.append(smscPropertiesManagement.getMaxMapVersion());
+			} else {
+				return SMSCOAMMessages.INVALID_COMMAND;
+			}
+
+			return sb.toString();
+		} else {
+			StringBuilder sb = new StringBuilder();
+			sb.append("scgt = ");
+			sb.append(smscPropertiesManagement.getServiceCenterGt());
+			sb.append("\n");
+
+			sb.append("scssn = ");
+			sb.append(smscPropertiesManagement.getServiceCenterSsn());
+			sb.append("\n");
+
+			sb.append("hlrssn = ");
+			sb.append(smscPropertiesManagement.getHlrSsn());
+			sb.append("\n");
+
+			sb.append("mscssn = ");
+			sb.append(smscPropertiesManagement.getMscSsn());
+			sb.append("\n");
+
+			sb.append("maxmapv = ");
+			sb.append(smscPropertiesManagement.getMaxMapVersion());
+			sb.append("\n");
+
+			return sb.toString();
 		}
 	}
 

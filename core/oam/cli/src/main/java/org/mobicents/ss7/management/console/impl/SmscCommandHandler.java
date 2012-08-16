@@ -19,6 +19,20 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
 		esme.addChild("create");
 		esme.addChild("delete");
 		esme.addChild("show");
+		
+		Node set = parent.addChild("set");
+		set.addChild("scgt");
+		set.addChild("scssn");
+		set.addChild("hlrssn");
+		set.addChild("mscssn");
+		set.addChild("maxmapv");
+		
+		Node get = parent.addChild("get");
+		get.addChild("scgt");
+		get.addChild("scssn");
+		get.addChild("hlrssn");
+		get.addChild("mscssn");
+		get.addChild("maxmapv");
 
 	};
 
