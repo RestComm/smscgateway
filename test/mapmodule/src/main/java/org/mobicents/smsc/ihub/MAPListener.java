@@ -188,9 +188,34 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 	}
 
 	@Override
-	public void onForwardShortMessageRequest(ForwardShortMessageRequest arg0) {
-		// TODO Auto-generated method stub
+	public void onForwardShortMessageRequest(ForwardShortMessageRequest event) {
+		if (logger.isInfoEnabled()) {
+			logger.info("Rx : onForwardShortMessageRequest=" + event);
+		}
 
+		// Lets first close the Dialog
+		MAPDialogSms mapDialogSms = event.getMAPDialog();
+
+		if (this.currentMapMessageCount % 7 == 0) {
+			// Send back AbsentSubscriber for every 7th MtSMS
+			try {
+				MAPErrorMessage mapErrorMessage = mAPErrorMessageFactory.createMAPErrorMessageAbsentSubscriberSM(1,
+						null, null);
+				mapDialogSms.sendErrorComponent(event.getInvokeId(), mapErrorMessage);
+				mapDialogSms.close(false);
+			} catch (MAPException e) {
+				logger.error("Error while sending MAPErrorMessageAbsentSubscriberSM ", e);
+			}
+		} else {
+
+			try {
+				mapDialogSms.addForwardShortMessageResponse(event.getInvokeId());
+				mapDialogSms.close(false);
+			} catch (MAPException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -210,7 +235,7 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Rx : MoForwardShortMessageRequestIndication=" + request);
 		}
-		
+
 		MAPDialogSms dialog = request.getMAPDialog();
 
 		try {

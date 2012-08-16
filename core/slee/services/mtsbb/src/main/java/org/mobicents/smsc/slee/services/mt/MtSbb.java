@@ -35,6 +35,8 @@ import org.mobicents.protocols.ss7.map.api.MAPException;
 import org.mobicents.protocols.ss7.map.api.dialog.MAPRefuseReason;
 import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
+import org.mobicents.protocols.ss7.map.api.service.sms.ForwardShortMessageRequest;
+import org.mobicents.protocols.ss7.map.api.service.sms.ForwardShortMessageResponse;
 import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
 import org.mobicents.protocols.ss7.map.api.service.sms.MtForwardShortMessageRequest;
 import org.mobicents.protocols.ss7.map.api.service.sms.MtForwardShortMessageResponse;
@@ -135,6 +137,42 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	/**
 	 * SMS Event Handlers
 	 */
+
+	/**
+	 * Received MT SMS. This is error we should never receive this
+	 * 
+	 * @param evt
+	 * @param aci
+	 */
+	public void onForwardShortMessageRequest(ForwardShortMessageRequest evt, ActivityContextInterface aci) {
+		this.logger.severe("Received FORWARD_SHORT_MESSAGE_REQUEST = " + evt);
+	}
+
+	/**
+	 * Received ACK for MT Forward SMS sent earlier
+	 * 
+	 * @param evt
+	 * @param aci
+	 */
+	public void onForwardShortMessageResponse(ForwardShortMessageResponse evt, ActivityContextInterface aci) {
+		if (this.logger.isInfoEnabled()) {
+			this.logger.info("Received FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
+		}
+		SmsEvent smsEvent = this.getOriginalSmsEvent();
+		if (smsEvent != null) {
+			try {
+				if (smsEvent.getSystemId() != null) {
+					sendSuccessDeliverSmToEsms(smsEvent);
+				} else {
+					// TODO : This is destined for Mobile user, send
+					// SMS-STATUS-REPORT
+				}
+			} catch (Exception e) {
+				this.logger.severe(
+						String.format("Exception while trying to send Delivery Report for SmsEvent=%s", smsEvent), e);
+			}
+		}
+	}
 
 	/**
 	 * Received MT SMS. This is error we should never receive this
