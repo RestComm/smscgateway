@@ -21,15 +21,17 @@
  */
 package org.mobicents.smsc.slee.services.mt;
 
-import javax.slee.ActivityContextInterface;
+import javax.slee.EventContext;
+
+import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
+import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 
 /**
  * 
  * @author amit bhayani
- *
+ * 
  */
-public interface MtActivityContextInterface extends ActivityContextInterface {
-	public int getPendingEventsOnNullActivity();
-
-	public void setPendingEventsOnNullActivity(int events);
+public interface MtForwardSmsInterface {
+	public void setupMtForwardShortMessageRequest(ISDNAddressString networkNode, IMSI imsi,
+			EventContext nullActivityEventContext);
 }

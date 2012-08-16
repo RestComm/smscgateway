@@ -41,6 +41,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private static final String SC_SSN = "scssn";
 	private static final String HLR_SSN = "hlrssn";
 	private static final String MSC_SSN = "mscssn";
+	private static final String MAX_MAP_VERSION = "maxmapv";
 
 	private static final String TAB_INDENT = "\t";
 	private static final String CLASS_ATTRIBUTE = "type";
@@ -59,6 +60,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private int serviceCenterSsn = -1;
 	private int hlrSsn = -1;
 	private int mscSsn = -1;
+	private int maxMapVersion = 3;
 
 	private SmscPropertiesManagement(String name) {
 		this.name = name;
@@ -124,6 +126,15 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 		this.store();
 	}
 
+	public int getMaxMapVersion() {
+		return maxMapVersion;
+	}
+
+	public void setMaxMapVersion(int maxMapVersion) {
+		this.maxMapVersion = maxMapVersion;
+		this.store();
+	}
+
 	public void start() throws Exception {
 
 		this.persistFile.clear();
@@ -170,6 +181,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			writer.write(this.serviceCenterSsn, SC_SSN, Integer.class);
 			writer.write(this.hlrSsn, HLR_SSN, Integer.class);
 			writer.write(this.mscSsn, MSC_SSN, Integer.class);
+			writer.write(this.maxMapVersion, MAX_MAP_VERSION, Integer.class);
 
 			writer.close();
 		} catch (Exception e) {
@@ -193,7 +205,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			this.serviceCenterSsn = reader.read(SC_SSN, Integer.class);
 			this.hlrSsn = reader.read(HLR_SSN, Integer.class);
 			this.mscSsn = reader.read(MSC_SSN, Integer.class);
+			this.maxMapVersion = reader.read(MAX_MAP_VERSION, Integer.class);
 
+			reader.close();
 		} catch (XMLStreamException ex) {
 			// this.logger.info(
 			// "Error while re-creating Linksets from persisted file", ex);

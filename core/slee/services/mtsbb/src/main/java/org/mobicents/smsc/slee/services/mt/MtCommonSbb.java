@@ -38,6 +38,7 @@ import javax.slee.nullactivity.NullActivity;
 import org.mobicents.protocols.ss7.indicator.NatureOfAddress;
 import org.mobicents.protocols.ss7.indicator.NumberingPlan;
 import org.mobicents.protocols.ss7.indicator.RoutingIndicator;
+import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
 import org.mobicents.protocols.ss7.map.api.MAPParameterFactory;
 import org.mobicents.protocols.ss7.map.api.MAPProvider;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
@@ -102,6 +103,8 @@ public abstract class MtCommonSbb implements Sbb {
 
 	private AddressString serviceCenterAddress;
 	private SccpAddress serviceCenterSCCPAddress = null;
+
+	protected MAPApplicationContextVersion maxMAPApplicationContextVersion = null;
 
 	public MtCommonSbb(String className) {
 		this.className = className;
@@ -319,6 +322,8 @@ public abstract class MtCommonSbb implements Sbb {
 			this.mapParameterFactory = this.mapProvider.getMAPParameterFactory();
 
 			this.logger = this.sbbContext.getTracer(this.className);
+
+			this.maxMAPApplicationContextVersion = MAPApplicationContextVersion.getInstance(smscPropertiesManagement.getMaxMapVersion());
 		} catch (Exception ne) {
 			logger.severe("Could not set SBB context:", ne);
 		}

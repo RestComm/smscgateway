@@ -31,8 +31,8 @@ import org.mobicents.protocols.ss7.indicator.NumberingPlan;
 import org.mobicents.protocols.ss7.indicator.RoutingIndicator;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
 import org.mobicents.protocols.ss7.map.api.MAPException;
+import org.mobicents.protocols.ss7.map.api.dialog.MAPRefuseReason;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
@@ -40,11 +40,19 @@ import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMReque
 import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
 import org.mobicents.protocols.ss7.sccp.parameter.GT0100;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
+import org.mobicents.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.mobicents.slee.resource.map.events.DialogProviderAbort;
+import org.mobicents.slee.resource.map.events.DialogReject;
 import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
 
+/**
+ * 
+ * 
+ * @author amit bhayani
+ *
+ */
 public abstract class SriSbb extends MtCommonSbb {
 
 	private static final String className = "SriSbb";
@@ -85,7 +93,7 @@ public abstract class SriSbb extends MtCommonSbb {
 		// which case persist this even in database
 
 		// This MSISDN is available. Begin SRI and let Mt process begin
-		this.sendSRI(event.getDestAddr());
+		this.sendSRI(event.getDestAddr(), this.getSRIMAPApplicationContext());
 
 	}
 
@@ -102,6 +110,31 @@ public abstract class SriSbb extends MtCommonSbb {
 	/**
 	 * Dialog Events override from MtCommonSbb that we care
 	 */
+
+	@Override
+	public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
+		MAPRefuseReason mapRefuseReason = evt.getRefuseReason();
+
+		// If ACN not supported, lets use the new one suggested
+		if (mapRefuseReason == MAPRefuseReason.ApplicationContextNotSupported) {
+			// lets detach so we don't get onDialogRelease() which will start
+			// delivering SMS waiting in queue for same MSISDN
+			aci.detach(this.sbbContext.getSbbLocalObject());
+
+			// Now send new SRI with supported ACN
+			ApplicationContextName tcapApplicationContextName = evt.getAlternativeApplicationContext();
+			MAPApplicationContext supportedMAPApplicationContext = MAPApplicationContext
+					.getInstance(tcapApplicationContextName.getOid());
+
+			SmsEvent event = this.getOriginalSmsEvent();
+
+			this.sendSRI(event.getDestAddr(), supportedMAPApplicationContext);
+
+		} else {
+			super.onDialogReject(evt, aci);
+		}
+	}
+
 	@Override
 	public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
 		super.onDialogProviderAbort(evt, aci);
@@ -149,6 +182,8 @@ public abstract class SriSbb extends MtCommonSbb {
 			this.logger.info("Received SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt + " Dialog=" + evt.getMAPDialog());
 		}
 
+		// lets detach so we don't get onDialogRelease() which will start
+		// delivering SMS waiting in queue for same MSISDN
 		aci.detach(this.sbbContext.getSbbLocalObject());
 
 		MtSbbLocalObject mtSbbLocalObject = null;
@@ -157,7 +192,8 @@ public abstract class SriSbb extends MtCommonSbb {
 			ChildRelation relation = getMtSbb();
 			mtSbbLocalObject = (MtSbbLocalObject) relation.create();
 
-			mtSbbLocalObject.setupMtForwardShortMessageRequestIndication(evt, this.getNullActivityEventContext());
+			mtSbbLocalObject.setupMtForwardShortMessageRequest(evt.getLocationInfoWithLMSI().getNetworkNodeNumber(),
+					evt.getIMSI(), this.getNullActivityEventContext());
 		} catch (CreateException e) {
 			this.logger.severe("Could not create Child SBB", e);
 
@@ -190,12 +226,12 @@ public abstract class SriSbb extends MtCommonSbb {
 				org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, destinationAddress);
 	}
 
-	private void sendSRI(String destinationAddress) {
+	private void sendSRI(String destinationAddress, MAPApplicationContext mapApplicationContext) {
 		// Send out SMS
 		MAPDialogSms mapDialogSms = null;
 		try {
 			// 1. Create Dialog first and add the SRI request to it
-			mapDialogSms = this.setupRoutingInfoForSMRequestIndication(destinationAddress);
+			mapDialogSms = this.setupRoutingInfoForSMRequestIndication(destinationAddress, mapApplicationContext);
 
 			// 2. Create the ACI and attach this SBB
 			ActivityContextInterface sriDialogACI = this.mapAcif.getActivityContextInterface(mapDialogSms);
@@ -219,14 +255,14 @@ public abstract class SriSbb extends MtCommonSbb {
 		}
 	}
 
-	private MAPDialogSms setupRoutingInfoForSMRequestIndication(String destinationAddress) throws MAPException {
+	private MAPDialogSms setupRoutingInfoForSMRequestIndication(String destinationAddress,
+			MAPApplicationContext mapApplicationContext) throws MAPException {
 		// this.mapParameterFactory.creat
 
 		SccpAddress destinationReference = this.convertAddressFieldToSCCPAddress(destinationAddress);
 
-		MAPDialogSms mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(
-				this.getSRIMAPApplicationContext(), this.getServiceCenterSccpAddress(), null, destinationReference,
-				null);
+		MAPDialogSms mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext,
+				this.getServiceCenterSccpAddress(), null, destinationReference, null);
 
 		mapDialogSms.addSendRoutingInfoForSMRequest(this.getCalledPartyISDNAddressString(destinationAddress), true,
 				this.getServiceCenterAddressString(), null, false, null, null);
@@ -236,13 +272,14 @@ public abstract class SriSbb extends MtCommonSbb {
 
 	private SccpAddress convertAddressFieldToSCCPAddress(String address) {
 		GT0100 gt = new GT0100(0, NumberingPlan.ISDN_TELEPHONY, NatureOfAddress.INTERNATIONAL, address);
-		return new SccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, 0, gt, smscPropertiesManagement.getHlrSsn());
+		return new SccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, 0, gt,
+				smscPropertiesManagement.getHlrSsn());
 	}
 
 	private MAPApplicationContext getSRIMAPApplicationContext() {
 		if (this.sriMAPApplicationContext == null) {
 			this.sriMAPApplicationContext = MAPApplicationContext.getInstance(
-					MAPApplicationContextName.shortMsgGatewayContext, MAPApplicationContextVersion.version3);
+					MAPApplicationContextName.shortMsgGatewayContext, this.maxMAPApplicationContextVersion);
 		}
 		return this.sriMAPApplicationContext;
 	}

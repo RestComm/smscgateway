@@ -241,6 +241,12 @@
 				<cmp-field>
 					<cmp-field-name>nullActivityEventContext</cmp-field-name>
 				</cmp-field>
+				<cmp-field>
+					<cmp-field-name>networkNode</cmp-field-name>
+				</cmp-field>
+				<cmp-field>
+					<cmp-field-name>imsi</cmp-field-name>
+				</cmp-field>								
 			</sbb-abstract-class>
 			<sbb-local-interface>
 				<sbb-local-interface-name>

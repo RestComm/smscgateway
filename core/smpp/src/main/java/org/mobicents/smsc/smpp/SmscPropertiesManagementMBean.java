@@ -38,4 +38,8 @@ public interface SmscPropertiesManagementMBean {
 	public int getMscSsn();
 
 	public void setMscSsn(int mscSsn);
+
+	public int getMaxMapVersion();
+
+	public void setMaxMapVersion(int maxMapVersion);
 }

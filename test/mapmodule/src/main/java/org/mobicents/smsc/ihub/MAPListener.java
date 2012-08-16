@@ -258,8 +258,6 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 		// Lets first close the Dialog
 		MAPDialogSms mapDialogSms = event.getMAPDialog();
 
-		System.err.println("\n" + this.currentMapMessageCount + "\n");
-
 		if (this.currentMapMessageCount % 7 == 0) {
 			// Send back AbsentSubscriber for every 7th MtSMS
 			try {

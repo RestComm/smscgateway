@@ -31,15 +31,15 @@ import org.mobicents.protocols.ss7.indicator.NumberingPlan;
 import org.mobicents.protocols.ss7.indicator.RoutingIndicator;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
 import org.mobicents.protocols.ss7.map.api.MAPException;
+import org.mobicents.protocols.ss7.map.api.dialog.MAPRefuseReason;
+import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
 import org.mobicents.protocols.ss7.map.api.service.sms.MtForwardShortMessageRequest;
 import org.mobicents.protocols.ss7.map.api.service.sms.MtForwardShortMessageResponse;
 import org.mobicents.protocols.ss7.map.api.service.sms.SM_RP_DA;
 import org.mobicents.protocols.ss7.map.api.service.sms.SM_RP_OA;
-import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
 import org.mobicents.protocols.ss7.map.api.smstpdu.AddressField;
 import org.mobicents.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
 import org.mobicents.protocols.ss7.map.api.smstpdu.TypeOfNumber;
@@ -52,12 +52,14 @@ import org.mobicents.protocols.ss7.map.smstpdu.SmsDeliverTpduImpl;
 import org.mobicents.protocols.ss7.map.smstpdu.UserDataImpl;
 import org.mobicents.protocols.ss7.sccp.parameter.GT0100;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
+import org.mobicents.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.mobicents.slee.resource.map.events.DialogProviderAbort;
+import org.mobicents.slee.resource.map.events.DialogReject;
 import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
 
-public abstract class MtSbb extends MtCommonSbb {
+public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface {
 
 	private static final String className = "MtSbb";
 
@@ -104,6 +106,30 @@ public abstract class MtSbb extends MtCommonSbb {
 
 		// TODO : Set flag for this MSISDN so no more Mt process is tried,
 		// rather handed to Mt directly
+	}
+
+	@Override
+	public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
+		MAPRefuseReason mapRefuseReason = evt.getRefuseReason();
+
+		// If ACN not supported, lets use the new one suggested
+		if (mapRefuseReason == MAPRefuseReason.ApplicationContextNotSupported) {
+			// lets detach so we don't get onDialogRelease() which will start
+			// delivering SMS waiting in queue for same MSISDN
+			aci.detach(this.sbbContext.getSbbLocalObject());
+
+			// Now send new SRI with supported ACN
+			ApplicationContextName tcapApplicationContextName = evt.getAlternativeApplicationContext();
+			MAPApplicationContext supportedMAPApplicationContext = MAPApplicationContext
+					.getInstance(tcapApplicationContextName.getOid());
+
+			SmsEvent event = this.getOriginalSmsEvent();
+
+			this.sendMtSms(this.getNetworkNode(), this.getImsi(), event, supportedMAPApplicationContext);
+
+		} else {
+			super.onDialogReject(evt, aci);
+		}
 	}
 
 	/**
@@ -163,24 +189,57 @@ public abstract class MtSbb extends MtCommonSbb {
 	 * 
 	 * @throws MAPException
 	 */
-	public void setupMtForwardShortMessageRequestIndication(SendRoutingInfoForSMResponse evt,
+	@Override
+	public void setupMtForwardShortMessageRequest(ISDNAddressString networkNode, IMSI imsi,
 			EventContext nullActivityEventContext) {
 		if (this.logger.isInfoEnabled()) {
-			this.logger
-					.info("Received setupMtForwardShortMessageRequestIndication SendRoutingInfoForSMResponseIndication= "
-							+ evt + " nullActivityEventContext" + nullActivityEventContext);
+			this.logger.info("Received setupMtForwardShortMessageRequestIndication ISDNAddressString= " + networkNode
+					+ " nullActivityEventContext" + nullActivityEventContext);
 		}
 
 		this.setNullActivityEventContext(nullActivityEventContext);
+		this.setNetworkNode(networkNode);
+		this.setImsi(imsi);
 
 		SmsEvent smsEvent = (SmsEvent) nullActivityEventContext.getEvent();
+
+		this.sendMtSms(networkNode, imsi, smsEvent, this.getMtFoSMSMAPApplicationContext());
+	}
+
+	/**
+	 * CMPs
+	 */
+
+	/**
+	 * Set the ISDNAddressString of network node where Mt SMS is to be submitted
+	 * 
+	 * @param networkNode
+	 */
+	public abstract void setNetworkNode(ISDNAddressString networkNode);
+
+	public abstract ISDNAddressString getNetworkNode();
+
+	/**
+	 * Set the IMSI of destination MSISDN
+	 * 
+	 * @param imsi
+	 */
+	public abstract void setImsi(IMSI imsi);
+
+	public abstract IMSI getImsi();
+
+	/**
+	 * Private Methods
+	 */
+
+	private void sendMtSms(ISDNAddressString networkNode, IMSI imsi, SmsEvent smsEvent,
+			MAPApplicationContext mapApplicationContext) {
 		MAPDialogSms mapDialogSms = null;
 		try {
-			mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(this.getMtFoSMSMAPApplicationContext(),
-					this.getServiceCenterSccpAddress(), null,
-					this.getMSCSccpAddress(evt.getLocationInfoWithLMSI().getNetworkNodeNumber()), null);
+			mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext,
+					this.getServiceCenterSccpAddress(), null, this.getMSCSccpAddress(networkNode), null);
 
-			SM_RP_DA sm_RP_DA = this.mapParameterFactory.createSM_RP_DA(evt.getIMSI());
+			SM_RP_DA sm_RP_DA = this.mapParameterFactory.createSM_RP_DA(imsi);
 
 			SM_RP_OA sm_RP_OA = this.mapParameterFactory.createSM_RP_OA_ServiceCentreAddressOA(this
 					.getServiceCenterAddressString());
@@ -205,7 +264,19 @@ public abstract class MtSbb extends MtCommonSbb {
 
 			SmsSignalInfoImpl SmsSignalInfoImpl = new SmsSignalInfoImpl(smsDeliverTpduImpl, null);
 
-			mapDialogSms.addMtForwardShortMessageRequest(sm_RP_DA, sm_RP_OA, SmsSignalInfoImpl, false, null);
+			switch (mapApplicationContext.getApplicationContextVersion()) {
+			case version3:
+				mapDialogSms.addMtForwardShortMessageRequest(sm_RP_DA, sm_RP_OA, SmsSignalInfoImpl, false, null);
+				break;
+			case version2:
+				mapDialogSms.addForwardShortMessageRequest(sm_RP_DA, sm_RP_OA, SmsSignalInfoImpl, false);
+				break;
+			default:
+				// TODO take care of this, but should this ever happen?
+				logger.severe(String.format("Trying to send Mt SMS with version=%d. This is serious!!",
+						mapApplicationContext.getApplicationContextVersion().getVersion()));
+				break;
+			}
 
 			ActivityContextInterface mtFOSmsDialogACI = this.mapAcif.getActivityContextInterface(mapDialogSms);
 			mtFOSmsDialogACI.attach(this.sbbContext.getSbbLocalObject());
@@ -224,17 +295,12 @@ public abstract class MtSbb extends MtCommonSbb {
 					.getNullActivityEventContext().getActivityContextInterface());
 			this.resumeNullActivityEventDelivery(mtSbbActivityContextInterface, this.getNullActivityEventContext());
 		}
-
 	}
-
-	/**
-	 * Private Methods
-	 */
 
 	private MAPApplicationContext getMtFoSMSMAPApplicationContext() {
 		if (this.mtFoSMSMAPApplicationContext == null) {
 			this.mtFoSMSMAPApplicationContext = MAPApplicationContext.getInstance(
-					MAPApplicationContextName.shortMsgMTRelayContext, MAPApplicationContextVersion.version3);
+					MAPApplicationContextName.shortMsgMTRelayContext, this.maxMAPApplicationContextVersion);
 		}
 		return this.mtFoSMSMAPApplicationContext;
 	}
