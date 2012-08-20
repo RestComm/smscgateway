@@ -39,6 +39,11 @@ import org.apache.log4j.Logger;
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.type.Address;
 
+/**
+ * 
+ * @author amit bhayani
+ *
+ */
 public class EsmeManagement implements EsmeManagementMBean {
 
 	private static final Logger logger = Logger.getLogger(EsmeManagement.class);
@@ -205,7 +210,8 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 			reader.setBinding(binding);
 			esmes = reader.read(ESME_LIST, FastList.class);
-
+			
+			reader.close();
 		} catch (XMLStreamException ex) {
 			// this.logger.info(
 			// "Error while re-creating Linksets from persisted file", ex);
