@@ -1,7 +1,7 @@
 #!/bin/sh
 ### ====================================================================== ###
 ##                                                                          ##
-##  Mobicents Media Server Bootstrap Script                                 ##
+##  Mobicents SMSC Test Server Bootstrap Script                             ##
 ##                                                                          ##
 ### ====================================================================== ###
 
@@ -152,7 +152,7 @@ fi
 # Display our environment
 echo "========================================================================="
 echo ""
-echo "  MMS Bootstrap Environment"
+echo "  Mobicents SMSC Gateway Test Server Bootstrap Environment"
 echo ""
 echo "  SMSC_HOME: $SMSC_HOME"
 echo ""

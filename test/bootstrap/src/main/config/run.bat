@@ -120,7 +120,7 @@ set MMS_ENDORSED_DIRS=%MMS_HOME%\lib
 
 echo ===============================================================================
 echo.
-echo   MMS Bootstrap Environment
+echo   Mobicents SMSC Gateway Test Server Bootstrap Environment
 echo.
 echo   MMS_HOME: %MMS_HOME%
 echo.
