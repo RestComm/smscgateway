@@ -265,7 +265,7 @@ public abstract class SriSbb extends MtCommonSbb {
 				this.getServiceCenterSccpAddress(), null, destinationReference, null);
 
 		mapDialogSms.addSendRoutingInfoForSMRequest(this.getCalledPartyISDNAddressString(destinationAddress), true,
-				this.getServiceCenterAddressString(), null, false, null, null);
+				this.getServiceCenterAddressString(), null, false, null, null, null);
 
 		return mapDialogSms;
 	}
