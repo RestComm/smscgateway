@@ -59,7 +59,6 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
-import org.mobicents.slee.resource.map.events.ProviderErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent;
 import org.mobicents.smsc.smpp.SmscPropertiesManagement;
@@ -138,17 +137,17 @@ public abstract class MtCommonSbb implements Sbb {
 		}
 	}
 
-	public void onProviderErrorComponent(ProviderErrorComponent event, ActivityContextInterface aci) {
-		this.logger.severe("Rx :  onProviderErrorComponent" + event);
-
-		SmsEvent original = this.getOriginalSmsEvent();
-
-		if (original != null) {
-			if (original.getSystemId() != null) {
-				this.sendFailureDeliverSmToEsms(original);
-			}
-		}
-	}
+//	public void onProviderErrorComponent(ProviderErrorComponent event, ActivityContextInterface aci) {
+//		this.logger.severe("Rx :  onProviderErrorComponent" + event);
+//
+//		SmsEvent original = this.getOriginalSmsEvent();
+//
+//		if (original != null) {
+//			if (original.getSystemId() != null) {
+//				this.sendFailureDeliverSmToEsms(original);
+//			}
+//		}
+//	}
 
 	public void onRejectComponent(RejectComponent event, ActivityContextInterface aci) {
 		this.logger.severe("Rx :  onRejectComponent" + event);

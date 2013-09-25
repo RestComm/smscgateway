@@ -188,15 +188,6 @@
 		</event>
 
 		<event event-direction="Receive" initial-event="False">
-			<event-name>ProviderErrorComponent</event-name>
-			<event-type-ref>
-				<event-type-name>ss7.map.PROVIDER_ERROR_COMPONENT</event-type-name>
-				<event-type-vendor>org.mobicents</event-type-vendor>
-				<event-type-version>1.0</event-type-version>
-			</event-type-ref>
-		</event>
-
-		<event event-direction="Receive" initial-event="False">
 			<event-name>RejectComponent</event-name>
 			<event-type-ref>
 				<event-type-name>ss7.map.REJECT_COMPONENT</event-type-name>

@@ -10,10 +10,11 @@ import org.mobicents.protocols.ss7.map.api.MAPMessage;
 import org.mobicents.protocols.ss7.map.api.dialog.MAPAbortProviderReason;
 import org.mobicents.protocols.ss7.map.api.dialog.MAPAbortSource;
 import org.mobicents.protocols.ss7.map.api.dialog.MAPNoticeProblemDiagnostic;
-import org.mobicents.protocols.ss7.map.api.dialog.MAPProviderError;
 import org.mobicents.protocols.ss7.map.api.dialog.MAPRefuseReason;
 import org.mobicents.protocols.ss7.map.api.dialog.MAPUserAbortChoice;
+import org.mobicents.protocols.ss7.map.api.errors.AbsentSubscriberDiagnosticSM;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageAbsentSubscriberSM;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageFactory;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
@@ -100,13 +101,6 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 	}
 
 	@Override
-	public void onDialogReject(MAPDialog arg0, MAPRefuseReason arg1, MAPProviderError arg2,
-			ApplicationContextName arg3, MAPExtensionContainer arg4) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void onDialogRelease(MAPDialog arg0) {
 		// TODO Auto-generated method stub
 
@@ -159,18 +153,6 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 
 	}
 
-	@Override
-	public void onProviderErrorComponent(MAPDialog arg0, Long arg1, MAPProviderError arg2) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onRejectComponent(MAPDialog arg0, Long arg1, Problem arg2) {
-		// TODO Auto-generated method stub
-
-	}
-
 	/**
 	 * SMS Listener
 	 */
@@ -199,7 +181,11 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 		if (this.currentMapMessageCount % 7 == 0) {
 			// Send back AbsentSubscriber for every 7th MtSMS
 			try {
-				MAPErrorMessage mapErrorMessage = mAPErrorMessageFactory.createMAPErrorMessageAbsentSubscriberSM(1,
+//			    MAPErrorMessageAbsentSubscriberSM createMAPErrorMessageAbsentSubscriberSM(
+//			            AbsentSubscriberDiagnosticSM absentSubscriberDiagnosticSM, MAPExtensionContainer extensionContainer,
+//			            AbsentSubscriberDiagnosticSM additionalAbsentSubscriberDiagnosticSM);
+
+				MAPErrorMessage mapErrorMessage = mAPErrorMessageFactory.createMAPErrorMessageAbsentSubscriberSM(AbsentSubscriberDiagnosticSM.IMSIDetached,
 						null, null);
 				mapDialogSms.sendErrorComponent(event.getInvokeId(), mapErrorMessage);
 				mapDialogSms.close(false);
@@ -286,7 +272,7 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 		if (this.currentMapMessageCount % 7 == 0) {
 			// Send back AbsentSubscriber for every 7th MtSMS
 			try {
-				MAPErrorMessage mapErrorMessage = mAPErrorMessageFactory.createMAPErrorMessageAbsentSubscriberSM(1,
+				MAPErrorMessage mapErrorMessage = mAPErrorMessageFactory.createMAPErrorMessageAbsentSubscriberSM(AbsentSubscriberDiagnosticSM.IMSIDetached,
 						null, null);
 				mapDialogSms.sendErrorComponent(event.getInvokeId(), mapErrorMessage);
 				mapDialogSms.close(false);
@@ -338,7 +324,10 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 		MAPDialogSms mapDialogSms = event.getMAPDialog();
 
 		try {
-			mapDialogSms.addSendRoutingInfoForSMResponse(event.getInvokeId(), imsi, li, null);
+//		    void addSendRoutingInfoForSMResponse(long invokeId, IMSI imsi, LocationInfoWithLMSI locationInfoWithLMSI,
+//		            MAPExtensionContainer extensionContainer, Boolean mwdSet) throws MAPException;
+
+			mapDialogSms.addSendRoutingInfoForSMResponse(event.getInvokeId(), imsi, li, null, null);
 			mapDialogSms.close(false);
 		} catch (MAPException e) {
 			e.printStackTrace();
@@ -350,4 +339,17 @@ public class MAPListener implements MAPDialogListener, MAPServiceSmsListener {
 		// TODO Auto-generated method stub
 
 	}
+
+    @Override
+    public void onRejectComponent(MAPDialog mapDialog, Long invokeId, Problem problem, boolean isLocalOriginated) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void onDialogReject(MAPDialog mapDialog, MAPRefuseReason refuseReason, ApplicationContextName alternativeApplicationContext,
+            MAPExtensionContainer extensionContainer) {
+        // TODO Auto-generated method stub
+        
+    }
 }
