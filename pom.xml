@@ -12,7 +12,7 @@
 
 	<groupId>org.mobicents.smsc</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.0.0.ALPHA-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 
 	<name>Mobicents SMSC Parent</name>
 
@@ -22,11 +22,19 @@
 			${release.name.prefix}${parent.version}${release.name.suffix}
 		</release.name>
 
-		<jboss.microcontainer.version>2.2.0.M2</jboss.microcontainer.version>
+
 		<compiler.plugin.version>2.0.2</compiler.plugin.version>
-		<compile.source>1.7</compile.source>
 		<testng.version>6.2</testng.version>
+		<slf4j.version>1.5.6</slf4j.version>
 		<javolution.version>5.5.1</javolution.version>
+		<jslee.ext.version>1.0.0.BETA2</jslee.ext.version>
+
+		<ss7.version>2.1.0-SNAPSHOT</ss7.version>
+		<mobicents.resources.sip.version>2.8.0-SNAPSHOT</mobicents.resources.sip.version>
+
+<!--
+		<jboss.microcontainer.version>2.2.0.M2</jboss.microcontainer.version>
+		<compile.source>1.7</compile.source>
 		<javassist.version>3.9.0.GA</javassist.version>
 		<xerces.version>2.9.1</xerces.version>
 		<log4j.version>1.2.12</log4j.version>
@@ -37,25 +45,25 @@
 
 		<mobicents.core.ext.version>1.0.0.BETA2</mobicents.core.ext.version>
 		<mobicents.resources.map.version>2.0.0-SNAPSHOT</mobicents.resources.map.version>
-		
-		<jslee.ext.version>1.0.0.BETA2</jslee.ext.version>
 
-		<!-- cloudhopper smpp -->
-		<ch.smpp.version>4.1.2</ch.smpp.version>
-
-		<ss7.version>2.0.0-SNAPSHOT</ss7.version>
-		<!-- mobicents but not strictly ss7 -->
 		<asn.version>2.0.0-SNAPSHOT</asn.version>
 		<stream.version>1.0.0.CR1</stream.version>
 		<sctp.version>1.0.0-SNAPSHOT</sctp.version>
 		<commons.version>1.0.0-SNAPSHOT</commons.version>
+
+-->
+
+		<!-- cloudhopper smpp -->
+		<ch.smpp.version>5.0.7</ch.smpp.version>
 
 		<application.name>mobicents-smsc-gateway</application.name>
 	</properties>
 
 	<modules>
 		<module>core</module>
+<!--
 		<module>test</module>
+-->
 	</modules>
 
 	<dependencies>
@@ -157,6 +165,20 @@
 	<!-- define repository so we dont have to checkout parent edit settings.xml -->
 	<repositories>
 		<repository>
+			<id>mobicents-public-repository-group</id>
+			<name>Mobicens Public Maven Repository Group</name>
+			<url>https://oss.sonatype.org/content/groups/public/</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>jboss-public-repository-group</id>
 			<name>JBoss Public Maven Repository Group</name>
 			<url>http://repository.jboss.org/nexus/content/groups/public</url>
@@ -184,12 +206,14 @@
 				<updatePolicy>never</updatePolicy>
 			</snapshots>
 		</repository>
+<!--
 		<repository>
 			<id>cloudhopper-public</id>
 			<name>Cloudhopper Public Maven Repository</name>
 			<layout>default</layout>
 			<url>http://maven.cloudhopper.com/repos/third-party</url>
 		</repository>
+-->
 	</repositories>
 
 </project>

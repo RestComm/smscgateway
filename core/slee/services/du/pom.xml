@@ -1,21 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-		
+
 	<parent>
-		<groupId>org.mobicents.smsc</groupId>
 		<artifactId>services-parent</artifactId>
-		<version>1.0.0.ALPHA-SNAPSHOT</version>
+		<groupId>org.mobicents.smsc</groupId>
+		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>smsc-service-du</artifactId>
-	<name>Core : SLEE : Service DU</name>
-									
+	<artifactId>smsc-services-du</artifactId>
+	<name>Core : SLEE : SMSC Services DU</name>
+
 	<dependencies>
+		<!-- Services -->
 		<dependency>
-			<artifactId>alert-sbb</artifactId>
+			<artifactId>smsc-library</artifactId>
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
-		</dependency>	
+		</dependency>
+		 
 		<dependency>
 			<artifactId>tx-smppserver-sbb</artifactId>
 			<groupId>${pom.groupId}</groupId>
@@ -27,22 +29,17 @@
 			<version>${pom.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>mt-sbb</artifactId>
+			<artifactId>tx-sipserver-sbb</artifactId>
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>mo-sbb</artifactId>
+			<artifactId>rx-sipserver-sbb</artifactId>
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
-		</dependency>				
-		<dependency>
-			<artifactId>smsc-events</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
-		</dependency>		
+		</dependency>
 	</dependencies>
-		
+
 	<build>
 		<plugins>
 			<plugin>
@@ -56,7 +53,7 @@
 							<goal>generate-ant-management-script</goal>
 						</goals>
 					</execution>
-				</executions>				
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -89,5 +86,5 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 </project>

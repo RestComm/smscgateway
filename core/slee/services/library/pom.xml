@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.smsc</groupId>
+		<artifactId>services-parent</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>smsc-library</artifactId>
+	<name>Core : SLEE : Library</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.mobicents.smsc</groupId>
+			<artifactId>smpp-server-ra-library</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
+<!--
+		<dependency>
+			<groupId>com.github.stephenc.eaio-uuid</groupId>
+			<artifactId>uuid</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+-->
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mobicents.tools</groupId>
+				<artifactId>maven-library-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>copy-dependencies</goal>
+							<goal>generate-descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
+				<!-- TODO: XXX: we need resource filtering, its a bit broken right now -->
+				<configuration>
+					<library-name>com.telscale.smsc</library-name>
+					<library-vendor>smsc-library</library-vendor>
+					<library-version>1.0</library-version>
+					<library-ref>
+						<library-name>library-map</library-name>
+						<library-vendor>library-map</library-vendor>
+						<library-version>2.0</library-version>
+					</library-ref>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

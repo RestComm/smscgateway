@@ -29,16 +29,5 @@
 				</resource-adaptor-class-name>
 			</resource-adaptor-class>
 		</resource-adaptor-classes>
-		<config-property>
-			<description>
-				Configures the type of the connection to SMSC. Can be
-				RECEIVER, TRANSMITTER or TRANSCEIVER
-			</description>
-			<config-property-name>jndiName</config-property-name>
-			<config-property-type>
-				java.lang.String
-			</config-property-type>
-			<config-property-value>java:/mobicents/smsc/smpphandler</config-property-value>
-		</config-property>
 	</resource-adaptor>
 </resource-adaptor-jar>

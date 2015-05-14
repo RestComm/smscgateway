@@ -1,0 +1,11 @@
+Name
+	smsc sip show
+
+SYNOPSIS
+	smsc sip show
+
+DESCRIPTION
+	This command is used to retrieve all SIP settings.
+
+SEE ALSO
+	smsc sip modify	

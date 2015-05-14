@@ -2,7 +2,7 @@
 <!DOCTYPE sbb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE SBB 1.1//EN"
                          "http://java.sun.com/dtd/slee-sbb-jar_1_1.dtd">
 <sbb-jar>
-	<sbb id="txSmppServerSbb">
+	<sbb id="rxSmppServerSbb">
 		<description>SBB listening for SMS from Mo or Mt and routing to ESME</description>
 		<sbb-name>RxSmppServerSbb</sbb-name>
 		<sbb-vendor>org.mobicents</sbb-vendor>
@@ -13,13 +13,15 @@
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.smpp.server.rx.RxSmppServerSbb</sbb-abstract-class-name>
+
+				<cmp-field><cmp-field-name>sms</cmp-field-name></cmp-field>
 			</sbb-abstract-class>
 		</sbb-classes>
 
 		<event event-direction="Receive" initial-event="True">
-			<event-name>DeliverSm</event-name>
+			<event-name>DeliveryEsme</event-name>
 			<event-type-ref>
-				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVER_SM</event-type-name>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVERY_ESME</event-type-name>
 				<event-type-vendor>org.mobicents</event-type-vendor>
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
@@ -33,7 +35,16 @@
 				<event-type-vendor>org.mobicents</event-type-vendor>
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
-		</event>		
+		</event>
+		
+		<event event-direction="Receive" initial-event="False">
+			<event-name>SubmitSmResp</event-name>
+			<event-type-ref>
+				<event-type-name>org.mobicents.resources.smpp.server.SUBMIT_SM_RESP</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>				
 
 		<event event-direction="Receive" initial-event="False">
 			<event-name>PduRequestTimeout</event-name>
@@ -53,6 +64,23 @@
 			</event-type-ref>
 		</event>
 
+		<event event-direction="Fire">
+			<event-name>DeliveryEsme</event-name>
+			<event-type-ref>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVERY_ESME</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Fire">
+			<event-name>DeliverySip</event-name>
+			<event-type-ref>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVERY_SIP</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
 
 
 		<resource-adaptor-type-binding>

@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.mobicents.smsc</groupId>
 		<artifactId>smpp-server-ra</artifactId>
-		<version>1.0.0.ALPHA-SNAPSHOT</version>
+		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>smpp-server-ra-library</artifactId>
@@ -13,21 +12,37 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>cloudhopper</groupId>
+			<groupId>com.cloudhopper</groupId>
 			<artifactId>ch-smpp</artifactId>
 			<version>${ch.smpp.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.mobicents.smsc</groupId>
+			<groupId>${pom.groupId}</groupId>
 			<artifactId>smpp</artifactId>
 			<version>${pom.version}</version>
 		</dependency>
+		
 		<!-- javolution -->
 		<dependency>
 			<groupId>javolution</groupId>
 			<artifactId>javolution</artifactId>
 			<version>${javolution.version}</version>
 		</dependency>
+		<!-- compile time -->
+<!--
+		<dependency>
+			<artifactId>mobicents-slee-ra-map-library</artifactId>
+			<groupId>org.mobicents.resources</groupId>
+			<version>${mobicents.resources.map.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>common-library</artifactId>
+			<version>${pom.version}</version>
+			<scope>compile</scope>
+		</dependency>
+-->
 	</dependencies>
 
 
@@ -45,9 +60,17 @@
 					</execution>
 				</executions>
 				<configuration>
+<!--
+					<excludeArtifactIds>common-library,mobicents-slee-ra-map-library</excludeArtifactIds>
+-->
 					<library-name>library-smpp-server</library-name>
 					<library-vendor>library-smpp-server</library-vendor>
 					<library-version>1.0</library-version>
+					<library-ref>
+						<library-name>com.telscale.smsc</library-name>
+						<library-vendor>common</library-vendor>
+						<library-version>1.0.0</library-version>
+					</library-ref>					
 				</configuration>
 			</plugin>
 		</plugins>

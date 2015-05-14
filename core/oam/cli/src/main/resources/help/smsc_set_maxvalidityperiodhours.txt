@@ -1,0 +1,20 @@
+Name
+	smsc set maxvalidityperiodhours
+
+SYNOPSIS
+	smsc set maxvalidityperiodhours <max-validity-period-hours>
+
+DESCRIPTION
+	This command is used to set a value for the maximum validity period (in hours).
+	All incoming messages with a validity period set greater than the value specified
+	by this parameter will either be rejected (if they are ESME originated messages)
+	or the value of their validity period will be set to this value (for MO originated
+	messages).
+
+EXAMPLES
+	smsc set maxvalidityperiodhours 6
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

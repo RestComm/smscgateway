@@ -1,6 +1,5 @@
 package org.mobicents.smsc.slee.resources.smpp.server;
 
-import javax.naming.InitialContext;
 import javax.slee.Address;
 import javax.slee.AddressPlan;
 import javax.slee.SLEEException;
@@ -24,24 +23,18 @@ import javax.slee.resource.SleeEndpoint;
 import javax.slee.resource.StartActivityException;
 import javax.slee.resource.UnrecognizedActivityHandleException;
 
-import org.mobicents.smsc.smpp.DefaultSmppServerHandler;
+import org.mobicents.smsc.smpp.SmppManagement;
 
 public class SmppServerResourceAdaptor implements ResourceAdaptor {
-
-	private static final String CONF_JNDI = "jndiName";
 
 	private transient Tracer tracer;
 	private transient ResourceAdaptorContext raContext;
 	private transient SleeEndpoint sleeEndpoint = null;
 	private transient EventLookupFacility eventLookup = null;
 	private EventIDCache eventIdCache = null;
-	private SmppServerSessionsImpl smppServerSession = null;
-
-	private DefaultSmppServerHandler defaultSmppServerHandler = null;
+	private SmppSessionsImpl smppServerSession = null;
 
 	private transient static final Address address = new Address(AddressPlan.IP, "localhost");
-
-	private String jndiName = null;
 
 	public SmppServerResourceAdaptor() {
 		// TODO Auto-generated constructor stub
@@ -52,8 +45,8 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 		if (this.tracer.isFineEnabled()) {
 			this.tracer.fine("Activity with handle " + activityHandle + " ended");
 		}
-		SmppServerTransactionHandle serverTxHandle = (SmppServerTransactionHandle) activityHandle;
-		final SmppServerTransactionImpl serverTx = serverTxHandle.getActivity();
+		SmppTransactionHandle serverTxHandle = (SmppTransactionHandle) activityHandle;
+		final SmppTransactionImpl serverTx = serverTxHandle.getActivity();
 		serverTxHandle.setActivity(null);
 
 		if (serverTx != null) {
@@ -96,14 +89,14 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 
 	@Override
 	public Object getActivity(ActivityHandle activityHandle) {
-		SmppServerTransactionHandle serverTxHandle = (SmppServerTransactionHandle) activityHandle;
+		SmppTransactionHandle serverTxHandle = (SmppTransactionHandle) activityHandle;
 		return serverTxHandle.getActivity();
 	}
 
 	@Override
 	public ActivityHandle getActivityHandle(Object activity) {
-		if (activity instanceof SmppServerTransactionImpl) {
-			final SmppServerTransactionImpl wrapper = ((SmppServerTransactionImpl) activity);
+		if (activity instanceof SmppTransactionImpl) {
+			final SmppTransactionImpl wrapper = ((SmppTransactionImpl) activity);
 			if (wrapper.getRa() == this) {
 				return wrapper.getActivityHandle();
 			}
@@ -125,21 +118,22 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 
 	@Override
 	public void queryLiveness(ActivityHandle activityHandle) {
-		final SmppServerTransactionHandle handle = (SmppServerTransactionHandle) activityHandle;
-		final SmppServerTransactionImpl smppServerTxActivity = handle.getActivity();
+		final SmppTransactionHandle handle = (SmppTransactionHandle) activityHandle;
+		final SmppTransactionImpl smppServerTxActivity = handle.getActivity();
 		if (smppServerTxActivity == null || smppServerTxActivity.getWrappedPduRequest() == null) {
 			sleeEndpoint.endActivity(handle);
 		}
-		
+
 	}
 
 	@Override
 	public void raActive() {
 		try {
-			InitialContext ic = new InitialContext();
-			this.defaultSmppServerHandler = (DefaultSmppServerHandler) ic.lookup(this.jndiName);
-			this.defaultSmppServerHandler.setSmppSessionHandlerInterface(this.smppServerSession
-					.getSmppSessionHandlerInterface());
+			SmppManagement smscManagemet = SmppManagement.getInstance();
+
+			smscManagemet.setSmppSessionHandlerInterface(this.smppServerSession.getSmppSessionHandlerInterface());
+
+			smscManagemet.startSmppManagement();
 
 			if (tracer.isInfoEnabled()) {
 				tracer.info("Activated RA Entity " + this.raContext.getEntityName());
@@ -159,19 +153,16 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 		if (tracer.isFineEnabled()) {
 			tracer.fine("Configuring RA Entity " + this.raContext.getEntityName());
 		}
-
-		try {
-			this.jndiName = (String) properties.getProperty(CONF_JNDI).getValue();
-		} catch (Exception e) {
-			tracer.severe("Configuring of SMPP Server RA failed ", e);
-		}
 	}
 
 	@Override
 	public void raInactive() {
-		this.smppServerSession.closeSmppSessions();
-		this.defaultSmppServerHandler.setSmppSessionHandlerInterface(null);
-		this.defaultSmppServerHandler = null;
+	    SmppManagement smscManagemet = SmppManagement.getInstance();
+		try {
+			smscManagemet.stopSmppManagement();
+		} catch (Exception e) {
+			tracer.severe("Error while inactivating RA Entity " + this.raContext.getEntityName(), e);
+		}
 
 		if (tracer.isInfoEnabled()) {
 			tracer.info("Inactivated RA Entity " + this.raContext.getEntityName());
@@ -186,20 +177,10 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 
 	@Override
 	public void raUnconfigure() {
-		this.jndiName = null;
 	}
 
 	@Override
 	public void raVerifyConfiguration(ConfigProperties properties) throws InvalidConfigurationException {
-
-		try {
-			String jndiName = (String) properties.getProperty(CONF_JNDI).getValue();
-			if (jndiName == null) {
-				throw new InvalidConfigurationException("JNDI Name cannot be null");
-			}
-		} catch (Exception e) {
-			throw new InvalidConfigurationException(e.getMessage(), e);
-		}
 	}
 
 	@Override
@@ -227,7 +208,7 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 		this.sleeEndpoint = raContext.getSleeEndpoint();
 		this.eventLookup = raContext.getEventLookupFacility();
 		this.eventIdCache = new EventIDCache(raContext);
-		this.smppServerSession = new SmppServerSessionsImpl(this);
+		this.smppServerSession = new SmppSessionsImpl(this);
 	}
 
 	@Override
@@ -243,19 +224,19 @@ public class SmppServerResourceAdaptor implements ResourceAdaptor {
 	 * Protected
 	 */
 
-	protected void startNewSmppServerTransactionActivity(SmppServerTransactionImpl txImpl)
+	protected void startNewSmppServerTransactionActivity(SmppTransactionImpl txImpl)
 			throws ActivityAlreadyExistsException, NullPointerException, IllegalStateException, SLEEException,
 			StartActivityException {
 		sleeEndpoint.startActivity(txImpl.getActivityHandle(), txImpl, ActivityFlags.REQUEST_ENDED_CALLBACK);
 	}
 
-	protected void startNewSmppTransactionSuspendedActivity(SmppServerTransactionImpl txImpl)
+	protected void startNewSmppTransactionSuspendedActivity(SmppTransactionImpl txImpl)
 			throws ActivityAlreadyExistsException, NullPointerException, IllegalStateException, SLEEException,
 			StartActivityException {
 		sleeEndpoint.startActivitySuspended(txImpl.getActivityHandle(), txImpl, ActivityFlags.REQUEST_ENDED_CALLBACK);
 	}
 
-	protected void endActivity(SmppServerTransactionImpl txImpl) {
+	protected void endActivity(SmppTransactionImpl txImpl) {
 		try {
 			this.sleeEndpoint.endActivity(txImpl.getActivityHandle());
 		} catch (Exception e) {

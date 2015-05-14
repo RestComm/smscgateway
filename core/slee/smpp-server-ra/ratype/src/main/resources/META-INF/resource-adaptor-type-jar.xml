@@ -23,18 +23,18 @@
 		<resource-adaptor-type-classes>
 			<activity-type>
 				<activity-type-name>
-					org.mobicents.smsc.slee.resources.smpp.server.SmppServerTransaction
+					org.mobicents.smsc.slee.resources.smpp.server.SmppTransaction
 				</activity-type-name>
 			</activity-type>
 			<activity-context-interface-factory-interface>
 				<activity-context-interface-factory-interface-name>
-					org.mobicents.smsc.slee.resources.smpp.server.SmppServerTransactionACIFactory
+					org.mobicents.smsc.slee.resources.smpp.server.SmppTransactionACIFactory
 				</activity-context-interface-factory-interface-name>
 			</activity-context-interface-factory-interface>
 
 			<resource-adaptor-interface>
 				<resource-adaptor-interface-name>
-					org.mobicents.smsc.slee.resources.smpp.server.SmppServerSessions
+					org.mobicents.smsc.slee.resources.smpp.server.SmppSessions
 				</resource-adaptor-interface-name>
 			</resource-adaptor-interface>
 		</resource-adaptor-type-classes>

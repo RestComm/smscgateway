@@ -6,12 +6,16 @@
 	<parent>
 		<groupId>org.mobicents.smsc</groupId>
 		<artifactId>services-parent</artifactId>
-		<version>1.0.0.ALPHA-SNAPSHOT</version>
+		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>smsc-events</artifactId>
 	<name>Core : SLEE : Services Events</name>
 	<dependencies>
-		
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>domain</artifactId>
+			<version>${pom.version}</version>
+		</dependency>
 	</dependencies>
 </project>
