@@ -63,7 +63,7 @@
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
 		</event>
-
+<!--
 		<event event-direction="Fire">
 			<event-name>DeliveryEsme</event-name>
 			<event-type-ref>
@@ -72,7 +72,7 @@
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
 		</event>
-
+-->
 		<event event-direction="Fire">
 			<event-name>DeliverySip</event-name>
 			<event-type-ref>

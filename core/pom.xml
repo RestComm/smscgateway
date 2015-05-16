@@ -19,8 +19,6 @@
 		<module>oam/cli</module>
 		<module>oam/clismpp</module>
 		<module>slee</module>
-<!--
 		<module>bootstrap</module>
--->
 	</modules>
 </project>

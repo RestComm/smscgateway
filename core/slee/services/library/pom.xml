@@ -39,14 +39,16 @@
 				</executions>
 				<!-- TODO: XXX: we need resource filtering, its a bit broken right now -->
 				<configuration>
-					<library-name>com.telscale.smsc</library-name>
+					<library-name>org.mobicents.smsc</library-name>
 					<library-vendor>smsc-library</library-vendor>
 					<library-version>1.0</library-version>
+<!--
 					<library-ref>
 						<library-name>library-map</library-name>
 						<library-vendor>library-map</library-vendor>
 						<library-version>2.0</library-version>
 					</library-ref>
+-->
 				</configuration>
 			</plugin>
 		</plugins>

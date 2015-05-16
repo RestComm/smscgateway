@@ -17,6 +17,7 @@
 		<module>events</module>
 		<module>ratype</module>
 		<module>ra</module>
+		<module>du</module>
 	</modules>
 
 	<dependencies>

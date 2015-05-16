@@ -11,13 +11,13 @@
 	<name>Core : SLEE : SMSC Services DU</name>
 
 	<dependencies>
-		<!-- Services -->
 		<dependency>
 			<artifactId>smsc-library</artifactId>
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
 		</dependency>
-		 
+
+		<!-- Services -->
 		<dependency>
 			<artifactId>tx-smppserver-sbb</artifactId>
 			<groupId>${pom.groupId}</groupId>
@@ -35,6 +35,12 @@
 		</dependency>
 		<dependency>
 			<artifactId>rx-sipserver-sbb</artifactId>
+			<groupId>${pom.groupId}</groupId>
+			<version>${pom.version}</version>
+		</dependency>
+
+		<dependency>
+			<artifactId>smsc-events</artifactId>
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
 		</dependency>

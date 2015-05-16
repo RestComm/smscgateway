@@ -11,7 +11,7 @@
 	</event-definition>
 	<event-definition>
 		<description>SMS event fired to SIP</description>
-		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVER_SIP</event-type-name>
+		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVERY_SIP</event-type-name>
 		<event-type-vendor>org.mobicents</event-type-vendor>
 		<event-type-version>1.0</event-type-version>
 		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SmsEvent</event-class-name>

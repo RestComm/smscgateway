@@ -61,16 +61,18 @@
 				</executions>
 				<configuration>
 <!--
-					<excludeArtifactIds>common-library,mobicents-slee-ra-map-library</excludeArtifactIds>
+					<excludeArtifactIds>common-library,mobicents-slee-ra-map-library </excludeArtifactIds>
 -->
 					<library-name>library-smpp-server</library-name>
 					<library-vendor>library-smpp-server</library-vendor>
 					<library-version>1.0</library-version>
+<!--
 					<library-ref>
-						<library-name>com.telscale.smsc</library-name>
+						<library-name>org.mobicents.smsc</library-name>
 						<library-vendor>common</library-vendor>
 						<library-version>1.0.0</library-version>
 					</library-ref>					
+-->
 				</configuration>
 			</plugin>
 		</plugins>

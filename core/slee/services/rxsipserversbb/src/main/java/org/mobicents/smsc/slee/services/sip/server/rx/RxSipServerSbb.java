@@ -108,29 +108,30 @@ public abstract class RxSipServerSbb implements Sbb {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void onDeliverySip(SmsEvent event, ActivityContextInterface aci, EventContext eventContext) {
+    public void onDeliverySip(SmsEvent event, ActivityContextInterface aci, EventContext eventContext) {
 
-		try {
-			if (this.logger.isFineEnabled()) {
-				this.logger.fine("\nReceived SIP SMS. event= " + event + "this=" + this);
-			}
+        try {
+            if (this.logger.isFineEnabled()) {
+                this.logger.fine("\nReceived SIP SMS. event= " + event + "this=" + this);
+            }
 
-			Sms sms = event.getSms();;
-            this.setSms(sms);
+            Sms sms = event.getSms();
 
-			try {
-				this.sendMessage(sms);
-			} catch (SmscProcessingException e) {
-				String s = "SmscProcessingException when sending SIP MESSAGE=" + e.getMessage() + ", Message=" + sms;
-				logger.severe(s, e);
-				this.onDeliveryError(sms, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s, aci);
-			}
-		} catch (Throwable e1) {
-			logger.severe(
-					"Exception in RxSmppServerSbb.onDeliverSm() when fetching records and issuing events: "
-							+ e1.getMessage(), e1);
-		}
-	}
+            try {
+                this.sendMessage(sms);
+            } catch (SmscProcessingException e) {
+                String s = "SmscProcessingException when sending SIP MESSAGE=" + e.getMessage() + ", Message=" + sms;
+                logger.severe(s, e);
+                this.onDeliveryError(sms, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s, aci);
+            }
+        } catch (Throwable e1) {
+            logger.severe(
+                    "Exception in RxSmppServerSbb.onDeliverSm() when fetching records and issuing events: " + e1.getMessage(),
+                    e1);
+        } finally {
+            this.endNullActivity(aci);
+        }
+    }
 
 	public void onCLIENT_ERROR(javax.sip.ResponseEvent event, ActivityContextInterface aci) {
 		this.logger.warning("onCLIENT_ERROR " + event);
@@ -195,18 +196,20 @@ public abstract class RxSipServerSbb implements Sbb {
             if (!smscPropertiesManagement.getReceiptsDisabling() && MessageUtil.isReceiptOnSuccess(registeredDelivery)) {
                 Sms receipt = MessageUtil.createReceiptSms(sms, true);
                 MessageUtil.assignDestClusterName(receipt);
-                if (receipt.getType() != SmType.SMS_FOR_NO_DEST) {
+                if (receipt.getType() == SmType.SMS_FOR_SIP) {
+                    try {
+                        this.sendMessage(receipt);
+                    } catch (SmscProcessingException e) {
+                        logger.severe("Exception when sending receipt 4:", e);
+                    }
+                } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
                     SmsEvent event2 = new SmsEvent();
                     event2.setSms(receipt);
                     NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
-                    ActivityContextInterface nullActivityContextInterface = this.sbbContext.getNullActivityContextInterfaceFactory()
-                            .getActivityContextInterface(nullActivity);
+                    ActivityContextInterface nullActivityContextInterface = this.sbbContext
+                            .getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
 
-                    if (receipt.getType() == SmType.SMS_FOR_ESME) {
-                        this.fireDeliveryEsme(event2, nullActivityContextInterface, null);
-                    } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
-                        this.fireDeliverySip(event2, nullActivityContextInterface, null);
-                    }
+                    this.fireDeliveryEsme(event2, nullActivityContextInterface, null);
                 }
             }
 
@@ -274,7 +277,9 @@ public abstract class RxSipServerSbb implements Sbb {
 	 * Private methods
 	 */
 	private void sendMessage(Sms sms) throws SmscProcessingException {
-		try {
+        this.setSms(sms);
+
+        try {
 			// TODO: let make here a special check if SIP is in a good state
 			// if not - skip sending and set temporary error
 
@@ -414,8 +419,6 @@ public abstract class RxSipServerSbb implements Sbb {
 	 */
 	private void freeSmsSetSucceded(Sms sms, ActivityContextInterface aci) {
         sms.setStatus(ErrorCode.SUCCESS);
-
-        this.endNullActivity(aci);
 	}
 
 	private void onDeliveryError(Sms sms, ErrorAction errorAction, ErrorCode smStatus, String reason, ActivityContextInterface aci) {
@@ -436,8 +439,6 @@ public abstract class RxSipServerSbb implements Sbb {
 
         sms.setStatus(smStatus);
 
-        this.endNullActivity(aci);
-
         CdrGenerator.generateCdr(sms, CdrGenerator.CDR_FAILED_SIP, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
 
@@ -447,18 +448,21 @@ public abstract class RxSipServerSbb implements Sbb {
             Sms receipt = MessageUtil.createReceiptSms(sms, false);
             this.logger.info("Adding an error receipt: source=" + receipt.getSourceAddr() + ", dest=" + receipt.getDestAddr());
             MessageUtil.assignDestClusterName(receipt);
-            if (receipt.getType() != SmType.SMS_FOR_NO_DEST) {
+            if (receipt.getType() == SmType.SMS_FOR_SIP) {
+                try {
+                    this.sendMessage(receipt);
+                } catch (SmscProcessingException e) {
+                    logger.severe("Exception when sending receipt 3:", e);
+                }
+               
+            } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
                 SmsEvent event2 = new SmsEvent();
                 event2.setSms(receipt);
                 NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
-                ActivityContextInterface nullActivityContextInterface = this.sbbContext.getNullActivityContextInterfaceFactory()
-                        .getActivityContextInterface(nullActivity);
+                ActivityContextInterface nullActivityContextInterface = this.sbbContext
+                        .getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
 
-                if (receipt.getType() == SmType.SMS_FOR_ESME) {
-                    this.fireDeliveryEsme(event2, nullActivityContextInterface, null);
-                } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
-                    this.fireDeliverySip(event2, nullActivityContextInterface, null);
-                }
+                this.fireDeliveryEsme(event2, nullActivityContextInterface, null);
             }
         }
 	}
@@ -571,7 +575,5 @@ public abstract class RxSipServerSbb implements Sbb {
 	}
 
     public abstract void fireDeliveryEsme(SmsEvent event, ActivityContextInterface aci, javax.slee.Address address);
-
-    public abstract void fireDeliverySip(SmsEvent event, ActivityContextInterface aci, javax.slee.Address address);
 
 }

@@ -99,7 +99,6 @@ public abstract class RxSmppServerSbb implements Sbb {
 			}
 
 			Sms sms = event.getSms();
-            this.setSms(sms);
 
 			try {
 				this.sendDeliverSm(sms, aci);
@@ -113,10 +112,12 @@ public abstract class RxSmppServerSbb implements Sbb {
 			logger.severe(
 					"Exception in RxSmppServerSbb.onDeliverSm() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
+        } finally {
+            this.endNullActivity(aci);
 		}
 	}
-	
-	public void onSubmitSmResp(SubmitSmResp event, ActivityContextInterface aci, EventContext eventContext){
+
+    public void onSubmitSmResp(SubmitSmResp event, ActivityContextInterface aci, EventContext eventContext) {
 		try {
 			if (logger.isFineEnabled()) {
 				logger.fine(String.format("onSubmitSmResp : SubmitSmResp=%s", event));
@@ -191,6 +192,8 @@ public abstract class RxSmppServerSbb implements Sbb {
 
 	private void sendDeliverSm(Sms sms, ActivityContextInterface aci) throws SmscProcessingException {
 
+	    this.setSms(sms);
+
 		// TODO: let make here a special check if ESME in a good state
 		// if not - skip sending and set temporary error
 		try {
@@ -207,6 +210,7 @@ public abstract class RxSmppServerSbb implements Sbb {
 
 			sms.setDestSystemId(esme.getSystemId());
 			sms.setDestEsmeName(esme.getName());
+			SmppTransaction smppServerTransaction;
 			if (esme.getSmppSessionType() == Type.CLIENT) {
 				SubmitSm submitSm = new SubmitSm();
                 submitSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(), sms
@@ -243,14 +247,10 @@ public abstract class RxSmppServerSbb implements Sbb {
 				// TODO : waiting for 2 secs for window to accept our request,
 				// is it
 				// good? Should time be more here?
-				SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, submitSm, 2000);
+				smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, submitSm, 2000);
 				if (logger.isInfoEnabled()) {
 					logger.info(String.format("\nsent submitSm to ESME %s: ", submitSm));
 				}
-
-				ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
-						.getActivityContextInterface(smppServerTransaction);
-				smppTxaci.attach(this.sbbContext.getSbbLocalObject());
 			} else {
 				DeliverSm deliverSm = new DeliverSm();
                 deliverSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(), sms
@@ -287,15 +287,15 @@ public abstract class RxSmppServerSbb implements Sbb {
 
 				// TODO : waiting for 2 secs for window to accept our request,
 				// is it good? Should time be more here?
-				SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, deliverSm, 2000);
+				smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, deliverSm, 2000);
 				if (logger.isInfoEnabled()) {
 					logger.info(String.format("\nsent deliverSm to ESME: ", deliverSm));
 				}
-
-				ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
-						.getActivityContextInterface(smppServerTransaction);
-				smppTxaci.attach(this.sbbContext.getSbbLocalObject());
 			}
+
+            ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
+                    .getActivityContextInterface(smppServerTransaction);
+            smppTxaci.attach(this.sbbContext.getSbbLocalObject());
 
 		} catch (Exception e) {
 			throw new SmscProcessingException(
@@ -349,8 +349,6 @@ public abstract class RxSmppServerSbb implements Sbb {
 	 */
 	protected void freeSmsSetSucceded(Sms sms, ActivityContextInterface aci) {
         sms.setStatus(ErrorCode.SUCCESS);
-
-        this.endNullActivity(aci);
 	}
 
     private void onDeliveryError(Sms sms, ErrorAction errorAction, ErrorCode smStatus, String reason,
@@ -372,8 +370,6 @@ public abstract class RxSmppServerSbb implements Sbb {
             }
         }
 
-        this.endNullActivity(aci);
-
         CdrGenerator.generateCdr(sms, CdrGenerator.CDR_FAILED_ESME, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
 
@@ -381,21 +377,23 @@ public abstract class RxSmppServerSbb implements Sbb {
         int registeredDelivery = sms.getRegisteredDelivery();
         if (!smscPropertiesManagement.getReceiptsDisabling() && MessageUtil.isReceiptOnFailure(registeredDelivery)) {
             Sms receipt = MessageUtil.createReceiptSms(sms, false);
-
             this.logger.info("Adding an error receipt: source=" + receipt.getSourceAddr() + ", dest=" + receipt.getDestAddr());
             MessageUtil.assignDestClusterName(receipt);
-            if (receipt.getType() != SmType.SMS_FOR_NO_DEST) {
-                SmsEvent event = new SmsEvent();
-                event.setSms(receipt);
-                NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
-                ActivityContextInterface nullActivityContextInterface = this.sbbContext.getNullActivityContextInterfaceFactory()
-                        .getActivityContextInterface(nullActivity);
 
-                if (receipt.getType() == SmType.SMS_FOR_ESME) {
-                    this.fireDeliveryEsme(event, nullActivityContextInterface, null);
-                } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
-                    this.fireDeliverySip(event, nullActivityContextInterface, null);
+            if (receipt.getType() == SmType.SMS_FOR_ESME) {
+                try {
+                    this.sendDeliverSm(receipt, aci);
+                } catch (SmscProcessingException e) {
+                    logger.severe("Exception when sending receipt 1:", e);
                 }
+            } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
+                SmsEvent event2 = new SmsEvent();
+                event2.setSms(receipt);
+                NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
+                ActivityContextInterface nullActivityContextInterface = this.sbbContext
+                        .getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
+
+                this.fireDeliverySip(event2, nullActivityContextInterface, null);
             }
         }
 	}
@@ -516,18 +514,20 @@ public abstract class RxSmppServerSbb implements Sbb {
             if (!smscPropertiesManagement.getReceiptsDisabling() && MessageUtil.isReceiptOnSuccess(registeredDelivery)) {
                 Sms receipt = MessageUtil.createReceiptSms(sms, true);
                 MessageUtil.assignDestClusterName(receipt);
-                if (receipt.getType() != SmType.SMS_FOR_NO_DEST) {
+                if (receipt.getType() == SmType.SMS_FOR_ESME) {
+                    try {
+                        this.sendDeliverSm(receipt, aci);
+                    } catch (SmscProcessingException e) {
+                        logger.severe("Exception when sending receipt 1:", e);
+                    }
+                } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
                     SmsEvent event2 = new SmsEvent();
                     event2.setSms(receipt);
                     NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
-                    ActivityContextInterface nullActivityContextInterface = this.sbbContext.getNullActivityContextInterfaceFactory()
-                            .getActivityContextInterface(nullActivity);
+                    ActivityContextInterface nullActivityContextInterface = this.sbbContext
+                            .getNullActivityContextInterfaceFactory().getActivityContextInterface(nullActivity);
 
-                    if (receipt.getType() == SmType.SMS_FOR_ESME) {
-                        this.fireDeliveryEsme(event2, nullActivityContextInterface, null);
-                    } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
-                        this.fireDeliverySip(event2, nullActivityContextInterface, null);
-                    }
+                    this.fireDeliverySip(event2, nullActivityContextInterface, null);
                 }
             }
 
@@ -538,7 +538,6 @@ public abstract class RxSmppServerSbb implements Sbb {
 		}
 	}	
 
-    public abstract void fireDeliveryEsme(SmsEvent event, ActivityContextInterface aci, javax.slee.Address address);
-
     public abstract void fireDeliverySip(SmsEvent event, ActivityContextInterface aci, javax.slee.Address address);
+
 }

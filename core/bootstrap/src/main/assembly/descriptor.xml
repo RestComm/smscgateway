@@ -1,0 +1,46 @@
+<assembly>
+	<id>server</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<files>
+
+	</files>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<includes>
+
+				<!-- cloudhopper library -->
+				<include>com.cloudhopper:ch-smpp</include>
+				<include>joda:joda-time</include>
+				<include>slf4j:slf4j-api</include>
+				<include>io.netty:netty</include>
+
+				<!-- Not strictly SS7, But needed by SS7 -->
+				<include>javolution:javolution</include>
+
+				<!-- SS7 Libraries -->
+				<include>org.mobicents.protocols.ss7.scheduler:scheduler</include>
+				<include>org.mobicents.protocols.ss7.management:shell-server-api</include>
+				<include>org.mobicents.protocols.ss7.management:shell-server-impl</include>
+				<include>org.mobicents.protocols.ss7.management:shell-transport</include>
+
+				<!-- SMSC libraries -->
+				<include>org.mobicents.smsc:bootstrap</include>
+				<include>org.mobicents.smsc:smpp</include>
+				<include>org.mobicents.smsc:domain</include>
+
+			</includes>
+		</dependencySet>
+	</dependencySets>
+	<componentDescriptors>
+		<componentDescriptor>
+			src/main/assembly/common.xml
+		</componentDescriptor>
+	</componentDescriptors>
+</assembly>
