@@ -56,6 +56,7 @@ import org.mobicents.smsc.domain.SipXHeaders;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.library.CharacterSet;
 import org.mobicents.smsc.domain.library.DataCodingScheme;
+import org.mobicents.smsc.domain.library.MessageDeliveryResultResponseInterface;
 import org.mobicents.smsc.domain.library.MessageUtil;
 import org.mobicents.smsc.domain.library.SmType;
 import org.mobicents.smsc.domain.library.Sms;
@@ -443,8 +444,14 @@ public abstract class TxSipServerSbb implements Sbb {
 
             if (sms.getType() == SmType.SMS_FOR_ESME) {
                 this.fireDeliveryEsme(event, nullActivityContextInterface, null);
-            } else if (sms.getType() == SmType.SMS_FOR_ESME) {
+            } else if (sms.getType() == SmType.SMS_FOR_SIP) {
                 this.fireDeliverySip(event, nullActivityContextInterface, null);
+            }
+        } else {
+            if (sms.getMessageDeliveryResultResponse() != null) {
+                sms.getMessageDeliveryResultResponse().responseDeliveryFailure(
+                        MessageDeliveryResultResponseInterface.DeliveryFailureReason.invalidDestinationAddress);
+//                sms.setMessageDeliveryResultResponse(null);
             }
         }
 	}

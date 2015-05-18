@@ -44,6 +44,7 @@ import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.library.CharacterSet;
 import org.mobicents.smsc.domain.library.DataCodingScheme;
+import org.mobicents.smsc.domain.library.MessageDeliveryResultResponseInterface;
 import org.mobicents.smsc.domain.library.MessageUtil;
 import org.mobicents.smsc.domain.library.SmType;
 import org.mobicents.smsc.domain.library.Sms;
@@ -100,9 +101,9 @@ public abstract class TxSmppServerSbb implements Sbb {
 		Esme esme = smppServerTransaction.getEsme();
 		String esmeName = esme.getName();
 
-		if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nReceived SUBMIT_SM = " + event + " from Esme name=" + esmeName);
-		}
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("\nReceived SUBMIT_SM = " + event + " from Esme name=" + esmeName);
+        }
 
 		Sms sms;
 		try {
@@ -578,6 +579,8 @@ public abstract class TxSmppServerSbb implements Sbb {
                 msg = new String(textPart, ucs2Charset);
             }
         }
+        sms.setShortMessageText(msg);
+        sms.setShortMessageBin(udhData);
 
 		// ValidityPeriod processing
 		Tlv tlvQosTimeToLive = event.getOptionalParameter(SmppConstants.TAG_QOS_TIME_TO_LIVE);
@@ -638,6 +641,7 @@ public abstract class TxSmppServerSbb implements Sbb {
             e.setSkipErrorLogging(true);
             throw e;
         }
+
         // checking if SMSC is paused
         if (smscPropertiesManagement.isDeliveryPause()) {
             SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR, 0, null);
@@ -662,8 +666,14 @@ public abstract class TxSmppServerSbb implements Sbb {
 
             if (sms.getType() == SmType.SMS_FOR_ESME) {
                 this.fireDeliveryEsme(event, nullActivityContextInterface, null);
-            } else if (sms.getType() == SmType.SMS_FOR_ESME) {
+            } else if (sms.getType() == SmType.SMS_FOR_SIP) {
                 this.fireDeliverySip(event, nullActivityContextInterface, null);
+            }
+        } else {
+            if (sms.getMessageDeliveryResultResponse() != null) {
+                sms.getMessageDeliveryResultResponse().responseDeliveryFailure(
+                        MessageDeliveryResultResponseInterface.DeliveryFailureReason.invalidDestinationAddress);
+//                sms.setMessageDeliveryResultResponse(null);
             }
         }
     }

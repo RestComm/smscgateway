@@ -386,7 +386,7 @@ public abstract class RxSmppServerSbb implements Sbb {
                 } catch (SmscProcessingException e) {
                     logger.severe("Exception when sending receipt 1:", e);
                 }
-            } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
+            } else if (receipt.getType() == SmType.SMS_FOR_SIP) {
                 SmsEvent event2 = new SmsEvent();
                 event2.setSms(receipt);
                 NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();
@@ -520,7 +520,7 @@ public abstract class RxSmppServerSbb implements Sbb {
                     } catch (SmscProcessingException e) {
                         logger.severe("Exception when sending receipt 1:", e);
                     }
-                } else if (receipt.getType() == SmType.SMS_FOR_ESME) {
+                } else if (receipt.getType() == SmType.SMS_FOR_SIP) {
                     SmsEvent event2 = new SmsEvent();
                     event2.setSms(receipt);
                     NullActivity nullActivity = this.sbbContext.getNullActivityFactory().createNullActivity();

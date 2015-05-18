@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.log4j.Logger;
 import org.mobicents.smsc.domain.SmsRouteManagement;
 import org.mobicents.smsc.smpp.GenerateType;
 
@@ -437,6 +438,7 @@ public class MessageUtil {
     public static void assignDestClusterName(Sms sms) {
         SmsRouteManagement smsRouteManagement = SmsRouteManagement.getInstance();
 
+        // Step 1: Searching for SMPP
         String orignatingEsmeName = sms.getOrigEsmeName();
 
         String destClusterName = smsRouteManagement.getEsmeClusterName(sms.getDestAddrTon(), sms.getDestAddrNpi(),

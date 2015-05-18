@@ -17,6 +17,8 @@
 
 				<!-- cloudhopper library -->
 				<include>com.cloudhopper:ch-smpp</include>
+				<include>com.cloudhopper:ch-commons-charset</include>
+				<include>com.cloudhopper:ch-commons-util</include>
 				<include>joda:joda-time</include>
 				<include>slf4j:slf4j-api</include>
 				<include>io.netty:netty</include>

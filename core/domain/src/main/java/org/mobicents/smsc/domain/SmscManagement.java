@@ -197,12 +197,16 @@ public class SmscManagement implements SmscManagementMBean {
             logger.warn(String.format("Failed to load the SS7 configuration file. \n%s", e.getMessage()));
         }
 
+        smscPropertiesManagement.setSmscStopped(false);
+
 		logger.warn("Started SmscManagemet " + name);
 
 	}
 
 	public void stop() throws Exception {
 		logger.info("Stopping SmscManagemet " + name);
+
+		smscPropertiesManagement.setSmscStopped(true);
 
 		this.smscPropertiesManagement.stop();
 		ObjectName smscObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":layer="
