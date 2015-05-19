@@ -49,14 +49,6 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<dependencies>
-<!--
-				<dependency>
-					<groupId>${pom.groupId}</groupId>
-					<artifactId>persistence-ra</artifactId>
-					<version>${pom.version}</version>
-					<type>test-jar</type>
-				</dependency>			
--->
 				<dependency>
 					<groupId>org.testng</groupId>
 					<artifactId>testng</artifactId>

@@ -33,27 +33,6 @@
 		<ss7.version>2.1.0.FINAL</ss7.version>
 		<mobicents.resources.sip.version>2.8.0-SNAPSHOT</mobicents.resources.sip.version>
 
-<!--
-		<jboss.microcontainer.version>2.2.0.M2</jboss.microcontainer.version>
-		<compile.source>1.7</compile.source>
-		<javassist.version>3.9.0.GA</javassist.version>
-		<xerces.version>2.9.1</xerces.version>
-		<log4j.version>1.2.12</log4j.version>
-		<drools.version>5.0.1</drools.version>
-		<servlet.version>2.5</servlet.version>
-		<concurrent.version>1.3.4</concurrent.version>
-		<mvel.dep.version>2.0.10</mvel.dep.version>
-
-		<mobicents.core.ext.version>1.0.0.BETA2</mobicents.core.ext.version>
-		<mobicents.resources.map.version>2.0.0-SNAPSHOT</mobicents.resources.map.version>
-
-		<asn.version>2.0.0-SNAPSHOT</asn.version>
-		<stream.version>1.0.0.CR1</stream.version>
-		<sctp.version>1.0.0-SNAPSHOT</sctp.version>
-		<commons.version>1.0.0-SNAPSHOT</commons.version>
-
--->
-
 		<!-- cloudhopper smpp -->
 		<ch.smpp.version>5.0.7</ch.smpp.version>
 
@@ -89,7 +68,7 @@
 							</autoVersionSubmodules>
 
 							<tagBase>
-								https://mobicents.googlecode.com/svn/tags/applications/ussdgateway
+								https://mobicents.googlecode.com/svn/tags/applications/smscgateway
 							</tagBase>
 							<resume>false</resume>
 							<preparationGoals>
@@ -109,19 +88,6 @@
 		</profile>
 	</profiles>
 
-	<scm>
-		<connection>
-			scm:svn:https://mobicents.googlecode.com/svn/trunk/applications/ussdgateway
-		</connection>
-		<developerConnection>
-			scm:svn:https://mobicents.googlecode.com/svn/trunk/applications/ussdgateway
-		</developerConnection>
-		<url>
-			http://mobicents.googlecode.com/svn/trunk/applications/ussdgateway
-		</url>
-	</scm>
-
-	<!-- -->
 	<build>
 		<plugins>
 			<plugin>
@@ -205,14 +171,6 @@
 				<updatePolicy>never</updatePolicy>
 			</snapshots>
 		</repository>
-<!--
-		<repository>
-			<id>cloudhopper-public</id>
-			<name>Cloudhopper Public Maven Repository</name>
-			<layout>default</layout>
-			<url>http://maven.cloudhopper.com/repos/third-party</url>
-		</repository>
--->
 	</repositories>
 
 </project>
