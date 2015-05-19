@@ -62,9 +62,7 @@
 
 	<modules>
 		<module>core</module>
-<!--
-		<module>test</module>
--->
+		<module>tools</module>
 	</modules>
 
 	<dependencies>
