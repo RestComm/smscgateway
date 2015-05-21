@@ -32,41 +32,41 @@ import com.cloudhopper.smpp.SmppSession;
  */
 public class SmppSimulatorParameters {
 
-	private int windowSize = 1;
-	private SmppBindType bindType = SmppBindType.TRANSCEIVER;
-	private String host = "127.0.0.1";
-	private int port = 2776;
-	private long connectTimeout = 10000;
-	private String systemId = "test";
-	private String password = "test";
-	private long requestExpiryTimeout = 30000;
-	private long windowMonitorInterval = 15000;
-	
-	private boolean rejectIncomingDeliveryMessage = false;
+    private int windowSize = 1;
+    private SmppBindType bindType = SmppBindType.TRANSCEIVER;
+    private String host = "127.0.0.1";
+    private int port = 2776;
+    private long connectTimeout = 10000;
+    private String systemId = "test";
+    private String password = "test";
+    private long requestExpiryTimeout = 30000;
+    private long windowMonitorInterval = 15000;
 
-	private TON sourceTon = TON.International;
-	private NPI sourceNpi = NPI.ISDN;
-	private TON destTon = TON.International;
-	private NPI destNpi = NPI.ISDN;
+    private boolean rejectIncomingDeliveryMessage = false;
+
+    private TON sourceTon = TON.International;
+    private NPI sourceNpi = NPI.ISDN;
+    private TON destTon = TON.International;
+    private NPI destNpi = NPI.ISDN;
     private String sourceAddress = "6666";
-	private String destAddress = "5555";
+    private String destAddress = "5555";
     private String addressRange = "6666";
 
-	private String messageText = "Hello!";
-	private EncodingType encodingType = EncodingType.GSM7;
-	private boolean messageClass;
-	private SplittingType splittingType = SplittingType.DoNotSplit;
+    private String messageText = "Hello!";
+    private EncodingType encodingType = EncodingType.GSM7;
+    private boolean messageClass;
+    private SplittingType splittingType = SplittingType.DoNotSplit;
     private ValidityType validityType = ValidityType.NoSpecial;
     private MCDeliveryReceipt mcDeliveryReceipt = MCDeliveryReceipt.No;
     private SendingMessageType sendingMessageType = SendingMessageType.SubmitSm;
     private int submitMultiMessageCnt = 2;
     private SmppSession.Type smppSessionType = SmppSession.Type.CLIENT;
     private int smppEncoding = 0;
-    private MessagingMode messagingMode = MessagingMode.storeAndForward;
+    private MessagingMode messagingMode = MessagingMode.datagramm;
 
-	private int bulkDestAddressRangeStart = 500000;
-	private int bulkDestAddressRangeEnd = 600000;
-	private int bulkMessagePerSecond = 10;
+    private int bulkDestAddressRangeStart = 500000;
+    private int bulkDestAddressRangeEnd = 600000;
+    private int bulkMessagePerSecond = 10;
 
 	public int getWindowSize() {
 		return windowSize;

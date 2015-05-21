@@ -18,6 +18,7 @@
 
 	<modules>
 		<module>simulator</module>
+		<module>bootstrap</module>
 	</modules>
 
 	<dependencies>
