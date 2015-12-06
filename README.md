@@ -1,4 +1,4 @@
-# smscgateway
+# Mobicents SMSC Gateway
  Mobicents SMSC Gateway to send/receive SMS from/to Operators Network (GSM)
 
 ## Introduction 
