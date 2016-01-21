@@ -1,22 +1,24 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  
+ * Copyright 2012, Telestax Inc and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.smsc.domain;
 
 /**
@@ -52,12 +54,12 @@ public class SmsRouteManagement {
         return this.smsRoutingRule;
     }
 
-	public String getEsmeClusterName(int ton, int npi, String address, String name) {
-		return this.smsRoutingRule.getEsmeClusterName(ton, npi, address, name);
+	public String getEsmeClusterName(int ton, int npi, String address, String name, int networkId) {
+		return this.smsRoutingRule.getEsmeClusterName(ton, npi, address, name, networkId);
 	}
 	
-	public String getSipClusterName(int ton, int npi, String address){
-		return this.smsRoutingRule.getSipClusterName(ton, npi, address);
+	public String getSipClusterName(int ton, int npi, String address, int networkId){
+		return this.smsRoutingRule.getSipClusterName(ton, npi, address, networkId);
 	}
 
 }

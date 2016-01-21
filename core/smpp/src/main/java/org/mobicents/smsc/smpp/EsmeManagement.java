@@ -1,20 +1,23 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  
+ * Copyright 2012, Telestax Inc and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package org.mobicents.smsc.smpp;
@@ -27,6 +30,9 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -81,21 +87,28 @@ public class EsmeManagement implements EsmeManagementMBean {
 
     private MBeanServer mbeanServer = null;
 
+    private Timer timer;
+    private TimerTask timerTask;
+
 	private static EsmeManagement instance = null;
 
-	private EsmeManagement(String name) {
+	protected EsmeManagement(String name) {
 		this.name = name;
 
 		binding.setClassAttribute(CLASS_ATTRIBUTE);
 		binding.setAlias(Esme.class, "esme");
 	}
 
-	protected static EsmeManagement getInstance(String name) {
-		if (instance == null) {
-			instance = new EsmeManagement(name);
-		}
-		return instance;
-	}
+    protected static EsmeManagement getInstance(String name) {
+        if (instance == null) {
+            instance = new EsmeManagement(name);
+        }
+        return instance;
+    }
+
+    protected static void setInstance(EsmeManagement instance) {
+        EsmeManagement.instance = instance;
+    }
 
 	public static EsmeManagement getInstance() {
 		return instance;
@@ -187,11 +200,14 @@ public class EsmeManagement implements EsmeManagementMBean {
 		return null;
 	}
 
-    public Esme createEsme(String name, String systemId, String password, String host, int port, String smppBindType,
-            String systemType, String smppIntVersion, byte ton, byte npi, String address, String smppSessionType,
-            int windowSize, long connectTimeout, long requestExpiryTimeout, long windowMonitorInterval, long windowWaitTimeout,
-            String clusterName, int enquireLinkDelay, int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon,
-            int routingNpi, String routingAddressRange) throws Exception {
+    public Esme createEsme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
+            String smppBindType, String systemType, String smppIntVersion, byte ton, byte npi, String address,
+            String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long windowMonitorInterval,
+            long windowWaitTimeout, String clusterName, boolean countersEnabled, int enquireLinkDelay, int sourceTon,
+            int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
+            int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour, long rateLimitPerDay,
+            int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength, int maxMessageLength)
+            throws Exception {
 
 		SmppBindType smppBindTypeOb = SmppBindType.valueOf(smppBindType);
 
@@ -257,29 +273,29 @@ public class EsmeManagement implements EsmeManagementMBean {
 		}// for loop
 
 		EsmeCluster esmeCluster = this.esmeClusters.get(clusterName);
+        if (esmeCluster != null) {
+            if (esmeCluster.getNetworkId() != networkId) {
+                throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_WRONG_NETWORKID_IN_ESMECLUSTER, esmeCluster.getNetworkId(), networkId));
+            }
+        }
 
 		if (clusterName == null) {
 			clusterName = name;
 		}
 
-        Esme esme = new Esme(name, systemId, password, host, port, systemType, smppInterfaceVersionTypeObj,
+        Esme esme = new Esme(name, systemId, password, host, port, chargingEnabled, systemType, smppInterfaceVersionTypeObj,
                 ton, npi, address, smppBindTypeOb, smppSessionTypeObj, windowSize, connectTimeout, requestExpiryTimeout,
-                windowMonitorInterval, windowWaitTimeout, clusterName, enquireLinkDelay, sourceTon, sourceNpi,
-                sourceAddressRange, routingTon, routingNpi, routingAddressRange);
+                windowMonitorInterval, windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay, sourceTon, sourceNpi,
+                sourceAddressRange, routingTon, routingNpi, routingAddressRange, networkId, rateLimitPerSecond,
+                rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay, nationalLanguageSingleShift,
+                nationalLanguageLockingShift, minMessageLength, maxMessageLength);
 
-//        public Esme(String name, String systemId, String password, String host, int port, String systemType,
-//                SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange, SmppBindType smppBindType,
-//                Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long windowMonitorInterval,
-//                long windowWaitTimeout, String clusterName, int enquireLinkDelay, int sourceTon, int sourceNpi,
-//                String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange) {
-        
-        
 		esme.esmeManagement = this;
 
 		esmes.add(esme);
 
 		if (esmeCluster == null) {
-			esmeCluster = new EsmeCluster(clusterName);
+			esmeCluster = new EsmeCluster(clusterName, networkId);
 			this.esmeClusters.put(clusterName, esmeCluster);
 		}
 
@@ -399,9 +415,17 @@ public class EsmeManagement implements EsmeManagementMBean {
 			Esme esme = n.getValue();
 			this.registerEsmeMbean(esme);
 		}
+
+		// setting a timer for cleaning of 
+        this.clearMessageClearTimer();
+        this.timer = new Timer();
+        this.timerTask = new MessageCleanerTimerTask();
+        this.timer.scheduleAtFixedRate(timerTask, 0, 1000);
 	}
 
 	public void stop() throws Exception {
+        this.clearMessageClearTimer();
+
         this.store();
 
 		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
@@ -410,6 +434,17 @@ public class EsmeManagement implements EsmeManagementMBean {
 			this.unregisterEsmeMbean(esme.getName());
 		}
 	}
+
+    private void clearMessageClearTimer() {
+        if (timerTask != null) {
+            timerTask.cancel();
+            timerTask = null;
+        }
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
 
 	/**
 	 * Persist
@@ -472,8 +507,10 @@ public class EsmeManagement implements EsmeManagementMBean {
 				String esmeClusterName = esme.getClusterName();
 				EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
 				if (esmeCluster == null) {
-					esmeCluster = new EsmeCluster(esmeClusterName);
+					esmeCluster = new EsmeCluster(esmeClusterName, esme.getNetworkId());
 					this.esmeClusters.put(esmeClusterName, esmeCluster);
+                } else {
+                    esme.setNetworkId(esmeCluster.getNetworkId());
                 }
                 esmeCluster.addEsme(esme);
 			}
@@ -517,4 +554,45 @@ public class EsmeManagement implements EsmeManagementMBean {
 			logger.error(String.format("Error while unregistering MBean for ESME %s", esmeName), e);
 		}
 	}
+
+    private class MessageCleanerTimerTask extends TimerTask {
+
+        private int lastDay = -1;
+        private int lastHour = -1;
+        private int lastMinute = -1;
+
+        @Override
+        public void run() {
+            boolean needDay = false;
+            boolean needHour = false;
+            boolean needMinute = false;
+            Date tm = new Date();
+            if (lastDay != tm.getDay()) {
+                lastDay = tm.getDay();
+                needDay = true;
+            }
+            if (lastHour != tm.getHours()) {
+                lastHour = tm.getHours();
+                needHour = true;
+            }
+            if (lastMinute != tm.getMinutes()) {
+                lastMinute = tm.getMinutes();
+                needMinute = true;
+            }
+
+            for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
+                Esme esme = n.getValue();
+                if (needDay) {
+                    esme.clearDayMsgCounter();
+                } else if (needHour) {
+                    esme.clearHourMsgCounter();
+                } else if (needMinute) {
+                    esme.clearMinuteMsgCounter();
+                } else {
+                    esme.clearSecondMsgCounter();
+                }
+            }
+        }
+
+    }
 }

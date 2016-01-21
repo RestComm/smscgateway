@@ -1,0 +1,26 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+<chapter
+	id="setup_hardware">
+	<title>Hardware Setup</title>
+	<para>
+		For legacy SS7 links, you must have relevant SS7 cards installed along with their native libraries.
+	</para>
+	<para>
+	&THIS.PLATFORM; &THIS.APPLICATION; supports <literal>dahdi</literal> based SS7 cards like <literal>diguim</literal> and <literal>sangoma</literal> as well as <literal>dialogic</literal> cards. Since <literal>dahdi</literal> based SS7 crads do not have MTP2/MTP3 support on board they rely on external software to provide these services. But <literal>dialogic</literal> based SS7 cards have on board support for MTP2/MTP3.
+	</para>
+	<para>
+		This guide does not provide installation instructions for SS7 hardware. You must refer to respective vendor documentation for installing and configuring the hardware cards. The following external links point to information that will assist you in setting up the hardware. 
+	</para>
+	<itemizedlist>
+		<listitem><para>Sangoma: <ulink url="http://wiki.sangoma.com/"></ulink></para></listitem>
+		<listitem><para>Diguim: <ulink url="http://www.digium.com/en/products/digital/"></ulink></para></listitem>
+		<listitem><para>Dialogic: <ulink url="http://www.dialogic.com/"></ulink></para></listitem>
+	</itemizedlist>
+	
+</chapter>
+

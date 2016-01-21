@@ -1,0 +1,17 @@
+Name
+	smsc set revisesecondsonsmscstart <seconds>
+
+SYNOPSIS
+	smsc set revisesecondsonsmscstart <seconds>
+
+DESCRIPTION
+	This command is used to set the revise period (in seconds). After every restart,
+	the SMSC Gateway will revise the last 'x' seconds before shutdown to ensure that
+	all the arrived messages are processed; where 'x' is the value set in seconds
+	for the parameter 'revisesecondsonsmscstart' using this command.
+EXAMPLES
+	smsc set revisesecondsonsmscstart 30
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

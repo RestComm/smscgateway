@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE resource-adaptor-type-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE Resource Adaptor Type 1.1//EN" "http://java.sun.com/dtd/slee-resource-adaptor-type-jar_1_1.dtd">
+
+<resource-adaptor-type-jar>
+
+	<resource-adaptor-type>
+		<description>Scheduler Resource Adaptor Type</description>
+		<resource-adaptor-type-name>SchedulerResourceAdaptorType</resource-adaptor-type-name>
+		<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+		<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+
+		<resource-adaptor-type-classes>
+			<activity-type>
+				<activity-type-name>
+					org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity
+				</activity-type-name>
+			</activity-type>
+			<activity-context-interface-factory-interface>
+				<activity-context-interface-factory-interface-name>
+					org.mobicents.smsc.slee.resources.scheduler.SchedulerActivityContextInterfaceFactory
+				</activity-context-interface-factory-interface-name>
+			</activity-context-interface-factory-interface>
+			<resource-adaptor-interface>
+				<resource-adaptor-interface-name>
+					org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface
+				</resource-adaptor-interface-name>
+			</resource-adaptor-interface>
+		</resource-adaptor-type-classes>
+		<event-type-ref>
+			<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SS7_SM</event-type-name>
+			<event-type-vendor>org.mobicents</event-type-vendor>
+			<event-type-version>1.0</event-type-version>
+		</event-type-ref>
+		<event-type-ref>
+			<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SMPP_SM</event-type-name>
+			<event-type-vendor>org.mobicents</event-type-vendor>
+			<event-type-version>1.0</event-type-version>
+		</event-type-ref>
+		<event-type-ref>
+			<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SIP_SM</event-type-name>
+			<event-type-vendor>org.mobicents</event-type-vendor>
+			<event-type-version>1.0</event-type-version>
+		</event-type-ref>		
+	</resource-adaptor-type>
+</resource-adaptor-type-jar>
+

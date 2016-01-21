@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+<chapter id="managing">
+
+	<title>Managing</title>
+<para>Now that you have set up the Gateway you must configure the SS7 Stack and the Gateway. &THIS.PLATFORM; &THIS.APPLICATION; comes with a convenient user-friendly Graphical User Interface (GUI) and a Command Line Interface (CLI) that will allow you to configure, monitor and manage the Gateway. While the CLI tool allows complete configuration and control of the Gateway, the GUI-based management enhances the usability of the Gateway and gives you the ability to configure and manage the SMSC Gateway dynamically. This chapter will explain how to manage the Gateway effectively using both the GUI and the CLI.
+
+<!--
+6:02 PM so we can have "default" profile as clean
+  and "simulator" profile configured to connect to simulator
+
+
+ -->
+
+</para>
+	<!--<section id="configuring_ss7">-->
+	<formalpara>
+		<title>Configuring the SS7 Stack</title>
+		<para>You must configure the SS7 stack prior to configuring SMSC. For details on configuring the SS7 Stack please refer to the RestComm SS7 Stack User Guide. The RestComm SS7 Stack User Guide lists all available Shell commands and GUI operations to configure SS7. In addition, help files are also available for every Shell command providing all details relevant to the command. </para> 
+	</formalpara>
+	<!-- </section>
+	<section id="setting_smsc_parameters">-->
+	<formalpara>
+		<title>Configuring the Gateway</title>
+		<para>
+</para>
+	</formalpara>
+	
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Section-Managing-Server-Settings.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Section-Managing-SMPP-Server-Settings.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Section-Managing-ESME-Settings.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Section-Managing-SIP-Settings.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Section-Managing-MAP-Version-Cache-Settings.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Section-Managing-DB-Routing-Settings.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Section-Managing-mproc-rules.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Section-Managing-Stats.xml" />
+
+
+</chapter>

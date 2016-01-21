@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE resource-adaptor-type-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE Resource Adaptor Type 1.1//EN" "http://java.sun.com/dtd/slee-resource-adaptor-type-jar_1_1.dtd">
+
+<resource-adaptor-type-jar>
+	<description>
+		Skeleton RA to setup hector connection.
+	</description>
+	<resource-adaptor-type>
+		<description>Hector Client Resource Adaptor Type</description>
+		<resource-adaptor-type-name>PersistenceResourceAdaptorType</resource-adaptor-type-name>
+		<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+		<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+
+		<library-ref>
+			<library-name>library-persistence</library-name>
+			<library-vendor>telestax</library-vendor>
+			<library-version>1.0</library-version>
+		</library-ref>
+
+		<resource-adaptor-type-classes>
+			<resource-adaptor-interface>
+				<resource-adaptor-interface-name>
+					org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface
+				</resource-adaptor-interface-name>
+			</resource-adaptor-interface>
+		</resource-adaptor-type-classes>
+	</resource-adaptor-type>
+</resource-adaptor-type-jar>
+

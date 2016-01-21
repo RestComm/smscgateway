@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE event-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE Event 1.1//EN" "http://java.sun.com/dtd/slee-event-jar_1_1.dtd">
+<event-jar>
+	<library-ref>
+		<library-name>org.mobicents.smsc</library-name>
+		<library-vendor>common</library-vendor>
+		<library-version>1.0.0</library-version>
+	</library-ref>
+
+	<event-definition>
+		<description>SMS event fired to Mt Service to send SMS to Mobile User</description>
+		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SS7_SM</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent</event-class-name>
+	</event-definition>
+	<event-definition>
+		<description>SMS event fired to Rx SMPP module to be delivered to ESME</description>
+		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SMPP_SM</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent</event-class-name>
+	</event-definition>
+	<event-definition>
+		<description>SMS event fired to Rx SIP module to be delivered to SIP CLient</description>
+		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SIP_SM</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent</event-class-name>
+	</event-definition>	
+</event-jar>

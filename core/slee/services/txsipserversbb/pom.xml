@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.mobicents.smsc</groupId>
 		<artifactId>services-parent</artifactId>
-		<version>2.0.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>tx-sipserver-sbb</artifactId>
@@ -18,26 +18,35 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
-			<artifactId>domain</artifactId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${pom.groupId}</groupId>
-			<artifactId>smsc-events</artifactId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.mobicents.servers.jainslee.api</groupId>
 			<artifactId>jain-slee-11-ext</artifactId>
 			<version>${jslee.ext.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<artifactId>persistence-ra-library</artifactId>
+			<groupId>${pom.groupId}</groupId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>persistence-ratype</artifactId>
+			<groupId>${pom.groupId}</groupId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.resources</groupId>
+			<artifactId>mobicents-slee-ra-map-ratype</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.mobicents.resources</groupId>
 			<artifactId>sip11-ratype</artifactId>
 			<version>${mobicents.resources.sip.version}</version>
-		</dependency>
+		</dependency>		
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>charging-sbb</artifactId>
+			<version>${pom.version}</version>
+		</dependency>			
 	</dependencies>
 
 	<profiles>
@@ -48,6 +57,12 @@
 			</activation>
 			<dependencies>
 				<dependency>
+					<groupId>${pom.groupId}</groupId>
+					<artifactId>persistence-ra</artifactId>
+					<version>${pom.version}</version>
+					<type>test-jar</type>
+				</dependency>			
+				<dependency>
 					<groupId>org.testng</groupId>
 					<artifactId>testng</artifactId>
 					<version>${testng.version}</version>
@@ -56,12 +71,12 @@
                 <dependency>
                     <artifactId>statistics-api</artifactId>
                     <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${ss7.version}</version>
+                    <version>${jss7.mobicents.version}</version>
                 </dependency>       
                 <dependency>
                     <artifactId>statistics-impl</artifactId>
                     <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${ss7.version}</version>
+                    <version>${jss7.mobicents.version}</version>
                 </dependency>       
 			</dependencies>
 		</profile>

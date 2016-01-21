@@ -1,0 +1,18 @@
+Name
+	smsc get firstduedelay
+
+SYNOPSIS
+	smsc get firstduedelay
+
+DESCRIPTION
+	This command is used to get value for first-due-delay (in seconds). This 
+	parameter specifies the delay time period in seconds between message incoming time 
+	and first delivery attempt.
+
+EXAMPLES
+	smsc get firstduedelay
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

@@ -1,0 +1,19 @@
+Name
+	smsc set gti
+
+SYNOPSIS
+	smsc set gti 0001|0010|0011|0100
+
+DESCRIPTION
+	This command is used to set the value of SCCP Global Title type.
+	This Global Title type will be used for SCCP outgoing messages.
+	Default value for ITU-T is 0100.
+	Global title 0001 - Nature of address indicator included
+	Global title 0010 - Translation type included
+	Global title 0011 - Translation type, Numbering plan and Encoding
+						scheme included
+	Global title 0100 - Translation type, Numbering plan, Encoding
+						scheme and Nature of address indicator included 
+
+SEE ALSO
+	smsc set scgt, smsc set tt

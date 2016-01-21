@@ -1,0 +1,752 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+<chapter id="design_overview">
+
+	<title>Architecture</title>
+
+	<para>&THIS.PLATFORM; &THIS.APPLICATION;
+		is based on robust and proven &THIS.PLATFORM;
+		JAIN SLEE 1.1 Server and &THIS.PLATFORM;
+		jSS7 Stack and provides easy integration with any third party communication protocol and platform.
+	</para>
+
+	<para>&THIS.PLATFORM;
+		JAIN SLEE Server is a highly scalable event-driven application server with a robust component model and fault tolerant execution environment. It provides a set of connectors to a
+		variety of networks elements: SS7 MAP, TCAP, INAP, ISUP, SMPP, XMPP, SIP, MGCP, HTTP, XDM, XCAP, Diameter and many others. It is fully compliant with JSR 240 (JSLEE 1.1).
+	</para>
+
+	<para>&THIS.PLATFORM;
+		jSS7 is a software based implementation of the SS7 protocol. It provides implementation for Level 2 and above in the SS7 protocol Stack. &THIS.PLATFORM;
+		jSS7 Stack User Guide is bundled within and you can refer to the guide for more details on the Stack.
+	</para>
+
+	<para>The diagram below depicts a high level design of &THIS.PLATFORM; &THIS.APPLICATION;.</para>
+	<mediaobject>
+		<imageobject>
+			<imagedata align="center" fileref="images/smsc-application-design-overview.png" format="PNG" />
+		</imageobject>
+		<caption>
+			<para>&THIS.APPLICATION;
+				Design overview
+			</para>
+		</caption>
+	</mediaobject>
+	<para>
+		&THIS.PLATFORM; &THIS.APPLICATION; provides six basic services of an SMSC as shown in the figure above. Each of these six services are implemented in the Gateway as a module that can be activated or deactivated based on the needs of an operator. All these services interact with the Cassandra database for storing data (messages not yet sent and an archive for sent/failed to send messages) and retreiving data for messages that are pending to be sent.
+	</para>
+	<para>
+&THIS.PLATFORM; &THIS.APPLICATION; can accept SMPP (incoming BIND) from ESMEs or can also initiate SMPP (outgoing BIND) to third party SMSC and hence itself acting as an ESME. &THIS.PLATFORM; &THIS.APPLICATION; provides intelligent routing rules that can route SMS between various SMPP connections or between SMPP, GSM and SIP Network.
+</para>
+	<para>
+		<variablelist>
+			<title>Service Modules</title>
+			<varlistentry>
+				<term>Mo (Mobile originated) module</term>
+				<listitem><para>Handles mobile originated SMS.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Mt (Mobile terminated)</term>
+				<listitem><para>Delivers SMS to mobile.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Rx SMPP module</term>
+				<listitem><para>Listens for incoming SMS from ESME/third party SMSC and routes them to Mt module (GSM), other ESME/third party SMSC or SIP Client depending on the routing rule.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Tx SMPP module</term>
+				<listitem><para>Delivers SMS to external ESME/third party SMSC received from Mo Module (GSM), ESME/third Party SMSC or SIP Client.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Rx SIP module</term>
+				<listitem><para>Listens for incoming SMS from SIP Client and routes them to Mt module (GSM), other ESME/third party SMSC or SIP Client depending on the routing rule.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Tx SIP module</term>
+				<listitem><para>Delivers SMS to SIP Client received from Mo Module (GSM), ESME/third Party SMSC or other SIP Client.</para></listitem>
+			</varlistentry>						
+
+		</variablelist>
+		<variablelist>
+			<title>Administration</title>
+				<varlistentry>
+					<term>CLI
+					</term>
+					<listitem><para>&THIS.PLATFORM; &THIS.APPLICATION; comes with a Command Line Interface (CLI) that provides easy to use commands to manage and monitor the SS7 Stack and the SMSC Gateway.
+					</para></listitem>
+				</varlistentry>
+				<varlistentry>
+					<term>Web Interface
+					</term>
+					<listitem><para>&THIS.PLATFORM; &THIS.APPLICATION; also includes an easy to use Web Interface administration tool that allows you to manage and monitor the Gateway via a convenient Web console.
+					</para></listitem>
+				</varlistentry>
+				<varlistentry>
+					<term>Campaign Tool
+					</term>
+					<listitem><para>In addition, future releases will also offer a Web based campaign tool to define and manage campaigns.</para></listitem>
+				</varlistentry>
+		</variablelist>
+	</para>
+
+	<section id="Database_Table_Structure">
+		<title>Database Table Structure</title>
+		<para> &THIS.PLATFORM; &THIS.APPLICATION; stores messages using Cassandra database. The database is used for
+storing unsent messages, messages successfully sent and messages that failed to be sent.</para>
+		<para>
+		The &THIS.PLATFORM; &THIS.APPLICATION; creates three tables for every new day with the date suffixed to the names of the tables as <literal>DST_SLOT_TABLE_yyyy_mm_dd</literal>, <literal>SLOT_MESSAGES_TABLE_yyyy_mm_dd</literal> and <literal>MESSAGES_yyyy_mm_dd</literal> where <literal>yyyy_mm_dd</literal> is the date in that format. 
+		</para>
+		<para>
+		Apart from the above tables created everyday, the database also comprises of three other tables namely <literal>CURRENT_SLOT_TABLE</literal>, <literal>SMPP_SMS_ROUTING_RULE</literal> and <literal>SIP_SMS_ROUTING_RULE</literal> created when the SMSC is started for the first time. The former is used for storing system-wide data and the latter two for storing the routing rules.
+		</para>
+		<section id="CURRENT_SLOT_TABLE">
+		<title>CURRENT_SLOT_TABLE</title>
+
+<table
+						frame="all"
+						pgwide="1">
+		<title> <literal>CURRENT_SLOT_TABLE</literal></title>
+		<tgroup cols='3' colsep='1' rowsep='1'>
+		<colspec
+								colnum="1"
+								colname="c0" />
+		<colspec
+								colnum="2"
+								colname="c1" />
+		<colspec
+								colnum="3"
+								colname="c2" />
+		<thead>
+			<row>
+				<entry>Column Name</entry>
+				<entry>Data Type</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry>ID</entry>
+				<entry>INT</entry>
+				<entry>Acts as a primary key and is unique for each entry. The value acts as an identifier of content: 0 indicates the current due slot that the SMSC processes now and 1 indicates the last assigned <literal>messageId</literal>.</entry>
+			</row>
+			<row>
+				<entry>NEXT_SLOT</entry>
+				<entry>BIGINT</entry>
+				<entry>The next slot value.</entry>
+			</row>
+		</tbody>
+		</tgroup>
+</table>
+	</section>
+	<section id="SMS_ROUTING_RULE">
+		<title>SMPP_SMS_ROUTING_RULE</title>
+
+<table
+						frame="all"
+						pgwide="1">
+		<title> <literal>SMPP_SMS_ROUTING_RULE</literal></title>
+		<tgroup cols='3' colsep='1' rowsep='1'>
+		<colspec
+								colnum="1"
+								colname="c0" />
+		<colspec
+								colnum="2"
+								colname="c1" />
+		<colspec
+								colnum="3"
+								colname="c2" />
+		<thead>
+			<row>
+				<entry>Column Name</entry>
+				<entry>Data Type</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry>ADDRESS</entry>
+				<entry>Text</entry>
+				<entry>Acts as a primary key and is unique for each entry. Stores the address for which the messages are being routed.</entry>
+			</row>
+			<row>
+				<entry>CLUSTER_NAME</entry>
+				<entry>Text</entry>
+				<entry>The name of the SMPP Cluster.</entry>
+			</row>
+		</tbody>
+		</tgroup>
+</table>
+	</section>
+	
+	<section id="SIP_SMS_ROUTING_RULE">
+		<title>SIP_SMS_ROUTING_RULE</title>
+
+		<table frame="all" pgwide="1">
+			<title> <literal>SIP_SMS_ROUTING_RULE</literal></title>
+			<tgroup cols='3' colsep='1' rowsep='1'>
+			<colspec colnum="1" colname="c0" />
+			<colspec colnum="2" colname="c1" />
+			<colspec colnum="3" colname="c2" />
+		<thead>
+			<row>
+				<entry>Column Name</entry>
+				<entry>Data Type</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry>ADDRESS</entry>
+				<entry>Text</entry>
+				<entry>Acts as a primary key and is unique for each entry. Stores the address for which the messages are being routed.</entry>
+			</row>
+			<row>
+				<entry>CLUSTER_NAME</entry>
+				<entry>Text</entry>
+				<entry>The name of the SIP Cluster. This is not used as of now and all SMS message are routed through a single SIP stack.</entry>
+			</row>
+		</tbody>
+		</tgroup>
+		</table>
+	</section>	
+	
+<section id="DST_SLOT_TABLE_yyyy_mm_dd">
+		<title>DST_SLOT_TABLE_yyyy_mm_dd</title>
+<para>
+This table contains a list of <literal>DUE_SLOT</literal> values for <literal>TARGET_ID</literal> to store the data for this day. 
+</para>
+<table
+						frame="all"
+						pgwide="1">
+		<title> <literal>DST_SLOT_TABLE_yyyy_mm_dd</literal></title>
+		<tgroup cols='3' colsep='1' rowsep='1'>
+		<colspec
+								colnum="1"
+								colname="c0" />
+		<colspec
+								colnum="2"
+								colname="c1" />
+		<colspec
+								colnum="3"
+								colname="c2" />
+		<thead>
+			<row>
+				<entry>Column Name</entry>
+				<entry>Data Type</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry>TARGET_ID</entry>
+				<entry>ASCII</entry>
+				<entry>Acts as a primary key and is made up of <literal>ADDR_DST_DIGITS+”_”+ADDR_DST_TON+”_”+ADDR_DST_NPI</literal>.</entry>
+			</row>
+			<row>
+				<entry>DUE_SLOT</entry>
+				<entry>BIGINT</entry>
+				<entry>All new incoming messages will be added into this DUE_SLOT if it is not yet processed. If DUE_SLOT has been processed already or is absent, a new DUE_SLOT will be assigned.</entry>
+			</row>
+		</tbody>
+		</tgroup>
+</table>
+	</section>
+<section id="SLOT_MESSAGES_TABLE_yyyy_mm_dd">
+		<title>SLOT_MESSAGES_TABLE_yyyy_mm_dd</title>
+<para>This table stores the messages that are scheduled for delivery. The messages are not deleted after delivery.</para>
+<para>The fields "DUE_SLOT", "TARGET_ID", "ID" together act as the primary key.</para>
+<table
+						frame="all"
+						pgwide="1">
+		<title> <literal>SLOT_MESSAGES_TABLE_yyyy_mm_dd</literal></title>
+		<tgroup cols='3' colsep='1' rowsep='1'>
+		<colspec
+								colnum="1"
+								colname="c0" />
+		<colspec
+								colnum="2"
+								colname="c1" />
+		<colspec
+								colnum="3"
+								colname="c2" />
+		<thead>
+			<row>
+				<entry>Column Name</entry>
+				<entry>Data Type</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry>ID</entry>
+				<entry>UUID</entry>
+				<entry>Record Identifier.</entry>
+			</row>
+			<row>
+				<entry>TARGET_ID</entry>
+				<entry>ASCII</entry>
+				<entry>Made up of <literal>ADDR_DST_DIGITS+”_”+ADDR_DST_TON+”_”+ADDR_DST_NPI</literal>.</entry>
+			</row>
+			<row>
+				<entry>DUE_SLOT</entry>
+				<entry>BIGINT</entry>
+				<entry>For which the messages will be loaded for delivering.</entry>
+			</row>
+			<row>
+				<entry>IN_SYSTEM</entry>
+				<entry>INT</entry>
+				<entry>0 - idle state, 1 - delivery in progress, 2 - delivery finished (by success or failure)</entry>
+			</row>
+			<row>
+				<entry>SMSC_UUID</entry>
+				<entry>UUID</entry>
+				<entry>Id of the SMSC session (from start to stop), this is needed to know which session has launched the delivery of a message.</entry>
+			</row>
+			<row>
+				<entry>ADDR_DST_DIGITS</entry>
+				<entry>ASCII</entry>
+				<entry>Destination address digits.</entry>
+			</row>
+			<row>
+				<entry>ADDR_DST_TON</entry>
+				<entry>INT</entry>
+				<entry>SMPP style TON (type of number) of destination address.</entry>
+			</row>
+			<row>
+				<entry>ADDR_DST_NPI</entry>
+				<entry>INT</entry>
+				<entry>SMPP style Numbering Plan Indicator of destination address.</entry>
+			</row>
+			<row>
+				<entry>ADDR_SRC_DIGITS</entry>
+				<entry>ASCII</entry>
+				<entry>Originating address digits.</entry>
+			</row>
+			<row>
+				<entry>ADDR_SRC_TON</entry>
+				<entry>INT</entry>
+				<entry>SMPP style TON (type of number) of source address.</entry>
+			</row>
+			<row>
+				<entry>ADDR_SRC_NPI</entry>
+				<entry>INT</entry>
+				<entry>SMPP style Numbering Plan Indicator of source address.</entry>
+			</row>
+			<row>
+				<entry>DUE_DELAY</entry>
+				<entry>INT</entry>
+				<entry>Duration (in seconds) after which a new delivery attempt will be done. If the SMS has
+just arrived in the system, this
+value is 0.
+</entry>
+			</row>
+			<row>
+				<entry>ALERTING_SUPPORTED</entry>
+				<entry>BOOLEAN</entry>
+				<entry>The value is 'true' if SMSC was successfully registered at HLR after delivery failure. However this field is currently not being used because this demands extra database access.</entry>
+			</row>
+			<row>
+				<entry>MESSAGE_ID</entry>
+				<entry>BIGINT</entry>
+				<entry>A unique message ID assigned by SMSC (since the SMSC started).</entry>
+			</row>
+			<row>
+				<entry>MO_MESSAGE_REF</entry>
+				<entry>INT</entry>
+				<entry>SMS TPDU Message Reference field.</entry>
+			</row>
+			<row>
+				<entry>ORIG_ESME_ID</entry>
+				<entry>TEXT</entry>
+				<entry>SMSC internal name of origination ESME (empty for MO messages).</entry>
+			</row>
+			<row>
+				<entry>ORIG_SYSTEM_ID</entry>
+				<entry>TEXT</entry>
+				<entry>SMPP name of origination ESME (empty for MO messages).</entry>
+			</row>
+			<row>
+				<entry>DEST_CLUSTER_NAME</entry>
+				<entry>TEXT</entry>
+				<entry>Name of cluster for destination ESME terminated massages (empty for MT messages).</entry>
+			</row>
+			<row>
+				<entry>DEST_ESME_ID</entry>
+				<entry>TEXT</entry>
+				<entry>SMSC internal name of destination ESME (empty for MT messages).</entry>
+			</row>
+			<row>
+				<entry>DEST_SYSTEM_ID</entry>
+				<entry>TEXT</entry>
+				<entry>SMPP name of destination ESME (empty for MT messages).</entry>
+			</row>
+			<row>
+				<entry>SUBMIT_DATE</entry>
+				<entry>TIMESTAMP</entry>
+				<entry>Time when a message was received by SMSC.</entry>
+			</row>
+			<row>
+				<entry>DELIVER_DATE</entry>
+				<entry>TIMESTAMP</entry>
+				<entry>Time when a message was sent from SMSC (null if message failed to deliver).</entry>
+			</row>
+
+			<row>
+				<entry>SERVICE_TYPE</entry>
+				<entry>TEXT</entry>
+				<entry>SMPP parameter (<literal>service_type</literal>) for ESME originated messages.</entry>
+			</row>
+			<row>
+				<entry>ESM_CLASS</entry>
+				<entry>INT</entry>
+				<entry>Indicates Message Mode (Messaging Mode==Datagram, Forward or Store and Forward mode) and Message Type  (MessageType==some flags including UDH indicator).</entry>
+			</row>
+			<row>
+				<entry>PROTOCOL_ID</entry>
+				<entry>INT</entry>
+				<entry>Protocol Identifier SMPP parameter (TP-Protocol-Identifier files for GSM).</entry>
+			</row>
+			<row>
+				<entry>PRIORITY</entry>
+				<entry>INT</entry>
+				<entry>SMPP parameter (priority_flag).</entry>
+			</row>
+			<row>
+				<entry>REGISTERED_DELIVERY</entry>
+				<entry>INT</entry>
+				<entry>SMPP parameter (registered_delivery).</entry>
+			</row>
+			<row>
+				<entry>REPLACE</entry>
+				<entry>INT</entry>
+				<entry>SMPP parameter (replace_if_present_flag).</entry>
+			</row>
+			<row>
+				<entry>DATA_CODING</entry>
+				<entry>INT</entry>
+				<entry>data_coding scheme.</entry>
+			</row>
+			<row>
+				<entry>DEFAULT_MSG_ID</entry>
+				<entry>INT</entry>
+				<entry>SMPP parameter (sm_default_msg_id).</entry>
+			</row>
+			<row>
+				<entry>MESSAGE</entry>
+				<entry>BLOB</entry>
+				<entry>Message text in source style that has been received from EMSE or from MS.</entry>
+			</row>
+			<row>
+				<entry>OPTIONAL_PARAMETERS</entry>
+				<entry>TEXT</entry>
+				<entry>TLVs.</entry>
+			</row>
+			<row>
+				<entry>SCHEDULE_DELIVERY_TIME</entry>
+				<entry>TIMESTAMP</entry>
+				<entry>SMPP parameter (schedule_delivery_time) - time when SMSC should start a delivery (may be null if immediate message delivery).</entry>
+			</row>
+			<row>
+				<entry>VALIDITY_PERIOD</entry>
+				<entry>TIMESTAMP</entry>
+				<entry>The validity period of this message. If ESME has not defined (or for MO messages) this field is filled by default SMSC settings.</entry>
+			</row>
+			<row>
+				<entry>IMSI</entry>
+				<entry>ASCII</entry>
+				<entry>From SRI response.</entry>
+			</row>
+            <row>
+                <entry>CORR_ID</entry>
+                <entry>ASCII</entry>
+                <entry>This field is used for keeping of correlationId value for home routing mode.
+                This table will keep this value when StoreAndForward mode for time between storing of message and scheduling it for delivering.</entry>
+            </row>
+			<row>
+				<entry>NNN_DIGITS</entry>
+				<entry>ASCII</entry>
+				<entry>NetworkNodeNumber = MSC that serves MS – from SRI response.</entry>
+			</row>
+			<row>
+				<entry>NNN_AN</entry>
+				<entry>INT</entry>
+				<entry></entry>
+			</row>
+			<row>
+				<entry>NNN_NP</entry>
+				<entry>INT</entry>
+				<entry></entry>
+			</row>
+			<row>
+				<entry>SM_STATUS</entry>
+				<entry>INT</entry>
+				<entry>Error Code value for the last attempt (0==no attempts yet). For more details on Error Codes please refer to <xref linkend="appendix-SMSC-ErrorCodes" /></entry>
+			</row>
+			<row>
+				<entry>SM_TYPE</entry>
+				<entry>INT</entry>
+				<entry>0-ESME terminated, 1-MT</entry>
+			</row>
+			<row>
+				<entry>DELIVERY_COUNT</entry>
+				<entry>INT</entry>
+				<entry>Delivery attempt count. (this will be==1 if a message was delivered in one go)</entry>
+			</row>
+		</tbody>
+		</tgroup>
+</table>
+	</section>
+<section id="MESSAGES_yyyy_mm_dd">
+		<title>MESSAGES_yyyy_mm_dd</title>
+<para>This table archives the messages that have been delivered successfully or whose delivery failed.</para>
+<para>The fields "ADDR_DST_DIGITS", "ID" together act as the primary key.</para>
+<table
+						frame="all"
+						pgwide="1">
+		<title> <literal>MESSAGES_yyyy_mm_dd</literal></title>
+		<tgroup cols='3' colsep='1' rowsep='1'>
+		<colspec
+								colnum="1"
+								colname="c0" />
+		<colspec
+								colnum="2"
+								colname="c1" />
+		<colspec
+								colnum="3"
+								colname="c2" />
+		<thead>
+			<row>
+				<entry>Column Name</entry>
+				<entry>Data Type</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry>ID</entry>
+				<entry>UUID</entry>
+				<entry>Record Identifier.</entry>
+			</row>
+			<row>
+				<entry>TARGET_ID</entry>
+				<entry>ASCII</entry>
+				<entry>Made up of <literal>ADDR_DST_DIGITS+”_”+ADDR_DST_TON+”_”+ADDR_DST_NPI</literal>.</entry>
+			</row>
+			<row>
+				<entry>DUE_SLOT</entry>
+				<entry>BIGINT</entry>
+				<entry>For which the messages will be loaded for delivering.</entry>
+			</row>
+			<row>
+				<entry>IN_SYSTEM</entry>
+				<entry>INT</entry>
+				<entry>Not used in this table.</entry>
+			</row>
+			<row>
+				<entry>SMSC_UUID</entry>
+				<entry>UUID</entry>
+				<entry>Id of the SMSC session (from start to stop), this is needed to know which session has launched the delivery of a message.</entry>
+			</row>
+			<row>
+				<entry>ADDR_DST_DIGITS</entry>
+				<entry>ASCII</entry>
+				<entry>Destination address digits.</entry>
+			</row>
+			<row>
+				<entry>ADDR_DST_TON</entry>
+				<entry>INT</entry>
+				<entry>SMPP style TON (type of number) of destination address.</entry>
+			</row>
+			<row>
+				<entry>ADDR_DST_NPI</entry>
+				<entry>INT</entry>
+				<entry>SMPP style Numbering Plan Indicator of destination address.</entry>
+			</row>
+			<row>
+				<entry>ADDR_SRC_DIGITS</entry>
+				<entry>ASCII</entry>
+				<entry>Originating address digits.</entry>
+			</row>
+			<row>
+				<entry>ADDR_SRC_TON</entry>
+				<entry>INT</entry>
+				<entry>SMPP style TON (type of number) of source address.</entry>
+			</row>
+			<row>
+				<entry>ADDR_SRC_NPI</entry>
+				<entry>INT</entry>
+				<entry>SMPP style Numbering Plan Indicator of source address.</entry>
+			</row>
+			<row>
+				<entry>DUE_DELAY</entry>
+				<entry>INT</entry>
+				<entry>Duration (in seconds) after which a new delivery attempt will be done - value before the last delivery attempt.
+</entry>
+			</row>
+			<row>
+				<entry>ALERTING_SUPPORTED</entry>
+				<entry>BOOLEAN</entry>
+				<entry>The value is 'true' if SMSC was successfully registered at HLR after delivery failure. However this field is currently not being used because this demands extra database access.</entry>
+			</row>
+			<row>
+				<entry>MESSAGE_ID</entry>
+				<entry>BIGINT</entry>
+				<entry>A unique message ID assigned by SMSC (since the SMSC started).</entry>
+			</row>
+			<row>
+				<entry>MO_MESSAGE_REF</entry>
+				<entry>INT</entry>
+				<entry>SMS TPDU Message Reference field.</entry>
+			</row>
+			<row>
+				<entry>ORIG_ESME_ID</entry>
+				<entry>TEXT</entry>
+				<entry>SMSC internal name of origination ESME (empty for MO messages).</entry>
+			</row>
+			<row>
+				<entry>ORIG_SYSTEM_ID</entry>
+				<entry>TEXT</entry>
+				<entry>SMPP name of origination ESME (empty for MO messages).</entry>
+			</row>
+			<row>
+				<entry>DEST_CLUSTER_NAME</entry>
+				<entry>TEXT</entry>
+				<entry>Name of cluster for destination ESME terminated massages (empty for MT messages).</entry>
+			</row>
+			<row>
+				<entry>DEST_ESME_ID</entry>
+				<entry>TEXT</entry>
+				<entry>SMSC internal name of destination ESME (empty for MT messages).</entry>
+			</row>
+			<row>
+				<entry>DEST_SYSTEM_ID</entry>
+				<entry>TEXT</entry>
+				<entry>SMPP name of destination ESME (empty for MT messages).</entry>
+			</row>
+			<row>
+				<entry>SUBMIT_DATE</entry>
+				<entry>TIMESTAMP</entry>
+				<entry>Time when a message was received by SMSC.</entry>
+			</row>
+			<row>
+				<entry>DELIVER_DATE</entry>
+				<entry>TIMESTAMP</entry>
+				<entry>Time when a message was sent from SMSC (null if message failed to deliver).</entry>
+			</row>
+
+			<row>
+				<entry>SERVICE_TYPE</entry>
+				<entry>TEXT</entry>
+				<entry>SMPP parameter (<literal>service_type</literal>) for ESME originated messages.</entry>
+			</row>
+			<row>
+				<entry>ESM_CLASS</entry>
+				<entry>INT</entry>
+				<entry>Indicates Message Mode (Messaging Mode==Datagram, Forward or Store and Forward mode) and Message Type  (MessageType==some flags including UDH indicator).</entry>
+			</row>
+			<row>
+				<entry>PROTOCOL_ID</entry>
+				<entry>INT</entry>
+				<entry>Protocol Identifier SMPP parameter (TP-Protocol-Identifier files for GSM).</entry>
+			</row>
+			<row>
+				<entry>PRIORITY</entry>
+				<entry>INT</entry>
+				<entry>SMPP parameter (priority_flag).</entry>
+			</row>
+			<row>
+				<entry>REGISTERED_DELIVERY</entry>
+				<entry>INT</entry>
+				<entry>SMPP parameter (registered_delivery).</entry>
+			</row>
+			<row>
+				<entry>REPLACE</entry>
+				<entry>INT</entry>
+				<entry>SMPP parameter (replace_if_present_flag).</entry>
+			</row>
+			<row>
+				<entry>DATA_CODING</entry>
+				<entry>INT</entry>
+				<entry>data_coding scheme.</entry>
+			</row>
+			<row>
+				<entry>DEFAULT_MSG_ID</entry>
+				<entry>INT</entry>
+				<entry>SMPP parameter (sm_default_msg_id).</entry>
+			</row>
+			<row>
+				<entry>MESSAGE</entry>
+				<entry>BLOB</entry>
+				<entry>Message text in source style that has been received from EMSE or from MS.</entry>
+			</row>
+			<row>
+				<entry>OPTIONAL_PARAMETERS</entry>
+				<entry>TEXT</entry>
+				<entry>TLVs.</entry>
+			</row>
+			<row>
+				<entry>SCHEDULE_DELIVERY_TIME</entry>
+				<entry>TIMESTAMP</entry>
+				<entry>SMPP parameter (schedule_delivery_time) - time when SMSC should start a delivery (may be null if immediate message delivery).</entry>
+			</row>
+			<row>
+				<entry>VALIDITY_PERIOD</entry>
+				<entry>TIMESTAMP</entry>
+				<entry>The validity period of this message. If ESME has not defined (or for MO messages) this field is filled by default SMSC settings.</entry>
+			</row>
+			<row>
+				<entry>IMSI</entry>
+				<entry>ASCII</entry>
+				<entry>From SRI response.</entry>
+			</row>
+            <row>
+                <entry>CORR_ID</entry>
+                <entry>ASCII</entry>
+                <entry>This field is used for keeping of correlationId value for home routing mode.
+                This table  will keep this value for logging purpose.</entry>
+            </row>
+			<row>
+				<entry>NNN_DIGITS</entry>
+				<entry>ASCII</entry>
+				<entry>NetworkNodeNumber = MSC that serves MS – from SRI response.</entry>
+			</row>
+			<row>
+				<entry>NNN_AN</entry>
+				<entry>INT</entry>
+				<entry></entry>
+			</row>
+			<row>
+				<entry>NNN_NP</entry>
+				<entry>INT</entry>
+				<entry></entry>
+			</row>
+			<row>
+				<entry>SM_STATUS</entry>
+				<entry>INT</entry>
+				<entry>Error Code value for the last attempt (0==no attempts yet). For more details on Error Codes please refer to <xref linkend="appendix-SMSC-ErrorCodes" /></entry>
+			</row>
+			<row>
+				<entry>SM_TYPE</entry>
+				<entry>INT</entry>
+				<entry>0-ESME terminated, 1-MT</entry>
+			</row>
+			<row>
+				<entry>DELIVERY_COUNT</entry>
+				<entry>INT</entry>
+				<entry>Delivery attempt count. (this will be==1 if a message was delivered in one go)</entry>
+			</row>
+		</tbody>
+		</tgroup>
+</table>
+	</section>
+	<section id="db-reporting">
+		<title>Reporting</title>
+		<para>As of now there is no reporting in &THIS.PLATOFORM; &THIS.APPLICATION;. However you can leverage any external third party tool to dig Cassandra tables as defined above and create reports. The next release of &THIS.PLATOFORM; &THIS.APPLICATION; will feature a reporting section and also the flexibility to search for a specific SMS based on various search criteria.</para>
+	</section>
+	</section>
+
+</chapter>
+

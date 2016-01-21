@@ -1,22 +1,6 @@
-/*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
- *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+/**
+ * 
  */
-
 package org.mobicents.smsc.domain;
 
 import java.io.File;
@@ -155,8 +139,8 @@ public class SipManagement implements SipManagementMBean {
 		return null;
 	}
 
-    public synchronized Sip createSip(String name, String clusterName, String host, int port, byte addressTon, byte addressNpi,
-            String addressRange) throws Exception {
+	public synchronized Sip createSip(String name, String clusterName, String host, int port, boolean chargingEnabled,
+			byte addressTon, byte addressNpi, String addressRange, boolean countersEnabled, int networkId) throws Exception {
 
 		for (FastList.Node<Sip> n = sips.head(), end = sips.tail(); (n = n.getNext()) != end;) {
 			Sip esme = n.getValue();
@@ -171,7 +155,8 @@ public class SipManagement implements SipManagementMBean {
 			clusterName = name;
 		}
 
-        Sip sip = new Sip(name, clusterName, host, port, addressTon, addressNpi, addressRange);
+		Sip sip = new Sip(name, clusterName, host, port, chargingEnabled, addressTon, addressNpi, addressRange,
+				countersEnabled, networkId);
 		sip.sipManagement = this;
 
 		sips.add(sip);
@@ -241,8 +226,9 @@ public class SipManagement implements SipManagementMBean {
 			// only one SIP. However in future when we allow adding more SIP
 			// stack, this can be changed
 
-            this.createSip(SIP_NAME, SIP_NAME, "127.0.0.1", 5065, (byte) smscPropertiesManagement.getDefaultTon(),
-                    (byte) smscPropertiesManagement.getDefaultNpi(), null);
+			this.createSip(SIP_NAME, SIP_NAME, "127.0.0.1", 5065, false,
+					(byte) smscPropertiesManagement.getDefaultTon(), (byte) smscPropertiesManagement.getDefaultNpi(),
+					null, false, 0);
 		}
 
 	}

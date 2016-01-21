@@ -1,0 +1,182 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+<chapter
+	id="setup_downloading">
+	<title>Downloading and Installing</title>
+	<para>Installing &THIS.PLATFORM; &THIS.APPLICATION; is easy and quick with the binary download. You can either download the binary release or download the source code and set up from source.</para> 
+	<section id="downloading_binary">
+		<title>Binary Download and Installation</title>
+		<para>The binary release is available for download at TeleStax Customer Support Portal <ulink url="&THIS.RELEASE_BINARY_URL;" /> </para>
+		<procedure>
+					<title>
+						Binary Download and Installation
+					</title>
+					<step>
+						<para>
+							Download the zip file <literal>&lt;filename&gt;</literal> to any folder of your choice.
+						</para>
+					</step>
+					<step>
+						<para>Extract the contents of the zip file.
+						<screen>Downloads]$ unzip &lt;filename&gt;</screen>
+						</para>
+					</step>
+					<step>
+						<para>Verify the contents of the newly created directory.</para>
+					</step>
+</procedure>
+	</section>
+	<section id="dir_structure">
+		<title>Directory Structure</title>
+	<para>
+		When you download the binary release, you will notice that the top level directory is named <literal>mobicents-smscgateway-&lt;version&gt;</literal> and immediately below this are five sub-directories as explained below:
+</para>
+<itemizedlist>
+			<listitem><para>cassandra: Contains description of the Cassandra database tables' structure.</para></listitem>
+			<listitem><para>docs: Contains all relevant documentation in respective subfolders.</para></listitem>
+			<listitem><para>jboss-5.1.0.GA: The core server with two profiles "default" and "simulator". The "default" profile is a clean profile where you will have to start from scratch and configure the entire SS7 Stack and SMSC Gateway. The "simulator" profile is a pre-configured profile to work with jss7-simulator. Refer to the Admin Guide for instructions on how to start the server in either of the profiles.</para></listitem>
+			<listitem><para>resources: Contains SLEE MAP RA jars.</para></listitem>
+			<listitem>
+				<para>
+					tools: Contains SLEE tools and SMSC test tools as explained below.
+					<itemizedlist>
+						<listitem><para>RestComm-hlr-simulator: Command line HLR simulator used for load testing of SMSC. RestComm-hlr-simulator is pre-configured to integrate with SMSC run in simulator profile.</para></listitem>
+						<listitem>
+							<para>
+								RestComm-jss7-simulator: jSS7 Simulator that can be run in GUI or command line mode. This tool is useful to test <literal>MoForwardSM</literal> and other such functionality of SMSC like "when subscriber absent", etc. For more details on using this tool, please refer to RestComm SS7Stack User Guide. RestComm-jss7-simulator is pre-configured to integrate with SMSC run in simulator profile.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								RestComm-smpp-load: smpp-load tool is a Command line simulator to generate SMPP load. You must have <literal>ant</literal> installed to be able to run this tool. The smpp-load tool can be started to run as a SMPP Server accepting in-coming connection (BIND) from &THIS.PLATFORM; &THIS.APPLICATION; or run as a SMPP Client to send BIND to &THIS.PLATFORM; &THIS.APPLICATION;. You can confiugre this tool by editing the <filename>build.xml</filename> to define how many SMPP connections should be initiated, what kind of load should be generated, etc.				</para>
+						</listitem>						
+						<listitem>
+							<para>
+								RestComm-smpp-simulator: smpp-simulator is a GUI tool to generate SMPP load. It can only initiate BIND and act as a SMPP Client. You can also use it to test other functionalities like <literal>UCS2</literal>, breaking <literal>SUBMIT_SM</literal> into multiple SMS etc.
+							</para>
+						</listitem>												
+					</itemizedlist>				
+				</para>
+			</listitem>
+		</itemizedlist>
+
+<screen><![CDATA[
+|- mobicents-smsc-<version>
+		|- cassandra
+		|- docs
+				|+ container
+				|+ jss7
+				|+ management-hq
+				|+ resources
+				|+ slee
+				|+ smsc
+				|+ tools
+		|- jboss-5.1.0.GA
+				|+ bin    //contains start up and shutdown scripts for the Server.
+				|+ client
+				|+ common
+				|+ docs
+				|+ lib
+				|- server
+					|+ default	//clean profile to set up from scratch
+					|+ simulator	//pre-configured profile to work with the jss7-simulator
+		|- resources
+				|+ diameter-base
+				|+ diameter-ro
+				|+ map
+				|+ sip11 
+		|- tools
+				|+ eclipslee
+				|+ jopr-plugin
+				|+ remote-slee-connection
+				|+ snmp
+				|+ RestComm-hlr-simulator
+				|+ RestComm-jss7-simulator
+				|+ RestComm-smpp-load
+				|+ RestComm-smpp-simulator
+				|+ twiddle
+]]>
+</screen>
+  	
+</section>
+<!--End of Binary layout section -->			  
+		
+	<section
+		id="source_code">
+		<title>
+			Setup from Source 
+		</title>
+		<para>&THIS.PLATFORM; &THIS.APPLICATION; is an open source project and you have the freedom to build from source. Building from source means you can stay on top with the latest features. Whilst aspects of &THIS.PLATFORM; &THIS.APPLICATION; are quite 
+		complicated, you may find ways to become contributors.</para>
+		
+		<para>&THIS.PLATFORM; &THIS.APPLICATION; works with JDK1.7 or above. In addition you must have the following tools installed.
+		
+		<itemizedlist>
+			<listitem>
+				<para><literal>Git Client 1.6</literal> : Instructions for using GIT, including install, can be found at <ulink
+								url="http://git-scm.com/book" /></para>
+			</listitem>		
+			<listitem>
+				<para><literal>Subversion Client 1.4</literal> : Instructions for using SVN, including install, can be found at <ulink
+								url="http://subversion.tigris.org" /></para>
+			</listitem>
+			<listitem>
+				<para><literal>Maven 2.0.9</literal> : Instructions for using Maven, including install, can be found at <ulink
+								url="http://maven.apache.org/" /></para>
+			</listitem>	
+			<listitem>
+				<para><literal>Ant 1.7.0</literal> : Instructions for using Ant, including install, can be found at <ulink
+								url="http://ant.apache.org" /></para>
+			</listitem>	
+		</itemizedlist>
+</para>
+<!--TODO not clear for RestComm 
+		<para>INSTRUCTIONS NOT AVAILABLE</para>-->
+<!-- -->
+		<section
+			id="source_building">
+			<title>Release Source Code Building</title>
+			<procedure>
+				<step>
+					<title>Downloading the source code</title>
+					
+					<para>Use GIT to checkout a specific release source, the base URL is &THIS.TRUNK_SOURCE_CODE_URL;,
+						then add the specific release version.
+					</para>
+					<programlisting>
+[usr]$ git clone https://userid@bitbucket.org/telestax/mobicents-smscgateway.git 
+[usr]$ cd mobicents-smscgateway
+[usr]$ git checkout &lt;version&gt;					
+					</programlisting>
+				
+				</step>
+				<step>
+					<title>Building the source code</title>
+					<para>Now that we have the source the next step is to build and install the source. 
+					&THIS.PLATFORM; &THIS.APPLICATION; uses Maven 2 to build the system. You must ensure that <literal>JAVA_HOME</literal> environment variable is set properly prior to building the source.</para>
+<programlisting>
+[usr]$ mvn clean install
+</programlisting>
+
+				</step>
+			</procedure>
+		</section>
+
+		<section
+			id="trunk_source_building">
+			<title>Development Trunk Source Building</title>
+			<para>
+				Similar process as for
+				<xref
+					linkend="source_building" />,
+				the only change is don't switch to specific tag.
+			</para>
+		</section>
+
+	</section>
+</chapter>
+

@@ -1,0 +1,1037 @@
+
+<h3 style="margin: 0px;">
+	<i class="icon-link"></i> Message Processing Rules
+</h3>
+<hr style="margin: 10 0px;" />
+<span style="float: right;">
+	<button id="refresh" style="float: right; margin-right: 20px; margin-left: 20px; height: 30px;" class="btn btn-medium btn-success" data-toggle="tooltip" data-placement="left" title="Refresh MProc Rules List" onclick="updateMProc();">
+		<i class="icon-refresh"></i>
+	</button>
+</span>
+<span id="esmes-table-wrapper">
+	<table id="no-esmes-table" class="table" style="display: none;">
+		<tr>
+			<td>
+				<div class="alert alert-info fade in">
+					<strong>No message processing rule defined yet!</strong> 
+				</div>
+			</td>
+		</tr>
+	</table>
+
+	<table id="esmes-table" class="table table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30px;">&nbsp;</th>
+				<th>Id</th>
+				<th>Rule Class Name</th>
+				<th>For Post Arrival</th>
+				<th>For Post Imsi Request</th>
+				<th>For Post Delivery State</th>
+				<th>Rule Parameters</th>
+				<th style="text-align: center; width: 150px;">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	<p>
+		<a href="#entities-modal" role="button" class="btn btn-info btn-small" data-toggle="modal" ><i class="icon-link"></i> Create Default Message Processing Rule</a> &nbsp;&nbsp;
+		<a href="#entities-modal-custom" role="button" class="btn btn-info btn-small" data-toggle="modal" ><i class="icon-link"></i> Create Custom Message Processing Rule</a>
+	</p>	
+</span>
+
+<div id="entities-modal-custom" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>Create Custom Message Processing Rule</h3>
+	</div>
+	
+	<div id="entities-modal-body-custom" class="modal-body">
+		<div class="alert alert-error" id="login-settings-error-custom" style="display:none;">
+		  <button type="button" class="close">&times;</button>
+		  Some Fields are not correctly filled out, please double check the settings below !
+		</div>
+		<p>
+			<span>
+				<div id="div-id-custom" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="A unique id for this message processing rule. Rules are sorted in ascending order based on this id. All the matching rules are applied">
+						<span class="add-on">Id</span>
+						<input id="id-custom" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Id" />
+					</span>				
+				</div>
+				
+				<div id="div-classname-custom" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="the name of class of mproc rules implementation. For the default implementation class name is mproc.">
+						<span class="add-on">Class Name</span>
+						<input id="classname-custom" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" placeholder="Class Name" />
+					</span>				
+				</div>
+				
+				<div id="div-parameters-custom" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="the parameters that should be set for this mproc">
+						<span class="add-on">Parameters</span>
+						<input id="parameters-custom" type="text" class="input-mini" style="width: 420px; margin-right: 12px; text-align: center;" placeholder="parameters" />
+					</span>				
+				</div>								
+				
+				<button id="add-entity-button-custom" class="btn btn btn-primary" onclick="createMProcCustom()">Create</button>
+			</span>
+		</p>
+		<p>&nbsp;</p>
+		<div class="accordion" id="entities-accordion-custom">
+		</div>
+	</div>
+	<div class="modal-footer">
+		<a href="#" onclick="$('#entities-modal-custom').modal('hide'); return false;" class="btn">Close</a>
+	</div>
+</div>
+
+<div id="entities-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>Create Message Processing Rule</h3>
+	</div>
+	<div id="entities-modal-body" class="modal-body">
+		<div class="alert alert-error" id="login-settings-error" style="display:none;">
+		  <button type="button" class="close">&times;</button>
+		  Some Fields are not correctly filled out, please double check the settings below !
+		</div>
+		<p>
+			<span>
+				<div id="div-id" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="A unique id for this message processing rule. Rules are sorted in ascending order based on this id. All the matching rules are applied">
+						<span class="add-on">Id</span>
+						<input id="id" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Id" />
+					</span>				
+				</div>
+				
+				<div id="div-desttonmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if destination type of number (TON) of target SMS match's with this rule's desttonmask. Set value to -1 as wild card to match all the TON. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13; Default value is -1">
+						<span class="add-on">Destination Type of Number (TON)</span>
+						<select id="desttonmask" >
+							<option value="-1">-1: Null</option>
+							<option value="0">0 : Unknown</option>
+							<option value="1">1 : International</option>
+							<option value="2">2 : National</option>
+							<option value="3">3 : Network Specific</option>
+							<option value="4">4 : Subscriber Number</option>
+							<option value="5">5 : Alphanumeric</option>
+							<option value="6">6 : Abbreviated</option>
+							<option value="7">7 : Reserved</option>
+						</select>
+					</span>	
+				</div>
+								
+				<div id="div-destnpimask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if destination number plan indicator (NPI) of target SMS match's with this rule's destnpimask. Set value to -1 as wild card to match all the NPI. Valid values of TON are &#13; 0  : Unknown &#13; 1  : ISDN (E163/E164) &#13; 3  : Data (X.121) &#13; 4  : Telex (F.69) &#13; 6  : Land Mobile (E.212) &#13; 8  : National &#13; 9  : Private &#13; 10 : ERMES &#13; 14 : Internet &#13; 18 : WAP Client Id &#13; Default value is -1 ">
+						<span class="add-on">Destination Number Plan Indicator (NPI)</span>
+						<select id="destnpimask" >
+							<option value="-1">-1 : Null</option>
+							<option value="0">0 : Unknown</option>
+							<option value="1">1 : ISDN (E163/E164)</option>
+							<option value="3">3 : Data (X.121)</option>
+							<option value="4">4 : Telex (F.69)</option>
+							<option value="6">6 : Land Mobile (E.212)</option>
+							<option value="8">8: National</option>
+							<option value="9">9 : Private</option>
+							<option value="10">10 : ERMES</option>
+							<option value="14">14 : Internet (IP)</option>
+							<option value="18">18 : WAP Client Id</option>
+						</select>
+					</span>	
+				</div>
+				
+				<div id="div-destdigmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if destination number of target SMS match's with this rule's destdigmask. destdigmask is java regular expression. Set value to -1 or leave blank as wild card to match all the digits of target SMS destination. Default value is -1">
+						<span class="add-on">Destination Digit Mask</span>
+						<input id="destdigmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
+					</span>				
+				</div>	
+				
+				<div id="div-originatingmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if target SMS is originated from channel as specified by originatingmask. Select All as wild card to match all the origination type. Valid values are &#13; SMPP &#13; SS7_MO &#13; SS7_HR &#13; SIP &#13; Default value is All (null)">
+						<span class="add-on">Originating Channel</span>
+						<select id="originatingmask" >
+							<option value="All">All</option>
+							<option value="SS7_MO">SS7 Mobile Originated</option>
+							<option value="SS7_HR">SS7 Home Routing</option>
+							<option value="SMPP">SMPP</option>
+							<option value="SIP">SIP</option>
+						</select>
+					</span>	
+				</div>	
+				
+				<div id="div-origesmenamemask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if target SMS is originated from SMPP channel (ESME) and who's name match's with originating ESME name mask (Java Regular Expression). Set -1 as wild card to match all the ESME.">
+						<span class="add-on">Originating ESME Name Mask</span>
+						<input id="origesmenamemask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Originating ESME name mask" />
+					</span>				
+				</div>					
+				
+				<div id="div-networkidmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if target SMS is origination networkid with this rule's networkidmask. Set value to -1 as wild card to match all the network id's. Default value is -1">
+						<span class="add-on">Network Id Mask</span>
+						<input id="networkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
+					</span>				
+				</div>	
+				
+				<div id="div-newnetworkid" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's network id will be change to one set here. This will allow to received SMS from different network and terminate on different network. Set this to -1 to keep original network id. Default value is -1.">
+						<span class="add-on">New Network Id</span>
+						<input id="newnetworkid" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
+					</span>				
+				</div>	
+				
+				<div id="div-newdestton" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's destination type of number(TON) will be changed to one set here. Set this to -1 to keep original TON. Default value is -1.">
+						<span class="add-on">New Type Of Number (TON)</span>
+						<select id="newdestton" >
+							<option value="-1">-1 : null</option>
+							<option value="0">0 : Unknown</option>
+							<option value="1">1 : International</option>
+							<option value="2">2 : National</option>
+							<option value="3">3 : Network Specific</option>
+							<option value="4">4 : Subscriber Number</option>
+							<option value="5">5 : Alphanumeric</option>
+							<option value="6">6 : Abbreviated</option>
+							<option value="7">7 : Reserved</option>
+						</select>
+					</span>	
+				</div>
+								
+				<div id="div-newdestnpi" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's destination number plan indicator (NPI) will be changed to one set here. Set this to -1 to keep original NPI. Default value is -1.">
+						<span class="add-on">New Number Plan Indicator (NPI)</span>
+						<select id="newdestnpi" >
+							<option value="-1">-1 : null</option>
+							<option value="0">0 : Unknown</option>
+							<option value="1">1 : ISDN (E163/E164)</option>
+							<option value="3">3 : Data (X.121)</option>
+							<option value="4">4 : Telex (F.69)</option>
+							<option value="6">6 : Land Mobile (E.212)</option>
+							<option value="8">8 : National</option>
+							<option value="9">9 : Private</option>
+							<option value="10">10 : ERMES</option>
+							<option value="14">14 : Internet (IP)</option>
+							<option value="18">18 : WAP Client Id</option>
+						</select>
+					</span>	
+				</div>	
+				
+				<div id="div-addestdigprefix" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's destination number will be prefixed with adddestdigprefix set here. Set this to -1 or leave leave empty to keep original destination number. Dfault value is -1.">
+						<span class="add-on">Address prefix</span>
+						<input id="addestdigprefix" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
+					</span>				
+				</div>																		
+				
+				<div id="div-makecopy" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix will be applied to new SMS">
+						<span class="add-on">Make Copy</span>
+						<select id="makecopy" >
+							<option value="false">False</option>
+							<option value="true">True</option>
+						</select>
+					</span>	
+				</div>	
+							
+				<div id="div-dropaftersri" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's and if a MAP SRI success response is received, message will be dropped without delivery attempt. A delivery response in this case will contain extra fields (IMSI and NetworkNodeNumber values). This action is applied only for SMS that are attempted to be delivered to SS7 network. ">
+						<span class="add-on">Drop After MAP SRI Request</span>
+						<select id="dropaftersri" >
+							<option value="false">False</option>
+							<option value="true">True</option>
+						</select>
+					</span>	
+				</div>
+												
+				<button id="add-entity-button" class="btn btn btn-primary" onclick="createMProc()">Create</button>
+			</span>
+		</p>
+		<p>&nbsp;</p>
+		<div class="accordion" id="entities-accordion">
+		</div>
+	</div>
+	<div class="modal-footer">
+		<a href="#" onclick="$('#entities-modal').modal('hide'); return false;" class="btn">Close</a>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	function processRuleParameters(ruleparameters, parameter){
+		ruleparameters = ruleparameters.toLowerCase();
+		parameter = parameter.toLowerCase();
+		var index = ruleparameters.indexOf(parameter);
+		if(index == -1){
+			return "-1";
+		}
+		
+		var valueStartIndex = ruleparameters.indexOf("=", index);
+		valueStartIndex = valueStartIndex+1;
+		
+		var valueEndIndex = ruleparameters.indexOf(",", index);
+		if(valueEndIndex != -1){
+			return (ruleparameters.substring(valueStartIndex,valueEndIndex));
+		} 
+		
+		return (ruleparameters.substring(valueStartIndex));
+	}
+
+	function convertTon(ton){
+		switch(ton){
+		case -1:
+			return "null";
+		case 0:
+			return "Unknown";
+		case 1:
+			return "International";
+		case 2:
+			return "National";
+		case 3:
+			return "Network Specific";
+		case 4:
+			return "Subscriber Number";
+		case 5:
+			return "Alphanumeric";
+		case 6:
+			return "Abbreviated";
+		case 7:
+			return "Reserved";
+		default:
+			return "NA";
+		}
+	}
+	
+	function convertNpi(npi){
+		switch(npi){
+		case -1:
+			return "null";
+		case 0:
+			return "Unknown";
+		case 1:
+			return "ISDN (E163/E164)";
+		case 3:
+			return "Data (X.121)";
+		case 4:
+			return "Telex (F.69)";
+		case 6:
+			return "Land Mobile (E.212)";
+		case 8:
+			return "National";
+		case 9:
+			return "Private";
+		case 10:
+			return "ERMES";
+		case 14:
+			return "Internet (IP)";
+		case 18:
+			return "WAP Client Id";
+		default:
+			return "NA";
+		}
+	}	
+	
+	
+	
+	function updateMProc() {
+		mbeanSearch="org.mobicents.smsc:layer=MProcManagement,name=*";
+		var mbeanVar;
+		$.ajax({
+			dataType: "json",
+			url: window.jolokiaProtocol + "//" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+		})
+		.done(function(html) {
+			if (html.error) {
+				logToConsole("ERROR", html.error);
+			}
+			else {		
+				
+				$('.service-row').remove();
+
+				jQuery.each(html.value, function() {
+					mbeanVar = this;
+					
+					
+					jolokia.request(
+							[
+								{ type: "read", mbean: mbeanVar },
+							],
+							{ success: [
+								function(response) {
+									
+									var mProcRules = response.value.MProcRules;
+									var noOfMProcRules = 0;
+									jQuery.each(mProcRules, function(index, value) {
+										
+										noOfMProcRules = noOfMProcRules + 1;
+									
+										var id = value.id;
+										var ruleclassname = value.ruleClassName;
+										var forpostarrivalstate = value.forPostArrivalState;
+										var forpostimsirequeststate = value.forPostImsiRequestState;
+										var forpostdeliverystate = value.forPostDeliveryState;
+										var ruleparameters = value.ruleParameters;
+										
+										serviceClass = 'active-service';
+										
+										$('#esmes-table').children('tbody').append('<tr class="service-row"><td style="vertical-align: middle; text-align: center;"><i style="color: #51A351;" class="icon-play-circle"></i></td>'+
+												'<td style="cursor: pointer;" >' + id + '</td>' +
+												'<td style="cursor: pointer;" >' + ruleclassname + '</td>' +
+												'<td style="cursor: pointer;" >' + forpostarrivalstate + '</td>' +
+												'<td style="cursor: pointer;" >' + forpostimsirequeststate + '</td>' +
+												'<td style="cursor: pointer;" >' + forpostdeliverystate + '</td>' +
+												'<td style="cursor: pointer;" >' + ruleparameters + '</td>' +
+												'<td style="font-size: 16px; vertical-align: middle; text-align: center; width: 150px;">' + 
+													'<button class="btn btn-small btn-danger"' + ' data-toggle="tooltip" title="Remove MProc" data-placement="bottom" onclick="mprocOperation(\'destroyMProcRule\', \'' + id +  '\')"><i class="icon-remove"> </i></button> ' +
+													'<a href="#entities-modal'+id+'" role="button" class="btn btn-info btn-small" data-toggle="modal"><i class="icon-external-link"></i></a>' +
+												'</td></tr>'
+	
+	
+												
+										);	
+										
+										if(ruleclassname == "mproc"){
+											
+										var desttonmask = processRuleParameters(ruleparameters, "desttonmask");
+										var destnpimask = processRuleParameters(ruleparameters, "destnpimask");
+										var destdigmask = processRuleParameters(ruleparameters, "destdigmask");
+										var originatingmask = processRuleParameters(ruleparameters, "originatingmask");
+										var networkidmask = processRuleParameters(ruleparameters, "networkidmask");
+										var newnetworkid = processRuleParameters(ruleparameters, "newnetworkid");
+										var newdestton = processRuleParameters(ruleparameters, "newdestton");
+										var newdestnpi = processRuleParameters(ruleparameters, "newdestnpi");
+										var addestdigprefix = processRuleParameters(ruleparameters, "adddestdigprefix");
+										var makecopy = processRuleParameters(ruleparameters, "makecopy");
+										var origesmenamemask = processRuleParameters(ruleparameters, "origesmenamemask"); 
+										var dropaftersri = processRuleParameters(ruleparameters, "dropaftersri");
+										
+										$('#esmes-table-wrapper').append('<div id="entities-modal'+id+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
+												'<div class="modal-header">'+
+													'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+													'<h3>Message Procesing Rule # '+id+' properties</h3>'+
+												'</div>'+	
+												'<div id="entities-modal-body" class="modal-body">'+
+														'<div class="accordion-group">' +
+															'<div class="accordion-heading">' +id+ '</div>'+
+															'<div id="' + id + '" class="accordion-body">' +
+																'<div class="accordion-inner">' +
+																	'<strong><i class="icon-list"></i>Default Message Processing Rule</strong>' +
+																	
+																	'<div class="alert alert-error" id="login-settings-error" style="display:none;">'+
+																	  '<button type="button" class="close">&times;</button>'+
+																	  'Some Fields are not correctly filled out, please double check the settings below !'+
+																	'</div>'+																			
+																	
+																	'<table id="'+id+'-ESME" class="table table-condensed table-striped">' + 
+																		'<thead><tr><th style="width: 40%;">Name</th><th style="width: 55%;">Value</th><th>&nbsp;</th></tr></thead>' +
+																		'<tbody>'+
+																		
+																			'<tr data-toggle="tooltip" title="Rule will be applied only if destination type of number (TON) of target SMS match\'s with this rule\'s desttonmask. Set value to -1 as wild card to match all the TON. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13; Default value is -1">'+
+																				'<td style="font-size: 0.9em;">Destination Type Of Number (TON)</td>'+
+																				'<td style="font-size: 0.9em; padding: 0;">'+
+																					'<div id="div-' + id +'desttonmask-input" class="control-group">'+
+																					'<span id="' + id +'desttonmask-input" style="display: none;">'+
+																						'<input type="text" class="input-small" value="' + desttonmask + '" /> ' +
+																						'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'desttonmask\', \'' + id+"desttonmask" + '\', \'true\')"></i> ' +
+																						'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"desttonmask"+']\').toggle(); $(\'input[id^='+id+"desttonmask"+']\').focus();"></i>' + 
+																					'</span>'+
+																					'</div>' +
+																					'<span id="' +id + 'desttonmask-text">' + desttonmask + '</span>'+
+																				'</td>'+
+																				'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"desttonmask"+']\').toggle(); $(\'input[id^='+id+"desttonmask"+']\').focus();"></i>' +
+																				'</td>'+
+																			'</tr>'+
+																			
+																			'<tr data-toggle="tooltip" title="Rule will be applied only if destination number plan indicator (NPI) of target SMS match\'s with this rule\'s destnpimask. Set value to -1 as wild card to match all the NPI. Valid values of NPI are &#13; 0  : Unknown &#13; 1  : ISDN (E163/E164) &#13; 3  : Data (X.121) &#13; 4  : Telex (F.69) &#13; 6  : Land Mobile (E.212) &#13; 8  : National &#13; 9  : Private &#13; 10 : ERMES &#13; 14 : Internet &#13; 18 : WAP Client Id &#13; Default value is -1">'+
+																			'<td style="font-size: 0.9em;">Destination Number Plan Indicator (NPI)</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'DestNpiMask-input" class="control-group">'+
+																				'<span id="' + id +'DestNpiMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + destnpimask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'destnpimask\', \'' + id+"DestNpiMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"DestNpiMask"+']\').toggle(); $(\'input[id^='+id+"DestNpiMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'DestNpiMask-text">' + destnpimask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DestNpiMask"+']\').toggle(); $(\'input[id^='+id+"DestNpiMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if destination number of target SMS match\'s with this rule\'s destdigmask. destdigmask is java regular expression. Set value to -1 or leave blank as wild card to match all the digits of target SMS destination. Default value is -1">'+
+																			'<td style="font-size: 0.9em;">Destination Digits Mask</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'DestDigMask-input" class="control-group">'+
+																				'<span id="' + id +'DestDigMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + destdigmask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'destdigmask\', \'' + id+"DestDigMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"DestDigMask"+']\').toggle(); $(\'input[id^='+id+"DestDigMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'DestDigMask-text">' + destdigmask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DestDigMask"+']\').toggle(); $(\'input[id^='+id+"DestDigMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+	
+																		
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS is originated from channel as specified by originatingmask. Leave blank as wild card to match all the origination type. Valid values are &#13; SMPP &#13; SS7_MO &#13; SS7_HR &#13; SIP &#13; Default is blank">'+
+																			'<td style="font-size: 0.9em;">Originating Chanel</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'OriginatingMask-input" class="control-group">'+
+																				'<span id="' + id +'OriginatingMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + originatingmask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'originatingmask\', \'' + id+"OriginatingMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginatingMask"+']\').toggle(); $(\'input[id^='+id+"OriginatingMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'OriginatingMask-text">' + originatingmask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginatingMask"+']\').toggle(); $(\'input[id^='+id+"OriginatingMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+	
+																		
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS is originated from SMPP channel (ESME) and who\'s name match\'s with originating ESME name mask (Java Regular Expression). Set -1 as wild card to match all the ESME.">'+
+																			'<td style="font-size: 0.9em;">Originating ESME Name Mask</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'OrigEsmeNameMask-input" class="control-group">'+
+																				'<span id="' + id +'OrigEsmeNameMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + origesmenamemask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'origesmenamemask\', \'' + id+"OrigEsmeNameMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"OrigEsmeNameMask"+']\').toggle(); $(\'input[id^='+id+"OrigEsmeNameMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'OrigEsmeNameMask-text">' + origesmenamemask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OrigEsmeNameMask"+']\').toggle(); $(\'input[id^='+id+"OrigEsmeNameMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
+																		
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS origination networkid match\'s with this rule\'s networkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1">'+
+																			'<td style="font-size: 0.9em;">Network Id Mask</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NetworkIdMask-input" class="control-group">'+
+																				'<span id="' + id +'NetworkIdMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + networkidmask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'networkidmask\', \'' + id+"NetworkIdMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"NetworkIdMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NetworkIdMask-text">' + networkidmask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"NetworkIdMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s network id will be change to one set here. This will allow to received SMS from different network and terminate on different network. Set this to -1 to keep original network id. Default value is -1.">'+
+																			'<td style="font-size: 0.9em;">New Network Id</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewNetworkId-input" class="control-group">'+
+																				'<span id="' + id +'NewNetworkId-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newnetworkid + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newnetworkid\', \'' + id+"NewNetworkId" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewNetworkId"+']\').toggle(); $(\'input[id^='+id+"NewNetworkId"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewNetworkId-text">' + newnetworkid + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewNetworkId"+']\').toggle(); $(\'input[id^='+id+"NewNetworkId"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s destination type of number(TON) will be changed to one set here. Set this to -1 to keep original TON. Default value is -1. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13;">'+
+																			'<td style="font-size: 0.9em;">New Destination Ton</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewDestTon-input" class="control-group">'+
+																				'<span id="' + id +'NewDestTon-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newdestton + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newdestton\', \'' + id+"NewDestTon" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewDestTon"+']\').toggle(); $(\'input[id^='+id+"NewDestTon"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewDestTon-text">' + newdestton + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewDestTon"+']\').toggle(); $(\'input[id^='+id+"NewDestTon"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s destination number plan indicator (NPI) will be changed to one set here. Set this to -1 to keep original NPI. Default value is -1. Valid values of NPI are &#13; 0  : Unknown &#13; 1  : ISDN (E163/E164) &#13; 3  : Data (X.121) &#13; 4  : Telex (F.69) &#13; 6  : Land Mobile (E.212) &#13; 8  : National &#13; 9  : Private &#13; 10 : ERMES &#13; 14 : Internet &#13; 18 : WAP Client Id &#13;">'+
+																			'<td style="font-size: 0.9em;">New Destination Npi</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewDestNpi-input" class="control-group">'+
+																				'<span id="' + id +'NewDestNpi-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newdestnpi + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newdestnpi\', \'' + id+"NewDestNpi" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewDestNpi"+']\').toggle(); $(\'input[id^='+id+"NewDestNpi"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewDestNpi-text">' + newdestnpi + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewDestNpi"+']\').toggle(); $(\'input[id^='+id+"NewDestNpi"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s destination number will be prefixed with adddestdigprefix set here. Set this to -1 or leave blank to keep original destination number. Dfault value is -1.">'+
+																			'<td style="font-size: 0.9em;">Destination Digits Prefix</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'AddDestDigPrefix-input" class="control-group">'+
+																				'<span id="' + id +'AddDestDigPrefix-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + addestdigprefix + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'adddestdigprefix\', \'' + id+"AddDestDigPrefix" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"AddDestDigPrefix"+']\').toggle(); $(\'input[id^='+id+"AddDestDigPrefix"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'AddDestDigPrefix-text">' + addestdigprefix + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"AddDestDigPrefix"+']\').toggle(); $(\'input[id^='+id+"AddDestDigPrefix"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+	
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix will be applied to new SMS">'+
+																			'<td style="font-size: 0.9em;">Make Copy</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'MakeCopy-input" class="control-group">'+
+																				'<span id="' + id +'MakeCopy-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + makecopy + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'makecopy\', \'' + id+"MakeCopy" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"MakeCopy"+']\').toggle(); $(\'input[id^='+id+"MakeCopy"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'MakeCopy-text">' + makecopy + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"MakeCopy"+']\').toggle(); $(\'input[id^='+id+"MakeCopy"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+																		
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s and if a MAP SRI success response is received, message will be dropped without delivery attempt. A delivery response in this case will contain extra fields (IMSI and NetworkNodeNumber values). This action is applied only for SMS that are attempted to be delivered to SS7 network.">'+
+																			'<td style="font-size: 0.9em;">Drop After MAP SRI Request</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'DropAfterSri-input" class="control-group">'+
+																				'<span id="' + id +'DropAfterSri-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + dropaftersri + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'dropaftersri\', \'' + id+"DropAfterSri" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropAfterSri"+']\').toggle(); $(\'input[id^='+id+"DropAfterSri"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'DropAfterSri-text">' + dropaftersri + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropAfterSri"+']\').toggle(); $(\'input[id^='+id+"DropAfterSri"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
+																		
+																		'</tbody>' +
+																	'</table>' +	
+																	
+																'</div>'+
+															'</div>'+
+														'</div>'+
+												'</div>'+
+												'<div class="modal-footer">'+
+													'<a href="#" onclick="$(\'#entities-modal'+id+'\').modal(\'hide\'); return false;" class="btn">Close</a>'+
+												'</div>'+										
+											'</div>');	
+										} else {
+											var classname = value.ruleClassName;
+											$('#esmes-table-wrapper').append('<div id="entities-modal'+id+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
+													'<div class="modal-header">'+
+														'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+														'<h3>Message Procesing Rule # '+id+' properties</h3>'+
+													'</div>'+	
+													'<div id="entities-modal-body" class="modal-body">'+
+															'<div class="accordion-group">' +
+																'<div class="accordion-heading">' +id+ '</div>'+
+																'<div id="' + id + '" class="accordion-body">' +
+																	'<div class="accordion-inner">' +
+																		'<strong><i class="icon-list"></i>Custom Message Processing Rule</strong>' +
+																		
+																		'<div class="alert alert-error" id="login-settings-error" style="display:none;">'+
+																		  '<button type="button" class="close">&times;</button>'+
+																		  'Some Fields are not correctly filled out, please double check the settings below !'+
+																		'</div>'+																			
+																		
+																		'<table id="'+id+'-ESME" class="table table-condensed table-striped">' + 
+																			'<thead><tr><th style="width: 40%;">Name</th><th style="width: 55%;">Value</th><th>&nbsp;</th></tr></thead>' +
+																			'<tbody>'+
+																			
+																				'<tr data-toggle="tooltip" title="Rule will be applied only if destination type of number (TON) of target SMS match\'s with this rule\'s desttonmask. Set value to -1 as wild card to match all the TON. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13; Default value is -1">'+
+																					'<td style="font-size: 0.9em;">Class Name</td>'+
+																					'<td style="font-size: 0.9em; padding: 0;">'+
+																						'<span id="' +id + 'classname-text">' + classname + '</span>'+
+																					'</td>'+
+																					'<td> &nbsp;' +
+																					'</td>'+
+																				'</tr>'+
+																				
+																				'<tr data-toggle="tooltip" title="Once rule match\'s, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix will be applied to new SMS">'+
+																				'<td style="font-size: 0.9em;">Rule Parameters</td>'+
+																				'<td style="font-size: 0.9em; padding: 0;">'+
+																					'<div id="div-' + id +'RuleParameters-input" class="control-group">'+
+																					'<span id="' + id +'RuleParameters-input" style="display: none;">'+
+																						'<input type="text" class="input-small" value="' + ruleparameters + '" /> ' +
+																						'<i class="icon-ok" style="cursor: pointer;" onclick="onCustomModifyEsmeOk(\'' + id+ '\', \'ruleparameters\', \'' + id+"RuleParameters" + '\', \'true\')"></i> ' +
+																						'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"RuleParameters"+']\').toggle(); $(\'input[id^='+id+"RuleParameters"+']\').focus();"></i>' + 
+																					'</span>'+
+																					'</div>' +
+																					'<span id="' +id + 'RuleParameters-text">' + ruleparameters + '</span>'+
+																				'</td>'+
+																				'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"RuleParameters"+']\').toggle(); $(\'input[id^='+id+"RuleParameters"+']\').focus();"></i>' +
+																				'</td>'+
+																			'</tr>'+																				
+																			'</tbody>' +
+																		'</table>' +	
+																	'</div>'+
+																'</div>'+
+															'</div>'+
+													'</div>'+
+													'<div class="modal-footer">'+
+														'<a href="#" onclick="$(\'#entities-modal'+id+'\').modal(\'hide\'); return false;" class="btn">Close</a>'+
+													'</div>'+										
+												'</div>');											
+											
+										}
+										
+										
+									});
+									
+									if(noOfMProcRules == 0){
+										$('#no-esmes-table').show();
+										$('#esmes-table').hide();
+									}else {
+										$('#no-esmes-table'+name).hide();
+										$('#esmes-table').show();
+									}
+								}],
+								error: function(value){
+									errorUID = ("st" + new Date().getTime()).hashCode();
+									createStackTrace(errorUID, value.stacktrace);
+									logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+								}
+							}
+						); 
+
+				});
+			}
+		})
+		.fail(function() {
+			logToConsole("ERROR", "Failure trying to communicate with the SMSC Gateway. Please try again later.");
+		})
+	}
+	
+	function mprocOperation(operation, name) {
+		mbeanSearch="org.mobicents.smsc:layer=MProcManagement,name=SmscManagement";
+		jolokia.execute(mbeanSearch,operation,name,
+				{
+					success: function(value) {
+						updateMProc();
+						logToConsole('INFO', 'Successfully '+operation+' ' + name );
+					},
+					error: function(value){
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+					}
+				});	
+		
+	}
+	
+	function createMProcCustom(){
+		var formInvalid = false;
+		var focusNotSet = true;
+		
+		var parametersstring = "";
+		
+		var id = $("#id-custom").val();
+		if(id.trim() == "") {
+			$("#div-id-custom").addClass("error");
+			if(focusNotSet){
+				$("#id-custom").focus();
+				focusNotSet = false;
+			}
+			formInvalid = true;
+		} else if($("#div-id-custom").hasClass("error")) {
+			$("#div-id-custom").removeClass("error");		
+		}
+		
+		var ruleclassname = $("#classname-custom").val();
+		if(ruleclassname.trim() == "") {
+			$("#div-classname-custom").addClass("error");
+			if(focusNotSet){
+				$("#classname-custom").focus();
+				focusNotSet = false;
+			}
+			formInvalid = true;
+		} else if($("#div-classname-custom").hasClass("error")) {
+			$("#div-classname-custom").removeClass("error");		
+		}
+		
+		var parametersstring = $("#parameters-custom").val();
+		if(parametersstring.trim() == "") {
+			parametersstring = null;
+		} else {
+			parametersstring = parametersstring.trim();	
+		}	
+		
+		if(formInvalid) {
+			$("#login-settings-error").show();
+			logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+			return false;
+		} else {
+			$("#login-settings-error").hide();
+		}
+		
+		jolokia.execute("org.mobicents.smsc:layer=MProcManagement,name=SmscManagement","createMProcRule", id,ruleclassname,parametersstring, 
+				{
+					success: function(value) {
+						updateMProc();
+						logToConsole('INFO', 'MProc rule ' + id + ' created successfuly.');
+						$('#entities-modal').modal('hide');
+					},
+					error: function(value){
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+					}					
+				});		
+		
+	}	
+	
+	function createMProc(){
+		var formInvalid = false;
+		var focusNotSet = true;
+		
+		var parametersstring = "";
+		
+		var id = $("#id").val();
+		if(id.trim() == "") {
+			$("#div-id").addClass("error");
+			if(focusNotSet){
+				$("#id").focus();
+				focusNotSet = false;
+			}
+			formInvalid = true;
+		} else if($("#div-id").hasClass("error")) {
+			$("#div-id").removeClass("error");		
+		}
+		
+		var e = document.getElementById("desttonmask");
+		if(e.selectedIndex != -1){
+			var desttonmask = e.options[e.selectedIndex].value;
+			parametersstring = parametersstring + " desttonmask "+desttonmask;
+		}
+		
+		e = document.getElementById("destnpimask");
+		if(e.selectedIndex != -1){
+			var destnpimask = e.options[e.selectedIndex].value;
+			parametersstring = parametersstring + " destnpimask "+destnpimask;
+		}
+		
+		
+		var destdigmask = $("#destdigmask").val();
+		if(destdigmask.trim() == "") {
+			destdigmask = null;		
+		} else {
+			parametersstring = parametersstring + " destdigmask "+destdigmask;
+		}
+		
+		e = document.getElementById("originatingmask");
+		var originatingmask = e.options[e.selectedIndex].value;
+		
+		if(originatingmask == "All") {
+			originatingmask = null;		
+		} else {
+			parametersstring = parametersstring + " originatingmask "+originatingmask;
+		}
+		
+		var origesmenamemask = $("#origesmenamemask").val();
+		if(origesmenamemask.trim() == "") {
+			destdigmask = null;		
+		} else {
+			parametersstring = parametersstring + " origesmenamemask "+origesmenamemask;
+		}		
+		
+		var networkidmask = $("#networkidmask").val();
+		if(networkidmask.trim() == "") {
+			networkidmask = "-1";
+		} else {
+			parametersstring = parametersstring + " networkidmask "+networkidmask;
+		}
+		
+		var newnetworkid = $("#newnetworkid").val();
+		if(newnetworkid.trim() == "") {
+			newnetworkid = "-1";
+		} else {
+			parametersstring = parametersstring + " newnetworkid "+newnetworkid;
+		}
+		
+		var e = document.getElementById("newdestton");
+		if(e.selectedIndex != -1){
+			var newdestton = e.options[e.selectedIndex].value;
+			parametersstring = parametersstring + " newdestton "+newdestton;
+		}
+		
+		e = document.getElementById("newdestnpi");
+		if(e.selectedIndex != -1){
+			var newdestnpi = e.options[e.selectedIndex].value;
+			parametersstring = parametersstring + " newdestnpi "+newdestnpi;
+		}
+		
+		
+		var addestdigprefix = $("#addestdigprefix").val();
+		if(addestdigprefix == "") {
+			addestdigprefix = null;
+		} else {
+			parametersstring = parametersstring + " adddestdigprefix "+addestdigprefix;
+		}
+		
+		
+		e = document.getElementById("makecopy");
+		var makecopy = e.options[e.selectedIndex].value;
+		parametersstring = parametersstring + " makecopy "+makecopy;
+		
+		e = document.getElementById("dropaftersri");
+		var dropaftersri = e.options[e.selectedIndex].value;
+		parametersstring = parametersstring + " dropaftersri "+dropaftersri;
+		
+		parametersstring = parametersstring.trim();
+		
+		if(formInvalid) {
+			$("#login-settings-error").show();
+			logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+			return false;
+		} else {
+			$("#login-settings-error").hide();
+		}
+		
+		var ruleclassname = "mproc";
+		
+		jolokia.execute("org.mobicents.smsc:layer=MProcManagement,name=SmscManagement","createMProcRule", id,ruleclassname,parametersstring, 
+				{
+					success: function(value) {
+						updateMProc();
+						logToConsole('INFO', 'MProc rule ' + id + ' created successfuly.');
+						$('#entities-modal').modal('hide');
+					},
+					error: function(value){
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+					}					
+				});		
+		
+	}
+	
+	function onModifyEsmeOk(mbeanName, propertyName, spanId){
+		var skipCheck = false;
+		onModifyEsmeOk(mbeanName, propertyName, spanId, skipCheck)
+	}
+	
+	function onCustomModifyEsmeOk(mbeanName, className, spanId, skipCheck){
+		var formInvalid = false;
+		
+		var spanElement = document.getElementById(spanId + "-input");
+		var eleChild = spanElement.childNodes;
+		var inputTextEle = eleChild[0];
+		var spanElementTxt = document.getElementById(spanId + "-text");
+		
+		var propValue = inputTextEle.value;
+		
+		if(!skipCheck){
+			if(propValue.trim() == "") {
+				$("#div-"+spanId + "-input").addClass("error");					    			
+				formInvalid = true;
+			} else if($("#div-"+spanId + "-input").hasClass("error")) {
+				$("#div-"+spanId + "-input").removeClass("error");		
+			}	
+			
+			if(formInvalid) {
+				$("#login-settings-error").show();
+				logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+				return false;
+			} else {
+				$("#login-settings-error").hide();
+			}
+		}
+		
+		if(propValue == ""){
+			propValue = "-1";
+		}
+		
+		var mbeanSearch="org.mobicents.smsc:layer=MProcManagement,name=SmscManagement";
+		jolokia.execute(mbeanSearch,"modifyMProcRule",mbeanName,propValue,
+				{
+					success: function(value) {
+						updateMProc();
+						logToConsole('INFO', 'Successfully modified rule ' + mbeanName );
+					},
+					error: function(value){
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+					}
+				});		
+		
+		spanElement.style.display = 'none';
+		spanElementTxt.style.display = '';
+		
+		
+	}
+	
+	function onModifyEsmeOk(mbeanName, propertyName, spanId, skipCheck){
+		var formInvalid = false;
+		
+		var spanElement = document.getElementById(spanId + "-input");
+		var eleChild = spanElement.childNodes;
+		var inputTextEle = eleChild[0];
+		var spanElementTxt = document.getElementById(spanId + "-text");
+		
+		var propValue = inputTextEle.value;
+		
+		if(!skipCheck){
+			if(propValue.trim() == "") {
+				$("#div-"+spanId + "-input").addClass("error");					    			
+				formInvalid = true;
+			} else if($("#div-"+spanId + "-input").hasClass("error")) {
+				$("#div-"+spanId + "-input").removeClass("error");		
+			}	
+			
+			if(formInvalid) {
+				$("#login-settings-error").show();
+				logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+				return false;
+			} else {
+				$("#login-settings-error").hide();
+			}
+		}
+		
+		if(propValue == ""){
+			propValue = "-1";
+		}
+		
+		var parametersstring = propertyName + " " + propValue;
+		
+		var mbeanSearch="org.mobicents.smsc:layer=MProcManagement,name=SmscManagement";
+		jolokia.execute(mbeanSearch,"modifyMProcRule",mbeanName,parametersstring,
+				{
+					success: function(value) {
+						updateMProc();
+						logToConsole('INFO', 'Successfully modified rule ' + mbeanName );
+						spanElementTxt.innerHTML= inputTextEle.value;
+					},
+					error: function(value){
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+					}
+				});		
+		
+		spanElement.style.display = 'none';
+		spanElementTxt.style.display = '';
+		
+		
+	}	
+	$(document).ready(function () {
+		updateMProc();
+	});
+</script>

@@ -1,20 +1,23 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  
+ * Copyright 2012, Telestax Inc and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package org.mobicents.smsc.smpp;
@@ -68,22 +71,21 @@ public class SmppShellExecutor implements ShellExecutor {
     }
 
     /**
-     * Command is smpp esme modify <name> password <password> esme-ton <esme
-     * address ton> esme-npi <esme address npi> esme-range <esme address range>
-     * window-size <windowSize> connect-timeout <connectTimeout>
-     * request-expiry-timeout <requestExpiryTimeout> window-monitor-interval
-     * <windowMonitorInterval> window-wait-timeout <windowWaitTimeout>
-     * enquire-link-delay <30000>
-     * source-ton <source address ton>
-     * source-npi <source address npi> source-range <source address range>
-     * routing-ton <routing address ton> routing-npi <routing address npi>
-     * routing-range <routing address range>
+     * Command is smpp esme modify <name> password <password> networkid <networkid> esme-ton <esme address ton> esme-npi <esme address npi> esme-range
+     * <esme address range> window-size <windowSize> connect-timeout <connectTimeout> request-expiry-timeout
+     * <requestExpiryTimeout> window-monitor-interval <windowMonitorInterval> window-wait-timeout <windowWaitTimeout>
+     * counters-enabled <true | false> enquire-link-delay <30000> charging-enabled <true | false> source-ton <source address
+     * ton> source-npi <source address npi> source-range <source address range> routing-ton <routing address ton> routing-npi
+     * <routing address npi> routing-range <routing address range> ratelimit-second <ratelimitsecond> ratelimit-minute
+     * <ratelimitminute> ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday> national-language-locking-shift
+     * <national-language-locking-shift> national-language-single-shift <national-language-single-shift> min-message-length
+     * <min-message-length> max-message-length <max-message-length>
      * 
      * @param args
      * @return
      */
     private String modifyEsme(String[] args) throws Exception {
-        if (args.length < 6 || args.length > 48) {
+        if (args.length < 6 || args.length > 58) {
             return SmppOamMessages.INVALID_COMMAND;
         }
 
@@ -110,6 +112,8 @@ public class SmppShellExecutor implements ShellExecutor {
 
             if (key.equals("password")) {
                 esme.setPassword(args[count++]);
+            } else if (key.equals("networkid")) {
+                esme.setNetworkId(Integer.parseInt(args[count++]));
             } else if (key.equals("esme-ton")) {
                 byte esmeTonType = Byte.parseByte(args[count++]);
                 esme.setEsmeTon(esmeTonType);
@@ -134,9 +138,15 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("window-wait-timeout")) {
                 long windowWaitTimeout = Long.parseLong(args[count++]);
                 esme.setWindowWaitTimeout(windowWaitTimeout);
+            } else if (key.equals("counters-enabled")) {
+                boolean countersEnabled = Boolean.parseBoolean(args[count++]);
+                esme.setCountersEnabled(countersEnabled);
             } else if (key.equals("enquire-link-delay")) {
                 int enquireLinkDelay = Integer.parseInt(args[count++]);
                 esme.setEnquireLinkDelay(enquireLinkDelay);
+            } else if (key.equals("charging-enabled")) {
+                boolean chargingEnabled = Boolean.parseBoolean(args[count++]);
+                esme.setChargingEnabled(chargingEnabled);
             } else if (key.equals("source-ton")) {
                 int sourceTon = Integer.parseInt(args[count++]);
                 esme.setSourceTon(sourceTon);
@@ -156,6 +166,32 @@ public class SmppShellExecutor implements ShellExecutor {
                 String routingAddressRange = args[count++];
                 esme.setRoutingAddressRange(routingAddressRange);
 
+            } else if (key.equals("ratelimit-second")) {
+                long val = Long.parseLong(args[count++]);
+                esme.setRateLimitPerSecond(val);
+            } else if (key.equals("ratelimit-minute")) {
+                long val = Long.parseLong(args[count++]);
+                esme.setRateLimitPerMinute(val);
+            } else if (key.equals("ratelimit-hour")) {
+                long val = Long.parseLong(args[count++]);
+                esme.setRateLimitPerHour(val);
+            } else if (key.equals("ratelimit-day")) {
+                long val = Long.parseLong(args[count++]);
+                esme.setRateLimitPerDay(val);
+
+            } else if (key.equals("national-language-locking-shift")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setNationalLanguageLockingShift(val);
+            } else if (key.equals("national-language-single-shift")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setNationalLanguageSingleShift(val);
+            } else if (key.equals("min-message-length")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setMinMessageLength(val);
+            } else if (key.equals("max-message-length")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setMaxMessageLength(val);
+
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
@@ -167,18 +203,22 @@ public class SmppShellExecutor implements ShellExecutor {
 
     /**
      * Command is smpp esme create name <systemId> <host-ip> <port> <SmppBindType> <SmppSession.Type> password <password>
-     * system-type <sms | vms | ota > interface-version <3.3 | 3.4 | 5.0> esme-ton <esme address ton> esme-npi <esme address
-     * npi> esme-range <esme address range> cluster-name <clusterName> window-size <windowSize> connect-timeout <connectTimeout>
-     * request-expiry-timeout <requestExpiryTimeout> window-monitor-interval <windowMonitorInterval> window-wait-timeout
-     * <windowWaitTimeout> enquire-link-delay <30000> source-ton
-     * <source address ton> source-npi <source address npi> source-range <source address range> routing-ton <routing address
-     * ton> routing-npi <routing address npi>, routing-range <routing address range> ratelimit-day <ratelimitday>
+     * networkid <networkid> system-type <sms | vms | ota > interface-version <3.3 | 3.4 | 5.0> esme-ton <esme address ton>
+     * esme-npi <esme address npi> esme-range <esme address range> cluster-name <clusterName> window-size <windowSize>
+     * connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> window-monitor-interval
+     * <windowMonitorInterval> window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> enquire-link-delay
+     * <30000> charging-enabled <true | false> source-ton <source address ton> source-npi <source address npi> source-range
+     * <source address range> routing-ton <routing address ton> routing-npi <routing address npi>, routing-range <routing
+     * address range> ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> ratelimit-hour <ratelimithour>
+     * ratelimit-day <ratelimitday> national-language-locking-shift <national-language-locking-shift>
+     * national-language-single-shift <national-language-single-shift> min-message-length <min-message-length>
+     * max-message-length <max-message-length>
      * 
      * @param args
      * @return
      */
     private String createEsme(String[] args) throws Exception {
-        if (args.length < 9 || args.length > 61) {
+        if (args.length < 9 || args.length > 69) {
             return SmppOamMessages.INVALID_COMMAND;
         }
 
@@ -193,7 +233,6 @@ public class SmppShellExecutor implements ShellExecutor {
             return SmppOamMessages.INVALID_COMMAND;
         }
 
-        //Password can be null
         String host = args[5];
         if (host == null) {
             return SmppOamMessages.INVALID_COMMAND;
@@ -228,6 +267,11 @@ public class SmppShellExecutor implements ShellExecutor {
         String esmeAddrRange = null;
         String clusterName = name;
         String password = null;
+        int networkId = 0;
+        long rateLimitPerSecond = 0;
+        long rateLimitPerMinute = 0;
+        long rateLimitPerHour = 0;
+        long rateLimitPerDay = 0;
         int count = 9;
 
         int windowSize = SmppConstants.DEFAULT_WINDOW_SIZE;
@@ -236,7 +280,9 @@ public class SmppShellExecutor implements ShellExecutor {
         long windowMonitorInterval = SmppConstants.DEFAULT_WINDOW_MONITOR_INTERVAL;
         long windowWaitTimeout = SmppConstants.DEFAULT_WINDOW_WAIT_TIMEOUT;
 
+        boolean countersEnabled = true;
         int enquireLinkDelay = 30000;
+        boolean chargingEnabled = false;
 
         int sourceTon = -1;
         int sourceNpi = -1;
@@ -245,6 +291,11 @@ public class SmppShellExecutor implements ShellExecutor {
         int routinigTon = -1;
         int routingNpi = -1;
         String routingAddressRange = "^[0-9a-zA-Z]*";
+
+        int nationalLanguageSingleShift = -1;
+        int nationalLanguageLockingShift = -1;
+        int minMessageLength = -1;
+        int maxMessageLength = -1;
 
         while (count < args.length) {
             // These are all optional parameters for a Tx/Rx/Trx binds
@@ -255,6 +306,8 @@ public class SmppShellExecutor implements ShellExecutor {
 
             if (key.equals("password")) {
                 password = args[count++];
+            } else if (key.equals("networkid")) {
+                networkId = Integer.parseInt(args[count++]);
             }else if (key.equals("system-type")) {
                 systemType = args[count++];
             } else if (key.equals("interface-version")) {
@@ -277,12 +330,12 @@ public class SmppShellExecutor implements ShellExecutor {
                 windowWaitTimeout = Long.parseLong(args[count++]);
             } else if (key.equals("cluster-name")) {
                 clusterName = args[count++];
-//            } else if (key.equals("counters-enabled")) {
-//                countersEnabled = Boolean.parseBoolean(args[count++]);
+            } else if (key.equals("counters-enabled")) {
+                countersEnabled = Boolean.parseBoolean(args[count++]);
             } else if (key.equals("enquire-link-delay")) {
                 enquireLinkDelay = Integer.parseInt(args[count++]);
-//            } else if (key.equals("charging-enabled")) {
-//                chargingEnabled = Boolean.parseBoolean(args[count++]);
+            } else if (key.equals("charging-enabled")) {
+                chargingEnabled = Boolean.parseBoolean(args[count++]);
             } else if (key.equals("source-ton")) {
                 sourceTon = Integer.parseInt(args[count++]);
             } else if (key.equals("source-npi")) {
@@ -296,16 +349,36 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("routing-range")) {
                 routingAddressRange = args[count++];
 
+            } else if (key.equals("ratelimit-second")) {
+                rateLimitPerSecond = Long.parseLong(args[count++]);
+            } else if (key.equals("ratelimit-minute")) {
+                rateLimitPerMinute = Long.parseLong(args[count++]);
+            } else if (key.equals("ratelimit-hour")) {
+                rateLimitPerHour = Long.parseLong(args[count++]);
+            } else if (key.equals("ratelimit-day")) {
+                rateLimitPerDay = Long.parseLong(args[count++]);
+
+            } else if (key.equals("national-language-single-shift")) {
+                nationalLanguageSingleShift = Integer.parseInt(args[count++]);
+            } else if (key.equals("national-language-locking-shift")) {
+                nationalLanguageLockingShift = Integer.parseInt(args[count++]);
+            } else if (key.equals("min-message-length")) {
+                minMessageLength = Integer.parseInt(args[count++]);
+            } else if (key.equals("max-message-length")) {
+                maxMessageLength = Integer.parseInt(args[count++]);
+
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
 
         }
 
-        Esme esme = this.smppManagement.getEsmeManagement().createEsme(name, systemId, password, host, intPort, smppBindTypeStr, systemType,
-                smppVersionType, esmeTonType, esmeNpiType, esmeAddrRange, smppSessionTypeStr, windowSize, connectTimeout, requestExpiryTimeout,
-                windowMonitorInterval, windowWaitTimeout, clusterName, enquireLinkDelay, sourceTon, sourceNpi, sourceAddressRange,
-                routinigTon, routingNpi, routingAddressRange);
+        Esme esme = this.smppManagement.getEsmeManagement().createEsme(name, systemId, password, host, intPort,
+                chargingEnabled, smppBindTypeStr, systemType, smppVersionType, esmeTonType, esmeNpiType, esmeAddrRange,
+                smppSessionTypeStr, windowSize, connectTimeout, requestExpiryTimeout, windowMonitorInterval, windowWaitTimeout,
+                clusterName, countersEnabled, enquireLinkDelay, sourceTon, sourceNpi, sourceAddressRange, routinigTon,
+                routingNpi, routingAddressRange, networkId, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
+                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, minMessageLength, maxMessageLength);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getSystemId());
     }
 

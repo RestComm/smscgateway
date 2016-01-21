@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<scgt value="0"/>
+<scgtList>
+	<scgtList networkId="1" serviceCenterGt="22229"/>
+</scgtList>
+<scssn value="-1"/>
+<hlrssn value="-1"/>
+<mscssn value="-1"/>
+<maxmapv value="3"/>
+<defaultValidityPeriodHours value="72"/>
+<maxValidityPeriodHours value="240"/>
+<defaultTon value="1"/>
+<defaultNpi value="1"/>
+<subscriberBusyDueDelay value="120"/>
+<firstDueDelay value="678"/>
+<secondDueDelay value="300"/>
+<maxDueDelay value="86400"/>
+<dueDelayMultiplicator value="200"/>
+<maxMessageLengthReducer value="6"/>
+<dbHosts value="127.0.0.1"/>
+<dbPort value="9042"/>
+<keyspaceName value="RestCommSMSC"/>
+<clusterName value="RestCommSMSC"/>
+<fetchPeriod value="200"/>
+<fetchMaxRows value="100"/>
+<deliveryPause value="false"/>
+<removingLiveTablesDays value="0"/>
+<removingArchiveTablesDays value="0"/>
+<hrHlrNumber value=""/>
+<nationalLanguageSingleShift value="0"/>
+<nationalLanguageLockingShift value="0"/>
+<maxActivityCount value="500"/>
+<smppEncodingForGsm7 value="Utf8"/>
+<smppEncodingForUCS2 value="Utf8"/>
+<reviseSecondsOnSmscStart value="60"/>
+<processingSmsSetTimeout value="600"/>
+<generateReceiptCdr value="false"/>
+<receiptsDisabling value="false"/>
+<origNetworkIdForReceipts value="false"/>
+<generateCdr value="7"/>
+<generateArchiveTable value="7"/>
+<storeAndForwordMode value="fast"/>
+<moCharging value="accept"/>
+<hrCharging value="accept"/>
+<txSmppCharging value="None"/>
+<txSipCharging value="None"/>
+<globalTitleIndicator value="GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS"/>
+<translationType value="0"/>
+<correlationIdLiveTime value="60"/>
+<sriResponseLiveTime value="0"/>
+<diameterDestRealm value="telestax.com"/>
+<diameterDestHost value="127.0.0.1"/>
+<diameterDestPort value="3868"/>
+<diameterUserName value=""/>

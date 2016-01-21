@@ -1,14 +1,18 @@
 Name
-	smsc get smppencodingforucs2
+    smsc get smppencodingforucs2
 
 SYNOPSIS
-	smsc get smppencodingforucs2 
+    smsc get smppencodingforucs2 
 
 DESCRIPTION
-	This command is used to get the SMPP Encoding Scheme for UCS2
+    This command is used to get the Encoding Scheme at SMPP side for
+    UCS2 encoding (DCS = 8).
 
-SEE ALSO
-	smsc esme_create, smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, 
-	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
-	smsc set maxmapv
+    At the SMPP side, messages accept 3 different encoding schemes namely UTF8,
+    UNICODE and GSM7 (8-bit), for both sending and receiving messages. The SMSC
+    can be configured to accept one of them (the one that ESME supports). If this
+    is not set, then the default encoding sheme is UTF8. For GSM8 encoding 
+    (DCS = 4), no charset encoding made in the SMSC. 
 
+EXAMPLES
+	smsc get smppencodingforucs2

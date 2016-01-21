@@ -1,22 +1,6 @@
-/*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
- *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+/**
+ * 
  */
-
 package org.mobicents.smsc.domain;
 
 /**
@@ -56,6 +40,16 @@ public interface SipMBean {
 
 	void setPort(int port);
 
+    /**
+     * networkId
+     * default value is 0
+     * 
+     * @return
+     */
+    int getNetworkId();
+
+    void setNetworkId(int networkId);
+
 	/**
 	 * The {@link DefaultSmsRoutingRule} will try to match the dest_addr_ton of
 	 * outgoing SMS with one configured here. If configured value is null(-1) or
@@ -93,5 +87,23 @@ public interface SipMBean {
 	String getRoutingAddressRange();
 
 	void setRoutingAddressRange(String sourceAddressRange);
+
+	/**
+	 * true if counters is enabled. Not used as of now
+	 * 
+	 * @return
+	 */
+	boolean isCountersEnabled();
+
+	void setCountersEnabled(boolean countersEnabled);
+
+	/**
+	 * true if charging is enabled for this SIP stack
+	 * 
+	 * @return
+	 */
+	boolean isChargingEnabled();
+
+	void setChargingEnabled(boolean chargingEnabled);
 
 }

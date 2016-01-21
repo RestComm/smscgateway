@@ -1,0 +1,18 @@
+Name
+	smsc set fetchmaxrows
+
+SYNOPSIS
+	smsc set fetchmaxrows <fetch-max-rows>
+
+DESCRIPTION
+	This command is used to set the maximum message fetching count for every fetching
+	step from the database.
+	The default value is 100 messages.
+
+EXAMPLES
+	smsc set fetchmaxrows 200
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

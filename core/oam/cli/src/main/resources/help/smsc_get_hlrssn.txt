@@ -1,0 +1,14 @@
+Name
+	smsc get hlrssn
+
+SYNOPSIS
+	smsc get hlrssn 
+
+DESCRIPTION
+	This command is used to get the value of HLR Sub System Number (SSN).
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, 
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv
+

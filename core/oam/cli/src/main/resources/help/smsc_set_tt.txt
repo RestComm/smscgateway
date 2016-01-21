@@ -1,0 +1,13 @@
+Name
+	smsc set tt
+
+SYNOPSIS
+	smsc set tt <translation type value>
+
+DESCRIPTION
+	This command is used to set the value of SCCP translation type
+	value. Translation type value will be used for SCCP outgoing
+	messages. Default value for ITU-T is 0.
+
+SEE ALSO
+	smsc set scgt, smsc set gti

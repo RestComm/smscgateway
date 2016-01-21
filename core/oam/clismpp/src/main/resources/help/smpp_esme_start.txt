@@ -1,8 +1,8 @@
 Name
-	smsc esme start
+	smpp esme start
 
 SYNOPSIS
-	smsc esme start <esmeName>
+	smpp esme start <esmeName>
 
 DESCRIPTION
 	This command is used to start an existing ESME.

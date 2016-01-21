@@ -1,28 +1,39 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package org.mobicents.smsc.tools.smppsimulator;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 
-import org.mobicents.smsc.domain.library.DataCodingScheme;
+import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
+import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecoder;
+import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecodingData;
+import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
+import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 
 import com.cloudhopper.smpp.PduAsyncResponse;
 import com.cloudhopper.smpp.SmppConstants;
@@ -46,6 +57,7 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
     private static Charset utf8Charset = Charset.forName("UTF-8");
     private static Charset ucs2Charset = Charset.forName("UTF-16BE");
     private static Charset isoCharset = Charset.forName("ISO-8859-1");
+    private static Charset gsm7Charset = new GSMCharset("GSM", new String[] {});
 
     public ClientSmppSessionHandler(SmppTestingForm testingForm) {
         this.testingForm = testingForm;
@@ -58,9 +70,26 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
         testingForm.doStop();
     }
 
+//    private int incMsgCnt = 0;
+
     @Override
     public PduResponse firePduRequestReceived(PduRequest pduRequest) {
+
+
+//        incMsgCnt++;
+//        if (incMsgCnt > 150) {
+//            incMsgCnt = 0;
+//            try {
+//                Thread.sleep(60000);
+//            } catch (InterruptedException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
+
+
         testingForm.addMessage("PduRequestReceived: " + pduRequest.getName(), pduRequest.toString());
+        this.testingForm.messagesRcvd.incrementAndGet();
 
         PduResponse resp = pduRequest.createResponse();
 
@@ -80,7 +109,7 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                     }
                 }
 
-                DataCodingScheme dcs = new DataCodingScheme(dev.getDataCoding());
+                DataCodingScheme dcs = new DataCodingSchemeImpl(dev.getDataCoding());
 
                 boolean udhPresent = (dev.getEsmClass() & SmppConstants.ESM_CLASS_UDHI_MASK) != 0;
                 byte[] textPart = data;
@@ -98,17 +127,30 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
 
                 String s = null;
                 switch (dcs.getCharacterSet()) {
-                case GSM7:
-                case UCS2:
-                    if (this.testingForm.getSmppSimulatorParameters().getSmppEncoding() == 0) {
-                        s = new String(textPart, utf8Charset);
-                    } else {
-                        s = new String(textPart, ucs2Charset);
-                    }
-                    break;
-                case GSM8:
-                    s = new String(textPart, isoCharset);
-                    break;
+                    case GSM7:
+                    case UCS2:
+                        if (this.testingForm.getSmppSimulatorParameters().getSmppEncoding() == 0) {
+                            s = new String(textPart, utf8Charset);
+                        } else if (this.testingForm.getSmppSimulatorParameters().getSmppEncoding() == 1) {
+                            s = new String(textPart, ucs2Charset);
+                        } else {
+                            GSMCharsetDecoder decoder = (GSMCharsetDecoder) gsm7Charset.newDecoder();
+                            decoder.setGSMCharsetDecodingData(new GSMCharsetDecodingData(Gsm7EncodingStyle.bit8_smpp_style,
+                                    Integer.MAX_VALUE, 0));
+                            ByteBuffer bb = ByteBuffer.wrap(textPart);
+                            CharBuffer bf = null;
+                            try {
+                                bf = decoder.decode(bb);
+                            } catch (CharacterCodingException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            s = bf.toString();
+                        }
+                        break;
+                    case GSM8:
+                        s = new String(textPart, isoCharset);
+                        break;
                 }
 
                 String s2 = "";
@@ -128,33 +170,14 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                     s2 = sb.toString();
                 }
 
-
-//                if (dcs.getCharacterSet() == CharacterSet.UCS2) {
-//                    boolean udhPresent = (dev.getEsmClass() & SmppConstants.ESM_CLASS_UDHI_MASK) != 0;
-//                    // if (udhPresent) {
-//                    // Charset ucs2Charset = Charset.forName("UTF-16BE");
-//                    // ByteBuffer bb = ByteBuffer.wrap(msg);
-//                    // CharBuffer cb = ucs2Charset.decode(bb);
-//                    // s = cb.toString();
-//                    // } else {
-//
-//                    Charset utf8Charset;
-//                    if (this.testingForm.getSmppSimulatorParameters().getSmppEncoding() == 0) {
-//                        utf8Charset = Charset.forName("UTF-8");
-//                    } else {
-//                        utf8Charset = Charset.forName("UTF-16BE");
-//                    }
-//                    ByteBuffer bb = ByteBuffer.wrap(msg);
-//                    CharBuffer cb = utf8Charset.decode(bb);
-//                    s = cb.toString();
-//                    // }
-//                } else {
-//                    s = new String(msg);
-//                }
-
-
-
                 testingForm.addMessage("TextReceived: ", s2 + s);
+
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    // TODO Auto-generated catch block
+//                    e.printStackTrace();
+//                }
             }
 
             if (this.testingForm.getSmppSimulatorParameters().isRejectIncomingDeliveryMessage()) {

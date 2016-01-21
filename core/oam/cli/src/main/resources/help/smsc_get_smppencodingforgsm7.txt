@@ -1,15 +1,18 @@
 Name
-	smsc get smppencodingforgsm7
+    smsc get smppencodingforgsm7
 
 SYNOPSIS
-	smsc get smppencodingforgsm7
+    smsc get smppencodingforgsm7 
 
 DESCRIPTION
-	This command is used to set the SMPP Encoding Scheme for GSM7. SMPP side messages 
-	with data coding == 8 [UCS2] accept two different encoding schemes [UTF8 and 
-	UNICODE] for both sending and receiving messages. SMSC can be configured to 
-	accept for one of them (the one that ESME supports). If this is not set, 
-	then the default encoding scheme is UTF8.
+    This command is used to get the Encoding Scheme at SMPP side for
+    GSM7 encoding (DCS =0).
+
+    At the SMPP side, messages accept 3 different encoding schemes namely UTF8,
+    UNICODE and GSM7 (8-bit), for both sending and receiving messages. The SMSC
+    can be configured to accept one of them (the one that ESME supports). If this
+    is not set, then the default encoding sheme is UTF8. For GSM8 encoding 
+    (DCS = 4), no charset encoding made in the SMSC. 
 
 EXAMPLES
 	smsc get smppencodingforgsm7

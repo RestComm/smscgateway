@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+	<section id="SIP">
+			<title>SIP Settings</title>
+			<para>&THIS.PLATFORM; &THIS.APPLICATION; comes with default JSLEE SIP RA. You can modify the SIP settings using the CLI or GUI.</para>
+
+			<section id="sip_cli">
+			<title>Using CLI</title>
+			<para>
+			You can modify the SIP settings by issuing the command <command>smsc sip modify</command> with appropriate parameters as described below. You can view the settings by issuing the command <command>smsc sip show</command> which will display all the values.
+			</para>
+<screen><![CDATA[
+Name
+	smsc sip modify
+
+SYNOPSIS
+	smsc sip modify name cluster-name <clusterName> host <ip> port <port> 
+	routing-ton <routing address ton> routing-npi <routing address npi> 
+	routing-range <routing address range> counters-enabled <true | false> 
+	charging-enabled <true | false> networkid <networkId>
+
+DESCRIPTION
+	This command is used to modify SIP settings. 
+
+PARAMETERS
+
+	Standard Parameters
+
+	Name			- The name of the SIP Stack that is being modified. Since
+				  the Gateway does not allow creating more than one SIP
+				  Stack presently, the name is hardcored to "SIP".
+
+	Cluster-name		- The name of the Cluster to which this SIP Stack belongs 
+				  to. This parameter is not used presently and is meant
+				  for future use when Cluster of SIP is enabled.
+
+	Host			- IP address of the remote node to which all SIP messages
+				  must be forwarded.
+
+	Port			- Port of the remote node to which all SIP messages
+				  must be forwarded.
+
+	routing-ton		- The DefaultSmsRoutingRule will try to match the 
+				  'dest_addr_ton' of outgoing SMS with the value 
+				  configured here. If this configured value is null(-1) 
+				  or not null and matches, the SMSC will compare the
+				  'dest_addr_npi' and 'destination_addr' as explained 
+				  below. If it doesn't match, the SMSC will select the 
+				  next SIP in the list for matching routing rule.
+
+	routing-npi		- The DefaultSmsRoutingRule will try to match the 
+				  'dest_addr_npi' of outgoing SMS with the value
+				  configured here. If this configured value is null(-1)
+				  or not null and matches, the SMSC will compare the 
+				  'destination_addr' as below. If it doesn't match, the 
+				  SMSC will select the next SIP in the list for matching 
+				  routing rule.
+
+	routing-range		- The DefaultSmsRoutingRule will try to match the 
+				  'destination_addr' of outgoing SMS with the value
+				  configured here. This is a regular java expression and 
+				  default value is null. If it matches, the SMSC will 
+				  send the SMS out over this SIP connection. If it 
+				  doesn't match, the SMSC will select the next ESME in 
+				  the list for matching routing rule.
+
+	counters-enabled	- Flag to enable or disable counters. Not used presently.
+
+	charging-enabled	- Flag to enable or disable charging for every SMS 
+				  arriving from SIP.
+
+    networkId     - means to which virtual subnetwork belongs the SIP
+                  connector (this is for multi-tenancy support). Default value
+                  is 0. If you do not use multi-tenancy support - set this value
+                  to 0.
+]]></screen>
+			</section>
+			<section id="sip_gui">
+			<title>Using GUI</title>
+			<procedure>
+				<title>Managing the SIP Connection using the GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'SIPs' in the left panel.
+				</para></step>
+				<step><para>The main panel will display the existing SIP settings. You can view and modify the SIP settings in this panel.
+				</para></step>
+			</procedure>
+			</section>
+		</section>

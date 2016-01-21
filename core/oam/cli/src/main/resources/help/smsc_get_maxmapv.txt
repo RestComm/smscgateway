@@ -1,0 +1,14 @@
+Name
+	smsc get maxmapv
+
+SYNOPSIS
+	smsc get maxmapv 
+
+DESCRIPTION
+	This command is used to get the value of MAP Application Context version.
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, 
+	smsc get hlrssn, smsc set hlrssn, smsc get mscssn, smsc set mscssn, 
+	smsc set maxmapv
+

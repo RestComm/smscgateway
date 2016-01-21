@@ -1,20 +1,23 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package org.mobicents.smsc.tools.smppsimulator;
@@ -29,41 +32,47 @@ import com.cloudhopper.smpp.SmppSession;
  */
 public class SmppSimulatorParameters {
 
-    private int windowSize = 1;
-    private SmppBindType bindType = SmppBindType.TRANSCEIVER;
-    private String host = "127.0.0.1";
-    private int port = 2776;
-    private long connectTimeout = 10000;
-    private String systemId = "test";
-    private String password = "test";
-    private long requestExpiryTimeout = 30000;
-    private long windowMonitorInterval = 15000;
+	private int windowSize = 1;
+	private SmppBindType bindType = SmppBindType.TRANSCEIVER;
+	private String host = "127.0.0.1";
+	private int port = 2776;
+	private long connectTimeout = 10000;
+	private String systemId = "test";
+	private String password = "test";
+	private long requestExpiryTimeout = 30000;
+	private long windowMonitorInterval = 15000;
+	
+	private boolean rejectIncomingDeliveryMessage = false;
 
-    private boolean rejectIncomingDeliveryMessage = false;
-
-    private TON sourceTon = TON.International;
-    private NPI sourceNpi = NPI.ISDN;
-    private TON destTon = TON.International;
-    private NPI destNpi = NPI.ISDN;
+	private TON sourceTon = TON.International;
+	private NPI sourceNpi = NPI.ISDN;
+	private TON destTon = TON.International;
+	private NPI destNpi = NPI.ISDN;
     private String sourceAddress = "6666";
-    private String destAddress = "5555";
+	private String destAddress = "5555";
     private String addressRange = "6666";
 
-    private String messageText = "Hello!";
-    private EncodingType encodingType = EncodingType.GSM7;
-    private boolean messageClass;
-    private SplittingType splittingType = SplittingType.DoNotSplit;
+	private String messageText = "Hello!";
+	private EncodingType encodingType = EncodingType.GSM7_DCS_0;
+    // message class value: 0-no, 1-class0, 2-class1, 3-class2, 4-class3
+    private int messageClass = 0;
+	private SplittingType splittingType = SplittingType.DoNotSplit;
+	private int specifiedSegmentLength = 100;
     private ValidityType validityType = ValidityType.NoSpecial;
     private MCDeliveryReceipt mcDeliveryReceipt = MCDeliveryReceipt.No;
     private SendingMessageType sendingMessageType = SendingMessageType.SubmitSm;
     private int submitMultiMessageCnt = 2;
     private SmppSession.Type smppSessionType = SmppSession.Type.CLIENT;
+    /**
+     * Encoding style of text at SMPP part
+     * 0-Utf8, 1-Unicode, 2-Gsm7
+     */
     private int smppEncoding = 0;
-    private MessagingMode messagingMode = MessagingMode.datagramm;
+    private MessagingMode messagingMode = MessagingMode.storeAndForward;
 
-    private int bulkDestAddressRangeStart = 500000;
-    private int bulkDestAddressRangeEnd = 600000;
-    private int bulkMessagePerSecond = 10;
+	private int bulkDestAddressRangeStart = 500000;
+	private int bulkDestAddressRangeEnd = 600000;
+	private int bulkMessagePerSecond = 10;
 
 	public int getWindowSize() {
 		return windowSize;
@@ -274,11 +283,11 @@ public class SmppSimulatorParameters {
 		this.bulkMessagePerSecond = bulkMessagePerSecond;
 	}
 
-    public boolean isMessageClass() {
+    public int betMessageClass() {
         return messageClass;
     }
 
-    public void setMessageClass(boolean messageClass) {
+    public void setMessageClass(int messageClass) {
         this.messageClass = messageClass;
     }
 
@@ -330,13 +339,20 @@ public class SmppSimulatorParameters {
         this.messagingMode = messagingMode;
     }
 
+    public int getSpecifiedSegmentLength() {
+        return specifiedSegmentLength;
+    }
+
+    public void setSpecifiedSegmentLength(int specifiedSegmentLength) {
+        this.specifiedSegmentLength = specifiedSegmentLength;
+    }
 
     public enum EncodingType {
-    	GSM7, GSM8, UCS2,
+    	GSM7_DCS_0, GSM8_DCS_4, UCS2_DCS_8,
     }
 
     public enum SplittingType {
-    	DoNotSplit, SplitWithParameters, SplitWithUdh,
+        DoNotSplit, SplitWithParameters_DefaultSegmentLength, SplitWithUdh_DefaultSegmentLength, SplitWithParameters_SpecifiedSegmentLength, SplitWithUdh_SpecifiedSegmentLength,
     }
 
     public enum TON {
@@ -386,7 +402,7 @@ public class SmppSimulatorParameters {
     }
 
     public enum SendingMessageType {
-        SubmitSm, DataSm, DeliverSm;
+        SubmitSm, DataSm, DeliverSm, SubmitMulti;
     }
 
     public enum MessagingMode {

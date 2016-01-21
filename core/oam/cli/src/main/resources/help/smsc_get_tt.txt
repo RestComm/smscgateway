@@ -1,0 +1,13 @@
+Name
+	smsc get tt
+
+SYNOPSIS
+	smsc get tt
+
+DESCRIPTION
+	This command is used to get the value of SCCP translation type
+	value. Translation type value will be used for SCCP outgoing
+	messages. Default value for ITU-T is 0.
+
+SEE ALSO
+	smsc get scgt, smsc get gti

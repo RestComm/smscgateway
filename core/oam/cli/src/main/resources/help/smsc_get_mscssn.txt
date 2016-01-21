@@ -1,0 +1,14 @@
+Name
+	smsc get mscssn
+
+SYNOPSIS
+	smsc get mscssn 
+
+DESCRIPTION
+	This command is used to get the value of MSC Sub System Number (SSN).
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, 
+	smsc get hlrssn, smsc set hlrssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv
+

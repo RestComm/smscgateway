@@ -1,22 +1,24 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  
+ * Copyright 2012, Telestax Inc and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.smsc.domain;
 
 import org.mobicents.smsc.smpp.Esme;
@@ -65,7 +67,7 @@ public class DefaultSmsRoutingRule implements SmsRoutingRule {
 	 * java.lang.String)
 	 */
 	@Override
-	public String getEsmeClusterName(int ton, int npi, String address, String name) {
+	public String getEsmeClusterName(int ton, int npi, String address, String name, int networkId) {
 
         // for (Esme esme : this.esmeManagement.getEsmes()) {
         for (FastList.Node<Esme> n = this.esmeManagement.getEsmes().head(), end = this.esmeManagement.getEsmes().tail(); (n = n.getNext()) != end;) {
@@ -77,7 +79,7 @@ public class DefaultSmsRoutingRule implements SmsRoutingRule {
 					|| (sessionBindType == SmppBindType.RECEIVER && smppSessionType == SmppSession.Type.SERVER)
 					|| (sessionBindType == SmppBindType.TRANSMITTER && smppSessionType == SmppSession.Type.CLIENT)) {
 
-                if (!(esme.getName().equals(name)) && esme.isRoutingAddressMatching(ton, npi, address)) {
+                if (!(esme.getName().equals(name)) && esme.getNetworkId() == networkId && esme.isRoutingAddressMatching(ton, npi, address)) {
                     return esme.getClusterName();
                 }
 			}
@@ -87,12 +89,12 @@ public class DefaultSmsRoutingRule implements SmsRoutingRule {
 	}
 
 	@Override
-	public String getSipClusterName(int ton, int npi, String address) {
+	public String getSipClusterName(int ton, int npi, String address, int networkId) {
 		for (FastList.Node<Sip> n = this.sipManagement.sips.head(), end = this.sipManagement.sips.tail(); (n = n
 				.getNext()) != end;) {
 			Sip sip = n.getValue();
 
-            if (sip.isRoutingAddressMatching(ton, npi, address)) {
+            if (sip.getNetworkId() == networkId && sip.isRoutingAddressMatching(ton, npi, address)) {
                 return sip.getClusterName();
             }
 		}

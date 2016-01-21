@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "SMSC_Gateway_Release_Notes.ent">
+%BOOK_ENTITIES;
+]>
+
+<chapter id="introduction">
+	<title>Introduction</title>
+   <!-- <section id="jss7_overview">
+    	<title>Overview</title>-->
+		<para>
+TeleStax is pleased to announce the release of &THIS.PLATFORM; &THIS.APPLICATION; &THIS.VERSION;. &THIS.PLATFORM; &THIS.APPLICATION; is the first and only Java based Open Source SMSC Gateway implementation that is fully tested and supported by TeleStax. 
+</para>
+		<para>
+&THIS.PLATFORM; &THIS.APPLICATION; strictly adheres to the standards and specifications defined by the International Telecommunications Union (ITU). It is an easy-to-install and easy-to-deploy platform based on the robust and proven &THIS.PLATFORM; JAIN SLEE 1.1 Server and
+&THIS.PLATFORM; jSS7 Stack. It can be installed on any Operating System that supports Java (JDK 7 and SCTP). 
+		</para>
+		<para>
+Enterprises can now use &THIS.PLATFORM; &THIS.APPLICATION; with the added assurance that the product is fully supported by TeleStax. 
+		</para>
+</chapter>

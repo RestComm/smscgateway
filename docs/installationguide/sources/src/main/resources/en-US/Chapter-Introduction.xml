@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+<chapter id="introduction">
+	<title>Introduction</title>
+   <para>&THIS.PLATFORM; &THIS.APPLICATION; is an Open Source Java based SMSC Gateway built on a modern extensible middleware platform. &THIS.PLATFORM; SMSC enables operators to provide core SMSC features like mobile subscriber to subscriber SMS messaging, broadcasting campaigns and group messaging<footnote id="fnrestcomm">
+<para>
+Group Messaging can be achieved using &THIS.PLATFORM; RestComm. For more details please contact info@telestax.com.
+</para>
+</footnote> between subscribers. In addition it also enables value added services through integration with OTT social networks and microblogs such as Facebook and Twitter.  
+	</para>
+	<para>&THIS.PLATFORM; &THIS.APPLICATION; is an easy-to-install and easy-to-deploy platform that can be set up and configured very quickly. Since it is built on a modern and extensible JSLEE platform it automatically provides out-of-the-box integration with various communication protocols such as SIP, Diameter, HTTP, XCAP, XMPP, MGCP and others in addition to the base SMPP protocol for connectivity to ESMEs. 
+	</para>
+	<para>
+&THIS.PLATFORM; &THIS.APPLICATION; stores messages using Cassandra database. The database is used for storing unsent messages, messages successfully sent and messages that failed to be sent.
+	</para>
+<para>
+		&THIS.PLATFORM; &THIS.APPLICATION; is cloud-ready. It can be deployed on dedicated hardware, private cloud infrastructure or public laaS such as AWS. &THIS.PLATFORM; &THIS.APPLICATION; supports TDM hardware offered by major vendors in the market, namely Intel family boards (Dialogic) and 
+		Zaptel/Dahdi (Digium, Sangoma). TeleStax also has in-house SS7 cards also known as RestComm SS7 Cards. RestComm SS7 cards have MTP2/3 support on-board and therefore the processing load on the server hosting the 
+		&THIS.PLATFORM; &THIS.APPLICATION; platform will be low when you use these SS7 cards.    
+	</para>
+
+<para>
+A single &THIS.PLATFORM; SMSC node can process up to 1000 SMS/sec. Multiple SMSC nodes can be arranged in a cluster across one or more geographically distributed data centers to scale up throughput and provide various levels of redundancy, high availability and fault tolerance.
+</para>
+	<para>&THIS.PLATFORM; &THIS.APPLICATION;
+		is based on the robust and proven &THIS.PLATFORM;
+		JAIN SLEE 1.1 Server and &THIS.PLATFORM;
+		jSS7 Stack.
+	&THIS.PLATFORM;
+		JAIN SLEE Server is a highly scalable event-driven application server with a robust component model and fault tolerant execution environment. It provides a set of connectors to a
+		variety of networks elements: SS7 MAP, CAP, INAP, TCAP, ISUP, SMPP, XMPP, SIP, MGCP, HTTP, XDM, XCAP, Diameter and many others. It is fully compliant with JSR 240 (JSLEE 1.1).
+	&THIS.PLATFORM;
+		jSS7 is a software based implementation of the SS7 protocol. It provides implementation for Level 2 and above in the SS7 protocol Stack. &THIS.PLATFORM;
+		jSS7 Stack User Guide is bundled within and you can refer to the guide for more details on the Stack.
+	</para>
+	<para>
+		This guide will assist you in installing &THIS.PLATFORM; &THIS.APPLICATION;. For more details on configuring and using the platform, please refer to the &THIS.PLATFORM; &THIS.APPLICATION; Admin Guide. 
+	</para>
+</chapter>

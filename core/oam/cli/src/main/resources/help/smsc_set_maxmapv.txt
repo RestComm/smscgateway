@@ -1,0 +1,21 @@
+Name
+	smsc set maxmapv
+
+SYNOPSIS
+	smsc set maxmapv <version-number>
+
+DESCRIPTION
+	This command is used to set the value of MAP Application Context version. The 
+	version number set here will be used for SMS messages exchanged. RestComm SMSC 
+	Gateway supports version negotiation. So if you set this to a higher version (say 
+	for example version 3, however your network only understands version 2), the SMSC Gateway
+	will automatically do the version negotiation and exchange V2 messages when V3 
+	exchange fails. However this causes additional messages to be exchanged and 
+	increases the overall load on the system. Therefore it is advisable to always set 
+	the correct version.
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, 
+	smsc get hlrssn, smsc set hlrssn, smsc get mscssn, smsc set mscssn, 
+	smsc get maxmapv
+

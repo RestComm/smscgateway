@@ -9,9 +9,26 @@
 		<sbb-version>1.0</sbb-version>
 		<sbb-alias>TxSipServerSbb</sbb-alias>
 
+        <sbb-ref>
+            <sbb-name>ChargingSbb</sbb-name>
+            <sbb-vendor>org.mobicents</sbb-vendor>
+            <sbb-version>1.0</sbb-version>
+            <sbb-alias>ChargingSbb</sbb-alias>
+        </sbb-ref>
+
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.sip.server.tx.TxSipServerSbb</sbb-abstract-class-name>
+
+                <get-child-relation-method>
+                    <sbb-alias-ref>
+                        ChargingSbb
+                    </sbb-alias-ref>
+                    <get-child-relation-method-name>
+                        getChargingSbb
+                    </get-child-relation-method-name>
+                    <default-priority>0</default-priority>
+                </get-child-relation-method>
 			</sbb-abstract-class>
 		</sbb-classes>
 
@@ -88,25 +105,6 @@
                 <event-type-version>1.2</event-type-version>
             </event-type-ref>
         </event>
-
-		<event event-direction="Fire">
-			<event-name>DeliveryEsme</event-name>
-			<event-type-ref>
-				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVERY_ESME</event-type-name>
-				<event-type-vendor>org.mobicents</event-type-vendor>
-				<event-type-version>1.0</event-type-version>
-			</event-type-ref>
-		</event>
-
-		<event event-direction="Fire">
-			<event-name>DeliverySip</event-name>
-			<event-type-ref>
-				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.DELIVERY_SIP</event-type-name>
-				<event-type-vendor>org.mobicents</event-type-vendor>
-				<event-type-version>1.0</event-type-version>
-			</event-type-ref>
-		</event>
-
         <resource-adaptor-type-binding>
             <resource-adaptor-type-ref>
                 <resource-adaptor-type-name>JAIN SIP</resource-adaptor-type-name>
@@ -117,6 +115,30 @@
             <resource-adaptor-entity-binding>
                 <resource-adaptor-object-name>slee/resources/jainsip/1.2/provider</resource-adaptor-object-name>
                 <resource-adaptor-entity-link>SipRA</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>PersistenceResourceAdaptorType</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>slee/resources/persistence/1.0/provider</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>PersistenceResourceAdaptor</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>SchedulerResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/scheduler/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
             </resource-adaptor-entity-binding>
         </resource-adaptor-type-binding>
 	</sbb>

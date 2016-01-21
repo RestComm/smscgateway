@@ -1,0 +1,14 @@
+Name
+	smsc get diameterdesthost
+
+SYNOPSIS
+	smsc get diameterdesthost
+
+DESCRIPTION
+	This command is used to retrieve the value set for Diameter Destination Host.
+
+SEE ALSO
+	smsc set diameterdestrealm, smsc set diameterdesthost, smsc set diameterdestport,
+	smsc set diameterusername, smsc set mocharging, smsc set txsmppcharging, 
+	smsc get diameterdestrealm, smsc get diameterdestport, smsc get diameterusername, 
+	smsc get mocharging, smsc get txsmppcharging

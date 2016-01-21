@@ -1,0 +1,30 @@
+Name
+	smsc set txsmppcharging
+
+SYNOPSIS
+	smsc set txsmppcharging <none|selected|all>
+
+DESCRIPTION
+	This command is used to set the value of the parameter 'txsmppcharging' to none,
+	selected or all. 
+
+	If this is set to 'all', all ESME Originated messages will be charged by OCS via
+	Diameter, prior to being sent.
+
+	If this is set to 'selected', only those messages originating from ESMEs marked 
+	with the parameter 'charging-enabled'=true at the time of ESME creation  will be 
+	charged by OCS via Diameter, prior to being sent.
+
+	If this is set to 'none', none of the ESME Originated messages will be charged by 
+	OCS via Diameter, prior to being sent. 
+
+	The parameter 'txsmppcharging' is set to 'none' by default.
+
+EXAMPLES
+	smsc set txsmppcharging selected
+
+SEE ALSO
+	smsc set diameterdestrealm, smsc set diameterdesthost, smsc set diameterdestport, 
+	smsc set diameterusername, smsc set mocharging, smsc get diameterdestrealm, 
+	smsc get diameterdesthost, smsc get diameterdestport, smsc get diameterusername, 
+	smsc get mocharging, smsc get txsmppcharging

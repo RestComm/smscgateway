@@ -1,0 +1,1487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+<chapter id="configuring">
+<title>Configuring</title>
+	<para>You must fine-tune Memory and Database settings for better performance before using &THIS.PLATFORM; &THIS.APPLICATION; in production. Once you complete setting up the Gateway you must configure the SS7 Stack the SMSC Gateway following the instructions specified in this guide.
+	</para>
+	<section id="memory_settings">
+		<title>Memory Settings</title>
+		<para>
+		You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size. These settings are specified in the file<filename>mobicents-smscgateway-&tl;version&gt;/jboss-5.1.0.GA/bin/run.conf</filename>.
+		</para> 
+		<variablelist>
+				<varlistentry>
+					<term>-Xms3072m</term><listitem><para> Initial heap size, set in megabytes</para></listitem>
+ 				</varlistentry>
+ 				<varlistentry>
+					<term>-Xmx3072m</term><listitem><para>Maximum heap size, set in megabytes</para></listitem>  
+ 				</varlistentry>
+		</variablelist>
+	</section>
+
+	<section id="logging">
+		<title>Configuring log4j Logging Service</title>
+		<para>
+		&THIS.PLATFORM; &THIS.APPLICATION; uses <literal>Apache log4j</literal> for logging. If you are not familiar with the <literal>log4j</literal> package, you can read more about it at the Jakarta <ulink url="http://jakarta.apache.org/log4j/">website</ulink>.
+		</para>
+		<para>Logging is controlled from a central configuration file located at <filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/conf/jboss-log4j.xml</filename>, one for each JBoss AS configuration profile. This file defines a set of appenders specifying the log files, what categories of messages should go there, the message format and the level of filtering. For more details, please refer to Section 9.6.3, "Logging Service" in the JBoss AS Getting Started Guide available <ulink url="https://community.jboss.org/wiki/JBossAS5InstallationAndGettingStartedGuide">here</ulink>. </para>
+		<para> You must make sure <literal>log4j</literal> is fine tuned for optimal performance in production. We recommend that you set logging threshold to <literal>WARN</literal> and let the CDR appender be <literal>DEBUG</literal>.</para>
+	</section>
+
+	<section id="routing_fundamentals">
+		<title>SMSC GW routing fundamentals</title>
+		<para>
+SMSC GW needs clear info to where it must route messages that have come to SMSC GW from SMPP / SS7 / SIP connectors or created inside SMSC GW receipts.
+Routing procedures gives the answer to this questions, that a user must configure before SMSC GW can properly work.
+	<itemizedlist>
+<para>SMSC GW has two routing procedures:</para>
+<listitem>
+<para>The procedure based on dividing of separated routing area into several areas ("subnetworks") and routing of messages between subnetworks.</para>
+</listitem>
+<listitem>
+<para>The procedure of routing messages to destinations inside subnetworks.</para>
+</listitem>
+	</itemizedlist>
+</para>
+
+<section id="routing_fundamentals_1">
+		<title>The procedure based on dividing of separated routing area into several areas ("subnetworks").</title>
+		<para>
+Each area has its unique digital "netwokId" value.
+Each SMPP connection (ESME), SS7 SCCP service access point (SAP), SIP connector and a database routing rule (if you use them instead of default ESME routing rules) belongs to one of network (to each of the a networkId value is assigned).
+Default netwokId value is "0".
+If a user does not specify a netwokId value when ESME, SAP, SIP or a database routing rule creation, networkId=0 will be assigned.
+		</para>
+		<para>
+When a message has come to SMSC GW a networkId value from ESME, SAP or SIP is assigned for the message.
+The message can be routed only inside the area with the same networkId to what the message belongs. So this means that by default a message can not leave a "networkId" area via which it has come to SMSC GW.
+		</para>
+		<para>
+If a user needs that a message will be delivered to another "networkId" area, he can configure "message processing" rules ("mproc" rules).
+There we can configure that a message from a specified networkId1 and which fits some other conditions (like destination address fit to some mask) must be moved to networkId2 (newNetworkId option of a mproc rule).
+And the message will be delivered via ESME, SAP or SIP that belongs to networkId2.
+		</para>
+		<para>
+Multi-tenancy support is also based on this routing procedure. For each networkId we can configure a separate SS7 GlobalTitle and for an external peer each networkId can play a role as a separate independed SMSC.
+</para>
+	<itemizedlist>
+<para>NetworkId for a generated inside SMSC receipt is assigned by two algoritms:</para>
+<listitem>
+<para>if the option "Delivery receipts will be routed to the origination networkId" is set to true - networkId from ESME/SIP/SAP via what an original message has left SMSC GW will be assigned</para>
+</listitem>
+<listitem>
+<para>if the option "Delivery receipts will be routed to the origination networkId" is set to false - networkId from ESME/SIP/SAP via what an original message has come to SMSC GW will be assigned</para>
+</listitem>
+	</itemizedlist>
+	<itemizedlist>
+<para>NetworkId are specified at different places:</para>
+<listitem>
+<para>for JSS7 level SAPs and SCCP routing rules are configured for this. See "7.4.5. Create a new Service Access Point" and "7.4.17. Create a new SCCP Rule" chapters of "JSS7 stack User Guide".</para>
+</listitem>
+<listitem>
+<para>for ESMEs see the chapter <xref linkend="ESME_Settings"/>.</para>
+</listitem>
+<listitem>
+<para>for SIP level see the chapter <xref linkend="SIP"/>.</para>
+</listitem>
+<listitem>
+<para>for database routing rules see <xref linkend="db_routing_rule_settings"/></para>
+</listitem>
+	</itemizedlist>
+		<para>For configuring of mproc rules - see chapters <xref linkend="mproc_rules_fundamentals"/> and <xref linkend="mproc_rule_settings"/>.
+		</para>
+		<para>For configuring of option "Delivery receipts will be routed to the origination networkId" - see the chapter <xref linkend="SMSC_Gateway_Server_Routing_DLV"/>.
+		</para>
+		<para>For configuring of SMSC Global Titles - see chapters <xref linkend="set_scgt"/>.
+		</para>
+</section>
+
+<section id="routing_fundamentals_2">
+		<title>The procedure of routing messages to destinations inside subnetworks.</title>
+		<para>
+	<itemizedlist>
+<para>Inside each subnetwork there may be several ESME, SAP or SIP configured. If we use default routing rules, then for routing SMSC GW makes following steps:</para>
+<listitem>
+<para>it checks all ESMEs that belongs to the networkId. It checks if TON, NPI and AddressRange of an ESME Routing Address fit to a message destination TON, NPI and address digits the the message will be routed to this ESME. There is one exception of this rule. A message will not be routed in any case to the ESME from which it has come.</para>
+</listitem>
+<listitem>
+<para>if no ESME found for routing SMSC GW then checks SIP connector if it's settings (TON, NPI and routing AddressRange) fits to a message destination TON, NPI and address digits. If yes the message will be routed to SIP</para>
+</listitem>
+<listitem>
+<para>if SIP also does not fit, a message will be routed to SS7 network. Then routing rules at SCCP level will be taken into account for furthe routing.</para>
+</listitem>
+	</itemizedlist>
+</para>
+For configuring of ESME and SIP routing parameters see <xref linkend="ESME_Settings"/> and <xref linkend="SIP"/>.
+<para>
+		</para>
+		<para>
+Instead of default routing rules database routing rules can be used. This is a set of stored in the cassandra database rules that describes where SMSC GW will route a message (to some ESME / SIP) depending on a message destination address.
+Messages that fit to no rules will be routed to SS7 network.
+For configuring of database routing rules see the chapter <xref linkend="mproc_rule_settings"/>
+		</para>
+</section>
+
+<section id="routing_fundamentals_3">
+		<title>Using of different routing procedures.</title>
+		<para>You can use only the procedure based on subnetworks (networkId) areas, only the procedure of routing messages inside subnetworks or both.
+		</para>
+		<para>
+	<itemizedlist>
+<para>If you want to use only the procedure based on subnetworks (networkId) areas you need:</para>
+<listitem>
+<para>configure SMSC GW so that only one SAP / ESME / SIP belongs to each networkId.</para>
+</listitem>
+<listitem>
+<para>for every ESME / SIP specify for "Routing Type of number (TON)"=-1, "Routing Number plan indicator (NPI)"=-1, "Routing Range"="^[0-9a-zA-Z]*" (that fits to any message destination address).</para>
+</listitem>
+<listitem>
+<para>configure a set of mproc rules that will manage of routing of messages from one subnetwork (networkId) to another.</para>
+</listitem>
+	</itemizedlist>
+		</para>
+		<para>
+	<itemizedlist>
+<para>If you want to use only the procedure based on subnetworks (networkId) areas you need:</para>
+<listitem>
+<para>configured for all SAP / SCCP routing rules / ESME / SIP the same networkId (default networkId=0 is usually used)</para>
+</listitem>
+<listitem>
+<para>for every ESME / SIP specify proper values for "Routing Type of number (TON)", "Routing Number plan indicator (NPI)" and "Routing Range" or configure database routing rules</para>
+</listitem>
+<listitem>
+<para>you do not need to configure mproc rules for routing</para>
+</listitem>
+	</itemizedlist>
+		</para>
+		<para>
+If you want to use both, you need to configure both parts.
+Messages will be routed between subnetworks (networkIds) by mproc rules and inside a subnetwork (networkId) by configuring of ESME / SIP "Routing Type of number (TON)", "Routing Number plan indicator (NPI)" and "Routing Range" (or database routing rules).
+		</para>
+</section>
+
+<section id="routing_fundamentals_4">
+		<title>Routing model examples.</title>
+<para>If you have one ESME and JSS7 connector, and the only traffic is ESME -> JSS7</para>
+<itemizedlist>
+  <listitem>
+  <para>use networkId=0 for all
+  </para>
+  </listitem>
+  <listitem>
+  <para>configure "Routing Range" value of the ESME to a value that fits to no mobile subscriber (for example "0")
+  </para>
+  </listitem>
+</itemizedlist>
+
+<para>If you use the model "all JSS7 originated messages must be routed to ESME and all ESME originated messages must be routed to JSS7", you can:</para>
+<itemizedlist>
+  <listitem>
+  <para>set networkId=0 for JSS7 and networkId=1 for ESME
+  </para>
+  </listitem>
+  <listitem>
+  <para>set ESME routing address so it accepts all messages
+  </para>
+  </listitem>
+  <listitem>
+<para>set mproc rules:</para>
+<para>smsc mproc add mproc 1 networkIdMask=1 newNetworkId=0</para>
+<para>smsc mproc add mproc 2 networkIdMask=0 newNetworkId=1</para>
+    </listitem>
+</itemizedlist>
+
+<para>If you have several ESMEs that send message to one SS7 connection and you need that delivery receipts come back to an originator ESME (and no more traffic), you can:</para>
+<itemizedlist>
+  <listitem>
+  <para>put SS7 SAP / SCCP rules to networkId=0
+  </para>
+  </listitem>
+  <listitem>
+  <para>put each ESME to each own networkId (1,2,3)
+  </para>
+  </listitem>
+  <listitem>
+<para>create a set of mproc rules that move ESME originated messages into SS7 network. CLI commabd can be like:</para>
+<para>smsc mproc add mproc 1 networkIdMask=1 newNetworkId=0</para>
+<para>smsc mproc add mproc 2 networkIdMask=2 newNetworkId=0</para>
+<para>smsc mproc add mproc 3 networkIdMask=3 newNetworkId=0</para>
+    </listitem>
+  <listitem>
+  <para>set the option "Delivery receipts will be routed to the origination networkId" is set to true
+  </para>
+  </listitem>
+</itemizedlist>
+</section>
+
+	</section>
+
+	<section id="mproc_rules_fundamentals">
+		<title>Message processing rules (mproc rules)</title>
+		<para>
+			Message processing rules (mproc rules) is a tool for processing messages and changing properties of message, for example source/destination TON, NPI, NetworkId etc. 
+			MProc rules are only applied if pre configured criterian match's.
+		</para>
+		
+		<para>
+			Following are the states at which mproc rules can be applied to messages:
+			<itemizedlist>
+				<listitem>
+					<para><literal>onPostArrival</literal> : When a message arrives in SMSC GW and has been already processed (accepted) by Diameter server (if Diameter server is configured).
+						<literal>onPostArrival</literal> following actions are possible:
+						<itemizedlist>
+							<listitem>
+								<para>message can be dropped (a success response will be returned to a message originator)</para>
+							</listitem>
+							<listitem>
+								<para>message can be rejected (a reject response will be returned to a message originator)</para>
+							</listitem>
+							<listitem>
+								<para>
+									most of a message parameters can be updated (for example destination address, networkId 
+									(this is needed for routing such messages to another subnetwork area (networkId) 
+									(see chapter <xref linkend="routing_fundamentals"/>)) or even a message content)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									a new message(es) can be posted for delivering. To post new messages at this step no Diameter server request and 
+									no mproc rules will be applied
+								</para>
+							</listitem>
+						</itemizedlist>
+						Only after actions applying messages will be stored into a database or/and delivered to a destination.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>onPostImsiRequest</literal> : When a successful SRI response has been received from HLR for an SS7 destination message. 
+						At this step a message can be dropped (to prevent further delivery). This can be very useful feature to prevent SMS being delivered to
+						off-net or roaming subscribers. 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>onPostDelivery</literal> : When a message delivery was succeeded or failed. At this step a new message(es) can be posted 
+						for delivering (it can be for example some delivery report).
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+		<para>
+			SMSC comes with predifined set of mproc rules (default implementation) (see chapter <xref linkend="mproc_rules_default"/>).
+			However users can make their own customized implementation of mproc rules by using java programming and implementing provided interfaces 
+			(see chapter <xref linkend="mproc_rules_customized"/>).
+			All mproc rules implementation has its Class Name. The Class Name of a default implementation is "mproc". 
+			This is the name by which users can create new mproc rule instances. 
+		</para>
+		<para>
+			Users can create one or more mproc rules, modify, show and remove some of them by CLI or GUI interface. 
+			See details in chapter <xref linkend="mproc_rule_settings"/>.
+			Each mproc rule has it's unique serial id. Mproc rule are sorted by this id value. SMSC appliec mproc rules to a message in ascending order, 
+			that is mproc rule with the least id is applied before mproc rule with next id etc.
+		</para>
+		<para>
+			While checking if mproc rule conditions match to a message, updates (that were made after previous rules applying) are taken into account.
+			For example if a message destination address has been changed by rule 1, then rule 2 will check if this updated destination address matches to rules 2 or not.
+		</para>
+
+		<section id="mproc_rules_default">
+			<title>Default message processing rules implementation</title>
+			<para>
+				SMSC GW contains a default implementation of mproc rules that cover some requirenments.
+				Information how to manage rules can be found in chapter <xref linkend="mproc_rule_settings"/>.
+				This chapter covers a description of conditions and actions that are present in default mproc rules implementation.
+			</para>
+			<para>
+				Parameters for mproc rule are divided into two cathegories:
+			</para>
+			<para>
+				a) Conditions. If a message fits to all conditions then the rule will be applied to the message.
+				<table frame="all" pgwide="1">
+					<title>The list of possible conditions</title>
+					<tgroup cols='4' colsep='1' rowsep='1'>
+					<colspec colnum="1" colname="c0" />
+					<colspec colnum="2" colname="c1" />
+					<colspec colnum="3" colname="c2" />
+					<colspec colnum="4" colname="c3" />
+					<thead>
+						<row>
+							<entry>Parameter name</entry>
+							<entry>Value</entry>
+							<entry>Description</entry>
+							<entry>Default value</entry>
+						</row>
+					</thead>
+					<tbody>
+						<row>
+							<entry>desttonmask</entry>
+							<entry>&lt;destination type of number&gt;</entry>
+							<entry>mproc rule will be applied only if message destination Type of Number is equal to this value "desttonmask"</entry>
+							<entry>"-1" : acts as wild card and hence messages with any TON will match.</entry>
+						</row>
+						<row>
+							<entry>destnpimask</entry>
+							<entry>&lt;destination numbering plan indicator&gt;</entry>
+							<entry>mproc rule will be applied only if message destination Numbering Plan Indicator is equal to this value "destnpimask".</entry>
+							<entry>"-1" : acts as wild card and hence messages with any NPI will match.</entry>
+						</row>
+						<row>
+							<entry>destdigmask</entry>
+							<entry>&lt;java regular expression - destination number digits mask&gt;</entry>
+							<entry>mproc rule will be applied only if message destination address digits match's with "destdigmask" java regular expression.</entry>
+							<entry>"-1" : acts as wild card and hence messages with any destination number will match.</entry>
+						</row>
+						<row>
+							<entry>originatingmask</entry>
+							<entry>&lt;SS7_MO | SS7_HR | SMPP | SIP&gt;</entry>
+							<entry><para>mproc rule will be applied only if message arrived in SMSC GW via a defined "originatingmask" connector.</para>
+							<para>
+								<itemizedlist>
+									<listitem>
+										<para>
+											SS7_MO: SMS Originated from Mobile - SS7 connection
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											SS7_HR: SMS Originated from Home Routing configuartion - SS7 connection
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											SMPP: SMS Originated from SMPP connector and SIP connector.
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											SIP: SMS Originated from SIP connector.
+										</para>
+									</listitem>																											
+								</itemizedlist>
+							</para></entry>
+							<entry>"-1" : acts as wild card and hence messages originated from any channel will match.</entry>
+						</row>
+						<row>
+							<entry>originatorsccpaddress- mask</entry>
+							<entry>&lt;java regular expression - originator CallingPartyAddress digits mask&gt;</entry>
+							<entry>mproc rule will be applied only if CallingPartyAddress digits match's with "originatorsccpaddress mask" java regular expression.
+							</entry>
+							<entry>"-1" : acts as wild card and hence messages with any CallingPartyAddress digits or without it will match.</entry>
+						</row>
+						<row>
+							<entry>networkidmask</entry>
+							<entry>&lt;networkId value&gt;</entry>
+							<entry>mproc rule will be applied only if message has come to SMSC GW via a subnetwork with networkId which is equal to this value "networkidmask".</entry>
+							<entry>"-1" : acts as wild card and hence messages from any network will match.</entry>
+			 			</row>
+						<row>
+							<entry>origesmenamemask</entry>
+							<entry>&lt;java regualar expression - origination ESME name mask&gt;</entry>
+							<entry>mproc rule will be applied only if message has come to SMSC GW from SMPP connector from ESME with a name that fits "origesmenamemask".</entry>
+							<entry>"-1" : acts as wild card and hence any message will match (never mind if it came from SS7 or SIP).</entry>
+			 			</row>
+					</tbody>
+					</tgroup>
+				</table>
+			</para>
+			<para>
+				b) Actions, which will be applied to messages.
+				<table	frame="all" pgwide="1">
+					<title>The list of possible actions</title>
+					<tgroup cols='4' colsep='1' rowsep='1'>
+					<colspec colnum="1" colname="c0" />
+					<colspec colnum="2" colname="c1" />
+					<colspec colnum="3" colname="c2" />
+					<colspec colnum="4" colname="c3" />
+					<thead>
+						<row>
+							<entry>Parameter name</entry>
+							<entry>Value</entry>
+							<entry>Description</entry>
+							<entry>Default value</entry>
+						</row>
+					</thead>
+					<tbody>
+						<row>
+							<entry>newnetworkid</entry>
+							<entry>&lt;new networkId value&gt;</entry>
+							<entry>networkId of the message will be changed to "newnetworkid" value. This means that the message will be 
+							delivered via connectors that belong to the new networId.</entry>
+							<entry>"-1". This means that networkId of the message will not be changed.</entry>
+						</row>
+						<row>
+							<entry>newdestton</entry>
+							<entry>&lt;new destination type of number&gt;</entry>
+							<entry>a message destination Type of Number will be changed to "newdestton" value.</entry>
+							<entry>"-1". This means that destination Type of Number of the message will not be changed.</entry>
+			 			</row>
+						<row>
+							<entry>newdestnpi</entry>
+							<entry>&lt;new destination numbering plan indicator&gt;</entry>
+							<entry>a message destination Numbering Plan Indicator will be changed to "newdestnpi" value.</entry>
+							<entry>"-1". This means that destination Numbering Plan Indicator of the message will not be changed.</entry>
+			 			</row>
+						<row>
+							<entry>adddestdigprefix</entry>
+							<entry>&lt;prefix&gt;</entry>
+							<entry>adddestdigprefix will be added into a begin of a message destination address digits. 
+							For example if adddestdigprefix is "22" and destination address digits are "3333333", then the new value of 
+							destination address digits will be "223333333".</entry>
+							<entry>"-1". This means that destination address digits of the message will not be changed.</entry>
+						</row>
+						<row>
+							<entry>makecopy</entry>
+							<entry>&lt;false | true&gt;</entry>
+							<entry>If the makecopy action is present then SMSC GW makes a copy of a message and 
+							then post the copy for further message processing in addition to the original message. 
+							All other actions in the rule will be applied only to the copy.
+							For example user wants to make copies of messages and send them to another destinations (by sending of copies into another networkId),
+							then for this you can create a rule and set for the rule "makecopy true" and "newnetworkid &lt;new networkId value&gt;" parameters.
+							This makes a copy of a message and set for the copy a new networkId value.</entry>
+							<entry>false</entry>
+						</row>
+						<row>
+							<entry>dropaftersri</entry>
+							<entry>&lt;false | true&gt;</entry>
+							<entry>This is an action at the step when a successful SRI response has been received from HLR for an SS7 destination message.
+							If a SRI success response has received then the message will be dropped without delivery attempt.
+							A delivery response in this case will contain extra fields (IMSI and NetworkNodeNumber values).</entry>
+							<entry>false</entry>
+						</row>
+					</tbody>
+					</tgroup>
+				</table>
+			</para>
+		</section>
+
+	<section id="mproc_rules_customized">
+		<title>Customized message processing rules</title>
+		<para>
+			Default mproc rules allows to change the properties of a message in pre defined way, however if user wants to achieve more, SMSC allows users to implement their own 
+			custom logic. Below steps describes how to implement custom mproc rules.
+		</para>
+
+		<para>
+			<procedure>
+				<title>Steps for custom mproc rules implementing</title>
+				<step>
+					<para>
+						User should implement the business logic as java code. There are couple of interfaces exposed by SMSC, <classname>MProcRuleFactory</classname>
+						and <classname>MProcRule</classname> that must be implemented and add the custom business logic.
+						User needs to cover two parts of rules usage - a rule configuring part and a rule applying part.
+						<important>
+							Please pay attention that in your code you may not perform long delays in order not to dramatically decrease of SMSC GW productivity.
+						</important>
+						Once custom rule is implemented, user will have to create jar file and deploy it into SMSC Gateway. 
+					</para>
+				</step>
+				<step>
+					<para>
+					 <substeps>
+						<step><para>User needs to decide a rule class name that will be used to uniquely identify the custom rules. This can be any word without spaces.
+							For default mproc rules implementation the rule class name is "mproc". For example consider rule class name as "testrule".
+						</para>
+						</step>	
+						<step><para>User needs to impelent two interfaces: <classname>MProcRuleFactory</classname> and <classname>MProcRule</classname>.
+							For example consider <classname>MProcRuleFactoryTestImpl</classname> and <classname>MProcRuleTestImpl</classname>.
+						</para>
+						</step>	
+						<step><para>User needs to decide which actions will custom rules perform and for which messages.
+							For example create a custom rule that will be applied to any message at <code>onPostArrival</code> state 
+							who's destination address digits are starting with a configurable parameter "par1". For all the messages which match's this rules condition, 
+							prefix "par2" (the configurable parameter) is to be applied to message destination address.
+						</para>
+						</step>	
+					 </substeps>
+					</para>
+				</step>
+				<step>
+					<para>
+						Creating custom classes:
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc.testimpl;
+
+import org.mobicents.smsc.mproc.MProcRuleFactory;
+
+public class MProcRuleFactoryTestImpl implements MProcRuleFactory {
+}
+</programlisting>
+
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc.testimpl;
+
+import org.mobicents.smsc.mproc.MProcRule;
+
+public class MProcRuleTestImpl implements MProcRule {
+}
+</programlisting>
+					</para>
+				</step>
+				<step>
+					<para>Implementing <classname>MProcRuleFactory</classname> interface. The interface is:
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc;
+
+public interface MProcRuleFactory {
+    String getRuleClassName();
+    MProcRule createMProcRuleInstance();
+}
+</programlisting>
+
+						Method <code>getRuleClassName()</code> must return the rule class name.
+						Method <code>createMProcRuleInstance()</code> must return a custom implementation of <classname>MProcRule</classname> 
+						(in this example instance of <classname>MProcRuleTestImpl</classname> class).
+						Here is an example of implementation:
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc.testimpl;
+
+import org.mobicents.smsc.mproc.MProcRule;
+import org.mobicents.smsc.mproc.MProcRuleFactory;
+
+public class MProcRuleFactoryTestImpl implements MProcRuleFactory {
+    public static final String CLASS_NAME = "testrule";
+
+    @Override
+    public String getRuleClassName() {
+        return CLASS_NAME;
+    }
+
+    @Override
+    public MProcRule createMProcRuleInstance() {
+        return new MProcRuleTestImpl();
+    }
+
+}
+</programlisting>
+					</para>
+				</step>
+				<step>
+					<para>
+						Next is actual business logic that should go in implement of <classname>MProcRule</classname> interface. 
+						Let's start with learning of the interface. The content of the interface is the following:
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc;
+
+public interface MProcRule extends MProcRuleMBean {
+
+    void setId(int val);
+
+    /**
+     * @return true if the mproc rule fits to a message when a message has just come to SMSC
+     */
+    boolean matchesPostArrival(MProcMessage message);
+
+    /**
+     * @return true if the mproc rule fits to a message when IMSI / NNN has been received from HLR
+     */
+    boolean matchesPostImsiRequest(MProcMessage message);
+
+    /**
+     * @return true if the mproc rule fits to a message when a message has just been delivered
+     * (or delivery failure)
+     */
+    boolean matchesPostDelivery(MProcMessage message);
+
+    /**
+     * the event occurs when a message has just come to SMSC
+     */
+    void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception;
+
+    /**
+     * the event occurs when IMSI / NNN has been received from HLR
+     */
+    void onPostImsiRequest(PostImsiProcessor factory, MProcMessage message) throws Exception;
+
+    /**
+     * the event occurs when a message has just been delivered (or delivery failure)
+     */
+    void onPostDelivery(PostDeliveryProcessor factory, MProcMessage message) throws Exception;
+
+    /**
+     * this method must implement setting of rule parameters as for provided CLI string at
+     * the step of rule creation
+     */
+    void setInitialRuleParameters(String parametersString) throws Exception;
+
+    /**
+     * this method must implement setting of rule parameters as for provided CLI string at
+     * the step of rules modifying
+     */
+    void updateRuleParameters(String parametersString) throws Exception;
+
+}
+</programlisting>
+		and the parent interface content is:
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc;
+
+public interface MProcRuleMBean {
+
+    /**
+     * @return the id of the mproc rule
+     */
+    int getId();
+
+    /**
+     * @return Rule class of the mproc rule ("default" or other when a customer implementation)
+     */
+    String getRuleClassName();
+
+    /**
+     * @return true if the mproc rule is used for the phase when a message has just come to SMSC
+     */
+    boolean isForPostArrivalState();
+
+    /**
+     * @return true if the mproc rule is used for the phase when IMSI / NNN has been received
+     * from HLR
+     */
+    boolean isForPostImsiRequestState();
+
+    /**
+     * @return true if the mproc rule is used for the phase when a message has just been
+     * delivered (or delivery failure)
+     */
+    boolean isForPostDeliveryState();
+
+    /**
+     * @return rule parameters as CLI return string
+     */
+    String getRuleParameters();
+
+}
+</programlisting>
+
+<table	frame="all" pgwide="1">
+<title><classname>MProcRule</classname> and <classname>MProcRuleMBean</classname> interfaces methods description</title>
+		<tgroup cols='2' colsep='1' rowsep='1'>
+		<colspec colnum="1" colname="c0" />
+		<colspec colnum="2" colname="c1" />
+		<thead>
+			<row>
+				<entry>Methods</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry><code>getId()</code>, <code>setId()</code> </entry>
+				<entry>mproc rule id getter and setter. id value is unique for each mproc rule inside SMSC GW.
+				</entry>
+			</row>
+			<row>
+				<entry><code>getRuleClassName()</code></entry>
+				<entry>Returns the rule class name ("testrule" in this example)</entry>
+			</row>
+			<row>
+				<entry><code>getRuleParameters()</code>, <code>setInitialRuleParameters()</code>, <code>updateRuleParameters()</code></entry>
+				<entry>Getter and setters of configured parameters for a rule instance. Parameters are formed as a plain text string, that can be provided by CLI interface.
+				In this example we need to configure two parameters par1 and par2. Let's specify the parameters strinf as "par1" and "par2" (two values after a space, for example "11 34").
+				</entry>
+			</row>
+			<row>
+				<entry><code>isForPostArrivalState()</code>, <code>isForPostImsiRequestState()</code>, <code>isForPostDeliveryState()</code></entry>
+				<entry>Returns true if this rule affects to a message processing step
+				(for onPostArrival, onPostDelivery and onPostImsi requests)
+				and false if not. You have to check configured parameters of a rule and return a proper value</entry>
+			</row>
+			<row>
+				<entry><code>matchesPostArrival(MProcMessage message)</code>,
+				<code>matchesPostImsiRequest(MProcMessage message)</code>,
+				<code>matchesPostDelivery(MProcMessage message)</code>
+				</entry>
+				<entry>These methods must return true if rule should be applied false if not (for onPostArrival, onPostImsi and onPostDelivery requests).</entry>
+			</row>
+			<row>
+				<entry><code>onPostArrival()</code>, <code>onPostImsiRequest()</code>, <code>onPostDelivery()</code></entry>
+				<entry>These methods are needed for implementing of rule applying actions.</entry>
+			</row>
+		</tbody>
+</tgroup>
+</table>
+Id parameter and custom rule parameters ("par1" and "par2" in this example) must be stored into xml config file (it is located in <filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/data/SmscManagement_mproc.xml</filename>).
+For this user needs to implement several extra methods that will be described later.
+				</para>
+				</step>
+				<step><para>Reusing of base <classname>MProcRuleBaseImpl</classname> class. It is recommended for your custom <classname>MProcRuleTestImpl</classname> to extend 
+				<classname>MProcRuleBaseImpl</classname> provided by SMSC. <classname>MProcRuleBaseImpl</classname> class contains some useful methods that cover getter and setter 
+				and code for persisting of this parameter into xml config file (read() and write() methods),
+				default stubs for <code>matches()</code> and <code>onPost*()</code> methods
+				and a service method for splitting of a parameters plain text string into subparameters (splitParametersString()). 
+				</para>
+				<para>Here is the new template of <classname>MProcRuleTestImpl</classname> class implementation that reuses the base class <classname>MProcRuleBaseImpl</classname>:
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc.testimpl;
+
+import org.mobicents.smsc.mproc.MProcRuleBaseImpl;
+
+public class MProcRuleTestImpl extends MProcRuleBaseImpl {
+}
+</programlisting>
+				</para>
+				</step>
+				<step>
+					<para>Implementing of <code>getRuleClassName()</code> method of <classname>MProcRule</classname>. Below is an example:
+<programlisting language="Java" role="JAVA">
+    @Override
+    public String getRuleClassName() {
+        return MProcRuleFactoryTestImpl.CLASS_NAME;
+    }
+</programlisting>
+					</para>
+				</step>
+				<step><para>Implementing of methods that cover getter / setters for message custom parameters and storing them into xml config file. 
+				</para>
+				<para>
+				In the example setInitialRuleParameters() and updateRuleParameters() methods are implemented in the same way.
+				You can implement them in different ways so that updateRuleParameters() method can accept not the whole set of parameters but only that ones that a user wants to change.
+				</para>
+				<para>
+				M_PROC_RULE_TEST_XML is responsible for XML serializing / deserializing. See more info for them in javolution library specification.
+				</para>
+				<para>
+				Here is an example (only the part that is described in this step):
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc.testimpl;
+
+import javolution.xml.XMLFormat;
+import javolution.xml.stream.XMLStreamException;
+import org.mobicents.smsc.mproc.MProcRuleBaseImpl;
+
+public class MProcRuleTestImpl extends MProcRuleBaseImpl {
+
+    private static final String PAR1 = "par1";
+    private static final String PAR2 = "par2";
+    private String par1, par2;
+
+    @Override
+    public void setInitialRuleParameters(String parametersString) throws Exception {
+        String[] args = splitParametersString(parametersString);
+        if (args.length != 2) {
+            throw new Exception("parametersString must contains 2 parameters");
+        }
+        par1 = args[0];
+        par2 = args[1];
+    }
+
+    @Override
+    public void updateRuleParameters(String parametersString) throws Exception {
+        String[] args = splitParametersString(parametersString);
+        if (args.length != 2) {
+            throw new Exception("parametersString must contains 2 parameters");
+        }
+        par1 = args[0];
+        par2 = args[1];
+    }
+
+    @Override
+    public String getRuleParameters() {
+        return par1 + " " + par2;
+    }
+
+    /**
+     * XML Serialization/Deserialization
+     */
+    protected static final XMLFormat&lt;MProcRuleTestImpl&gt; M_PROC_RULE_TEST_XML = new
+            XMLFormat&lt;MProcRuleTestImpl&gt;(MProcRuleTestImpl.class) {
+
+        @Override
+        public void read(javolution.xml.XMLFormat.InputElement xml, MProcRuleTestImpl
+            mProcRule) throws XMLStreamException {
+            M_PROC_RULE_BASE_XML.read(xml, mProcRule);
+
+            mProcRule.par1 = xml.getAttribute(PAR1, "");
+            mProcRule.par2 = xml.getAttribute(PAR2, "");
+        }
+
+        @Override
+        public void write(MProcRuleTestImpl mProcRule, javolution.xml.XMLFormat.OutputElement
+            xml) throws XMLStreamException {
+            M_PROC_RULE_BASE_XML.write(mProcRule, xml);
+
+            xml.setAttribute(PAR1, mProcRule.par1);
+            xml.setAttribute(PAR2, mProcRule.par2);
+        }
+    };
+}
+</programlisting>
+				</para>
+				</step>
+				<step><para>Overiding one of <code>isForPost*()</code> methods (for allowing of processing of a needed message processing step). In our example it is <code>isForPostArrivalState()</code>:
+<programlisting language="Java" role="JAVA">
+    @Override
+    public boolean isForPostArrivalState() {
+        return true;
+    }
+</programlisting>
+				</para>
+				</step>
+				<step><para>Implementing of a needed <code>matches***()</code> methods.
+				In our example we process messages which destination address digits are started with a configurable parameter "par1".
+<programlisting language="Java" role="JAVA">
+    @Override
+    public boolean matchesPostArrival(MProcMessage message) {
+        if (message.getDestAddr().startsWith(par1))
+            return true;
+        else
+            return false;
+    }
+</programlisting>
+				For <code>matches***()</code> methods we will use interface <classname>MProcMessage</classname> interface which provides info for processing message fields.
+				Here is a code of these interfaces. 
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc;
+
+import java.util.Date;
+
+public interface MProcMessage {
+
+    // source address part
+    int getSourceAddrTon();
+
+    int getSourceAddrNpi();
+
+    String getSourceAddr();
+
+    // dest address part
+    int getDestAddrTon();
+
+    int getDestAddrNpi();
+
+    String getDestAddr();
+
+    // message content part
+    String getShortMessageText();
+
+    byte[] getShortMessageBin();
+
+    // other options
+    int getNetworkId();
+
+    int getOrigNetworkId();
+
+    String getOrigEsmeName();
+
+    OrigType getOriginationType();
+
+    Date getScheduleDeliveryTime();
+
+    Date getValidityPeriod();
+
+    int getDataCoding();
+
+    int getNationalLanguageSingleShift();
+
+    int getNationalLanguageLockingShift();
+
+    int getEsmClass();
+
+    int getPriority();
+
+    int getRegisteredDelivery();
+
+    String getOriginatorSccpAddress();
+
+}
+</programlisting>
+
+				</para>
+				</step>
+				<step><para>
+				Implementing of methods that make some actions:
+				In example above this is <code>onPostArrival()</code> and the action is adding "par2" prefix into destination address digits.
+				These methods will be invoked for all messages that match rule's conditions.
+<programlisting language="Java" role="JAVA">
+    @Override
+    public void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception {
+        String destAddr = this.par2 + message.getDestAddr();
+        factory.updateMessageDestAddr(message, destAddr);
+    }
+</programlisting>
+				In <code>onPostArrival()</code>, <code>onPostImsiRequest()</code> and <code>onPostDelivery()</code> methods user can use provided interfaces 
+				<classname>PostArrivalProcessor</classname>, <classname>PostImsiProcessor</classname> and <classname>PostDeliveryProcessor</classname>
+				that provide methods for message processing / adding / dropping / rejecting.
+					 <substeps>
+						<step><para><classname>PostArrivalProcessor</classname> interface content:
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc;
+
+import java.util.Date;
+
+import org.apache.log4j.Logger;
+
+public interface PostArrivalProcessor {
+
+    // access to environmental parameters
+    /**
+     * @return the logger that an application can use for logging info into server.log
+     */
+    Logger getLogger();
+
+    // actions
+    /**
+     * Drop the message. Success response (that a message is accepted) will be return to
+     * a message originator.
+     */
+    void dropMessage();
+
+    /**
+     * Drop the message. A reject will be sent to a message originator.
+     */
+    void rejectMessage();
+
+    // updating of a message section
+    void updateMessageNetworkId(MProcMessage message, int newNetworkId);
+
+    /**
+     * Updating of destination address message TON. In case of bad value (&lt;0 or &gt;6)
+     * MProcRuleException will be thrown
+     * 
+     * @param message
+     * @param newDestTon
+     * @throws MProcRuleException
+     */
+    void updateMessageDestAddrTon(MProcMessage message, int newDestTon) throws MProcRuleException;
+
+
+    /**
+     * Updating of destination address message NPI. In case of bad value (&lt;0 or &gt;6)
+     * MProcRuleException will be thrown
+     * 
+     * @param message
+     * @param newDestNpi
+     * @throws MProcRuleException
+     */
+    void updateMessageDestAddrNpi(MProcMessage message, int newDestNpi) throws MProcRuleException;
+
+    /**
+     * Updating of destination address message digits. Value can not be null and must have length
+     * 1-21 characters. In case of bad value MProcRuleException will be thrown
+     * 
+     * @param message
+     * @param newDigits
+     * @throws MProcRuleException
+     */
+    void updateMessageDestAddr(MProcMessage message, String newDigits) throws MProcRuleException;
+
+    /**
+     * Updating of source address message TON. In case of bad value (&lt;0 or &gt;6)
+     * MProcRuleException will be thrown
+     * 
+     * @param message
+     * @param newDestTon
+     * @throws MProcRuleException
+     */
+    void updateMessageSourceAddrTon(MProcMessage message, int newDestTon) throws MProcRuleException;
+
+    /**
+     * Updating of source address message NPI. In case of bad value (&lt;0 or &gt;6)
+     * MProcRuleException will be thrown
+     * 
+     * @param message
+     * @param newDestNpi
+     * @throws MProcRuleException
+     */
+    void updateMessageSourceAddrNpi(MProcMessage message, int newDestNpi) throws MProcRuleException;
+
+    /**
+     * Updating of source address message digits. Value can not be null and must have length
+     * 1-21 characters. In case of bad value MProcRuleException will be thrown
+     * 
+     * @param message
+     * @param newDigits
+     * @throws MProcRuleException
+     */
+    void updateMessageSourceAddr(MProcMessage message, String newDigits) throws MProcRuleException;
+
+    /**
+     * Updating of message text. Value must not be null and must have length 0-4300. In case
+     * of bad value MProcRuleException will be thrown
+     * 
+     * @param message
+     * @param newShortMessageText
+     * @throws MProcRuleException
+     */
+    void updateShortMessageText(MProcMessage message, String newShortMessageText) throws MProcRuleException;
+
+    /**
+     * Updating of UDH binary content. Value can be null or must have length &gt; 0. In case
+     * of bad value MProcRuleException will be thrown
+     * 
+     * @param message
+     * @param newShortMessageText
+     * @throws MProcRuleException
+     */
+    void updateShortMessageBin(MProcMessage message, byte[] newShortMessageBin) throws MProcRuleException;
+
+    /**
+     * Updating of ScheduleDeliveryTime - the time before which a message will not be
+     * delivered. This value can be null, this means that the message will be tried to
+     * delivery immediately. This value must be at least 3 hours before a delivery
+     * period end. If you pass the value that is later then 3 hours before a delivery
+     * period end, then 3 hours before a delivery period end will be set. If you
+     * change both ValidityPeriod and ScheduleDeliveryTime values, then you have to
+     * setup ValidityPeriod value firstly.
+     * 
+     * @param message
+     * @param newScheduleDeliveryTime
+     */
+    void updateScheduleDeliveryTime(MProcMessage message, Date newScheduleDeliveryTime);
+
+    /**
+     * Updating delivery period end time. This value can be null, this means that
+     * delivery period will be set to a default delivery period value of SMSC GW.
+     * If the value is more than max validity period that is configured for SMSC GW,
+     * then max validity period will be used instead of a provided value. If you change
+     * both ValidityPeriod and ScheduleDeliveryTime values, then you have to setup
+     * ValidityPeriod value firstly.
+     * 
+     * @param message
+     * @param newValidityPeriod
+     */
+    void updateValidityPeriod(MProcMessage message, Date newValidityPeriod);
+
+    void updateDataCoding(MProcMessage message, int newDataCoding);
+
+    void updateDataCodingGsm7(MProcMessage message);
+
+    void updateDataCodingGsm8(MProcMessage message);
+
+    void updateDataCodingUcs2(MProcMessage message);
+
+    void updateNationalLanguageSingleShift(MProcMessage message,
+        int newNationalLanguageSingleShift);
+
+    void updateNationalLanguageLockingShift(MProcMessage message,
+        int newNationalLanguageLockingShift);
+
+    void updateEsmClass(MProcMessage message, int newEsmClass);
+
+    void updateEsmClass_ModeDatagram(MProcMessage message);
+
+    void updateEsmClass_ModeTransaction(MProcMessage message);
+
+    void updateEsmClass_ModeStoreAndForward(MProcMessage message);
+
+    void updateEsmClass_TypeNormalMessage(MProcMessage message);
+
+    void updateEsmClass_TypeDeliveryReceipt(MProcMessage message);
+
+    void updateEsmClass_UDHIndicatorPresent(MProcMessage message);
+
+    void updateEsmClass_UDHIndicatorAbsent(MProcMessage message);
+
+    void updatePriority(MProcMessage message, int newPriority);
+
+    void updateRegisteredDelivery(MProcMessage message, int newRegisteredDelivery);
+
+    void updateRegisteredDelivery_DeliveryReceiptNo(MProcMessage message);
+
+    void updateRegisteredDelivery_DeliveryReceiptOnSuccessOrFailure(MProcMessage message);
+
+    void updateRegisteredDelivery_DeliveryReceiptOnFailure(MProcMessage message);
+
+    void updateRegisteredDelivery_DeliveryReceiptOnSuccess(MProcMessage message);
+
+    // new message posting section
+    /**
+     * Creating a new message template for filling and sending by postNewMessage() method
+     */
+    MProcNewMessage createNewEmptyMessage(OrigType originationType);
+
+    MProcNewMessage createNewCopyMessage(MProcMessage message);
+
+    MProcNewMessage createNewResponseMessage(MProcMessage message);
+
+    /**
+     * Posting a new message. To post a new message you need: create a message template
+     * by invoking of createNewMessage(), fill it and post it be invoking of
+     * postNewMessage(). For this new message no mproc rule and diameter request will
+     * be applied.
+     */
+    void postNewMessage(MProcNewMessage message);
+}
+</programlisting>
+						</para>
+						</step>	
+						<step><para><classname>PostImsiProcessor</classname> interface content:
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc;
+
+import org.apache.log4j.Logger;
+
+public interface PostImsiProcessor {
+
+    // access to environmental parameters
+    /**
+     * @return the logger that an application can use for logging info into server.log
+     */
+    Logger getLogger();
+
+    // actions
+    void dropMessages();
+}
+</programlisting>
+						</para>
+						</step>	
+						<step><para><classname>PostDeliveryProcessor</classname> interface content:
+<programlisting language="Java" role="JAVA">
+package org.mobicents.smsc.mproc;
+
+import org.apache.log4j.Logger;
+
+public interface PostDeliveryProcessor {
+
+    // access to environmental parameters
+    /**
+     * @return the logger that an application can use for logging info into server.log
+     */
+    Logger getLogger();
+
+    boolean isDeliveryFailure();
+    
+    // actions
+    /**
+     * Creating a new message template for filling and sending by postNewMessage() method
+     */
+    MProcNewMessage createNewEmptyMessage(OrigType originationType);
+
+    MProcNewMessage createNewCopyMessage(MProcMessage message);
+
+    MProcNewMessage createNewResponseMessage(MProcMessage message);
+
+    /**
+     * Posting a new message. To post a new message you need: create a message template
+     * by invoking of createNewMessage(), fill it and post it be invoking of
+     * postNewMessage(). For this new message no mproc rule and diameter request will
+     * be applied.
+     */
+    void postNewMessage(MProcNewMessage message);
+
+}
+</programlisting>
+						</para>
+						</step>	
+					 </substeps>
+				</para>
+				</step>
+				<step><para>
+				Once all the source code is fully implemented, user should deploy it. 
+					 <substeps>
+						<step><para>User must compile java code and create a jar library. Copy the created jar into the folder
+						<filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/deploy/mobicents-smsc-server/lib</filename>.
+						</para>
+						</step>	
+						<step><para>You need to update <filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/deploy/mobicents-smsc-server/META-INF/jboss-beans.xml</filename> config file.
+						</para>
+						<para>Define factory implementing <classname>MProcRuleFactory</classname>in above example it will be <classname>MProcRuleFactoryTestImpl</classname>:
+<programlisting language="XML" role="XML">
+<![CDATA[    <bean name="MProcRuleFactoryTest" class="org.mobicents.smsc.mproc.testimpl.MProcRuleFactoryTestImpl">
+    </bean>
+]]></programlisting>
+
+						</para>
+						<para>bean name can be some unique name. 
+						</para>
+						<para>In the "bean name="SmscManagement"" section - property &lt;property name="MProcRuleFactories"&gt; - after the line &lt;inject bean="MProcRuleFactoryDefault"/&gt; (that means default mproc rules implementing)
+						- add the line that describes your new created bean:
+<programlisting language="XML" role="XML">
+<![CDATA[        <property name="MProcRuleFactories">
+            <list elementClass="org.mobicents.smsc.mproc.MProcRuleFactory">
+                <inject bean="MProcRuleFactoryDefault"/>
+                <inject bean="MProcRuleFactoryTest"/>
+            </list>
+        </property>
+]]></programlisting>
+						</para>
+						</step>	
+					 </substeps>
+				</para>
+				</step>
+				<step><para>Start SMSC GW</para>
+				</step>
+				<step>
+				<para>Create an mproc rule by using CLI interface. Let's create a rule with id=1 that will be applied for messages which destination adresses are started with "22" and this rule will add prefix "33".
+				To achive it run CLI console and run the following command</para>
+				<para>smsc mproc add testrule 1 22 33</para>
+				<para>where "testrule" is an implemented class name, "22 33" is aparameter string.</para>
+				</step>
+				<step><para>Send a message to the destination address that starts with "22" (for example "221111") and find that the message will be delivered to the address with prefix "33" ("33221111" in our example).</para>
+				</step>
+			</procedure>
+		</para>
+	</section>
+
+	</section>
+
+	<section id="sms_home_routing">
+		<title>SMS Home Routing</title>
+		<para>According to traditional GSM specifications, all outbound messages pass through an SMSC in the sending network. This allows the SMSC to convert the Mobile Originated (MO) messages into Mobile Terminated (MT) messages and deliver them directly to the destination devices, regardless of what network they are on. As a result, inbound messages generated on other networks will be sent directly to the destination devices under the control of the SMSC in the sending network, not the home network. In this traditional setup, operators can add value to the MO messages but not to the MT messages that the customer may receive from other networks, since they do not pass through an SMSC in the home network.
+		</para>
+		<para>
+		SMS Home Routing is a modification to the original GSM specifications, adopted by the 3GPP in 2007, that changed the way inbound messages are treated by the mobile networks. Home Routing uses the recipient network's Home Location Register (HLR) to change the flow of inbound messages, directing them to an MT Services Platform, rather than straight to the destination devices. The MT Services platform can add value to the MT messages and apply advanced services such as anti-spam, protection, divert, archiving, etc. to the messages prior to delivery.
+		</para>
+		<para>
+		Home Routing enables operators to offer a full range of value-added services to both inbound and outbound SMS thereby enhancing customer experience while generating additional revenue for the operators.
+		</para>
+		<para>
+		&THIS.PLATFORM; &THIS.APPLICATION; supports SMS Home Routing that enables you to handle Mobile Terminated messages in the network that owns the customer so you can offer a full range of advanced and value added services on both inbound and outbound SMS.
+		You need to configure SMSC GW before you can use SMS Home Routing.
+		For more details refer to <xref linkend="SMSC_Gateway_Server_HR"/>.</para>
+	</section>
+
+	<section id="Diameter_OCS_server">
+		<title>Interworking with Diameter OCS server</title>
+
+	<section id="Diameter_OCS_server_general">
+		<title>General information</title>
+		<para>SMSC GW can interoperate with an OCS server via Diameter protocol connection.
+		</para>
+		<para>
+For this case SMSC GW can be configured so any incoming SMPP, MO SS7, Home Routing SS7 and SIP originated messages before next processing will be sent to OCS server. 
+Then OCS server can check if SMSC GW must accept the message or not. If yes, SMSC GW will process the message, if not, the message will be dropped.
+OCS server can also make any charging operations as needed.
+		</para>
+		<para>
+For SMPP and MO SS7 originated messages SMSC GW will return error (reject) in the response back to the orgiginated message submit message.
+So MO and SMPP part will be informed if the message is rejected. (This functionality is not implemented now for Home Routing SS7 and SIP originated messages).
+		</para>
+		<para>
+For interconnecting with OCS Server SMSC GW uses diameter CCR (Credit-Control Request) with following filled AVPs (all of them are located in AVP Service-Information (873)):
+		</para>
+		<para>
+<table
+						frame="all"
+						pgwide="1">
+<title>The AVP list</title>
+		<tgroup cols='5' colsep='1' rowsep='1'>
+		<colspec
+								colnum="1"
+								colname="c0" />
+		<colspec
+								colnum="2"
+								colname="c1"
+								colwidth="0.6*" />
+		<colspec
+								colnum="3"
+								colname="c2"
+								colwidth="0.6*" />
+		<colspec
+								colnum="4"
+								colname="c3" />
+		<colspec
+								colnum="5"
+								colname="c4"
+								colwidth="2*" />
+		<thead>
+			<row>
+				<entry>AVP name</entry>
+				<entry>AVP code</entry>
+				<entry>AVP Type</entry>
+				<entry>Parent AVP</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry>SMS-Information</entry>
+				<entry>2000</entry>
+				<entry>Grouped</entry>
+				<entry>Service-Information</entry>
+				<entry>SMS service specific information elements</entry>
+			</row>
+			<row>
+				<entry>Originator-SCCP-Address</entry>
+				<entry>2008</entry>
+				<entry>Address</entry>
+				<entry>SMS-Information</entry>
+				<entry>The CallingParty SCCP Address of MO message</entry>
+			</row>
+			<row>
+				<entry>SMSC-Address</entry>
+				<entry>2017</entry>
+				<entry>Address</entry>
+				<entry>SMS-Information</entry>
+				<entry>SMSC address as it is present in SM_RP_DA field in MO request.
+				For not MO messages the value will be taken as a configured SMSC GT for networkId area</entry>
+			</row>
+			<row>
+				<entry>Data-Coding-Scheme</entry>
+				<entry>2001</entry>
+				<entry>Integer 32</entry>
+				<entry>SMS-Information</entry>
+				<entry>Data Coding Scheme of a message (for example 0 for GSM7 encoding or 8 for UCS2 encoding)</entry>
+			</row>
+			<row>
+				<entry>SM-Message-Type</entry>
+				<entry>2007</entry>
+				<entry></entry>
+				<entry></entry>
+				<entry>Message type, usually SUBMISSION (value = 0)</entry>
+			</row>
+			<row>
+				<entry>Originator-Interface</entry>
+				<entry>2009</entry>
+				<entry>Grouped</entry>
+				<entry>SMS-Information</entry>
+				<entry>Information related to the Interface on which the message originated.</entry>
+			</row>
+			<row>
+				<entry>Interface-Id</entry>
+				<entry>2003</entry>
+				<entry>UTF8-String</entry>
+				<entry>Originator-Interface</entry>
+				<entry>NetworkID value of the Interface on which the message originated.</entry>
+			</row>
+			<row>
+				<entry>Interface-Text</entry>
+				<entry>2005</entry>
+				<entry>UTF8-String</entry>
+				<entry>Originator-Interface</entry>
+				<entry>Name of ESME / SIP connector on which the message originated.</entry>
+			</row>
+			<row>
+				<entry>Recipient-Info</entry>
+				<entry>2026</entry>
+				<entry>Grouped</entry>
+				<entry>SMS-Information</entry>
+				<entry>Information associated with a recipient.</entry>
+			</row>
+			<row>
+				<entry>Recipient-Address</entry>
+				<entry>1201</entry>
+				<entry>Grouped</entry>
+				<entry>Recipient-Info</entry>
+				<entry>The address of message receiver (destination address)</entry>
+			</row>
+			<row>
+				<entry>Address-Type</entry>
+				<entry>899</entry>
+				<entry>Enum</entry>
+				<entry>Recipient-Address</entry>
+				<entry>Type of Recipient-Address: 1-MSISDN (for TON=1 - international) or 6-Other (for TON!=1)</entry>
+			</row>
+			<row>
+				<entry>Address-Data</entry>
+				<entry>897</entry>
+				<entry>UTF8-String</entry>
+				<entry>Recipient-Address</entry>
+				<entry>Digits of Recipient-Address</entry>
+			</row>
+			<row>
+				<entry>Originator-Received-Address</entry>
+				<entry>2027</entry>
+				<entry>Grouped</entry>
+				<entry>SMS-Information</entry>
+				<entry>The address of message sender (source address)</entry>
+			</row>
+			<row>
+				<entry>Address-Type</entry>
+				<entry>899</entry>
+				<entry>Enum</entry>
+				<entry>Originator-Received-Address</entry>
+				<entry>Type of Originator-Received-Address: 1-MSISDN (for TON=1 - international) or 6-Other (for TON!=1)</entry>
+			</row>
+			<row>
+				<entry>Address-Data</entry>
+				<entry>897</entry>
+				<entry>UTF8-String</entry>
+				<entry>Originator-Received-Address</entry>
+				<entry>Digits of Originator-Received-Address</entry>
+			</row>
+		</tbody>
+</tgroup>
+</table>
+		</para>
+		<para>When OCS server responds with 2001 code (access granted) SMSC GW will accept the message, all other respond codes will reject the message.
+		</para>
+	</section>
+
+	<section id="Diameter_OCS_server_conig">
+		<title>Configuring</title>
+		<para>You can use Telestax OCS server or any third party OCS server as you wish. SMSC GW party configuring is the same for both.
+Here there is a describtion for the case of Telestax OCS server and as an example - the simpliest case when we have OCS at the same host as SMSC GW.
+		</para>
+		<para>
+			<procedure>
+				<title>Steps for configuring of SMSC GW and OCS server</title>
+				<step><para>SMSC GW must be already configured for accepting and sending messages (general, SS7, SMPP, etc parts)</para>
+				</step>
+				<step><para>You can download for testing the Telestax OCS server from https://telestax.zendesk.com/forums/22947518-Product-Downloads. Download and unpack it to a separate folder.</para>
+				</step>
+				<step><para>SMSC GW uses the updated AVP dictionary library. Before using of OCS server copy from SMSC GW the file &lt;smsc gw root folder&gt;/resource/ocs/dictionary.xml
+				to Telestax OCS server to the folder &lt;jboss&gt;/server/default/deploy/RestComm-diameter-mux-6.2.0.GA.sar/config.</para>
+				</step>
+				<step><para>for simple test configuring of SMSC GW and OCS server you can copy example config files jdiameter-config.xml
+					 <substeps>
+						<step><para>from &lt;smsc gw root folder&gt;/resource/ocs/smsc-part to SMSC GW &lt;jboss&gt;/server/default/deploy/RestComm-diameter-mux-6.2.0.GA.sar/config</para>
+						</step>	
+						<step><para>from &lt;smsc gw root folder&gt;/resource/ocs/ocs-part to OCS server &lt;jboss&gt;/server/default/deploy/RestComm-diameter-mux-6.2.0.GA.sar/config</para>
+						</step>	
+					 </substeps>
+					 </para>
+				</step>
+				<step><para>Those configs suppose that you use Telestax OCS server and it is on the same host. If not you need to make extra configuring.
+In the testing config files SMSC GW plays a role of a diameter client and OCS server - a diameter server.
+In this case for OCS server part we need to update jdiameter-config.xml file:
+					 <substeps>
+						<step><para>&lt;LocalPeer&gt; section with URI, IPAddresses and Realm.</para>
+						</step>	
+						<step><para>In &lt;Network&gt; we need to specify &lt;Peer&gt; (SMSC GW diameter IP) and &lt;Realm&gt; (name and the same Realm that is configured in SMSC GW part)</para>
+						</step>	
+					 </substeps>
+For SMSC GW part we need to update:
+					 <substeps>
+						<step><para>&lt;LocalPeer&gt; section with URI, IPAddresses and Realm.</para>
+						</step>	
+						<step><para>In &lt;Network&gt; we need to specify &lt;Peer&gt; (OCS server diameter IP) and &lt;Realm&gt; (name and the same Realm that is configured in OCS server part)</para>
+						</step>	
+					 </substeps>
+You can read more for configuring in the manuals for Telestax Diameter protocol and Telestax OCS server.</para>
+				</step>
+				<step><para> Start OCS server. If it is located in the same host as SMSC GW you need to run it "-b 127.0.0.2" parameter so it uses 127.0.0.2 IP address (127.0.0.1 is used by SMSC GW)
+				Use fo starting the command like:</para>
+				<para>run -b 127.0.0.2</para>
+				</step>
+				<step><para>For accessing OCS managing console (after OCS server is started) use a browser with URL: http://127.0.0.2:8080/charging-server-rest-management/#/users</para>
+				<para>Avoid of using of Microsoft Internet Explorer, OCS server does not work correctly with it.</para>
+				<para>Add one or more test subscribers by the console. You need to specify an address of message sender (source address). OCS Server idendifies a subscriber by its sender address.</para>
+				</step>
+				<step><para>Start SMSC GW</para>
+				</step>
+				<step><para>You need to configure Destination Realm, Destination Host, Destination Port and User Name (of OCS server) - see the chapter "6.1.5. Diameter Settings" of SMSC GW Admin guide.
+You can take values from jdiameter-config.xml. You can assign for User Name any value (for example "telestax").</para>
+				</step>
+				<step><para>You need to specify which messages will be sent to OCS server (see chapter <xref linkend="SMSC_diameter_Settings"/>). For example if you want to charge mobile originated messages - 
+specify "Mobile Originated SMS Charged" to value "diameter".</para>
+				</step>
+				<step><para>SMSC GW is configured</para>
+				</step>
+			</procedure>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+	</section>
+
+	</section>
+
+	<section id="CDR_logging_settings">
+		<title>CDR Logging Settings</title>
+		<para>
+			&THIS.PLATFORM; &THIS.APPLICATION; is configured to generate CDR in a plain text file located at <filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/log/cdr.log</filename> and also detailed CDR in Cassandra table <literal>MESSAGES_yyyy_mm_dd</literal>. 
+		</para>
+		<para>&THIS.PLATFORM; &THIS.APPLICATION; can be configured to generate CDR for different message processing modes (<literal>datagramm, transactional, storeAndForward</literal>) and also for both receipt and regular messages or generate CDR only for regular messages. This is configurable by setting <literal>generateCdr</literal>, <literal>generateArchiveTable</literal> and <literal>generateReceiptCdr</literal> using the CLI or the GUI.  
+		For more details refer to Sections <xref linkend="generateCdr"/>, <xref linkend="generateArchiveTable"/> and <xref linkend="generateReceiptCdr"/>.
+		</para>
+		<para>
+        The CDR generated in a text file is of a specific format. The details of the format and the possible values for the fields recorded in the CDR log file are explained in <xref linkend="monitoring-SMSC-CDR-log" />.
+		</para>
+	</section>
+</chapter>

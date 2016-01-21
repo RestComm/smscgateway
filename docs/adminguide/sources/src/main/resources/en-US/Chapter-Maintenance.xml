@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+<chapter id="maintenance">
+
+	<title>Maintenance</title>
+	<section id="db_maint">
+		<title>Database</title>
+		<para>
+The &THIS.PLATFORM; &THIS.APPLICATION; creates three tables for every new day to store data relevant to the messages scheduled for delivery on that day, as explained in <xref linkend="Database_Table_Structure" />. These tables need to be dropped periodically else the tables may end up occupying huge disk space. 
+		</para>
+		<para>You can choose to drop these tables manually or configure the Gateway to drop the tables periodically. To configure these settings, you can make use of the parameters <literal>removinglivetablesdays</literal> and <literal>removingarchivetabledays</literal>. 
+		</para>
+		<note><para>By default, Cassandra Database creates snapshots of tables prior to dropping them. Therefore the disk space is not cleared upon dropping the tables. To overcome this, you must update the <filename>cassandra.yaml</filename> configuration file and set the value of <literal>auto_snapshot</literal> to false.</para></note>
+		<section id="auto_delete">
+		<title>Automatically drop tables</title>
+			<section id="auto_delete_CLI">
+			<title>Using CLI</title>
+<para>
+You can configure the auto-drop settings by issuing the command <command>smsc set removinglivetablesdays</command> for LIVE tables and the command <command>smsc set removingarchivetabledays</command>, with appropriate parameters as described below. You can verify this by issuing the command <command>smsc get removinglivetablesdays</command> and <command>smsc get removingarchivetabledays</command> which will display the values set for these properties.
+</para>
+<screen><![CDATA[
+Name
+	smsc set removinglivetablesdays
+
+SYNOPSIS
+	smsc set removinglivetablesdays <value>
+
+DESCRIPTION
+	This command is used to configure the SMSC to automatically drop LIVE tables from 
+	the Cassandra Database. The SMSC will attempt to delete tables just after
+	midnight and after every SMSC restart.
+
+PARAMETERS
+	removinglivetablesdays		- This parameter is used to specify the number
+					  of days the LIVE tables should be kept before 
+					  attempting to drop them automatically.
+
+					  If this value is specified as "0", the SMSC
+					  will not drop tables automatically. In this case
+					  you must manually drop tables.
+
+					  You must specify a value of 3 or more. You can
+					  not set this value to 1 or 2 days. This is to 
+					  ensure the tables will be kept for a minimum
+					  of 2 days after creation date.
+
+					  The SMSC wil attempt to delete tables for one 
+					  day. If the Cassandra Database keeps tables for 
+					  older days, then the administrator should drop 
+					  these manually.
+]]></screen>
+<screen><![CDATA[
+Name
+	smsc set removingarchivetabledays
+
+SYNOPSIS
+	smsc set removingarchivetabledays <value>
+
+DESCRIPTION
+	This command is used to configure the SMSC to automatically drop ARCHIVE tables 
+	from the Cassandra Database. The SMSC will attempt to delete tables just after
+	midnight and after every SMSC restart.
+
+PARAMETERS
+	removingarchivetabledays	- This parameter is used to specify the number
+					  of days the ARCHIVE tables should be kept before 
+					  attempting to drop them automatically.
+
+					  If this value is specified as "0", the SMSC
+					  will not drop tables automatically. In this case
+					  you must manually drop tables.
+
+					  You must specify a value of 3 or more. You can
+					  not set this value to 1 or 2 days. This is to 
+					  ensure the tables will be kept for a minimum
+					  of 2 days after creation date.
+
+					  The SMSC wil attempt to delete tables for one 
+					  day. If the Cassandra Database keeps tables for 
+					  older days, then the administrator should drop 
+					  these manually.
+
+]]></screen>
+
+			</section>
+			<!--<section id="auto_delete_GUI">
+			<title>Using GUI</title>
+			<procedure>
+				<title>Auto Drop Settings using the GUI</title>
+				<step><para>
+				</para></step>
+			</procedure>
+			</section>-->
+		</section>
+		<section id="manual_delete">
+		<title>Manually drop tables</title>
+		<para>If you do not want the SMSC Gateway to automatically drop tables you must set the value of the parameters <literal>removinglivetablesdays</literal> and <literal>removingarchivetabledays</literal> to zero and disable this feature as explained in the preceding section.</para>
+		<para>
+		You must decide on how much data you would like to retain in the Database and accordingly delete the tables. However you must take precaution to not delete the tables for today or a future date. All tables that store data for dates less than the current date may be safely deleted from the database without stopping the SMSC.
+		</para>
+		<para>To delete the tables manually you must run the required commands via Cassandra CQL3 as in the examples below:
+<screen><![CDATA[
+DROP TABLE DST_SLOT_TABLE_2014_01_05; 
+DROP TABLE SLOT_MESSAGES_TABLE_2014_01_05; 
+DROP TABLE MESSAGES_2014_01_05;
+]]></screen>
+		</para>
+		</section>
+	</section>
+
+
+</chapter>

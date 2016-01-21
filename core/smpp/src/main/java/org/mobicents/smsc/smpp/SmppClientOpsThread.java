@@ -1,22 +1,24 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  
+ * Copyright 2012, Telestax Inc and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.smsc.smpp;
 
 import java.util.Iterator;
@@ -226,17 +228,31 @@ public class SmppClientOpsThread implements Runnable {
 			config0.setConnectTimeout(esme.getConnectTimeout());
 			config0.setSystemId(esme.getSystemId());
 			config0.setPassword(esme.getPassword());
+			config0.setSystemType(esme.getSystemType());
 			config0.getLoggingOptions().setLogBytes(true);
 			// to enable monitoring (request expiration)
 			config0.setRequestExpiryTimeout(esme.getRequestExpiryTimeout());
 			config0.setWindowMonitorInterval(esme.getWindowMonitorInterval());
-//			config0.setCountersEnabled(esme.isCountersEnabled());
-
-			Address address = null;
-			if (esme.getEsmeTon() != -1 && esme.getEsmeNpi() != -1 && esme.getEsmeAddressRange() != null) {
-				address = new Address((byte) esme.getEsmeTon(), (byte) esme.getEsmeNpi(), esme.getEsmeAddressRange());
+			config0.setCountersEnabled(esme.isCountersEnabled());
+			
+			int addressTon = esme.getEsmeTon();
+			int addressNpi = esme.getEsmeNpi();
+			String addressRange = esme.getEsmeAddressRange();
+			
+			Address addressRangeObj = new Address();
+			if(addressTon!=-1){
+				addressRangeObj.setTon((byte)addressTon);
 			}
-			config0.setAddressRange(address);
+			
+			if(addressNpi != -1){
+				addressRangeObj.setNpi((byte)addressNpi);
+			}
+			
+			if(addressRange != null){
+				addressRangeObj.setAddress(addressRange);
+			}
+			
+			config0.setAddressRange(addressRangeObj);
 
 			SmppSessionHandler sessionHandler = new ClientSmppSessionHandler(esme,
 					this.smppSessionHandlerInterface.createNewSmppSessionHandler(esme));

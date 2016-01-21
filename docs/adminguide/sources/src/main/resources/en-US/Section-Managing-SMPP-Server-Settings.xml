@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+	<section id="SMPP_Server_Settings">
+	<title>SMPP Server Settings</title>
+
+		<section id="SMPP_Server_Settings_View">
+		<title>View SMPP Server Details</title>
+			<section id="SMPP_Server_Settings_View_GUI">
+			<title>Using GUI</title>
+			<procedure>
+				<title>View SMPP Server Details using the GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel.
+				</para></step>
+				<step><para>The main panel will display the existing SMPP Server details as configured in the section <literal>SmscManagement</literal> in the xml descriptor file <filename>mobicents-smsc-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/deploy/mobicents-smsc-server/META-INF/jboss-beans.xml</filename>.
+					</para></step>
+				<step><para>You can view the current Session details of the SMPP Server by clicking on the row corresponding to the name of the SMPP Server (<literal>SmscManagement</literal> in this case).
+				</para></step>
+			</procedure>
+			</section>
+		</section>
+		<section id="SMPP_Server_Settings_Edit">
+		<title>Edit SMPP Server Properties</title>
+			<section id="SMPP_Server_Settings_Edit_CLI">
+			<title>Using CLI</title>
+<para>
+You can edit the properties of the SMPP Server by issuing appropriate commands for every property as described below:
+</para>
+<screen><![CDATA[
+Name
+	smppserver set port
+
+SYNOPSIS
+	smppserver set port <port>
+
+DESCRIPTION
+	This command is used to set the port that the SMSC server is listening to for 
+	incoming bind request. 
+
+	If unspecified, the default port is 2776.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set bindtimeout
+
+SYNOPSIS
+	smppserver set bindtimeout <bind-timeout>
+
+DESCRIPTION
+	This command is used to set a value for bind-timeout in milli-seconds. 
+	Once the TCP socket is established, the SMSC server will wait for the time period 
+	specified by the parameter bind-timeout in milli-seconds, for the peer to send a 
+	bind request, after which it will kill the TCP socket.
+
+	If unspecified, the default value is 5000 milli-seconds.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set systemid
+
+SYNOPSIS
+	smppserver set systemid <system-id>
+
+DESCRIPTION
+	This command is used to set the value for system-id. This is the 'system-id' 
+	included in the Bind response.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set autonegotiateversion
+
+SYNOPSIS
+	smppserver set autonegotiateversion <true/false>
+
+DESCRIPTION
+	This command is used to specify if auto-negotiate-version is enabled or not.
+	If it is set to 'true' and a Bind is received with version <= 3.3 for 
+	interface version, then it is normalized to version 3.3. If a Bind is received 
+	with version >= 3.4 for interface version, it is normalized to version 3.4.
+
+	The default value is true.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set interfaceversion
+
+SYNOPSIS
+	smppserver set interfaceversion <interface-version>
+
+DESCRIPTION
+	This command is used to specify the SMPP version that the Server supports. 
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set maxconnectionsize
+
+SYNOPSIS
+	smppserver set maxconnectionsize <max-connection-size>
+
+DESCRIPTION
+	This command is used to specify the maximum number of connections/sessions this 
+	Server is expected to handle.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set defaultwindowsize
+
+SYNOPSIS
+	smppserver set defaultwindowsize <defaultwindowsize>
+
+DESCRIPTION
+	This command is used to specify the default window size for this Server. 
+	The window size is the amount of unacknowledged requests that are permitted to be 
+	outstanding/unacknowledged at any given time. If more requests are added, the 
+	underlying stack will throw an exception.
+
+	The default value is 100.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set defaultwindowwaittimeout
+
+SYNOPSIS
+	smppserver set defaultwindowwaittimeout <default-window-wait-timeout>
+
+DESCRIPTION
+	This command is used to specify the default-window-wait-timeout for this Server
+	in milli-seconds. 
+	The window wait timeout is the time within which the connection to remote SMSC
+	Server should be established.
+
+	The default value is 30000 milli seconds.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set defaultrequestexpirytimeout
+
+SYNOPSIS
+	smppserver set defaultrequestexpirytimeout <default-request-expiry-timeout>
+
+DESCRIPTION
+	This command is used to specify the default-request-expiry-timeout for the Server 
+	in milli-seconds. The request expiry timeout is the time to wait for an end-point 
+	to respond to before it expires.
+
+	The default value is 30000 milli seconds.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set defaultwindowmonitorinterval
+
+SYNOPSIS
+	smppserver set defaultwindowmonitorinterval <default-window-monitor-interval>
+
+DESCRIPTION
+	This command is used to specify the default-window-monitor-interval for the Server 
+	in milli-seconds. This is the time between executions of monitoring the window for
+	requests that expire. It is recommended that this value, generally, either matches 
+	or is half the value of 'request-expiry-timeout'. Therefore, in the worst case
+	scenario, a request could take upto 1.5 times the 'requestExpiryTimeout' to 
+	clear out.
+
+	The default value is 15000 milli seconds.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+<screen><![CDATA[
+Name
+	smppserver set defaultsessioncountersenabled
+
+SYNOPSIS
+	smppserver set defaultsessioncountersenabled <true/false>
+
+DESCRIPTION
+	This command is used to set the parameter 'defaultsessioncountersenabled' value 
+	to true or false.
+	When this is enabled, SMSC exposes the statistics for SMPP connections.
+
+	The default value is true.
+
+	You must restart the SMPP Server for the new value to take effect.
+]]></screen>
+
+
+			</section>
+			<section id="SMPP_Server_Settings_Edit_GUI">
+			<title>Using GUI</title>
+			<procedure>
+				<title>Edit SMPP Server Properties using GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel.
+				</para></step>
+				<step><para>The main panel will display the existing SMPP Server details as configured in the section <literal>SmscManagement</literal> in the xml descriptor file <filename>mobicents-smsc-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/deploy/mobicents-smsc-server/META-INF/jboss-beans.xml</filename>.
+				</para></step>
+				<step><para>You can edit the properties of the SMPP Server by launching the edit window. You can achieve this by clicking on the blue coloured 'edit' button at the end of the row. The edit window will display all SMPP properies as shown in the figure below. For more details of these parameters please refer to the descriptions of the CLI commands for the same in the preceding section. 
+
+	<figure>
+  		<title>SMPP Server - GUI - &THIS.PLATFORM; &THIS.APPLICATION;</title>
+  		<mediaobject>
+    		<imageobject>
+      			<imagedata fileref="images/GUI-SMSC-GW-SMPP-EDIT.png" format="PNG" align="center"/>
+    		</imageobject>
+  		</mediaobject>
+	</figure>
+				</para></step>
+				<step>
+					<para>
+						To edit any property, click on the edit icon of the row corresponding to the property. This action will display an editable text field for the property as shown in the figure above. 
+						Adjacent to the editable text field, you will find a 'tick' icon and a 'x' icon. To accept the newly entered value for the property, you must click on the 'tick' icon. To discard the change and 
+						stop the editing of the property, you must click on the 'x' icon.
+					</para>
+					<para>
+						SMPP Server can be setup for SSL so every incoming connection request should first do SSL hand-shake. Settingup SSL is only possible from GUI.
+					</para>
+				</step>
+				<step><para>You must click on the button 'Apply Changes' at the top of the window to save your settings. If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+				</para></step>
+			</procedure>
+			</section>
+		</section>
+
+
+
+		<section id="SMPP_Server_Settings_Start">
+		<title>Start SMPP Server</title>
+			<section id="SMPP_Server_Settings_Start_GUI">
+			<title>Using GUI</title>
+			<procedure>
+				<title>Start SMPP Server using GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel.
+				</para></step>
+				<step><para>The main panel will display the existing SMPP Server details as configured in the section <literal>SmscManagement</literal> in the xml descriptor file <filename>mobicents-smsc-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/deploy/mobicents-smsc-server/META-INF/jboss-beans.xml</filename>.
+				</para></step>
+				<step><para>You can start the SMPP Server by clicking on the 'Start' icon lit green in the row corresponding to the SmscManagement unit. This icon will be enabled only if the SMPP server is currently stopped.
+				</para></step>
+				<step><para>
+				This action will start the SMPP Server.
+				</para></step>
+				<step><para>If there is an error in starting the SMPP Server, then you will find the details of the error in the Management Console Log section below.
+				</para></step>
+			</procedure>
+			</section>
+		</section>
+		<section id="SMPP_Server_Settings_Stop">
+		<title>Stop SMPP Server</title>
+			<section id="SMPP_Server_Settings_Stop_GUI">
+			<title>Using GUI</title>
+			<procedure>
+				<title>Stop SMPP Server using GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel.
+				</para></step>
+				<step><para>The main panel will display the existing SMPP Server details as configured in the section <literal>SmscManagement</literal> in the xml descriptor file <filename>mobicents-smsc-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/deploy/mobicents-smsc-server/META-INF/jboss-beans.xml</filename>.
+				</para></step>
+				<step><para>You can stop the SMPP Server by clicking on the 'Stop' icon lit red in the row corresponding to the SmscManagement unit. This icon will be enabled only if the SMPP server is currently running.
+				</para></step>
+				<step><para>
+				This action will stop the SMPP Server.
+				</para></step>
+				<step><para>If there is an error in stopping the SMPP Server, then you will find the details of the error in the Management Console Log section below.
+				</para></step>
+			</procedure>
+			</section>
+		</section>
+		<section id="SMPP_Server_Settings_Reset_Counters">
+		<title>Reset Counters for SMPP Server</title>
+			<section id="SMPP_Server_Settings_Reset_Counters_GUI">
+			<title>Using GUI</title>
+			<procedure>
+				<title>Reset Counters for SMPP Server using GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel.
+				</para></step>
+				<step><para>The main panel will display the existing SMPP Server details as configured in the section <literal>SmscManagement</literal> in the xml descriptor file <filename>mobicents-smsc-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/deploy/mobicents-smsc-server/META-INF/jboss-beans.xml</filename>.
+				</para></step>
+				<step><para>You can view the current Session details of the SMPP Server by clicking on the row corresponding to the name of the SMPP Server (<literal>SmscManagement</literal> in this case).
+				</para></step>
+				<step><para>
+				This action will display the current session details of the SMPP Server. If you scroll to the bottom, you will find a button named 'Reset Counters'. Click on it if you wish to reset all counters for SMPP Server.
+				</para></step>
+				<step><para>If there is an error resetting the counters, then you will find the details of the error in the Management Console Log section below.
+				</para></step>
+			</procedure>
+			</section>
+		</section>
+	</section>

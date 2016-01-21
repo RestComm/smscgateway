@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+<section id="managing_statistics">
+	<title>Statistics</title>
+	<para>
+		The GUI will allow you to create campaigns of fixed duration for gathering statistics data. Campaign allows to select time period over which these statistics have been gathered (in hours, minutes and seconds). Once Campaign is defined, the statistics can be observed by clicking on the newly created campaign name or you can also navigate to Metrics (click Metrics on left panel) to get graph of statistics.
+	</para>
+	
+	<section id="managing_statistics_create">
+		<title>
+			Create new Campaign
+		</title>
+		<section id="managing_statistics_create_GUI">
+			<title>Using GUI</title>
+			<procedure>
+			<title>Create new Campaign using GUI</title>
+			<step><para>
+			To create a new Campaign open a Web Browser and navigate to http://localhost:8080/jss7-management-console/. Click on the 'Manage Campaigns' link in the left panel. The main panel will display the names of all existing campaigns and also a button to create a new campaign. The GUI will look similar to the figure below.
+			<figure>
+	  		<title>GUI - Campaigns</title>
+	  		<mediaobject>
+	    		<imageobject>
+	      			<imagedata fileref="images/GUI_Campaign_Management.png" format="PNG" align="center"/>
+	    		</imageobject>
+	  		</mediaobject>
+			</figure>
+			</para></step>
+			<step><para>
+			Click on the 'Create Statistics Campaign' button to create a new Campaign. Select the stack from the drop down 'Counter Definition Set Name' on which you want the new campaign to be defined.
+			</para></step>
+			<step><para> 
+			Select the time period from the drop down 'Duration' and enter a unique 'Campaign Name'.
+			</para></step>
+			</procedure>
+			<note>
+			<para>
+			  The drop down will also display SS7 counter definiton. You can create SS7 campaigns from the SS7 managment console. For SMSC, select 'SMSC GW-SMSC-Main'.
+			</para>
+			</note>
+		</section>
+	</section>
+	
+	<section id="managing_statistics_view">
+		<title>View Campaigns</title>
+		<section id="managing_statistics_view_gui">
+		<title>Using GUI</title>
+		<para>
+			You can view all existing campaigns in the GUI. On the main panel, click on the Campaign name. The GUI will look similar to the figure below and is divided into tabs. The first tab will display the properties of the campaign. The second tab explains all the counters in this campaigns and their definition. The last tab provides the values for each of these counters. The last tab also displays the 'Start Time' and 'End Time' representing the time duration for which the sample was collected.
+		<figure>
+  			<title>GUI - Campaigns View</title>
+  			<mediaobject>
+    			<imageobject>
+      				<imagedata fileref="images/GUI_Campaign_Management_View.png" format="PNG" align="center"/>
+    			</imageobject>
+  			</mediaobject>
+		</figure>
+		</para>
+		<note>
+			<para>
+				&THIS.PLATFORM; &THIS.APPLICATION; doesn't persist the statistics, hence the data collected for the campaign period refreshes for every defined 'Duration'. You must refresh the page for every 'Duration' period to gather statistics data for the previous time period.
+			</para>
+			<para>
+				Nevertheless you can also click on the 'Metrics' link on left panel, select the Campaign and observe the statistics graph. The metrics page gathers data from the time the page was loaded till user navigates away. Hence graph will show historic data from the point the page was loaded.
+			</para>
+		</note>
+		<para>
+			Metrics will show 3 graphs for Messages coming in, Messages attempted for delivery and Messages successfully delivered.
+		</para>
+		<figure>
+  			<title>GUI - Campaigns View</title>
+  			<mediaobject>
+    			<imageobject>
+      				<imagedata fileref="images/RestCommSMSC-Graphs.png" format="PNG" align="center"/>
+    			</imageobject>
+  			</mediaobject>
+		</figure>
+		</section>	
+	</section>
+</section>

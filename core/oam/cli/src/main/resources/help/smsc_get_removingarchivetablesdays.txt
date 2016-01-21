@@ -1,0 +1,13 @@
+Name
+	smsc get removingarchivetabledays
+
+SYNOPSIS
+	smsc get removingarchivetabledays
+
+DESCRIPTION
+	This command is used to retrieve the current settings for auto-dropping ARCHIVE 
+	tables from the Cassandra Database. 
+
+SEE ALSO
+	smsc set removinglivetabledays, smsc get removinglivetablesdays
+	smsc set removingarchivetabledays

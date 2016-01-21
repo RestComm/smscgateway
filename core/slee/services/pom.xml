@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>slee</artifactId>
 		<groupId>org.mobicents.smsc</groupId>
-		<version>2.0.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>services-parent</artifactId>
@@ -14,26 +14,24 @@
 
 	<modules>
 		<module>library</module>
+		<!-- 
 		<module>events</module>
+		<module>persistencesbb</module>
+		 -->
+		<module>alertsbb</module>
+		<module>chargingsbb</module>
 		<module>txsmppserversbb</module>
 		<module>rxsmppserversbb</module>
+		<module>mtsbb</module>
+		<module>mosbb</module>
 		<module>txsipserversbb</module>
 		<module>rxsipserversbb</module>
+		<module>homeroutingsbb</module>
 		<module>du</module>
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>${pom.groupId}</groupId>
-				<artifactId>domain</artifactId>
-				<version>${pom.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${pom.groupId}</groupId>
-				<artifactId>smsc-events</artifactId>
-				<version>${pom.version}</version>
-			</dependency>
 			<dependency>
 				<artifactId>smpp-server-ra-events</artifactId>
 				<groupId>${pom.groupId}</groupId>
@@ -43,6 +41,16 @@
 				<artifactId>smpp-server-ra-ratype</artifactId>
 				<groupId>${pom.groupId}</groupId>
 				<version>${pom.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mobicents.resources</groupId>
+				<artifactId>mobicents-slee-ra-map-ratype</artifactId>
+				<version>${mobicents.resources.map.version}</version>
+			</dependency>
+			<dependency>
+				<artifactId>mobicents-slee-ra-map-library</artifactId>
+				<groupId>org.mobicents.resources</groupId>
+				<version>${mobicents.resources.map.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

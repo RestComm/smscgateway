@@ -1,6 +1,39 @@
-/target
-/.classpath
-/.project
+#maven
 target
+#eclipse
+.classpath
+.project
+.settings
+#something
 /Notes
+/ACNNotSupportedAnalysis.ods
+#linux editor tmp file
+*.*~
 /SmppSimulatorParameters.xml
+/test-output
+${env.JBOSS_HOME}
+
+/SmscPropertiesManagementTest_smscproperties.xml
+/hs_err_pid22360.log
+/hs_err_pid26888.log
+/hs_err_pid23380.log
+/hs_err_pid9000.log
+# iml
+*.iml
+.iml
+*.gitignor
+# maven versions plugin
+pom.xml.releaseBackup
+/001
+/Test_smscproperties.xml
+/test_sip.xml
+/Test_esme.xml
+/HomeRoutingManagementTest_cc_mccmnc.xml
+/HomeRoutingManagementTest_corrid.xml
+/Test_cc_mccmnc.xml
+/Test_corrid.xml
+/Test_sip.xml
+/Test_mproc.xml
+/01/
+/TestMo_mproc.xml
+/TestTxSmpp_mproc.xml

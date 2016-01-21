@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+<chapter id="monitoring">
+	<title>Monitoring</title>
+<section id="smsc_stat_get">
+		<title>View SMSC Statistics</title>
+			<section id="smsc_stat_get_cli">
+			<title>Using CLI</title>
+<para>You can view the current state of SMSC using the command <command>smsc stat get</command> with appropriate parameters as described below: </para>
+<screen><![CDATA[
+Name
+	smsc stat get
+
+SYNOPSIS
+	smsc stat get 
+
+DESCRIPTION
+	This command is used to view the details of the current state of the SMSC and
+	monitor the SMSC. The output prints the following parameters:
+
+	Time			- Current time. By obtaining this statistic twice, this 
+				  value can be used to calculate the time interval between
+				  statistic time.
+
+	MessageInProcess	- Number of messages currently being processed for 
+				  delivery in GSM (MT messages) and SMPP (messages that
+				  are routed to ESME) and SIP (messages that are routed to
+				  ESME).
+
+	MessageId		- This is the last assigned Message Id. This indicates
+				  the number of messages that have come into the SMSC
+				  from GSM (Mobile Originated messages), from ESMEs or from SIP
+				  and stored in the Cassandra database. The MessageId 
+				  counter is initiated from the time of the installation
+				  of the SMSC.
+
+	MessageScheduledTotal	- The number of messages put into the delivering
+	              process in both GSM, SMPP or SIP since the SMSC was started.
+
+	DueSlotProcessingLag	- The time (in seconds) between "in time" due_slot
+	              and "in process" due_slot. "In time" means the current actual
+	              time, "in process" means that SMSC GW is processing messages
+	              that was scheduled for that time (in the past).
+
+				  If this value is equal to 0 or 1 or 2, it means that the
+				  SMSC is not highly loaded and all the messages are 
+				  being processed on time. 
+
+				  If this value is high, say for example 300, then it 
+				  means the SMSC is overloaded and is now processing 
+				  messages, that are scheduled for processing 300 seconds 
+				  before the current time. 
+
+				  If this value is progressively increasing, then the SMSC
+				  is heavily overloaded and the incoming messages count at
+				  SMPP (and MO) are more than what the SMSC can deliver.
+				  
+				  If the incoming messages are not many, this value will
+				  decrease and will reach 0 when there are no messages.
+
+				  Normally this value will return to 0 except for few
+				  peaks. If it does not, then you must reduce the load for
+				  SMSC.
+
+	DueSlotProcessingTime - This field shows the time for which SMSC GW is
+	              processing / fetching stored in cassandra database messages
+	              ("in process" due_slot). If this time is far before the
+	              current actual time, then this means:
+                  - either SMSC GW is overloaded and can not send messages
+                    in time
+                  - or SMSC GW was turned off for much time and now is
+                    checking for messages for the time when it was off
+                  If you want to skip unsent messages that was scheduled for
+                  the time in the past (and then shift DueSlotProcessingTime
+                  to to current time) - you can use the command [the reference
+                  to CLI / GUI command "smsc skip-unsent-messages" - see the
+                  Chapter "Skipping of scheduled for the past and not yet
+                  sent messages ("In process" due_slot shifting)."
+
+	Param1			- Ignore.
+
+	Param2			- Ignore.
+	
+	SmscStartTime		- The time when the SMSC was started.
+EXAMPLES
+	smsc stat get
+	Stat: Time: Mon Jan 13 18:40:42 CET 2014, MessageInProcess: 515, MessageId: 10212,
+	MessageScheduledTotal: 8992, DueSlotProcessingLag: 0, Param1: 0, Param2: 0, 
+	SmscStartTime: Mon Jan 13 18:39:30 CET 2014
+]]>
+</screen>
+			</section>
+			<section id="smsc_stat_get_gui">
+			<title>Using GUI</title>
+			<procedure>
+				<title>View SMSC Statistics using the GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'Stats' in the left panel.
+				</para></step>
+				<step><para>The main panel will display the current statistics of the SMSC and display the details of the parameters 'START TIME', 'CURRENT TIME', 'TOTAL MESSAGES SCHEDULED', 'MESSAGES IN PROCESS', 'CURRENT MESSAGE ID' and 'DUE SLOT PROCESSING LAG'. For more details of these parameters please refer to the description of the CLI command in the preceding section. 
+				</para>
+				<para>This page gets auto-refreshed every 2.5 seconds and therefore the statistics get refreshed automatically.
+				</para>
+				</step>
+			</procedure>
+			</section>
+		</section>
+
+<section
+	id="monitoring-SMSC-CDR-log">
+	<title>CDR Log</title>
+		<para>
+			&THIS.PLATFORM; &THIS.APPLICATION; is configured to generate CDR in a plain text file located at <filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/log/cdr.log</filename>. The CDR generated in the text file is of the below format:
+<screen><![CDATA[
+SIMBIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,Message_Delivery_Status,ORIG_SYSTEM_ID,MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,First 20 characters of SMS, Reason_For_Failure
+]]>
+</screen>
+where <literal>ADDR_SRC_DIGITS, ADDR_SRC_TON, ADDR_SRC_NPI, ADDR_DST_DIGITS, ADDR_DST_TON, ADDR_DST_NPI, ORIG_SYSTEM_ID, MESSAGE_ID, NNN_DIGITS, IMSI</literal> and <literal>CORR_ID</literal> are as explained in <xref linkend="SLOT_MESSAGES_TABLE_yyyy_mm_dd" />; <literal>SIMBIT_DATE</literal>, <literal>Message_Delivery_Status</literal> and <literal>Reason_For_Failure</literal> are described below in this section.
+</para>
+<note>
+<para>
+<literal>NNN_DIGITS</literal> and <literal>IMSI</literal> fields are present only in the case of SS7 terminated messages when there is a SRI positive response. <literal>CORR_ID</literal> is present only if a message has come to the SMSC Gateway via "home-routing" procedure.
+</para>
+</note>
+<formalpara>
+	<title>SIMBIT_DATE</title>
+	<para>Time when the message reached the SMSC Gateway.
+	</para>
+</formalpara>
+<formalpara>
+	<title>Message_Delivery_Status</title>
+		<para>
+The CDR text file contains a special field, <literal>Message_Delivery_Status</literal>, that specifies the message delivery status. The possible values are described below:
+	<variablelist>
+	<title>Message_Delivery_Status if delivering to GSM network:</title>
+	<varlistentry>
+	<term>partial</term>
+	<listitem><para>Delivered a part of a multi-part message but not the last part.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>success</term>
+	<listitem><para>Delivered the last part of a multi-part message or a single message.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>temp_failed</term>
+	<listitem><para>Failed delivering a part of a multi-part message or a single message. It does not indicate if a resend will be attempted or not.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>failed</term>
+	<listitem><para>Failed delivering a message and the SMSC will now attempt to resend the message or part of the message.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>failed_imsi</term>
+	<listitem><para>Delivery process was broken by a mproc rule applying at the step when a successful SRI response has been received from HLR.
+	</para></listitem>
+	</varlistentry>
+	</variablelist>
+	<variablelist>
+	<title>Message_Delivery_Status if delivering to ESME:</title>
+	<varlistentry>
+	<term>partial_esme</term>
+	<listitem><para>Delivered a part of a multi-part message but not the last part.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>success_esme</term>
+	<listitem><para>Delivered the last part of a multi-part message or a single message.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>temp_failed_esme</term>
+	<listitem><para>Failed delivering a part of a multi-part message or a single message.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>failed_esme</term>
+	<listitem><para>Failed delivering a message and the SMSC will now attempt to resend the message or part of the message.
+	</para></listitem>
+	</varlistentry>
+	</variablelist>
+	<variablelist>
+	<title>Message_Delivery_Status if delivering to SIP:</title>
+	<varlistentry>
+	<term>partial_sip</term>
+	<listitem><para>Delivered a part of a multi-part message but not the last part.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>success_sip</term>
+	<listitem><para>Delivered the last part of a multi-part message or a single message.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>temp_failed_sip</term>
+	<listitem><para>Failed delivering a part of a multi-part message or a single message.
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>failed_sip</term>
+	<listitem><para>Failed delivering a message and the SMSC will now attempt to resend the message or part of the message.
+	</para></listitem>
+	</varlistentry>
+	</variablelist>
+	<variablelist>
+	<title>Message_Delivery_Status if the message has been rejected by the OCS Server (Diameter Server):</title>
+	<varlistentry>
+	<term>ocs_rejected</term>
+	<listitem><para>OCS Server rejected an incoming message.
+	</para></listitem>
+	</varlistentry>
+	</variablelist>
+	<variablelist>
+	<title>Message_Delivery_Status if the message has been rejected by a mproc rule applying at the step when a message has been arrived to SMSC GW:</title>
+	<varlistentry>
+	<term>mproc_rejected</term>
+	<listitem><para>A mproc rule rejected an incoming message (and reject response was sent to a message originator).
+	</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<term>mproc_dropped</term>
+	<listitem><para>A mproc rule dropped an incoming message (and accept response was sent to a message originator).
+	</para></listitem>
+	</varlistentry>
+	</variablelist>
+	</para>	
+</formalpara>
+<formalpara>
+	<title></title>
+<para>The last field in the CDR generated is <literal>Reason_For_Failure</literal>, which records the reason for delivery failure and is empty if the delivery is successful. The possible delivery failure cases are explained below.
+		<variablelist>
+			<title>Reasons_For_Failure</title>
+			<varlistentry>
+				<term>XXX response from HLR</term>
+				<listitem><para>A MAP error message is received from HLR after SRI request; XXX: <literal>AbsentSubscriber</literal>, <literal>AbsentSubscriberSM</literal>, <literal>CallBarred</literal>, <literal>FacilityNotSuppored</literal>, <literal>SystemFailure</literal>, <literal>UnknownSubscriber</literal>, <literal>DataMissing</literal>, <literal>UnexpectedDataValue</literal>, <literal>TeleserviceNotProvisioned</literal>.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Error response from HLR: xxx</term>
+				<listitem><para>Another MAP error message is received from HLR after SRI request.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Error XXX after <literal>MtForwardSM</literal> Request</term>
+				<listitem><para>A MAP error message is received from MSC/VLR after <literal>MtForwardSM</literal> request; XXX: <literal>subscriberBusyForMtSms</literal>, <literal>absentSubscriber</literal>, <literal>absentSubscriberSM</literal>, <literal>smDeliveryFailure</literal>, <literal>systemFailure</literal>, <literal>facilityNotSup</literal>, <literal>dataMissing</literal>, <literal>unexpectedDataValue</literal>, <literal>facilityNotSupported</literal>, <literal>unidentifiedSubscriber</literal>, <literal>illegalSubscriber</literal>.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Error after <literal>MtForwardSM</literal> Request: xxx</term>
+				<listitem><para>Another MAP error message is received from MSC/VLR after <literal>MtForwardSM</literal> request.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>DialogClose after <literal>MtRequest</literal></term>
+				<listitem><para>No <literal>MtForwardSM</literal> response and no error message received after <literal>MtForwardSM</literal> request.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><literal>onDialogProviderAbort</literal> after <literal>MtForwardSM</literal> Request</term>
+				<listitem><para>MAP <literal>DialogProviderAbort</literal> is received after <literal>MtForwardSM</literal> request.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><literal>onDialogProviderAbort</literal> after SRI Request</term>
+				<listitem><para>MAP <literal>DialogProviderAbort</literal> is received after SRI request.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Error condition when invoking <literal>sendMtSms()</literal> from <literal>onDialogReject()</literal></term>
+				<listitem><para>After a <literal>MtForwardSM</literal> request MAP version conflict, MAP message negotiation was processed but this process failed, or other fundamental MAP error occurred.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><literal>onDialogReject</literal> after SRI Request</term>
+				<listitem><para>After a SRI request MAP version conflict, MAP message negotiation was processed but this process failed, or other fundamental MAP error occurred.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><literal>onDialogTimeout</literal> after <literal>MtForwardSM</literal> Request</term>
+				<listitem><para>Dialog timeout occurred after <literal>MtForwardSM</literal> Request. The reason may be GSM network connection failure or SMSC overload.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><literal>onDialogTimeout</literal> after SRI Request</term>
+				<listitem><para>Dialog timeout occurred after SRI Request. The reason may be GSM network connection failure or SMSC overload.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><literal>onDialogUserAbort</literal> after <literal>MtForwardSM</literal> Request</term>
+				<listitem><para><literal>DialogUserAbort</literal> message is received from a peer or sent to a peer. The reason may be GSM fundamental failure or SMSC overload.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><literal>onDialogUserAbort</literal> after SRI Request</term>
+				<listitem><para><literal>DialogUserAbort</literal> message is received from a peer or sent to a peer. The reason may be GSM fundamental failure or SMSC overload.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><literal>onRejectComponent</literal> after <literal>MtForwardSM</literal> Request</term>
+				<listitem><para>Reject component was received from a peer or sent to a peer. This is an abnormal case and implies MAP incompatibility.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><literal>onRejectComponent</literal> after SRI Request</term>
+				<listitem><para>Reject component was received from a peer or sent to a peer. This is an abnormal case and implies MAP incompatibility.</para></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Other</term>
+				<listitem><para>Any other message that usually indicates some internal failure.</para></listitem>
+			</varlistentry>
+		</variablelist>
+		</para>	
+</formalpara>
+</section>
+</chapter>

@@ -1,0 +1,16 @@
+Name
+	smsc mapcache set
+
+SYNOPSIS
+	smsc mapcache set<node_digits> <version>
+
+DESCRIPTION
+	This command is used to set the version for the specific node digits. SMSC Gateway
+	caches the negotiated MAP Version for each network node. Every MT SMS sent to this
+	node will use the cached Version.
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, 
+	smsc get hlrssn, smsc set hlrssn, smsc get mscssn, smsc set mscssn, 
+	smsc get maxmapv
+
