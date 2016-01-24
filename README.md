@@ -1,5 +1,5 @@
 # RestComm SMSC Gateway
- RestComm SMSC Gateway to send/receive SMS from/to Operators Network (GSM)
+ RestComm SMSC Gateway to send/receive SMS from/to Mobile Operator Networks (GSM, SS7 MAP) , SMS aggregators (SMPP) and Internet Telephony Service Providers (SIP, SMPP). 
 
 ## Introduction 
 
