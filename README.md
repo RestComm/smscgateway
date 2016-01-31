@@ -37,4 +37,4 @@ Read our [RestComm jSS7 wiki](https://github.com/RestComm/smscgateway/wiki)
 
 ## All Open Source RestComm Projects
 
-Open Source http://telestax.com/open-source-2/
+Open Source http://telestax.com/open-source/
