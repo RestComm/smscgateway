@@ -27,7 +27,7 @@
 
 		<!-- cloudhopper smpp -->
 		<dependency>
-			<groupId>com.cloudhopper</groupId>
+			<groupId>${ch.smpp.namespace}</groupId>
 			<artifactId>ch-smpp</artifactId>
 			<version>${ch.smpp.version}</version>
 		</dependency>
