@@ -25,7 +25,7 @@ RestComm SMSC Gateway is lead by [TeleStax, Inc.](www.telestax.com) and develope
 
 ## Downloads
 
-Download binary from [here](https://github.com/RestComm/smscgateway/releases) or Continuous Delivery builds from [CloudBees](https://mobicents.ci.cloudbees.com/job/Mobicents-SMSC/)
+Download binary from [here](https://github.com/RestComm/smscgateway/releases) or Continuous Delivery builds from [CloudBees](https://mobicents.ci.cloudbees.com/job/Restcomm-SMSC/)
 
 ## Maven Repository
 
@@ -33,7 +33,7 @@ Artifacts are available at [Sonatype Maven Repo](https://oss.sonatype.org/conten
 
 ## Wiki
 
-Read our [RestComm jSS7 wiki](https://github.com/RestComm/smscgateway/wiki) 
+Read our [RestComm SMSC wiki](https://github.com/RestComm/smscgateway/wiki) 
 
 ## All Open Source RestComm Projects
 
