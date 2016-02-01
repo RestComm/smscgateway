@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>mobicents-smsc-releasenotes</artifactId>
+		<artifactId>restcomm-smsc-releasenotes</artifactId>
 		<groupId>org.mobicents.smsc.docs.releasenotes</groupId>
 		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>mobicents-smsc-releasenotes-sources</artifactId>
+	<artifactId>restcomm-smsc-releasenotes-sources</artifactId>
 	<name>RestComm SMSC :: Docs :: Release Notes :: Sources :: ${pom.artifactId}</name>
 	<properties>
 

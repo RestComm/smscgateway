@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>mobicents-smsc-adminguide</artifactId>
+		<artifactId>restcomm-smsc-adminguide</artifactId>
 		<groupId>org.mobicents.smsc.docs.adminguide</groupId>
 		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>mobicents-smsc-adminguide-sources-mobicents</artifactId>
+	<artifactId>restcomm-smsc-adminguide-sources-restcomm</artifactId>
 	<name>RestComm SMSC :: Docs :: Admin Guide :: Sources :: ${pom.artifactId}</name>
 	<properties>
 		<THIS.PLATFORM>RestComm</THIS.PLATFORM>
@@ -47,7 +47,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>${pom.groupId}</groupId>
-									<artifactId>mobicents-smsc-adminguide-sources</artifactId>
+									<artifactId>restcomm-smsc-adminguide-sources</artifactId>
 									<version>${pom.version}</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
@@ -55,7 +55,7 @@
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.mobicents.smsc.docs.commons</groupId>
-									<artifactId>mobicents-smsc-commons-sources</artifactId>
+									<artifactId>restcomm-smsc-commons-sources</artifactId>
 									<version>${pom.version}</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>

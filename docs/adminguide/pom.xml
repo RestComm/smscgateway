@@ -4,11 +4,11 @@
 
 	<parent>
 		<groupId>org.mobicents.smsc.docs</groupId>
-		<artifactId>mobicents-smsc-docs</artifactId>
+		<artifactId>restcomm-smsc-docs</artifactId>
 		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>mobicents-smsc-adminguide</artifactId>
+	<artifactId>restcomm-smsc-adminguide</artifactId>
 	<groupId>org.mobicents.smsc.docs.adminguide</groupId>
 	<name>RestComm SMSC :: Docs :: Admin Guide :: ${pom.artifactId}</name>
 	<packaging>pom</packaging>
@@ -22,8 +22,8 @@
 	<!-- -->
 	<modules>
 		<module>sources</module>
-		<module>sources-mobicents</module>
-		<module>jdocbook-mobicents</module>
+		<module>sources-restcomm</module>
+		<module>jdocbook-restcomm</module>
 	</modules>
 	
 </project>
