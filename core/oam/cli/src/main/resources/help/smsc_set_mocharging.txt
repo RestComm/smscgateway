@@ -1,0 +1,23 @@
+Name
+	smsc set mocharging
+
+SYNOPSIS
+	smsc set mocharging <accept|reject|diameter>
+
+DESCRIPTION
+	This command is used to set the value of the parameter 'moCharging' to true
+	or false. This value is set to true by default.
+
+	If this is set to 
+	accept -all incoming messages are accepted without charging
+	reject - all incoming messages will be rejected
+	diameter - all incoming messages are checked by Diameter peer before delivering
+
+EXAMPLES
+	smsc set mocharging accept
+
+SEE ALSO
+	smsc set diameterdestrealm, smsc set diameterdesthost, smsc set diameterdestport, 
+	smsc set diameterusername, smsc set txsmppcharging, smsc get diameterdestrealm, 
+	smsc get diameterdesthost, smsc get diameterdestport, smsc get diameterusername, 
+	smsc get mocharging, smsc get txsmppcharging

@@ -1,0 +1,26 @@
+Name
+	smsc databaserule getrange
+
+SYNOPSIS
+	smsc databaserule getrange <SMPP|SIP> <address>
+
+DESCRIPTION
+	This command is used to retrieve a list of database rules as text data. 
+
+PARAMETERS
+	Standard Parameters:
+	<SMPP|SIP> -	This parameter is used to specify if you wish to retrieve the
+			range corresponding to SMPP or SIP.	
+
+	Optional Parameters:
+	<address> - 	If a value is not specified for <address>, then the command will 
+			retrieve the first 100 database rules. 
+
+			If <address> is specified, then the command will retrieve a list 
+			of 100 database rules starting from the record next to the record 
+			with address='address'.
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

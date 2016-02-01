@@ -1,0 +1,33 @@
+Name
+	smsc set removingarchivetabledays
+
+SYNOPSIS
+	smsc set removingarchivetabledays <value>
+
+DESCRIPTION
+	This command is used to configure the SMSC to automatically drop ARCHIVE tables 
+	from the Cassandra Database. The SMSC will attempt to delete tables just after
+	midnight and after every SMSC restart.
+
+PARAMETERS
+	removingarchivetabledays	- This parameter is used to specify the number
+					  of days the ARCHIVE tables should be kept before 
+					  attempting to drop them automatically.
+
+					  If this value is specified as "0", the SMSC
+					  will not drop tables automatically. In this case
+					  you must manually drop tables.
+
+					  You must specify a value of 3 or more. You can
+					  not set this value to 1 or 2 days. This is to 
+					  ensure the tables will be kept for a minimum
+					  of 2 days after creation date.
+
+					  The SMSC wil attempt to delete tables for one 
+					  day. If the Cassandra Database keeps tables for 
+					  older days, then the administrator should drop 
+					  these manually.
+
+SEE ALSO
+	smsc set removinglivetabledays, smsc get removinglivetablesdays, 
+	smsc get removingarchivetabledays

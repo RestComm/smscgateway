@@ -1,20 +1,23 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package org.mobicents.smsc.tools.smppsimulator.bootstrap;
@@ -75,6 +78,94 @@ public class Main {
 	}
 
 	private void processCommandLine(String[] args) {
+
+		// String programName = System.getProperty("program.name", APP_NAME);
+		//
+		// int c;
+		// String arg;
+		// LongOpt[] longopts = new LongOpt[5];
+		// longopts[0] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
+		// longopts[1] = new LongOpt("name", LongOpt.REQUIRED_ARGUMENT, null,
+		// 'n');
+		// longopts[2] = new LongOpt("http", LongOpt.REQUIRED_ARGUMENT, null,
+		// 't');
+		// longopts[3] = new LongOpt("rmi", LongOpt.REQUIRED_ARGUMENT, null,
+		// 'r');
+		// longopts[4] = new LongOpt("core", LongOpt.NO_ARGUMENT, null, 0);
+		//
+		// Getopt g = new Getopt(APP_NAME, args, "-:n:t:r:h", longopts);
+		// g.setOpterr(false); // We'll do our own error handling
+		// //
+		// while ((c = g.getopt()) != -1) {
+		// switch (c) {
+		//
+		// case 't':
+		// // http port
+		// arg = g.getOptarg();
+		// this.httpPort = Integer.parseInt(arg);
+		// if (this.httpPort < 0 || this.httpPort > 65000) {
+		// System.err.println("Http port should be in range 0 to 65000");
+		// System.exit(0);
+		// }
+		// break;
+		// case 'r':
+		// // rmi port
+		// arg = g.getOptarg();
+		// this.rmiPort = Integer.parseInt(arg);
+		// if (this.rmiPort < 0 || this.rmiPort > 65000) {
+		// System.err.println("RMI port should be in range 0 to 65000");
+		// System.exit(0);
+		// }
+		// break;
+		// case 'n':
+		// // name
+		// arg = g.getOptarg();
+		// this.appName = arg;
+		// break;
+		//
+		// case 'h':
+		// this.genericHelp();
+		// break;
+		//
+		// case ':':
+		// System.out.println("You need an argument for option " + (char)
+		// g.getOptopt());
+		// System.exit(0);
+		// break;
+		// case '?':
+		// System.out.println("The option '" + (char) g.getOptopt() +
+		// "' is not valid");
+		// System.exit(0);
+		// break;
+		// case 1:
+		// String optArg = g.getOptarg();
+		// if (optArg.equals("core")) {
+		// this.command = "core";
+		// } else if (optArg.equals("gui")) {
+		// this.command = "gui";
+		// } else if (optArg.equals("help")) {
+		// if (this.command == null) {
+		// this.genericHelp();
+		// } else if (this.command.equals("core")) {
+		// this.coreHelp();
+		// } else if (this.command.equals("gui")) {
+		// this.guiHelp();
+		// } else {
+		// System.out.println("Invalid command " + optArg);
+		// this.genericHelp();
+		// }
+		// } else {
+		// System.out.println("Invalid command " + optArg);
+		// this.genericHelp();
+		// }
+		// break;
+		//
+		// default:
+		// this.genericHelp();
+		// break;
+		// }
+		// }
+
 	}
 
 	private void genericHelp() {

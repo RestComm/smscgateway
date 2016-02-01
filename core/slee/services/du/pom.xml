@@ -4,20 +4,46 @@
 	<parent>
 		<artifactId>services-parent</artifactId>
 		<groupId>org.mobicents.smsc</groupId>
-		<version>2.0.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>smsc-services-du</artifactId>
 	<name>Core : SLEE : SMSC Services DU</name>
 
 	<dependencies>
+		<!-- Services -->
 		<dependency>
 			<artifactId>smsc-library</artifactId>
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
 		</dependency>
-
-		<!-- Services -->
+		<!-- 
+		<dependency>
+			<artifactId>smsc-events</artifactId>
+			<groupId>${pom.groupId}</groupId>
+			<version>${pom.version}</version>
+		</dependency>
+		 -->
+		 
+        <dependency>
+            <artifactId>alert-sbb</artifactId>
+            <groupId>${pom.groupId}</groupId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>charging-sbb</artifactId>
+            <groupId>${pom.groupId}</groupId>
+            <version>${pom.version}</version>
+        </dependency>
+		<!-- 
+		<dependency>
+			<artifactId>persistence-sbb</artifactId>
+			<groupId>${pom.groupId}</groupId>
+			<version>${pom.version}</version>
+			<scope>runtime</scope>
+			<type>jar</type>
+		</dependency>
+		 -->
 		<dependency>
 			<artifactId>tx-smppserver-sbb</artifactId>
 			<groupId>${pom.groupId}</groupId>
@@ -25,6 +51,16 @@
 		</dependency>
 		<dependency>
 			<artifactId>rx-smppserver-sbb</artifactId>
+			<groupId>${pom.groupId}</groupId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>mt-sbb</artifactId>
+			<groupId>${pom.groupId}</groupId>
+			<version>${pom.version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>mo-sbb</artifactId>
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
 		</dependency>
@@ -38,12 +74,12 @@
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
 		</dependency>
-
+		
 		<dependency>
-			<artifactId>smsc-events</artifactId>
+			<artifactId>homerouting-sbb</artifactId>
 			<groupId>${pom.groupId}</groupId>
 			<version>${pom.version}</version>
-		</dependency>
+		</dependency>						
 	</dependencies>
 
 	<build>

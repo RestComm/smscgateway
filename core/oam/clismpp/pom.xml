@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>core</artifactId>
 		<groupId>org.mobicents.smsc</groupId>
-		<version>2.0.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>org.mobicents.protocols.ss7.management</groupId>
 			<artifactId>shell-client</artifactId>
-			<version>${ss7.version}</version>
+			<version>${jss7.mobicents.version}</version>
 		</dependency>
 	</dependencies>
 

@@ -1,0 +1,30 @@
+Name
+	smsc get storeandforwordmode
+
+SYNOPSIS
+	smsc get storeandforwordmode
+
+DESCRIPTION
+	This command is used to get the storeandforwordmode value.
+	storeandforwordmode has two possible values:
+	
+	normal (default) - StoreAndForward mode is used for incoming 
+	smpp StoreAndForward messages and all SS7 and SIP messages. All 
+	the incoming messages into SMSC will be persisted before trying
+	for delivery.
+
+	fast - ForwardAndStore mode is used for incoming smpp StoreAndForward 
+	messages and all SS7 and SIP messages. This option can be switched 
+	without SMSC restart. All the incoming messages into SMSC will be tried
+	for delivery first and only if delivery fails, it will be persisted for
+	later re-try.
+	
+	Datagramm and Transactional modes will work in the same way for both normal and fast modes. 
+
+EXAMPLES
+	smsc get storeandforwordmode
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

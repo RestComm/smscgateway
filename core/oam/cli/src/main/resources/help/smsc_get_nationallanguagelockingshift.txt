@@ -1,0 +1,15 @@
+Name
+	smsc get nationallanguagelockingshift
+
+SYNOPSIS
+	smsc get nationallanguagelockingshift 
+
+DESCRIPTION
+	This command is used to get the value of National Language 
+	Locking Shift table. nationallanguagelockingshift will be
+	used when SMS is originated from SMPP and doesn't have UDH.
+	This is SMSC Gw level and can be overwritten for each 
+	ESME created.
+
+SEE ALSO
+	smsc set nationallanguagelockingshift

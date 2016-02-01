@@ -1,0 +1,16 @@
+Name
+	smsc set orignetworkidforreceipts
+
+SYNOPSIS
+	smsc set orignetworkidforreceipts <true | false>
+
+DESCRIPTION
+	If this option is turned on (true), for each generated delivery receipt's 
+	networkId will be set to the value of networkId of an ESME from which 
+	the original message has come to SMSC. This can help for routing of receipts 
+	back to the originated ESME. If this option is turned off (false) then the 
+	networkId of receipts will be taken from networkId of ESME / SS7 / SIP via 
+	which the original message has left SMSC GW. 
+
+SEE ALSO
+	smsc get orignetworkidforreceipts

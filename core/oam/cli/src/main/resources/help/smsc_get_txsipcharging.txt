@@ -1,0 +1,16 @@
+Name
+	smsc get txsipcharging
+
+SYNOPSIS
+	smsc get txsipcharging
+
+DESCRIPTION
+	This command is used to determine if the value of the parameter 'txsipcharging' 
+	is set to 'none', 'selected' or 'all'. This option defines if SIP originated 
+	messages will be charged by OCS via Diameter before delivery. 
+
+SEE ALSO
+	smsc set diameterdestrealm, smsc set diameterdesthost, smsc set diameterdestport,
+	smsc set diameterusername, smsc set mocharging, smsc set txsmppcharging, 
+	smsc get diameterdestrealm, smsc get diameterdesthost, smsc get diameterdestport, 
+	smsc get diameterusername, smsc get mocharging

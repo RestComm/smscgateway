@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+	<section id="db_routing_rule_settings">
+	<title>Database Routing Rules</title>
+	<para>
+	&THIS.PLATFORM; &THIS.APPLICATION; can now act as a SMPP Server accepting incoming SMPP connections or can also act as a SMPP client initiating a connection to a remote SMSC server. Therefore you can now set an intelligent database routing rule to route SMS between SMPP connections or between SMPP, SIP and GSM.
+	</para>
+	<para>
+By default, &THIS.PLATFORM; &THIS.APPLICATION; is setup to leverage the "routing address-range" to decide the routing of SMS. For example:
+	</para>
+	<para>
+1) If Server ESME is defined of type RECEIVER (and hence accepts incoming RECEIVER BIND from peer client) with routing address range as 6666; if SMS arrives in system destined for 6666, it matches with this ESME and SMS will be sent as DELIVER_SM to client side. 
+	</para>
+	<para>
+2) If Client ESME is defined of type TRANSMITTER (and hence initiates TRANSMITTER BIND to peer server) with routing address range as 6666; if SMS arrives in system destined for 6666, it matches with this ESME and SMS will be sent as SUBMIT_SM to server side.
+	</para>
+	<para>
+The destined number of SMS is checked with address range. &THIS.PLATFORM; &THIS.APPLICATION; uses regular expression for matching the pattern.
+	</para>
+	<para>
+The above methodology can work if the routing rule is based on MSISDN range, however if the range is not fixed (like in case of Number Portability) the above process will break. In such cases you can define a Database routing rule. You must change the value of the property <literal>smsRoutingRuleClass</literal> in the file <filename>RestComm-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/server/default/deploy/mobicents-smsc-server/META-INF/jboss-beans.xml</filename> to look like below and un-comment if its commented out:
+<screen><![CDATA[
+<property name="smsRoutingRuleClass">org.mobicents.smsc.smpp.DatabaseSmsRoutingRule</property> 
+]]>
+</screen>
+SMSC stores the routing rule in the Cassandra Database. You can populate this table with address and corresponding cluster name as explained in the sections below.
+	</para>
+		<section id="update_db_rule">
+		<title>Create/Update Database Routing Rule</title>
+			<section id="update_db_rule_cli">
+			<title>Using CLI</title>
+		<para>You can create or update a Database Routing Rule using the command <command>smsc databaserule update</command> with appropriate parameters as described below:
+		</para>
+<screen><![CDATA[
+Name
+	smsc databaserule update
+
+SYNOPSIS
+	smsc databaserule update <address> <systemId> <SMPP|SIP> networkid <networkId>
+
+DESCRIPTION
+	This command is used to add or update a Database Rule for SMPP or SIP. 
+
+	The parameter <SMPP|SIP> is used to define if the rule is for SMPP or SIP. This 
+	is an optional parameter and if unspecified, by default the rule is set for SMPP.
+ 	
+	Database Rules are Rules that are used for routing messages to a proper ESME. 
+	When you define a rule using the above command, you are creating a routing rule
+	that states:
+	"If the destination address of a message corresponds with the value specified in
+	the 'address' field, then the message be sent to an ESME identified by the value
+	specified in the 'systemId' field".
+
+	To add a new rule you must issue the command with the systemId parameter and
+	specify if the rule is for SIP or SMPP.
+
+	To update an existing rule, you must issue the command with both the address 
+	parameter and the systemId parameter and specifiy if the rule is for SIP or SMPP.
+
+	networkId - means to which virtual SS7 subnetwork belongs a database
+	            routing rule (this is for Multi-tenancy support). If this
+	            parameter is skipped - networkId will be set to "0" for
+	            a database routing rule operation.
+]]>
+</screen>
+			</section>
+			<section id="update_db_rule_gui">
+			<title>Using GUI</title>
+			<procedure>
+				<title>Create/Update Database Routing Rule using the GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'DB Routing Rule' in the left panel.
+				</para></step>
+				<step><para>The main panel will allow you to create/update, delete and view DB Routing Rules for SMPP or SIP.
+				</para></step>
+				<step><para>In order to create or update a DB Routing Rule, choose the type as SMPP or SIP from the drop down box, enter the values for MSISDN and ESME cluster name and click on 'Update'. A new rule will be created if it does not exist or updated if it exists. 
+				</para></step>
+			</procedure>
+			</section>
+		</section>
+		<section id="delete_db_rule">
+		<title>Delete Database Routing Rule</title>
+			<section id="delete_db_rule_cli">
+			<title>Using CLI</title>
+<para>You can delete a Database Routing Rule using the command <command>smsc databaserule delete</command> with appropriate parameters as described below:
+		</para>
+<screen><![CDATA[
+Name
+	smsc databaserule delete
+
+SYNOPSIS
+	smsc databaserule delete <address> <SMPP|SIP> networkid <networkId>
+
+DESCRIPTION
+	This command is used to delete an existing Database Rule specified for 'address'.
+
+	The parameter <SMPP|SIP> is used to define if the rule is deleted for SMPP or SIP. 
+	This is an optional parameter and if unspecified, by default the rule is 
+	deleted for SMPP. 
+
+    networkId - means to which virtual SS7 subnetwork belongs a database
+                routing rule (this is for Multi-tenancy support). If this
+                parameter is skipped - networkId will be set to "0" for
+                a database routing rule operation.
+]]>
+</screen>
+			</section>
+			<section id="delete_db_rule_gui">
+			<title>Using GUI</title>
+			<procedure>
+				<title>Delete Database Routing Rule using the GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'DB Routing Rule' in the left panel.
+				</para></step>
+				<step><para>The main panel will allow you to create/update, delete and view DB Routing Rules for SMPP or SIP.
+				</para></step>
+				<step><para>In order to delete a DB Routing Rule, choose the type as SMPP or SIP from the drop down box, enter the value for MSISDN and click on 'Delete'. The routing rule corresponding to that MSISDN will be deleted. 
+				</para></step>
+			</procedure>
+			</section>
+		</section>
+		<section id="get_db_rule">
+		<title>View Database Routing Rule Information</title>
+			<section id="get_db_rule_cli">
+			<title>Using CLI</title>
+<para>You can view a Database Routing Rule using the command <command>smsc databaserule get</command> with appropriate parameters as described below:
+		</para>
+<screen><![CDATA[
+Name
+	smsc databaserule get
+
+SYNOPSIS
+	smsc databaserule get <address> <SMPP|SIP> networkid <networkId>
+
+DESCRIPTION
+	This command is used to view the details of an existing Database Rule specified 
+	for 'address'. 
+
+	The parameter <SMPP|SIP> is used to define if the rule is to be viewed for SMPP 
+	or SIP. This is an optional parameter and if unspecified, by default the rule is 
+	retrieved for SMPP. 
+
+    networkId - means to which virtual SS7 subnetwork belongs a database
+                routing rule (this is for Multi-tenancy support). If this
+                parameter is skipped - networkId will be set to "0" for
+                a database routing rule operation.
+]]>
+</screen>
+			</section>
+			<section id="get_db_rule_gui">
+			<title>Using GUI</title>
+			<procedure>
+				<title>View Database Routing Rule using the GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'DB Routing Rule' in the left panel.
+				</para></step>
+				<step><para>The main panel will allow you to create/update, delete and view DB Routing Rules for SMPP or SIP.
+				</para></step>
+				<step><para>In order to view a DB Routing Rule, choose the type as SMPP or SIP from the drop down box, enter the value for MSISDN and click on 'View'. The routing rule corresponding to that MSISDN will be displayed. 
+				</para></step>
+			</procedure>
+			</section>
+		</section>
+		<section id="getrange_db_rule">
+		<title>Retrieve a range of Database Routing Rules</title>
+			<section id="getrange_db_rule_cli">
+			<title>Using CLI</title>
+<para>You can retrieve a range of Database Routing Rules using the command <command>smsc databaserule getrange</command> with appropriate parameters as described below:
+		</para>
+<screen><![CDATA[
+Name
+	smsc databaserule getrange
+
+SYNOPSIS
+	smsc databaserule getrange <SMPP|SIP> <address>
+
+DESCRIPTION
+	This command is used to retrieve a list of database rules as text data. 
+
+PARAMETERS
+	Standard Parameters:
+	<SMPP|SIP> -	This parameter is used to specify if you wish to retrieve the
+			range corresponding to SMPP or SIP.	
+
+	Optional Parameters:
+	<address> - 	If a value is not specified for <address>, then the command will 
+			retrieve the first 100 database rules. 
+
+			If <address> is specified, then the command will retrieve a list 
+			of 100 database rules starting from the record next to the record 
+			with address='address'.
+]]>
+</screen>
+			</section>
+		</section>
+	</section>

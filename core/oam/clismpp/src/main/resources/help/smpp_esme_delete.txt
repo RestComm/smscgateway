@@ -1,8 +1,8 @@
 Name
-	smsc esme delete
+	smpp esme delete
 
 SYNOPSIS
-	smsc esme delete <esmeName>
+	smpp esme delete <esmeName>
 
 DESCRIPTION
 	This command is used to delete an existing ESME.

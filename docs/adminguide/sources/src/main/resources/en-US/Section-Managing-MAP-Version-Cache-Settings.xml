@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+	<section id="mapcache">
+			<title>MAP Version Cache</title>
+			<para>&THIS.PLATFORM; &THIS.APPLICATION; caches the negotiated MAP Version for each network node. Cache stores the Global Title of SCCP address of the network node. Every MT SMS sent to this node will use the cached Version. This will help in reducing the MAP Version negotiation duration everytime and hence improve the performance.</para>
+
+			<section id="mapcache_cli">
+			<title>Using CLI</title>
+<para>
+You can set the 'MAP Version Cache' value by issuing the command <command>smsc mapcache set</command> with appropriate parameters as described below. You can verify this by issuing the command <command>smsc mapcache get</command> which will display all the cached values. Alternatively you can retrieve the cached value for a specific node by issuing the command <command>smsc mapcache get &lt;node_digits&gt;</command>. You can clear the cache by issuing the command <command>smsc mapcache clear</command>.
+</para>
+<screen><![CDATA[
+Name
+	smsc mapcache set
+
+SYNOPSIS
+	smsc mapcache set <node_digits> <version>
+
+DESCRIPTION
+	This command is used to set the version for the specific node digits. SMSC Gateway
+	caches the negotiated MAP Version for each network node. Every MT SMS sent to this
+	node will use the cached Version.
+]]></screen>
+			</section>
+			<section id="mapcache_gui">
+			<title>Using GUI</title>
+			<procedure>
+				<title>Managing MAP Version Cache value using the GUI</title>
+				<step><para>In the GUI Management Console for SMSC Gateway, click on 'MAP Version Cache' in the left panel.
+				</para></step>
+				<step><para>You can specify the MAP Application Context version for every node by entering the value for Node Digits and choosing the Version for MAP MtForwardSm operation.
+				</para></step>
+				<step><para>You must click on the button 'Update' to save your settings. If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+				</para></step>
+				<step><para>To view the cached version value for a specific node, enter the node digits (under View Cache) and click on the "View" button. The cached value will be displayed in the log.</para></step>
+				<step><para>To clear all the cached values, click on the "Clear Cache" button.</para></step>
+			</procedure>
+			</section>
+		</section>

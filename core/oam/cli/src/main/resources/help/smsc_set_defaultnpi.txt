@@ -1,0 +1,19 @@
+Name
+	smsc set defaultnpi
+
+SYNOPSIS
+	smsc set defaultnpi <default-npi>
+
+DESCRIPTION
+	This command is used to set a value for default NPI (Number Plan Indicator). If an
+	incoming message does not have a value defined for NPI, i.e. if NPI is set as
+	'unknown', then the value specified for defaultnpi will be used as NPI for that 
+	message.
+
+EXAMPLES
+	smsc set defaultnpi 1
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

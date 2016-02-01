@@ -1,0 +1,17 @@
+Name
+	smsc get dbport
+
+SYNOPSIS
+	smsc get dbport
+
+DESCRIPTION
+	This command is used to get the port for Cassandra Database
+	access.
+
+EXAMPLES
+	smsc get dbport
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

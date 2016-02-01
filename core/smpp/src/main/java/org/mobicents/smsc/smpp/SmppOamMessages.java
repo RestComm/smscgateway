@@ -1,20 +1,23 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  
+ * Copyright 2012, Telestax Inc and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package org.mobicents.smsc.smpp;
@@ -63,6 +66,8 @@ public interface SmppOamMessages {
 
     public static final String CREATE_EMSE_FAIL_PRIMARY_KEY_ALREADY_EXIST = "Creation of EMSE failed. Other ESME with same SystemId=%s host=%s port=%d and SmppBindType=%s already exist";
 
+    public static final String CREATE_EMSE_FAIL_WRONG_NETWORKID_IN_ESMECLUSTER = "Creation of EMSE failed. NetworkId of the ESME cluster is %d and not equal inserted NetworkId for a new ESME %d";
+
     public static final String DELETE_ESME_FAILED_NO_ESME_FOUND = "No Esme found with given name %s";
 
     public static final String DELETE_ESME_FAILED_ESME_STARTED = "Cannot remove ESME. Please stop ESME before removing";
@@ -81,6 +86,8 @@ public interface SmppOamMessages {
     public static final String SHOW_ESME_HOST = " host=";
 
     public static final String SHOW_ESME_PORT = " port=";
+
+    public static final String SHOW_NETWORK_ID = " networkId=";
 
     public static final String CHARGING_ENABLED = " chargingEnabled=";
 
@@ -109,5 +116,29 @@ public interface SmppOamMessages {
     public static final String SHOW_ROUTING_ADDRESS_NPI = " routingNpi=";
 
     public static final String SHOW_ROUTING_ADDRESS = " routingAddress=";
+
+    public static final String SHOW_RATE_LIMIT_PER_SECOND = " rateLimitPerSecond=";
+
+    public static final String SHOW_RATE_LIMIT_PER_MINUTE = " rateLimitPerMinute=";
+
+    public static final String SHOW_RATE_LIMIT_PER_HOUR = " rateLimitPerHour=";
+
+    public static final String SHOW_RATE_LIMIT_PER_DAY = " rateLimitPerDay=";
+
+    public static final String SHOW_SECOND_RECEIVED_MSG_COUNT = " secondReceivedMsgCount=";
+
+    public static final String SHOW_MINUTE_RECEIVED_MSG_COUNT = " minuteReceivedMsgCount=";
+
+    public static final String SHOW_HOUR_RECEIVED_MSG_COUNT = " hourReceivedMsgCount=";
+
+    public static final String SHOW_DAY_RECEIVED_MSG_COUNT = " dayReceivedMsgCount=";
+
+    public static final String SHOW_NATIONAL_LANGUAGE_SINGLE_SHIFT = " nationalLanguageSingleShift=";
+
+    public static final String SHOW_NATIONAL_LANGUAGE_LOCKING_SHIFT = " nationalLanguageLockingShift=";
+
+    public static final String MIN_MESSAGE_LENGTH = " minMessageLength=";
+
+    public static final String MAX_MESSAGE_LENGTH = " maxMessageLength=";
 
 }

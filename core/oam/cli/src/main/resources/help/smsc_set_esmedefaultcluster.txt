@@ -1,0 +1,15 @@
+Name
+	smsc set esmedefaultcluster
+
+SYNOPSIS
+	smsc set esmedefaultcluster <esme-default-cluster>
+
+DESCRIPTION
+	This command is used to set a value for ESME default cluster. If the 
+	destination-address does not match to any ESME (any Cluster Name) the message will
+	be routed to the cluster with the name specified here for esme-default-cluster.
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

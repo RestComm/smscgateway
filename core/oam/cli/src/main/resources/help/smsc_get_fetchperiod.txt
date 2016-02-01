@@ -1,0 +1,19 @@
+Name
+	smsc get fetchperiod
+
+SYNOPSIS
+	smsc get fetchperiod
+
+DESCRIPTION
+	This command is used to get the fetch period value in milli-seconds for the
+	Cassandra database. The parameter fetch-period specifies the time 
+	period (in milli-seconds) of fetching messages for delivery from the database.
+	The default value is 5 seconds.
+
+EXAMPLES
+	smsc get fetchperiod
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

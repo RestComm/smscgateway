@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mobicents.smsc</groupId>
+		<artifactId>scheduler-ra-parent</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>scheduler-ra-library</artifactId>
+	<name>Core : SLEE : Scheduler RA Library</name>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>${pom.groupId}</groupId>
+			<artifactId>persistence-ra-library</artifactId>
+			<version>${pom.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- for some reason'compile' time from ^^^ are not included... <dependency> 
+			<artifactId>common-library</artifactId> <groupId>${pom.groupId}</groupId> 
+			<version>${pom.version}</version> <scope>compile</scope> </dependency> <dependency> 
+			<artifactId>smpp-server-ra-library</artifactId> <groupId>${pom.groupId}</groupId> 
+			<version>${pom.version}</version> <scope>compile</scope> </dependency> <dependency> 
+			<artifactId>mobicents-slee-ra-map-library</artifactId> <groupId>org.mobicents.resources</groupId> 
+			<version>${mobicents.resources.map.version}</version> <scope>compile</scope> 
+			</dependency> -->
+	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mobicents.tools</groupId>
+				<artifactId>maven-library-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<!-- <goal>copy-dependencies</goal> -->
+							<goal>generate-descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<library-name>org.mobicents.smsc</library-name>
+					<library-vendor>scheduler</library-vendor>
+					<library-version>1.0.0</library-version>
+					<!-- this brings common library -->
+					<library-ref>
+						<library-name>library-persistence</library-name>
+						<library-vendor>telestax</library-vendor>
+						<library-version>1.0</library-version>
+					</library-ref>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

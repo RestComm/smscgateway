@@ -1,22 +1,24 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  
+ * Copyright 2012, Telestax Inc and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.smsc.smpp;
 
 import com.cloudhopper.smpp.jmx.DefaultSmppSessionMXBean;
@@ -70,6 +72,19 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 	String getHost();
 
     int getPort();
+    
+    void setNetworkId(int networkId);
+
+    int getNetworkId();
+
+	/**
+	 * Sets charging for this ESME. If charging is enabled, SMSC will try to deduct the units from charging server. If charging server returns negative response or error, SMS will be dropped and CDR will be logged
+	 * 
+	 * @param chargingEnabled
+	 */
+	void setChargingEnabled(boolean chargingEnabled);
+
+	boolean isChargingEnabled();
 
 	/**
 	 * every SMS coming into SMSC via this ESME should have same source_addr_ton
@@ -147,6 +162,21 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 	String getRoutingAddressRange();
 
 	void setRoutingAddressRange(String sourceAddressRange);
+
+	/**
+	 * Returns true if counters is enabled else false
+	 * 
+	 * @return
+	 */
+	boolean isCountersEnabled();
+
+	/**
+	 * Set to true if counters is to be enabled. Value takes effect only when
+	 * ESME is restarted
+	 * 
+	 * @param countersEnabled
+	 */
+	void setCountersEnabled(boolean countersEnabled);
 
 	/**
 	 * Sets the default window size. Value takes effect only when ESME is
@@ -233,5 +263,46 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
     int getEnquireLinkDelay();
 
     void setPassword(String password);
+
+
+    long getRateLimitPerSecond();
+
+    void setRateLimitPerSecond(long value);
+
+    long getRateLimitPerMinute();
+
+    void setRateLimitPerMinute(long value);
+
+    long getRateLimitPerHour();
+
+    void setRateLimitPerHour(long value);
+
+    long getRateLimitPerDay();
+
+    void setRateLimitPerDay(long value);
+
+    long getSecondReceivedMsgCount();
+
+    long getMinuteReceivedMsgCount();
+
+    long getHourReceivedMsgCount();
+
+    long getDayReceivedMsgCount();
+
+    int getNationalLanguageSingleShift();
+
+    void setNationalLanguageSingleShift(int nationalLanguageSingleShift);
+
+    int getNationalLanguageLockingShift();
+
+    void setNationalLanguageLockingShift(int nationalLanguageLockingShift);
+
+    int getMinMessageLength();
+
+    void setMinMessageLength(int minMessageLength);
+
+    int getMaxMessageLength();
+
+    void setMaxMessageLength(int maxMessageLength);
 
 }

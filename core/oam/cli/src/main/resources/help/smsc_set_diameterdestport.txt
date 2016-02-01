@@ -1,0 +1,17 @@
+Name
+	smsc set diameterdestport
+
+SYNOPSIS
+	smsc set diameterdestport <value>
+
+DESCRIPTION
+	This command is used to set the Diameter Destination Port for connection to OCS.
+
+EXAMPLES
+	smsc set diameterdestport 3868
+
+SEE ALSO
+	smsc set diameterdestrealm, smsc set diameterdesthost, smsc set diameterusername, 
+	smsc set mocharging, smsc set txsmppcharging, smsc get diameterdestrealm, 
+	smsc get diameterdesthost, smsc get diameterdestport, smsc get diameterusername, 
+	smsc get mocharging, smsc get txsmppcharging

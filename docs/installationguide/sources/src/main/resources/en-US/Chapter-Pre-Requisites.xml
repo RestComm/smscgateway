@@ -1,0 +1,90 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+<chapter
+	id="pre-requisites">
+	<title>Pre-Requisites</title>
+ <para>&THIS.PLATFORM; &THIS.APPLICATION;'s core requirement is Java. The following table details the Hardware, Operating System and Software requirements for a clean installation of &THIS.PLATFORM; &THIS.APPLICATION;. 
+<table
+						frame="all"
+						pgwide="1">
+						<title>Installation Pre-Requisites</title>
+						<tgroup cols='3' colsep='1' rowsep='1'>
+							<colspec
+								colnum="1"
+								colname="c0" />
+							<colspec
+								colnum="2"
+								colname="c1" />
+							<colspec
+								colnum="3"
+								colname="c2" />
+							<thead>
+								<row>
+									<entry>Component</entry>
+									<entry>Requirement</entry>
+									<entry>Notes</entry>
+								</row>
+							</thead>
+							<tbody>
+								<row>
+									<entry>System Requirements</entry>
+									<entry>Intel Pentium 1 GHz or faster for simple applications. Hard disk space of at least 10GB. RAM of at least 1.5 GB</entry>	
+									<entry>Higher the RAM and processing power, better is the throughput</entry>	
+								</row>
+								<row>
+									<entry>TDM Hardware (Optional)</entry>
+									<entry>
+										&THIS.PLATFORM; &THIS.APPLICATION; supports legacy E1/T1 links via SS7 cards. You must have <literal>dahdi</literal> or <literal>dialogic</literal> cards installed along with their native libraries.
+										&THIS.PLATFORM; &THIS.APPLICATION; also supports SIGTRAN (M3UA). 
+									</entry>	
+									<entry>In case if you are connecting to core network via SIGTRAN, TDM hardware is not needed.</entry>	
+								</row>
+								<row>
+									<entry>Operating System</entry>
+									<entry>
+										The platform can be installed on any OS that supports Java.
+										But native libraries for SS7 cards are compiled only for Linux at the moment and therefore supported only on Linux Operating System.
+									</entry>
+									<entry>The libraries for SS7 cards will be compiled for Windows in future releases. For SIGTRAN the OS should support SCTP protocol.</entry>
+								</row>
+								<row>
+									<entry>Java</entry>
+									<entry>You must have a working Java Runtime Environment (JRE) or Java Development Kit (JDK) installed on your system and it must be version 7 or higher. <literal>M3UA</literal> uses Java SCTP which is available only from JDK 7 onwards. Connectivity to MSC/HLR is via SIGTRAN links (M3UA).</entry>
+									<entry> </entry>	
+									
+								</row>
+								<row>
+									<entry>Database</entry>
+									<entry>You must have Cassandra database (version 1.2 or 2.0) installed (Version 2.1 or later is not supported now).
+									We strongly recommend that you use the latest version of 2.0 release because the support for version 1.2 will not be soon available, the most probably in the next release.
+									&THIS.PLATFORM; &THIS.APPLICATION; uses Cassandra Native Driver and therefore you should enable support for native drivers by setting the value of <literal>start_native_transport</literal> to <literal>true</literal> in the file <filename>apache-cassandra-&lt;version&gt;/conf/cassandra.yaml</filename>.
+									Failure to do this may result in the Gateway not starting correctly.</entry>
+									<entry> </entry>	
+									
+								</row>
+								<row>
+									<entry>Firewall Access</entry>
+									<entry>You must ensure that you have appropriate firewall permissions to allow access to IP:8080. This is required to access the management consoles.</entry>
+									<entry> </entry>	
+									
+								</row>
+								<row>
+									<entry>SCTP libraries</entry>
+									<entry>If you intend to use <literal>SIGTRAN (M3UA)</literal>, you must have the <literal>lksctp</literal> library installed. The Linux Kernel Stream Control Transmission Protocol (<literal>lksctp</literal>) library provides SCTP implementation.</entry>
+									<entry>For more details on downloading and installing <literal>lksctp</literal>, please refer to <ulink url="http://lksctp.sourceforge.net/"></ulink></entry>
+								</row>
+							</tbody>
+						</tgroup>
+					</table>
+</para>
+<important>					<para>
+			
+ You must ensure that the <literal>JAVA_HOME</literal> Environment variable is set properly for the user account(s) that will run the server. For more details on setting this variable, please refer to the appendix section.
+					</para>
+</important>
+</chapter>
+

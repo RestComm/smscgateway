@@ -1,0 +1,24 @@
+Name
+	smsc skipunsentmessages
+
+SYNOPSIS
+	smsc skipunsentmessages <time in seconds>
+
+DESCRIPTION
+	This command will skip of processing / fetching of messages that was 
+	scheduled for delivering for the time in the past but have not yet 
+	delivered by SMSC GW because of SMSC GW was turned off or overloaded. 
+	<time in seconds> means the point of the time 
+	(actual current time - <time in seconds>) to which the point of 
+	processing / fetching of messages will be shifted. If the value "0" 
+	is provided this means SMSC GW will be shifted into an actual (current) 
+	time. If the value is positive this means SMSC GW will be shifted into a 
+	some time in the past (for example if the value is 3600 - to the time 
+	before the current time for 1 hour). Negative value is not accepted. 
+	The point of the time can be shifted only forward. It is not possible to
+	shift the the point of time backward (and resend messages that was 
+	already sent once).
+
+SEE ALSO
+    smsc stat get
+		

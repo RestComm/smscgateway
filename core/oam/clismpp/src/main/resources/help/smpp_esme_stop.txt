@@ -1,8 +1,8 @@
 Name
-	smsc esme stop
+	smpp esme stop
 
 SYNOPSIS
-	smsc esme stop <esmeName>
+	smpp esme stop <esmeName>
 
 DESCRIPTION
 	This command is used to stop an already running ESME.

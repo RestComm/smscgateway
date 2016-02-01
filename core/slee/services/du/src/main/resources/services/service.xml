@@ -4,6 +4,39 @@
     "http://java.sun.com/dtd/slee-service-xml_1_1.dtd">
 <service-xml>
 	<service>
+		<service-name>MoService</service-name>
+		<service-vendor>org.mobicents</service-vendor>
+		<service-version>1.0</service-version>
+		<root-sbb>
+			<sbb-name>MoSbb</sbb-name>
+			<sbb-vendor>org.mobicents</sbb-vendor>
+			<sbb-version>1.0</sbb-version>
+		</root-sbb>
+		<default-priority>0</default-priority>
+	</service>
+	<service>
+		<service-name>AlertService</service-name>
+		<service-vendor>org.mobicents</service-vendor>
+		<service-version>1.0</service-version>
+		<root-sbb>
+			<sbb-name>AlertSbb</sbb-name>
+			<sbb-vendor>org.mobicents</sbb-vendor>
+			<sbb-version>1.0</sbb-version>
+		</root-sbb>
+		<default-priority>0</default-priority>
+	</service>
+	<service>
+		<service-name>ChargingService</service-name>
+		<service-vendor>org.mobicents</service-vendor>
+		<service-version>1.0</service-version>
+		<root-sbb>
+			<sbb-name>ChargingSbb</sbb-name>
+			<sbb-vendor>org.mobicents</sbb-vendor>
+			<sbb-version>1.0</sbb-version>
+		</root-sbb>
+		<default-priority>0</default-priority>
+	</service>
+	<service>
 		<service-name>SmscTxSmppServerService</service-name>
 		<service-vendor>org.mobicents</service-vendor>
 		<service-version>1.0</service-version>
@@ -20,6 +53,17 @@
 		<service-version>1.0</service-version>
 		<root-sbb>
 			<sbb-name>RxSmppServerSbb</sbb-name>
+			<sbb-vendor>org.mobicents</sbb-vendor>
+			<sbb-version>1.0</sbb-version>
+		</root-sbb>
+		<default-priority>0</default-priority>
+	</service>
+	<service>
+		<service-name>MtService</service-name>
+		<service-vendor>org.mobicents</service-vendor>
+		<service-version>1.0</service-version>
+		<root-sbb>
+			<sbb-name>SriSbb</sbb-name>
 			<sbb-vendor>org.mobicents</sbb-vendor>
 			<sbb-version>1.0</sbb-version>
 		</root-sbb>
@@ -47,4 +91,15 @@
 		</root-sbb>
 		<default-priority>0</default-priority>
 	</service>	
+	<service>
+		<service-name>HomeRoutingService</service-name>
+		<service-vendor>org.mobicents</service-vendor>
+		<service-version>1.0</service-version>
+		<root-sbb>
+			<sbb-name>HrSriServerSbb</sbb-name>
+			<sbb-vendor>org.mobicents</sbb-vendor>
+			<sbb-version>1.0</sbb-version>
+		</root-sbb>
+		<default-priority>0</default-priority>
+	</service>		
 </service-xml>

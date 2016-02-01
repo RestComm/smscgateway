@@ -1,0 +1,343 @@
+<h3 style="margin: 0px;">
+	<i class="icon-laptop"></i>SIP
+</h3>
+<hr style="margin: 10 0px;" />
+<span style="float: right;">
+	<button id="refresh" style="float: right; margin-right: 20px; margin-left: 20px; height: 30px;" class="btn btn-medium btn-success" data-toggle="tooltip" data-placement="left" title="Refresh ESME List" onclick="updateEsmes();">
+		<i class="icon-refresh"></i>
+	</button>
+</span>
+<span id="esmes-table-wrapper">
+	<table id="no-esmes-table" class="table" style="display: none;">
+		<tr>
+			<td>
+				<div class="alert alert-info fade in">
+					<strong>No SIP!</strong> 
+				</div>
+			</td>
+		</tr>
+	</table>
+
+	<table id="esmes-table" class="table table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30px;">&nbsp;</th>
+				<th>Name</th>
+				<th>State</th>
+				<th style="text-align: center; width: 150px;">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</span>
+
+
+<script type="text/javascript">
+	function updateEsmes() {
+		mbeanSearch="org.mobicents.smsc:layer=Sip,name=*";
+		var mbeanVar;
+		$.ajax({
+			dataType: "json",
+			url: window.jolokiaProtocol + "//" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+		})
+		.done(function(html) {
+			if (html.error) {
+				logToConsole("ERROR", html.error);
+			}
+			else {		
+				
+				$('.service-row').remove();
+				$('.text-info').remove();
+				jQuery.each(html.value, function() {
+					mbeanVar = this;
+					
+					
+					jolokia.request(
+							[
+								{ type: "read", mbean: mbeanVar },
+							],
+							{ success: [
+								function(response) {
+									
+									var host = response.value.Host;
+									var port = response.value.Port;
+									
+									var isSmppServerStarted = response.value.Started;
+									
+									var name = response.value.Name;
+									var networkId = response.value.NetworkId;
+									var clusterName = response.value.ClusterName;
+									
+									var state = "STOPPED";
+									
+									var addressTon = response.value.RoutingTon;
+									var addressNpi = response.value.RoutingNpi;
+									var addressRange = response.value.RoutingAddressRange;
+									
+									if(isSmppServerStarted){
+										state = "STARTED";
+									}
+									
+									serviceClass = isSmppServerStarted ? 'active-service' : 'inactive-service';
+									
+									$('#esmes-table').children('tbody').append('<tr class="service-row"><td style="vertical-align: middle; text-align: center;"><i style="color: ' + (isSmppServerStarted ? '#51A351' : '#BD362F') + ';" class="' + (isSmppServerStarted ? 'icon-play-circle' : 'icon-remove-circle') + '"></i></td>'+
+											'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + name + '</td>' +
+											'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + state + '</td>' +
+											'<td style="cursor: pointer; font-size: 16px; vertical-align: middle; text-align: center; width: 150px;">' + 
+											'	<a href="#entities-modal'+name+'" role="button" class="btn btn-info btn-small" data-toggle="modal"><i class="icon-external-link"></i></a>' +
+											'</td></tr>'+											
+											'</tr>'+
+
+											'<tr class="text-info" style="display: none;"><td colspan=3>' +
+											'<div class="bs-docs-example bs-docs-example-submenus"> '+
+									        '    <div>'+
+									        '      <p class="muted">SIP Properties</p>'+
+													'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+														'<dt>NetworkId</dt> <dd>' + networkId + ' </dd>' +
+														'<dt>ClusterName</dt> <dd>' + clusterName + ' </dd>' + 
+													'</dl>'+
+									        '    </div>'+
+								        		'<hr style="margin: 5px 0;"/>' +
+										        '    <div>'+
+										        '      <p class="muted">SIP Rouing Address</p>'+
+														'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+															'<dt>TypeOfNumber</dt> <dd>' + addressTon + ' </dd>' +
+															'<dt>NumberPlanIndicator</dt> <dd>' + addressNpi + ' </dd>' +
+															'<dt>AddressRange</dt> <dd>' + addressRange + ' </dd>' +
+														'</dl>'+
+										        '    </div>'+				        		
+									        	'<hr style="margin: 5px 0;"/>' +
+									        '    <div>'+
+									        '      <p class="muted">Statistics</p>'+
+													'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+													'<dt>BoundDuration</dt> <dd> TODO </dd>' +
+													
+													'</dl>'+
+									        '    </div>'+
+									        '	 <hr style="margin: 5px 0;"/>' +
+									        '    <div>'+
+									        '      <p class="muted">Various</p>'+
+													'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+													'<dt>ConfiguredAddressAndPort</dt> <dd>' + host +':'+ port + ' </dd>' +
+													'</dl>'+
+									        '    </div>'+	
+											'</td></tr>'
+
+									);	
+									
+									$('#esmes-table-wrapper').append('<div id="entities-modal'+name+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
+											'<div class="modal-header">'+
+												'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+												'<h3>SIP Server '+name+' properties</h3>'+
+											'</div>'+	
+											'<div id="entities-modal-body" class="modal-body">'+
+													'<div class="accordion-group">' +
+														'<div class="accordion-heading">' +name+ 										
+														'</div>'+
+														'<div id="' + name + '" class="accordion-body">' +
+															'<div class="accordion-inner">' +
+																'<strong><i class="icon-list"></i> SIP Server Configuration Properties</strong>' +
+																
+																'<div class="alert alert-error" id="login-settings-error" style="display:none;">'+
+																  '<button type="button" class="close">&times;</button>'+
+																  'Some Fields are not correctly filled out, please double check the settings below !'+
+																'</div>'+																			
+																
+																'<table class="table table-condensed table-striped">' + 
+																	'<thead><tr><th style="width: 40%;">Name</th><th style="width: 55%;">Value</th><th>&nbsp;</th></tr></thead>' +
+																	'<tbody>'+
+																	
+																		'<tr data-toggle="tooltip" title="network id to which this SIP connection belongs to">'+
+																			'<td style="font-size: 0.9em;">Network Id</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'NetworkId-input" class="control-group">'+
+																				'<span id="' + name +'NetworkId-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + networkId + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onSipServrConfigOk(\'' + name+ '\', \'NetworkId\', \'' + name+"NetworkId" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NetworkId"+']\').toggle(); $(\'input[id^='+name+"NetworkId"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name + 'NetworkId-text">' + networkId + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"NetworkId"+']\').toggle(); $(\'input[id^='+name+"NetworkId"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
+																	
+																		'<tr data-toggle="tooltip" title="cluster name of SIP bind">'+
+																			'<td style="font-size: 0.9em;">Cluster Name</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'SystemId-input" class="control-group">'+
+																				'<span id="' + name +'SystemId-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + clusterName + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onSipServrConfigOk(\'' + name+ '\', \'ClusterName\', \'' + name+"SystemId" + '\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SystemId"+']\').toggle(); $(\'input[id^='+name+"SystemId"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name + 'SystemId-text">' + clusterName + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SystemId"+']\').toggle(); $(\'input[id^='+name+"SystemId"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+	
+																		
+																		'<tr data-toggle="tooltip" title="host where SIP MESSAGE will be sent">'+
+																			'<td style="font-size: 0.9em;">Host</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'BindTimeout-input" class="control-group">'+
+																				'<span id="' +name + 'BindTimeout-input" style="display: none;" >'+
+																					'<input type="text" class="input-small" value="' + host + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onSipServrConfigOk(\'' + name+ '\', \'Host\', \'' + name+"BindTimeout" + '\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"BindTimeout"+']\').toggle(); $(\'input[id^='+name+"BindTimeout"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name+ 'BindTimeout-text">' + host + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"BindTimeout"+']\').toggle(); $(\'input[id^='+name+"BindTimeout"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
+																		
+																		'<tr data-toggle="tooltip" title="port where SIP MESSAGE will be sent">'+
+																			'<td style="font-size: 0.9em;">Port</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'Port-input" class="control-group">'+
+																				'<span id="'+name + 'Port-input" style="display: none;" >'+
+																					'<input type="text" class="input-small" value="' + port + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onSipServrConfigOk(\'' + name+ '\', \'Port\', \'' + name+"Port" + '\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Port"+']\').toggle(); $(\'input[id^='+name+"Port"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name+ 'Port-text">' + port + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"Port"+']\').toggle(); $(\'input[id^='+name+"Port"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+	
+																		
+																		'<tr data-toggle="tooltip" title="The DefaultSmsRoutingRule will try to match the dest_addr_ton of outgoing SMS with one configured here. If configured value is null(-1) or its not null and matchs, SMSC will compare dest_addr_npi and destination_addr as below. It it doesnt match, SMSC will select next SIP in list for matching routing rule">'+
+																			'<td style="font-size: 0.9em;">Routing Address Ton</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'AutoNegotiateInterfaceVersion-input" class="control-group">'+
+																				'<span id="' +name+ 'AutoNegotiateInterfaceVersion-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + addressTon + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onSipServrConfigOk(\'' + name+ '\', \'RoutingTon\', \'' + name+"AutoNegotiateInterfaceVersion" + '\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"AutoNegotiateInterfaceVersion"+']\').toggle(); $(\'input[id^='+name+"AutoNegotiateInterfaceVersion"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name+ 'AutoNegotiateInterfaceVersion-text">' + addressTon + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"AutoNegotiateInterfaceVersion"+']\').toggle(); $(\'input[id^='+name+"AutoNegotiateInterfaceVersion"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+	
+																	
+																		'<tr data-toggle="tooltip" title="The DefaultSmsRoutingRule will try to match the dest_addr_npi with one configured here. If configured value is null(-1)or its not null and matchs, SMSC will compare destination_addr as below. It it doesnt match, SMSC will select next SIP in list for matching routing rule">'+
+																			'<td style="font-size: 0.9em;">Routing Address Npi</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'InterfaceVersion-input" class="control-group">'+
+																				'<span id="' +name+ 'InterfaceVersion-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + addressNpi + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onSipServrConfigOk(\'' + name+ '\', \'RoutingNpi\', \'' + name+"InterfaceVersion" + '\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"InterfaceVersion"+']\').toggle(); $(\'input[id^='+name+"InterfaceVersion"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name+ 'InterfaceVersion-text">' + addressNpi + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"InterfaceVersion"+']\').toggle(); $(\'input[id^='+name+"InterfaceVersion"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+	
+																		
+																		'<tr data-toggle="tooltip" title="The DefaultSmsRoutingRule will try to match destination_addr here. This is regular java expression. Default value is null. If it matchs, SMSC will send the SMS out over this SIP connection. If it doesnt match, SMSC will select next ESME in list for matching routing rule">'+
+																			'<td style="font-size: 0.9em;">Routing Address Range</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'MaxConnSize-input" class="control-group">'+
+																				'<span id="' +name+ 'MaxConnSize-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + addressRange + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onSipServrConfigOk(\'' + name+ '\', \'RoutingAddressRange\', \'' + name+"MaxConnSize" + '\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxConnSize"+']\').toggle(); $(\'input[id^='+name+"MaxConnSize"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name+ 'MaxConnSize-text">' + addressRange + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxConnSize"+']\').toggle(); $(\'input[id^='+name+"MaxConnSize"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																	
+																		
+																	'</tbody>' +
+																'</table>' +															
+															'</div>'+
+														'</div>'+
+													'</div>'+
+											'</div>'+
+											'<div class="modal-footer">'+
+												'<a href="#" onclick="$(\'#entities-modal'+name+'\').modal(\'hide\'); return false;" class="btn">Close</a>'+
+											'</div>'+										
+										'</div>');									
+									
+								}],
+								error: function(value){
+									errorUID = ("st" + new Date().getTime()).hashCode();
+									createStackTrace(errorUID, value.stacktrace);
+									logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+								}
+							}
+						); 
+
+				});
+			}
+		})
+		.fail(function() {
+			logToConsole("ERROR", "Failure trying to communicate with the SMSC Gateway. Please try again later.");
+		})
+	}
+	function onSipServrConfigOk(mbeanName, propertyName, spanId){
+		var formInvalid = false;
+		
+		var spanElement = document.getElementById(spanId + "-input");
+		var eleChild = spanElement.childNodes;
+		var inputTextEle = eleChild[0];
+		var spanElementTxt = document.getElementById(spanId + "-text");
+		
+		var propvalue = inputTextEle.value;
+		
+		if(propvalue.trim() == "") {
+			$("#div-"+spanId + "-input").addClass("error");					    			
+			formInvalid = true;
+		} else if($("#div-"+spanId + "-input").hasClass("error")) {
+			$("#div-"+spanId + "-input").removeClass("error");		
+		}	
+		
+		if(formInvalid) {
+			$("#login-settings-error").show();
+			logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+			return false;
+		} else {
+			$("#login-settings-error").hide();
+		}					
+		
+		var mbeanSearch="org.mobicents.smsc:layer=Sip,name="+mbeanName;
+		jolokia.request(
+				[
+					{ type: "write", mbean: mbeanSearch, attribute: propertyName, value: inputTextEle.value },
+				],
+				{
+					success: function(response) {
+						
+						logToConsole("INFO", "SIP property "+ propertyName +"  successfully updated.");
+						
+						spanElementTxt.innerHTML= inputTextEle.value;
+					},
+					error: function(value) {
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+					} 
+				}
+			);		
+		
+		spanElement.style.display = 'none';
+		spanElementTxt.style.display = '';
+		
+		
+	}
+	$(document).ready(function () {
+		updateEsmes();
+	});
+</script>

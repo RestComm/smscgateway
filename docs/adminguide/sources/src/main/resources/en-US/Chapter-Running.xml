@@ -1,0 +1,502 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+<chapter id="running">
+
+	<title>Running</title>
+	
+	<section id="running_the_gateway">
+		<title>Running the Gateway</title>
+			<procedure>
+				<title>Run &THIS.PLATFORM; &THIS.APPLICATION;</title>
+				<step><para>Pre-requisite: </para>
+					 <substeps>
+						<step><para>You must have &THIS.PLATFORM; &THIS.APPLICATION; installed as explained in the Installation Guide.</para>
+						</step>	
+						<step><para>If you are using the SS7 board on server, you must ensure that the <literal>java.library.path</literal> variable is set to point to the directory containing the native component. Alternatively you can copy it to the JBoss native library path manually.</para></step>
+						<step><para>You must have Cassandra database running and configured as explained in the Installation Guide.</para></step>
+<step><para>You must have the Cassandra Keyspace created as explained in the Installation Guide.</para></step>
+					</substeps>
+				</step>
+				<step>
+					<para>All you have to do to start the Gateway is start the JBoss Application Server. To start the JBoss Server you must execute the <filename>run.sh</filename> (Unix) or <filename>run.bat</filename> (Microsoft Windows)
+					startup script in the <filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/bin</filename> folder (on Unix or Windows). Note that this will start the server in the default profile. The "default" profile is a clean profile where you will have to start from scratch and configure the entire SS7 Stack and SMSC Gateway.
+					</para>
+				</step>
+				<step><para>Result: If the service started properly you should see the following last few output lines in the Unix terminal or Command Prompt depending on your environment:
+	<screen><![CDATA[
+2013-07-22 17:41:48,817 INFO [org.mobicents.slee.container.management.ResourceManagement] (pool-27-thread-1) Created Resource Adaptor Entity SmppServerRA for ResourceAdaptorID[name=SMPPServerResourceAdaptor,vendor=org.mobicents,version=1.0] Config Properties: [] 
+2013-07-22 17:41:49,067 INFO [org.mobicents.slee.container.management.ResourceManagement] (pool-27-thread-1) Activated RA Entity SmppServerRA 2013-07-22 17:41:49,317 INFO [org.mobicents.slee.container.management.ResourceManagement] (pool-27-thread-1) Bound link between RA Entity SmppServerRA and Name SmppServerRA 
+2013-07-22 17:41:49,615 INFO [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-27-thread-1) Verify configuration in RA Entity SchedulerResourceAdaptor 
+2013-07-22 17:41:49,616 INFO [org.mobicents.slee.container.management.ResourceManagement] (pool-27-thread-1) Created Resource Adaptor Entity SchedulerResourceAdaptor for ResourceAdaptorID[name=SchedulerResourceAdaptor,vendor=org.mobicents,version=1.0] Config Properties: [] 
+2013-07-22 17:41:49,866 INFO [org.mobicents.slee.container.management.ResourceManagement] (pool-27-thread-1) Activated RA Entity SchedulerResourceAdaptor 
+.
+.
+.
+2013-07-22 17:41:51,122 INFO [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (pool-27-thread-1) Installing DeployableUnitID[url=file:/C:/JavaT/jboss/server/default/deploy/smsc-services-du-6.1.2-RestComm-SNAPSHOT.jar/] 
+2013-07-22 17:41:52,307 INFO [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (pool-27-thread-1) Installed LibraryID[name=org.mobicents.smsc,vendor=smsc-library,version=1.0] 
+2013-07-22 17:41:52,349 INFO [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (pool-27-thread-1) Installed SbbID[name=AlertSbb,vendor=org.mobicents,version=1.0] 
+2013-07-22 17:41:52,408 INFO [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (pool-27-thread-1) Installed SbbID[name=RxSmppServerSbb,vendor=org.mobicents,version=1.0] 
+2013-07-22 17:41:52,618 INFO [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (pool-27-thread-1) Installed SbbID[name=SriSbb,vendor=org.mobicents,version=1.0] 
+.
+.
+.
+2013-07-22 17:41:53,290 INFO [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (pool-27-thread-1) Installed DeployableUnitID[url=file:/C:/JavaT/jboss/server/default/deploy/smsc-services-du-6.1.2-RestComm-SNAPSHOT.jar/] 
+2013-07-22 17:41:53,543 INFO [org.mobicents.slee.container.management.ServiceManagementImpl] (pool-27-thread-1) Activated ServiceID[name=MoService,vendor=org.mobicents,version=1.0] 
+.
+.
+.
+ 2013-07-22 17:41:54,974 INFO [me.prettyprint.cassandra.connection.CassandraHostRetryService] (Thread-27) Downed Host Retry service started with queue size -1 and retry delay 10s 
+2013-07-22 17:41:55,004 INFO [me.prettyprint.cassandra.service.JmxMonitor] (Thread-27) Registering JMX me.prettyprint.cassandra.service_RestCommSMSC:ServiceType=hector,MonitorType=hector 
+2013-07-22 17:41:55,014 INFO [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (Thread-27) Scheduler IS up, starting fetch tasks 
+2013-07-22 17:41:55,019 INFO [org.mobicents.smsc.smpp.SmscManagement] (main) SMSC configuration file path C:\JavaT\jboss\server\default\data\SmscManagement_smsc.xml 
+2013-07-22 17:41:55,022 INFO [org.mobicents.smsc.smpp.SmppServerManagement] (main) Loading SMPP Server Properties from C:\JavaT\jboss\server\default\data\SmscManagement_smppserver.xml 
+2013-07-22 17:41:55,297 INFO [org.mobicents.smsc.smpp.SmppServerManagement] (main) Starting SMPP server... 
+2013-07-22 17:41:55,322 INFO [com.cloudhopper.smpp.impl.DefaultSmppServer] (main) SmscManagement started on SMPP port [2776] 
+2013-07-22 17:41:55,322 INFO [org.mobicents.smsc.smpp.SmppServerManagement] (main) SMPP server started 
+2013-07-22 17:41:55,378 INFO [org.mobicents.smsc.smpp.SmppClientOpsThread] (Thread-30) SmppClientOpsThread started. 
+2013-07-22 17:41:55,379 INFO [org.mobicents.smsc.smpp.SmscManagement] (main) Started SmscManagement 
+2013-07-22 17:41:55,379 INFO [javax.slee.RAEntityNotification[entity=SmppServerRA].SmppServerResourceAdaptor] (main) Activated RA Entity SmppServerRA 
+2013-07-22 17:42:00,652 INFO [org.apache.coyote.http11.Http11Protocol] (main) Starting Coyote HTTP/1.1 on http-127.0.0.1-8080 
+2013-07-22 17:42:00,674 INFO [org.apache.coyote.ajp.AjpProtocol] (main) Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009 
+2013-07-22 17:42:00,689 INFO [org.jboss.bootstrap.microcontainer.ServerImpl] (main) JBoss (Microcontainer) [5.1.0.GA (build: SVNTag=JBoss_5_1_0_GA date=200905221634)] Started in 1m:45s:372ms
+]]>
+				</screen>		
+</para>
+</step>
+<step>
+<para>If you are starting &THIS.PLATFORM; &THIS.APPLICATION; for the first time, SS7 and SMSC working parameters (and possibly database access) are not configured. You need to use the Shell Client or the GUI to connect to the Gateway and configure the SS7 Stack and SMSC. Once configured, the state and configuration is persisted which stands server re-start. The next chapter will discuss in detail about configuration.</para> 
+</step>
+
+			</procedure>
+			<procedure id="smsc-Running-alter">
+				<title>Bind the SMSC Gateway to a specific IP </title>
+				<step><para>
+					Using <literal>run.sh</literal> without any arguments binds the SMSC Gateway to localhost <literal>127.0.0.1</literal>. 
+					To bind the Gateway to a different IP, pass the IP address as value to the <literal>-b</literal> command line option. 
+					For example to bind the SMSC to <literal>10.199.7.23</literal> you will use the command from the <filename>bin</filename> folder as below:
+<screen><![CDATA[
+[vsmsc bin]$ ./run.sh -b 10.199.7.23
+]]></screen>
+				</para></step>
+	
+			</procedure>
+			<procedure>
+				<title>Stop the Gateway</title>
+				<step><para>To stop the &THIS.PLATFORM; &THIS.APPLICATION;, you must shut down the JBoss Application Server. To shut down the server(s) you must execute the <command>shutdown.sh -s</command> (Unix) or 
+					<command>shutdown.bat -s</command> (Microsoft Windows) script in the <filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/bin</filename> 
+					directory (on Unix or Windows).</para></step>
+				<step><para> If the server stopped properly, you will see the following three lines as the 
+					last output in the Unix terminal or Command Prompt:
+                        <screen><![CDATA[[Server] Shutdown complete
+Halting VM]]></screen></para></step>
+			</procedure>		
+
+	</section>
+<section id="running_the_gateway_simulator">
+		<title>Running the Gateway - Simulator Profile</title>
+			<para>The &THIS.PLATFORM; &THIS.APPLICATION; offers you an option to run the Gateway with a "simulator" profile for testing purpose. The "simulator" profile is a pre-configured profile to work with the jss7-simulator, the smpp-simulator and some SIP phone. Starting the Gateway with the "simulator" profile is similar to the steps explained for the "default" profile except that you must pass the string value "simulator" to the -c command line option when invoking the run script. 
+<screen><![CDATA[
+[bin]$ ./run.sh -c simulator
+]]>
+</screen>
+</para>	
+			<para>
+By default, the SMSC Simulator profile is configured for use in Linux systems. For using it under Microsoft Windows you need to open the file <filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/server/simulator/data/SCTPManagement_sctp.xml</filename> and replace (in two places) <literal>ipChannelType="0"</literal> to <literal>ipChannelType="1"</literal> for using a TCP connection instead of SCTP (SCTP is not supported under Windows). 
+			</para>
+		<section id="configuring_the_gateway_simulator_profile">
+			<title>Configuring the Gateway in Simulator Profile</title>
+			<para>The SMSC Gateway in a Simulator Profile is configured as it would have been if configured with the following CLI commands:</para>
+<screen><![CDATA[
+
+sctp server create serv1 127.0.0.1 8012 sockettype SCTP
+sctp server start serv1
+sctp association create ass1 SERVER serv1 127.0.0.1 8011 sockettype SCTP
+
+m3ua as create as1 IPSP mode SE ipspType server rc 101 traffic-mode loadsharing network-appearance 102 
+m3ua asp create asp1 ass1 
+m3ua as add as1 asp1 
+m3ua asp start asp1 
+m3ua route add as1 1 2 3
+
+sccp sap create 1 1 2 2 
+sccp dest create 1 1 1 1 0 255 255 
+sccp address create 1 82 1 8 0 1 4 000 
+sccp address create 2 82 2 8 0 1 4 000 
+sccp rule create 1 K 82 0 8 0 1 4 * solitary 1 origination-type localOriginated 
+sccp rule create 2 K 82 0 8 0 1 4 * solitary 2 origination-type remoteOriginated 
+sccp rsp create 1 1 0 0 
+sccp rss create 1 1 8 0
+
+smsc set scgt 22220 
+smsc set scssn 8 
+smsc set hlrssn 8 
+smsc set mscssn 8 
+smsc set maxmapv 3
+
+smpp esme create test test 127.0.0.1 -1 TRANSCEIVER SERVER password test esme-ton -1 esme-npi -1 esme-range 6666 source-range 6666 routing-range 6666 charging-enabled false
+smpp esme start test
+
+smsc sip modify SIP cluster-name SIP host 127.0.0.1 port 5065 routing-ton 1 routing-npi 1 routing-range 5555 counters-enabled false charging-enabled false
+]]>
+</screen>
+		</section>
+
+		<section id="running_the_simulator_ss7">
+			<title>Running the jSS7 Simulator</title>
+			<para>If you are not familiar with the RestComm jss7 Simulator, you can find instructions about using the
+jss7-simulator in the RestComm jSS7 User Guide. You will also find example test cases explained in detail in the jSS7 User Guide.</para>
+
+		<procedure>
+			<title>Running RestComm jSS7 Simulator</title>
+			<step><para>
+			Change the working directory to the bin folder in the Simulator's installation directory.
+<screen><![CDATA[
+[vinu@vinu-neha ~]$ cd RestComm-smsc-<version>/tools/RestComm-ss7-simulator/bin
+]]>
+</screen>
+			</para></step>
+			<step>
+						<para>
+							 Ensure that the
+							<filename>run.sh</filename>
+							start script is executable.
+<screen><![CDATA[
+bin$ chmod +x run.sh
+]]>
+</screen>
+					
+						</para>
+			</step>
+			<step>
+						<para>
+							Execute the
+							<filename>run.sh</filename>.
+							Bourne shell script with the command <literal>./run.sh gui</literal> or in the case of Windows <literal>./run.bat gui</literal>. 
+<screen><![CDATA[
+bin$ ./run.sh gui
+]]>
+</screen>
+This will launch the Simulator GUI Application.
+						</para>
+
+			</step>
+			<step>
+						<para>
+							When the GUI shows up, select "main" (default) as host name [or type "win" as host name under Windows] and press the 'Start' button. The Simulator is already pre-configured to connect to the SMSC Gateway (running in simulator profile). Press 'Run test' and again click on 'Start' in the next screen. The Simulator will connect to SMSC (via m3ua protocol).
+						</para>
+
+			</step>
+			<step><para>
+The Low level part is configured to SCTP (not TCP) protocol and hence you can test the SMSC in a Linux environment. To test under Windows OS, you must change the SS7 simulator settings to TCP. The SS7 Simulator will play both HLR and MSC roles and respond to <literal>SendRoutingInfo</literal> and <literal>ForwardSM</literal> requests from SMSC gateways. 
+			</para></step>
+			<step><para>
+ You can configure the <literal>SMS_TEST_CLIENT</literal> testing task to play with different modes including return error responses to SMSC and bulk mode without adding information for any event to an application form. You can also play with different data coding schemes and MAP protocol versions.
+			</para></step>
+		</procedure>
+		</section>
+
+		<section id="running_the_simulator_smpp">
+			<title>Running the SMPP Simulator</title>
+		<procedure>
+			<title>Running SMPP Simulator</title>
+			<step><para>
+			Change the working directory to the bin folder for the SMPP Simulator.
+<screen><![CDATA[
+[vinu@vinu-neha ~]$ cd RestComm-smsc-<version>/tools/RestComm-smpp-simulator/bin
+]]>
+</screen>
+			</para></step>
+			<step>
+						<para>
+							 Ensure that the
+							<filename>run.sh</filename>
+							start script is executable.
+<screen><![CDATA[
+bin$ chmod +x run.sh
+]]>
+</screen>
+					
+						</para>
+			</step>
+			<step>
+						<para>
+							Execute the
+							<filename>run.sh</filename>.
+							Bourne shell script with the command <literal>./run.sh</literal> or in the case of Windows <literal>./run.bat</literal>. 
+<screen><![CDATA[
+bin$ ./run.sh
+]]>
+</screen>
+This will launch the SMPP Simulator GUI Application.
+						</para>
+
+			</step>
+			<step>
+						<para>
+							The SMPP Simulator default settings fit to connect to the SMSC Gateway (running in simulator profile).
+							You can in this case just press 'Run test' and then press on 'Start Session' to connect to the SMSC Gateway.
+						</para>
+
+			</step>
+			<step>
+						<para>
+Using the button 'Configuring data for message submitting', you can configure different sending modes, data coding schemas, origination and destination addresses.
+See chapter <xref linkend="smpp_simulator"/> to understand more of SMPP simulator usage.  
+						</para>
+
+			</step>
+			<step>
+						<para>
+When the SMSC Gateway is running in a "simulator" profile it works with SMPP as ESME
+with the address "6666" (TON=1, NPI=1). So all messages with the destination address
+"6666" (TON=1, NPI=1) will be routed to SMPP Simulator. All other messages will be routed
+to SS7 Simulator (except messages for "5555" address that will be routed to SIP).
+						</para>
+                        <para>
+With the SMPP Simulator you can also simulate a bulk message delivery to &THIS.APPLICATION;. This may be random bulk messages and bulk messages obtained from a pcap file.
+                        </para>
+
+			</step>
+		</procedure>
+		</section>
+
+		<section id="running_the_simulator_hlr">
+			<title>Running the HLR Simulator</title>
+			<para>
+				You can use the Command line HLR Simulator for load testing the &THIS.APPLICATION;. RestComm-hlr-simulator is pre-configured to integrate with SMSC run in simulator profile. The HLR Simulator receives the MAP SRI request from SMSC and returns response with random VLR and IMSI. SMSC will then forward <literal>MT_Forward_SM</literal> request to HLR. For every 7th <literal>MT_Forward_SM</literal> request, the HLR Simulator will return an <literal>AbsentSubscriber</literal> error.
+			</para>
+			<para>
+				For every 400 messages processed by the HLR Simulator, it shows the below message (time in milli seconds)
+				<screen><![CDATA[
+				Received 400 MAP Dialog requests in 1000
+				]]>
+				</screen>				
+			</para>
+			<procedure>
+			<title>Running HLR Simulator</title>
+			<step><para>
+			Change the working directory to the bin folder for the HLR Simulator.
+<screen><![CDATA[
+[vinu@vinu-neha ~]$ cd RestComm-smsc-<version>/tools/RestComm-hlr-simulator/bin
+]]>
+</screen>
+			</para></step>
+			<step>
+						<para>
+							 Ensure that the
+							<filename>run.sh</filename>
+							start script is executable.
+<screen><![CDATA[
+bin$ chmod +x run.sh
+]]>
+</screen>
+					
+						</para>
+			</step>
+			<step>
+						<para>
+							Execute the
+							<filename>run.sh</filename>
+							
+<screen><![CDATA[
+bin$ ./run.sh
+]]>
+</screen>
+This will launch the HLR Simulator ready for processing SRI and MT_Forward_SM requests
+						</para>
+
+			</step>
+			<step>
+						<para>
+							<!--When the GUI shows up, select "main" (default) as host name and press the 'Start' button. -->The HLR Simulator is already pre-configured to connect to the SMSC Gateway (running in simulator profile).
+						</para>
+
+			</step>
+		</procedure>
+
+            <para>
+                Additional configuring of the HLR Simulator is possible only by manually updating the configuration files in the <filename>RestComm-hlr-simulator/data</filename> folder. For example, in order to run the HLR Simulator in Microsoft Windows you need to update the file <filename>SCTPManagement_sctp.xml</filename> and set the parameter <literal>ipChannelType</literal> to "1".
+            </para>
+		</section>
+
+		<section id="running_the_simulator_smpp_load">
+			<title>Running the SMPP Load tool</title>
+			<para>
+				The smpp-load tool is a Command line simulator to generate SMPP load. You must have <literal>ant</literal> installed to be able to run this tool. The smpp-load tool can be started as a SMPP Server accepting in-coming connection (BIND) from &THIS.PLATFORM; &THIS.APPLICATION; or can be started as a SMPP Client to send BIND to &THIS.PLATFORM; &THIS.APPLICATION;. You can modify the configuration parameters in the <filename>build.xml</filename> to define how many SMPP connections should be initiated, what kind of load should be generated, etc.
+			</para>
+			
+			<procedure>
+			<title>Running SMPP Load Tool</title>
+			<step><para>
+			Change the working directory to the bin folder for the SMPP Load Tool.
+<screen><![CDATA[
+[vinu@vinu-neha ~]$ cd RestComm-smsc-<version>/tools/RestComm-smpp-simulator/bin
+]]>
+</screen>
+			</para></step>
+
+			<step>
+						<para>
+							Execute the <command>ant client</command> command to start the SMPP load tool as a client or execute the <command>ant server</command> command to start the SMPP load tool as a SMPP Server.
+							
+<screen><![CDATA[
+ant client
+]]>
+</screen>
+This will launch the SMPP load tool as a SMPP Client.
+<screen><![CDATA[
+ant server
+]]>
+</screen>
+This will launch the SMPP load tool as a SMPP Server.
+
+						</para>
+
+			</step>
+			<step>
+						<para>
+							<!--When the GUI shows up, select "main" (default) as host name and press the 'Start' button. -->The SMPP load client is already pre-configured to connect to the &THIS.PLATFORM; &THIS.APPLICATION; (running in simulator profile).
+						</para>
+
+			</step>
+		</procedure>
+		</section>
+
+
+        <section id="Sip_Phone">
+        <title>Running Jitsi or Linphone SIP phones</title>
+<para>In order to test SMSC features for interconnection with SIP servers, you can use Jisti or Linphone SIP phones that can play the role of a SIP server.
+</para>
+            <procedure>
+                <title>Configure Jitsi</title>
+    <step>
+    <para>Download Jisti from the <ulink url="http://www.jitsi.org/">website</ulink> and run it.
+    </para>
+    </step>
+    <step>
+    <para>Create a registrarless account (do not provide password, registrar and proxy address), enable PRESENSE (SIMPLE) at the forth tab for this account (Advanced). Identifier of this account must be "5555" because SMSC is configured to route all messages for subscriber "5555" to SIP.
+    </para>
+    </step>
+    <step>
+    <para>In the menu, go to Tools -> Options -> Security -> Chat, and enable all three options at the end.
+    </para>
+    </step>
+    <step>
+    <para>Then go to Tools -> Options -> Advanced -> SIP and define SIP port as "5065" (SMSC is configured for sending outgoing SIP messages to this port).
+    </para>
+    </step>
+    <step>
+    <para>In the menu, go to File -> Add contact and add a new contact with definition to which subscriber you will send messages to. SMSC is configured such that all messages for "6666" will be routed to ESME (SMPP simulator) and others (except "5555" that is for SIP) to GSM network (to SS7 Simulator). Therefore you can add two new contacts as below:
+<itemizedlist>
+<listitem><para>for SS7 Simulator: "sip:1111@127.0.0.1:5060"</para></listitem>
+<listitem><para>for SMPP Simulator: "sip:6666@127.0.0.1:5060"</para></listitem>
+</itemizedlist>
+The SMSC listens to 5060 port for incoming SIP messages. For addressing to/from the SS7 Simulator, the address "1111" will be used.
+    </para>
+    </step>
+            </procedure>
+
+            <procedure>
+                <title>Configure Linphone</title>
+    <step>
+    <para>Download Linphone from the <ulink url="http://www.linphone.org/">website</ulink> and run it.
+    </para>
+    </step>
+    <step>
+    <para>Go to Parameters -> Network settings -> Network protocols and ports -> SIP UDP port and set the port to 5066.
+    </para>
+    </step>
+    <step>
+    <para>Add a contact with SIP address: "sip:6666@127.0.0.1:5060" for message exchange with SMPP simulator.
+    </para>
+    </step>
+    <step>
+    <para>Add a contact with SIP address: "sip:1111@127.0.0.1:5060" for message exchange with SS7 simulator.
+    </para>
+    </step>
+            </procedure>
+
+<para>Now you can run the following tests:
+<orderedlist>
+<listitem>
+<para>For testing sending messages from a SIP phone you can use the feature "Send message" to a concrete contact, type a message text and send. After about 1 minute you will receive the message on the SS7 Simulator or the SIP Simulator.
+</para>
+</listitem>
+<listitem>
+<para>For testing sending messages to the SIP phone you just need to send a message from the SS7 Simulator or SMPP Simulator to the address "5555". You must put the originating address as "1111" for SS7 Simulator and "6666" for SMPP Simulator.
+</para>
+</listitem>
+</orderedlist>
+</para>
+        </section>
+
+
+</section>
+<section id="running_shell">
+			<title>Running the Shell</title>	
+		<para>
+			You must start the Shell client and connect to the managed instance prior to executing commands to configure the Gateway. Shell can be started by issuing the following command from
+			<filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/bin</filename> directory:
+		</para>
+		<programlisting>[$] ./ss7-cli.sh</programlisting>
+		<para>Once console starts, it will print following information and await further commands:</para>
+		<screen>
+version=2.0.0-SNAPSHOT,name=mobicents CLI,prefix=mobicents,vendor=TeleStax
+mobicents>
+		</screen>
+	<para>
+			Before issuing further commands you must connect to a managed instance. For more details on connecting to an instance and for a list of all supported commands and details on configuring the SS7 stack refer to the RestComm SS7 Stack User Guide. 
+		</para>
+
+</section>
+<section id="using_GUI">
+		<title>Running the Graphical User Interface</title>
+<para> Open a Web Browser and navigate to http://IP:8080/mobicents-management/ (where IP is the IP Address to which the SMSC is bound to). This will launch the &THIS.PLATFORM; GUI Management Console which is horizontally segregated into multiple tabs, one tab for each product in the &THIS.PLATFORM; Suite. You will notice that only the tabs of products whose binaries are installed already will be shown enabled and active in the GUI. If you have successfully installed the &THIS.PLATFORM; &THIS.APPLICATION; you will find the tabs for JAIN-SLEE, JMX, SS7 and SMSC GW active and enabled. For more details on using the GUI for SS7 or JAIN-SLEE please refer to their respective user guides. This document only provides instructions for using the GUI to configure the SMSC Gateway.
+</para>
+
+<para>
+Switch to the SMSC GW tab and you will find that the window will look similar to the figure below. The GUI is divided into three sections:
+	<itemizedlist>
+	<listitem><para>A left panel listing the management and monitoring units (Server Settings, SMPP Server, ESMEs, SIPs, MAP Version Cache, DB Routing Rules). You can click on any of these to select and navigate to the specific management unit.</para></listitem>
+	<listitem><para>A main panel displaying the currently selected management unit. <!-- At the top of this panel you will find a bread crumb trail providing links back to each previous page that you navigated through in order to get to the current page.--> The main view is categorized into multiple tabs to manage different aspects of the selected layer.</para></listitem>
+	<listitem><para>A bottom panel displaying the log data. You can clear the log anytime by clicking on the trash icon at the top right corner of this panel. You can also minimize or maximize this panel to suit your needs.</para></listitem>
+	</itemizedlist>
+
+	<figure>
+  		<title>GUI - &THIS.PLATFORM; &THIS.APPLICATION;</title>
+  		<mediaobject>
+    		<imageobject>
+      			<imagedata fileref="images/GUI-SMSC-GW-main.png" format="PNG" align="center"/>
+    		</imageobject>
+  		</mediaobject>
+	</figure>
+</para>
+		
+		
+		<section id="connect_gui">
+		<title>Connect to a new Instance</title>
+		<para>You can connect to a new instance by entering the IP:Port values and the login credentials in the top left corner of the GUI. However please note that this feature is not available in this release but will be fully functional in the next release. 
+		</para>
+
+   </section>	
+  <section id="gui_security">
+		<title>Authentication</title>	
+			<para>
+				&THIS.PLATFORM; &THIS.APPLICATION; GUI Management Security is based on the JBoss Security Framework. To read more on JBoss Security Framework refer JBoss Installation Guide <ulink url="http://docs.jboss.org/jbossas/docs/Installation_And_Getting_Started_Guide/5/html_single/index.html#Basic_Configuration_Issues-Security_Service">here</ulink>
+			</para>
+			<note>
+				<para>
+					Deafult user-id and password for GUI Management Console is admin and admin. You can change the user-id and password in files <filename>jmx-console-roles.properties</filename> and <filename>jmx-console-users.properties</filename> 
+					located at <filename>mobicents-smscgateway-&lt;version&gt;/jboss-5.1.0.GA/server/&lt;profile&gt;/conf/props/</filename>
+				</para>
+			</note>			
+ </section>
+
+</section>
+
+</chapter>
+

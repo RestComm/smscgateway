@@ -1,0 +1,18 @@
+Name
+	smsc set deliverypause
+
+SYNOPSIS
+	smsc set deliverypause <true | false>
+
+DESCRIPTION
+	This command is used to set the deliverypause value. 
+	If true, delivery of all SMS is paused by SMSC. By
+	default its false. Use this option with extreme caution. 
+
+EXAMPLES
+	smsc set deliverypause true
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

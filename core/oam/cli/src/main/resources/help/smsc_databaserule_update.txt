@@ -1,0 +1,29 @@
+Name
+	smsc databaserule update
+
+SYNOPSIS
+	smsc databaserule update <address> <systemId> <SMPP|SIP>
+
+DESCRIPTION
+	This command is used to add or update a Database Rule for SMPP or SIP. 
+
+	The parameter <SMPP|SIP> is used to define if the rule is for SMPP or SIP. This 
+	is an optional parameter and if unspecified, by default the rule is set for SMPP.
+ 	
+	Database Rules are Rules that are used for routing messages to a proper ESME. 
+	When you define a rule using the above command, you are creating a routing rule
+	that states:
+	"If the destination address of a message corresponds with the value specified in
+	the 'address' field, then the message be sent to an ESME identified by the value
+	specified in the 'systemId' field".
+
+	To add a new rule you must issue the command with the systemId parameter and
+	specify if the rule is for SIP or SMPP.
+
+	To update an existing rule, you must issue the command with both the address 
+	parameter and the systemId parameter and specifiy if the rule is for SIP or SMPP.
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

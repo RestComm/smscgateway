@@ -1,0 +1,14 @@
+Name
+	smsc get smshomerouting
+
+SYNOPSIS
+	smsc get smshomerouting
+
+DESCRIPTION
+	The SMSC can be configured to support Home Routing functionality, by setting
+	the parameter 'smshomerouting' to true. This command is used to retrieve the
+	current settings.
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

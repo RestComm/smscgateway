@@ -1,8 +1,8 @@
 Name
-	smsc esme show
+	smpp esme show
 
 SYNOPSIS
-	smsc esme show
+	smpp esme show
 
 DESCRIPTION
 	This command is used to list all configured ESMEs.

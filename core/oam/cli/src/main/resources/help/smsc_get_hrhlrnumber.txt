@@ -1,0 +1,28 @@
+Name
+	smsc get hrhlrnumber
+
+SYNOPSIS
+	smsc get hrhlrnumber
+
+DESCRIPTION
+	This command is used to get the value of the parameter hrhlrnumber which
+	holds the pre-configured HLR address for SRI messages.
+	
+	In some scenarios it may be required to set a HLR address instead of a
+	MSISDN address into the SCCP 'CalledPartyAddress' of 'SendRoutingInfo'
+	requests issued by the SMSC GW in both mobile terminated and home routing
+	modes. In such cases, the parameter 'hrhlrnumber' holds a value for 
+	pre-configured HLR address. 
+	
+	For all other scenarios where this is not required, this is empty. 
+	When this is empty, the SCCP 'CalledPartyAddress' of 
+	'SendRoutingInfo' request will be set to the destination MSISDN of a 
+	subscriber.
+
+EXAMPLES
+	smsc get hrhlrnumber
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv, smsc set hrhlrnumber, smsc remove hrhlrnumber

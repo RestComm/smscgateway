@@ -1,20 +1,23 @@
 /*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2015, Telestax Inc and individual contributors
- * by the @authors tag.
+ * TeleStax, Open Source Cloud Communications  
+ * Copyright 2012, Telestax Inc and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package org.mobicents.smsc.smpp;
@@ -39,7 +42,7 @@ import org.jboss.mx.util.MBeanServerLocator;
 public class SmppManagement implements SmppManagementMBean {
     private static final Logger logger = Logger.getLogger(SmppManagement.class);
 
-    public static final String JMX_DOMAIN = "com.telscale.smpp";
+    public static final String JMX_DOMAIN = "com.mobicents.smpp";
     public static final String JMX_LAYER_ESME_MANAGEMENT = "EsmeManagement";
     public static final String JMX_LAYER_SMPP_SERVER_MANAGEMENT = "SmppServerManagement";
     public static final String JMX_LAYER_SMPP_CLIENT_MANAGEMENT = "SmppClientManagement";
@@ -132,7 +135,7 @@ public class SmppManagement implements SmppManagementMBean {
         this.isStarted = true;
         logger.info("Started SmppManagement");
 
-        // Step 3 Start SMPP Server
+        // Step 6 Start SMPP Server
         this.smppServerManagement = new SmppServerManagement(this.name, this.esmeManagement,
                 this.smppSessionHandlerInterface);
         this.smppServerManagement.setPersistDir(this.persistDir);
@@ -142,7 +145,7 @@ public class SmppManagement implements SmppManagementMBean {
                 + JMX_LAYER_SMPP_SERVER_MANAGEMENT + ",name=" + this.getName());
         this.registerMBean(this.smppServerManagement, SmppServerManagementMBean.class, true, smppServerManaObjName);
 
-        // Step 4 Start SMPP Clients
+        // Step 7 Start SMPP Clients
         this.smppClientManagement = new SmppClientManagement(this.name, this.esmeManagement,
                 this.smppSessionHandlerInterface);
 

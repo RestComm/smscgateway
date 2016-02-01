@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+<chapter
+	id="shell_commands">
+	<title>Shell Commands</title>
+	
+		<para> This chapter describes the available Shell
+			commands and provides examples of usage.
+			To see examples of specific flow or to perform certain tasks, please refer to corresponding sections devoted to
+			<literal>Linksets</literal>, <literal>SCCP</literal> or <literal>M3UA</literal>
+			
+		</para>
+
+</chapter>

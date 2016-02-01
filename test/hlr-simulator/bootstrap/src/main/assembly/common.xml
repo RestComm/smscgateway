@@ -1,0 +1,35 @@
+<component>
+	<files>
+		<file>
+			<source>target/run.jar</source>
+			<destName>bin/run.jar</destName>
+		</file>
+
+		<!-- Conf -->
+		<file>
+			<source>src/main/config/bootstrap-beans.xml</source>
+			<destName>conf/bootstrap-beans.xml</destName>
+		</file>
+
+		<file>
+			<source>src/main/config/log4j.xml</source>
+			<destName>conf/log4j.xml</destName>
+		</file>
+
+
+		<!-- Deploy -->
+		<file>
+			<source>src/main/config/oam-beans.xml</source>
+			<destName>deploy/oam-beans.xml</destName>
+		</file>
+		<file>
+			<source>src/main/config/ss7/ss7-beans.xml</source>
+			<destName>deploy/ss7-beans.xml</destName>
+		</file>
+
+		<file>
+			<source>src/main/config/map-beans.xml</source>
+			<destName>deploy/map-beans.xml</destName>
+		</file>
+	</files>
+</component>
