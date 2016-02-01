@@ -155,7 +155,7 @@
 	<!-- Shell Service -->
 	<!-- ==================================================================== -->
 	<!-- Define Shell Executor -->
-	<bean name="ShellExecutor" class="com.mobicents.ss7.management.console.ShellServer">
+	<bean name="ShellExecutor" class="org.mobicents.ss7.management.console.ShellServer">
 		<constructor>
 			<parameter>
 				<inject bean="SS7Scheduler" />
@@ -265,7 +265,7 @@
 	<!-- RestComm jSS7 Managemenet Service -->
 	<!-- ==================================================================== -->
 	<bean name="Ss7Management" class="org.mobicents.protocols.ss7.oam.common.jmxss7.Ss7Management">
-		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="com.mobicents.ss7:service=Ss7Management",exposedInterface=org.mobicents.protocols.ss7.oam.common.jmxss7.Ss7ManagementMBean.class,registerDirectly=true)
+		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.ss7:service=Ss7Management",exposedInterface=org.mobicents.protocols.ss7.oam.common.jmxss7.Ss7ManagementMBean.class,registerDirectly=true)
 		</annotation>
 		<property name="agentId">jboss</property>
 	</bean>

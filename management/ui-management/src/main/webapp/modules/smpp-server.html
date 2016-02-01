@@ -35,7 +35,7 @@
 
 <script type="text/javascript">
 				function updateServices() {
-					mbeanSearch="com.mobicents.smpp:layer=SmppServerManagement,name=*";
+					mbeanSearch="org.mobicents.smpp:layer=SmppServerManagement,name=*";
 					var mbeanVar;
 					$.ajax({
 						dataType: "json",
@@ -966,7 +966,7 @@
 				
 				}
 				function serviceOperation(operation, name) {
-					mbeanSearch="com.mobicents.smpp:layer=SmppServerManagement,name="+name;
+					mbeanSearch="org.mobicents.smpp:layer=SmppServerManagement,name="+name;
 					
 					alert(operation+' : '+mbeanSearch);
 					
@@ -1015,7 +1015,7 @@
 						$("#login-settings-error").hide();
 					}					
 					
-					var mbeanSearch="com.mobicents.smpp:layer=SmppServerManagement,name="+mbeanName;
+					var mbeanSearch="org.mobicents.smpp:layer=SmppServerManagement,name="+mbeanName;
 					jolokia.request(
 							[
 								{ type: "write", mbean: mbeanSearch, attribute: propertyName, value: propvalue },
@@ -1041,7 +1041,7 @@
 					
 				}
 				function resetCounters(mbeanName){
-					var mbeanSearch="com.mobicents.smpp:layer=SmppServerManagement,name="+mbeanName;
+					var mbeanSearch="org.mobicents.smpp:layer=SmppServerManagement,name="+mbeanName;
 					jolokia.execute(mbeanSearch,"resetCounters",
 							{
 								success: function(value) {

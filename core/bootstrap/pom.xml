@@ -115,7 +115,7 @@
 
 		<!-- cloudhopper smpp -->
 		<dependency>
-			<groupId>com.cloudhopper</groupId>
+			<groupId>${ch.smpp.namespace}</groupId>
 			<artifactId>ch-smpp</artifactId>
 			<version>${ch.smpp.version}</version>
 		</dependency>
@@ -291,7 +291,7 @@
 		</dependency>
 		<dependency>
 			<artifactId>shell-server-impl</artifactId>
-			<groupId>org.mobicents.protocols.ss7.oam</groupId>
+			<groupId>org.mobicents.protocols.ss7.management</groupId>
 			<version>${jss7.mobicents.version}</version>
 		</dependency>
 		<dependency>
