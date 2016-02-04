@@ -4,7 +4,7 @@
 
 
 	<parent>
-		<artifactId>mobicents-smsc-parent</artifactId>
+		<artifactId>restcomm-smsc-parent</artifactId>
 		<groupId>org.mobicents.smsc</groupId>
 		<version>3.0.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
@@ -33,7 +33,7 @@
 			<version>${log4j.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.cloudhopper</groupId>
+			<groupId>${ch.smpp.namespace}</groupId>
 			<artifactId>ch-smpp</artifactId>
 			<version>${ch.smpp.version}</version>
 		</dependency>

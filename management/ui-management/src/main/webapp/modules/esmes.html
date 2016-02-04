@@ -428,7 +428,7 @@
 	}
 	
 	function updateEsmes() {
-		mbeanSearch="com.mobicents.smpp:layer=Esme,name=*";
+		mbeanSearch="org.mobicents.smpp:layer=Esme,name=*";
 		var mbeanVar;
 		$.ajax({
 			dataType: "json",
@@ -1743,7 +1743,7 @@
 		})
 	}
 	function disableLogBytes(esmeName){
-		mbeanSearch="com.mobicents.smpp:layer=Esme,name="+esmeName;
+		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
 		jolokia.execute(mbeanSearch,"disableLogBytes",
 				{
 					success: function(value) {
@@ -1757,7 +1757,7 @@
 				});	
 	}
 	function disableLogPdu(esmeName){
-		mbeanSearch="com.mobicents.smpp:layer=Esme,name="+esmeName;
+		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
 		jolokia.execute(mbeanSearch,"disableLogPdu",
 				{
 					success: function(value) {
@@ -1771,7 +1771,7 @@
 				});	
 	}	
 	function dumpWindow(esmeName){
-		mbeanSearch="com.mobicents.smpp:layer=Esme,name="+esmeName;
+		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
 		jolokia.execute(mbeanSearch,"dumpWindow",
 				{
 					success: function(value) {
@@ -1785,7 +1785,7 @@
 				});	
 	}
 	function enableLogBytes(esmeName){
-		mbeanSearch="com.mobicents.smpp:layer=Esme,name="+esmeName;
+		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
 		jolokia.execute(mbeanSearch,"enableLogBytes",
 				{
 					success: function(value) {
@@ -1799,7 +1799,7 @@
 				});	
 	}	
 	function enableLogPdu(esmeName){
-		mbeanSearch="com.mobicents.smpp:layer=Esme,name="+esmeName;
+		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
 		jolokia.execute(mbeanSearch,"enableLogPdu",
 				{
 					success: function(value) {
@@ -1813,7 +1813,7 @@
 				});	
 	}	
 	function resetCounters(esmeName){
-		mbeanSearch="com.mobicents.smpp:layer=Esme,name="+esmeName;
+		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
 		jolokia.execute(mbeanSearch,"resetCounters",
 				{
 					success: function(value) {
@@ -1827,7 +1827,7 @@
 				});	
 	}	
 	function esmeOperation(operation, name) {
-		mbeanSearch="com.mobicents.smpp:layer=EsmeManagement,name=SmppManagement";
+		mbeanSearch="org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement";
 		jolokia.execute(mbeanSearch,operation,name,
 				{
 					success: function(value) {
@@ -2034,7 +2034,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("com.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
+		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
 				{
 					success: function(value) {
 						updateEsmes();
@@ -2087,7 +2087,7 @@
 			propValue = null;
 		}
 		
-		var mbeanSearch="com.mobicents.smpp:layer=Esme,name="+mbeanName;
+		var mbeanSearch="org.mobicents.smpp:layer=Esme,name="+mbeanName;
 		jolokia.request(
 				[
 					{ type: "write", mbean: mbeanSearch, attribute: propertyName, value: propValue },

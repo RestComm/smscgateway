@@ -1,5 +1,5 @@
 # RestComm SMSC Gateway
- RestComm SMSC Gateway to send/receive SMS from/to Operators Network (GSM)
+ RestComm SMSC Gateway to send/receive SMS from/to Mobile Operator Networks (GSM, SS7 MAP) , SMS aggregators (SMPP) and Internet Telephony Service Providers (SIP, SMPP). 
 
 ## Introduction 
 
@@ -25,7 +25,7 @@ RestComm SMSC Gateway is lead by [TeleStax, Inc.](www.telestax.com) and develope
 
 ## Downloads
 
-Download binary from [here](https://github.com/RestComm/smscgateway/releases) or Continuous Delivery builds from [CloudBees](https://mobicents.ci.cloudbees.com/job/Mobicents-SMSC/)
+Download binary from [here](https://github.com/RestComm/smscgateway/releases) or Continuous Delivery builds from [CloudBees](https://mobicents.ci.cloudbees.com/job/Restcomm-SMSC/)
 
 ## Maven Repository
 
@@ -37,4 +37,4 @@ Read our [RestComm jSS7 wiki](https://github.com/RestComm/smscgateway/wiki)
 
 ## All Open Source RestComm Projects
 
-Open Source http://telestax.com/open-source-2/
+Open Source http://telestax.com/open-source/

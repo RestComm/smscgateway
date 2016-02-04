@@ -42,7 +42,7 @@ import org.jboss.mx.util.MBeanServerLocator;
 public class SmppManagement implements SmppManagementMBean {
     private static final Logger logger = Logger.getLogger(SmppManagement.class);
 
-    public static final String JMX_DOMAIN = "com.mobicents.smpp";
+    public static final String JMX_DOMAIN = "org.mobicents.smpp";
     public static final String JMX_LAYER_ESME_MANAGEMENT = "EsmeManagement";
     public static final String JMX_LAYER_SMPP_SERVER_MANAGEMENT = "SmppServerManagement";
     public static final String JMX_LAYER_SMPP_CLIENT_MANAGEMENT = "SmppClientManagement";
