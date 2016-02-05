@@ -54,7 +54,7 @@
 	<property name="checkout.community-cassandra.dir" value="${cassandra.dir}/apache-${community-cassandra.version}" />
 
 	<!-- Cloudhopper will be removed when the code ready in official github -->
-	<property name="restcomm-cloudhopper.smpp.tag" value="test_build_submit_multi" />
+	<property name="restcomm-cloudhopper.smpp.tag" value="master_submit_multi-2" />
 
 
 	<property name="cloudbees.url" value="https://mobicents.ci.cloudbees.com" />
