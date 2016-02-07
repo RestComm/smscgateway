@@ -27,8 +27,8 @@
 	<property name="restcomm.smsc.release.version" value="3.0.0-SNAPSHOT"/>
 		<!-- **//-->
 
-	<property name="restcomm-slee.build-number" value="51" />
-	<property name="restcomm-slee.version" value="2.8.23" />
+	<property name="restcomm-slee.build-number" value="54" />
+	<property name="restcomm-slee.version" value="2.8.25" />
 
 	<property name="restcomm-slee.ss7.tag" value="2.8.21" />
 
@@ -561,6 +561,11 @@
 		                <include name="**" />
 		        </fileset>
 		</copy>
+
+		<copy file="${checkout.restcomm-diam.dir}/core/mux/mobicents-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
+			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+		<copy file="${checkout.restcomm-diam.dir}/core/mux/mobicents-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
+			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
     	
 		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-mobicents-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
