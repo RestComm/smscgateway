@@ -50,7 +50,7 @@
 
 
 	<!-- Cassandra community version -->
-	<property name="community-cassandra.version" value="3.2.1" />
+	<property name="community-cassandra.version" value="2.2.4" />
 	<property name="checkout.community-cassandra.dir" value="${cassandra.dir}/apache-${community-cassandra.version}" />
 
 	<!-- Cloudhopper will be removed when the code ready in official github -->
