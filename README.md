@@ -18,7 +18,7 @@ When an SMS message is sent from a mobile phone, it will reach an SMS center fir
 4) It will forward the SMS message when the recipient is available.
 
 ## Testing
-Configuration for SMSC GW with RestComm jSS7 is [here](https://github.com/RestComm/smscgateway/wiki/Testing-SMSC-GW-with-jSS7-Simulator) 
+Configuration for SMSC GW with RestComm jSS7 Simulator is [here](https://github.com/RestComm/smscgateway/wiki/Testing-SMSC-GW-with-jSS7-Simulator) 
 
 ## License
 
