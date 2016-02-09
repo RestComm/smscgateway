@@ -10,11 +10,15 @@ When a user sends a text message (SMS message) to another user, the message gets
 An SMS center (SMSC) is responsible for handling the SMS operations of a wireless network.
 
 When an SMS message is sent from a mobile phone, it will reach an SMS center first.
+
 2) The SMS center then forwards the SMS message towards the destination.
 
 3) The main duty of an SMSC is to route SMS messages and regulate the process. If the recipient is unavailable (for example, when the mobile phone is switched off), the SMSC will store the SMS message.
 
 4) It will forward the SMS message when the recipient is available.
+
+## Testing
+Configuration for SMSC GW with RestComm jSS7 is [here](https://github.com/RestComm/smscgateway/wiki/Testing-SMSC-GW-with-jSS7-Simulator) 
 
 ## License
 
