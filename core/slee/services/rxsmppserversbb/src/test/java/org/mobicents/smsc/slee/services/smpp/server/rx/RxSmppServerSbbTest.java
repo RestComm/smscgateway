@@ -185,6 +185,9 @@ public class RxSmppServerSbbTest {
 
     @Test(groups = { "TxSmppServer" })
     public void testSubmitSm_createSmsEvent() throws Exception {
+        if (!this.cassandraDbInited)
+            return;
+
         String s1 = "������Hel";
         String s2 = "Hello bbs";
 
@@ -229,6 +232,9 @@ public class RxSmppServerSbbTest {
 
     @Test(groups = { "RxSmppServer" })
     public void testSubmitSm_test1() throws Exception {
+        if (!this.cassandraDbInited)
+            return;
+
         ArrayList<SmsDef> lst = new ArrayList<SmsDef>();
         SmsDef sd1 = new SmsDef();
         lst.add(sd1);
@@ -248,6 +254,9 @@ public class RxSmppServerSbbTest {
 
     @Test(groups = { "RxSmppServer" })
     public void testSubmitSm_test1_2() throws Exception {
+        if (!this.cassandraDbInited)
+            return;
+
         ArrayList<SmsDef> lst = new ArrayList<SmsDef>();
         SmsDef sd1 = new SmsDef();
         sd1.stored = true;
@@ -268,6 +277,9 @@ public class RxSmppServerSbbTest {
 
     @Test(groups = { "RxSmppServer" })
     public void testSubmitSm_test3_2() throws Exception {
+        if (!this.cassandraDbInited)
+            return;
+
         ArrayList<SmsDef> lst = new ArrayList<SmsDef>();
         SmsDef sd1 = new SmsDef();
         sd1.msg = "Msg 1";
