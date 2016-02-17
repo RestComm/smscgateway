@@ -14,71 +14,71 @@
 		<!-- Services -->
 		<dependency>
 			<artifactId>smsc-library</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 
 		<dependency>
 			<artifactId>smsc-events</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		 -->
 		 
         <dependency>
             <artifactId>alert-sbb</artifactId>
-            <groupId>${pom.groupId}</groupId>
-            <version>${pom.version}</version>
+            <groupId>${project.groupId}</groupId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <artifactId>charging-sbb</artifactId>
-            <groupId>${pom.groupId}</groupId>
-            <version>${pom.version}</version>
+            <groupId>${project.groupId}</groupId>
+            <version>${project.version}</version>
         </dependency>
 		<!-- 
 		<dependency>
 			<artifactId>persistence-sbb</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 			<scope>runtime</scope>
 			<type>jar</type>
 		</dependency>
 		 -->
 		<dependency>
 			<artifactId>tx-smppserver-sbb</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>rx-smppserver-sbb</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>mt-sbb</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>mo-sbb</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>tx-sipserver-sbb</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>rx-sipserver-sbb</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
 			<artifactId>homerouting-sbb</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>						
 	</dependencies>
 

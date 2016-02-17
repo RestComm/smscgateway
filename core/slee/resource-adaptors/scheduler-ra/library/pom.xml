@@ -13,16 +13,16 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>persistence-ra-library</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<!-- for some reason'compile' time from ^^^ are not included... <dependency> 
-			<artifactId>common-library</artifactId> <groupId>${pom.groupId}</groupId> 
-			<version>${pom.version}</version> <scope>compile</scope> </dependency> <dependency> 
-			<artifactId>smpp-server-ra-library</artifactId> <groupId>${pom.groupId}</groupId> 
-			<version>${pom.version}</version> <scope>compile</scope> </dependency> <dependency> 
+			<artifactId>common-library</artifactId> <groupId>${project.groupId}</groupId> 
+			<version>${project.version}</version> <scope>compile</scope> </dependency> <dependency> 
+			<artifactId>smpp-server-ra-library</artifactId> <groupId>${project.groupId}</groupId> 
+			<version>${project.version}</version> <scope>compile</scope> </dependency> <dependency> 
 			<artifactId>mobicents-slee-ra-map-library</artifactId> <groupId>org.mobicents.resources</groupId> 
 			<version>${mobicents.resources.map.version}</version> <scope>compile</scope> 
 			</dependency> -->

@@ -20,21 +20,21 @@
 		</dependency>
 		<dependency>
 			<artifactId>persistence-ratype</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>smpp-server-ra-events</artifactId>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 		</dependency>
 		<dependency>
 			<artifactId>smsc-library</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>smpp-server-ra-ratype</artifactId>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servers.jainslee.api</groupId>
@@ -44,41 +44,22 @@
 		</dependency>
 		<dependency>
 			<artifactId>persistence-ra-library</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>smpp-server-ra-library</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>
 			<artifactId>mobicents-slee-ra-map-ratype</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
-			<artifactId>smpp-server-ra-library</artifactId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>smpp-server-ra-events</artifactId>
-			<groupId>${pom.groupId}</groupId>
-		</dependency>
-		<dependency>
-			<artifactId>persistence-ra-library</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>persistence-ratype</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>charging-sbb</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>			
 	</dependencies>
 
@@ -96,9 +77,9 @@
 					<scope>test</scope>
 				</dependency>
 				<dependency>
-					<groupId>${pom.groupId}</groupId>
+					<groupId>${project.groupId}</groupId>
 					<artifactId>persistence-ra</artifactId>
-					<version>${pom.version}</version>
+					<version>${project.version}</version>
 					<type>test-jar</type>
 				</dependency>			
                 <dependency>

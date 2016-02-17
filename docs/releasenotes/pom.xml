@@ -11,7 +11,7 @@
 
 	<artifactId>restcomm-smsc-releasenotes</artifactId>
 	<groupId>org.mobicents.smsc.docs.releasenotes</groupId>
-	<name>RestComm SMSC :: Docs :: Release Notes :: ${pom.artifactId}</name>
+	<name>RestComm SMSC :: Docs :: Release Notes :: ${project.artifactId}</name>
 	<packaging>pom</packaging>
 
 	<properties>

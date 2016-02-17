@@ -13,7 +13,7 @@
 		<dependency>
 			<groupId>org.mobicents.smsc</groupId>
 			<artifactId>smpp-server-ra-library</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>mobicents-slee-ra-map-library</artifactId>

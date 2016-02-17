@@ -82,7 +82,7 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<build>
-				<finalName>${pom.artifactId}</finalName>
+				<finalName>${project.artifactId}</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -97,9 +97,9 @@
 								<configuration>
 									<artifactItems>
 										<artifactItem>
-											<groupId>${pom.groupId}</groupId>
-											<artifactId>${pom.artifactId}</artifactId>
-											<version>${pom.version}</version>
+											<groupId>${project.groupId}</groupId>
+											<artifactId>${project.artifactId}</artifactId>
+											<version>${project.version}</version>
 											<type>jar</type>
 											<overWrite>true</overWrite>
 											<outputDirectory>

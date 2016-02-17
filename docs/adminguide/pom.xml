@@ -10,7 +10,7 @@
 
 	<artifactId>restcomm-smsc-adminguide</artifactId>
 	<groupId>org.mobicents.smsc.docs.adminguide</groupId>
-	<name>RestComm SMSC :: Docs :: Admin Guide :: ${pom.artifactId}</name>
+	<name>RestComm SMSC :: Docs :: Admin Guide :: ${project.artifactId}</name>
 	<packaging>pom</packaging>
 
 	<properties>

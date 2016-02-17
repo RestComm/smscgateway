@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>org.mobicents.smsc</groupId>
 			<artifactId>smpp-simulator</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>

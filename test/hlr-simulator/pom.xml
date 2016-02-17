@@ -206,17 +206,5 @@
 			<artifactId>javolution</artifactId>
 			<version>${javolution.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.jboss.microcontainer</groupId>
-			<artifactId>jboss-kernel</artifactId>
-			<version>${version.jboss.microcontainer}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.microcontainer</groupId>
-			<artifactId>jboss-aop-mc-int</artifactId>
-			<version>${version.jboss.microcontainer}</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 </project>

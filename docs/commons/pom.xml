@@ -11,7 +11,7 @@
 
 	<artifactId>restcomm-smsc-commons-sources</artifactId>
 	<groupId>org.mobicents.smsc.docs.commons</groupId>
-	<name>RestComm SMSC :: Docs :: Commons :: Sources :: ${pom.artifactId}</name>
+	<name>RestComm SMSC :: Docs :: Commons :: Sources :: ${project.artifactId}</name>
 	<properties>
 
 	</properties>

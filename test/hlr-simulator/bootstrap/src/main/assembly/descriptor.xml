@@ -101,8 +101,6 @@
 				<include>org.mobicents.protocols.ss7.hardware:mobicents-dialogic</include>
 				<include>org.mobicents.protocols.ss7.congestion:congestion</include>
 				
-				<include>org.mobicents.protocols.ss7.statistics:statistics</include>
-				
 				<!-- SS7 OAM Cli Libraries -->
 				<include>org.jboss.jreadline:jreadline</include>
 				<include>org.mobicents.protocols.ss7.m3ua:m3ua-cli-sctp</include>
@@ -110,11 +108,13 @@
 				<include>org.mobicents.protocols.ss7.sccp:sccp-cli</include>
 				
 			  	<!-- RestComm licensing lib -->
+<!--
 			 	<include>com.mobicents.licensing:lce-core</include>
 			    <include>com.mobicents.licensing:lce-common:jar:jar-with-dependencies</include>
 			    <include>com.mobicents.licensing:lce-secret:jar:obfuscated</include>
 			    <include>com.mobicents.licensing:lce-notify</include>
 			    <include>com.mobicents.licensing:lce-offline:jar:obfuscated</include>
+-->
 			    <include>org.apache.commons:commons-email</include>					
 			</includes>
 		</dependencySet>

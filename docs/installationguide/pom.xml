@@ -11,7 +11,7 @@
 
 	<artifactId>restcomm-smsc-installguide</artifactId>
 	<groupId>org.mobicents.smsc.docs.installguide</groupId>
-	<name>RestComm SMSC :: Docs :: Install Guide :: ${pom.artifactId}</name>
+	<name>RestComm SMSC :: Docs :: Install Guide :: ${project.artifactId}</name>
 	<packaging>pom</packaging>
 
 	<properties>

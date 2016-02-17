@@ -25,23 +25,23 @@
 		</dependency>
 		<dependency>
 			<artifactId>persistence-ra-library</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>scheduler-ratype</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>persistence-ratype</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.smsc</groupId>
 			<artifactId>smpp-server-ra-library</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>
@@ -50,18 +50,18 @@
 		<dependency>
 			<groupId>org.mobicents.smsc</groupId>
 			<artifactId>smpp-server-ra-ratype</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
 			<artifactId>smpp-server-ra-events</artifactId>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 		</dependency>
 
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>charging-sbb</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>			
 	</dependencies>
 
@@ -73,9 +73,9 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>${pom.groupId}</groupId>
+					<groupId>${project.groupId}</groupId>
 					<artifactId>persistence-ra</artifactId>
-					<version>${pom.version}</version>
+					<version>${project.version}</version>
 					<type>test-jar</type>
 				</dependency>			
 				<dependency>

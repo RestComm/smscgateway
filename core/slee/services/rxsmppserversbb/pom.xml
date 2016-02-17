@@ -13,26 +13,26 @@
 	<dependencies>
 		<dependency>
 			<artifactId>persistence-ratype</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>smpp-server-ra-events</artifactId>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 		</dependency>
 		<dependency>
 			<artifactId>smsc-common-library</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>smpp-server-ra-ratype</artifactId>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 		</dependency>
 		<dependency>
 			<artifactId>scheduler-ratype</artifactId>
-			<groupId>${pom.groupId}</groupId>
-			<version>${pom.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servers.jainslee.api</groupId>
@@ -41,9 +41,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>${pom.groupId}</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>domain</artifactId>
-			<version>${pom.version}</version>
+			<version>${project.version}</version>
 		</dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -61,15 +61,15 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>${pom.groupId}</groupId>
+					<groupId>${project.groupId}</groupId>
 					<artifactId>persistence-ra</artifactId>
-					<version>${pom.version}</version>
+					<version>${project.version}</version>
 					<type>test-jar</type>
 				</dependency>			
                 <dependency>
-                    <groupId>${pom.groupId}</groupId>
+                    <groupId>${project.groupId}</groupId>
                     <artifactId>smpp</artifactId>
-                    <version>${pom.version}</version>
+                    <version>${project.version}</version>
                     <type>test-jar</type>
                 </dependency>           
 				<dependency>

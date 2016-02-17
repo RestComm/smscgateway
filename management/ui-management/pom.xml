@@ -10,7 +10,7 @@
 
 	<artifactId>ui-management</artifactId>
 	
-	<name>RestComm SMSC :: Management :: UI :: ${pom.artifactId}</name>
+	<name>RestComm SMSC :: Management :: UI :: ${project.artifactId}</name>
 	<packaging>war</packaging>
 
 	<properties>

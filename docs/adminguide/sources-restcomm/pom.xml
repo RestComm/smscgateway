@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>restcomm-smsc-adminguide-sources-restcomm</artifactId>
-	<name>RestComm SMSC :: Docs :: Admin Guide :: Sources :: ${pom.artifactId}</name>
+	<name>RestComm SMSC :: Docs :: Admin Guide :: Sources :: ${project.artifactId}</name>
 	<properties>
 		<THIS.PLATFORM>RestComm</THIS.PLATFORM>
 		<JEE.PLATFORM>JBoss Application Server</JEE.PLATFORM>
@@ -46,9 +46,9 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>${pom.groupId}</groupId>
+									<groupId>${project.groupId}</groupId>
 									<artifactId>restcomm-smsc-adminguide-sources</artifactId>
-									<version>${pom.version}</version>
+									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
 									<outputDirectory>${basedir}/src/main/resources</outputDirectory>
@@ -56,7 +56,7 @@
 								<artifactItem>
 									<groupId>org.mobicents.smsc.docs.commons</groupId>
 									<artifactId>restcomm-smsc-commons-sources</artifactId>
-									<version>${pom.version}</version>
+									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
 									<outputDirectory>${basedir}/src/main/resources</outputDirectory>
