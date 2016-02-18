@@ -27,30 +27,30 @@
 	<property name="restcomm.smsc.release.version" value="3.0.0-SNAPSHOT"/>
 		<!-- **//-->
 
-	<property name="restcomm-slee.build-number" value="54" />
-	<property name="restcomm-slee.version" value="2.8.25" />
+	<property name="restcomm-slee.build-number" value="65" />
+	<property name="restcomm-slee.version" value="2.8.31" />
 
-	<property name="restcomm-slee.ss7.tag" value="2.8.21" />
+	<property name="restcomm-slee.ss7.tag" value="2.8.26" />
 
 	<!-- JainSlee SIP RA DU -->
-	<property name="restcomm-slee-sip11.build-number" value="11" />	
+	<property name="restcomm-slee-sip11.build-number" value="20" />	
 	<property name="restcomm-slee-sip11.tag" value="2.8.${restcomm-slee-sip11.build-number}" />
 	<property name="restcomm-slee-sip11.version" value="${restcomm-slee-sip11.tag}" />
 
-	<property name="restcomm-jss7.build-number" value="1329" />
+	<property name="restcomm-jss7.build-number" value="1336" />
 	<property name="restcomm-jss7.version" value="3.0.${restcomm-jss7.build-number}" />
-	<property name="restcomm-jss7.timestamp" value="1601292003" />
+	<property name="restcomm-jss7.timestamp" value="1602171452" />
 	<property name="restcomm-jss7.tag" value="${restcomm-jss7.version}" />
 
 
 	<!-- <property name="restcomm-management-hq.version" value="6.1.4.GA" /> -->
-	<property name="restcomm-diam.build-number" value="74" />
+	<property name="restcomm-diam.build-number" value="83" />
 	<property name="restcomm-diam.version" value="1.7.0" />
-	<property name="restcomm-diam.resources.version" value="2.7.1.FINAL" />
+	<property name="restcomm-diam.resources.version" value="2.8.0-SNAPSHOT" />
 
 
 	<!-- Cassandra community version -->
-	<property name="community-cassandra.version" value="2.2.4" />
+	<property name="community-cassandra.version" value="2.2.5" />
 	<property name="checkout.community-cassandra.dir" value="${cassandra.dir}/apache-${community-cassandra.version}" />
 
 	<!-- Cloudhopper will be removed when the code ready in official github -->
@@ -64,7 +64,7 @@
 	<property name="restcomm-slee.download.distro.file" value="${restcomm-slee.download.distro.name}.zip" />
 	<property name="restcomm-slee.download.url" value="${cloudbees.url}/job/Restcomm-JAIN-SLEE-Release/${restcomm-slee.build-number}/artifact/release/${restcomm-slee.download.distro.file}" />
 	<property name="restcomm-slee.distro.zip.path" value="${checkout.dir}/${restcomm-slee.download.distro.file}" />
-	<property name="restcomm-jss7.download.distro.file" value="mobicents-jss7-${restcomm-jss7.version}-${restcomm-jss7.timestamp}.zip" />
+	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm-jss7.version}-${restcomm-jss7.timestamp}.zip" />
 	<property name="restcomm-jss7.download.url" value="${cloudbees.url}/job/Restcomm-jSS7/${restcomm-jss7.build-number}/artifact/release/${restcomm-jss7.download.distro.file}" />
 	<property name="restcomm-jss7.distro.zip.path" value="${checkout.dir}/${restcomm-jss7.download.distro.file}" />
 	
@@ -437,8 +437,9 @@
         </copy>
         <copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-	    <copy file="${release.dir}/resources/map/mobicents-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-	    <copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+<!--   	<copy file="${release.dir}/resources/map/mobicents-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" /> -->
+    	<copy file="${base.dir}/map-ra/target/map-du/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+    	<copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
     	<mkdir dir="${release.dir}/jboss-5.1.0.GA/server/default/data"/>
 	    <copy file="${basedir}/profile.xml" todir="${release.dir}/jboss-5.1.0.GA/server/default/conf/bootstrap" failonerror="true" overwrite="true"/>
@@ -450,7 +451,8 @@
         </copy>
         <copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-	    <copy file="${release.dir}/resources/map/mobicents-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+<!--	    <copy file="${release.dir}/resources/map/mobicents-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" /> -->
+    	<copy file="${base.dir}/map-ra/target/map-du/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
         <copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/data" failonerror="true">
                 <fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/data">
@@ -466,7 +468,7 @@
 	    <copy file="${basedir}/profile.xml" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/conf/bootstrap" failonerror="true" overwrite="true"/>
 		<!--tools-->
 		<copy todir="${release.dir}/tools/restcomm-jss7-simulator" failonerror="true">
-		        <fileset dir="${checkout.restcomm-jss7.dir}/mobicents-jss7-${restcomm-jss7.version}/ss7/mobicents-ss7-simulator">
+		        <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/restcomm-ss7-simulator">
 		                <include name="**" />
 		        </fileset>
 		</copy>
@@ -499,13 +501,13 @@
     	<!--CLI-->
         <copy file="${checkout.restcomm-smsc.dir}/core/oam/clismpp/target/smpp-cli-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/lib" failonerror="true" />
 		<copy todir="${release.dir}/jboss-5.1.0.GA/" failonerror="true">
-		        <fileset dir="${checkout.restcomm-jss7.dir}/mobicents-jss7-${restcomm-jss7.version}/ss7/shell">
+		        <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell">
 		                <include name="**/*" />
 		        </fileset>
 		</copy>
         <copy file="${checkout.restcomm-smsc.dir}/core/oam/cli/target/smsc-cli-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/lib" failonerror="true" />
         <copy todir="${release.dir}/jboss-5.1.0.GA/" failonerror="true">
-                <fileset dir="${checkout.restcomm-jss7.dir}/mobicents-jss7-${restcomm-jss7.version}/ss7/shell">
+                <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell">
                         <include name="**/*" />
                 </fileset>
         </copy>
@@ -527,10 +529,10 @@
     	<copy file="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/log4j/jboss-log4j-default.xml" tofile="${release.dir}/jboss-5.1.0.GA/server/simulator/conf/jboss-log4j.xml" overwrite="true"></copy>
 			
     	<!-- oam/new-ui - jolokia war & jss7-management-console.war-->
-	    <copy file="${checkout.restcomm-jss7.dir}/mobicents-jss7-${restcomm-jss7.version}/oam/new-ui/jolokia.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-	    <copy file="${checkout.restcomm-jss7.dir}/mobicents-jss7-${restcomm-jss7.version}/oam/new-ui/jolokia.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-	    <copy file="${checkout.restcomm-jss7.dir}/mobicents-jss7-${restcomm-jss7.version}/oam/new-ui/jss7-management-console.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-	    <copy file="${checkout.restcomm-jss7.dir}/mobicents-jss7-${restcomm-jss7.version}/oam/new-ui/jss7-management-console.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+	    <copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jolokia.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+	    <copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jolokia.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+	    <copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jss7-management-console.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+	    <copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jss7-management-console.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
     	
 		<!-- restcomm Management HQ is not needed
 		<echo>restcomm Management Hq</echo>
@@ -562,18 +564,18 @@
 		        </fileset>
 		</copy>
 
-		<copy file="${checkout.restcomm-diam.dir}/core/mux/mobicents-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
+		<copy file="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-diam.dir}/core/mux/mobicents-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
+		<copy file="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
     	
-		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-mobicents-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
+		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-mobicents-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
+		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-diam.dir}/resources/ro/diameter-mobicents-slee-ra-diameter-ro-ra-DU-${restcomm-diam.resources.version}.jar" 
+		<copy file="${checkout.restcomm-diam.dir}/resources/ro/diameter-restcomm-slee-ra-diameter-ro-ra-DU-${restcomm-diam.resources.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-diam.dir}/resources/ro/diameter-mobicents-slee-ra-diameter-ro-ra-DU-${restcomm-diam.resources.version}.jar" 
+		<copy file="${checkout.restcomm-diam.dir}/resources/ro/diameter-restcomm-slee-ra-diameter-ro-ra-DU-${restcomm-diam.resources.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 		<copy file="${release.dir}/resources/sip11/sip11-ra-DU-${restcomm-slee-sip11.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
@@ -614,7 +616,7 @@
 		<mkdir dir="${docs.dir}/jss7"/>
 		<mkdir dir="${docs.dir}/smsc"/>
 		<copy todir="${docs.dir}/jss7" failonerror="true">
-		        <fileset dir="${checkout.restcomm-jss7.dir}/mobicents-jss7-${restcomm-jss7.version}/_docs/">
+		        <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/_docs/">
 		                <include name="*.pdf" />
 		        </fileset>
 		</copy>
@@ -663,7 +665,7 @@
 		<mkdir dir="${bundle.docs.dir}/jss7"/>
 		<mkdir dir="${bundle.docs.dir}/smsc"/>
 		<copy todir="${bundle.docs.dir}/jss7" failonerror="true">
-		        <fileset dir="${checkout.restcomm-jss7.dir}/mobicents-jss7-${restcomm-jss7.version}/_docs/">
+		        <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/_docs/">
 		                <include name="**" />
 		        </fileset>
 		</copy>
