@@ -20,12 +20,12 @@
 		<dependency>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
 			<artifactId>map-api</artifactId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
 			<artifactId>map-impl</artifactId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>smpp-server-ra-ratype</artifactId>

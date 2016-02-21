@@ -38,9 +38,9 @@
 		</dependency>
 
 		<dependency>
-			<artifactId>mobicents-slee-ra-map-library</artifactId>
+			<artifactId>restcomm-slee-ra-map-library</artifactId>
 			<groupId>org.mobicents.resources</groupId>
-			<version>${mobicents.resources.map.version}</version>
+			<version>${restcomm.resources.map.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

@@ -35,12 +35,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>
-			<artifactId>mobicents-slee-ra-map-ratype</artifactId>
+			<artifactId>restcomm-slee-ra-map-ratype</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>
 			<artifactId>sip11-ratype</artifactId>
-			<version>${mobicents.resources.sip.version}</version>
+			<version>${restcomm.resources.sip.version}</version>
 		</dependency>		
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -71,12 +71,12 @@
                 <dependency>
                     <artifactId>statistics-api</artifactId>
                     <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${jss7.mobicents.version}</version>
+                    <version>${jss7.restcomm.version}</version>
                 </dependency>       
                 <dependency>
                     <artifactId>statistics-impl</artifactId>
                     <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${jss7.mobicents.version}</version>
+                    <version>${jss7.restcomm.version}</version>
                 </dependency>       
 			</dependencies>
 		</profile>

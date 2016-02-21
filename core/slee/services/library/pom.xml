@@ -16,11 +16,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>mobicents-slee-ra-map-library</artifactId>
+			<artifactId>restcomm-slee-ra-map-library</artifactId>
 			<groupId>org.mobicents.resources</groupId>
 		</dependency>
 		<dependency>
-			<artifactId>mobicents-slee-ra-diameter-cca-common-library</artifactId>
+			<artifactId>restcomm-slee-ra-diameter-cca-common-library</artifactId>
 			<groupId>org.mobicents.resources</groupId>
 			<version>${jdiameter.version}</version>
 		</dependency>

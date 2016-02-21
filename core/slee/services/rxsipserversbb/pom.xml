@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>
 			<artifactId>sip11-ratype</artifactId>
-			<version>${mobicents.resources.sip.version}</version>
+			<version>${restcomm.resources.sip.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>scheduler-ratype</artifactId>

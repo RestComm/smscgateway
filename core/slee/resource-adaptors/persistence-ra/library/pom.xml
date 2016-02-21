@@ -25,20 +25,20 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<artifactId>mobicents-slee-ra-map-library</artifactId>
+			<artifactId>restcomm-slee-ra-map-library</artifactId>
 			<groupId>org.mobicents.resources</groupId>
-			<version>${mobicents.resources.map.version}</version>
+			<version>${restcomm.resources.map.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
 			<artifactId>map-api</artifactId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
 			<artifactId>map-impl</artifactId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		
 		<!-- Cassandra Driver and dep tree -->
@@ -121,7 +121,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<excludeArtifactIds>common-library,smpp-server-ra-library,mobicents-slee-ra-map-library</excludeArtifactIds>
+					<excludeArtifactIds>common-library,smpp-server-ra-library,restcomm-slee-ra-map-library</excludeArtifactIds>
 					<library-name>library-persistence</library-name>
 					<library-vendor>telestax</library-vendor>
 					<library-version>1.0</library-version>

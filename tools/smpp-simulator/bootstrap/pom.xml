@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>simulator-bootstrap</artifactId>
-	<name>Mobicents SMPP Simulator :: Simulator Bootstrap</name>
+	<name>RestComm SMPP Simulator :: Simulator Bootstrap</name>
 
 	<dependencies>
 		<dependency>

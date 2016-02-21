@@ -101,7 +101,7 @@
 	
 	<taskdef onerror="fail" resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
-			<pathelement location="${ant.file.mobicents.ussdgw.release}/../ant-contrib-1.0b3.jar" />
+			<pathelement location="${ant.file.restcomm.smscgw.release}/../ant-contrib-1.0b3.jar" />
 		</classpath>
 	</taskdef>
 	
@@ -349,8 +349,8 @@
 		<delete dir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/deploy.last" includeemptydirs="true" failonerror="true" />
 		<delete dir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/snmp-adaptor.sar" includeemptydirs="true" failonerror="true" />
 		<delete dir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/juddi-service.sar" includeemptydirs="true" failonerror="true" />
-		<delete file="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/mobicents-slee/profiles-external-ds.xml" failonerror="true" />
-		<delete file="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/mobicents-slee/META-INF/jboss-cache-config.xml" failonerror="true" />
+		<delete file="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-slee/profiles-external-ds.xml" failonerror="true" />
+		<delete file="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-slee/META-INF/jboss-cache-config.xml" failonerror="true" />
 		<delete file="${release.dir}/jboss-5.1.0.GA/server/simulator/iiop-service.xml" failonerror="true" />
 		<delete file="${release.dir}/jboss-5.1.0.GA/server/simulator/conf/jacorb.properties" failonerror="true" />
 		<delete file="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/iiop-service.xml" failonerror="true" />
@@ -410,7 +410,7 @@
         <echo>Copy RestComm Map RA DU</echo>
         <copy todir="${release.dir}/resources/map" failonerror="true">
                 <fileset dir="${base.dir}/map-ra/target/map-du">
-                        <include name="mobicents-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" />
+                        <include name="restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" />
                 </fileset>
         </copy>
 
@@ -437,7 +437,7 @@
         </copy>
         <copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-<!--   	<copy file="${release.dir}/resources/map/mobicents-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" /> -->
+<!--   	<copy file="${release.dir}/resources/map/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" /> -->
     	<copy file="${base.dir}/map-ra/target/map-du/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
     	<copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
@@ -451,7 +451,7 @@
         </copy>
         <copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-<!--	    <copy file="${release.dir}/resources/map/mobicents-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" /> -->
+<!--	    <copy file="${release.dir}/resources/map/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" /> -->
     	<copy file="${base.dir}/map-ra/target/map-du/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
         <copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/data" failonerror="true">
@@ -564,11 +564,13 @@
 		        </fileset>
 		</copy>
 
+
 		<copy file="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 		<copy file="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-    	
+
+
 		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 

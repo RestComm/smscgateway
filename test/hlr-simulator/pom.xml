@@ -65,109 +65,109 @@
 		<dependency>
 			<groupId>org.mobicents.protocols.ss7.congestion</groupId>
 			<artifactId>congestion</artifactId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<!-- Scheduler -->
 		<dependency>
 			<groupId>org.mobicents.protocols.ss7.scheduler</groupId>
 			<artifactId>scheduler</artifactId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<!-- Management Shell -->
 		<dependency>
 			<artifactId>shell-client</artifactId>
 			<groupId>org.mobicents.protocols.ss7.management</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>		
 		<dependency>
 			<artifactId>shell-server-api</artifactId>
 			<groupId>org.mobicents.protocols.ss7.management</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>shell-server-impl</artifactId>
 			<groupId>org.mobicents.protocols.ss7.management</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>		
 		<dependency>
 			<artifactId>shell-transport</artifactId>
 			<groupId>org.mobicents.protocols.ss7.management</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		
 		<!-- Management linkset -->
 		<dependency>
 			<artifactId>linkset</artifactId>
 			<groupId>org.mobicents.protocols.ss7.hardware</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<!-- Hardware Dialogic Java -->
 		<dependency>
-			<artifactId>mobicents-dialogic</artifactId>
+			<artifactId>restcomm-dialogic</artifactId>
 			<groupId>org.mobicents.protocols.ss7.hardware</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<!-- MTP -->
 		<dependency>
 			<artifactId>mtp</artifactId>
 			<groupId>org.mobicents.protocols.ss7.mtp</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>mtp-api</artifactId>
 			<groupId>org.mobicents.protocols.ss7.mtp</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<!-- M3UA -->
 		<dependency>
 			<artifactId>m3ua-api</artifactId>
 			<groupId>org.mobicents.protocols.ss7.m3ua</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>m3ua-impl</artifactId>
 			<groupId>org.mobicents.protocols.ss7.m3ua</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<!-- SCCP -->
 		<dependency>
 			<artifactId>sccp-api</artifactId>
 			<groupId>org.mobicents.protocols.ss7.sccp</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>sccp-impl</artifactId>
 			<groupId>org.mobicents.protocols.ss7.sccp</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<!-- TCAP -->
 		<dependency>
 			<artifactId>tcap-api</artifactId>
 			<groupId>org.mobicents.protocols.ss7.tcap</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>tcap-impl</artifactId>
 			<groupId>org.mobicents.protocols.ss7.tcap</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<!-- MAP -->
 		<dependency>
 			<artifactId>map-api</artifactId>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>map-impl</artifactId>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<dependency>

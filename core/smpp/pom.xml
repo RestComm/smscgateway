@@ -42,7 +42,7 @@
         <dependency>
             <artifactId>shell-server-api</artifactId>
             <groupId>org.mobicents.protocols.ss7.management</groupId>
-            <version>${jss7.mobicents.version}</version>
+            <version>${jss7.restcomm.version}</version>
         </dependency>
 	</dependencies>
 

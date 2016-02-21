@@ -23,8 +23,8 @@
 			<version>${project.version}</version> <scope>compile</scope> </dependency> <dependency> 
 			<artifactId>smpp-server-ra-library</artifactId> <groupId>${project.groupId}</groupId> 
 			<version>${project.version}</version> <scope>compile</scope> </dependency> <dependency> 
-			<artifactId>mobicents-slee-ra-map-library</artifactId> <groupId>org.mobicents.resources</groupId> 
-			<version>${mobicents.resources.map.version}</version> <scope>compile</scope> 
+			<artifactId>restcomm-slee-ra-map-library</artifactId> <groupId>org.mobicents.resources</groupId> 
+			<version>${restcomm.resources.map.version}</version> <scope>compile</scope> 
 			</dependency> -->
 	</dependencies>
 

@@ -21,7 +21,7 @@
 		<dependency>
 			<artifactId>sccp-impl</artifactId>
 			<groupId>org.mobicents.protocols.ss7.sccp</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>persistence-ratype</artifactId>
@@ -64,7 +64,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>
-			<artifactId>mobicents-slee-ra-map-ratype</artifactId>
+			<artifactId>restcomm-slee-ra-map-ratype</artifactId>
 		</dependency>
 		<dependency>
 			<artifactId>scheduler-ratype</artifactId>
@@ -101,12 +101,12 @@
                 <dependency>
                     <artifactId>statistics-api</artifactId>
                     <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${jss7.mobicents.version}</version>
+                    <version>${jss7.restcomm.version}</version>
                 </dependency>       
                 <dependency>
                     <artifactId>statistics-impl</artifactId>
                     <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${jss7.mobicents.version}</version>
+                    <version>${jss7.restcomm.version}</version>
                 </dependency>       
 			</dependencies>
 		</profile>

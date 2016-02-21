@@ -18,7 +18,7 @@
 		<dependency>
 			<groupId>org.mobicents.protocols.ss7.management</groupId>
 			<artifactId>shell-client</artifactId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 	</dependencies>
 

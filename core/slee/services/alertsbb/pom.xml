@@ -14,7 +14,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>
-			<artifactId>mobicents-slee-ra-map-ratype</artifactId>
+			<artifactId>restcomm-slee-ra-map-ratype</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servers.jainslee.api</groupId>

@@ -30,9 +30,9 @@
 		</dependency>
 		<!-- compile time -->
 		<dependency>
-			<artifactId>mobicents-slee-ra-map-library</artifactId>
+			<artifactId>restcomm-slee-ra-map-library</artifactId>
 			<groupId>org.mobicents.resources</groupId>
-			<version>${mobicents.resources.map.version}</version>
+			<version>${restcomm.resources.map.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -58,7 +58,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<excludeArtifactIds>common-library,mobicents-slee-ra-map-library</excludeArtifactIds>
+					<excludeArtifactIds>common-library,restcomm-slee-ra-map-library</excludeArtifactIds>
 					<library-name>library-smpp-server</library-name>
 					<library-vendor>library-smpp-server</library-vendor>
 					<library-version>1.0</library-version>

@@ -20,22 +20,22 @@
 		</dependency>
 
 		<dependency>
-			<artifactId>mobicents-slee-ra-diameter-cca-common-library</artifactId>
+			<artifactId>restcomm-slee-ra-diameter-cca-common-library</artifactId>
 			<groupId>org.mobicents.resources</groupId>
 			<version>${jdiameter.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>mobicents-slee-ra-diameter-ro-events</artifactId>
+			<artifactId>restcomm-slee-ra-diameter-ro-events</artifactId>
 			<groupId>org.mobicents.resources</groupId>
 			<version>${jdiameter.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>mobicents-slee-ra-diameter-ro-ra</artifactId>
+			<artifactId>restcomm-slee-ra-diameter-ro-ra</artifactId>
 			<groupId>org.mobicents.resources</groupId>
 			<version>${jdiameter.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>mobicents-slee-ra-diameter-ro-ratype</artifactId>
+			<artifactId>restcomm-slee-ra-diameter-ro-ratype</artifactId>
 			<groupId>org.mobicents.resources</groupId>
 			<version>${jdiameter.version}</version>
 		</dependency>

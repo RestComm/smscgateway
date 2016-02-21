@@ -199,7 +199,7 @@
 		<constructor>
 			<parameter>MAP</parameter>
 		</constructor>
-		<property name="jndiName">java:/mobicents/ss7/map</property>
+		<property name="jndiName">java:/restcomm/ss7/map</property>
 		<property name="stack">
 			<inject bean="MapStack" property="MAPProvider" />
 		</property>

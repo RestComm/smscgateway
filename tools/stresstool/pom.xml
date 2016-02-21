@@ -34,7 +34,7 @@
 		<dependency>
 			<artifactId>map-impl</artifactId>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
-			<version>${jss7.mobicents.version}</version>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<dependency>
@@ -49,7 +49,7 @@
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<groupId>org.mobicents.tools</groupId>
 				<version>
-					${mobicents.tools.mavenplugin.eclipse.version}
+					${restcomm.tools.mavenplugin.eclipse.version}
 				</version>
 				<inherited>false</inherited>
 				<executions />
