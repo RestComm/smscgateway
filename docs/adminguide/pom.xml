@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.mobicents.smsc.docs</groupId>
+		<artifactId>restcomm-smsc-docs</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>restcomm-smsc-adminguide</artifactId>
+	<groupId>org.mobicents.smsc.docs.adminguide</groupId>
+	<name>RestComm SMSC :: Docs :: Admin Guide :: ${project.artifactId}</name>
+	<packaging>pom</packaging>
+
+	<properties>
+		<docs.application.name>SMSC Gateway</docs.application.name>
+		<docs.application.dirname>smscgateway</docs.application.dirname>
+		<docs.bookid>SMSCGateway</docs.bookid>
+	</properties>
+
+	<!-- -->
+	<modules>
+		<module>sources</module>
+		<module>sources-restcomm</module>
+		<module>jdocbook-restcomm</module>
+	</modules>
+	
+</project>

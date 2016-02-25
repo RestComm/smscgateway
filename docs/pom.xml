@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.mobicents.smsc</groupId>
+		<artifactId>restcomm-smsc-parent</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.mobicents.smsc.docs</groupId>
+	<artifactId>restcomm-smsc-docs</artifactId>
+
+	<name>RestComm SMSC :: Docs :: Parent :: ${project.artifactId}</name>
+	<packaging>pom</packaging>
+
+	<properties>
+	</properties>
+
+	<modules>
+		<module>commons</module>
+		<module>releasenotes</module>
+		<module>adminguide</module>
+		<module>installationguide</module>
+	</modules>
+</project>

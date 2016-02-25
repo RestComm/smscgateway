@@ -1,0 +1,25 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "${ent.filename}">
+%BOOK_ENTITIES;
+]>
+
+<chapter
+	id="setup_database">
+	<title>Database Setup</title>
+	<para>
+&THIS.PLATFORM; &THIS.APPLICATION; stores messages using Cassandra database. The database is used for storing unsent messages, messages successfully sent and messages that failed to be sent.
+You must have Cassandra database (version 1.2 or 2.0) installed. We stronly recommend that you use the version 2.0 (v 2.0.16 is the most recent version yet).
+The support for version 1.2 will not be soon available, the most probably already in the next release.
+	</para>
+	<note><para> &THIS.PLATFORM; &THIS.APPLICATION; uses Cassandra Native Driver and therefore you should enable support for native drivers by setting the value of <literal>start_native_transport</literal> to <literal>true</literal> in the file <filename>apache-cassandra-1.2.8/conf/cassandra.yaml</filename>. Failure to do this may result in the Gateway not starting correctly.</para></note>
+	<para>
+	To install the Cassandra database, look for distributives at the offical Apache website here <ulink url="http://cassandra.apache.org/download/"></ulink>. We recommend that you download the latest binaries and install the database following the instructions specified in the Apache documentation in their website <ulink url="http://wiki.apache.org/cassandra/GettingStarted"></ulink>.
+	</para>
+	<para>If you already use cassandra version 1.2, you must think to update it to version 2.0.16 when it is possible before next version has been released.
+	If you do not have database routing rules and it is not important to you to lose of pending messages in SMSC GW, you can just remove RestCommSMSC Keyspace, uninstall 1.2 version,
+	install a new one and create an empty RestCommSMSC Keyspace.
+	Else you can update your database as DataStax recommends: http://docs.datastax.com/en/upgrade/doc/upgrade/cassandra/upgradeCassandraDetails.html.
+	</para>
+</chapter>
+
