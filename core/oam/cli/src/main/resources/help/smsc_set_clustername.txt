@@ -1,0 +1,18 @@
+Name
+	smsc set clustername
+
+SYNOPSIS
+	smsc set clustername <cluster-name>
+
+DESCRIPTION
+	This command is used to set the Cluster name for Cassandra Database. If you use
+	the script available in the distributive the name will be set to 'RestCommSMSC' by
+	default. 
+
+EXAMPLES
+	smsc set clustername RestCommSMSC
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

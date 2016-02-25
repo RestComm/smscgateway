@@ -1,0 +1,20 @@
+Name
+	smsc set nationallanguagelockingshift
+
+SYNOPSIS
+	smsc set nationallanguagelockingshift <value>
+
+DESCRIPTION
+	This command is used to get the value of National Language 
+	Single Shift table. nationallanguagelockingshift will be
+	used when SMS is originated from SMPP and doesn't have UDH.
+	This is SMSC Gw level and can be overwritten for each 
+	ESME created.
+	
+	The default GSM data coding table is mostly used. 
+	Possible values: 
+	   = 0  : default GSM data coding table 
+	   = 13 : urdu (arabic) national language shift table 	
+
+SEE ALSO
+	smsc get nationallanguagesingleshift

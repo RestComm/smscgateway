@@ -1,0 +1,18 @@
+Name
+	smsc get keyspacename
+
+SYNOPSIS
+	smsc get keyspacename
+
+DESCRIPTION
+	This command is used to get the Keyspace name for Cassandra Database. If you use
+	the script available in the distributive the name will be set to 'RestCommSMSC' by
+	default. 
+
+EXAMPLES
+	smsc get keyspacename
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

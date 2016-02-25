@@ -1,0 +1,14 @@
+Name
+	smsc get sriresponselivetime
+
+SYNOPSIS
+	smsc get sriresponselivetime
+
+DESCRIPTION
+	This command is used to get the SRI responses Cache Time.
+
+EXAMPLES
+	smsc get sriresponselivetime
+
+SEE ALSO
+	smsc set sriresponselivetime

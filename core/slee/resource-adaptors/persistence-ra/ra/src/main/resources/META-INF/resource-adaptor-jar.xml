@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE resource-adaptor-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE Resource Adaptor 1.1//EN" "http://java.sun.com/dtd/slee-resource-adaptor-jar_1_1.dtd">
+<resource-adaptor-jar>
+	<resource-adaptor id="persistence_ra">
+		<description>Persistence Resource Adaptor</description>
+		<resource-adaptor-name>
+			PersistenceResourceAdaptor
+		</resource-adaptor-name>
+		<resource-adaptor-vendor>org.mobicents</resource-adaptor-vendor>
+		<resource-adaptor-version>1.0</resource-adaptor-version>
+
+		<resource-adaptor-type-ref>
+			<resource-adaptor-type-name>PersistenceResourceAdaptorType</resource-adaptor-type-name>
+			<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+			<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+		</resource-adaptor-type-ref>
+
+        <!-- 
+		<library-ref>
+			<library-name>me.prettyprint</library-name>
+			<library-vendor>hector-core</library-vendor>
+			<library-version>${hector-core.version}</library-version>
+		</library-ref>
+        -->
+		<resource-adaptor-classes>
+			<resource-adaptor-class>
+				<resource-adaptor-class-name>
+					org.mobicents.smsc.slee.resources.persistence.PersistenceResourceAdaptor
+				</resource-adaptor-class-name>
+			</resource-adaptor-class>
+		</resource-adaptor-classes>
+
+        <!-- 
+        <config-property>
+            <description>
+
+            </description>
+            <config-property-name>cluster.name</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value>RestCommSMSC</config-property-value>
+        </config-property>
+        <config-property>
+            <description>
+
+            </description>
+            <config-property-name>cluster.hosts</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value>127.0.0.1:9160</config-property-value>
+        </config-property>
+        <config-property>
+            <description>
+
+            </description>
+            <config-property-name>cluster.keyspace</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value>RestCommSMSC</config-property-value>
+        </config-property>
+        -->
+
+    </resource-adaptor>
+</resource-adaptor-jar>

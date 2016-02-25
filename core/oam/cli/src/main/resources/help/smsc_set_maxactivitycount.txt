@@ -1,0 +1,21 @@
+Name
+	smsc set maxactivitycount
+
+SYNOPSIS
+	smsc set maxactivitycount <max-activity-count>
+
+DESCRIPTION
+	This command is used to set the maximum count of delivering activities that are 
+	possible at the same time. 'Count of delivering activities' means the count of 
+	messages that are in the state 'delivering' (messages that are fetched from the 
+	database and may be already sent or are going to be sent but 
+	no delivery acception/rejection has been received). 
+	When the delivery process of a message is in progress, field LIVE.IN_SYSTEM==2.
+
+EXAMPLES
+	smsc set maxactivitycount 500
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

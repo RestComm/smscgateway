@@ -1,0 +1,132 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>resource-adaptors-parent</artifactId>
+		<groupId>org.mobicents.smsc</groupId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>common-library</artifactId>
+	<name>Core : SLEE : Common Library</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.slee</groupId>
+			<artifactId>jain-slee</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>${ch.smpp.namespace}</groupId>
+			<artifactId>ch-smpp</artifactId>
+			<version>${ch.smpp.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>smpp</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- javolution -->
+		<dependency>
+			<groupId>javolution</groupId>
+			<artifactId>javolution</artifactId>
+			<version>${javolution.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<artifactId>restcomm-slee-ra-map-library</artifactId>
+			<groupId>org.mobicents.resources</groupId>
+			<version>${restcomm.resources.map.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>smsc-common-library</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mproc-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+<!--
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>smpp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+-->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>domain</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mobicents.tools</groupId>
+				<artifactId>maven-library-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>copy-dependencies</goal>
+							<goal>generate-descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<includeScope>runtime</includeScope>  
+					<library-name>org.mobicents.smsc</library-name>
+					<library-vendor>common</library-vendor>
+					<library-version>1.0.0</library-version>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.mobicents.tools
+										</groupId>
+										<artifactId>
+											maven-library-plugin
+										</artifactId>
+										<versionRange>
+											[1.0.0.FINAL,)
+										</versionRange>
+										<goals>
+											<goal>
+												copy-dependencies
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

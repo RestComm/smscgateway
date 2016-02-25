@@ -1,0 +1,19 @@
+Name
+	smsc set processingsmssettimeout <seconds>
+
+SYNOPSIS
+	smsc set processingsmssettimeout <seconds>
+
+DESCRIPTION
+	This command is used to set the Cache timeout period (in seconds). 
+	Messages are cached in the SMSC until their processing is completed. In case of a 
+	delivery failure, these cached messages are force cleaned by the SMSC after 
+	waiting for the timeout period set for the parameter 'processingsmssettimeout' 
+	using this command.
+EXAMPLES
+	smsc set processingsmssettimeout 45
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

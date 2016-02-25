@@ -1,0 +1,19 @@
+Name
+	smsc set defaultton
+
+SYNOPSIS
+	smsc set defaultton <default-ton>
+
+DESCRIPTION
+	This command is used to set a value for default TON (Type Of Number). If an
+	incoming message does not have a value defined for TON, i.e. if TON is set as
+	'unknown', then the value specified for defaultton will be used as TON for that 
+	message.
+
+EXAMPLES
+	smsc set defaultton 1
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

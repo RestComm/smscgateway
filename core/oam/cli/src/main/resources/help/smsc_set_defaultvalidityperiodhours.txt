@@ -1,0 +1,20 @@
+Name
+	smsc set defaultvalidityperiodhours
+
+SYNOPSIS
+	smsc set defaultvalidityperiodhours <default-validity-period-hours>
+
+DESCRIPTION
+	This command is used to set a value for default validity period (in hours) for 
+	incoming SMSC messages that do not have their own validity period value. Validity 
+	period is the time duration for which the SMSC Gateway will attempt to
+	send the SMS. If the time period expires before the message can be delivered, 
+	the SMSC Gateway will drop it.
+
+EXAMPLES
+	smsc set defaultvalidityperiodhours 3
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

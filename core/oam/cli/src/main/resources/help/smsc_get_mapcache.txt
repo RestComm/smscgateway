@@ -1,0 +1,25 @@
+Name
+	smsc mapcache get
+
+SYNOPSIS
+	smsc mapcache get <node_digits>
+
+DESCRIPTION
+	This command is used to retrieve the cached Version values. SMSC Gateway caches 
+	the negotiated MAP Version for each network node. Every MT SMS sent to this node 
+	will use the cached Version.
+
+OPTIONAL PARAMETERS
+	<node_digits> is an optional parameter.
+
+	If a value is not specified for <node_digits>, then the command will retrieve all 
+	cached values. 
+
+	If <node_digits> is specified, then the command will retrieve the cached version
+	value for the specified node digits.
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, 
+	smsc get hlrssn, smsc set hlrssn, smsc get mscssn, smsc set mscssn, 
+	smsc get maxmapv
+

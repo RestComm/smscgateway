@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rule>
+	<id value="1"/>
+	<value ruleType="Solitary" loadSharingAlgo="Undefined" originatingType="LocalOriginated" mask="K" paddress="1" saddress="-1" networkId="0">
+		<patternSccpAddress pc="0" ssn="8">
+			<ai value="82"/>
+			<gt type="GT0100" tt="0" es="1" np="1" nai="4" digits="*"/>
+		</patternSccpAddress>
+	</value>
+	<id value="2"/>
+	<value ruleType="Solitary" loadSharingAlgo="Undefined" originatingType="RemoteOriginated" mask="K" paddress="2" saddress="-1" networkId="0">
+		<patternSccpAddress pc="0" ssn="8">
+			<ai value="82"/>
+			<gt type="GT0100" tt="0" es="1" np="1" nai="4" digits="*"/>
+		</patternSccpAddress>
+	</value>
+</rule>
+<routingAddress>
+	<id value="1"/>
+	<sccpAddress pc="1" ssn="8">
+		<ai value="83"/>
+		<gt type="GT0100" tt="0" es="1" np="1" nai="4" digits="000"/>
+	</sccpAddress>
+	<id value="2"/>
+	<sccpAddress pc="2" ssn="8">
+		<ai value="83"/>
+		<gt type="GT0100" tt="0" es="1" np="1" nai="4" digits="000"/>
+	</sccpAddress>
+</routingAddress>
+<longMessageRule/>
+<sap>
+	<id value="1"/>
+	<value mtp3Id="1" opc="2" ni="2" networkId="0">
+		<mtp3DestinationMap>
+			<id value="1"/>
+			<value firstDpc="1" lastDpc="1" firstSls="0" lastSls="255" slsMask="255"/>
+		</mtp3DestinationMap>
+	</value>
+</sap>

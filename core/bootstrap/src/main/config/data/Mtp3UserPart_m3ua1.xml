@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<heartbeattime value="10000"/>
+<aspFactoryList>
+	<aspFactory name="asp1" assocName="ass1" started="true" maxseqnumber="256" aspid="2" heartbeat="false"/>
+</aspFactoryList>
+<asList>
+	<as name="as1" minAspActiveForLb="1" functionality="IPSP" exchangeType="SE" ipspType="SERVER">
+		<routingContext size="1">
+			<rc value="101"/>
+		</routingContext>
+		<networkAppearance value="102"/>
+		<trafficMode mode="2"/>
+		<defTrafficMode mode="2"/>
+		<asps>
+			<asp name="asp1"/>
+		</asps>
+	</as>
+</asList>
+<route>
+	<key value="1:2:3"/>
+	<routeAs trafficModeType="2" as="as1"/>
+</route>

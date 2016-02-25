@@ -1,0 +1,61 @@
+Name
+	smsc stat get
+
+SYNOPSIS
+	smsc stat get 
+
+DESCRIPTION
+	This command is used to view the details of the current state of the SMSC and
+	monitor the SMSC. The output prints the following parameters:
+
+	Time			- Current time. By obtaining this statistic twice, this 
+				  value can be used to calculate the time interval between
+				  statistic time.
+
+	MessageInProcess	- Number of messages currently being processed for 
+				  delivery in GSM (MT messages) and SMPP (messages that
+				  are routed to ESME).
+
+	MessageId		- This is the last assigned Message Id. This indicates
+				  the number of messages that have come into the SMSC
+				  from GSM (Mobile Originated messages) or from ESMEs and
+				  and stored in the Cassandra database. The MessageId 
+				  counter is initiated from the time of the installation
+				  of the SMSC.
+
+	MessageScheduledTotal	- The number of messages put into the delivering process
+				  in both GSM and SMPP since the SMSC was started.
+
+	DueSlotProcessingLag	- The time (in seconds) between "in time" due_slot and 
+				  "in process" due_slot. 
+
+				  If this value is equal to 0 or 1 or 2, it means that the
+				  SMSC is not highly loaded and all the messages are 
+				  being processed on time. 
+
+				  If this value is high, say for example 300, then it 
+				  means the SMSC is overloaded and is now processing 
+				  messages, that are scheduled for processing 300 seconds 
+				  before the current time. 
+
+				  If this value is progressively increasing, then the SMSC
+				  is heavily overloaded and the incoming messages count at
+				  SMPP (and MO) are more than what the SMSC can deliver.
+				  
+				  If the incoming messages are not many, this value will
+				  decrease and will reach 0 when there are no messages.
+
+				  Normally this value will return to 0 except for few
+				  peaks. If it does not, then you must reduce the load for
+				  SMSC.
+	
+	Param1			- Ignore.
+
+	Param2			- Ignore.
+	
+	SmscStartTime		- The time when the SMSC was started.
+EXAMPLES
+	smsc stat get
+	Stat: Time: Mon Jan 13 18:40:42 CET 2014, MessageInProcess: 515, MessageId: 10212,
+	MessageScheduledTotal: 8992, DueSlotProcessingLag: 0, Param1: 0, Param2: 0, 
+	SmscStartTime: Mon Jan 13 18:39:30 CET 2014

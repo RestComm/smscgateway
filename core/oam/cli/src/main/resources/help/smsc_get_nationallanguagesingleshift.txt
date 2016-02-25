@@ -1,0 +1,15 @@
+Name
+	smsc get nationallanguagesingleshift
+
+SYNOPSIS
+	smsc get nationallanguagesingleshift 
+
+DESCRIPTION
+	This command is used to get the value of National Language 
+	Single Shift table. nationallanguagesingleshift will be
+	used when SMS is originated from SMPP and doesn't have UDH.
+	This is SMSC Gw level and can be overwritten for each 
+	ESME created.
+
+SEE ALSO
+	smsc set nationallanguagesingleshift

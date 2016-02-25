@@ -1,0 +1,19 @@
+Name
+	smpp esme delete
+
+SYNOPSIS
+	smpp esme delete <esmeName>
+
+DESCRIPTION
+	This command is used to delete an existing ESME.
+
+PARAMETERS
+	esmeName		- Name of the ESME to be destroyed.
+
+SEE ALSO
+	smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv
+
+
+

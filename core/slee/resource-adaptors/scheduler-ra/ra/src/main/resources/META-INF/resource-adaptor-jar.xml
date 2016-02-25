@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE resource-adaptor-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE Resource Adaptor 1.1//EN" "http://java.sun.com/dtd/slee-resource-adaptor-jar_1_1.dtd">
+<resource-adaptor-jar>
+	<resource-adaptor id="Scheduler">
+		<description>Scheduler Resource Adaptor</description>
+		<resource-adaptor-name>SchedulerResourceAdaptor</resource-adaptor-name>
+		<resource-adaptor-vendor>org.mobicents</resource-adaptor-vendor>
+		<resource-adaptor-version>1.0</resource-adaptor-version>
+		
+		<resource-adaptor-type-ref>
+			<resource-adaptor-type-name>SchedulerResourceAdaptorType</resource-adaptor-type-name>
+			<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+			<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+		</resource-adaptor-type-ref>
+		
+		<library-ref>
+			<library-name>org.mobicents.smsc</library-name>
+			<library-vendor>scheduler</library-vendor>
+			<library-version>1.0.0</library-version>
+		</library-ref>
+
+		<resource-adaptor-classes>
+			<resource-adaptor-class>
+				<resource-adaptor-class-name>
+					org.mobicents.smsc.slee.resources.scheduler.SchedulerResourceAdaptor
+				</resource-adaptor-class-name>
+			</resource-adaptor-class>
+
+            <resource-adaptor-usage-parameters-interface>
+                <description>Activity count limitation facility</description>
+                <resource-adaptor-usage-parameters-interface-name>
+                    org.mobicents.smsc.slee.resources.scheduler.SchedulerRaUsageParameters
+                </resource-adaptor-usage-parameters-interface-name>
+                <usage-parameter name="activityCount" notifications-enabled="False" />
+            </resource-adaptor-usage-parameters-interface>
+		</resource-adaptor-classes>
+
+        <!-- 
+		<config-property>
+			<description>
+
+			</description>
+			<config-property-name>cluster.name</config-property-name>
+			<config-property-type>java.lang.String</config-property-type>
+			<config-property-value>RestCommSMSC</config-property-value>
+		</config-property>
+		<config-property>
+			<description>
+
+			</description>
+			<config-property-name>cluster.hosts</config-property-name>
+			<config-property-type>java.lang.String</config-property-type>
+			<config-property-value>127.0.0.1:9160</config-property-value>
+		</config-property>
+		<config-property>
+			<description>
+			</description>
+			<config-property-name>cluster.keyspace</config-property-name>
+			<config-property-type>java.lang.String</config-property-type>
+			<config-property-value>RestCommSMSC</config-property-value>
+		</config-property>
+
+		<config-property>
+			<description>
+			</description>
+			<config-property-name>fetch.max.rows</config-property-name>
+			<config-property-type>java.lang.Integer</config-property-type>
+			<config-property-value>10000</config-property-value>
+		</config-property>
+
+		<config-property>
+			<description>
+			</description>
+			<config-property-name>fetch.period</config-property-name>
+			<config-property-type>java.lang.Long</config-property-type>
+			<config-property-value>5000</config-property-value>
+		</config-property>
+
+		<config-property>
+			<description>
+			</description>
+			<config-property-name>high.water.mark</config-property-name>
+			<config-property-type>java.lang.Integer</config-property-type>
+			<config-property-value>50000</config-property-value>
+		</config-property>
+        -->
+
+	</resource-adaptor>
+</resource-adaptor-jar>

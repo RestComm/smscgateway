@@ -1,0 +1,18 @@
+Name
+	smsc mproc remove
+
+SYNOPSIS
+	smsc mproc remove <id>
+
+DESCRIPTION
+	This command is used to remove existing Message Processing Rule. 
+
+PARAMETERS
+
+	Standard Parameters
+
+	id				- A unique id for which message processing rule is to be removed. 
+																		  
+	
+SEE ALSO
+	smsc mproc add, smsc mproc modify, smsc mproc show

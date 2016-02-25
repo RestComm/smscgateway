@@ -1,0 +1,17 @@
+Name
+	smsc get dbhosts
+
+SYNOPSIS
+	smsc get dbhosts
+
+DESCRIPTION
+	This command is used to get the host-ip address for Cassandra Database
+	access.
+
+EXAMPLES
+	smsc get dbhosts
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

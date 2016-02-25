@@ -1,0 +1,18 @@
+Name
+	smsc set dbhosts <ip-address>
+
+SYNOPSIS
+	smsc set dbhosts
+
+DESCRIPTION
+	This command is used to set the host-ip address for Cassandra Database
+	access. Pass comma separated values if Cassandra is setup in cluster
+	and can be accessed via multiple IP's 
+
+EXAMPLES
+	smsc set dbhosts 127.0.0.1
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

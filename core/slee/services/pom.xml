@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+
+	<parent>
+		<artifactId>slee</artifactId>
+		<groupId>org.mobicents.smsc</groupId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>services-parent</artifactId>
+	<name>Core : SLEE : Services Parent</name>
+
+	<modules>
+		<module>library</module>
+		<!-- 
+		<module>events</module>
+		<module>persistencesbb</module>
+		 -->
+		<module>alertsbb</module>
+		<module>chargingsbb</module>
+		<module>txsmppserversbb</module>
+		<module>rxsmppserversbb</module>
+		<module>mtsbb</module>
+		<module>mosbb</module>
+		<module>txsipserversbb</module>
+		<module>rxsipserversbb</module>
+		<module>homeroutingsbb</module>
+		<module>du</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<artifactId>smpp-server-ra-events</artifactId>
+				<groupId>${project.groupId}</groupId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<artifactId>smpp-server-ra-ratype</artifactId>
+				<groupId>${project.groupId}</groupId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mobicents.resources</groupId>
+				<artifactId>restcomm-slee-ra-map-ratype</artifactId>
+				<version>${restcomm.resources.map.version}</version>
+			</dependency>
+			<dependency>
+				<artifactId>restcomm-slee-ra-map-library</artifactId>
+				<groupId>org.mobicents.resources</groupId>
+				<version>${restcomm.resources.map.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>

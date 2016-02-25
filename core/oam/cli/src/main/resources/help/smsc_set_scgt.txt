@@ -1,0 +1,25 @@
+Name
+	smsc set scgt
+
+SYNOPSIS
+	smsc set scgt <globalTitle> networkid <networkId>
+
+DESCRIPTION
+        This command is used to set a value for SMSC Global Title.
+
+        networkId - a specifies Global Title for a virtual SS7
+        subnetwork (this is for Multi-tenancy support). By using of
+        this command with different networkIds you can specify
+        Global Titles for several subnetworks. 
+        If this parameter is skipped - networkId will be set to "0"
+        when Global Title creation (master networkId).
+        When we do not specify Global Title for some networkid -
+        Global Title for master networkId will be used. When we
+        use "0" as Global Title value 
+        (like "smsc set scgt 0 networkid <xxx>") -
+        this will just clear Global Title for an specified networkid.
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

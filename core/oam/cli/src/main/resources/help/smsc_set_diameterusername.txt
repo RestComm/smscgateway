@@ -1,0 +1,17 @@
+Name
+	smsc set diameterusername
+
+SYNOPSIS
+	smsc set diameterusername <value>
+
+DESCRIPTION
+	This command is used to set the Diameter Username for connection to OCS.
+
+EXAMPLES
+	smsc set diameterdestusername svinu
+
+SEE ALSO
+	smsc set diameterdestrealm, smsc set diameterdesthost, smsc set diameterdestport, 
+	smsc set mocharging, smsc set txsmppcharging, smsc get diameterdestrealm, 
+	smsc get diameterdesthost, smsc get diameterdestport, smsc get diameterusername, 
+	smsc get mocharging, smsc get txsmppcharging

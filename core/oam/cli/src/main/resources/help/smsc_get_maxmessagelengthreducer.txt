@@ -1,0 +1,32 @@
+Name
+	smsc get maxmessagelengthreducer
+
+SYNOPSIS
+	smsc get maxmessagelengthreducer
+
+DESCRIPTION
+	This command is used to set an integer value for max-message-length-reducer.
+	The recommended value is 6. Possible values are numbers from 0 to 12. 
+
+	Empty TC-BEGIN will be used if the message length is greater than the maximum
+	possible message length minus the value specified for max-message-length-reducer.
+
+	(message-length > max-possible-message-length - max-message-length-reducer) 
+
+	Empty TC-BEGIN is used in MAP Version 2 and 3 for forwardSM and Mt-ForwardSM 
+	requests. In MAP Version 2 the dailog portion
+	(ApplicationContextName, MAPOpenInfo primitive) and the component portion 
+	(forwardSM and mt-ForwardSM requests) may both together be too long to fit within 
+	a MTP message. In Empty TC-BEGIN case, it first sends the dailog portion in 
+	TC-BEGIN followed by the component portion in the next TC-CONTINUE. 
+	Whether empty TC-BEGIN is used or not depends on the length of a message and the 
+	length of SCCP addresses. This option increases the guarantee of delivery of a 
+	message  to some network.
+
+EXAMPLES
+	smsc get maxmessagelengthreducer
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv
