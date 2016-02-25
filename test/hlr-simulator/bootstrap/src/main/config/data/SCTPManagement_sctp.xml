@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<connectdelay value="5000"/>
+<workerthreads value="8"/>
+<singlethread value="true"/>
+<servers/>
+<associations>
+	<name value="Ass_main"/>
+	<association name="Ass_main" assoctype="CLIENT" hostAddress="127.0.0.1" hostPort="8011" peerAddress="127.0.0.1" peerPort="8012" serverName="" ipChannelType="0" extraHostAddresseSize="0"/>
+</associations>

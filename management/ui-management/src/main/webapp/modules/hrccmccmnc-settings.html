@@ -1,0 +1,228 @@
+					<h3 style="margin: 0px;"><i class="icon-th"></i> Home Routing CC - MNC MCC Table</h3>
+					<hr style="margin: 10 0px;"/>
+					
+					<link href="resources/css/bootstrap-slider.css" rel="stylesheet">
+					<script type="text/javascript" src="resources/js/bootstrap-slider.js"></script>
+					<script type="text/javascript" src="resources/js/jquery-knob.js"></script>
+					
+					
+					<p>
+						<br/>
+					</p> 
+					
+					<div class="alert alert-error" id="login-settings-error" style="display:none;">
+					  <button type="button" class="close">&times;</button>
+					  Some Fields are not correctly filled out, please double check the settings below !
+					</div>
+					
+
+					<h5>Add/Update Configuration</h5>						
+					<div id="dbrr-update-configuration-wrapper">
+						<div class="input-prepend">
+							<div id="div-updatecc" class="control-group">
+							<span id="updatecc-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Country Code which will replace Mobile Country Code and Mobile Network Code">
+								<span class="add-on">Country Code</span>
+								<input id="updatecc" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+							
+							<div id="div-updatemccmnc" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Mobile Country Code and Mobile Network Code">
+								<span class="add-on">Mobile Country Code and Mobile Network Code</span>
+								<input id="updatemccmnc" type="text" class="input-mini" style="width: 180px; margin-right: 12px; text-align: center;" value="" />
+							</span>					
+							</div>
+							
+							<div id="div-updatesmscgt" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="optional SMSC Global Title">
+								<span class="add-on">Global Title</span>
+								<input id="updatesmscgt" type="text" class="input-mini" style="width: 90px; margin-right: 12px; text-align: center;" value="" />
+							</span>					
+							</div>							
+						</div>
+						<div class="row">
+							<span class="span12" style="text-align: right;">
+								&nbsp;<button class="btn btn-primary" onclick="updateCcMccMnc('add');"><i class="icon-save"></i> Add</button>
+								&nbsp;<button class="btn btn-primary" onclick="updateCcMccMnc('update');"><i class="icon-save"></i> Update</button>
+							</span>
+						</div>						
+					</div>
+					
+					<hr />
+					
+					<h5>Delete Configuration</h5>
+					<div id="dbrr-delete-configuration-wrapper">
+						<div class="input-prepend">
+							<div id="div-deletecc" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Country code corresponding to which entry is to be deleted">
+								<span class="add-on">Country Code</span>
+								<input id="deletecc" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+						</div>
+						<div class="row">
+							<span class="span12" style="text-align: right;">
+								&nbsp;<button class="btn btn-primary" onclick="deleteCcMccMnc();"><i class="icon-remove"></i> Delete</button>
+							</span>
+						</div>						
+					</div>	
+					
+					<hr />
+					
+					<h5>View Configuration</h5>
+					<div id="dbrr-view-configuration-wrapper">
+						<div class="input-prepend">
+							<div id="div-viewcc" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="view the table for given country code or pass null to view whole table">
+								<span class="add-on">Country Code</span>
+								<input id="viewcc" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+						</div>
+						<div class="row">
+							<span class="span12" style="text-align: right;">
+								&nbsp;<button class="btn btn-primary" onclick="viewCcMccMnc();"><i class="icon-eye-open"></i> View</button>
+							</span>
+						</div>						
+					</div>									
+					
+				<script type="text/javascript">
+					$('#login-settings-error .close').on("click", function(e) {
+					    $(this).parent().hide();
+					});
+					
+					function updateCcMccMnc(action) {
+						var mbeanSearch="org.mobicents.smsc:layer=HomeRoutingManagement,name=SmscManagement";
+						var formInvalid = false;
+						
+						
+						var updatecc = $("#updatecc").val();
+						if(updatecc.trim() == "") {
+			    			$("#div-updatecc").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-updatecc").hasClass("error")) {
+			    			$("#div-updatecc").removeClass("error");		
+			    		}
+						
+						var updatemccmnc = $("#updatemccmnc").val();
+						if(updatemccmnc.trim() == "") {
+			    			$("#div-updatemccmnc").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-updatemccmnc").hasClass("error")) {
+			    			$("#div-updatemccmnc").removeClass("error");		
+			    		}
+						
+						var updatesmscgt =  $("#updatesmscgt").val();
+						if(updatesmscgt.trim() == "") {
+							updatesmscgt = null;	
+			    		}
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}						
+						
+						
+						var methodname = "modifyCcMccmnc";
+						if(action == "add"){
+							methodname = "addCcMccmnc";
+						}
+						
+						jolokia.execute(mbeanSearch,methodname,updatecc,updatemccmnc,updatesmscgt,
+								{
+									success: function(value) {
+										logToConsole('INFO', 'Successfully '+ action+'\'d row for ' + updatecc + ' Country Code ' );
+									},
+									error: function(value){
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									}
+								});							
+
+					}
+					
+					function deleteCcMccMnc() {
+						var mbeanSearch="org.mobicents.smsc:layer=HomeRoutingManagement,name=SmscManagement";
+						var formInvalid = false;
+						
+						var deletecc = $("#deletecc").val();
+						if(deletecc.trim() == "") {
+			    			$("#div-deletecc").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-deletecc").hasClass("error")) {
+			    			$("#div-deletecc").removeClass("error");		
+			    		}
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}						
+						
+						jolokia.execute(mbeanSearch,"removeCcMccmnc",deletecc,
+								{
+									success: function(value) {
+										logToConsole('INFO', 'Successfully deleted row for Country Code ' + deletecc );
+									},
+									error: function(value){
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									}
+								});							
+
+					}	
+					
+					function viewCcMccMnc() {
+						var mbeanSearch="org.mobicents.smsc:layer=HomeRoutingManagement,name=SmscManagement";
+
+						var viewcc = $("#viewcc").val();
+						
+						
+						if(viewcc.trim() == ""){
+							jolokia.request(
+									[
+										{ type: "read", mbean: mbeanSearch },
+									],
+									{ success: [
+										function(response) {
+											jQuery.each(response.value.CcMccmncMap, function(key, value) {
+												logToConsole('INFO', 'Country Code:'+value.countryCode + ' MCCMNC:'+value.mccMnc + ' SMSC GT:'+value.smsc );
+												
+											});
+										}],
+										error: function(value) {
+											errorUID = ("st" + new Date().getTime()).hashCode();
+											createStackTrace(errorUID, value.stacktrace);
+											logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+										} 
+									}
+								);							
+						} else {
+							jolokia.execute(mbeanSearch,"getCcMccmnc",viewcc,
+									{
+										success: function(value) {
+											if(value!=null){
+												logToConsole('INFO', 'Country Code:'+value.countryCode + ' MCCMNC:'+value.mccMnc + ' SMSC GT:'+value.smsc );
+											} else{
+												logToConsole('WARN','No row defined for '+viewcc);
+											}
+										},
+										error: function(value){
+											errorUID = ("st" + new Date().getTime()).hashCode();
+											createStackTrace(errorUID, value.stacktrace);
+											logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+										}
+									});	
+						}
+
+					}	
+					
+					
+				</script>

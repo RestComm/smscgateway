@@ -1,0 +1,170 @@
+<project basedir="." default="assemble">
+
+
+	<property environment="sys" />
+	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
+		<os family="windows" />
+	</condition>
+
+
+	<property name="packageprefix" value="org.mobicents.protocols.smpp.load" />
+	<property name="javac.source" value="1.7" />
+	<property name="srcroot" value="${root}/src" />
+
+	<property name="assemble.dir" value="${ant.file.mobicents.release}/../target/load" />
+	<path id="project.class.path">
+		<pathelement location="${assemble.dir}/smpp-load-3.0.0-SNAPSHOT.jar" />
+		<pathelement location="${assemble.dir}/ch-smpp-5.0.10-SNAPSHOT.jar" />
+		<pathelement location="${assemble.dir}/netty-3.9.0.Final.jar" />
+		<pathelement location="${assemble.dir}/slf4j-api-1.7.10.jar" />
+		<pathelement location="${assemble.dir}/slf4j-log4j12-1.7.10.jar" />
+
+		<pathelement location="${assemble.dir}/ch-commons-charset-3.0.2.jar" />
+		<pathelement location="${assemble.dir}/ch-commons-util-6.0.1.jar" />
+		<pathelement location="${assemble.dir}/joda-time-2.6.jar" />
+
+		<pathelement location="${assemble.dir}/log4j-1.2.14.jar" />
+		<pathelement location="${assemble.dir}/guava-18.0.jar" />
+		<pathelement location="src/main/resources" />
+
+	</path>
+
+	<property name="cp.property" refid="project.class.path" />
+
+	<target name="assemble" description="Builds load tests and assembles binaries.">
+
+
+		<echo message="Java Version: ${java.version}" />
+		<echo message="Java home: ${java.home}" />
+		<fail message="Unsupported Java version: ${java.version}. Make sure that the version of the Java compiler is 1.7 (7.0) or greater.">
+			<condition>
+				<not>
+					<or>
+						<contains string="${java.version}" substring="1.7" casesensitive="false" />
+					</or>
+				</not>
+			</condition>
+		</fail>
+
+		<exec executable="${mvn.executable}" dir="${ant.file.mobicents.release}/../">
+			<arg line="install -Passemble" />
+		</exec>
+	</target>
+
+	<target name="slowserver" description="run the Load Test Slow Server.">
+		<echo message="${cp.property}" />
+		<delete dir="slowserver" />
+		<mkdir dir="slowserver" />
+		<delete file="log4j-slowserver.log" />
+		<java classname="${packageprefix}.SlowServer" fork="true" maxmemory="2048m" classpathref="project.class.path" dir="server">
+			<jvmarg value="-Dlog.file.name=log4j-slowserver.log" />
+			<!--
+			<jvmarg value="-XX:+PrintGCDetails" />
+			<jvmarg value="-XX:+PrintGCTimeStamps" />
+			-->
+			<arg value="2776" />
+			<!-- listerning port -->
+			<arg value="10" />
+			<!-- Max number of connections. Must be >= 1 -->
+			<arg value="true" />
+			<!-- nonBlockingSocketsEnabled -->
+			<arg value="30000" />
+			<!-- defaultRequestExpiryTimeout -->
+			<arg value="15000" />
+			<!-- defaultWindowMonitorInterval -->
+			<arg value="500" />
+			<!-- defaultWindowSize -->
+			<arg value="-1" />
+			<!-- defaultWindowWaitTimeout -->
+			<arg value="true" />
+			<!-- defaultSessionCountersEnabled -->
+			<arg value="true" />
+			<!-- jmxEnabled -->
+		</java>
+	</target>
+	<target name="server" description="run the Load Test Server.">
+		<echo message="${cp.property}" />
+		<delete dir="server" />
+		<mkdir dir="server" />
+		<delete file="log4j-server.log" />
+		<java classname="${packageprefix}.Server" fork="true" maxmemory="2048m" classpathref="project.class.path" dir="server">
+			<jvmarg value="-Dlog.file.name=log4j-server.log" />
+			<!--
+			<jvmarg value="-XX:+PrintGCDetails" />
+			<jvmarg value="-XX:+PrintGCTimeStamps" />
+			-->
+
+			<arg value="2776" />
+			<!-- listerning port -->
+			<arg value="10" />
+			<!-- Max number of connections. Must be >= 1 -->
+			<arg value="true" />
+			<!-- nonBlockingSocketsEnabled -->
+			<arg value="30000" />
+			<!-- defaultRequestExpiryTimeout -->
+			<arg value="15000" />
+			<!-- defaultWindowMonitorInterval -->
+			<arg value="500" />
+			<!-- defaultWindowSize -->
+			<arg value="-1" />
+			<!-- defaultWindowWaitTimeout -->
+			<arg value="true" />
+			<!-- defaultSessionCountersEnabled -->
+			<arg value="true" />
+			<!-- jmxEnabled -->
+		</java>
+	</target>
+	<target name="client" description="run the Load Test Client">
+		<echo message="${cp.property}" />
+		<delete dir="client" />
+		<mkdir dir="client" />
+		<java classname="${packageprefix}.Client" fork="true" maxmemory="2048m" classpathref="project.class.path" dir="client">
+			<jvmarg value="-Dlog.file.name=log4j-client.log" />
+			<!-- Session Count -->
+			<arg value="1" />
+
+			<!-- Window Size -->
+			<arg value="500000" />
+
+			<!-- SUBMIT_SM to send -->
+			<arg value="50000" />
+			
+			<!-- SMS per second rate to maintain -->
+			<arg value="150" />			
+
+			<!-- Start destination number -->
+			<arg value="9960200000" />
+
+			<!-- Destination number diff -->
+			<arg value="10000" />
+
+			<!-- Source number -->
+			<arg value="6666" />
+
+			<!-- Peer Address -->
+			<arg value="127.0.0.1" />
+
+			<!-- Peer Port -->
+			<arg value="2776" />
+
+			<!-- System Id -->
+			<arg value="test" />
+
+			<!-- Password -->
+			<arg value="test" />
+
+            <!-- Message -->
+            <arg value="Hello World" />
+
+            <!-- EsmClass -->
+            <arg value="3" />
+		</java>
+	</target>
+	<!-- -->
+	<target name="clean" description="clean the logs">
+		<delete dir="server" />
+		<delete dir="client" />
+	</target>
+
+
+</project>

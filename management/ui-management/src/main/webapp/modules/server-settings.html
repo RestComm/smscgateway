@@ -1,0 +1,1637 @@
+					<h3 style="margin: 0px;"><i class="icon-dashboard"></i> SMSC Gateway Server Settings</h3>
+					<hr style="margin: 10 0px;"/>
+
+					<p>
+						<br/>
+					</p> 
+					
+					<div class="alert alert-error" id="login-settings-error" style="display:none;">
+					  <button type="button" class="close">&times;</button>
+					  Some Fields are not correctly filled out, please double check the settings below !
+					</div>
+					
+ 					<p>
+					<span id="mss-settings">
+					<ul class="nav nav-tabs" id="myTab">
+						<li class="active"><a href="#properties" data-toggle="tab">Properties</a></li>
+  						<li><a href="#ss7settings" data-toggle="tab">SS7 settings</a></li>
+  						<li><a href="#dbsettings" data-toggle="tab">Cassandra</a></li>
+  						<li><a href="#scheduler" data-toggle="tab">Scheduler</a></li>
+  						<li><a href="#diameter" data-toggle="tab">Diameter</a></li>
+  						<li><a href="#processing" data-toggle="tab">Processing</a></li>
+  						<li><a href="#cdr" data-toggle="tab">CDR</a></li>
+  						<li><a href="#homerouting" data-toggle="tab">Home Routing</a></li>
+					</ul>	
+						
+  				 	<div class="tab-content">
+                        <div class="tab-pane active" id="properties" style="margin-left: 10px;">
+                        	
+                        	<h5 style="border-bottom: 1px solid #DDD;">SMS Validity Configuration</h5> 
+                        	
+                        	<div id="div-propdefaultvalidityhrs" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set a value for default validity period (in hours) for incoming SMSC messages that do not have their own validity period value. Validity period is the time duration for which the SMSC Gateway will attempt to send the SMS. If the time period expires before the message can be delivered, the SMSC Gateway will drop it.">
+									<span class="add-on">Default validity period hours (in hours)</span>
+									<input id="propdefaultvalidityhrs" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>	
+							<div id="div-propmaxvalidityhrs" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for the maximum validity period (in hours). All incoming messages with a validity period set greater than the value specified by this parameter will either be rejected (if they are ESME originated messages) or the value of their validity period will be set to this value (for MO originated messages).">
+									<span class="add-on">Maximum validity period (in hours)</span>
+									<input id="propmaxvalidityhrs" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>
+							&nbsp;
+                        	<h5 style="border-bottom: 1px solid #DDD;">SMPP/ESME Configuration</h5> 
+                        	<div id="div-propdefaultton" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for default TON (Type Of Number). If an incoming message does not have a value defined for TON, i.e. if TON is set as 'unknown', then the value specified for defaultton will be used as TON for that message.">
+									<span class="add-on">Default type of number (TON)</span>
+									<input id="propdefaultton" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>						
+							</div>								
+							<div id="div-propdefaultnpi" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for default NPI (Number Plan Indicator). If an incoming message does not have a value defined for NPI, i.e. if NPI is set as 'unknown', then the value specified for defaultnpi will be used as NPI for that message.">
+									<span class="add-on">Default numbering plan indicator (NPI)</span>
+									<input id="propdefaultnpi" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>
+							<div id="div-esmedefaultclustername" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for ESME default cluster. If the destination-address does not match to any ESME (any Cluster Name) the message will be routed to the cluster with the name specified here for esme-default- cluster.">
+									<span class="add-on">Default Cluster Name</span>
+									<input id="esmedefaultclustername" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
+								</span>                         
+							</div>
+							<div id="div-gsm7encoding" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the SMPP Encoding Scheme for GSM7. SMPP side messages with data coding == 0 [GSM7] accept two different encoding schemes [UTF8 and UNICODE] for both sending and receiving messages. SMSC can be configured to accept for one of them (the one that ESME supports). If this is not set, then the default encoding scheme is UTF8.">
+									<span class="add-on">SMPP Encoding for GSM7</span>
+									<select id="smppencodingforgsm7" >
+										<option>Utf8</option>
+										<option>Unicode</option>
+										<option>Gsm7</option>
+									</select>
+								</span>                         
+							</div>							
+							<div id="div-ucs2encoding" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the SMPP Encoding Scheme for UCS2. SMPP side messages with data coding == 8 [UCS2] accept two different encoding schemes [UTF8 and UNICODE] for both sending and receiving messages. SMSC can be configured to accept for one of them (the one that ESME supports). If this is not set, then the default encoding scheme is UTF8.">
+									<span class="add-on">SMPP Encoding for UCS2</span>
+									<select id="smppencodingforucs2" >
+										<option>Utf8</option>
+										<option>Unicode</option>
+										<option>Gsm7</option>
+									</select>
+								</span>                         
+							</div>
+							<div id="div-storeandforwardmode" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="every in-coming SMS will be processed as per Store And Forward Mode. If its set to fast, SMSC will attempt to deliver SMS first and only if it fails, it will persist for later re-try. If its normal, SMSC will persist SMS before delivery attempt. If incoming SMS is from SMPP connection, fast will be applied only when the message mode property is Store and Forward ">
+									<span class="add-on">Store And Forward Mode</span>
+									<select id="storeandforwardmode" >
+										<option>normal</option>
+										<option>fast</option>
+									</select>
+								</span>                         
+							</div>	
+							<div id="div-nationalLanguageSingleShift" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="national langugae single shift tables for the case when a message is SMPP originated and does not have included UDH. This is SMSC Gw level and can be overwritten for each ESME created. The default GSM data coding table is mostly used. Possible values: = 0  : default GSM data coding table; = 13 : urdu (arabic) national language shift table">
+									<span class="add-on">National Language Single Shift</span>
+									<input id="nationalLanguageSingleShift" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
+								</span>                         
+							</div>
+							
+							<div id="div-nationalLanguageLockingShift" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="national langugae locking shift tables for the case when a message is SMPP originated and does not have included UDH. This is SMSC Gw level and can be overwritten for each ESME created. The default GSM data coding table is mostly used. Possible values: = 0  : default GSM data coding table; = 13 : urdu (arabic) national language shift table">
+									<span class="add-on">National Language Locking Shift</span>
+									<input id="nationalLanguageLockingShift" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
+								</span>                         
+							</div>																				
+							
+							&nbsp;
+                        	<h5 style="border-bottom: 1px solid #DDD;">Delivery Delay Configuration</h5>
+                        	<div id="div-propsubbusduedel" class="control-group"> 
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for subscriber-busy-due-delay (in seconds). This parameter specifies the delay time period in seconds when there has been a delivery failure with the cause subscriber busy.">
+									<span class="add-on">Subscriber busy due delay (in sec)</span>
+									<input id="propsubbusduedel" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>														
+							</div>
+							<div id="div-propfirduedel" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for first-due-delay (in seconds). This parameter specifies the delay time period in seconds between message incoming time and first delivery attempt. ">
+									<span class="add-on">First due delay (in sec)</span>
+									<input id="propfirduedel" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>												
+							</div>		
+							<div id="div-propsecduedel" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for second-due-delay (in seconds). This parameter specifies the delay time period in seconds between the first and second delivery attempt (i.e. if the first delivery attempt failed).">
+									<span class="add-on">Second due delay (in sec)</span>
+									<input id="propsecduedel" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>												
+							</div>		
+							<div id="div-propmaxduedel" class="control-group">									                        
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for max-due-delay (in seconds). This parameter specifies the maximum possible delay time period in seconds between delivery attempts.">
+									<span class="add-on">Max due delay (in sec)</span>
+									<input id="propmaxduedel" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>												
+							</div>		
+							<div id="div-duedelaymultiplicator" class="control-group">									                        
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for due-delay-multiplicator. This parameter specifies the delay multiplicator value before another delivery attempt (after failure) is made. After a message delivery failure (if message validity period is not over and the failure is temporary), a delay period is induced before the next delivery attempt. This delay period is calculated as follows:
+
+Delay after the first delivery failure = second-due-delay
+
+Delay after every consecutive delivery failure = prev-due-delay * due-delay-multiplicator / 100 where prev-due-delay is the delay at the previous step.">
+									<span class="add-on">Due delay multiplicator</span>
+									<input id="duedelaymultiplicator" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>												
+							</div>	
+							
+							&nbsp;
+																			
+							<div class="control-group">
+								<span class="span12" style="text-align: left;">
+									&nbsp;<button class="btn btn-danger" onclick="updateProperties();"><i class="icon-undo"></i> Revert</button>
+									&nbsp;<button class="btn btn-primary" onclick="applyProperties();"><i class="icon-save"></i> Save</button>
+								</span>
+							</div>								
+                        </div>  				 	
+                        <div class="tab-pane" id="ss7settings">
+                        	<h5 style="border-bottom: 1px solid #DDD;">Global Title Configuration</h5>
+                        	
+							<div id="div-gtinitext" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC Gateway Global Title Indicator Network Id. Double click on select box to add new values. networkId specifies Global Title for a virtual SS7 subnetwork (this is for Multi-tenancy support). You can define different networkIds as unique subnetworks and assign Global Titles for each of the subnetworks. networkId 0 is for default SS7 network.">
+								  <span class="add-on">SMSC Gateway Global Title Indicator Network Id</span>				
+								  <select id="gtinisel" style="width: 200px;" onchange="gtInSelChange()">
+								  </select>
+							 	 <input id="gtinitext" type="text" name="format" class="input-mini" value="0" style="width: 165px; margin-left: -199px; margin-top: 1px; border: none;">
+							 	</span>
+							</div>	                        	
+                        	
+                        	<div id="div-ussdgt" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC Gateway Global Title">
+									<span class="add-on">SMSC Gateway Global Title</span>
+									<input id="ussdgt" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>
+							
+                        	<div id="div-gti" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC Gateway Global Title Indicator">
+									<span class="add-on">SMSC Gateway Global Title Indicator</span>
+									<select id="gti" >
+										<option value="GLOBAL_TITLE_INCLUDES_NATURE_OF_ADDRESS_INDICATOR_ONLY">0001 - Nature of address indicator included</option>
+										<option value="GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_ONLY">0010 - Translation type included</option>
+										<option value="GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_AND_ENCODING_SCHEME">0011 - Translation type, Numbering plan and Encoding scheme included</option>
+										<option value="GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS">0100 - Translation type, Numbering plan, Encoding scheme and Nature of address indicator included</option>
+									</select>
+								</span>
+							</div>	
+                        	<div id="div-tt" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC Gateway Global Title - Translation Type">
+									<span class="add-on">SMSC Gateway Global Title - Translation Type</span>
+									<input id="tt" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>													
+							&nbsp;
+							<h5 style="border-bottom: 1px solid #DDD;">Sub System Number Configuration</h5>
+							<div id="div-ussdssn" class="control-group">        
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC Gateway subsystem number">
+									<span class="add-on">SMSC Gateway subsystem number</span>
+									<input id="ussdssn" type="text" class="input-mini" style="width: 30px; margin-right: 12px; text-align: center;" value="0" />
+								</span>	
+							</div>
+							<div id="div-hlrssn" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="HLR subsystem number">
+									<span class="add-on">HLR subsystem number</span>
+									<input id="hlrssn" type="text" class="input-mini" style="width: 30px; margin-right: 12px; text-align: center;" value="0" />
+								</span>	
+							</div>
+							<div id="div-mscssn" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="MSC subsystem number">
+									<span class="add-on">MSC subsystem number</span>
+									<input id="mscssn" type="text" class="input-mini" style="width: 30px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>
+							&nbsp;
+							<h5 style="border-bottom: 1px solid #DDD;">SS7 Version Configuration</h5>
+							<div id="div-maxmapv" class="control-group">        						                		
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of MAP Application Context version. The version number set here will be used for SMS messages exchanged. RestComm SMSC Gateway supports version negotiation. So if you set this to a higher version (say for example version 3, however your network only understands version 2), the SMSC Gateway will automatically do the version negotiation and exchange V2 messages when V3 exchange fails. However this causes additional messages to be exchanged and increases the overall load on the system. Therefore it is advisable to always set the correct version.">
+									<span class="add-on">MAP version supported</span>
+									<input id="maxmapv" type="text" class="input-mini" style="width: 30px; margin-right: 12px; text-align: center;" value="0" />
+								</span>	
+							</div>
+							&nbsp;
+							<h5 style="border-bottom: 1px solid #DDD;">Others</h5>
+							<div id="div-maxmessagelengthreducer" class="control-group">        						                		
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set an integer value for max-message-length- reducer. The recommended value is 6. Possible values are numbers from 0 to 12. Empty TC-BEGIN will be used if the message length is greater than the maximum possible message length minus the value specified for max-message-length- reducer.  
+
+(message-length > max-possible-message-length - max-message-length-reducer)  
+
+Empty TC-BEGIN is used in MAP Version 2 and 3 for forwardSM and Mt- ForwardSM requests. In MAP Version 2 the dailog portion (ApplicationContextName, MAPOpenInfo primitive) and the component portion (forwardSM and mt-ForwardSM requests) may both together be too long to fit within a MTP message. In Empty TC-BEGIN case, it first sends the dailog portion in TC-BEGIN followed by the component portion in the next TC-CONTINUE. Whether empty TC-BEGIN is used or not depends on the length of a message and the length of SCCP addresses. This option increases the guarantee of delivery of a message to some network.">
+									<span class="add-on">Max Message Length Reducer</span>
+									<input id="maxmessagelengthreducer" type="text" class="input-mini" style="width: 30px; margin-right: 12px; text-align: center;" value="0" />
+								</span>								
+							</div>
+                        	<div id="div-hrHlrNumber" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a pre-configured HLR address for SRI messages. In some scenarios it may be required to set a HLR address instead of a MSISDN address into the SCCP CalledPartyAddress of SendRoutingInfo requests issued by the SMSC GW in both mobile terminated and home routing modes. In such cases, you must set this parameter hrhlrnumber to a pre-configured HLR address. For all other scenarios where this is not required, you may leave this parameter empty. When this is empty, the SCCP CalledPartyAddress of SendRoutingInfo request will be set to the destination MSISDN of a subscriber">
+									<span class="add-on">Home Routing HLR Global Title</span>
+									<input id="hrHlrNumber" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="" />
+								</span>
+							</div>
+                        	
+                        	<div id="div-sriResponseLiveTime" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC GW can store successfull SendRoutinInfo (SRI) responses (with IMSI and NetworkNodeNumber data) into an internal cache for some configurable time (sec). Caching of SRI responses takes some system resources and is recommended only if you need it for some scenarios (like you send firstly only an SRI request and do not deliver a message just to understand IMSI / NetworkNodeNumber (this scenario is achievable by mproc rules) and then send a message in short time if needed). Any value less than 1 means no cache.">
+									<span class="add-on">SRI Response Cache Time (in secs)</span>
+									<input id="sriResponseLiveTime" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="" />
+								</span>
+							</div>
+																					
+							<div class="control-group">
+								<span class="span12" style="text-align: left;">
+									&nbsp;<button class="btn btn-danger" onclick="updateSs7Properties();"><i class="icon-undo"></i> Revert</button>
+									&nbsp;<button class="btn btn-primary" onclick="applySs7Settings();"><i class="icon-save"></i> Save</button>
+								</span>
+							</div>							
+                        </div>
+                         <div class="tab-pane" id="dbsettings">
+							<h5 style="border-bottom: 1px solid #DDD;">Cassandra Configuration</h5>
+							<div id="div-cassandrahost" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="cassandra host address">
+									<span class="add-on">Host Address</span>
+									<input id="cassandrahost" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
+								</span>                         
+							</div>
+							<div id="div-cassandraport" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="cassandra port">
+									<span class="add-on">Port</span>
+									<input id="cassandraport" type="text" class="input-mini" style="width: 100px; margin-right: 12px; text-align: center;" value="0" />
+								</span>                         
+							</div>
+							<div id="div-cassandrakeyspace" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="cassandra keyspace name">
+									<span class="add-on">Keyspace Name</span>
+									<input id="cassandrakeyspace" type="text" class="input-mini" style="width: 100px; margin-right: 12px; text-align: center;" value="0" />
+								</span>                         
+							</div>
+							<div id="div-cassandraclustername" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="cassandra cluster name">
+									<span class="add-on">Cluster Name</span>
+									<input id="cassandraclustername" type="text" class="input-mini" style="width: 100px; margin-right: 12px; text-align: center;" value="0" />
+								</span>                         
+							</div>
+							<h5 style="border-bottom: 1px solid #DDD;">Archive Table Configuration</h5>
+							<div id="div-removinglivetablesdays" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="configure the SMSC to automatically drop LIVE tables from the Cassandra Database. The SMSC will attempt to delete tables just after midnight and after every SMSC restart. This parameter is used to specify the number of days the LIVE tables should be kept before attempting to drop them automatically. If this value is specified as 0, the SMSC will not drop tables automatically. In this case you must manually drop tables. You must specify a value of 3 or more. You can not set this value to 1 or 2 days. This is to ensure the tables will be kept for a minimum of 2 days after creation date. The SMSC wil attempt to delete tables for one day. If the Cassandra Database keeps tables for older days, then the administrator should drop these manually.">
+									<span class="add-on">Removing Live Tables Days</span>
+									<input id="removinglivetablesdays" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
+								</span>                         
+							</div>
+							<div id="div-removingarchivetabledays" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="This command is used to configure the SMSC to automatically drop ARCHIVE tables from the Cassandra Database. The SMSC will attempt to delete tables just after
+midnight and after every SMSC restart. This parameter is used to specify the number of days the ARCHIVE tables should be kept before attempting to drop them automatically.
+If this value is specified as 0, the SMSC will not drop tables automatically. In this case you must manually drop tables. You must specify a value of 3 or more. You can
+not set this value to 1 or 2 days. This is to ensure the tables will be kept for a minimum of 2 days after creation date. The SMSC wil attempt to delete tables for one
+day. If the Cassandra Database keeps tables for older days, then the administrator should drop">
+									<span class="add-on">Removing Archive Table Days</span>
+									<input id="removingarchivetabledays" type="text" class="input-mini" style="width: 100px; margin-right: 12px; text-align: center;" value="0" />
+								</span>                         
+							</div>	
+							<div class="control-group">
+								<span class="span12" style="text-align: left;">
+									&nbsp;<button class="btn btn-danger" onclick="updateCassandra();"><i class="icon-undo"></i> Revert</button>
+									&nbsp;<button class="btn btn-primary" onclick="applyCassandra();"><i class="icon-save"></i> Save</button>
+								</span>
+							</div>													
+                        </div>
+                        <div class="tab-pane" id="scheduler">
+							<h5 style="border-bottom: 1px solid #DDD;">Scheduler Configuration</h5>
+							<div id="div-schedulerfetchperiod" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the fetch period value in milli-seconds for the Cassandra database. The parameter fetch-period specifies the time period (in milli-seconds) of fetching messages for delivery from the database.">
+									<span class="add-on">Fetch Period (in ms)</span>
+									<input id="schedulerfetchperiod" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
+							<div id="div-schedulerfetchmaxrows" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the maximum message fetching count for every fetching step from the database. The default value is 100 messages.">
+									<span class="add-on">Max Rows</span>
+									<input id="schedulerfetchmaxrows" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
+							<div id="div-schedulerfetchmaxactivity" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the maximum count of delivering activities that are possible at the same time. Count of delivering activities means the count of messages that are in the state delivering (messages that are fetched from the database and may be already sent or are going to be sent but no delivery acception/rejection has been received).">
+								<span class="add-on">Max Activity Count</span>
+								<input id="schedulerfetchmaxactivity" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+							</span> 
+							</div>							
+							<div id="div-reviseSecondsOnSmscStart" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the revise period (in seconds). After every restart, the SMSC Gateway will revise the last x seconds before shutdown to ensure that all the arrived messages are processed; where 'x' is the value set in seconds">
+									<span class="add-on">Revise period after SMSC restart (sec)</span>
+									<input id="reviseSecondsOnSmscStart" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
+							<div id="div-processingSmsSetTimeout" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the Cache timeout period (in seconds). Messages are cached in the SMSC until the processing is completed. In case of a delivery failure, these cached messages are force cleaned by the SMSC after waiting for the timeout period">
+									<span class="add-on">Processing Sms set cache timeout (sec)</span>
+									<input id="processingSmsSetTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
+							<div class="control-group">
+								<span class="span12" style="text-align: left;">
+									&nbsp;<button class="btn btn-danger" onclick="updateScheduler();"><i class="icon-undo"></i> Revert</button>
+									&nbsp;<button class="btn btn-primary" onclick="applyScheduler();"><i class="icon-save"></i> Save</button>
+								</span>
+							</div>	
+							&nbsp;
+							<h5 style="border-bottom: 1px solid #DDD;">Skip Unsent Messages</h5>
+							<div id="div-skipUnsentMessages" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="This command will skip of processing / fetching of messages that was scheduled for delivering for the time in the past but have not yet delivered by SMSC GW because of SMSC GW was turned off or overloaded. <time in seconds> means the point of the time (actual current time - <time in seconds>) to which the point of processing / fetching of messages will be shifted. If the value 0 is provided this means SMSC GW will be shifted into an actual (current) time. If the value is positive this means SMSC GW will be shifted into a some time in the past (for example if the value is 3600 - to the time before the current time for 1 hour). Negative value is not accepted. The point of the time can be shifted only forward. It is not possible to shift the the point of time backward (and resend messages that was already sent once).">
+									<span class="add-on">Skip Unsent Messages (in sec)</span>
+									<input id="skipUnsentMessages" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>	
+							<div class="control-group">
+								<span class="span12" style="text-align: left;">
+									<button class="btn btn-primary" onclick="applySkipUnsentMessages();"><i class="icon-save"></i> Save</button>
+								</span>
+							</div>																												
+                        </div>
+                        
+                        <div class="tab-pane" id="diameter">
+							<h5 style="border-bottom: 1px solid #DDD;">Diameter Servre Configuration</h5>
+							<div id="div-chargingdiamdestrealm" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the Diameter Destination Realm for connection to OCS.">
+									<span class="add-on">Destination Realm</span>
+									<input id="chargingdiamdestrealm" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
+							<div id="div-chargingdiamdesthost" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the Diameter Destination Host for connection to OCS">
+									<span class="add-on">Destination Host</span>
+									<input id="chargingdiamdesthost" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
+							<div id="div-chargingdiamdestport" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the Diameter Destination Port for connection to OCS">
+									<span class="add-on">Destination Port</span>
+									<input id="chargingdiamdestport" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
+							<div id="div-chargingdiamusername" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the Diameter Username for connection to OCS">
+									<span class="add-on">User Name</span>
+									<input id="chargingdiamusername" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
+							&nbsp;
+							<h5 style="border-bottom: 1px solid #DDD;">Charging Configuration</h5>
+							<div id="div-chargingmo" class="control-group">        						                		
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of the parameter 'moCharging'. If this is accept, all Mobile Originated messages will be accepted for further processin. If set to reject, all Mobile Originated messages will be rejected and proper error message will be sent to peer. If set to diameter, all Mobile Originated messages be charged by OCS via Diameter, prior to being sent.">
+									<span class="add-on">Mobile Originated SMS Charged </span>
+									<select id="chargingmo" >
+										<option>accept</option>
+										<option>reject</option>
+										<option>diameter</option>
+									</select>
+								</span>  															
+							</div>	
+							<div id="div-chargingesme" class="control-group">        						                		
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of the parameter 'txsmppcharging' to none, selected or all. If this is set to 'all', all ESME Originated messages will be charged by OCS via Diameter, prior to being sent. If this is set to 'selected', only those messages originating from ESMEs marked with the parameter 'charging-enabled'=true at the time of ESME creation will be charged by OCS via Diameter, prior to being sent. If this is set to 'none', none of the ESME Originated messages will be charged by OCS via Diameter, prior to being sent.">
+									<span class="add-on">ESME Originated SMS Charged </span>
+									<select id="chargingesme" >
+										<option>None</option>
+										<option>Selected</option>
+										<option>All</option>
+									</select>
+								</span>  															
+							</div>	
+							<div id="div-chargingesip" class="control-group">        						                		
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="should SIP originated SMS be charged">
+									<span class="add-on">SIP Originated SMS Charged </span>
+									<select id="chargingsip" >
+										<option>None</option>
+										<option>Selected</option>
+										<option>All</option>
+									</select>
+								</span>  															
+							</div>	
+							<div id="div-charginghr" class="control-group">        						                		
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of the parameter 'hrcharging'. If this is accept, all Mobile Originated messages arrived by Home Routing will be accepted for further processin. If set to reject, all Mobile Originated messages arrived by Home Routing will be rejected and proper error message will be sent to peer. If set to diameter, all Mobile Originated messages arrived by Home Routing will be charged by OCS via Diameter, prior to being sent.">
+									<span class="add-on">Home Routed SMS Charged </span>
+									<select id="charginghr" >
+										<option>accept</option>
+										<option>reject</option>
+										<option>diameter</option>
+									</select>
+								</span>  															
+							</div>							
+							<div class="control-group">
+								<span class="span12" style="text-align: left;">
+									&nbsp;<button class="btn btn-danger" onclick="updateDiameter();"><i class="icon-undo"></i> Revert</button>
+									&nbsp;<button class="btn btn-primary" onclick="applyDiameter();"><i class="icon-save"></i> Save</button>
+								</span>
+							</div>																											
+                        </div>
+                        
+           				<div class="tab-pane" id="processing">
+							<h5 style="border-bottom: 1px solid #DDD;">Processing Options</h5>
+							<div id="div-deliverypause" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set to true to disable delivery of SMS. SMS will not be delivered to any medium. Use with great caution.">
+									<span class="add-on">Delivery Pause</span>
+									<select id="deliveryPause" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span> 								
+							</div>
+							
+							<div id="div-receiptsdisabling" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set to true to disable SMS receipt. Even if SMS carries header for delivery receipt, SMSC will not generate one">
+									<span class="add-on">Disable Delivery Receipt</span>
+									<select id="receiptsdisabling" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span> 								
+							</div>
+							
+							<div id="div-origNetworkIdForReceipts" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if this option is turned on (true), for each generated delivery receipts networkId will be set to the value of networkId of an ESME from which the original message has come to SMSC. This can help for routing of receipts back to the originated ESME. If this option is turned off (false) then the networkId of receipts will be taken from networkId of ESME / SS7 / SIP via which the original message has left SMSC GW. ">
+									<span class="add-on">Original NetworkId For Receipts</span>
+									<select id="origNetworkIdForReceipts" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span> 								
+							</div>														
+							
+							<div class="control-group">
+								<span class="span12" style="text-align: left;">
+									&nbsp;<button class="btn btn-danger" onclick="updateProcessing();"><i class="icon-undo"></i> Revert</button>
+									&nbsp;<button class="btn btn-primary" onclick="applyProcessing();"><i class="icon-save"></i> Save</button>
+								</span>
+							</div>															
+                        </div>
+                        
+           				<div class="tab-pane" id="cdr">
+                        	<h5 style="border-bottom: 1px solid #DDD;">CDR Configuration</h5>
+							<div id="div-generateReceiptCdr" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="The SMSC can be configured to generate CDR for both receipt and regular messages or generate CDR only for regular messages. By default the SMSC will generate CDR for regular messages only. However if you require the SMSC to generate CDR for receipt messages as well, you must set the parameter 'generatereceiptcdr' to true.">
+									<span class="add-on">Generate receipt CDR</span>
+									<select id="generateReceiptCdr" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span>                         
+							</div>	
+							&nbsp;
+							<div id="div-generateCdr" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC generates CDR's in simple .txt file and also adds detailed CDR in MESSAGES_YYYY_MM_DD table of Cassandra. Generate CDR defines which CDR's should be added in .txt file if at all. None means no CDR is added in text file. Datagram means CDR only for SMPP originated messages with datagram mode will logged. Transactional means CDR only for SMPP originated messages with transcation mode will logged. Store And Forward means CDR for SMPP originated with transcation mode, all SS7, all SIP messages will be logged. Select all three options to log all CDR's in .txt file">
+									<span class="add-on">Generate CDR in text file</span>
+									<br/>
+									<span class="add-on">None</span>
+									<input id="generateCdrNone" onClick="generateCdrCheckBox()" type="checkbox" class="input-mini" style="margin-left:3px; margin-top:0px; margin-right:12px; text-align:center; width:30px; height:30px;"></input>									
+									<span class="add-on">Datagram</span>
+									<input id="generateCdrDatagram" onClick="generateCdrCheckBox()" type="checkbox" class="input-mini" style="margin-left:3px; margin-top:0px; margin-right:12px; text-align:center; width:30px; height:30px;"></input>
+									<span class="add-on">Transactional</span>
+									<input id="generateCdrTransactional" onClick="generateCdrCheckBox()" type="checkbox" class="input-mini" style="margin-left:3px; margin-top:0px; margin-right:12px; text-align:center; width:30px; height:30px;"></input>
+									<span class="add-on">Store And Forward</span>
+									<input id="generateCdrSNF" onClick="generateCdrCheckBox()" type="checkbox" class="input-mini" style="margin-left:3px; margin-top:0px; margin-right:12px; text-align:center; width:30px; height:30px;"></input>							
+								</span>                         
+							</div>	
+							&nbsp;	
+							<div id="div-generateArchiveTable" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC generates CDR's in simple .txt file and also adds detailed CDR in MESSAGES_YYYY_MM_DD table of Cassandra. Generate Archive Table defines which CDR's should be added in Caasandra Table if at all. None means no CDR is added in Table. Datagram means CDR only for SMPP originated messages with datagram mode will inserted. Transactional means CDR only for SMPP originated messages with transcation mode will inserted. Store And Forward means CDR for SMPP originated with transcation mode, all SS7, all SIP messages will be inserted. Select all three options to insert all CDR's in Table">
+									<span class="add-on">Generate CDR in cassandra table</span>
+									<br/>
+									<span class="add-on">None</span>
+									<input id="generateArchiveTableNone" onClick="generateArchiveTableCheckBox()" type="checkbox" class="input-mini" style="margin-left:3px; margin-top:0px; margin-right:12px; text-align:center; width:30px; height:30px;"></input>									
+									<span class="add-on">Datagram</span>
+									<input id="generateArchiveTableDatagram" onClick="generateArchiveTableCheckBox()" type="checkbox" class="input-mini" style="margin-left:3px; margin-top:0px; margin-right:12px; text-align:center; width:30px; height:30px;"></input>
+									<span class="add-on">Transactional</span>
+									<input id="generateArchiveTableTransactional" onClick="generateArchiveTableCheckBox()" type="checkbox" class="input-mini" style="margin-left:3px; margin-top:0px; margin-right:12px; text-align:center; width:30px; height:30px;"></input>
+									<span class="add-on">Store And Forward</span>
+									<input id="generateArchiveTableSNF" onClick="generateArchiveTableCheckBox()" type="checkbox" class="input-mini" style="margin-left:3px; margin-top:0px; margin-right:12px; text-align:center; width:30px; height:30px;"></input>							
+								</span>                         
+							</div>
+							&nbsp;													
+							<div class="control-group">
+								<span class="span12" style="text-align: left;">
+									&nbsp;<button class="btn btn-danger" onclick="updateCdr();"><i class="icon-undo"></i> Revert</button>
+									&nbsp;<button class="btn btn-primary" onclick="applyCdr();"><i class="icon-save"></i> Save</button>
+								</span>
+							</div>															
+                        </div>   
+                        
+           				<div class="tab-pane" id="homerouting">
+                        	<h5 style="border-bottom: 1px solid #DDD;">SMS Home Routing Configuration</h5>
+                        	<!-- 
+							<div id="div-smsHomeRouting" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC can be configured to support SMS Home Routing by enabling the parameter smshomerouting. If this is set to true, the SMSC will accept MT messages and support Home Routing functionality.">
+									<span class="add-on">Home routing</span>
+									<select id="smsHomeRouting" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span>                         
+							</div>
+							 -->
+                        	<div id="div-smsHomeRoutingCorrIdLivTme" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="cahce time in sec for SMSC to store the correlation id. Do not make this value too high or too low.">
+									<span class="add-on">Correlation Id Cache Time (in secs)</span>
+									<input id="smsHomeRoutingCorrIdLivTme" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>	
+							&nbsp;
+							<div class="control-group">
+								<span class="span12" style="text-align: left;">
+									&nbsp;<button class="btn btn-danger" onclick="updateHomeRouting();"><i class="icon-undo"></i> Revert</button>
+									&nbsp;<button class="btn btn-primary" onclick="applyHomeRouting();"><i class="icon-save"></i> Save</button>
+								</span>
+							</div>																					
+                        </div>                                                                      
+                                                                        
+					</div>	
+					</span>					 
+				</p>	
+				<script type="text/javascript">
+					$('#login-settings-error .close').on("click", function(e) {
+					    $(this).parent().hide();
+					});
+					
+					
+					$(document).ready(function () {												
+						updateProperties();		
+						updateSs7Properties();
+						updateCassandra();
+						updateScheduler();
+						updateDiameter();
+						updateProcessing();
+						updateCdr();
+						updateHomeRouting();
+	    			});	
+					
+					function gtInSelChange(){
+						var gtinisel = document.getElementById("gtinisel");
+						var gtinitext = document.getElementById("gtinitext");
+						var ussdgt = document.getElementById("ussdgt");
+						
+						gtinitext.value = gtinisel.options[gtinisel.selectedIndex].text;
+						ussdgt.value = gtinisel.options[gtinisel.selectedIndex].value;
+					}
+					
+					function generateCdrCheckBox(){
+						var e = document.getElementById("generateCdrNone");
+						if(e.checked == true){
+							document.getElementById("generateCdrDatagram").checked = false;
+							document.getElementById("generateCdrTransactional").checked = false;
+							document.getElementById("generateCdrSNF").checked = false;
+						} else {
+							e.checked = false;
+						}
+					}
+					
+					function generateArchiveTableCheckBox(){
+						var e = document.getElementById("generateArchiveTableNone");
+						if(e.checked == true){
+							document.getElementById("generateArchiveTableDatagram").checked = false;
+							document.getElementById("generateArchiveTableTransactional").checked = false;
+							document.getElementById("generateArchiveTableSNF").checked = false;
+						} else {
+							e.checked = false;
+						}
+					}					
+					
+					function updateProperties(){
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "read", mbean: mbeanSearch },
+								],
+								{ success: [
+									function(response) {
+										$("#propdefaultvalidityhrs").val(response.value.DefaultValidityPeriodHours);
+										$("#propmaxvalidityhrs").val(response.value.MaxValidityPeriodHours);
+										$("#propdefaultton").val(response.value.DefaultTon);
+										$("#propdefaultnpi").val(response.value.DefaultNpi);
+										
+										$("#esmedefaultclustername").val(response.value.EsmeDefaultClusterName);
+										
+										$("#nationalLanguageSingleShift").val(response.value.NationalLanguageSingleShift);
+										$("#nationalLanguageLockingShift").val(response.value.NationalLanguageLockingShift);
+										
+										var smppEncodingForUCS2 = response.value.SmppEncodingForUCS2;
+										
+										if(smppEncodingForUCS2 == "Utf8"){
+											smppencodingforucs2.options[0].selected = true;
+										} else if(smppEncodingForUCS2 == "Unicode"){ 
+											smppencodingforucs2.options[1].selected = true;
+										} else {
+											smppencodingforucs2.options[2].selected = true;
+										}
+										
+										var smppEncodingForGsm7 = response.value.SmppEncodingForGsm7;
+										
+										if(smppEncodingForGsm7 == "Utf8"){
+											smppencodingforgsm7.options[0].selected = true;
+										} else if(smppEncodingForGsm7 == "Unicode"){ 
+											smppencodingforgsm7.options[1].selected = true;
+										} else { 
+											smppencodingforgsm7.options[2].selected = true;
+										}										
+										
+										var storeAndForwordMode = response.value.StoreAndForwordMode;
+										
+										if(storeAndForwordMode == "normal"){
+											storeandforwardmode.options[0].selected = true;
+										} else {
+											storeandforwardmode.options[1].selected = true;
+										}										
+										
+										$("#propsubbusduedel").val(response.value.SubscriberBusyDueDelay);
+										$("#propfirduedel").val(response.value.FirstDueDelay);
+										$("#propsecduedel").val(response.value.SecondDueDelay);
+										$("#propmaxduedel").val(response.value.MaxDueDelay);
+										
+										$("#duedelaymultiplicator").val(response.value.DueDelayMultiplicator);
+										
+										//var smsHomeRoutingTmp = response.value.SMSHomeRouting
+										//if(smsHomeRoutingTmp){
+										//	smsHomeRouting.options[0].selected = true;
+										//} else {
+										//	smsHomeRouting.options[1].selected = true;
+										//}
+									}],
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+									} 
+								}
+							);						
+					}
+					
+					function updateSs7Properties(){
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "read", mbean: mbeanSearch },
+								],
+								{ success: [
+									function(response) {
+										$("#ussdgt").val(response.value.ServiceCenterGt);
+										$("#ussdssn").val(response.value.ServiceCenterSsn);
+										$("#hlrssn").val(response.value.HlrSsn);
+										$("#mscssn").val(response.value.MscSsn);
+										$("#maxmapv").val(response.value.MaxMapVersion);
+										$("#maxmessagelengthreducer").val(response.value.MaxMessageLengthReducer);
+										$("#hrHlrNumber").val(response.value.HrHlrNumber);
+										$("#sriResponseLiveTime").val(response.value.SriResponseLiveTime);
+																				
+										var gtiVar = response.value.GlobalTitleIndicator;
+										if(gtiVar == "GLOBAL_TITLE_INCLUDES_NATURE_OF_ADDRESS_INDICATOR_ONLY"){
+											gti.options[0].selected = true;
+										} else if(gtiVar == "GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_ONLY"){
+											gti.options[1].selected = true;
+										} else if(gtiVar == "GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_AND_ENCODING_SCHEME"){
+											gti.options[2].selected = true;
+										} else if(gtiVar == "GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS"){
+											gti.options[3].selected = true;
+										}
+										
+										$("#tt").val(response.value.TranslationType);
+										
+										$("#gtinisel").append(new Option("0", response.value.ServiceCenterGt));
+										
+										jQuery.each(response.value.NetworkIdVsServiceCenterGt, function(key, val) {
+											$("#gtinisel").append(new Option(key, val));
+											
+										});
+									}],
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+									} 
+								}
+							);						
+					}	
+					
+					function updateCassandra(){
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "read", mbean: mbeanSearch },
+								],
+								{ success: [
+									function(response) {
+										var cassandrahost = response.value.DbHosts; 
+										var cassandraport = response.value.DbPort;
+										
+										
+										$("#cassandrahost").val(cassandrahost);
+										$("#cassandraport").val(cassandraport);
+										$("#cassandrakeyspace").val(response.value.KeyspaceName);
+										$("#cassandraclustername").val(response.value.ClusterName);
+										
+										$("#removinglivetablesdays").val(response.value.RemovingLiveTablesDays);
+										$("#removingarchivetabledays").val(response.value.RemovingArchiveTablesDays);										
+									}],
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+									} 
+								}
+							);						
+					}	
+					
+					function updateScheduler(){
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "read", mbean: mbeanSearch },
+								],
+								{ success: [
+									function(response) {
+										$("#schedulerfetchperiod").val(response.value.FetchPeriod);
+										$("#schedulerfetchmaxrows").val(response.value.FetchMaxRows);
+										$("#schedulerfetchmaxactivity").val(response.value.MaxActivityCount);
+										
+										$("#reviseSecondsOnSmscStart").val(response.value.ReviseSecondsOnSmscStart);
+										$("#processingSmsSetTimeout").val(response.value.ProcessingSmsSetTimeout);
+									}],
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+									} 
+								}
+							);						
+					}
+					
+					function updateProcessing(){
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "read", mbean: mbeanSearch },
+								],
+								{ success: [
+									function(response) {
+										var deliverypauseVar = response.value.DeliveryPause;
+										
+										if(deliverypauseVar){
+											deliveryPause.options[0].selected = true;
+										} else {
+											deliveryPause.options[1].selected = true;
+										}
+										
+										var receiptsdisablingVar = response.value.ReceiptsDisabling;
+										
+										if(receiptsdisablingVar){
+											receiptsdisabling.options[0].selected = true;
+										} else {
+											receiptsdisabling.options[1].selected = true;
+										}
+										
+										var origNetworkIdForReceiptsVar = response.value.OrigNetworkIdForReceipts;
+										
+										if(origNetworkIdForReceiptsVar){
+											origNetworkIdForReceipts.options[0].selected = true;
+										} else {
+											origNetworkIdForReceipts.options[1].selected = true;
+										}										
+									}],
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+									} 
+								}
+							);						
+					}	
+					
+					function updateCdr(){
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "read", mbean: mbeanSearch },
+								],
+								{ success: [
+									function(response) {
+										var generateReceiptCdrTmp = response.value.GenerateReceiptCdr
+										if(generateReceiptCdrTmp){
+											generateReceiptCdr.options[0].selected = true;
+										} else {
+											generateReceiptCdr.options[1].selected = true;
+										}
+										
+										var FLAG_DATAGRAMM = 0x01;
+										var FLAG_TRANSACTIONAL = 0x02;
+										var FLAG_STORE_AND_FORWARD = 0x04;
+										
+										var generateCdrIntTmp = response.value.GenerateCdrInt;
+										
+										if(generateCdrIntTmp == 0){
+											document.getElementById("generateCdrNone").checked = true;
+											document.getElementById("generateCdrDatagram").checked = false;
+											document.getElementById("generateCdrTransactional").checked = false;
+											document.getElementById("generateCdrSNF").checked = false;
+										} else {
+											document.getElementById("generateCdrNone").checked = false;
+											
+											if((generateCdrIntTmp & FLAG_DATAGRAMM) != 0){
+												document.getElementById("generateCdrDatagram").checked = true;
+											}
+											
+											if((generateCdrIntTmp & FLAG_TRANSACTIONAL) != 0){
+												document.getElementById("generateCdrTransactional").checked = true;
+											}
+											
+											if((generateCdrIntTmp & FLAG_STORE_AND_FORWARD) != 0){
+												document.getElementById("generateCdrSNF").checked = true;
+											}
+											
+										}
+										
+										var generateArchiveTableIntTmp = response.value.GenerateArchiveTableInt;
+										
+										if(generateArchiveTableIntTmp == 0){
+											document.getElementById("generateArchiveTableNone").checked = true;
+											document.getElementById("generateArchiveTableDatagram").checked = false;
+											document.getElementById("generateArchiveTableTransactional").checked = false;
+											document.getElementById("generateArchiveTableSNF").checked = false;
+										} else {
+											document.getElementById("generateArchiveTableNone").checked = false;
+											
+											if((generateArchiveTableIntTmp & FLAG_DATAGRAMM) != 0){
+												document.getElementById("generateArchiveTableDatagram").checked = true;
+											}
+											
+											if((generateArchiveTableIntTmp & FLAG_TRANSACTIONAL) != 0){
+												document.getElementById("generateArchiveTableTransactional").checked = true;
+											}
+											
+											if((generateArchiveTableIntTmp & FLAG_STORE_AND_FORWARD) != 0){
+												document.getElementById("generateArchiveTableSNF").checked = true;
+											}
+											
+										}										
+										
+									}],
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+									} 
+								}
+							);						
+					}					
+					
+					function updateDiameter(){
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "read", mbean: mbeanSearch },
+								],
+								{ success: [
+									function(response) {
+										$("#chargingdiamdestrealm").val(response.value.DiameterDestRealm);
+										$("#chargingdiamdesthost").val(response.value.DiameterDestHost);
+										$("#chargingdiamdestport").val(response.value.DiameterDestPort);
+										$("#chargingdiamusername").val(response.value.DiameterUserName);
+										
+										var chargingmoVar = response.value.MoCharging
+										
+										if(chargingmoVar == "accept"){
+											chargingmo.options[0].selected = true;
+										} else if(chargingmoVar == "reject") {
+											chargingmo.options[1].selected = true;
+										} else {
+											chargingmo.options[2].selected = true;
+										}
+										
+										var chargingesmeVar = response.value.TxSmppChargingType
+										
+										if(chargingesmeVar == "None"){
+											chargingesme.options[0].selected = true;
+										} else if(chargingesmeVar == "Selected"){
+											chargingesme.options[1].selected = true;
+										} else {
+											chargingesme.options[2].selected = true;
+										}	
+										
+										var chargingsipVar = response.value.TxSipChargingType
+										
+										if(chargingsipVar == "None"){
+											chargingsip.options[0].selected = true;
+										} else if(chargingsipVar == "Selected"){
+											chargingsip.options[1].selected = true;
+										} else {
+											chargingsip.options[2].selected = true;
+										}
+										
+										var charginghrVar = response.value.HrCharging
+										
+										if(charginghrVar == "accept"){
+											charginghr.options[0].selected = true;
+										} else if(charginghrVar == "reject") {
+											charginghr.options[1].selected = true;
+										} else {
+											charginghr.options[2].selected = true;
+										}
+									}],
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+									} 
+								}
+							);						
+					}
+					
+					function updateHomeRouting(){
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "read", mbean: mbeanSearch },
+								],
+								{ success: [
+									function(response) {
+										//var smsHomeRoutingTmp = response.value.SMSHomeRouting
+										//if(smsHomeRoutingTmp){
+										//	smsHomeRouting.options[0].selected = true;
+										//} else {
+										//	smsHomeRouting.options[1].selected = true;
+										//}
+										
+										$("#smsHomeRoutingCorrIdLivTme").val(response.value.CorrelationIdLiveTime);
+									}],
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+									} 
+								}
+							);						
+					}
+					
+					function applyHomeRouting() {
+						var formInvalid = false;
+						//var e2 = document.getElementById("smsHomeRouting");
+						//var smsHomeRouting = e2.options[e2.selectedIndex].text;
+												
+						var smsHomeRoutingCorrIdLivTme = $("#smsHomeRoutingCorrIdLivTme").val();
+						if(smsHomeRoutingCorrIdLivTme.trim() == "") {
+			    			$("#div-smsHomeRoutingCorrIdLivTme").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-smsHomeRoutingCorrIdLivTme").hasClass("error")) {
+			    			$("#div-smsHomeRoutingCorrIdLivTme").removeClass("error");		
+			    		}
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}
+						
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									//{ type: "write", mbean: mbeanSearch, attribute: "SMSHomeRouting", value: smsHomeRouting },
+									{ type: "write", mbean: mbeanSearch, attribute: "CorrelationIdLiveTime", value: smsHomeRoutingCorrIdLivTme },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway Proerties successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);
+									
+					}					
+
+					
+					function applyProperties() {
+						var formInvalid = false;
+						
+						var propdefaultvalidityhrs = $("#propdefaultvalidityhrs").val();
+						if(propdefaultvalidityhrs.trim() == "") {
+			    			$("#div-propdefaultvalidityhrs").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propdefaultvalidityhrs").hasClass("error")) {
+			    			$("#div-propdefaultvalidityhrs").removeClass("error");		
+			    		}
+						
+						var propmaxvalidityhrs = $("#propmaxvalidityhrs").val();
+						if(propmaxvalidityhrs.trim() == "") {
+			    			$("#div-propmaxvalidityhrs").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propmaxvalidityhrs").hasClass("error")) {
+			    			$("#div-propmaxvalidityhrs").removeClass("error");		
+			    		}
+						
+						var propdefaultton = $("#propdefaultton").val();
+						if(propdefaultton.trim() == "") {
+			    			$("#div-propdefaultton").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propdefaultton").hasClass("error")) {
+			    			$("#div-propdefaultton").removeClass("error");		
+			    		}
+						
+						var propdefaultnpi = $("#propdefaultnpi").val();
+						if(propdefaultnpi.trim() == "") {
+			    			$("#div-propdefaultnpi").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propdefaultnpi").hasClass("error")) {
+			    			$("#div-propdefaultnpi").removeClass("error");		
+			    		}
+						
+						var propesmedefaultclustername = $("#esmedefaultclustername").val();
+						
+						var propnationalLanguageSingleShift = $("#nationalLanguageSingleShift").val();
+						if(propnationalLanguageSingleShift.trim() == "") {
+			    			$("#div-propdefaultnpi").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propdefaultnpi").hasClass("error")) {
+			    			$("#div-propdefaultnpi").removeClass("error");		
+			    		}						
+						
+						var propnationalLanguageLockingShift = $("#nationalLanguageLockingShift").val();
+						if(propnationalLanguageLockingShift.trim() == "") {
+			    			$("#div-propdefaultnpi").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propdefaultnpi").hasClass("error")) {
+			    			$("#div-propdefaultnpi").removeClass("error");		
+			    		}						
+						
+						var e = document.getElementById("smppencodingforucs2");
+						var smppencodingforucs2 = e.options[e.selectedIndex].text;
+						
+						var e = document.getElementById("smppencodingforgsm7");
+						var smppencodingforgsm7 = e.options[e.selectedIndex].text;						
+						
+						e = document.getElementById("storeandforwardmode");
+						var storeandforwardmode = e.options[e.selectedIndex].text;						
+						
+						var propsubbusduedel = $("#propsubbusduedel").val();
+						if(propsubbusduedel.trim() == "") {
+			    			$("#div-propsubbusduedel").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propsubbusduedel").hasClass("error")) {
+			    			$("#div-propsubbusduedel").removeClass("error");		
+			    		}
+						
+						var propfirduedel = $("#propfirduedel").val();
+						if(propfirduedel.trim() == "") {
+			    			$("#div-propfirduedel").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propfirduedel").hasClass("error")) {
+			    			$("#div-propfirduedel").removeClass("error");		
+			    		}
+						
+						var propsecduedel = $("#propsecduedel").val();
+						if(propsecduedel.trim() == "") {
+			    			$("#div-propsecduedel").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propsecduedel").hasClass("error")) {
+			    			$("#div-propsecduedel").removeClass("error");		
+			    		}
+						
+						var propmaxduedel = $("#propmaxduedel").val();
+						if(propmaxduedel.trim() == "") {
+			    			$("#div-propmaxduedel").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-propmaxduedel").hasClass("error")) {
+			    			$("#div-propmaxduedel").removeClass("error");		
+			    		}
+						
+						var duedelaymultiplicator = $("#duedelaymultiplicator").val();
+						if(duedelaymultiplicator.trim() == "") {
+			    			$("#div-duedelaymultiplicator").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-duedelaymultiplicator").hasClass("error")) {
+			    			$("#div-duedelaymultiplicator").removeClass("error");		
+			    		}
+						
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}
+						
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "write", mbean: mbeanSearch, attribute: "DefaultValidityPeriodHours", value: propdefaultvalidityhrs },
+									{ type: "write", mbean: mbeanSearch, attribute: "MaxValidityPeriodHours", value: propmaxvalidityhrs },
+									{ type: "write", mbean: mbeanSearch, attribute: "DefaultTon", value: propdefaultton },
+									{ type: "write", mbean: mbeanSearch, attribute: "DefaultNpi", value: propdefaultnpi },
+									{ type: "write", mbean: mbeanSearch, attribute: "EsmeDefaultClusterName", value: propesmedefaultclustername },
+									{ type: "write", mbean: mbeanSearch, attribute: "NationalLanguageSingleShift", value: propnationalLanguageSingleShift },
+									{ type: "write", mbean: mbeanSearch, attribute: "NationalLanguageLockingShift", value: propnationalLanguageLockingShift },
+									{ type: "write", mbean: mbeanSearch, attribute: "SmppEncodingForUCS2", value: smppencodingforucs2 },
+									{ type: "write", mbean: mbeanSearch, attribute: "SmppEncodingForGsm7", value: smppencodingforgsm7 },
+									{ type: "write", mbean: mbeanSearch, attribute: "StoreAndForwordMode", value: storeandforwardmode },
+									{ type: "write", mbean: mbeanSearch, attribute: "SubscriberBusyDueDelay", value: propsubbusduedel },
+									{ type: "write", mbean: mbeanSearch, attribute: "FirstDueDelay", value: propfirduedel },
+									{ type: "write", mbean: mbeanSearch, attribute: "SecondDueDelay", value: propsecduedel },
+									{ type: "write", mbean: mbeanSearch, attribute: "MaxDueDelay", value: propmaxduedel },
+									{ type: "write", mbean: mbeanSearch, attribute: "DueDelayMultiplicator", value: duedelaymultiplicator },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway Proerties successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);
+									
+					}
+					
+					function applySs7Settings() {
+						var formInvalid = false;
+						
+						var gtinitext = $("#gtinitext").val();
+						if(gtinitext.trim() == "") {
+			    			$("#div-gtinitext").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-gtinitext").hasClass("error")) {
+			    			$("#div-gtinitext").removeClass("error");		
+			    		}						
+						
+						var ussdgt = $("#ussdgt").val();
+						if(ussdgt.trim() == "") {
+							ussdgt = null;							
+			    		} 
+						
+						var ussdssn = $("#ussdssn").val();
+						if(ussdssn.trim() == "") {
+			    			$("#div-ussdssn").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-ussdssn").hasClass("error")) {
+			    			$("#div-ussdssn").removeClass("error");		
+			    		}		
+						
+						var hlrssn = $("#hlrssn").val();
+						if(hlrssn.trim() == "") {
+			    			$("#div-hlrssn").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-hlrssn").hasClass("error")) {
+			    			$("#div-hlrssn").removeClass("error");		
+			    		}	
+						
+						var mscssn = $("#mscssn").val();
+						if(mscssn.trim() == "") {
+			    			$("#div-mscssn").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-mscssn").hasClass("error")) {
+			    			$("#div-mscssn").removeClass("error");		
+			    		}
+						
+						var maxmapv = $("#maxmapv").val();
+						if(maxmapv.trim() == "") {
+			    			$("#div-maxmapv").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-maxmapv").hasClass("error")) {
+			    			$("#div-maxmapv").removeClass("error");		
+			    		}
+						
+						var maxmessagelengthreducer = $("#maxmessagelengthreducer").val();
+						if(maxmessagelengthreducer.trim() == "") {
+			    			$("#div-maxmessagelengthreducer").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-maxmessagelengthreducer").hasClass("error")) {
+			    			$("#div-maxmessagelengthreducer").removeClass("error");		
+			    		}
+						
+						var e = document.getElementById("gti");
+						var gtiVar = e.options[e.selectedIndex].value;
+						
+						var ttVar = $("#tt").val();
+						
+						var hrhlrnumber = $("#hrHlrNumber").val();
+						if(hrhlrnumber.trim() == ""){
+							hrhlrnumber = null;
+						}
+						
+						var sriresponselivetime = $("#sriResponseLiveTime").val();
+						if(sriresponselivetime.trim() == ""){
+							sriresponselivetime = "0";
+						}
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}
+						
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "write", mbean: mbeanSearch, attribute: "ServiceCenterSsn", value: ussdssn },
+									{ type: "write", mbean: mbeanSearch, attribute: "HlrSsn", value: hlrssn },
+									{ type: "write", mbean: mbeanSearch, attribute: "MscSsn", value: mscssn },
+									{ type: "write", mbean: mbeanSearch, attribute: "MaxMapVersion", value: maxmapv },
+									{ type: "write", mbean: mbeanSearch, attribute: "MaxMessageLengthReducer", value: maxmessagelengthreducer },
+									{ type: "write", mbean: mbeanSearch, attribute: "GlobalTitleIndicator", value: gtiVar },
+									{ type: "write", mbean: mbeanSearch, attribute: "TranslationType", value: ttVar },
+									{ type: "write", mbean: mbeanSearch, attribute: "HrHlrNumber", value: hrhlrnumber },
+									{ type: "write", mbean: mbeanSearch, attribute: "SriResponseLiveTime", value: sriresponselivetime },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway SS7 settings successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);
+						
+						
+						if(gtinitext != "0"){
+						jolokia.execute(mbeanSearch,"setServiceCenterGt", gtinitext,ussdgt, 
+								{
+									success: function(value) {
+										$("#gtinisel").empty();
+										updateSs7Properties();
+										logToConsole("INFO", "SMSC Gateway SS7 settings successfully updated.");
+									},
+									error: function(value){
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									}					
+								});	
+						} else {
+							
+							mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+							jolokia.request(
+									[							
+										{ type: "write", mbean: mbeanSearch, attribute: "ServiceCenterGt", value: ussdgt },
+									],
+									{
+										success: function(response) {
+											logToConsole("INFO", "SMSC Gateway SS7 settings successfully updated.");
+										},
+										error: function(response) {
+											logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+										} 
+									}
+							);
+						}
+									
+					}
+					
+					function applyCassandra() {
+						var formInvalid = false;
+						
+						var cassandrahost = $("#cassandrahost").val();
+						if(cassandrahost.trim() == "") {
+			    			$("#div-cassandrahost").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-cassandrahost").hasClass("error")) {
+			    			$("#div-cassandrahost").removeClass("error");		
+			    		}
+						
+						var cassandraport = $("#cassandraport").val();
+						if(cassandraport.trim() == "") {
+			    			$("#div-cassandraport").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-cassandraport").hasClass("error")) {
+			    			$("#div-cassandraport").removeClass("error");		
+			    		}
+						
+						var cassandrakeyspace = $("#cassandrakeyspace").val();
+						if(cassandrakeyspace.trim() == "") {
+			    			$("#div-cassandrakeyspace").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-cassandrakeyspace").hasClass("error")) {
+			    			$("#div-cassandrakeyspace").removeClass("error");		
+			    		}
+						
+						var cassandraclustername = $("#cassandraclustername").val();
+						
+						
+						var removinglivetablesdays = $("#removinglivetablesdays").val();
+						if(removinglivetablesdays.trim() == "") {
+			    			$("#div-removinglivetablesdays").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-removinglivetablesdays").hasClass("error")) {
+			    			$("#div-removinglivetablesdays").removeClass("error");		
+			    		}
+						
+						
+						var removingarchivetabledays = $("#removingarchivetabledays").val();
+						if(removingarchivetabledays.trim() == "") {
+			    			$("#div-removingarchivetabledays").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-removingarchivetabledays").hasClass("error")) {
+			    			$("#div-removingarchivetabledays").removeClass("error");		
+			    		}
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}
+						
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "write", mbean: mbeanSearch, attribute: "DbHosts", value: cassandrahost },
+									{ type: "write", mbean: mbeanSearch, attribute: "DbPort", value: cassandraport },
+									{ type: "write", mbean: mbeanSearch, attribute: "KeyspaceName", value: cassandrakeyspace },
+									{ type: "write", mbean: mbeanSearch, attribute: "ClusterName", value: cassandraclustername },
+									{ type: "write", mbean: mbeanSearch, attribute: "RemovingLiveTablesDays", value: removinglivetablesdays },
+									{ type: "write", mbean: mbeanSearch, attribute: "RemovingArchiveTablesDays", value: removingarchivetabledays },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway Cassandra setting successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);
+									
+					}
+					
+					function applySkipUnsentMessages(){
+						var skipUnsentMessages = $("#skipUnsentMessages").val();
+						
+						if(skipUnsentMessages.trim() == "") {
+			    			$("#div-skipUnsentMessages").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-skipUnsentMessages").hasClass("error")) {
+			    			$("#div-skipUnsentMessages").removeClass("error");		
+			    		}
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "write", mbean: mbeanSearch, attribute: "SkipUnsentMessages", value: skipUnsentMessages },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway SkipUnsentMessages setting successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);						
+					}
+					
+					function applyScheduler() {
+						var formInvalid = false;
+						
+						var schedulerfetchperiod = $("#schedulerfetchperiod").val();
+						if(schedulerfetchperiod.trim() == "") {
+			    			$("#div-schedulerfetchperiod").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-schedulerfetchperiod").hasClass("error")) {
+			    			$("#div-schedulerfetchperiod").removeClass("error");		
+			    		}
+						
+						var schedulerfetchmaxrows = $("#schedulerfetchmaxrows").val();
+						if(schedulerfetchmaxrows.trim() == "") {
+			    			$("#div-schedulerfetchmaxrows").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-schedulerfetchmaxrows").hasClass("error")) {
+			    			$("#div-schedulerfetchmaxrows").removeClass("error");		
+			    		}
+						
+						var schedulerfetchmaxactivity = $("#schedulerfetchmaxactivity").val();
+						if(schedulerfetchmaxactivity.trim() == "") {
+			    			$("#div-schedulerfetchmaxactivity").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-schedulerfetchmaxactivity").hasClass("error")) {
+			    			$("#div-schedulerfetchmaxactivity").removeClass("error");		
+			    		}
+						
+						var reviseSecondsOnSmscStart = $("#reviseSecondsOnSmscStart").val();
+						if(reviseSecondsOnSmscStart.trim() == "") {
+			    			$("#div-reviseSecondsOnSmscStart").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-reviseSecondsOnSmscStart").hasClass("error")) {
+			    			$("#div-reviseSecondsOnSmscStart").removeClass("error");		
+			    		}		
+						
+						var processingSmsSetTimeout = $("#processingSmsSetTimeout").val();
+						if(processingSmsSetTimeout.trim() == "") {
+			    			$("#div-processingSmsSetTimeout").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-processingSmsSetTimeout").hasClass("error")) {
+			    			$("#div-processingSmsSetTimeout").removeClass("error");		
+			    		}	
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}
+						
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "write", mbean: mbeanSearch, attribute: "FetchPeriod", value: schedulerfetchperiod },
+									{ type: "write", mbean: mbeanSearch, attribute: "FetchMaxRows", value: schedulerfetchmaxrows },
+									{ type: "write", mbean: mbeanSearch, attribute: "MaxActivityCount", value: schedulerfetchmaxactivity },
+									{ type: "write", mbean: mbeanSearch, attribute: "ReviseSecondsOnSmscStart", value: reviseSecondsOnSmscStart },
+									{ type: "write", mbean: mbeanSearch, attribute: "ProcessingSmsSetTimeout", value: processingSmsSetTimeout },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway Scheduler setting successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);
+									
+					}
+					
+					function applyDiameter() {
+						var formInvalid = false;
+						
+						var chargingdiamdestrealm = $("#chargingdiamdestrealm").val();
+						if(chargingdiamdestrealm.trim() == "") {
+			    			$("#div-chargingdiamdestrealm").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-chargingdiamdestrealm").hasClass("error")) {
+			    			$("#div-chargingdiamdestrealm").removeClass("error");		
+			    		}
+						
+						var chargingdiamdesthost = $("#chargingdiamdesthost").val();
+						if(chargingdiamdesthost.trim() == "") {
+			    			$("#div-chargingdiamdesthost").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-chargingdiamdesthost").hasClass("error")) {
+			    			$("#div-chargingdiamdesthost").removeClass("error");		
+			    		}
+						
+						var chargingdiamdestport = $("#chargingdiamdestport").val();
+						if(chargingdiamdestport.trim() == "") {
+			    			$("#div-chargingdiamdestport").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-chargingdiamdestport").hasClass("error")) {
+			    			$("#div-chargingdiamdestport").removeClass("error");		
+			    		}
+						
+						var chargingdiamusername = $("#chargingdiamusername").val();
+						if(chargingdiamusername.trim() == "") {
+			    			$("#div-chargingdiamusername").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-chargingdiamusername").hasClass("error")) {
+			    			$("#div-chargingdiamusername").removeClass("error");		
+			    		}	
+						
+						e = document.getElementById("chargingmo");
+						var chargingmo = e.options[e.selectedIndex].text;
+						
+						e = document.getElementById("chargingesme");
+						var chargingesme = e.options[e.selectedIndex].text;
+						
+						e = document.getElementById("chargingsip");
+						var chargingsip = e.options[e.selectedIndex].text;
+						
+						e = document.getElementById("charginghr");
+						var charginghr = e.options[e.selectedIndex].text;
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}
+						
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "write", mbean: mbeanSearch, attribute: "DiameterDestRealm", value: chargingdiamdestrealm },
+									{ type: "write", mbean: mbeanSearch, attribute: "DiameterDestHost", value: chargingdiamdesthost },
+									{ type: "write", mbean: mbeanSearch, attribute: "DiameterDestPort", value: chargingdiamdestport },
+									{ type: "write", mbean: mbeanSearch, attribute: "DiameterUserName", value: chargingdiamusername },
+									{ type: "write", mbean: mbeanSearch, attribute: "MoCharging", value: chargingmo },
+									{ type: "write", mbean: mbeanSearch, attribute: "TxSmppChargingType", value: chargingesme },
+									{ type: "write", mbean: mbeanSearch, attribute: "TxSipChargingType", value: chargingsip },
+									{ type: "write", mbean: mbeanSearch, attribute: "HrCharging", value: charginghr },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway Diameter settings successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);
+									
+					}	
+					
+					function applyProcessing() {
+						
+						e = document.getElementById("deliveryPause");
+						var deliverypauseVar = e.options[e.selectedIndex].text;
+						
+						e = document.getElementById("receiptsdisabling");
+						var receiptsdisabling = e.options[e.selectedIndex].text;
+						
+						e = document.getElementById("origNetworkIdForReceipts");
+						var origNetworkIdForReceipts = e.options[e.selectedIndex].text;
+						
+						
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "write", mbean: mbeanSearch, attribute: "DeliveryPause", value: deliverypauseVar },
+									{ type: "write", mbean: mbeanSearch, attribute: "ReceiptsDisabling", value: receiptsdisabling },
+									{ type: "write", mbean: mbeanSearch, attribute: "OrigNetworkIdForReceipts", value: origNetworkIdForReceipts },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway Processing settings successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);
+									
+					}
+					
+					function applyCdr() {
+						
+						var e1 = document.getElementById("generateReceiptCdr");
+						var generateReceiptCdr = e1.options[e1.selectedIndex].text;
+						
+						var FLAG_DATAGRAMM = 0x01;
+						var FLAG_TRANSACTIONAL = 0x02;
+						var FLAG_STORE_AND_FORWARD = 0x04;
+						
+						var generateCdrTmp = 0;
+						if(document.getElementById("generateCdrDatagram").checked == true){
+							generateCdrTmp = (generateCdrTmp | FLAG_DATAGRAMM);
+						}
+						
+						if(document.getElementById("generateCdrTransactional").checked == true){
+							generateCdrTmp = (generateCdrTmp | FLAG_TRANSACTIONAL);
+						}
+						
+						if(document.getElementById("generateCdrSNF").checked == true){
+							generateCdrTmp = (generateCdrTmp | FLAG_STORE_AND_FORWARD);
+						}
+						
+						var generateArchiveTableTmp = 0;
+						if(document.getElementById("generateArchiveTableDatagram").checked == true){
+							generateArchiveTableTmp = (generateArchiveTableTmp | FLAG_DATAGRAMM);
+						}
+						
+						if(document.getElementById("generateArchiveTableTransactional").checked == true){
+							generateArchiveTableTmp = (generateArchiveTableTmp | FLAG_TRANSACTIONAL);
+						}
+						
+						if(document.getElementById("generateArchiveTableSNF").checked == true){
+							generateArchiveTableTmp = (generateArchiveTableTmp | FLAG_STORE_AND_FORWARD);
+						}
+						
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "write", mbean: mbeanSearch, attribute: "GenerateReceiptCdr", value: generateReceiptCdr },
+									{ type: "write", mbean: mbeanSearch, attribute: "GenerateCdrInt", value: generateCdrTmp },
+									{ type: "write", mbean: mbeanSearch, attribute: "GenerateArchiveTableInt", value: generateArchiveTableTmp },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway Processing settings successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);
+									
+					}					
+					
+					</script>

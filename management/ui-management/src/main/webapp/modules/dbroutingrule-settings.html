@@ -1,0 +1,272 @@
+					<h3 style="margin: 0px;"><i class="icon-sitemap"></i> Database Routing Rule Settings</h3>
+					<hr style="margin: 10 0px;"/>
+					
+					<link href="resources/css/bootstrap-slider.css" rel="stylesheet">
+					<script type="text/javascript" src="resources/js/bootstrap-slider.js"></script>
+					<script type="text/javascript" src="resources/js/jquery-knob.js"></script>
+					
+					
+					<p>
+						<br/>
+					</p> 
+					
+					<div class="alert alert-error" id="login-settings-error" style="display:none;">
+					  <button type="button" class="close">&times;</button>
+					  Some Fields are not correctly filled out, please double check the settings below !
+					</div>
+					
+
+					<h5>Update Configuration</h5>						
+					<div id="dbrr-update-configuration-wrapper">
+						<div class="input-prepend">
+							<div id="div-dbRuleType" class="control-group">
+							<span id="dbRuleType-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="updates existing routing rule for SIP or SMPP">
+								<span class="add-on">Type</span>
+								<select id="dbRuleType" style="width: 100px;">
+									<option value="SMPP">SMPP</option>	
+									<option value="SIP">SIP</option>
+								</select>
+							</span>
+							</div>
+							
+							<div id="div-updatemsisdn" class="control-group">
+							<span id="updatemsisdn-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="updates existing routing rule if exist else creates new. MSISDN for which rule is to be set.">
+								<span class="add-on">MSISDN</span>
+								<input id="updatemsisdn" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+							
+							<div id="div-updtaemsisdnclunme" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="cluster name of ESME where the message should be routed for configured MSISDN.">
+								<span class="add-on">Name</span>
+								<input id="updtaemsisdnclunme" type="text" class="input-mini" style="width: 180px; margin-right: 12px; text-align: center;" value="" />
+							</span>					
+							</div>
+							
+							<div id="div-updtaemsisdnnetid" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="network-id for which this MSISDN should be considered. By default is 0">
+								<span class="add-on">Network Id</span>
+								<input id="updtaemsisdnnetid" type="text" class="input-mini" style="width: 90px; margin-right: 12px; text-align: center;" value="" />
+							</span>					
+							</div>							
+						</div>
+						<div class="row">
+							<span class="span12" style="text-align: right;">
+								&nbsp;<button class="btn btn-primary" onclick="updateDbRr();"><i class="icon-save"></i> Update</button>
+							</span>
+						</div>						
+					</div>
+					
+					<hr />
+					
+					<h5>Delete Configuration</h5>
+					<div id="dbrr-delete-configuration-wrapper">
+						<div class="input-prepend">
+							<div id="div-dbRuleType-delete" class="control-group">
+							<span id="dbRuleType-span-delete" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="delete existing routing rule for SIP or SMPP">
+								<span class="add-on">Type</span>
+								<select id="dbRuleType-delete" style="width: 100px;">
+									<option value="SMPP">SMPP</option>	
+									<option value="SIP">SIP</option>
+								</select>
+							</span>
+							</div>
+													
+							<div id="div-deletemsisdn" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="delete the routing rule set for given MSISDN.">
+								<span class="add-on">MSISDN</span>
+								<input id="deletemsisdn" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+							
+							<div id="div-deletemsisdnnetid" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="network-id for which this MSISDN should be considered. By default is 0">
+								<span class="add-on">Network Id</span>
+								<input id="deletemsisdnnetid" type="text" class="input-mini" style="width: 90px; margin-right: 12px; text-align: center;" value="" />
+							</span>					
+							</div>							
+						</div>
+						<div class="row">
+							<span class="span12" style="text-align: right;">
+								&nbsp;<button class="btn btn-primary" onclick="deleteDbRr();"><i class="icon-remove"></i> Delete</button>
+							</span>
+						</div>						
+					</div>	
+					
+					<hr />
+					
+					<h5>View Configuration</h5>
+					<div id="dbrr-view-configuration-wrapper">
+						<div class="input-prepend">
+							
+							<div id="div-dbRuleType-view" class="control-group">
+							<span id="dbRuleType-span-view" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="view the routing rule for SIP or SMPP">
+								<span class="add-on">Type</span>
+								<select id="dbRuleType-view" style="width: 100px;">
+									<option value="SMPP">SMPP</option>	
+									<option value="SIP">SIP</option>
+								</select>
+							</span>
+							</div>						
+						
+							<div id="div-viewmsisdn" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="view the routing rule (cluster name) set for given MSISDN.">
+								<span class="add-on">MSISDN</span>
+								<input id="viewmsisdn" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+							
+							<div id="div-updtaemsisdnclunme" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="network-id for which this MSISDN should be considered. By default is 0">
+								<span class="add-on">Network Id</span>
+								<input id="viewmsisdnnetid" type="text" class="input-mini" style="width: 90px; margin-right: 12px; text-align: center;" value="" />
+							</span>					
+							</div>							
+						</div>
+						<div class="row">
+							<span class="span12" style="text-align: right;">
+								&nbsp;<button class="btn btn-primary" onclick="viewDbRr();"><i class="icon-eye-open"></i> View</button>
+							</span>
+						</div>						
+					</div>									
+					
+				<script type="text/javascript">
+					$('#login-settings-error .close').on("click", function(e) {
+					    $(this).parent().hide();
+					});
+					
+					function updateDbRr() {
+						var mbeanSearch="org.mobicents.smsc:layer=DatabaseSmsRoutingRule,name=SmscManagement";
+						var formInvalid = false;
+						
+						var dbRuleType = $("#dbRuleType").val();
+						
+						var updatemsisdn = $("#updatemsisdn").val();
+						if(updatemsisdn.trim() == "") {
+			    			$("#div-updatemsisdn").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-updatemsisdn").hasClass("error")) {
+			    			$("#div-updatemsisdn").removeClass("error");		
+			    		}
+						
+						var updtaemsisdnclunme = $("#updtaemsisdnclunme").val();
+						if(updtaemsisdnclunme.trim() == "") {
+			    			$("#div-updtaemsisdnclunme").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-updtaemsisdnclunme").hasClass("error")) {
+			    			$("#div-updtaemsisdnclunme").removeClass("error");		
+			    		}
+						
+						var updtaemsisdnnetid =  $("#updtaemsisdnnetid").val();
+						if(updtaemsisdnnetid.trim() == "") {
+							updtaemsisdnnetid = "0";	
+			    		}
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}						
+						
+						jolokia.execute(mbeanSearch,"updateDbSmsRoutingRule",dbRuleType,updatemsisdn,updtaemsisdnnetid,updtaemsisdnclunme,
+								{
+									success: function(value) {
+										logToConsole('INFO', 'Successfully set routing rule to ' + updtaemsisdnclunme + ' for MSISDN ' + updatemsisdn );
+									},
+									error: function(value){
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									}
+								});							
+
+					}
+					
+					function deleteDbRr() {
+						var mbeanSearch="org.mobicents.smsc:layer=DatabaseSmsRoutingRule,name=SmscManagement";
+						var formInvalid = false;
+						
+						var dbRuleType = $("#dbRuleType-delete").val();
+						
+						var deletemsisdn = $("#deletemsisdn").val();
+						if(deletemsisdn.trim() == "") {
+			    			$("#div-deletemsisdn").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-deletemsisdn").hasClass("error")) {
+			    			$("#div-deletemsisdn").removeClass("error");		
+			    		}
+						
+						var deletemsisdnnetid =  $("#deletemsisdnnetid").val();
+						if(deletemsisdnnetid.trim() == "") {
+							deletemsisdnnetid = "0";	
+			    		}
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}						
+						
+						jolokia.execute(mbeanSearch,"deleteDbSmsRoutingRule",dbRuleType,deletemsisdn,deletemsisdnnetid,
+								{
+									success: function(value) {
+										logToConsole('INFO', 'Successfully deleted rule for MSISDN ' + deletemsisdn );
+									},
+									error: function(value){
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									}
+								});							
+
+					}	
+					
+					function viewDbRr() {
+						var mbeanSearch="org.mobicents.smsc:layer=DatabaseSmsRoutingRule,name=SmscManagement";
+						var formInvalid = false;
+						
+						var dbRuleType = $("#dbRuleType-view").val();
+						
+						var viewmsisdn = $("#viewmsisdn").val();
+						if(viewmsisdn.trim() == "") {
+			    			$("#div-viewmsisdn").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-viewmsisdn").hasClass("error")) {
+			    			$("#div-viewmsisdn").removeClass("error");		
+			    		}
+						
+						var viewmsisdnnetid =  $("#viewmsisdnnetid").val();
+						if(viewmsisdnnetid.trim() == "") {
+							viewmsisdnnetid = "0";	
+			    		}
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}						
+						
+						jolokia.execute(mbeanSearch,"getSmsRoutingRule",dbRuleType,viewmsisdn,viewmsisdnnetid,
+								{
+									success: function(value) {
+										if(value!=null){
+											logToConsole('INFO', 'Name:'+value.clusterName + ' Address:'+value.address + ' Type:'+value.smsRoutingRuleType );
+										} else{
+											logToConsole('WARN','No rule defined for '+viewmsisdn);
+										}
+									},
+									error: function(value){
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									}
+								});							
+
+					}					
+				</script>

@@ -1,0 +1,1061 @@
+
+<h3 style="margin: 0px;">
+	<i class="icon-cogs"></i> SMPP Servers
+</h3>
+<hr style="margin: 10 0px;" />
+<span style="float: right;">
+	<button id="refresh" style="float: right; margin-right: 20px; margin-left: 20px; height: 30px;" class="btn btn-medium btn-success" data-toggle="tooltip" data-placement="left" title="Refresh SMPPP Servers List" onclick="updateServices();">
+		<i class="icon-refresh"></i>
+	</button>
+</span>
+<span id="services-table-wrapper">
+	<table id="no-services-table" class="table" style="display: none;">
+		<tr>
+			<td>
+				<div class="alert alert-info fade in">
+					<strong>No Services!</strong> There are no services matching the
+					filtering criteria.
+				</div>
+			</td>
+		</tr>
+	</table>
+
+	<table id="services-table" class="table table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30px;">&nbsp;</th>
+				<th>Name</th>
+				<th style="text-align: center; width: 150px;">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</span>
+
+<script type="text/javascript">
+				function updateServices() {
+					mbeanSearch="org.mobicents.smpp:layer=SmppServerManagement,name=*";
+					var mbeanVar;
+					$.ajax({
+						dataType: "json",
+						url: window.jolokiaProtocol+ "//"  + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+					})
+					.done(function(html) {
+						if (html.error) {
+							logToConsole("ERROR", html.error);
+						}
+						else {		
+							
+							$('.service-row').remove();
+							$('.text-info').remove();
+							jQuery.each(html.value, function() {
+								mbeanVar = this;
+								
+								
+								
+								jolokia.request(
+										[
+											{ type: "read", mbean: mbeanVar },
+										],
+										{ success: [
+											function(response) {
+												
+												var isSmppServerStarted = response.value.Started;
+												var name = response.value.Name;
+												var systremId = response.value.SystemId;
+												var port = response.value.BindPort;
+												var bindTimeout  = response.value.BindTimeout;
+												var autoNegotiateInterfaceVersion = response.value.AutoNegotiateInterfaceVersion;
+												var interfaceVersion = response.value.InterfaceVersion;
+												var maxConnectionSize = response.value.MaxConnectionSize;
+												var defaultWindowSize = response.value.DefaultWindowSize;
+												var defaultWindowWaitTimeout = response.value.DefaultWindowWaitTimeout;
+												var defaultRequestExpiryTimeout = response.value.DefaultRequestExpiryTimeout;
+												var defaultWindowMonitorInterval = response.value.DefaultWindowMonitorInterval;
+												var defaultSessionCountersEnabled = response.value.DefaultSessionCountersEnabled;
+												
+												var useSsl = response.value.UseSsl;
+												var certAlias = response.value.CertAlias;
+												var crlPath = response.value.CrlPath;
+												var keyManagerFactoryAlgorithm = response.value.KeyManagerFactoryAlgorithm;
+												var keyManagerPassword = response.value.KeyManagerPassword;
+												var keyStorePassword = response.value.KeyStorePassword;
+												var keyStorePath = response.value.KeyStorePath;
+												var keyStoreProvider = response.value.KeyStoreProvider;
+												var keyStoreType = response.value.KeyStoreType;
+												var maxCertPathLength = response.value.MaxCertPathLength;
+												var needClientAuth = response.value.NeedClientAuth;
+												var ocspResponderURL = response.value.OcspResponderURL;
+												var protocol = response.value.Protocol;
+												var provider = response.value.Provider;
+												var secureRandomAlgorithm = response.value.SecureRandomAlgorithm;
+												var sslSessionCacheSize = response.value.SslSessionCacheSize;
+												var sslSessionTimeout = response.value.SslSessionTimeout;
+												var trustManagerFactoryAlgorithm = response.value.TrustManagerFactoryAlgorithm;
+												var trustStorePassword = response.value.TrustStorePassword;
+												var trustStorePath = response.value.TrustStorePath;
+												var trustStoreProvider = response.value.TrustStoreProvider;
+												var trustStoreType = response.value.TrustStoreType;
+												var wantClientAuth = response.value.WantClientAuth;
+												var allowRenegotiate = response.value.AllowRenegotiate;
+												var enableCRLDP = response.value.EnableCRLDP;
+												var enableOCSP = response.value.EnableOCSP;
+												var sessionCachingEnabled = response.value.SessionCachingEnabled;
+												var trustAll = response.value.TrustAll;
+												var validateCerts = response.value.ValidateCerts;
+												var validatePeerCerts = response.value.ValidatePeerCerts;
+												
+												
+												var sessionSize = response.value.SessionSize;
+												var transceiverSessionSize = response.value.TransceiverSessionSize;
+												var transmitterSessionSize = response.value.TransmitterSessionSize;
+												var receiverSessionSize = response.value.ReceiverSessionSize;
+												var sessionCreated = response.value.SessionCreated;
+												var sessionDestroyed = response.value.SessionDestroyed;
+												
+												
+												var connectionSize = response.value.ConnectionSize;
+												var channelConnects = response.value.ChannelConnects;
+												var channelDisconnects = response.value.ChannelDisconnects;
+												
+												var bindTimeouts = response.value.BindTimeouts;
+												var bindRequested = response.value.BindRequested;
+												
+												var nonBlockingSocketsEnabled = response.value.NonBlockingSocketsEnabled;
+												var reuseAddress = response.value.ReuseAddress;
+												
+												
+												serviceClass = isSmppServerStarted ? 'active-service' : 'inactive-service';
+												
+												$('#services-table').children('tbody').append('<tr class="service-row"><td style="vertical-align: middle; text-align: center;"><i style="color: ' + (isSmppServerStarted ? '#51A351' : '#BD362F') + ';" class="' + (isSmppServerStarted ? 'icon-play-circle' : 'icon-remove-circle') + '"></i></td>'+
+														'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + name + '</td>' +
+														'<td style="cursor: pointer; font-size: 16px; vertical-align: middle; text-align: center; width: 150px;" onclick="$(this).parent().next().toggle();">' + 
+															'<button class="btn btn-small btn-success"' + (isSmppServerStarted ? 'disabled' : '') + ' data-toggle="tooltip" title="Start SMPP Server" data-placement="bottom" onclick="serviceOperation(\'start\', \'' + name + '\')"><i class="icon-play"> </i></button> ' +
+															'<button class="btn btn-small btn-danger"' + (!isSmppServerStarted ? 'disabled' : '') + ' data-toggle="tooltip" title="Stop SMPP Server" data-placement="bottom" onclick="serviceOperation(\'stop\', \'' + name +  '\')"><i class="icon-stop"> </i></button> ' +
+															'<a href="#entities-modal'+name+'" role="button" class="btn btn-info btn-small" data-toggle="modal"><i class="icon-external-link"></i></a>' +
+														'</td></tr>'+
+												
+														'<tr class="text-info" style="display: none;"><td>&nbsp;</td><td colspan=2>' +
+														'<div class="bs-docs-example bs-docs-example-submenus"> '+
+														
+												        '    <div>'+
+												        '      <p class="muted">Properties</p>'+
+																'<dl class="dl-horizontal" style="width:360px;font-size: 0.8em;">' +
+																	'<dt>Port</dt> <dd>' + port + ' </dd>' + 
+																	'<dt>BindTimeout</dt> <dd>' + bindTimeout + ' </dd>' + 
+																	'<dt>SystemId</dt> <dd>' + systremId + ' </dd>' + 
+																	'<dt>AutoNegotiateInterfaceVersion</dt> <dd>' + autoNegotiateInterfaceVersion + ' </dd>' + 
+																	'<dt>InterfaceVersion</dt> <dd>' + interfaceVersion + ' </dd>' + 
+																	'<dt>MaxConnectionSize</dt> <dd>' + maxConnectionSize + ' </dd>' +
+																	'<dt>DefaultWindowSize</dt> <dd>' + defaultWindowSize + ' </dd>' +
+																	'<dt>DefaultWindowWaitTimeout</dt> <dd>' + defaultWindowWaitTimeout + ' </dd>' +
+																	'<dt>DefaultRequestExpiryTimeout</dt> <dd>' + defaultRequestExpiryTimeout + ' </dd>' +
+																	'<dt>DefaultWindowMonitorInterval</dt> <dd>' + defaultWindowMonitorInterval + ' </dd>' +
+																	'<dt>DefaultSessionCountersEnabled</dt> <dd>' + defaultSessionCountersEnabled + ' </dd>' +
+																'</dl>'+
+												        '    </div>'+														
+														
+												        '    <div>'+
+												        '      <p class="muted">Session Details</p>'+
+																'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+																	'<dt>CurrentSessionSize</dt> <dd>' + sessionSize + ' </dd>' + 
+																	'<dt>CurrentTransceiverSessionSize</dt> <dd>' + transceiverSessionSize + ' </dd>' + 
+																	'<dt>CurrentTransmitterSessionSize</dt> <dd>' + transmitterSessionSize + ' </dd>' + 
+																	'<dt>CurrentReceiverSessionSize</dt> <dd>' + receiverSessionSize + ' </dd>' + 
+																	'<dt>TotalSessionsCreated</dt> <dd>' + sessionCreated + ' </dd>' + 
+																	'<dt>TotalSessionsDestroyed</dt> <dd>' + sessionDestroyed + ' </dd>' + 
+																'</dl>'+
+												        '    </div>'+
+											        		'<hr style="margin: 5px 0;"/>' +
+													        '    <div>'+
+													        '      <p class="muted">Connection Details</p>'+
+																	'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+																		'<dt>ConnectionSize</dt> <dd>' + connectionSize + ' </dd>' + 
+																		'<dt>ChannelConnects</dt> <dd>' + channelConnects + ' </dd>' + 
+																		'<dt>ChannelDisconnects</dt> <dd>' + channelDisconnects + ' </dd>' + 
+																	'</dl>'+
+													        '    </div>'+	
+													        
+											        		'<hr style="margin: 5px 0;"/>' +
+													        '    <div>'+
+													        '      <p class="muted">Bind Details</p>'+
+																	'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+																		'<dt>BindTimeouts</dt> <dd>' + bindTimeouts + ' </dd>' +
+																		'<dt>BindRequested</dt> <dd>' + bindRequested + ' </dd>' +
+																	'</dl>'+
+													        '    </div>'+		
+											        		'<hr style="margin: 5px 0;"/>' +
+													        '    <div>'+
+													        '      <p class="muted">Miscellaneous Details</p>'+
+																	'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+																		'<dt>NonBlockingSocketsEnabled</dt> <dd>' + nonBlockingSocketsEnabled + ' </dd>' +
+																		'<dt>ReuseAddress</dt> <dd>' + reuseAddress + ' </dd>' +
+																	'</dl>'+
+													        '    </div>'+
+													        
+											        		'<hr style="margin: 5px 0;"/>' +
+													        '    <div>'+
+													        '      <p class="muted">SSL Details</p>'+
+																	'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+																		'<dt>UseSsl</dt> <dd>' + useSsl + ' </dd>' +
+																		'<dt>CertAlias</dt> <dd>' + certAlias + ' </dd>' +
+																		'<dt>CrlPath</dt> <dd>' + crlPath + ' </dd>' +
+																		'<dt>KeyManagerFactoryAlgorithm</dt> <dd>' + keyManagerFactoryAlgorithm + ' </dd>' +
+																		'<dt>KeyManagerPassword</dt> <dd>' + keyManagerPassword + ' </dd>' +
+																		'<dt>KeyStorePassword</dt> <dd>' + keyStorePassword + ' </dd>' +
+																		'<dt>KeyStorePath</dt> <dd>' + keyStorePath + ' </dd>' +
+																		'<dt>KeyStoreProvider</dt> <dd>' + keyStoreProvider + ' </dd>' +
+																		'<dt>KeyStoreType</dt> <dd>' + keyStoreType + ' </dd>' +
+																		'<dt>MaxCertPathLength</dt> <dd>' + maxCertPathLength + ' </dd>' +
+																		'<dt>NeedClientAuth</dt> <dd>' + needClientAuth + ' </dd>' +
+																		'<dt>OcspResponderURL</dt> <dd>' + ocspResponderURL + ' </dd>' +
+																		'<dt>Protocol</dt> <dd>' + protocol + ' </dd>' +
+																		'<dt>Provider</dt> <dd>' + provider + ' </dd>' +
+																		'<dt>SecureRandomAlgorithm</dt> <dd>' + secureRandomAlgorithm + ' </dd>' +
+																		'<dt>SslSessionCacheSize</dt> <dd>' + sslSessionCacheSize + ' </dd>' +
+																		'<dt>SslSessionTimeout</dt> <dd>' + sslSessionTimeout + ' </dd>' +
+																		'<dt>TrustManagerFactoryAlgorithm</dt> <dd>' + trustManagerFactoryAlgorithm + ' </dd>' +
+																		'<dt>TrustStorePassword</dt> <dd>' + trustStorePassword + ' </dd>' +
+																		'<dt>TrustStorePath</dt> <dd>' + trustStorePath + ' </dd>' +
+																		'<dt>TrustStoreProvider</dt> <dd>' + trustStoreProvider + ' </dd>' +
+																		'<dt>TrustStoreType</dt> <dd>' + trustStoreType + ' </dd>' +
+																		'<dt>WantClientAuth</dt> <dd>' + wantClientAuth + ' </dd>' +
+																		'<dt>AllowRenegotiate</dt> <dd>' + allowRenegotiate + ' </dd>' +
+																		'<dt>EnableCRLDP</dt> <dd>' + enableCRLDP + ' </dd>' +
+																		'<dt>EnableOCSP</dt> <dd>' + enableOCSP + ' </dd>' +
+																		'<dt>SessionCachingEnabled</dt> <dd>' + sessionCachingEnabled + ' </dd>' +
+																		'<dt>TrustAll</dt> <dd>' + trustAll + ' </dd>' +
+																		'<dt>ValidateCerts	</dt> <dd>' + validateCerts + ' </dd>' +
+																		'<dt>ValidatePeerCerts</dt> <dd>' + validatePeerCerts + ' </dd>' +
+																		
+																	'</dl>'+
+													        '    </div>'+													        
+													        
+													        '<hr style="margin: 5px 0;"/>' +
+													        '<div class="btn-group">'+
+													        '	<button type="button" class="btn" onclick="resetCounters(\'' + name +  '\')"><i class="icon-spinner"></i> Reset Counters</button>'+
+													        '</div>'+
+													        
+													        
+											        	'</div>'+
+														'</td></tr>'												
+												);		
+												
+												$('#services-table-wrapper').append('<div id="entities-modal'+name+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
+														'<div class="modal-header">'+
+															'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+															'<h3>SMPP Server '+name+' properties</h3>'+
+														'</div>'+	
+														'<div id="entities-modal-body" class="modal-body">'+
+																'<div class="accordion-group">' +
+																	'<div class="accordion-heading">' +name+ 										
+																	'</div>'+
+																	'<div id="' + name + '" class="accordion-body">' +
+																		'<div class="accordion-inner">' +
+																			'<strong><i class="icon-list"></i> SMPP Server Configuration Properties</strong>' +
+																			
+																			'<div class="alert alert-error" id="login-settings-error" style="display:none;">'+
+																			  '<button type="button" class="close">&times;</button>'+
+																			  'Some Fields are not correctly filled out, please double check the settings below !'+
+																			'</div>'+																			
+																			
+																			'<table class="table table-condensed table-striped">' + 
+																				'<thead><tr><th style="width: 40%;">Name</th><th style="width: 55%;">Value</th><th>&nbsp;</th></tr></thead>' +
+																				'<tbody>'+
+																					'<tr data-toggle="tooltip" title="SystemId sent back in BIND response. Provides an identification of the SMSC to the ESME">'+
+																						'<td style="font-size: 0.9em;">SystemId</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'SystemId-input" class="control-group">'+
+																							'<span id="' + name +'SystemId-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + systremId + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'SystemId\', \'' + name+"SystemId" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SystemId"+']\').toggle(); $(\'input[id^='+name+"SystemId"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name + 'SystemId-text">' + systremId + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SystemId"+']\').toggle(); $(\'input[id^='+name+"SystemId"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+																
+																				
+																					'<tr data-toggle="tooltip" title="server listens to this port for incoming requests">'+
+																						'<td style="font-size: 0.9em;">BindPort</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'Port-input" class="control-group">'+
+																							'<span id="'+name + 'Port-input" style="display: none;" >'+
+																								'<input type="text" class="input-small" value="' + port + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'BindPort\', \'' + name+"Port" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Port"+']\').toggle(); $(\'input[id^='+name+"Port"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'Port-text">' + port + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"Port"+']\').toggle(); $(\'input[id^='+name+"Port"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="length of time (ms) to wait for a bind request before server automatically closes connection">'+
+																						'<td style="font-size: 0.9em;">BindTimeout</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'BindTimeout-input" class="control-group">'+
+																							'<span id="' +name + 'BindTimeout-input" style="display: none;" >'+
+																								'<input type="text" class="input-small" value="' + bindTimeout + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'BindTimeout\', \'' + name+"BindTimeout" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"BindTimeout"+']\').toggle(); $(\'input[id^='+name+"BindTimeout"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'BindTimeout-text">' + bindTimeout + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"BindTimeout"+']\').toggle(); $(\'input[id^='+name+"BindTimeout"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="if true, <= 3.3 for interface version normalizes to version 3.3 and >= 3.4 for interface version normalizes to version 3.4">'+
+																						'<td style="font-size: 0.9em;">AutoNegotiateInterfaceVersion</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'AutoNegotiateInterfaceVersion-input" class="control-group">'+
+																							'<span id="' +name+ 'AutoNegotiateInterfaceVersion-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + autoNegotiateInterfaceVersion + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'AutoNegotiateInterfaceVersion\', \'' + name+"AutoNegotiateInterfaceVersion" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"AutoNegotiateInterfaceVersion"+']\').toggle(); $(\'input[id^='+name+"AutoNegotiateInterfaceVersion"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'AutoNegotiateInterfaceVersion-text">' + autoNegotiateInterfaceVersion + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"AutoNegotiateInterfaceVersion"+']\').toggle(); $(\'input[id^='+name+"AutoNegotiateInterfaceVersion"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="smpp version the server supports">'+
+																						'<td style="font-size: 0.9em;">InterfaceVersion</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'InterfaceVersion-input" class="control-group">'+
+																							'<span id="' +name+ 'InterfaceVersion-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + interfaceVersion + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'InterfaceVersion\', \'' + name+"InterfaceVersion" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"InterfaceVersion"+']\').toggle(); $(\'input[id^='+name+"InterfaceVersion"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'InterfaceVersion-text">' + interfaceVersion + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"InterfaceVersion"+']\').toggle(); $(\'input[id^='+name+"InterfaceVersion"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="max number of connections/sessions this server will expect to handle">'+
+																						'<td style="font-size: 0.9em;">MaxConnectionSize</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'MaxConnSize-input" class="control-group">'+
+																							'<span id="' +name+ 'MaxConnSize-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + maxConnectionSize + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'MaxConnectionSize\', \'' + name+"MaxConnSize" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxConnSize"+']\').toggle(); $(\'input[id^='+name+"MaxConnSize"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'MaxConnSize-text">' + maxConnectionSize + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxConnSize"+']\').toggle(); $(\'input[id^='+name+"MaxConnSize"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="window size is the amount of unacknowledged requests that are permitted to be outstanding/unacknowledged at any given time">'+
+																						'<td style="font-size: 0.9em;">DefaultWindowSize</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'DefWindSize-input" class="control-group">'+
+																							'<span id="' +name+ 'DefWindSize-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + defaultWindowSize + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'DefaultWindowSize\', \'' + name+"DefWindSize" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefWindSize"+']\').toggle(); $(\'input[id^='+name+"DefWindSize"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'DefWindSize-text">' + defaultWindowSize + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefWindSize"+']\').toggle(); $(\'input[id^='+name+"DefWindSize"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="amount of time to wait until a slot opens up in the sendWindow">'+
+																						'<td style="font-size: 0.9em;">DefaultWindowWaitTimeout</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'DefWindWtTimout-input" class="control-group">'+
+																							'<span id="' +name+ 'DefWindWtTimout-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + defaultWindowWaitTimeout + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'DefaultWindowWaitTimeout\', \'' + name+"DefWindWtTimout" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefWindWtTimout"+']\').toggle(); $(\'input[id^='+name+"DefWindWtTimout"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'DefWindWtTimout-text">' + defaultWindowWaitTimeout + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefWindWtTimout"+']\').toggle(); $(\'input[id^='+name+"DefWindWtTimout"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="amount of time to wait for an endpoint to respond to a request before it expires. Defaults to disabled (-1)">'+
+																						'<td style="font-size: 0.9em;">DefaultRequestExpiryTimeout</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'DefReqExpTimout-input" class="control-group">'+
+																							'<span id="' + name + 'DefReqExpTimout-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + defaultRequestExpiryTimeout + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'DefaultRequestExpiryTimeout\', \'' + name+"DefReqExpTimout" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefReqExpTimout"+']\').toggle(); $(\'input[id^='+name+"DefReqExpTimout"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'DefReqExpTimout-text">' + defaultRequestExpiryTimeout + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefReqExpTimout"+']\').toggle(); $(\'input[id^='+name+"DefReqExpTimout"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="amount of time between executions of monitoring the window for requests that expire. Its recommended that this generally either matches or is half the value of requestExpiryTimeout. Therefore, at worst a request would could take up 1.5X the requestExpiryTimeout to clear out">'+
+																						'<td style="font-size: 0.9em;">DefaultWindowMonitorInterval</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'DefWinMonIntrv-input" class="control-group">'+
+																							'<span id="' + name + 'DefWinMonIntrv-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + defaultWindowMonitorInterval + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'DefaultWindowMonitorInterval\', \'' + name+"DefWinMonIntrv" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefWinMonIntrv"+']\').toggle(); $(\'input[id^='+name+"DefWinMonIntrv"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'DefWinMonIntrv-text">' + defaultWindowMonitorInterval + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefWinMonIntrv"+']\').toggle(); $(\'input[id^='+name+"DefWinMonIntrv"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="tracks counters for SMPP operations">'+
+																						'<td style="font-size: 0.9em;">DefaultSessionCountersEnabled</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'DefSesCouEna-input" class="control-group">'+
+																							'<span id="' + name + 'DefSesCouEna-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + defaultSessionCountersEnabled + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'DefaultSessionCountersEnabled\', \'' + name+"DefSesCouEna" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefSesCouEna"+']\').toggle(); $(\'input[id^='+name+"DefSesCouEna"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'DefSesCouEna-text">' + defaultSessionCountersEnabled + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"DefSesCouEna"+']\').toggle(); $(\'input[id^='+name+"DefSesCouEna"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="tracks if SMPP connections should always be over SSL">'+
+																						'<td style="font-size: 0.9em;">UseSSL</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																						'<div id="div-' + name +'UseSsl-input" class="control-group">'+
+																						'<span id="' + name + 'UseSsl-input" style="display: none;">'+
+																							'<input type="text" class="input-small" value="' + useSsl + '" /> ' +
+																							'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'UseSsl\', \'' + name+"UseSsl" + '\')"></i> ' +
+																							'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"UseSsl"+']\').toggle(); $(\'input[id^='+name+"UseSsl"+']\').focus();"></i>' + 
+																						'</span>'+
+																						'</div>' +
+																						'<span id="' +name+ 'UseSsl-text">' + useSsl + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"UseSsl"+']\').toggle(); $(\'input[id^='+name+"UseSsl"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																				
+																					'<tr data-toggle="tooltip" title="certificate Alias">'+
+																						'<td style="font-size: 0.9em;">CertAlias</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'CertAlias-input" class="control-group">'+
+																							'<span id="' + name + 'CertAlias-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + certAlias + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'CertAlias\', \'' + name+"CertAlias" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"CertAlias"+']\').toggle(); $(\'input[id^='+name+"CertAlias"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'CertAlias-text">' + certAlias + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"CertAlias"+']\').toggle(); $(\'input[id^='+name+"CertAlias"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																			
+																					'<tr data-toggle="tooltip" title="Crl Path">'+
+																						'<td style="font-size: 0.9em;">CrlPath</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'CrlPath-input" class="control-group">'+
+																							'<span id="' + name + 'CrlPath-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + crlPath + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'CrlPath\', \'' + name+"CrlPath" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"CrlPath"+']\').toggle(); $(\'input[id^='+name+"CrlPath"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'CrlPath-text">' + crlPath + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"CrlPath"+']\').toggle(); $(\'input[id^='+name+"CrlPath"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+	
+																		
+																					'<tr data-toggle="tooltip" title="Key manager factory algorithm">'+
+																						'<td style="font-size: 0.9em;">KeyManagerFactoryAlgorithm</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'KeyManagerFactoryAlgorithm-input" class="control-group">'+
+																							'<span id="' + name + 'KeyManagerFactoryAlgorithm-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + keyManagerFactoryAlgorithm + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'KeyManagerFactoryAlgorithm\', \'' + name+"KeyManagerFactoryAlgorithm" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"KeyManagerFactoryAlgorithm"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'KeyManagerFactoryAlgorithm-text">' + keyManagerFactoryAlgorithm + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"KeyManagerFactoryAlgorithm"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+											
+																	
+																					'<tr data-toggle="tooltip" title="Key manager password">'+
+																						'<td style="font-size: 0.9em;">KeyManagerPassword</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'KeyManagerPassword-input" class="control-group">'+
+																							'<span id="' + name + 'KeyManagerPassword-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + keyManagerPassword + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'KeyManagerPassword\', \'' + name+"KeyManagerPassword" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyManagerPassword"+']\').toggle(); $(\'input[id^='+name+"KeyManagerPassword"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'KeyManagerPassword-text">' + keyManagerPassword + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyManagerPassword"+']\').toggle(); $(\'input[id^='+name+"KeyManagerPassword"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																
+																					'<tr data-toggle="tooltip" title="Key store password">'+
+																						'<td style="font-size: 0.9em;">KeyStorePassword</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'KeyStorePassword-input" class="control-group">'+
+																							'<span id="' + name + 'KeyStorePassword-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + keyStorePassword + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'KeyStorePassword\', \'' + name+"KeyStorePassword" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStorePassword"+']\').toggle(); $(\'input[id^='+name+"KeyStorePassword"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'KeyStorePassword-text">' + keyStorePassword + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStorePassword"+']\').toggle(); $(\'input[id^='+name+"KeyStorePassword"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+															
+																					'<tr data-toggle="tooltip" title="Key store path">'+
+																						'<td style="font-size: 0.9em;">KeyStorePath</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'KeyStorePath-input" class="control-group">'+
+																							'<span id="' + name + 'KeyStorePath-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + keyStorePath + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'KeyStorePath\', \'' + name+"KeyStorePath" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStorePath"+']\').toggle(); $(\'input[id^='+name+"KeyStorePath"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'KeyStorePath-text">' + keyStorePath + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStorePath"+']\').toggle(); $(\'input[id^='+name+"KeyStorePath"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+	
+														
+																					'<tr data-toggle="tooltip" title="Key store provider">'+
+																						'<td style="font-size: 0.9em;">KeyStoreProvider</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'KeyStoreProvider-input" class="control-group">'+
+																							'<span id="' + name + 'KeyStoreProvider-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + keyStoreProvider + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'KeyStoreProvider\', \'' + name+"KeyStoreProvider" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStoreProvider"+']\').toggle(); $(\'input[id^='+name+"KeyStoreProvider"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'KeyStoreProvider-text">' + keyStoreProvider + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStoreProvider"+']\').toggle(); $(\'input[id^='+name+"KeyStoreProvider"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+														
+													
+																					'<tr data-toggle="tooltip" title="Key store type">'+
+																						'<td style="font-size: 0.9em;">KeyStoreType</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'KeyStoreType-input" class="control-group">'+
+																							'<span id="' + name + 'KeyStoreType-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + keyStoreType + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'KeyStoreType\', \'' + name+"KeyStoreType" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStoreType"+']\').toggle(); $(\'input[id^='+name+"KeyStoreType"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'KeyStoreType-text">' + keyStoreType + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStoreType"+']\').toggle(); $(\'input[id^='+name+"KeyStoreType"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+												
+																					'<tr data-toggle="tooltip" title="Max certificate path length">'+
+																						'<td style="font-size: 0.9em;">MaxCertPathLength</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'MaxCertPathLength-input" class="control-group">'+
+																							'<span id="' + name + 'MaxCertPathLength-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + maxCertPathLength + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'MaxCertPathLength\', \'' + name+"MaxCertPathLength" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxCertPathLength"+']\').toggle(); $(\'input[id^='+name+"MaxCertPathLength"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'MaxCertPathLength-text">' + maxCertPathLength + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxCertPathLength"+']\').toggle(); $(\'input[id^='+name+"MaxCertPathLength"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+											
+																					'<tr data-toggle="tooltip" title="Need client authentication">'+
+																						'<td style="font-size: 0.9em;">NeedClientAuth</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'NeedClientAuth-input" class="control-group">'+
+																							'<span id="' + name + 'NeedClientAuth-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + needClientAuth + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'NeedClientAuth\', \'' + name+"NeedClientAuth" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NeedClientAuth"+']\').toggle(); $(\'input[id^='+name+"NeedClientAuth"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'NeedClientAuth-text">' + needClientAuth + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"NeedClientAuth"+']\').toggle(); $(\'input[id^='+name+"NeedClientAuth"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+										
+																					'<tr data-toggle="tooltip" title="OCS responder URL">'+
+																						'<td style="font-size: 0.9em;">OcspResponderURL</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'OcspResponderURL-input" class="control-group">'+
+																							'<span id="' + name + 'OcspResponderURL-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + ocspResponderURL + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'OcspResponderURL\', \'' + name+"OcspResponderURL" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"OcspResponderURL"+']\').toggle(); $(\'input[id^='+name+"OcspResponderURL"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'OcspResponderURL-text">' + ocspResponderURL + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"OcspResponderURL"+']\').toggle(); $(\'input[id^='+name+"OcspResponderURL"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+	
+									
+																					'<tr data-toggle="tooltip" title="Protocol">'+
+																						'<td style="font-size: 0.9em;">Protocol</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'Protocol-input" class="control-group">'+
+																							'<span id="' + name + 'Protocol-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + protocol + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'Protocol\', \'' + name+"Protocol" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Protocol"+']\').toggle(); $(\'input[id^='+name+"Protocol"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'Protocol-text">' + protocol + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"Protocol"+']\').toggle(); $(\'input[id^='+name+"Protocol"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+	
+								
+																					'<tr data-toggle="tooltip" title="Provider">'+
+																						'<td style="font-size: 0.9em;">Provider</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'Provider-input" class="control-group">'+
+																							'<span id="' + name + 'Provider-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + provider + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'Provider\', \'' + name+"Provider" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Provider"+']\').toggle(); $(\'input[id^='+name+"Provider"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'Provider-text">' + provider + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"Provider"+']\').toggle(); $(\'input[id^='+name+"Provider"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+	
+							
+																					'<tr data-toggle="tooltip" title="Secure random algorithm">'+
+																						'<td style="font-size: 0.9em;">SecureRandomAlgorithm</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'SecureRandomAlgorithm-input" class="control-group">'+
+																							'<span id="' + name + 'SecureRandomAlgorithm-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + secureRandomAlgorithm + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'SecureRandomAlgorithm\', \'' + name+"SecureRandomAlgorithm" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SecureRandomAlgorithm"+']\').toggle(); $(\'input[id^='+name+"SecureRandomAlgorithm"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'SecureRandomAlgorithm-text">' + secureRandomAlgorithm + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SecureRandomAlgorithm"+']\').toggle(); $(\'input[id^='+name+"SecureRandomAlgorithm"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+	
+						
+																					'<tr data-toggle="tooltip" title="SSL session cache size">'+
+																						'<td style="font-size: 0.9em;">SslSessionCacheSize</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'SslSessionCacheSize-input" class="control-group">'+
+																							'<span id="' + name + 'SslSessionCacheSize-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + sslSessionCacheSize + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'SslSessionCacheSize\', \'' + name+"SslSessionCacheSize" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SslSessionCacheSize"+']\').toggle(); $(\'input[id^='+name+"SslSessionCacheSize"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'SslSessionCacheSize-text">' + sslSessionCacheSize + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SslSessionCacheSize"+']\').toggle(); $(\'input[id^='+name+"SslSessionCacheSize"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+	
+																				
+																					'<tr data-toggle="tooltip" title="SSL session timeout">'+
+																						'<td style="font-size: 0.9em;">SslSessionTimeout</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'SslSessionTimeout-input" class="control-group">'+
+																							'<span id="' + name + 'SslSessionTimeout-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + sslSessionTimeout + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'SslSessionTimeout\', \'' + name+"SslSessionTimeout" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SslSessionTimeout"+']\').toggle(); $(\'input[id^='+name+"SslSessionTimeout"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'SslSessionTimeout-text">' + sslSessionTimeout + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SslSessionTimeout"+']\').toggle(); $(\'input[id^='+name+"SslSessionTimeout"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																			
+																					'<tr data-toggle="tooltip" title="Trust manager factory algorithm">'+
+																						'<td style="font-size: 0.9em;">TrustManagerFactoryAlgorithm</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'TrustManagerFactoryAlgorithm-input" class="control-group">'+
+																							'<span id="' + name + 'TrustManagerFactoryAlgorithm-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + trustManagerFactoryAlgorithm + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'TrustManagerFactoryAlgorithm\', \'' + name+"TrustManagerFactoryAlgorithm" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'TrustManagerFactoryAlgorithm-text">' + trustManagerFactoryAlgorithm + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																				
+																					'<tr data-toggle="tooltip" title="Trust manager factory algorithm">'+
+																						'<td style="font-size: 0.9em;">TrustManagerFactoryAlgorithm</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'TrustManagerFactoryAlgorithm-input" class="control-group">'+
+																							'<span id="' + name + 'TrustManagerFactoryAlgorithm-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + trustManagerFactoryAlgorithm + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'TrustManagerFactoryAlgorithm\', \'' + name+"TrustManagerFactoryAlgorithm" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'TrustManagerFactoryAlgorithm-text">' + trustManagerFactoryAlgorithm + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+			
+
+																					'<tr data-toggle="tooltip" title="Trust store password">'+
+																						'<td style="font-size: 0.9em;">TrustStorePassword</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'TrustStorePassword-input" class="control-group">'+
+																							'<span id="' + name + 'TrustStorePassword-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + trustStorePassword + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'TrustStorePassword\', \'' + name+"TrustStorePassword" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePassword"+']\').toggle(); $(\'input[id^='+name+"TrustStorePassword"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'TrustStorePassword-text">' + trustStorePassword + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePassword"+']\').toggle(); $(\'input[id^='+name+"TrustStorePassword"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="Trust store path">'+
+																						'<td style="font-size: 0.9em;">TrustStorePath</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'TrustStorePath-input" class="control-group">'+
+																							'<span id="' + name + 'TrustStorePath-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + trustStorePath + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'TrustStorePath\', \'' + name+"TrustStorePath" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePath"+']\').toggle(); $(\'input[id^='+name+"TrustStorePath"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'TrustStorePath-text">' + trustStorePath + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePath"+']\').toggle(); $(\'input[id^='+name+"TrustStorePath"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+		
+																					
+																					'<tr data-toggle="tooltip" title="Trust store provider">'+
+																						'<td style="font-size: 0.9em;">TrustStoreProvider</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'TrustStoreProvider-input" class="control-group">'+
+																							'<span id="' + name + 'TrustStoreProvider-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + trustStoreProvider + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'TrustStoreProvider\', \'' + name+"TrustStoreProvider" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreProvider"+']\').toggle(); $(\'input[id^='+name+"TrustStoreProvider"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'TrustStoreProvider-text">' + trustStoreProvider + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreProvider"+']\').toggle(); $(\'input[id^='+name+"TrustStoreProvider"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="Trust store type">'+
+																						'<td style="font-size: 0.9em;">TrustStoreType</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'TrustStoreType-input" class="control-group">'+
+																							'<span id="' + name + 'TrustStoreType-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + trustStoreType + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'TrustStoreType\', \'' + name+"TrustStoreType" + '\', \'true\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreType"+']\').toggle(); $(\'input[id^='+name+"TrustStoreType"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'TrustStoreType-text">' + trustStoreType + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreType"+']\').toggle(); $(\'input[id^='+name+"TrustStoreType"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="should client be authenticated">'+
+																						'<td style="font-size: 0.9em;">WantClientAuth</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'WantClientAuth-input" class="control-group">'+
+																							'<span id="' + name + 'WantClientAuth-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + wantClientAuth + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'WantClientAuth\', \'' + name+"WantClientAuth" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WantClientAuth"+']\').toggle(); $(\'input[id^='+name+"WantClientAuth"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'WantClientAuth-text">' + wantClientAuth + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"WantClientAuth"+']\').toggle(); $(\'input[id^='+name+"WantClientAuth"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+	
+																					
+																					'<tr data-toggle="tooltip" title="Allow renegotiate">'+
+																						'<td style="font-size: 0.9em;">AllowRenegotiate</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'AllowRenegotiate-input" class="control-group">'+
+																							'<span id="' + name + 'AllowRenegotiate-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + allowRenegotiate + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'AllowRenegotiate\', \'' + name+"AllowRenegotiate" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"AllowRenegotiate"+']\').toggle(); $(\'input[id^='+name+"AllowRenegotiate"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'AllowRenegotiate-text">' + allowRenegotiate + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"AllowRenegotiate"+']\').toggle(); $(\'input[id^='+name+"AllowRenegotiate"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+																					
+																					
+																					'<tr data-toggle="tooltip" title="Enable CRLDP">'+
+																						'<td style="font-size: 0.9em;">EnableCRLDP</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'EnableCRLDP-input" class="control-group">'+
+																							'<span id="' + name + 'EnableCRLDP-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + enableCRLDP + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'EnableCRLDP\', \'' + name+"EnableCRLDP" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableCRLDP"+']\').toggle(); $(\'input[id^='+name+"EnableCRLDP"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'EnableCRLDP-text">' + enableCRLDP + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableCRLDP"+']\').toggle(); $(\'input[id^='+name+"EnableCRLDP"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="Enable OCSP">'+
+																						'<td style="font-size: 0.9em;">EnableOCSP</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'EnableOCSP-input" class="control-group">'+
+																							'<span id="' + name + 'EnableOCSP-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + enableOCSP + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'EnableOCSP\', \'' + name+"EnableOCSP" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableOCSP"+']\').toggle(); $(\'input[id^='+name+"EnableOCSP"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'EnableOCSP-text">' + enableOCSP + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableOCSP"+']\').toggle(); $(\'input[id^='+name+"EnableOCSP"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="Session caching enabled">'+
+																						'<td style="font-size: 0.9em;">SessionCachingEnabled</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'SessionCachingEnabled-input" class="control-group">'+
+																							'<span id="' + name + 'SessionCachingEnabled-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + sessionCachingEnabled + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'SessionCachingEnabled\', \'' + name+"SessionCachingEnabled" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SessionCachingEnabled"+']\').toggle(); $(\'input[id^='+name+"SessionCachingEnabled"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'SessionCachingEnabled-text">' + sessionCachingEnabled + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SessionCachingEnabled"+']\').toggle(); $(\'input[id^='+name+"SessionCachingEnabled"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="Trust all certificates">'+
+																						'<td style="font-size: 0.9em;">TrustAll</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'TrustAll-input" class="control-group">'+
+																							'<span id="' + name + 'TrustAll-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + trustAll + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'TrustAll\', \'' + name+"TrustAll" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustAll"+']\').toggle(); $(\'input[id^='+name+"TrustAll"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'TrustAll-text">' + trustAll + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustAll"+']\').toggle(); $(\'input[id^='+name+"TrustAll"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+		
+																					
+																					'<tr data-toggle="tooltip" title="if certificate should be validated">'+
+																						'<td style="font-size: 0.9em;">ValidateCerts</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'ValidateCerts-input" class="control-group">'+
+																							'<span id="' + name + 'ValidateCerts-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + validateCerts + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'ValidateCerts\', \'' + name+"ValidateCerts" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ValidateCerts"+']\').toggle(); $(\'input[id^='+name+"ValidateCerts"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'ValidateCerts-text">' + validateCerts + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"ValidateCerts"+']\').toggle(); $(\'input[id^='+name+"ValidateCerts"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="if peer certificate should be validated">'+
+																						'<td style="font-size: 0.9em;">ValidatePeerCerts</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'ValidatePeerCerts-input" class="control-group">'+
+																							'<span id="' + name + 'ValidatePeerCerts-input" style="display: none;">'+
+																								'<input type="text" class="input-small" value="' + validatePeerCerts + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'ValidatePeerCerts\', \'' + name+"ValidatePeerCerts" + '\', \'false\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ValidatePeerCerts"+']\').toggle(); $(\'input[id^='+name+"ValidatePeerCerts"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'ValidatePeerCerts-text">' + validatePeerCerts + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"ValidatePeerCerts"+']\').toggle(); $(\'input[id^='+name+"ValidatePeerCerts"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+																						
+																					
+																				'</tbody>' +
+																			'</table>' +															
+																		'</div>'+
+																	'</div>'+
+																'</div>'+
+														'</div>'+
+														'<div class="modal-footer">'+
+														'<div class="control-group warning">'+
+														'<label class="control-label" for="inputWarning">Properties updated will be reflected only after SMPP Server is stopped and started again!</label>'+
+														'</div>'+
+														'<a href="#" onclick="$(\'#entities-modal'+name+'\').modal(\'hide\'); return false;" class="btn">Close</a>'+
+														'</div>'+										
+													'</div>');																					
+												
+											}],
+											error: function(value){
+												errorUID = ("st" + new Date().getTime()).hashCode();
+												createStackTrace(errorUID, value.stacktrace);
+												logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+											}
+										}
+									);
+							});
+						}
+					})
+					.fail(function() {
+						logToConsole("ERROR", "Failure trying to communicate with the SMSC Gateway. Please try again later.");
+					})					
+				
+				}
+				function serviceOperation(operation, name) {
+					mbeanSearch="org.mobicents.smpp:layer=SmppServerManagement,name="+name;
+					
+					alert(operation+' : '+mbeanSearch);
+					
+					jolokia.execute(mbeanSearch,operation,
+							{
+								success: function(value) {
+									updateServices();
+									logToConsole('INFO', 'Successfully '+operation+'ed SmppServerManagement ' + name );
+								}
+							});	
+					
+				}
+				function onSmppServrConfigOk(mbeanName, propertyName, spanId){
+					var skipCheck = false;
+					onSmppServrConfigOk(mbeanName, propertyName, spanId, skipCheck)
+				}
+				
+				function onSmppServrConfigOk(mbeanName, propertyName, spanId, skipCheck){
+					var formInvalid = false;
+					
+					var spanElement = document.getElementById(spanId + "-input");
+					var eleChild = spanElement.childNodes;
+					var inputTextEle = eleChild[0];
+					var spanElementTxt = document.getElementById(spanId + "-text");
+					
+					var propvalue = inputTextEle.value;
+					
+					if(!skipCheck){
+						if(propvalue.trim() == "") {
+							$("#div-"+spanId + "-input").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-"+spanId + "-input").hasClass("error")) {
+			    			$("#div-"+spanId + "-input").removeClass("error");		
+			    		}
+					}
+					
+					if(propvalue == ""){
+						propvalue = null;
+					}
+					
+					if(formInvalid) {
+						$("#login-settings-error").show();
+						logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+						return false;
+					} else {
+						$("#login-settings-error").hide();
+					}					
+					
+					var mbeanSearch="org.mobicents.smpp:layer=SmppServerManagement,name="+mbeanName;
+					jolokia.request(
+							[
+								{ type: "write", mbean: mbeanSearch, attribute: propertyName, value: propvalue },
+							],
+							{
+								success: function(response) {
+									
+									logToConsole("INFO", "SmppServerManagement property "+ propertyName +"  successfully updated.");
+									
+									spanElementTxt.innerHTML= inputTextEle.value;
+								},
+								error: function(value) {
+									errorUID = ("st" + new Date().getTime()).hashCode();
+									createStackTrace(errorUID, value.stacktrace);
+									logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+								} 
+							}
+						);		
+					
+					spanElement.style.display = 'none';
+					spanElementTxt.style.display = '';
+					
+					
+				}
+				function resetCounters(mbeanName){
+					var mbeanSearch="org.mobicents.smpp:layer=SmppServerManagement,name="+mbeanName;
+					jolokia.execute(mbeanSearch,"resetCounters",
+							{
+								success: function(value) {
+									logToConsole('INFO', 'Successfully resetted counters for SMPP Server ' + mbeanName );
+									updateServices();
+								},
+								error: function(value){
+									errorUID = ("st" + new Date().getTime()).hashCode();
+									createStackTrace(errorUID, value.stacktrace);
+									logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+								}
+							});	
+				}					
+				$(document).ready(function () {
+					updateServices();
+				});
+			</script>

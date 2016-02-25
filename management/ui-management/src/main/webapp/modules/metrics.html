@@ -1,0 +1,290 @@
+				<h3 style="margin: 0px;"><i class="icon-bar-chart"></i> SMSC Metrics</h3>
+				<hr style="margin: 10 0px;"/>
+				
+				<span class="span5 offset7">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="select the refresh rate at which page will be refreshed">
+					<span class="add-on">Refresh Rate</span>
+					<select id="refresh-rate-select" onchange="refreshRate()">
+						<option value="5000">5 Sec</option>
+						<option value="10000">10 Sec</option>
+						<option value="15000">15 Sec</option>
+						<option value="20000">20 Sec</option>
+						<option value="30000">30 Sec</option>
+						<option selected="selected" value="60000">60 Sec</option>
+						<option value="300000">5 Min</option>
+						<option value="600000">10 Min</option>
+						<option value="900000">15 Min</option>
+						<option value="1200000">20 Min</option>
+						<option value="1800000">30 Min</option>
+						<option value="3600000">60 Min</option>
+					</select>
+					</span>					
+					<button id="refresh" style="float: right; margin-right: 20px; margin-left: 20px; height: 30px;" class="btn btn-medium btn-success" data-toggle="tooltip" data-placement="left" onclick="updateGraphs();" data-original-title="Refresh Graph"><i class="icon-refresh"></i></button>
+				</span>
+				
+				<span id="ras-table-wrapper">
+					<table id="no-campaigns-table" class="table" style="display: none;">
+						<tr>
+							<td>
+								<div class="alert alert-info fade in">
+									<strong>No Campaigns defined yet!</strong> 
+								</div>
+							</td>
+						</tr>
+					</table>	
+					
+					<div id="campaigns-div" class="control-group">
+						<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="select the campaign to display the metrics graph">
+							<span class="add-on">Campaigns</span>
+							<select id="campaigns-list-select" onchange="createGraphs()">
+								<option value="Select">Select</option>
+							</select>
+						</span>
+					</div>
+					
+					<input type="hidden" value="-1" id="timerIdValue"/>
+					
+					<div id="chart_div_msginreceive" style="width: 900px; height: 500px;"></div>				
+					<div id="chart_div_msgouttry" style="width: 900px; height: 500px;"></div>
+					<div id="chart_div_msgoutsent" style="width: 900px; height: 500px;"></div>
+					
+				</span>
+				
+				
+				<script type='text/javascript'>
+					//@ sourceURL=loadGoogleCharts.js
+					//MsgInReceived
+					var msgInReceived = new google.visualization.DataTable();
+					msgInReceived.addColumn('datetime', 'Time');
+					msgInReceived.addColumn('number', 'MsgInReceivedAll');
+					msgInReceived.addColumn('number', 'MsgInReceivedSs7');
+					msgInReceived.addColumn('number', 'MsgInReceivedSmpp');
+					msgInReceived.addColumn('number', 'MsgInReceivedSip');
+					msgInReceived.addColumn('number', 'MsgInRejectedAll');
+					msgInReceived.addColumn('number', 'MsgInFailedAll');
+					
+					 var msgInReceivedOptions = {
+					          title: 'Message In',
+					          curveType: 'function',
+					          pointSize: 5,
+					          width: 1200,
+					      	  height: 400,
+					      	  hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}},
+					          vAxis: {minValue: 0},
+					 };
+				 
+			        var msgInReceivedChart = new google.visualization.LineChart(document.getElementById('chart_div_msginreceive'));					
+					
+			        //MsgOutTry
+					var msgOutTry = new google.visualization.DataTable();
+					msgOutTry.addColumn('datetime', 'Time');
+					msgOutTry.addColumn('number', 'MsgOutTryAll');
+					msgOutTry.addColumn('number', 'MsgOutTrySs7');
+					msgOutTry.addColumn('number', 'MsgOutTrySmpp');
+					msgOutTry.addColumn('number', 'MsgOutTrySip');
+					
+					 var msgOutTryOptions = {
+					          title: 'Message Out Try',
+					          curveType: 'function',
+					          pointSize: 5,
+					          width: 1200,
+					      	  height: 400,
+					      	  hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}},
+					          vAxis: {minValue: 0},					      	  
+					 };
+				 
+			        var msgOutTryChart = new google.visualization.LineChart(document.getElementById('chart_div_msgouttry'));
+			        
+			        //MsgOutSent
+					var msgOutSent = new google.visualization.DataTable();
+					msgOutSent.addColumn('datetime', 'Time');
+					msgOutSent.addColumn('number', 'MsgOutSentAll');
+					msgOutSent.addColumn('number', 'MsgOutSentSs7');
+					msgOutSent.addColumn('number', 'MsgOutSentSmpp');
+					msgOutSent.addColumn('number', 'MsgOutSentSip');
+					msgOutSent.addColumn('number', 'MsgOutFailedAll');
+					
+					 var msgOutSentOptions = {
+					          title: 'Message Out Sent',
+					          curveType: 'function',
+					          pointSize: 5,
+					          width: 1200,
+					      	  height: 400,
+					      	  hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}},
+					          vAxis: {minValue: 0},					      	  
+					 };
+				 
+			        var msgOutSentChart = new google.visualization.LineChart(document.getElementById('chart_div_msgoutsent'));			        
+				        
+					function drawCharts() {
+						msgInReceivedChart.draw(msgInReceived, msgInReceivedOptions);
+				        msgOutTryChart.draw(msgOutTry, msgOutTryOptions);
+				        msgOutSentChart.draw(msgOutSent, msgOutSentOptions);
+					}
+					
+					function refreshCampaignsList(){
+						
+						jolokia.request(
+								[
+									{ type: "read", mbean: "org.mobicents.ss7:layer=COUNTER,name=CounterHost,type=Management"}
+								],
+								{ success: 
+									function(response) {
+										var noOfCampaigns = 0 ;
+										var campaignsList = response.value.CampaignsList;
+										
+										jQuery.each(campaignsList, function() {
+											noOfCampaigns = noOfCampaigns + 1;
+											$('#campaigns-list-select').append('<option value='+this+'>'+this+'</option>')										
+										});	
+									
+										if(noOfCampaigns == 0){
+											$('#no-campaigns-table').show();
+											$('#campaigns-div').hide();
+										}else {
+											$('#no-campaigns-table').hide();
+											$('#campaigns-div').show();
+										}	
+
+									},
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									} 
+								}
+							);
+					}
+					
+				function refreshRate() {
+					var timerIdValue = document.getElementById("timerIdValue").value;
+					clearInterval(timerIdValue);
+					
+					var e = document.getElementById("refresh-rate-select");
+					var refreshRate = e.options[e.selectedIndex].value;
+					var timerId = setAutoCancellableInterval(refreshRate, "updateGraphs", "SMSC Metrics");
+					
+					$("#timerIdValue").val(timerId);
+				}
+					
+				function createGraphs() {
+					//Remove all rows
+					var numRowsmsgInReceived = msgInReceived.getNumberOfRows();
+					if(numRowsmsgInReceived != 0){
+						msgInReceived.removeRows(0, numRowsmsgInReceived)
+					}
+					
+					var numRows = msgOutTry.getNumberOfRows();
+					if(numRows != 0){
+						msgOutTry.removeRows(0, numRows)
+					}
+					
+					var numRowsmsgOutSent = msgOutSent.getNumberOfRows();
+					if(numRowsmsgOutSent != 0){
+						msgOutSent.removeRows(0, numRowsmsgOutSent)
+					}
+					
+					updateGraphs();
+					var timerIdValue = document.getElementById("timerIdValue").value;
+					
+					if(timerIdValue == "-1"){
+						var timerId = setAutoCancellableInterval(60000, "updateGraphs", "SMSC Metrics");
+						$("#timerIdValue").val(timerId);
+					}
+				}
+				
+				function updateGraphs() {
+					
+					var e = document.getElementById("campaigns-list-select");
+					var value = e.options[e.selectedIndex].text;
+					
+					if(value=="Select"){						
+						return;
+					}
+					
+					
+					jolokia.request(
+						[ 
+							{ type: "exec", mbean: "org.mobicents.ss7:layer=COUNTER,name=CounterHost,type=Management", operation: "getLastCounterValues", arguments: [value]},
+						],
+						{ success: [ 
+							function(response) {
+								if(response.value == null){
+									logToConsole("ERROR", "Last CounterValueSet Does not exist");
+									return;
+								}
+								var counterValues = response.value.counterValues;
+								
+								var msgOutTryAll = 0;
+								var msgOutTrySs7 = 0;
+								var msgOutTrySmpp = 0;
+								var msgOutTrySip = 0;
+								
+								var msgOutSentAll = 0;
+								var msgOutSentSs7 = 0;
+								var msgOutSentSmpp = 0;
+								var msgOutSentSip = 0;
+								var msgOutFailedAll = 0;
+								
+								var msgInReceivedAll = 0;
+								var msgInReceivedSs7 = 0;
+								var msgInReceivedSmpp = 0;
+								var msgInReceivedSip = 0;
+								var msgInRejectedAll = 0;
+								var msgInFailedAll = 0;
+								
+								jQuery.each(counterValues, function() {
+									if(this.counterDef.counterName == "MsgOutTryAll"){
+										msgOutTryAll = this.longValue;
+									} else if(this.counterDef.counterName == "MsgOutTrySs7"){
+										msgOutTrySs7 = this.longValue;
+									} else if(this.counterDef.counterName == "MsgOutTrySmpp"){
+										msgOutTrySmpp = this.longValue;
+									} else if(this.counterDef.counterName == "MsgOutTrySip"){
+										msgOutTrySip = this.longValue;
+									} else if(this.counterDef.counterName == "MsgInReceivedAll"){
+										msgInReceivedAll = this.longValue;
+									} else if(this.counterDef.counterName == "MsgInReceivedSs7"){
+										msgInReceivedSs7 = this.longValue;
+									} else if(this.counterDef.counterName == "MsgInReceivedSmpp"){
+										msgInReceivedSmpp = this.longValue;
+									} else if(this.counterDef.counterName == "MsgInReceivedSip"){
+										msgInReceivedSip = this.longValue;
+									} else if(this.counterDef.counterName == "MsgInRejectedAll"){
+										msgInRejectedAll = this.longValue;
+									} else if(this.counterDef.counterName == "MsgInFailedAll"){
+										msgInFailedAll = this.longValue;
+									} else if(this.counterDef.counterName == "MsgOutSentAll"){
+										msgOutSentAll = this.longValue;
+									} else if(this.counterDef.counterName == "MsgOutSentSs7"){
+										msgOutSentSs7 = this.longValue;
+									} else if(this.counterDef.counterName == "MsgOutSentSmpp"){
+										msgOutSentSmpp = this.longValue;
+									} else if(this.counterDef.counterName == "MsgOutSentSip"){
+										msgOutSentSip = this.longValue;
+									} else if(this.counterDef.counterName == "MsgOutFailedAll"){
+										msgOutFailedAll = this.longValue;
+									}
+								});
+								
+								var dateNow = new Date();
+								msgInReceived.addRow([(dateNow), msgInReceivedAll, msgInReceivedSs7, msgInReceivedSmpp, msgInReceivedSip, msgInRejectedAll, msgInFailedAll]);
+								msgOutTry.addRow([(dateNow), msgOutTryAll, msgOutTrySs7, msgOutTrySmpp, msgOutTrySip]);
+								msgOutSent.addRow([(dateNow), msgOutSentAll, msgOutSentSs7, msgOutSentSmpp, msgOutSentSip, msgOutFailedAll]);
+								
+								drawCharts();
+							}
+							],
+							error: function(response) {
+								alert("Jolokia request failed: " + response.error);
+							} 
+						}
+					);
+					
+					
+				}
+				$(document).ready(function () {
+					refreshCampaignsList();
+					//setAutoCancellableInterval(1000, "updateState", "SS7 Metrics");
+				});
+			</script>				

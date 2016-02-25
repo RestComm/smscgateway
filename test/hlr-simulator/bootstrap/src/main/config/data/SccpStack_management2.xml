@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<zmarginxudtmessage value="240"/>
+<reassemblytimerdelay value="15000"/>
+<maxdatamessage value="2560"/>
+<removespc value="true"/>
+<previewMode value="false"/>
+<sccpProtocolVersion value="ITU"/>
+<ssttimerduration_min value="10000"/>
+<ssttimerduration_max value="600000"/>
+<ssttimerduration_increasefactor value="1.5"/>

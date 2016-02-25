@@ -1,0 +1,72 @@
+<h3 style="margin: 0px;"><i class="icon-bar-chart"></i> SMSC Statistics</h3>
+<hr style="margin: 10 0px;"/>
+
+<table id="exec-stats" style="width: 100%;">
+	<tr>
+		<td><div style="padding: 3px; border: 0px solid #EEE; border-radius: 5px;">
+				<h4 class="text-right">
+					<span class="label label-info" style="font-size: 1.2em; line-height: 1.1em;">Stats</span>
+				</h4>
+				<hr style="margin: 10px 0;">
+				<h4 style="margin: 7px 0;">
+					<span id="smscStartTime"></span><small> START TIME</small>
+				</h4>
+				<h4 style="margin: 7px 0;">
+					<span id="smscCurrentTime"></span><small> CURRENT TIME</small>
+				</h4>				
+				<h4 style="margin: 7px 0;">
+					<span id="messageScheduledTotal"></span><small> TOTAL MESSAGES SCHEDULED</small>
+				</h4>
+				<h4 style="margin: 7px 0;">
+					<span id="messageInProcess"></span><small> MESSAGES IN PROCESS</small>
+				</h4>
+				<h4 style="margin: 7px 0;">
+					<span id="currentMessageId"></span><small> CURRENT MESSAGE ID </small>
+				</h4>
+				<h4 style="margin: 7px 0;">
+					<span id="dueSlotProcessingLag"></span><small> DUE SLOT PROCESSING LAG </small>
+				</h4>
+			</div>
+		</td>
+		
+	</tr>
+</table>
+<hr>
+
+
+<script type="text/javascript">
+	//@ sourceURL=loadEventRouterStats.js
+	$(document).ready(function () {
+		setAutoCancellableInterval(2500, "updateSmscStats", "SMSC Statistics");
+	});
+
+	function updateSmscStats() {
+		
+		mbeanSearch="org.mobicents.smsc:layer=SmscStats,name=SmscManagement";
+		jolokia.request(
+				[
+					{ type: "read", mbean: mbeanSearch },
+				],
+				{ success: [
+					function(response) {
+						$("#messageScheduledTotal").text(response.value.MessageScheduledTotal);
+						$("#messageInProcess").text(response.value.MessageInProcess);
+						$("#currentMessageId").text(response.value.CurrentMessageId);
+						$("#dueSlotProcessingLag").text(response.value.DueSlotProcessingLag);
+						
+						$("#smscStartTime").text(response.value.SmscStartTime);
+						
+						var currentdate = new Date();
+						
+						$("#smscCurrentTime").text(currentdate);
+					}],
+					error: function(value) {
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+					} 
+				}
+			);			
+	}
+
+</script>

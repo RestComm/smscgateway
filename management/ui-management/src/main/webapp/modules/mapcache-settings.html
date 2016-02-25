@@ -1,0 +1,186 @@
+					<h3 style="margin: 0px;"><i class="icon-table"></i> MAP version Cache</h3>
+					<hr style="margin: 10 0px;"/>
+					
+					<link href="resources/css/bootstrap-slider.css" rel="stylesheet">
+					<script type="text/javascript" src="resources/js/bootstrap-slider.js"></script>
+					<script type="text/javascript" src="resources/js/jquery-knob.js"></script>
+					
+					
+					<p>
+						<br/>
+					</p> 
+					
+					<div class="alert alert-error" id="login-settings-error" style="display:none;">
+					  <button type="button" class="close">&times;</button>
+					  Some Fields are not correctly filled out, please double check the settings below !
+					</div>
+					
+
+					<h5>Update Cache</h5>						
+					<div id="dbrr-update-configuration-wrapper">
+						<div class="input-prepend">
+							<div id="div-updatemsisdn" class="control-group">
+							<span id="updatemsisdn-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="default value for MAP Version to be used when sending Mt SMS for this node. If not specified, value set MAP version supported will be used and finally the negotiated version will be set">
+								<span class="add-on">Node Digits</span>
+								<input id="updatemsisdn" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+							<div id="div-smppBindTypeBtnGrp" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if SMSC is acting as ESME, it will initiate corresponding bind else if its server it will accept corresponding bind from remote ESME">
+									<span class="add-on">Smpp Bind Type</span>
+									<select id="smppBindType" >
+										<option value="1">version1</option>
+										<option value="2">version2</option>
+										<option value="3">version3</option>
+									</select>
+								</span>
+							</div>
+						</div>
+						<div class="row">
+							<span class="span12" style="text-align: right;">
+								&nbsp;<button class="btn btn-primary" onclick="setCache();"><i class="icon-save"></i> Update</button>
+							</span>
+						</div>						
+					</div>
+
+					<hr />
+					
+					<h5>View Cache</h5>
+					<div id="dbrr-view-configuration-wrapper">
+						<div class="input-prepend">
+							<div id="div-viewmsisdn" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="view the cache value for given node digits. If no node digits is specified complete cache will be shown">
+								<span class="add-on">Node Digits</span>
+								<input id="viewmsisdn" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+						</div>
+						<div class="row">
+							<span class="span12" style="text-align: right;">
+								&nbsp;<button class="btn btn-primary" onclick="getCache();"><i class="icon-eye-open"></i> View</button>
+							</span>
+						</div>						
+					</div>									
+										
+					<hr />
+					
+					<h5>Clear Cache</h5>
+					<div id="dbrr-delete-configuration-wrapper">
+						<div class="row">
+							<span class="span12" style="text-align: right;">
+								&nbsp;<button class="btn btn-primary" onclick="clearCache();"><i class="icon-remove"></i> Clear Cache</button>
+							</span>
+						</div>						
+					</div>	
+					
+
+					
+				<script type="text/javascript">
+					$('#login-settings-error .close').on("click", function(e) {
+					    $(this).parent().hide();
+					});
+					
+					function setCache() {
+						var mbeanSearch="org.mobicents.smsc:layer=MapVersionCache,name=SmscManagement";
+						var formInvalid = false;
+						
+						var updatemsisdn = $("#updatemsisdn").val();
+						if(updatemsisdn.trim() == "") {
+			    			$("#div-updatemsisdn").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-updatemsisdn").hasClass("error")) {
+			    			$("#div-updatemsisdn").removeClass("error");		
+			    		}
+						
+						var e = document.getElementById("smppBindType");
+						var smppBindType = e.options[e.selectedIndex].text;
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}						
+						
+						jolokia.execute(mbeanSearch,"forceMAPApplicationContextVersion",updatemsisdn,smppBindType,
+								{
+									success: function(value) {
+										logToConsole('INFO', 'Successfully cached MAP Version to ' + smppBindType + ' for Node ' + updatemsisdn );
+									},
+									error: function(value){
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									}
+								});							
+
+					}
+					
+					function clearCache() {
+						var mbeanSearch="org.mobicents.smsc:layer=MapVersionCache,name=SmscManagement";
+									
+						
+						jolokia.execute(mbeanSearch,"forceClear",
+								{
+									success: function(value) {
+										logToConsole('INFO', 'Successfully cleared cache ');
+									},
+									error: function(value){
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									}
+								});							
+
+					}	
+					
+					function getCache() {
+						var mbeanSearch="org.mobicents.smsc:layer=MapVersionCache,name=SmscManagement";
+						var formInvalid = false;
+						
+						var viewmsisdn = $("#viewmsisdn").val();
+						
+						if(viewmsisdn == ""){
+							jolokia.request(
+									[
+										{ type: "read", mbean: mbeanSearch },
+									],
+									{ success: [
+										function(response) {
+											var cacheSize = 0;
+											var cache = "";
+											$.each( response.value.MAPApplicationContextVersionCache, function( key, value ) {
+												cache = cache + key + " : " + value.curVersion +"<br/>";
+												cacheSize = cacheSize+1;
+												});
+											if(cacheSize == 0){
+												logToConsole('INFO', "No map version found in the cache");
+											} else {
+												logToConsole('INFO', cache);
+											}
+										}],
+										error: function(value) {
+											errorUID = ("st" + new Date().getTime()).hashCode();
+											createStackTrace(errorUID, value.stacktrace);
+											logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+										}
+									}
+							);		
+							
+						} else {
+							jolokia.execute(mbeanSearch,"getMAPApplicationContextVersion",viewmsisdn,
+									{
+										success: function(value) {
+											logToConsole('INFO', viewmsisdn+" : "+value );
+										},
+										error: function(value){
+											errorUID = ("st" + new Date().getTime()).hashCode();
+											createStackTrace(errorUID, value.stacktrace);
+											logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+										}
+									});
+						}
+
+					}					
+				</script>
