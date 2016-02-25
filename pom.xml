@@ -1,0 +1,311 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>restcomm-parent</artifactId>
+		<groupId>org.mobicents</groupId>
+		<version>2.27.32</version>
+	</parent>
+
+	<artifactId>restcomm-smsc-parent</artifactId>
+	<groupId>org.mobicents.smsc</groupId>
+	<version>3.0.0-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<name>RestComm SMSC :: ${project.artifactId}</name>
+
+
+
+	<properties>
+		<testng.version>6.8</testng.version>
+		<javolution.version>5.5.1</javolution.version>
+		<compiler.plugin.version>2.3.1</compiler.plugin.version>
+		<compile.source>1.7</compile.source>
+		<!-- restcomm but not strictly ss7 -->
+		<asn.version>2.0.3.FINAL</asn.version>
+		<stream.version>1.0.0.CR1</stream.version>
+		<sctp.version>1.6.0.FINAL</sctp.version>
+		<commons.version>1.0.0.CR1</commons.version>
+		<log4j.version>1.2.14</log4j.version>
+		<junit.version>3.8.1</junit.version>
+		<!-- cloudhopper smpp -->
+		<ch.smpp.namespace>com.fizzed</ch.smpp.namespace> <!-- com.fizzed com.cloudhopper -->
+		<ch.smpp.version>5.0.10-SNAPSHOT</ch.smpp.version> <!-- 5.0.9 -->
+		<slf4j.version>1.7.10</slf4j.version> <!-- 1.5.6, 1.6.0 -->
+
+		<!-- Cassandra Driver and dependency -->
+		<cassandra-driver-core.version>2.1.9</cassandra-driver-core.version> <!-- 2.0.2, 2.0.10, 2.1.6, 2.1.9, 2.2.0-rc3, 3.0.0 -->
+
+		<snappy-java.version>1.0.5</snappy-java.version>
+
+		<google-guava.version>14.0.1</google-guava.version>
+        <codahale-metrics.version>3.0.2</codahale-metrics.version> <!-- 3.0.1 -->
+		<netty.version>3.9.0.Final</netty.version>  <!-- 3.6.3.Final -->
+
+		<jackson.version>1.9.2</jackson.version>
+		
+		<!-- restcomm properties -->
+		<jss7.restcomm.version>3.0.1336</jss7.restcomm.version>
+		<dialogic.version>6.7.1</dialogic.version>
+		<ts.slee.version>2.8.10</ts.slee.version>
+		<jslee.ext.version>${ts.slee.version}</jslee.ext.version>
+		<restcomm.resources.map.version>2.8.26</restcomm.resources.map.version>
+		<restcomm.resources.sip.version>2.8.20</restcomm.resources.sip.version>
+		<jdiameter.version>2.8.21</jdiameter.version>
+		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+	</properties>
+
+	<modules>
+		<module>core</module>
+		
+		<module>test/hlr-simulator</module>
+		<!-- 		
+		<module>test/smpp-simulator</module>
+		 -->
+		<module>test/smpp-load</module>
+		<module>tools</module>
+		<module>management/ui-management</module>
+	</modules>
+
+	<profiles>
+		<profile>
+			<id>maven-release</id>
+			<modules>
+				<module>docs</module>
+			</modules>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-release-plugin</artifactId>
+						<configuration>
+							<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
+							<preparationGoals>clean install</preparationGoals>
+							<autoVersionSubmodules>true</autoVersionSubmodules>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>release</id>
+			<modules>
+				<module>docs</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>install</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	<developers>
+		<developer>
+			<id>serg.vetyutnev</id>
+			<name>Sergey</name>
+			<email>serg.vetyutnev@gmail.com</email>
+			<organization>TeleStax</organization>
+			<organizationUrl>http://telestax.com/</organizationUrl>
+			<roles>
+				<role>Active Developer</role>
+			</roles>
+			<timezone>+3</timezone>
+		</developer>
+		<developer>
+			<id>amit.bhayani</id>
+			<name>Amit Bhayani</name>
+			<email>amit.bhayani@gmail.com</email>
+			<organization>TeleStax</organization>
+			<organizationUrl>http://telestax.com/</organizationUrl>
+			<roles>
+				<role>Active Developer</role>
+			</roles>
+			<timezone>+5.5</timezone>
+		</developer>
+		<developer>
+			<id>baranowb</id>
+			<name>Bartosz Baranowski</name>
+			<email>baranowb@gmail.com</email>
+			<organization>JBoss/Red Hat</organization>
+			<organizationUrl>http://www.redhat.com/</organizationUrl>
+			<roles>
+				<role>Active Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>GNU Affero General Public License</name>
+			<url>http://www.gnu.org/licenses/agpl-3.0.html</url>
+			<distribution>repo</distribution>
+		</license>
+
+	</licenses>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<groupId>org.mobicents.tools</groupId>
+				<version>
+					${restcomm.tools.mavenplugin.eclipse.version}
+				</version>
+				<inherited>false</inherited>
+				<executions />
+				<configuration>
+					<classpathExcludes>
+						<exclude>xml-apis:xml-apis</exclude>
+						<exclude>jtidy:jtidy</exclude>
+					</classpathExcludes>
+					<resolveTransitiveDependencies>
+						true
+					</resolveTransitiveDependencies>
+					<eclipseProjectName>
+						restcomm-smscgateway
+					</eclipseProjectName>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${compiler.plugin.version}</version>
+				<configuration>
+					<source>${compile.source}</source>
+					<target>${compile.source}</target>
+					<debug>${compile.debug}</debug>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<scm>
+		<connection>scm:git:https://github.com/RestComm/smscgateway.git</connection>
+		<developerConnection>scm:git:https://github.com/RestComm/smscgateway.git</developerConnection>
+		<url>https://github.com/RestComm/smscgateway</url>
+	</scm>
+
+		<!-- repositories -->
+	<repositories>
+		<repository>
+			<id>mobicents-public-repository-group</id>
+			<name>Mobicens Public Maven Repository Group</name>
+			<url>https://oss.sonatype.org/content/groups/public</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jboss-3rd-party-repository-group</id>
+			<name>JBoss ThirdParty Releases Repository Group</name>
+			<url>http://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jboss-3rd-party-upload-repository-group</id>
+			<name>JBoss ThirdParty Upload Repository Group</name>
+			<url>http://repository.jboss.org/nexus/content/repositories/thirdparty-upload</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>java.net-Public</id>
+			<name>Maven Java Net Snapshots and Releases</name>
+			<url>http://download.java.net/maven/2/</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>backup.repository.jboss.org</id>
+			<name>JBoss Repository Backup</name>
+			<url>http://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
+
+</project>
