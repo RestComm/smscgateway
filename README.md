@@ -35,6 +35,19 @@ Download binary from [here](https://github.com/RestComm/smscgateway/releases) or
 
 Artifacts are available at [Sonatype Maven Repo](https://oss.sonatype.org/content/repositories/releases/org/mobicents) which are also synched to central
 
+## Build From Source
+
+SMSC GW refers now for cloud hopper SMPP project version (with support for submit_multi operation) that is not yet merged to https://github.com/fizzed/cloudhopper-smpp repo.
+Because of it if you need to compile SMSC GW locally, you previously need to compile the updated version of cloud hopper SMPP from repo https://github.com/RestComm/cloudhopper-smpp, branch "master\_submit\_multi-2".
+
+You can use these commands:
+
+```
+git clone https://github.com/RestComm/cloudhopper-smpp
+git checkout master\_submit\_multi-2
+mvn clean install
+```
+
 ## Wiki
 
 Read our [RestComm SMSC wiki](https://github.com/RestComm/smscgateway/wiki) 
