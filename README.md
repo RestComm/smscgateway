@@ -48,6 +48,11 @@ mvn clean install
 ```
 Then you can download and compile SMSC GW code locally.
 
+SMSC GW contains branches with code versions:
+* master   - the last actual code (support for smpp, ss7 and sip connectors and diameter OCS server)
+* legacy-2 - code with support only for smpp and sip
+* legacy   - very old poor code version
+
 ## Wiki
 
 Read our [RestComm SMSC wiki](https://github.com/RestComm/smscgateway/wiki) 
