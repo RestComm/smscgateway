@@ -120,7 +120,7 @@ public class TT_PersistenceRAInterfaceProxy extends DBOperations_C2 implements P
                     g1++;
                 }
 
-                ProtocolVersion protVersion = cluster.getConfiguration().getProtocolOptions().getProtocolVersionEnum();
+                ProtocolVersion protVersion = DBOperations_C2.getProtocolVersion(cluster);
                 if (protVersion == ProtocolVersion.V1) {
                     if (tstRes == 0) {
                         session.execute("CREATE TABLE \"TEST_TABLE\" (id uuid primary key);");
@@ -269,7 +269,7 @@ public class TT_PersistenceRAInterfaceProxy extends DBOperations_C2 implements P
         res.smType = row.getInt(Schema.COLUMN_SM_TYPE);
         res.deliveryCount = row.getInt(Schema.COLUMN_DELIVERY_COUNT);
 
-        res.deliveryDate = row.getDate(Schema.COLUMN_DELIVERY_DATE);
+        res.deliveryDate = DBOperations_C2.getRowDate(row, Schema.COLUMN_DELIVERY_DATE);
 
         return res;
     }

@@ -29,6 +29,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -56,11 +57,14 @@ import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Cluster.Builder;
 import com.datastax.driver.core.Host;
+import com.datastax.driver.core.KeyspaceMetadata;
 import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.PreparedStatement;
+import com.datastax.driver.core.ProtocolVersion;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.TableMetadata;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
 
 /**
@@ -147,7 +151,7 @@ public class DBOperations_C2 {
 	private PreparedStatement getSipSmsRoutingRulesRange;
 	private PreparedStatement getSipSmsRoutingRulesRange2;
 	
-	private PreparedStatement getTableList;
+//	private PreparedStatement getTableList;
 
 	private Date pcsDate;
 	private PreparedStatementCollection_C3[] savedPsc;
@@ -162,6 +166,28 @@ public class DBOperations_C2 {
 	public static DBOperations_C2 getInstance() {
 		return instance;
 	}
+
+    // here are methods that contain code for cassandra access that is different between 2.* and 3.* cassandra versions
+    public static void setBoundStatementDate(BoundStatement boundStatement, String columnName, Date date) {
+        // drivers 3.0
+        boundStatement.setTimestamp(columnName, date);
+        // drivers 2.1
+        // boundStatement.setDate(columnName, date);
+    }
+
+    public static Date getRowDate(Row row, String columnName) {
+        // drivers 3.0
+        return row.getTimestamp(columnName);
+        // drivers 2.1
+        // return row.getDate(columnName);
+    }
+
+    public static ProtocolVersion getProtocolVersion(Cluster cluster) {
+        // drivers 3.0
+        return cluster.getConfiguration().getProtocolOptions().getProtocolVersion();
+        // drivers 2.1
+        // return cluster.getConfiguration().getProtocolOptions().getProtocolVersionEnum();
+    }
 
     public boolean isStarted() {
         return started;
@@ -253,8 +279,8 @@ public class DBOperations_C2 {
 				+ "\" where token(\"" + Schema.COLUMN_ADDRESS + "\") >= token(?) LIMIT " + row_count + ";");
 		getSipSmsRoutingRulesRange2 = session.prepare("select * from \"" + Schema.FAMILY_SIP_SMS_ROUTING_RULE
 				+ "\"  LIMIT " + row_count + ";");
-		
-		getTableList = session.prepare("select * from system.schema_columnfamilies;");
+
+//        getTableList = session.prepare("select * from system.schema_columnfamilies;");
 
 		try {
 			currentDueSlot = c2_getCurrentSlotTable(CURRENT_DUE_SLOT);
@@ -848,11 +874,11 @@ public class DBOperations_C2 {
         } else
             boundStatement.setToNull(Schema.COLUMN_ORIG_SYSTEM_ID);
 		if (sms.getSubmitDate() != null) {
-			boundStatement.setDate(Schema.COLUMN_SUBMIT_DATE, sms.getSubmitDate());
+		    setBoundStatementDate(boundStatement, Schema.COLUMN_SUBMIT_DATE, sms.getSubmitDate());
         } else
             boundStatement.setToNull(Schema.COLUMN_SUBMIT_DATE);
 		if (sms.getDeliverDate() != null) {
-			boundStatement.setDate(Schema.COLUMN_DELIVERY_DATE, sms.getDeliverDate());
+		    setBoundStatementDate(boundStatement, Schema.COLUMN_DELIVERY_DATE, sms.getDeliverDate());
         } else
             boundStatement.setToNull(Schema.COLUMN_DELIVERY_DATE);
 		if (sms.getServiceType() != null) {
@@ -919,11 +945,11 @@ public class DBOperations_C2 {
         }
 
 		if (sms.getScheduleDeliveryTime() != null) {
-			boundStatement.setDate(Schema.COLUMN_SCHEDULE_DELIVERY_TIME, sms.getScheduleDeliveryTime());
+		    setBoundStatementDate(boundStatement, Schema.COLUMN_SCHEDULE_DELIVERY_TIME, sms.getScheduleDeliveryTime());
         } else
             boundStatement.setToNull(Schema.COLUMN_SCHEDULE_DELIVERY_TIME);
 		if (sms.getValidityPeriod() != null) {
-			boundStatement.setDate(Schema.COLUMN_VALIDITY_PERIOD, sms.getValidityPeriod());
+		    setBoundStatementDate(boundStatement, Schema.COLUMN_VALIDITY_PERIOD, sms.getValidityPeriod());
         } else
             boundStatement.setToNull(Schema.COLUMN_VALIDITY_PERIOD);
 
@@ -1064,7 +1090,7 @@ public class DBOperations_C2 {
 		sms.setMoMessageRef(row.getInt(Schema.COLUMN_MO_MESSAGE_REF));
 		sms.setOrigEsmeName(row.getString(Schema.COLUMN_ORIG_ESME_NAME));
 		sms.setOrigSystemId(row.getString(Schema.COLUMN_ORIG_SYSTEM_ID));
-		sms.setSubmitDate(row.getDate(Schema.COLUMN_SUBMIT_DATE));
+        sms.setSubmitDate(getRowDate(row, Schema.COLUMN_SUBMIT_DATE));
 
 		sms.setServiceType(row.getString(Schema.COLUMN_SERVICE_TYPE));
 		sms.setEsmClass(row.getInt(Schema.COLUMN_ESM_CLASS));
@@ -1135,8 +1161,8 @@ public class DBOperations_C2 {
             }
         }
 
-        sms.setScheduleDeliveryTime(row.getDate(Schema.COLUMN_SCHEDULE_DELIVERY_TIME));
-		sms.setValidityPeriod(row.getDate(Schema.COLUMN_VALIDITY_PERIOD));
+        sms.setScheduleDeliveryTime(getRowDate(row, Schema.COLUMN_SCHEDULE_DELIVERY_TIME));
+		sms.setValidityPeriod(getRowDate(row, Schema.COLUMN_VALIDITY_PERIOD));
 		sms.setDeliveryCount(row.getInt(Schema.COLUMN_DELIVERY_COUNT));
 
 		String s = row.getString(Schema.COLUMN_OPTIONAL_PARAMETERS);
@@ -2051,29 +2077,45 @@ public class DBOperations_C2 {
     }
 
     public String[] c2_getTableList(String keyspace) {
-        ArrayList<String> res = new ArrayList<String>();
-        try {
-            
-            BoundStatement boundStatement = new BoundStatement(this.getTableList);
-
-            ResultSet result = session.execute(boundStatement);
-
-            for (Row row : result) {
-                String keyspace1 = row.getString(Schema.COLUMN_SYSTEM_KEYSPACE_NAME);
-                String tableName = row.getString(Schema.COLUMN_SYSTEM_COLUMNFAMILY_NAME);
-
-                if (keyspace.equals(keyspace1)) {
-                    res.add(tableName);
+        List<KeyspaceMetadata> lst = this.cluster.getMetadata().getKeyspaces();
+        String[] ss = new String[0];
+        for (KeyspaceMetadata km : lst) {
+            if (km.getName().equals(keyspace)) {
+                Collection<TableMetadata> lstTableMetadata = km.getTables();
+                ss = new String[lstTableMetadata.size()];
+                int i1 = 0;
+                for (TableMetadata tm : lstTableMetadata) {
+                    ss[i1++] = tm.getName();
                 }
+                break;
             }
-        } catch (Exception e) {
-            logger.info("Can not get a cassandra table list");
-            return new String[0];
         }
-
-        String[] ss = new String[res.size()];
-        res.toArray(ss);
         return ss;
+
+
+//        ArrayList<String> res = new ArrayList<String>();
+//        try {
+//            
+//            BoundStatement boundStatement = new BoundStatement(this.getTableList);
+//
+//            ResultSet result = session.execute(boundStatement);
+//
+//            for (Row row : result) {
+//                String keyspace1 = row.getString(Schema.COLUMN_SYSTEM_KEYSPACE_NAME);
+//                String tableName = row.getString(Schema.COLUMN_SYSTEM_COLUMNFAMILY_NAME);
+//
+//                if (keyspace.equals(keyspace1)) {
+//                    res.add(tableName);
+//                }
+//            }
+//        } catch (Exception e) {
+//            logger.info("Can not get a cassandra table list");
+//            return new String[0];
+//        }
+//
+//        String[] ss = new String[res.size()];
+//        res.toArray(ss);
+//        return ss;
     }
 
 	private class DueSlotWritingElement {

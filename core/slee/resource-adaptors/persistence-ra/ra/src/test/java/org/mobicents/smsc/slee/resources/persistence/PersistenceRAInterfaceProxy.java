@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.mobicents.smsc.cassandra.DBOperations_C1;
+import org.mobicents.smsc.cassandra.DBOperations_C2;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.PreparedStatementCollection_C3;
 import org.mobicents.smsc.cassandra.Schema;
@@ -140,7 +141,7 @@ public class PersistenceRAInterfaceProxy extends DBOperations_C1 implements Pers
         res.smType = row.getInt(Schema.COLUMN_SM_TYPE);
         res.deliveryCount = row.getInt(Schema.COLUMN_DELIVERY_COUNT);
 
-        res.deliveryDate = row.getDate(Schema.COLUMN_DELIVERY_DATE);
+        res.deliveryDate = DBOperations_C2.getRowDate(row, Schema.COLUMN_DELIVERY_DATE);
 
         return res;
         
