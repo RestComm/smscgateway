@@ -14,6 +14,7 @@ import javolution.xml.XMLObjectWriter;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
+import org.mobicents.smsc.cassandra.DBOperations_C2;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.Schema;
 import org.mobicents.smsc.library.Sms;
@@ -165,7 +166,7 @@ public class NN_DBOper {
                 boundStatement.setString(Schema.COLUMN_ORIG_SYSTEM_ID, sms.getOrigSystemId());
             }
             if (sms.getSubmitDate() != null) {
-                boundStatement.setDate(Schema.COLUMN_SUBMIT_DATE, sms.getSubmitDate());
+                DBOperations_C2.setBoundStatementDate(boundStatement, Schema.COLUMN_SUBMIT_DATE, sms.getSubmitDate());
             }
             if (sms.getServiceType() != null) {
                 boundStatement.setString(Schema.COLUMN_SERVICE_TYPE, sms.getServiceType());
@@ -183,10 +184,11 @@ public class NN_DBOper {
                 boundStatement.setBytes(Schema.COLUMN_MESSAGE, ByteBuffer.wrap(sms.getShortMessage()));
             }
             if (sms.getScheduleDeliveryTime() != null) {
-                boundStatement.setDate(Schema.COLUMN_SCHEDULE_DELIVERY_TIME, sms.getScheduleDeliveryTime());
+                DBOperations_C2.setBoundStatementDate(boundStatement, Schema.COLUMN_SCHEDULE_DELIVERY_TIME,
+                        sms.getScheduleDeliveryTime());
             }
             if (sms.getValidityPeriod() != null) {
-                boundStatement.setDate(Schema.COLUMN_VALIDITY_PERIOD, sms.getValidityPeriod());
+                DBOperations_C2.setBoundStatementDate(boundStatement, Schema.COLUMN_VALIDITY_PERIOD, sms.getValidityPeriod());
             }
 
             boundStatement.setInt(Schema.COLUMN_DELIVERY_COUNT, sms.getDeliveryCount());
@@ -967,7 +969,7 @@ public class NN_DBOper {
                 boundStatement.setString(Schema.COLUMN_ORIG_SYSTEM_ID, sms.getOrigSystemId());
             }
             if (sms.getSubmitDate() != null) {
-                boundStatement.setDate(Schema.COLUMN_SUBMIT_DATE, sms.getSubmitDate());
+                DBOperations_C2.setBoundStatementDate(boundStatement, Schema.COLUMN_SUBMIT_DATE, sms.getSubmitDate());
             }
             if (sms.getServiceType() != null) {
                 boundStatement.setString(Schema.COLUMN_SERVICE_TYPE, sms.getServiceType());
@@ -985,10 +987,11 @@ public class NN_DBOper {
                 boundStatement.setBytes(Schema.COLUMN_MESSAGE, ByteBuffer.wrap(sms.getShortMessage()));
             }
             if (sms.getScheduleDeliveryTime() != null) {
-                boundStatement.setDate(Schema.COLUMN_SCHEDULE_DELIVERY_TIME, sms.getScheduleDeliveryTime());
+                DBOperations_C2.setBoundStatementDate(boundStatement, Schema.COLUMN_SCHEDULE_DELIVERY_TIME,
+                        sms.getScheduleDeliveryTime());
             }
             if (sms.getValidityPeriod() != null) {
-                boundStatement.setDate(Schema.COLUMN_VALIDITY_PERIOD, sms.getValidityPeriod());
+                DBOperations_C2.setBoundStatementDate(boundStatement, Schema.COLUMN_VALIDITY_PERIOD, sms.getValidityPeriod());
             }
 
             boundStatement.setInt(Schema.COLUMN_DELIVERY_COUNT, sms.getDeliveryCount());
@@ -1118,7 +1121,7 @@ public class NN_DBOper {
         sms.setMoMessageRef(row.getInt(Schema.COLUMN_MO_MESSAGE_REF));
         sms.setOrigEsmeName(row.getString(Schema.COLUMN_ORIG_ESME_NAME));
         sms.setOrigSystemId(row.getString(Schema.COLUMN_ORIG_SYSTEM_ID));
-        sms.setSubmitDate(row.getDate(Schema.COLUMN_SUBMIT_DATE));
+        sms.setSubmitDate(DBOperations_C2.getRowDate(row, Schema.COLUMN_SUBMIT_DATE));
 
         sms.setSourceAddr(row.getString(Schema.COLUMN_ADDR_SRC_DIGITS));
         sms.setSourceAddrTon(row.getInt(Schema.COLUMN_ADDR_SRC_TON));
@@ -1137,8 +1140,8 @@ public class NN_DBOper {
         byte[] buf = new byte[bb.limit() - bb.position()];
         bb.get(buf);
         sms.setShortMessage(buf);
-        sms.setScheduleDeliveryTime(row.getDate(Schema.COLUMN_SCHEDULE_DELIVERY_TIME));
-        sms.setValidityPeriod(row.getDate(Schema.COLUMN_VALIDITY_PERIOD));
+        sms.setScheduleDeliveryTime(DBOperations_C2.getRowDate(row, Schema.COLUMN_SCHEDULE_DELIVERY_TIME));
+        sms.setValidityPeriod(DBOperations_C2.getRowDate(row, Schema.COLUMN_VALIDITY_PERIOD));
         sms.setDeliveryCount(row.getInt(Schema.COLUMN_DELIVERY_COUNT));
 
         String s = row.getString(Schema.COLUMN_OPTIONAL_PARAMETERS);
