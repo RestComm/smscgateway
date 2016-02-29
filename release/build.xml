@@ -23,7 +23,7 @@
 		<!-- Eg: 
 			ant -Drestcomm.smsc.git.tag=ts115ga -Drestcomm.smsc.release.version=6.1.5.GA-restcomm
 		-->
-	<property name="restcomm.smsc.git.tag" value="smsc-public-dev"/>
+	<property name="restcomm.smsc.git.tag" value="master"/>
 	<property name="restcomm.smsc.release.version" value="3.0.0-SNAPSHOT"/>
 		<!-- **//-->
 
