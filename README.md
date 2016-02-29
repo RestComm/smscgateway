@@ -37,16 +37,16 @@ Artifacts are available at [Sonatype Maven Repo](https://oss.sonatype.org/conten
 
 ## Build From Source
 
-SMSC GW refers now for cloud hopper SMPP project version (with support for submit_multi operation) that is not yet merged to https://github.com/fizzed/cloudhopper-smpp repo.
-Because of it if you need to compile SMSC GW locally, you previously need to compile the updated version of cloud hopper SMPP from repo https://github.com/RestComm/cloudhopper-smpp, branch "master\_submit\_multi-2".
+SMSC GW refers now to cloud hopper SMPP project version (with support for submit_multi operation) that is not yet merged to https://github.com/fizzed/cloudhopper-smpp repo.
+Therefore if you need to compile SMSC GW locally, you need to compile the updated version of cloud hopper SMPP from repo https://github.com/RestComm/cloudhopper-smpp, branch "master\_submit\_multi-2" previously.
 
 You can use these commands:
-
 ```
 git clone https://github.com/RestComm/cloudhopper-smpp
-git checkout master\_submit\_multi-2
+git checkout master\submit\multi-2
 mvn clean install
 ```
+Then you can download and compile SMSC GW code locally.
 
 ## Wiki
 
