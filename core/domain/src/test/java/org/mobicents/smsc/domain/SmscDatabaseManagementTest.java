@@ -9,6 +9,10 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Metadata;
+import com.datastax.driver.core.Session;
+
 public class SmscDatabaseManagementTest {
 
     private String ip = "127.0.0.1";
@@ -20,11 +24,34 @@ public class SmscDatabaseManagementTest {
     public void setUpClass() throws Exception {
         System.out.println("setUpClass");
 
+        cassandraDbInited = testCassandraAccess();
+
+        if (cassandraDbInited) {
+            try {
+                this.db = DBOperations_C2.getInstance();
+                this.db.start(ip, 9042, keyspace, 60, 60, 60 * 10);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public boolean testCassandraAccess() {
         try {
-            this.db = DBOperations_C2.getInstance();
-            this.db.start(ip, 9042, keyspace, 60, 60, 60 * 10);
-            cassandraDbInited = true;
+            Cluster cluster = Cluster.builder().addContactPoint(ip).build();
+
+            try {
+                Metadata metadata = cluster.getMetadata();
+
+                Session session = cluster.connect();
+
+                return true;
+            } finally {
+                cluster.close();
+            }
         } catch (Exception e) {
+            e.printStackTrace();
+
+            return false;
         }
     }
 
