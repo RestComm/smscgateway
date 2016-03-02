@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>restcomm-smsc-installguide</artifactId>
 		<groupId>org.mobicents.smsc.docs.installguide</groupId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.0.16</version>
 	</parent>
 
 	<artifactId>restcomm-smsc-installguide-jdocbook-restcomm</artifactId>
