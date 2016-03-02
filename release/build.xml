@@ -44,7 +44,7 @@
 
 
 	<!-- <property name="restcomm-management-hq.version" value="6.1.4.GA" /> -->
-	<property name="restcomm-diam.build-number" value="83" />
+	<property name="restcomm-diam.build-number" value="89" />
 	<property name="restcomm-diam.version" value="1.7.0" />
 	<property name="restcomm-diam.resources.version" value="2.8.0-SNAPSHOT" />
 
@@ -564,12 +564,12 @@
 		        </fileset>
 		</copy>
 
-
+<!--
 		<copy file="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 		<copy file="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-
+-->
 
 		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
