@@ -151,7 +151,8 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                     this.logger.fine("HomeRouting: correlationID=" + correlationID + ", found CorrelationIdValue=" + civ);
                 }
             }
-            if (civ != null) {
+
+            if (civ != null && civ.getLocationInfoWithLMSI() != null && civ.getImsi() != null) {
                 // preloaded routing info is found - skip SRI request
                 MWStatus mwStatus = civ.getMwStatus();
                 if (mwStatus != null) {
@@ -605,7 +606,8 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 		// this.mapParameterFactory.creat
 
         String hlrAddress = destinationAddress;
-        if (smscPropertiesManagement.getHrHlrNumber() != null && smscPropertiesManagement.getHrHlrNumber().length() > 0) {
+        if (smscPropertiesManagement.getHrHlrNumber(networkId) != null
+                && smscPropertiesManagement.getHrHlrNumber().length() > 0) {
             hlrAddress = smscPropertiesManagement.getHrHlrNumber();
         }
         SccpAddress destinationAddr = this.convertAddressFieldToSCCPAddress(hlrAddress, ton, npi);

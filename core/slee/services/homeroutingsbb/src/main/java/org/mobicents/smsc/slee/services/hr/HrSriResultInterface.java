@@ -32,7 +32,7 @@ import org.mobicents.smsc.library.CorrelationIdValue;
  */
 public interface HrSriResultInterface {
 
-    public void onSriSuccess(CorrelationIdValue correlationIdValue);
+    public void onSriSuccess(CorrelationIdValue correlationIdValue, boolean sriBypass);
 
     public void onSriFailure(CorrelationIdValue correlationIdValue, MAPErrorMessage errorResponse, String cause);
 

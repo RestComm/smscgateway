@@ -79,6 +79,7 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         set.addChild("removinglivetablesdays");
         set.addChild("removingarchivetablesdays");
         set.addChild("hrhlrnumber");
+        set.addChild("hrsribypass");
         set.addChild("sriresponselivetime");
         set.addChild("nationallanguagesingleshift");
         set.addChild("nationallanguagelockingshift");
@@ -165,6 +166,7 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         get.addChild("removinglivetablesdays");
         get.addChild("removingarchivetablesdays");
         get.addChild("hrhlrnumber");
+        get.addChild("hrsribypass");
         get.addChild("sriresponselivetime");
         get.addChild("nationallanguagesingleshift");
         get.addChild("nationallanguagelockingshift");
@@ -187,6 +189,7 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         Node remove = parent.addChild("remove");
         remove.addChild("esmedefaultcluster");
         remove.addChild("hrhlrnumber");
+        remove.addChild("hrsribypass");
 
 		Node smppServer = parent.addChild("smppserver");
 

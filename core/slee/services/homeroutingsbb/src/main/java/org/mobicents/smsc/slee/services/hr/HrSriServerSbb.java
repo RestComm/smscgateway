@@ -203,13 +203,20 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
         HrSriClientSbbLocalObject hrSriClientSbbLocalObject = this.getHrSriClientSbbLocalObject();
         if (hrSriClientSbbLocalObject != null) {
             String sca = msisdn.getAddress();
-//          String sca = serviceCentreAddress.getAddress();
-            NextCorrelationIdResult correlationIDRes = this.homeRoutingManagement.getNextCorrelationId(sca);
+            NextCorrelationIdResult correlationIDRes = homeRoutingManagement.getNextCorrelationId(sca);
             if (correlationIDRes.getSmscAddress() != null && !correlationIDRes.getSmscAddress().equals(""))
                 this.setSmscAddressForCountryCode(correlationIDRes.getSmscAddress());
             String correlationID = correlationIDRes.getCorrelationId();
             CorrelationIdValue correlationIdValue = new CorrelationIdValue(correlationID, msisdn, serviceCentreAddress, networkId);
-            hrSriClientSbbLocalObject.setupSriRequest(correlationIdValue);
+
+            boolean sriBypass = smscPropertiesManagement.getHrSriBypass(networkId);
+            if (sriBypass) {
+                // bypass of SRI request to a local HLR - just sending of a response
+                onSriSuccess(correlationIdValue, true);
+            } else {
+                // sending SRI request to a local HLR
+                hrSriClientSbbLocalObject.setupSriRequest(correlationIdValue);
+            }
 
             if (this.logger.isFineEnabled()) {
                 StringBuilder sb = new StringBuilder();
@@ -217,18 +224,11 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 sb.append(correlationID);
                 sb.append(" for received ServiceCentedAddress=");
                 sb.append(sca);
+                sb.append(" sriBypass: ");
+                sb.append(sriBypass);
                 this.logger.severe(sb.toString());
             }
         }
-
-//        if (hrSriClientSbbLocalObject != null) {
-//            NextCorrelationIdResult correlationIDRes = this.persistence.c2_getNextCorrelationId(msisdn.getAddress());
-//            if (correlationIDRes.getSmscAddress() != null && !correlationIDRes.getSmscAddress().equals(""))
-//                this.setSmscAddressForCountryCode(correlationIDRes.getSmscAddress());
-//            String correlationID = correlationIDRes.getCorrelationId();
-//            CorrelationIdValue correlationIdValue = new CorrelationIdValue(correlationID, msisdn, serviceCentreAddress, networkId);
-//            hrSriClientSbbLocalObject.setupSriRequest(correlationIdValue);
-//        }
     }
 
     /**
@@ -270,24 +270,27 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
      * 
      */
     @Override
-    public void onSriSuccess(CorrelationIdValue correlationIdValue) {
+    public void onSriSuccess(CorrelationIdValue correlationIdValue, boolean sriBypass) {
         MAPDialogSms dlg = this.getActivity();
         if (dlg == null) {
             this.logger.severe("Home routing: can not get MAPDialog for sending SRI positive Response");
             return;
         }
 
-        smscStatAggregator.updateMsgInHrSriPosReq();
+        if (!sriBypass) {
+            smscStatAggregator.updateMsgInHrSriPosReq();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Home routing: positive SRI response from HLR: transaction: ");
-        sb.append(correlationIdValue);
-        if (this.logger.isInfoEnabled())
-            this.logger.info(sb.toString());
+            StringBuilder sb = new StringBuilder();
+            sb.append("Home routing: positive SRI response from HLR: transaction: ");
+            sb.append(correlationIdValue);
+            if (this.logger.isInfoEnabled())
+                this.logger.info(sb.toString());
+        }
 
         // storing correlationId into a cache
         try {
-            SmsSetCache.getInstance().putCorrelationIdCacheElement(correlationIdValue, smscPropertiesManagement.getCorrelationIdLiveTime());
+            SmsSetCache.getInstance().putCorrelationIdCacheElement(correlationIdValue,
+                    smscPropertiesManagement.getCorrelationIdLiveTime());
         } catch (Exception e1) {
             if (dlg != null) {
                 dlg.release();

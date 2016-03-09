@@ -664,13 +664,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 			} else if (parName.equals("maxactivitycount")) {
 				int val = Integer.parseInt(options[3]);
 				smscPropertiesManagement.setMaxActivityCount(val);
-				// } else if (parName.equals("cdrdatabaseexportduration")) {
-				// int val = Integer.parseInt(options[3]);
-				// smscPropertiesManagement.setCdrDatabaseExportDuration(val);
 			} else if (parName.equals("esmedefaultcluster")) {
 				smscPropertiesManagement.setEsmeDefaultClusterName(options[3]);
-//            } else if (parName.equals("smshomerouting")) {
-//                smscPropertiesManagement.setSMSHomeRouting(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("correlationidlivetime")) {
                 int val = Integer.parseInt(options[3]);
                 smscPropertiesManagement.setCorrelationIdLiveTime(val);
@@ -728,9 +723,22 @@ public class SMSCShellExecutor implements ShellExecutor {
                 if (val == 1 || val == 2 || val < 0)
                     return SMSCOAMMessages.REMOVING_LIVE_ARCHIVE_TABLES_DAYS_BAD_VALUES;
                 smscPropertiesManagement.setRemovingArchiveTablesDays(val);
-
             } else if (parName.equals("hrhlrnumber")) {
-                smscPropertiesManagement.setHrHlrNumber(options[3]);
+                String hrhlrnumber = options[3];
+                if (options.length >= 6 && options[4].equals("networkid")) {
+                    int val = Integer.parseInt(options[5]);
+                    smscPropertiesManagement.setHrHlrNumber(val, hrhlrnumber);
+                } else {
+                    smscPropertiesManagement.setHrHlrNumber(hrhlrnumber);
+                }
+            } else if (parName.equals("hrsribypass")) {
+                boolean hrsribypass = Boolean.parseBoolean(options[3]);
+                if (options.length >= 6 && options[4].equals("networkid")) {
+                    int val = Integer.parseInt(options[5]);
+                    smscPropertiesManagement.setHrSriBypass(val, hrsribypass);
+                } else {
+                    smscPropertiesManagement.setHrSriBypass(hrsribypass);
+                }
 
             } else if (parName.equals("nationallanguagesingleshift")) {
                 int val = Integer.parseInt(options[3]);
@@ -766,7 +774,19 @@ public class SMSCShellExecutor implements ShellExecutor {
             if (parName.equals("esmedefaultcluster")) {
                 smscPropertiesManagement.setEsmeDefaultClusterName(null);
             } else if (parName.equals("hrhlrnumber")) {
-                smscPropertiesManagement.setHrHlrNumber("");
+                if (options.length >= 5 && options[3].equals("networkid")) {
+                    int val = Integer.parseInt(options[4]);
+                    smscPropertiesManagement.setHrHlrNumber(val, null);
+                } else {
+                    smscPropertiesManagement.setHrHlrNumber(null);
+                }
+            } else if (parName.equals("hrsribypass")) {
+                if (options.length >= 5 && options[3].equals("networkid")) {
+                    int val = Integer.parseInt(options[4]);
+                    smscPropertiesManagement.removeHrSriBypassForNetworkId(val);
+                } else {
+                    smscPropertiesManagement.removeHrSriBypassForNetworkId(0);
+                }
 
 			} else {
 				return SMSCOAMMessages.INVALID_COMMAND;
@@ -865,8 +885,6 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getSmppEncodingForGsm7());
             } else if (parName.equals("smppencodingforucs2")) {
                 sb.append(smscPropertiesManagement.getSmppEncodingForUCS2());
-//            } else if (parName.equals("hosts")) {
-//                sb.append(smscPropertiesManagement.getHosts());
             } else if (parName.equals("dbhosts")) {
                 sb.append(smscPropertiesManagement.getDbHosts());
             } else if (parName.equals("dbport")) {
@@ -881,12 +899,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 				sb.append(smscPropertiesManagement.getFetchMaxRows());
 			} else if (parName.equals("maxactivitycount")) {
 				sb.append(smscPropertiesManagement.getMaxActivityCount());
-				// } else if (parName.equals("cdrdatabaseexportduration")) {
-				// sb.append(smscPropertiesManagement.getCdrDatabaseExportDuration());
 			} else if (parName.equals("esmedefaultcluster")) {
 				sb.append(smscPropertiesManagement.getEsmeDefaultClusterName());
-//            } else if (parName.equals("smshomerouting")) {
-//                sb.append(smscPropertiesManagement.getSMSHomeRouting());
             } else if (parName.equals("correlationidlivetime")) {
                 sb.append(smscPropertiesManagement.getCorrelationIdLiveTime());
             } else if (parName.equals("sriresponselivetime")) {
@@ -930,7 +944,24 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getRemovingArchiveTablesDays());
 
             } else if (parName.equals("hrhlrnumber")) {
+                sb.append("networkId=0 - hrhlrnumber=");
                 sb.append(smscPropertiesManagement.getHrHlrNumber());
+                for (Integer key : smscPropertiesManagement.getNetworkIdVsHrHlrNumber().keySet()) {
+                    sb.append("\nnetworkId=");
+                    sb.append(key);
+                    sb.append(" - hrhlrnumber=");
+                    sb.append(smscPropertiesManagement.getNetworkIdVsHrHlrNumber().get(key));
+                }
+            } else if (parName.equals("hrsribypass")) {
+                sb.append("networkId=0 - hrsribypass=");
+                sb.append(smscPropertiesManagement.getHrSriBypass());
+                for (Integer key : smscPropertiesManagement.getNetworkIdVsHrSriBypass().keySet()) {
+                    sb.append("\nnetworkId=");
+                    sb.append(key);
+                    sb.append(" - hrsribypass=");
+                    sb.append(smscPropertiesManagement.getNetworkIdVsHrSriBypass().get(key));
+                }
+
             } else if (parName.equals("nationallanguagesingleshift")) {
                 sb.append(smscPropertiesManagement.getNationalLanguageSingleShift());
             } else if (parName.equals("nationallanguagelockingshift")) {
@@ -1163,8 +1194,30 @@ public class SMSCShellExecutor implements ShellExecutor {
             sb.append(smscPropertiesManagement.getRemovingLiveTablesDays());
             sb.append("\n");
 
-            sb.append("hrhlrnumber = ");
+            sb.append("hrhlrnumber : ");
+            sb.append("networkId=0 - hrhlrnumber=");
             sb.append(smscPropertiesManagement.getHrHlrNumber());
+            for (Integer key : smscPropertiesManagement.getNetworkIdVsHrHlrNumber().keySet()) {
+                if (key != null) {
+                    sb.append("\nnetworkId=");
+                    sb.append(key);
+                    sb.append(" - hrhlrnumber=");
+                    sb.append(smscPropertiesManagement.getNetworkIdVsHrHlrNumber().get(key));
+                }
+            }
+            sb.append("\n");
+
+            sb.append("hrsribypass : ");
+            sb.append("networkId=0 - hrsribypass=");
+            sb.append(smscPropertiesManagement.getHrSriBypass());
+            for (Integer key : smscPropertiesManagement.getNetworkIdVsHrSriBypass().keySet()) {
+                if (key != null) {
+                    sb.append("\nnetworkId=");
+                    sb.append(key);
+                    sb.append(" - hrsribypass=");
+                    sb.append(smscPropertiesManagement.getNetworkIdVsHrSriBypass().get(key));
+                }
+            }
             sb.append("\n");
 
             sb.append("nationallanguagesingleshift = ");

@@ -249,8 +249,26 @@ public interface SmscPropertiesManagementMBean {
 
     public String getHrHlrNumber();
 
+    public String getHrHlrNumber(int networkId);
+
+    public Map<Integer, String> getNetworkIdVsHrHlrNumber();
+
     public void setHrHlrNumber(String hrHlrNumber);
 
+    public void setHrHlrNumber(int networkId, String hrHlrNumber);
+
+    public boolean getHrSriBypass();
+
+    public boolean getHrSriBypass(int networkId);
+
+    public Map<Integer, Boolean> getNetworkIdVsHrSriBypass();
+
+    public void setHrSriBypass(boolean hrSriBypass);
+
+    public void setHrSriBypass(int networkId, boolean hrSriBypass);
+
+    public void removeHrSriBypassForNetworkId(int networkId);
+    
     public int getNationalLanguageSingleShift();
 
     public void setNationalLanguageSingleShift(int nationalLanguageSingleShift);

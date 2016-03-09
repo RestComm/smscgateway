@@ -107,6 +107,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String REMOVING_ARCHIVE_TABLES_DAYS = "removingArchiveTablesDays";
     private static final String MO_UNKNOWN_TYPE_OF_NUMBER_PREFIX = "moUnknownTypeOfNumberPrefix";
     private static final String HR_HLR_NUMBER = "hrHlrNumber";
+    private static final String HR_HLR_NUMBER_LIST = "hrHlrNumberList";
+    private static final String HR_SRI_BYPASS = "hrSriBypass";
+    private static final String HR_SRI_BYPASS_LIST = "hrSriBypassList";
     private static final String NATIONAL_LANGUAGE_SINGLE_SHIFT = "nationalLanguageSingleShift";
     private static final String NATIONAL_LANGUAGE_LOCKING_SHIFT = "nationalLanguageLockingShift";
 
@@ -273,6 +276,11 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // this address will be inserted as CalledPartyAddress SCCP into all SRI
     // outgoing requests
     private String hrHlrNumber = "";
+    private FastMap<Integer, String> networkIdVsHrHlrNumber = new FastMap<Integer, String>();
+
+    // if true - SRI request to local HLR will be skipped
+    private boolean hrSriBypass = false;
+    private FastMap<Integer, Boolean> networkIdVsHrSriBypass = new FastMap<Integer, Boolean>();
 
     // national single and locking shift tables for the case when a message is SMPP originated and does not have included UDH
     private int nationalLanguageSingleShift = 0;
@@ -835,8 +843,69 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         return hrHlrNumber;
     }
 
+    public String getHrHlrNumber(int networkId) {
+        String res = networkIdVsHrHlrNumber.get(networkId);
+        if (res != null)
+            return res;
+        else
+            return hrHlrNumber;
+    }
+
+    public Map<Integer, String> getNetworkIdVsHrHlrNumber() {
+        return networkIdVsHrHlrNumber;
+    }
+
     public void setHrHlrNumber(String hrHlrNumber) {
-        this.hrHlrNumber = hrHlrNumber;
+        this.setHrHlrNumber(0, hrHlrNumber);
+    }
+
+    public void setHrHlrNumber(int networkId, String hrHlrNumber) {
+        if (networkId == 0) {
+            this.hrHlrNumber = hrHlrNumber;
+        } else {
+            if (hrHlrNumber == null || hrHlrNumber.equals("") || hrHlrNumber.equals("0")) {
+                this.networkIdVsHrHlrNumber.remove(networkId);
+            } else {
+                this.networkIdVsHrHlrNumber.put(networkId, hrHlrNumber);
+            }
+        }
+
+        this.store();
+    }
+
+    public boolean getHrSriBypass() {
+        return hrSriBypass;
+    }
+
+    public boolean getHrSriBypass(int networkId) {
+        Boolean res = networkIdVsHrSriBypass.get(networkId);
+        if (res != null)
+            return res;
+        else
+            return hrSriBypass;
+    }
+
+    public Map<Integer, Boolean> getNetworkIdVsHrSriBypass() {
+        return networkIdVsHrSriBypass;
+    }
+
+    public void setHrSriBypass(boolean hrSriBypass) {
+        this.setHrSriBypass(0, hrSriBypass);
+    }
+
+    public void setHrSriBypass(int networkId, boolean hrSriBypass) {
+        if (networkId == 0) {
+            this.hrSriBypass = hrSriBypass;
+        } else {
+            this.networkIdVsHrSriBypass.put(networkId, hrSriBypass);
+        }
+
+        this.store();
+    }
+
+    public void removeHrSriBypassForNetworkId(int networkId) {
+        this.networkIdVsHrSriBypass.remove(networkId);
+
         this.store();
     }
 
@@ -1005,6 +1074,29 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.removingLiveTablesDays, REMOVING_LIVE_TABLES_DAYS, Integer.class);
             writer.write(this.removingArchiveTablesDays, REMOVING_ARCHIVE_TABLES_DAYS, Integer.class);
             writer.write(this.hrHlrNumber, HR_HLR_NUMBER, String.class);
+            if (networkIdVsHrHlrNumber.size() > 0) {
+                ArrayList<HrHlrNumberNetworkIdElement> al = new ArrayList<HrHlrNumberNetworkIdElement>();
+                for (Entry<Integer, String> val : networkIdVsHrHlrNumber.entrySet()) {
+                    HrHlrNumberNetworkIdElement el = new HrHlrNumberNetworkIdElement();
+                    el.networkId = val.getKey();
+                    el.hrHlrNumber = val.getValue();
+                    al.add(el);
+                }
+                SmscPropertiesManagement_HrHlrNumberNetworkId al2 = new SmscPropertiesManagement_HrHlrNumberNetworkId(al);
+                writer.write(al2, HR_HLR_NUMBER_LIST, SmscPropertiesManagement_HrHlrNumberNetworkId.class);
+            }
+            writer.write(this.hrSriBypass, HR_SRI_BYPASS, Boolean.class);
+            if (networkIdVsHrSriBypass.size() > 0) {
+                ArrayList<HrSriBypassNetworkIdElement> al = new ArrayList<HrSriBypassNetworkIdElement>();
+                for (Entry<Integer, Boolean> val : networkIdVsHrSriBypass.entrySet()) {
+                    HrSriBypassNetworkIdElement el = new HrSriBypassNetworkIdElement();
+                    el.networkId = val.getKey();
+                    el.hrSriBypass = val.getValue();
+                    al.add(el);
+                }
+                SmscPropertiesManagement_HrSriBypassNetworkId al2 = new SmscPropertiesManagement_HrSriBypassNetworkId(al);
+                writer.write(al2, HR_SRI_BYPASS_LIST, SmscPropertiesManagement_HrSriBypassNetworkId.class);
+            }
 
             writer.write(this.nationalLanguageSingleShift, NATIONAL_LANGUAGE_SINGLE_SHIFT, Integer.class);
             writer.write(this.nationalLanguageLockingShift, NATIONAL_LANGUAGE_LOCKING_SHIFT, Integer.class);
@@ -1140,6 +1232,25 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             vals = reader.read(HR_HLR_NUMBER, String.class);
             if (vals != null)
                 this.hrHlrNumber = vals;
+            SmscPropertiesManagement_HrHlrNumberNetworkId al2 = reader.read(HR_HLR_NUMBER_LIST, SmscPropertiesManagement_HrHlrNumberNetworkId.class);
+            networkIdVsHrHlrNumber.clear();
+            if (al2 != null) {
+                for (HrHlrNumberNetworkIdElement elem : al2.getData()) {
+                    networkIdVsHrHlrNumber.put(elem.networkId, elem.hrHlrNumber);
+                }
+            }
+
+            valB = reader.read(HR_SRI_BYPASS, Boolean.class);
+            if (valB != null)
+                this.hrSriBypass = valB;
+            SmscPropertiesManagement_HrSriBypassNetworkId al3 = reader.read(HR_SRI_BYPASS_LIST,
+                    SmscPropertiesManagement_HrSriBypassNetworkId.class);
+            networkIdVsHrSriBypass.clear();
+            if (al3 != null) {
+                for (HrSriBypassNetworkIdElement elem : al3.getData()) {
+                    networkIdVsHrSriBypass.put(elem.networkId, elem.hrSriBypass);
+                }
+            }
 
             val = reader.read(NATIONAL_LANGUAGE_SINGLE_SHIFT, Integer.class);
             if (val != null)
@@ -1257,8 +1368,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 		}
 	}
 
-    public static class SmscPropertiesManagement_serviceCenterGtNetworkId extends ArrayListSerializingBase<ServiceCenterGtNetworkIdElement> {
-
+    public static class SmscPropertiesManagement_serviceCenterGtNetworkId extends
+            ArrayListSerializingBase<ServiceCenterGtNetworkIdElement> {
         public SmscPropertiesManagement_serviceCenterGtNetworkId() {
             super(SC_GT_LIST, ServiceCenterGtNetworkIdElement.class);
         }
@@ -1266,6 +1377,28 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         public SmscPropertiesManagement_serviceCenterGtNetworkId(ArrayList<ServiceCenterGtNetworkIdElement> data) {
             super(SC_GT_LIST, ServiceCenterGtNetworkIdElement.class, data);
         }
-
     }
+
+    public static class SmscPropertiesManagement_HrHlrNumberNetworkId extends
+            ArrayListSerializingBase<HrHlrNumberNetworkIdElement> {
+        public SmscPropertiesManagement_HrHlrNumberNetworkId() {
+            super(HR_HLR_NUMBER_LIST, HrHlrNumberNetworkIdElement.class);
+        }
+
+        public SmscPropertiesManagement_HrHlrNumberNetworkId(ArrayList<HrHlrNumberNetworkIdElement> data) {
+            super(HR_HLR_NUMBER_LIST, HrHlrNumberNetworkIdElement.class, data);
+        }
+    }
+
+    public static class SmscPropertiesManagement_HrSriBypassNetworkId extends
+            ArrayListSerializingBase<HrSriBypassNetworkIdElement> {
+        public SmscPropertiesManagement_HrSriBypassNetworkId() {
+            super(HR_SRI_BYPASS_LIST, HrSriBypassNetworkIdElement.class);
+        }
+
+        public SmscPropertiesManagement_HrSriBypassNetworkId(ArrayList<HrSriBypassNetworkIdElement> data) {
+            super(HR_SRI_BYPASS_LIST, HrSriBypassNetworkIdElement.class, data);
+        }
+    }
+
 }

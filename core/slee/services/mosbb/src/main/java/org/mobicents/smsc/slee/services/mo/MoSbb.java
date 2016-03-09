@@ -1289,6 +1289,7 @@ public abstract class MoSbb extends MoCommonSbb {
 
             smsSet.setNetworkId(networkId);
             smsSet.setCorrelationId(civ.getCorrelationID());
+
             smsSet.addSms(sms);
         }
         sms.setSmsSet(smsSet);

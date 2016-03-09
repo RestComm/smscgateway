@@ -376,7 +376,8 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
         // this.mapParameterFactory.creat
 
         String hlrAddress = destinationAddress;
-        if (smscPropertiesManagement.getHrHlrNumber() != null && smscPropertiesManagement.getHrHlrNumber().length() > 0) {
+        if (smscPropertiesManagement.getHrHlrNumber(networkId) != null
+                && smscPropertiesManagement.getHrHlrNumber().length() > 0) {
             hlrAddress = smscPropertiesManagement.getHrHlrNumber();
         }
         SccpAddress destinationAddr = this.convertAddressFieldToSCCPAddress(hlrAddress, ton, npi);
@@ -433,7 +434,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
         HrSriClientSbbLocalObject local = (HrSriClientSbbLocalObject) super.sbbContext.getSbbLocalObject();
         HrSriResultInterface parent = (HrSriResultInterface) local.getParent();
-        parent.onSriSuccess(correlationIdValue);
+        parent.onSriSuccess(correlationIdValue, false);
     }
 
     private void returnSriFailure(CorrelationIdValue correlationIdValue, MAPErrorMessage errorResponse, String cause) {
