@@ -2,7 +2,7 @@ Name
 	smsc remove hrhlrnumber
 
 SYNOPSIS
-	smsc remove hrhlrnumber 
+	smsc remove hrhlrnumber networkid <networkId>
 
 DESCRIPTION
 	This command is used to remove the value configured for the parameter 
@@ -21,8 +21,14 @@ DESCRIPTION
 	'SendRoutingInfo' request will be set to the destination MSISDN of a 
 	subscriber.
 
+	networkId - specifies a virtual SS7 subnetwork (this is for Multi-tenancy
+	support). By using of this command with different networkIds you can
+	specify hrhlrnumber for several subnetworks. 
+	If this parameter is skipped - networkId will be set to "0".
+
 EXAMPLES
 	smsc remove hrhlrnumber
+	smsc remove hrhlrnumber networkid 1
 
 SEE ALSO
 	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,

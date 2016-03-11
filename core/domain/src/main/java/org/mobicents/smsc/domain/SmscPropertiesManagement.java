@@ -844,11 +844,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     }
 
     public String getHrHlrNumber(int networkId) {
-        String res = networkIdVsHrHlrNumber.get(networkId);
-        if (res != null)
-            return res;
-        else
+        if (networkId == 0)
             return hrHlrNumber;
+        else
+            return networkIdVsHrHlrNumber.get(networkId);
     }
 
     public Map<Integer, String> getNetworkIdVsHrHlrNumber() {

@@ -606,9 +606,9 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 		// this.mapParameterFactory.creat
 
         String hlrAddress = destinationAddress;
-        if (smscPropertiesManagement.getHrHlrNumber(networkId) != null
-                && smscPropertiesManagement.getHrHlrNumber().length() > 0) {
-            hlrAddress = smscPropertiesManagement.getHrHlrNumber();
+        String hrHlrNumber = smscPropertiesManagement.getHrHlrNumber(networkId);
+        if (hrHlrNumber != null && hrHlrNumber.length() > 0) {
+            hlrAddress = hrHlrNumber;
         }
         SccpAddress destinationAddr = this.convertAddressFieldToSCCPAddress(hlrAddress, ton, npi);
 
