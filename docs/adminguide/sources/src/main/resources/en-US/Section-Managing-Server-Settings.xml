@@ -977,28 +977,37 @@ EXAMPLES
 			<section id="set_hrhlrnumber_sri_CLI">
 			<title>Using CLI</title>
 <para>
-You can set a pre-configured HLR address for SRI messages by issuing the command <command>smsc set hrhlrnumber</command> with appropriate parameters as described below. You can remove this pre-configured address by issuing the command <command>smsc remove hrhlrnumber</command>. You can verify this by issuing the command <command>smsc get hrhlrnumber</command> which will display the value set for this property.
+You can set a pre-configured HLR address for SRI messages by issuing the command <command>smsc set hrhlrnumber</command> with appropriate parameters as described below.
+You can remove this pre-configured address by issuing the command <command>smsc remove hrhlrnumber</command>.
+You can verify this by issuing the command <command>smsc get hrhlrnumber</command> which will display the value set for this property.
 </para>
 <screen><![CDATA[
 Name
 	smsc set hrhlrnumber
+	smsc remove hrhlrnumber
 
 SYNOPSIS
-	smsc set hrhlrnumber <hlr GT digits>
+	smsc set hrhlrnumber <hlr GT digits> networkid <networkId>
+	smsc remove hrhlrnumber networkid <networkId>
 
 DESCRIPTION
 	This command is used to set a pre-configured HLR address for SRI messages.
-	
+
 	In some scenarios it may be required to set a HLR address instead of a
 	MSISDN address into the SCCP 'CalledPartyAddress' of 'SendRoutingInfo'
 	requests issued by the SMSC GW in both mobile terminated and home routing
 	modes. In such cases, you must set this parameter 'hrhlrnumber' to a 
 	pre-configured HLR address. 
-	
+
 	For all other scenarios where this is not required, you may leave this
 	parameter empty. When this is empty, the SCCP 'CalledPartyAddress' of 
 	'SendRoutingInfo' request will be set to the destination MSISDN of a 
 	subscriber.
+
+	networkId - specifies a virtual SS7 subnetwork (this is for Multi-tenancy
+	support). By using of this command with different networkIds you can
+	specify hrhlrnumber for several subnetworks. 
+	If this parameter is skipped - networkId will be set to "0".
 ]]></screen>
 			</section>
 			<section id="set_hrhlrnumber_sri_GUI">
@@ -1009,7 +1018,8 @@ DESCRIPTION
 				</para></step>
 				<step><para>The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing. Switch to the 'SS7 Settings' tab in the GUI.
 				</para></step>
-				<step><para>You can specify (set or remove) the Pre-configured HLR address for SRI messages by entering appropriate values. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section. 
+				<step><para>You can specify (set or remove) the Pre-configured HLR address for SRI messages by entering appropriate values for a specified networkID.
+				For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section. 
 				</para></step>
 				<step><para>You must click on the button 'Apply Changes' at the top of the window to save your settings. If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 				</para></step>
@@ -2038,45 +2048,97 @@ EXAMPLES
             </section>
 
 
-
-<!---
-            <section id="updateccmccmnstable">
-            <title>Loading of correlation table between CountryCodes and MCC-MNC codes</title>
-            <section id="updateccmccmnstable_CLI">
+            <section id="hrSriBypass">
+            <title>Bypassing of SRI request to a local HLR</title>
+            <section id="hrSriBypass_CLI">
             <title>Using CLI</title>
 <para>
-This command forces of loading of a SmscManagement_cc_mccmnc.xml table with correlations between CouintryCodes and MCC-MNC codes for correlationId creating (for home routing mode).
+SMSC GW home routing procedure for each networkId area can be configured to send or do not send SendRoutinInfo request to a local HLR.
+This is configured by parameter "hrsribypass". Default value is "false" - this means that SMSC GW will send SRI requests to local HLR before sending back SRI response.
+	<variablelist>
+	<title>Messageflow for home routing procedure when hrsribypass==false</title>
+	<varlistentry>
+	<listitem><para>SRI request:  remote SMSC GW -> Telscale SMSC GW</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<listitem><para>SRI request:  Telscale SMSC GW -> local HLR</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<listitem><para>SRI response: local HLR -> Telscale SMSC GW</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<listitem><para>SRI response: Telscale SMSC GW -> remote SMSC GW</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<listitem><para>MT request:   remote SMSC GW -> Telscale SMSC GW</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<listitem><para>MT response:  Telscale SMSC GW -> remote SMSC GW</para></listitem>
+	</varlistentry>
+	</variablelist>
+
+	<variablelist>
+	<title>Messageflow for home routing procedure when hrsribypass==true (SRI request to local HLR bypassing)</title>
+	<varlistentry>
+	<listitem><para>SRI request:  remote SMSC GW -> Telscale SMSC GW</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<listitem><para>SRI response: Telscale SMSC GW -> remote SMSC GW</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<listitem><para>MT request:   remote SMSC GW -> Telscale SMSC GW</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	<listitem><para>MT response:  Telscale SMSC GW -> remote SMSC GW</para></listitem>
+	</varlistentry>
+	</variablelist>
+You can set the 'hrsribypass' option by issuing the command
+<command>smsc set hrsribypass</command> with appropriate parameters as described below.
+You can verify this by issuing the command <command>smsc get hrsribypass</command> which will display the value set for this property.
 </para>
 <screen><![CDATA[
 Name
-    smsc updateccmccmnstable
+    smsc set hrsribypass
 
 SYNOPSIS
-    smsc updateccmccmnstable
+    smsc set hrsribypass <digital option> networkid <networkId>
 
 DESCRIPTION
-    Use this command after updating of content of cc_mccmnc.xml
-    for SMSC GW will reload it from a disc.
+    This command is used to set if SMSC GW will
+    bypass a SRI to a local HLR.
+
+	networkId - specifies a virtual SS7 subnetwork (this is for Multi-tenancy
+	support). By using of this command with different networkIds you can
+	specify hrsribypass for several subnetworks. 
+	If this parameter is skipped - networkId will be set to "0".
+	If you have not specified hrsribypass parameter for a networkId
+	then a master hrsribypass will be used (that was specified for
+	networkId 0).
+
+    Default value: false.
 
 EXAMPLES
-    smsc updateccmccmnstable
+    smsc set hrsribypass true
+    smsc set hrsribypass false networkid <networkId>
 ]]></screen>
             </section>
-            <section id="updateccmccmnstable_GUI">
+            <section id="hrSriBypass_GUI">
             <title>Using GUI</title>
             <procedure>
-                <title>Loading of correlation table between CountryCodes and MCC-MNC codes using the GUI</title>
+                <title>Setting of living time of elements in correlation cache using the GUI</title>
                 <step><para>In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
                 </para></step>
-                <step><para>The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing. Switch to the 'Properties' tab in the GUI.
+                <step><para>The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+                Switch to the 'Home Routing' tab in the GUI.
                 </para></step>
-                <step><para>You can specify CDR generation option by selecting an appropriate value in the field "Load of correlation table". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section. 
+                <step><para>You can specify hrsribypass option by selecting an appropriate value in the field "Bypassing of SRI request to a local HLR" for a specified networkId.
+                For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+                </para></step>
+                <step><para>You must click on the button 'Save' at the top of the window to save your settings. If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
                 </para></step>
             </procedure>
             </section>
             </section>
--->
-
 
 
             <section id="hrccmccmnc_add">
