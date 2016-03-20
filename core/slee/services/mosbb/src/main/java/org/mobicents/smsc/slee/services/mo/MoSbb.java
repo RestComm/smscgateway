@@ -1394,7 +1394,7 @@ public abstract class MoSbb extends MoCommonSbb {
                             if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
                                 try {
                                     sms.setStoringAfterFailure(true);
-                                    this.scheduler.injectSmsOnFly(sms.getSmsSet());
+                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                                 } catch (Exception e) {
                                     throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
                                             + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);

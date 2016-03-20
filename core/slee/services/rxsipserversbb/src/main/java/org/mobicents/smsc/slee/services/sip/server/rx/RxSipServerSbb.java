@@ -308,7 +308,7 @@ public abstract class RxSipServerSbb implements Sbb {
                                     boolean storeAndForwMode = MessageUtil.isStoreAndForward(smst);
                                     if (!storeAndForwMode) {
                                         try {
-                                            this.scheduler.injectSmsOnFly(smst.getSmsSet());
+                                            this.scheduler.injectSmsOnFly(smst.getSmsSet(), true);
                                         } catch (Exception e) {
                                             this.logger.severe(
                                                     "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
@@ -318,7 +318,7 @@ public abstract class RxSipServerSbb implements Sbb {
                                         if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
                                             try {
                                                 smst.setStoringAfterFailure(true);
-                                                this.scheduler.injectSmsOnFly(smst.getSmsSet());
+                                                this.scheduler.injectSmsOnFly(smst.getSmsSet(), true);
                                             } catch (Exception e) {
                                                 this.logger.severe(
                                                         "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
@@ -371,7 +371,7 @@ public abstract class RxSipServerSbb implements Sbb {
 								boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
 								if (!storeAndForwMode) {
 									try {
-										this.scheduler.injectSmsOnFly(receipt.getSmsSet());
+										this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
 									} catch (Exception e) {
 										this.logger.severe(
 												"Exception when runnung injectSmsOnFly() for receipt in handleSmsResponse(): "
@@ -381,7 +381,7 @@ public abstract class RxSipServerSbb implements Sbb {
 									if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
 										try {
 											receipt.setStoringAfterFailure(true);
-											this.scheduler.injectSmsOnFly(receipt.getSmsSet());
+											this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
 										} catch (Exception e) {
 											this.logger.severe(
 													"Exception when runnung injectSmsOnFly() for receipt in handleSmsResponse(): "
@@ -871,7 +871,7 @@ public abstract class RxSipServerSbb implements Sbb {
                                 boolean storeAndForwMode = MessageUtil.isStoreAndForward(smst);
                                 if (!storeAndForwMode) {
                                     try {
-                                        this.scheduler.injectSmsOnFly(smst.getSmsSet());
+                                        this.scheduler.injectSmsOnFly(smst.getSmsSet(), true);
                                     } catch (Exception e) {
                                         this.logger.severe(
                                                 "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
@@ -881,7 +881,7 @@ public abstract class RxSipServerSbb implements Sbb {
                                     if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
                                         try {
                                             smst.setStoringAfterFailure(true);
-                                            this.scheduler.injectSmsOnFly(smst.getSmsSet());
+                                            this.scheduler.injectSmsOnFly(smst.getSmsSet(), true);
                                         } catch (Exception e) {
                                             this.logger.severe(
                                                     "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
@@ -933,7 +933,7 @@ public abstract class RxSipServerSbb implements Sbb {
 								boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
 								if (!storeAndForwMode) {
 									try {
-										this.scheduler.injectSmsOnFly(receipt.getSmsSet());
+										this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
 									} catch (Exception e) {
 										this.logger.severe(
 												"Exception when runnung injectSmsOnFly() for receipt in onDeliveryError(): "
@@ -943,7 +943,7 @@ public abstract class RxSipServerSbb implements Sbb {
 									if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
 										try {
 											receipt.setStoringAfterFailure(true);
-											this.scheduler.injectSmsOnFly(receipt.getSmsSet());
+											this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
 										} catch (Exception e) {
 											this.logger.severe(
 													"Exception when runnung injectSmsOnFly() for receipt in onDeliveryError(): "

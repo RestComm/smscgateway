@@ -88,8 +88,8 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 		this.schedulerRaSbbInterface = new SchedulerRaSbbInterface() {
 
             @Override
-            public void injectSmsOnFly(SmsSet smsSet) throws Exception {
-                doInjectSmsOnFly(smsSet);
+            public void injectSmsOnFly(SmsSet smsSet, boolean callFromSbb) throws Exception {
+                doInjectSmsOnFly(smsSet, callFromSbb);
             }
 
             @Override
@@ -509,7 +509,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 		this.decrementActivityCount();
 	}
 
-    public void doInjectSmsOnFly(SmsSet smsSet) throws Exception {
+    public void doInjectSmsOnFly(SmsSet smsSet, boolean callFromSbb) throws Exception {
         SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
 
         if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
@@ -519,7 +519,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
                 return;
         }
 
-        doInjectSms(smsSet, true);
+        doInjectSms(smsSet, callFromSbb);
     }
 
     public void doInjectSmsDatabase(SmsSet smsSet) throws Exception {
@@ -634,7 +634,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
                                             boolean storeAndForwMode = MessageUtil.isStoreAndForward(smst);
                                             if (!storeAndForwMode) {
                                                 try {
-                                                    this.schedulerRaSbbInterface.injectSmsOnFly(smst.getSmsSet());
+                                                    this.schedulerRaSbbInterface.injectSmsOnFly(smst.getSmsSet(), false);
                                                 } catch (Exception e) {
                                                     this.tracer.severe(
                                                             "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
@@ -644,7 +644,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
                                                 if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
                                                     try {
                                                         smst.setStoringAfterFailure(true);
-                                                        this.schedulerRaSbbInterface.injectSmsOnFly(smst.getSmsSet());
+                                                        this.schedulerRaSbbInterface.injectSmsOnFly(smst.getSmsSet(), false);
                                                     } catch (Exception e) {
                                                         this.tracer.severe(
                                                                 "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
@@ -694,7 +694,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
                                             boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
                                             if (!storeAndForwMode) {
                                                 try {
-                                                    this.schedulerRaSbbInterface.injectSmsOnFly(receipt.getSmsSet());
+                                                    this.schedulerRaSbbInterface.injectSmsOnFly(receipt.getSmsSet(), false);
                                                 } catch (Exception e) {
                                                     this.tracer.severe(
                                                             "Exception when runnung injectSmsOnFly() for receipt in doInjectSmsDatabase(): " + e.getMessage(),
@@ -704,7 +704,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
                                                 if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
                                                     try {
                                                         receipt.setStoringAfterFailure(true);
-                                                        this.schedulerRaSbbInterface.injectSmsOnFly(receipt.getSmsSet());
+                                                        this.schedulerRaSbbInterface.injectSmsOnFly(receipt.getSmsSet(), false);
                                                     } catch (Exception e) {
                                                         this.tracer.severe(
                                                                 "Exception when runnung injectSmsOnFly() for receipt in doInjectSmsDatabase(): "

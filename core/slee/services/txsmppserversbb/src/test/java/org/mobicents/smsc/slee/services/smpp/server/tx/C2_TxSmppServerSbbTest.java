@@ -974,7 +974,7 @@ public class C2_TxSmppServerSbbTest {
     private class SchedulerResourceAdaptorProxy implements SchedulerRaSbbInterface {
 
         @Override
-        public void injectSmsOnFly(SmsSet smsSet) throws Exception {
+        public void injectSmsOnFly(SmsSet smsSet, boolean callFromSbb) throws Exception {
             // TODO Auto-generated method stub
 
         }

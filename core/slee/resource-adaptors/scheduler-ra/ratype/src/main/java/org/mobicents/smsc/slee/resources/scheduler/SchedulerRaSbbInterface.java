@@ -31,7 +31,7 @@ import org.mobicents.smsc.library.SmsSet;
  */
 public interface SchedulerRaSbbInterface {
 
-    public void injectSmsOnFly(SmsSet smsSet) throws Exception;
+    public void injectSmsOnFly(SmsSet smsSet, boolean callFromSbb) throws Exception;
 
     public void injectSmsDatabase(SmsSet smsSet) throws Exception;
 

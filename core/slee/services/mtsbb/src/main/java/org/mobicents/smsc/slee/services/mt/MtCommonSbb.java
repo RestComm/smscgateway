@@ -631,7 +631,7 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
                                 boolean storeAndForwMode = MessageUtil.isStoreAndForward(smst);
                                 if (!storeAndForwMode) {
                                     try {
-                                        this.scheduler.injectSmsOnFly(smst.getSmsSet());
+                                        this.scheduler.injectSmsOnFly(smst.getSmsSet(), true);
                                     } catch (Exception e) {
                                         this.logger.severe(
                                                 "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages in onDeliveryError(): "
@@ -641,7 +641,7 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
                                     if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
                                         try {
                                             smst.setStoringAfterFailure(true);
-                                            this.scheduler.injectSmsOnFly(smst.getSmsSet());
+                                            this.scheduler.injectSmsOnFly(smst.getSmsSet(), true);
                                         } catch (Exception e) {
                                             this.logger.severe(
                                                     "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages in onDeliveryError(): "
@@ -692,7 +692,7 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
                                 boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
                                 if (!storeAndForwMode) {
                                     try {
-                                        this.scheduler.injectSmsOnFly(receipt.getSmsSet());
+                                        this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
                                     } catch (Exception e) {
                                         this.logger.severe("Exception when runnung injectSmsOnFly() for receipt in onDeliveryError(): " + e.getMessage(), e);
                                     }
@@ -700,7 +700,7 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
                                     if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
                                         try {
                                             receipt.setStoringAfterFailure(true);
-                                            this.scheduler.injectSmsOnFly(receipt.getSmsSet());
+                                            this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
                                         } catch (Exception e) {
                                             this.logger
                                                     .severe("Exception when runnung injectSmsOnFly() for receipt in onDeliveryError(): " + e.getMessage(), e);
@@ -800,7 +800,7 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
                             boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
                             if (!storeAndForwMode) {
                                 try {
-                                    this.scheduler.injectSmsOnFly(receipt.getSmsSet());
+                                    this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
                                 } catch (Exception e) {
                                     this.logger.severe(
                                             "Exception when runnung injectSmsOnFly() for receipt in onImsiDrop(): "
@@ -810,7 +810,7 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
                                 if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
                                     try {
                                         receipt.setStoringAfterFailure(true);
-                                        this.scheduler.injectSmsOnFly(receipt.getSmsSet());
+                                        this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
                                     } catch (Exception e) {
                                         this.logger.severe(
                                                 "Exception when runnung injectSmsOnFly() for receipt in onImsiDrop(): "
