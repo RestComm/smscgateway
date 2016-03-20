@@ -2,7 +2,7 @@
 <deployment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns="urn:jboss:bean-deployer:2.0">
 
-
+<!--
 	<bean name="SCTPManagement" class="org.mobicents.protocols.sctp.ManagementImpl">
 		<constructor>
 			<parameter>SCTPManagement</parameter>
@@ -22,6 +22,8 @@
 			</map>
 		</property>
 	</bean>
+-->
+
 	<!-- ==================================================================== -->
 	<!-- M3UA -->
 	<!-- M3UAManagement is managing the m3ua side commands -->
@@ -34,6 +36,7 @@
 		</constructor>
 	</bean>
 
+<!--
 	<bean name="Mtp3UserPart"
 		class="org.mobicents.protocols.ss7.m3ua.impl.M3UAManagementImpl">
 		<constructor>
@@ -61,6 +64,7 @@
 			</map>
 		</property>
 	</bean>
+-->
 
 	<!-- ==================================================================== -->
 	<!-- Scheduler -->
@@ -79,7 +83,6 @@
 	<!-- ==================================================================== -->
 	<!-- Dialogic Mtp3UserPart -->
 	<!-- ==================================================================== -->
-<!--
 	<bean name="Mtp3UserPart"
 		class="org.mobicents.ss7.hardware.dialogic.DialogicMtp3UserPart">
 		<constructor>
@@ -87,8 +90,7 @@
 		</constructor>
 		<property name="sourceModuleId">61</property>
 		<property name="destinationModuleId">34</property>
-	</bean> 
--->
+	</bean>
 
 	<!-- ==================================================================== -->
 	<!-- SCCP Service -->
@@ -163,8 +165,10 @@
 				<list class="javolution.util.FastList"
 					elementClass="org.mobicents.ss7.management.console.ShellExecutor">
 					<inject bean="SccpExecutor" />
+<!--
 					<inject bean="M3UAShellExecutor" />
 					<inject bean="SCTPShellExecutor" />
+-->
 					<inject bean="TcapExecutor" />
                     <inject bean="SmppShellExecutor" />
                     <inject bean="SMSCShellExecutor" />
@@ -283,6 +287,7 @@
 		<property name="persistDir">${jboss.server.data.dir}</property>
 	</bean>			
 
+<!--
  	<bean name="RestCommSctpManagement" class="org.mobicents.protocols.ss7.oam.common.sctp.SctpManagementJmx">
 		<constructor>
 			<parameter><inject bean="Ss7Management" /></parameter>
@@ -296,6 +301,7 @@
 			<parameter><inject bean="Mtp3UserPart" /></parameter>
 		</constructor>
 	</bean>	
+-->
 
 	<bean name="RestCommSccpManagement" class="org.mobicents.protocols.ss7.oam.common.sccp.SccpManagementJmx">
 		<constructor>
