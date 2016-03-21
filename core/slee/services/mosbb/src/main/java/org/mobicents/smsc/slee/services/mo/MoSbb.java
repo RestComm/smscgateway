@@ -28,7 +28,12 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.slee.ActivityContextInterface;
+import javax.slee.ActivityEndEvent;
+import javax.slee.EventContext;
 import javax.slee.InitialEventSelector;
+import javax.slee.ServiceID;
+import javax.slee.serviceactivity.ServiceActivity;
+import javax.slee.serviceactivity.ServiceStartedEvent;
 
 import javolution.util.FastList;
 
@@ -85,6 +90,7 @@ import org.mobicents.smsc.domain.StoreAndForwordMode;
 import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
+import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
@@ -1464,6 +1470,20 @@ public abstract class MoSbb extends MoCommonSbb {
             }
         }
         return ret;
+    }
+
+    public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        ServiceID serviceID = event.getService();
+        this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
+        SbbStates.setMoServiceState(true);
+    }
+
+    public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
+        if (isServiceActivity) {
+            this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
+            SbbStates.setMoServiceState(false);
+        }
     }
 
 }

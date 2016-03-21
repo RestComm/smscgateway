@@ -31,9 +31,11 @@ import javax.naming.InitialContext;
 import javax.slee.ActivityContextInterface;
 import javax.slee.ActivityEndEvent;
 import javax.slee.CreateException;
+import javax.slee.EventContext;
 import javax.slee.RolledBackContext;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
+import javax.slee.ServiceID;
 import javax.slee.facilities.TimerEvent;
 import javax.slee.facilities.TimerFacility;
 import javax.slee.facilities.TimerOptions;
@@ -42,6 +44,8 @@ import javax.slee.facilities.Tracer;
 import javax.slee.nullactivity.NullActivityContextInterfaceFactory;
 import javax.slee.nullactivity.NullActivityFactory;
 import javax.slee.resource.ResourceAdaptorTypeID;
+import javax.slee.serviceactivity.ServiceActivity;
+import javax.slee.serviceactivity.ServiceStartedEvent;
 
 import javolution.util.FastList;
 import net.java.slee.resource.diameter.base.events.avp.DiameterAvp;
@@ -73,6 +77,7 @@ import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 import org.mobicents.smsc.library.MessageUtil;
+import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
@@ -252,9 +257,9 @@ public abstract class ChargingSbb implements Sbb {
 		this.sbbContext = null;
 	}
 
-	public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci) {
-		logger.info(" Activity Ended[" + aci.getActivity() + "]");
-	}
+//	public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci) {
+//		logger.info(" Activity Ended[" + aci.getActivity() + "]");
+//	}
 
 	// Setup charging request
 
@@ -471,6 +476,20 @@ public abstract class ChargingSbb implements Sbb {
 	public abstract void setChargingData(ChargingData chargingData);
 
 	public abstract ChargingData getChargingData();
+
+    public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        ServiceID serviceID = event.getService();
+        this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
+        SbbStates.setChargingServiceState(true);
+    }
+
+    public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
+        if (isServiceActivity) {
+            this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
+            SbbStates.setChargingServiceState(false);
+        }
+    }
 
 	// Events
 

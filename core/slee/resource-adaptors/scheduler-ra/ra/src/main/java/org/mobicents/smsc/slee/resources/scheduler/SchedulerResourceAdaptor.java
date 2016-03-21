@@ -44,6 +44,7 @@ import org.mobicents.smsc.domain.StoreAndForwordMode;
 import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageUtil;
+import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.SmType;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
@@ -338,10 +339,25 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 
 	private OneWaySmsSetCollection savedOneWaySmsSetCollection = null;
 
+    private String shownServicesDownList = null;
+    private long shownServicesDownTime = 0;
+
 	// /////////////////
 	// Helper methods //
 	// /////////////////
 	protected void onTimerTick() {
+
+        // checking if all SBBs are already running
+        if (!SbbStates.isAllServicesUp()) {
+            String s1 = SbbStates.getServicesDownList();
+            if (!s1.equals(shownServicesDownList) || System.currentTimeMillis() - shownServicesDownTime > 10000) {
+                // we are displaying this message every 10 seconds or if ServicesDownList has changed
+                this.tracer.info("Not all SBB are running now: " + s1);
+                shownServicesDownList = s1;
+                shownServicesDownTime = System.currentTimeMillis();
+            }
+            return;
+        }
 
 		try {
 			// garbageCollectionTime
