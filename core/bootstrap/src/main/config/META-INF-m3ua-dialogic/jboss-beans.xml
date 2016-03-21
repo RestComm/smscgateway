@@ -82,7 +82,7 @@
 	<bean name="Mtp3UserPart_Dialogic"
 		class="org.mobicents.ss7.hardware.dialogic.DialogicMtp3UserPart">
 		<constructor>
-			<parameter>DialogicMtp3UserPart</parameter>
+			<parameter>RestComm-jSS7</parameter>
 		</constructor>
 		<property name="sourceModuleId">61</property>
 		<property name="destinationModuleId">34</property>
