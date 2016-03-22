@@ -41,7 +41,7 @@ public class CdrParser {
     }
 
     private void load(String fileName, String outName) {
-        String dest = "Creval SMS";
+        String dest = "";
 
         FastMap<String, ArrayList<Cdr>> al1 = new FastMap<String, ArrayList<Cdr>>();
         TreeMap<String, Cdr> sl2 = new TreeMap<String, Cdr>();
@@ -73,7 +73,7 @@ public class CdrParser {
                         ArrayList<Cdr> al = al1.get(from_to);
                         if (al != null && !al.isEmpty()) {
                             Cdr cdr2 = al.remove(0);
-                            if (cdr2.a_from.equals(dest))
+                            if (cdr2.a_from.startsWith(dest))
                                 sl2.put(cdr2.date, cdr2);
                         } else {
                             int gg = 0;
@@ -108,7 +108,7 @@ public class CdrParser {
             for (String s : al1.keySet()) {
                 ArrayList<Cdr> al = al1.get(s);
                 for (Cdr cdr : al) {
-                    if (cdr.a_from.equals(dest)) {
+                    if (cdr.a_from.startsWith(dest)) {
                         sl.put(cdr.date, cdr);
                     }
                 }
