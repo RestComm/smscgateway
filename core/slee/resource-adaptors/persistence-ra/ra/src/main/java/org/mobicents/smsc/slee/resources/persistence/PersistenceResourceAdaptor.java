@@ -87,7 +87,10 @@ public class PersistenceResourceAdaptor implements ResourceAdaptor {
             }
 
             public boolean isDatabaseAvailable() {
-                return dbOperations_C2.isDatabaseAvailable();
+                if (dbOperations_C2 == null)
+                    return false;
+                else
+                    return dbOperations_C2.isDatabaseAvailable();
             }
 
 		    // C1
