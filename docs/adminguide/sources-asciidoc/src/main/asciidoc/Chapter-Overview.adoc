@@ -1,0 +1,105 @@
+= Overview 
+
+[[_smsc_gateway_desc]]
+== SMSC Gateway
+
+SMSC (Short Message Service Center) is a telecommunications network facility responsible for handling the SMS operations of a wireless network.
+When a subscriber sends an SMS message from a mobile phone, the message first reaches the SMS Center which then forwards the message to the desired destination.
+The SMS Center is responsible for routing the SMS messages and regulating the process.
+If the recipient is not reachable (the phone is switched off or out of coverage area etc.) the SMS Center will store the message to a database and forward it to the recipient when available.
+Messages that are delivered successfully and messages that failed to be delivered are stored in an archive database for logging purposes.
+
+[[_mobicents_smsc_overview]]
+== {this-platform} {this-application} 
+
+{this-platform} 's implementation of SMSC Gateway is the first and only open source SMSC Gateway with a host of rich features and advantages. 
+
+
+
+Java-based:::
+  {this-platform} {this-application} is the only Java based SMSC Gateway.
+  It is robust and reliable and can be installed on any Operating System that supports Java (JDK 7 and SCTP).
+
+Open Source:::
+  The Software is open-source, giving you the freedom to understand the code and customise it to your enterprise needs.
+  It is supported by a vibrant Open source community.
+
+SS7 Hardware Cards:::
+  {this-platform} {this-application} supports E1/T1 links via SS7 cards (Dialogic SS7 cards) or Zaptel/Dahdi compatible TDM devices (Digium, Sangoma).
+
+SIGTRAN (M3UA):::
+  It also supports connectivity to MSC/HLR via SIGTRAN links (M3UA using SCTP).
+
+Charging enabled (Diameter):::
+  Pre paid based charging is enabled (optional) via Diameter Ro and Base protocol.
+  RestComm SMSC easily integrates with http://telestax.wpengine.netdna-cdn.com/wp-content/uploads/2013/07/PRODUCT-DATASHEET-TELSCALE-Convergent-Charging-Server.pdf[RestComm Convergent Charging Server] over Diameter
+
+Cloud-ready:::
+  {this-platform} {this-application} is cloud-ready and can also be deployed on a private cloud infrastructure.
+
+Easy Configuration and Management:::
+  {this-platform} {this-application} comes with an efficient Command Line Interface (CLI) tool allowing you to easily configure the gateway at run-time and manage it using simple commands rather than do everything manually. {this-platform} {this-application} also includes an efficient Web Interface administration tool for easy management and monitoring through a Web console. 
+
+Major Features:::
+{this-platform} {this-application} enables mobile operators to provide core SMSC features like subscriber to subscriber SMS messaging, broadcasting campaigns and group messaging between subscribers. 
+
+* {this-platform} {this-application} can handle mobile originated SMS and deliver them to the intended recipient (mobile, ESME or SIP). It also provides a flexible routing mechanism to route messages to/from ESME over SMPP protocol. {this-platform} {this-application} supports normal style (Server side) SMPP connection.
+  It can also act as ESME initiating connection to third party SMSC (Client side). Submit_Sm, Data_Sm, Submit_Multi and Deliver_Sm messages are supported. 
+* {this-platform} {this-application} supports SIP connection through JSLEE SIP RA. 
+* For incoming from SMPP ESME messages, {this-platform} {this-application} supports StoreAndForward, Datagramm and Transactional modes and a special ForwardAndStore mode for reducing the database load. 
++
+When a message comes from SMPP, the {this-application} checks the `EsmClass` field in the SMPP message.
+For Datagramm and Transactional modes, the SMSC will try to immediately deliver the message to a destination.
+If it is in Transactional mode, the SMSC will also return a delivery result (success/failure) to the ESME.
+Such messages are not stored in the Cassandra database.
+In case of delivery failure the message will be dropped and no more delivery attempts will be made.
++
+If the `EsmClass` field indicates StoreAndForward (or default) mode, more than one attempt will be made to deliver the message (if the first attempt fails). Such messages will be stored in the Cassandra database.
+The {this-application}  can be configured in two modes for processing of StoreAndForward messages as shown below: 
+
+StoreAndForward (normal) mode::
+  In the StoreAndForward mode, an incoming "StoreAndForward" message will always be stored in a database and scheduled for delivery after few seconds.
+  This mode is fully compliant with SMPP specification. 					
+
+ForwardAndStore (fast) mode::
+  In the ForwardAndStore mode, an incoming "StoreAndForward" message will be attempted for delivery immediately, without storing in the database and therefore without any delay.
+  If this first delivery attempt fails, the message will be stored in a database for futher scheduling. 					
+
+* Messages that come from SS7 or SIP are processed the same way as "StoreAndForward" messages that come from SMPP ESME. 
+* {this-platform} {this-application} supports Non Transparent Home Routing as explained in 3GPP Specification version 23.840 5.2.3. 
+* {this-application} has support for SSL for SMPP connection (both client and server side).  
+* {this-platform} {this-application} can be configured for congestion control to reject messages when the number of messages in processing exceeds a configurable limit (`MaxActivityCount`). 
++
+When the SMSC is configured in ForwardAndStore (fast) mode, SMPP originated messages will be first rejected.
+Then when the number of messages in processing further increases, SIP originated messages will be rejected and finally SS7 originated messages will be rejected. 
++
+When SMSC is configured in StoreAndForward (normal) mode, only datagramm and transactional SMPP originated messages will be rejected.
+However StoreAndForward messages and all SS7/SIP originated messages will be stored in the Cassandra database and the scheduling for delivery of these messages will be stopped until the number of messages in processing does not exceed the configured limit. 
+
+* {this-platform} {this-application} has a congestion control at ESME side.
+  Each ESME can be configured for rate limit per a second, a minute, a hour or a day. 
+* {this-platform} {this-application} supports ReportSMDeliveryStatus and AlertServiceCentre requests after mobile delivery failure.
+* {this-platform} {this-application} supports GSM7, GSM8 and UCS2 message encoding.
+* {this-platform} {this-application} itself splits ESME and SIP originated long length messages before delivering to mobile phones, if a message does not contain User Data headers (UDH).
+* Multi-tenancy support: {this-platform} {this-application} supports a model of message network as a splitted to several logical subnetworks and SMSC messages will be logically processed only in one of this logical subnetwork.
+  SMPP ESMEs, SCCP SAPs (Service Access Points) and SIP connector will belong to one of such subnetworks (A subnetwork is identified by a digital value - networkId). Any message that has come to SMSC GW from some port (ESME, SS7, SIP) will belong to networkId (subnetwork) from networkId of the port the message has come to SMSC.
+  Then the message will be routed into the port (ESME, SS7, SIP) which belongs to the same networkId (subnetwork). 
+* Additionally, when enabled with proper administrator privileges, {this-platform} {this-application} allows convenient group messaging between subscribers (e.g.
+  family, friends, colleagues) .
+* {this-platform} {this-application} is built on the RestComm jSS7 stack which provides advanced SCCP routing rules to map short codes to MSISDN, allowing users to send an SMS to a short-code instead of a complete MSISDN. 
+* It also enables value added services through integration with OTT social networks and microblogs such as Facebook and Twitter.
+* A single {this-platform} SMSC node can process up to 1000 SMS/sec.
+    Multiple SMSC nodes can be arranged in a cluster across one or more geographically distributed data centers to scale up throughput and provide various levels of redundancy, high availability and fault tolerance.                     
+
+{this-platform} {this-application} can be adapted to the needs of telecom service providers of different sizes in any country.
+       
+
+[[_smsc_gateway_sip]]
+== Session Initiation Protocol (SIP) Support
+
+IP Short Message Gateway (IP-SM-GW), which is in line with relevant 3GPP 23.824 specifications, acts as a bridge managing the origination and termination of SMS messages between circuit-switched and IP-based networks (over SIP). With this solution, mobile operators can make use of existing messaging platforms such as short message service centers (SMSCs) to deliver IP-based messaging.
+The IP-SM-GW is also essential for rolling out rich communication services (RCS), which enable operators to deliver sticky messaging services like presence-enabled address book, SIP-based chat services and mobile instant messaging. 
+
+RestComm SMSC has support for SIP messagaing and can send short messages from SIP to SS7 or ESME and vice-a-versa.
+RestComm SMSC can easily be integarted with RestComm RestComm via SIP to enable developers to rapidly build voice, video, WebRTC, USSD, SMS, fax and rich messaging applications.
+For more details about RestComm you may refer to, http://www.telestax.com/restcomm/[TeleStax website.]             

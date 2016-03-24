@@ -1,0 +1,26 @@
+= Introduction
+
+{this-platform} {this-application} is an Open Source Java based SMSC Gateway built on a modern extensible middleware platform and provides easy integration with any third party communication protocol and platform. {this-platform} {this-application} enables mobile operators to provide core SMSC features like subscriber to subscriber SMS messaging, broadcasting campaigns and group messagingfootnote:[Group Messaging can be achieved using  RestComm. For more details please contact info@telestax.com.] between subscribers.
+In addition it also enables value added services through integration with OTT social networks and microblogs such as Facebook and Twitter.
+ 
+
+{this-platform} {this-application} is an easy-to-install and easy-to-deploy platform that can be set up and configured very quickly.
+Since it is built on a modern and extensible JSLEE platform it automatically provides out-of-the-box integration with various communication protocols such as SIP, Diameter, HTTP, XCAP, XMPP, MGCP and others in addition to the base SMPP protocol for connectivity to ESMEs.
+ 
+
+{this-platform} {this-application} stores messages using Cassandra database.
+The database is used for storing unsent messages, messages successfully sent and messages that failed to be sent. 
+
+{this-platform} {this-application} is cloud-ready.
+It can be deployed on dedicated hardware, private cloud infrastructure or public laaS such as AWS. {this-platform} {this-application} supports TDM hardware offered by major vendors in the market, namely Intel family boards (Dialogic) and  Zaptel/Dahdi (Digium, Sangoma). 
+
+{this-platform} {this-application} is based on the robust and proven {this-platform} JAIN SLEE 1.1 Server and {this-platform} jSS7 Stack. {this-platform} JAIN SLEE Server is a highly scalable event-driven application server with a robust component model and fault tolerant execution environment.
+It provides a set of connectors to a variety of networks elements: SS7 MAP, TCAP, INAP, ISUP, SMPP, XMPP, SIP, MGCP, HTTP, XDM, XCAP, Diameter and many others.
+It is fully compliant with JSR 240 (JSLEE 1.1). {this-platform} jSS7 is a software based implementation of the SS7 protocol.
+It provides implementation for Level 2 and above in the SS7 protocol Stack. {this-platform} jSS7 Stack User Guide is bundled within and you can refer to the guide for more details on the Stack. 
+
+The Open Source Software gives you the flexibility to understand the readily available source code and the freedom to customise the product to meet your Enterprise needs.
+
+This guide provides details on configuring and using the platform and information regarding the supported protocols and compliant standards.
+For installation instructions, please refer to the Installation Guide published along with this.
+ 

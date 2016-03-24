@@ -1,0 +1,144 @@
+[[_smpp_simulator]]
+= SMPP Simulator Tool
+
+SMPP Simulator is a GUI application for testing of the SMPP connection to SMSC GW and understanding its functionality.
+The test cases will allow you to test SMSC GW with different scenarios.
+To know more about Running the SMPP Simulator please refer to <<_running_the_simulator_smpp>> in this guide. 
+
+[[_smpp_simulator_general_parameters]]
+== SMPP Simulator Tool general parameters
+
+This chapter will describe the first step of SMPP Simulator configuring - establishing a connection to SMSC GW. 
+
+Default SMPP Simulator settings fit to SMSC GW settings when SMSC GW is started in "simulator" mode.
+SMSC GW is configured in this case for a single server ESME with SystemId "test", password "test", SMPP listening port 2776, bind type "transceiver" and ESME address_range=""6666" (this means that bind_request must contain address_range "6666", all SMPP Simulator originated messages must have source address "6666" and all messages for destination "6666" address will be routed to to this ESME). SMPP Simulator must play the "client" role in this case. 
+
+If SMPP Simulator is run at the same host as SMSC GW, you can just connect as it is.
+If not you need to press "Configure" button firstly and then update "SMSC host" parameter with a proper SMSC GW IP address value and press "OK" button.
+Then to connect to SMSC GW press "Run test" button and then in the new opened window "Start a session" button.
+A message "Session has been successfully started" must occur in the upper half of the window. 
+
+If SMSC GW has other settings you need before of connecting configure SMPP Simulator.
+Press "Configure" button to see "SMPP general parameters" form.
+Then configure in a new opened form "SystemId", "Password", "SMSC host", "SMSC port" and "SMPP bind type" (TRANSCIEVER, TRANSMITTER or RECIEVER) parameters. 
+
+.SMPP Simulator "SMPP general parameters" form
+image::images/smpp-sim-03.png[]
+
+SMPP session type is usually "CLIENT". This means that SMSC GW has ESME "SERVER" type and SMPP will create TCP connection to SMSC GW ("SMSC port" is used as a SMSC GW side port). SMSC GW must be configured to allow any client port (ESME "Port" parameter must be set to "-1" value when ESME creating). When SMSC GW has ESME configured as "CLIENT", then you need to configure SMPP Simulator "SMPP Session type" as "SERVER". In this case SMPP Simulator will listen "SMSC port" port for incoming connections and SMSC GW will try to establish a TCP connection to SMPP Simulator.
+"Esme "address_range" field" means "address_range" field value that will be put into bind_submit or bind_data request to establish a connection to SMSC GW.
+ 
+
+For fine tuning you can configure SMPP values "SMPP windows size", "ConnectionTimeout", "RequestExpiryTimeout" and "WindowMonitorInterval" parameters.
+But usually it is not needed. 
+
+If you configure "Rejecting of incoming SMPP delivery messages" parameter to "true" than SMPP Simulator will reject all incoming from SMSC GW deliver_sm messages (with cause 1 - ESME_RINVMSGLEN). 
+
+After finishing of configuring press "OK" button and then to connect to SMSC GW press "Run test" button and then in the new opened window "Start a session" button.
+A message "Session has been successfully started" must occur in the upper half of the window. 
+
+.SMPP Simulator main testing form
+image::images/smpp-sim-01.png[]
+
+SMPP Simulator does not store configured values and after SMPP Simulator restart you need to configure all values again. 
+
+[[_smpp_simulator_message_parameters]]
+== SMPP Simulator Tool message parameters
+
+We will describe in this chapter how to receive and send a single message.
+Bulk message task (sending of very many messages) is described in the next chapter. 
+
+I assume that SMPP Simulator is already connected to SMSC GW. 
+
+The information of all received message will be put in the top half of the application form.
+SMPP Simulator will accept all received messages if the option "Rejecting of incoming SMPP delivery messages" is not set to true. 
+
+There is a button "Open event window" in the form which opens a new window with a selected record (in the top half of the form) full data.
+This is useful to check the content and fields of incoming messages and responses from SMSC GW. 
+
+Before message sending press to the button "Configure data for message submitting" to open "SMPP message parameters form". 
+
+.SMPP Simulator "SMPP message parameters" form
+image::images/smpp-sim-02.png[]
+
+The first point of which you must take a care is - "Source address" and "Destination address". For SMSC GW Simulator profile for SMPP Simulator address "6666" is assigned , for SIP - "5555" and all other addresses for SS7 network.
+This means that when you want to send a message to a SS7 network then you need to configure "Source address" to "6666" and "Destination address" to value other then "5555" and "6666" (for example "1111"). And when you want to send a message to a SIP connector then you need to configure "Source address" to "6666" and "Destination address" to "5555". For other cases "Source address" and "Destination address" will be others.
+For "Type of number" and "Numbering plan indicator" parameters you can leave default values ("International" and "ISDN") for most cases.
+Change them for the usage of specific numbering. 
+
+And then you can put a desired message text, press "OK" and then "Submit a message" buttons.
+A message should be submitted to SMSC GW for delivering. 
+
+Other parameters in "General" TAB of "SMPP message parameters form" allow you to specify sending message parameters.
+Here is a list of configurable parameters : 
+
+
+
+. Data coding scheme (DCS): you can configure GSM7_DCS_0 (GSM7 default encoding - that covers latin characters, digits and also some other little subset of characters), GSM8_DCS_4 (binary messages, will be encoded by ISO-8859-1 charset in SMPP part) and UCS2_DCS_8 (UCS2 messages - that covers all characters). This parameter affects to "data_coding" parameter in submit_sm message (and further encoding when delivering to SS7 network) but does not affect to message text encoding at SMPP part (For this there is another option). 
+. Message class: means a GSM message class that is encoded in DCS field in SS7 messages, encoded as Destination Address Subunit TLV optional parameter. 
+. Encoding type at SMPP part for (GSM7/UCS2) (values: Utf8 / Unicode / Gsm7): Encoding / decoding that will be applied to message text for DCS=0 (GSM7) and 8 (UCS2). For DCS=4 (GSM8) encoding is always ISO-8859-1 because of this DCS is meant as binary. 
+. Message splitting type: this option is used when we are sending a long message which must be splitted into several segments.
+  A message can we sent to SMSC GW as a single message (SMSM GW will split it itself when delivering the message to SS7 destination). Use in this case "DoNotSplit" option.
+  A message can be splitted by SMPP simulator and sent to SMSC GW by a set of several messages.
+  You can split messages by using of two possible encoding styles: "SplitWithParameters" (by using of optional Tlv parameters SAR_MSG_REF_NUM, SAR_TOTAL_SEGMENTS and SAR_SEGMENT_SEQNUM)  and "SplitWithUdh" (by using of "Concatenated short messages" User data header (UDH)). Another option is a length of each message segment - DefaultSegmentLength (each segment will have a length that is long enough to be sent to SS7 subscriber, the exact length depends on DCS) and SpecifiedSegmentLength (you have to specify a desired length in the field "Specified segment length").  
+. Validity period / Schedule delivery time: Default value is "No special" that means that neither "Validity period" nor "Schedule delivery time" will be added to a sending messages.
+  If you configure a value "ValidityPeriod_5min" then a message will be sent with "Validity period" 5 minutes from the sending time.
+  This means that SMSC GW will make delivery attempts only within 5 minutes from a message has come to SMSC GW.
+  If you configure a value "ValidityPeriod_2hours" then a message will be sent with "Validity period" 2 hours from the sending time.
+  This means that SMSC GW will make delivery attempts only within 2 hours from a message has come to SMSC GW.
+  If you configure a value "ScheduleDeliveryTime_5min" then a message will be sent with "Schedule Delivery Time" 5 minutes from the sending time.
+  This means that SMSC GW will make the first delivery attempt only in 5 minutes from a time when a message has come to SMSC GW. 
+. Message sending time: outgoing messages will be sent by submit_sm, data_sm, deliver_sm or submit_multi SMPP messages.
+  submit_sm, data_sm, and submit_multi can be used when SMPP Simulator plays an SMPP CLIENT role (the most common use). deliver_sm can be used when SMPP Simulator plays an SMPP SERVER role.
+  When usage of submit_multi message the message will be sent to several destination addresses.
+  The exact count of destination addresses is set by "Message count for for Submit_milti message" parameter (default value is 2). Destination addresses in submit_multi will be: next address is by 1 more then a previous one.
+  For example if "Destination address" has value "1111", then submit_multi destination addresses will be "1111", "1112", "1113", ... 
+. MCDeliveryReceipt request: set the SMPP field "registered_delivery" about should SMSC GW send back delivery receipts back to SMPP simulator or not.
+  Default value is "No" - no delivery receipts will be generated.
+  Other possible values: "onSuccessOrFailure" (delivery receipts will be generated in any case),  "onFailure" (delivery receipts will be generated only when delivery failure) and "onSuccess (delivery receipts will be generated only when delivery success)" 
+. Messaging mode: set the SMPP esm_class field with value "Messaging Mode". Possible values are: "storeAndForward" (default - all messages are stored into databases and several delivery attempts after failure), "datagramm" (message are not stored in a database, only one message delivery retry), "transaction" (also only one retry and no database storage but SMSC GW will return in response the result of message delivery (success / failure)), "defaultSmscMode" (one of mentioned above modes which is SMSC GW default). 	
+
+"Submit message" button initiate of sending of one message to SMSC GW.
+"Send bad packet" button sends to SMSC GW a malformed packet (for testing purposes). 
+
+[[_smpp_simulator_bulk_messages]]
+== SMPP Simulator Tool - sending of bulk messages
+
+SMPP Simulator can send bulk messages in two modes: 
+
+. A random bulk messages set 
+. Bulk messages that are taken from some PCAP trace file 	
+
+[[_smpp_simulator_bulk_messages_random]]
+=== Sending of random bulk messages
+
+Before a sending start you need to configure parameters like it is described in <<_smpp_simulator_message_parameters>> except of a destination address. 
+
+Then you need to configure extra options in the TAB "Bulk" of "SMPP Message parameters form" (to see this form press "Configure data for a message submitting" button). 
+
+"Destination address range start" and "Destination address range end" parameters describe destination addresses that will be (randomly) assigned to outgoing messages.
+If you configure start and end field with the same value all messages will be sent to the same address.
+If you configure a big range this means that most messages will be addressed to different addresses. 
+
+"Bulk messages per a second" parameter sets the rate with which messages will be sent to SMSC GW. 
+
+After setting of parameters you need to select "Random bulk messages" option and press "Start bulk sending" button.
+To stop bulk message sending press "Stop bulk sending" button.
+When a bulk message sending process no records will not be put into top half of the form (because there are too many messages when bulk sending). 
+
+When a random bulk message sending process, many messages will contain the message text that is configured.
+But some messages will be supplied by a long length message text.
+This is done for simulating of long message splitting at SMSC GW side.
+ 
+
+[[_smpp_simulator_bulk_messages_pcap]]
+=== Sending of bulk messages from a PCAP file
+
+SMPP Simulator can use for bulk messages data a source of captured SMPP traffic in a PCAP Wireshark trace data file.
+The target of this solution is a possibility to simulate some desired traffic to SMSC GW. 
+
+In order to achieve it you need to select the option "Bulk messages from pcap file", select a file name by pressing of ". . ." button, and specify "TCP port for TCAP parsing". All TCP messages which have a destination TCP port as here configured, will be seached in PCAP file, then be parsed and parsed messages will be sent to SMSC GW.
+ 
+
+After setting of parameters you need to press "Start bulk sending" button.
+To stop bulk message sending press "Stop bulk sending" button. 

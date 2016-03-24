@@ -1,0 +1,4 @@
+= Shell Commands
+
+This chapter describes the available Shell commands and provides examples of usage.
+To see examples of specific flow or to perform certain tasks, please refer to corresponding sections devoted to `Linksets`, `SCCP` or `M3UA`			 
