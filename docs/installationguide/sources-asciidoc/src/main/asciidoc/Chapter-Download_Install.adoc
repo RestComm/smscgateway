@@ -1,0 +1,132 @@
+[[_setup_downloading]]
+= Downloading and Installing
+
+Installing {this-platform} {this-application} is easy and quick with the binary download.
+You can either download the binary release or download the source code and set up from source.
+
+[[_downloading_binary]]
+== Binary Download and Installation
+
+The binary release is available for download at TeleStax Customer Support Portal &THIS.RELEASE_BINARY_URL;link: 
+
+.Procedure: Binary Download and Installation
+. Download the zip file `<filename>` to any folder of your choice. 
+. Extract the contents of the zip file. 
++
+----
+Downloads]$ unzip <filename>
+----						
+. Verify the contents of the newly created directory.
+
+[[_dir_structure]]
+== Directory Structure
+
+When you download the binary release, you will notice that the top level directory is named `mobicents-smscgateway-<version>` and immediately below this are five sub-directories as explained below: 
+
+* cassandra: Contains description of the Cassandra database tables' structure.
+* docs: Contains all relevant documentation in respective subfolders.
+* jboss-5.1.0.GA: The core server with two profiles "default" and "simulator". The "default" profile is a clean profile where you will have to start from scratch and configure the entire SS7 Stack and SMSC Gateway.
+  The "simulator" profile is a pre-configured profile to work with jss7-simulator.
+  Refer to the Admin Guide for instructions on how to start the server in either of the profiles.
+* resources: Contains SLEE MAP RA jars.
+* tools: Contains SLEE tools and SMSC test tools as explained below. 
+** RestComm-hlr-simulator: Command line HLR simulator used for load testing of SMSC.
+  RestComm-hlr-simulator is pre-configured to integrate with SMSC run in simulator profile.
+** RestComm-jss7-simulator: jSS7 Simulator that can be run in GUI or command line mode.
+  This tool is useful to test `MoForwardSM` and other such functionality of SMSC like "when subscriber absent", etc.
+  For more details on using this tool, please refer to RestComm SS7Stack User Guide.
+  RestComm-jss7-simulator is pre-configured to integrate with SMSC run in simulator profile. 
+** RestComm-smpp-load: smpp-load tool is a Command line simulator to generate SMPP load.
+  You must have `ant` installed to be able to run this tool.
+  The smpp-load tool can be started to run as a SMPP Server accepting in-coming connection (BIND) from {this-platform}  {this-application}  or run as a SMPP Client to send BIND to {this-platform}  {this-application} .
+  You can confiugre this tool by editing the [path]_build.xml_ to define how many SMPP connections should be initiated, what kind of load should be generated, etc.
+** RestComm-smpp-simulator: smpp-simulator is a GUI tool to generate SMPP load.
+  It can only initiate BIND and act as a SMPP Client. You can also use it to test other functionalities like `UCS2`, breaking `SUBMIT_SM` into multiple SMS etc. 				 
+
+----
+
+|- mobicents-smsc-<version>
+		|- cassandra
+		|- docs
+				|+ container
+				|+ jss7
+				|+ management-hq
+				|+ resources
+				|+ slee
+				|+ smsc
+				|+ tools
+		|- jboss-5.1.0.GA
+				|+ bin    //contains start up and shutdown scripts for the Server.
+				|+ client
+				|+ common
+				|+ docs
+				|+ lib
+				|- server
+					|+ default	//clean profile to set up from scratch
+					|+ simulator	//pre-configured profile to work with the jss7-simulator
+		|- resources
+				|+ diameter-base
+				|+ diameter-ro
+				|+ map
+				|+ sip11 
+		|- tools
+				|+ eclipslee
+				|+ jopr-plugin
+				|+ remote-slee-connection
+				|+ snmp
+				|+ RestComm-hlr-simulator
+				|+ RestComm-jss7-simulator
+				|+ RestComm-smpp-load
+				|+ RestComm-smpp-simulator
+				|+ twiddle
+----
+
+[[_source_code]]
+== Setup from Source 
+
+{this-platform} {this-application} is an open source project and you have the freedom to build from source.
+Building from source means you can stay on top with the latest features.
+Whilst aspects of {this-platform} {this-application} are quite  complicated, you may find ways to become contributors.
+
+{this-platform} {this-application} works with JDK1.7 or above.
+In addition you must have the following tools installed.
+ 
+
+* `Git Client` : Instructions for using GIT, including install, can be found at http://git-scm.com/book
+* `Maven 3.2.X` : Instructions for using Maven, including install, can be found at http://maven.apache.org/
+* `Ant 1.9.X` : Instructions for using Ant, including install, can be found at http://ant.apache.org
+
+
+[[_source_building]]
+=== Release Source Code Building
+
+
+. Downloading the source code
++
+Use GIT to checkout a specific release source, the base URL is {this-trunk-source-code-url}, then add the specific release version. 
++
+[source]
+----
+
+[usr]$ git clone https://userid@bitbucket.org/telestax/restcomm-smscgateway.git 
+[usr]$ cd restcomm-smscgateway
+[usr]$ git checkout <version>
+----
+
+. Building the source code
++
+Now that we have the source the next step is to build and install the source.
+ {this-platform} {this-application} uses Maven 2 to build the system.
+You must ensure that `JAVA_HOME` environment variable is set properly prior to building the source.
++
+[source]
+----
+
+[usr]$ mvn clean install
+----
+
+
+[[_trunk_source_building]]
+=== Development Trunk Source Building
+
+Similar process as for <<_source_building>>, the only change is don't switch to specific tag. 

@@ -1,0 +1,5 @@
+[[_setup_uninstalling]]
+= Uninstalling
+
+If you wish to remove {this-platform} {this-application} you can do so by deleting the installation directory.
+ 

@@ -1,0 +1,61 @@
+[[_setup_configuration]]
+= Post Installation Configuration
+
+== Memory Settings
+
+You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size. 
+
+-Xms3072m::
+  Initial heap size, set in megabytes
+
+-Xmx3072m::
+  Maximum heap size, set in megabytes
+
+== Database Settings
+
+You must ensure that you configure the database correctly before using the {this-platform} {this-application} in production.
+Cassandra has the concept of a keyspace, which is similar to a database in a RDBMS.
+You must create a keyspace by following the instructions in the procedure below:
+
+.Procedure: Create a Cassandra database (keyspace)
+. You must have the database running prior to creating the keyspace.
+For instructions on how to run Cassandra, please refer to the vendor documentation available in their website http://wiki.apache.org/cassandra/GettingStarted. 
++
+----
+
+[vinu@vinu-neha]$ cd $CASSANDRA_HOME
+[vinu@vinu-neha cassandra]$ ./bin/cassandra -f
+----     
+. When you have the database running successfully, you can proceed to creating the keyspace by making use of the cql command as below: 
++
+----
+
+[vinu@vinu-neha]$ CREATE KEYSPACE "RestCommSMSC" WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor': 1};
+----     
++
+You should setup the keyspace strategy and the replication factor as required.
+If the above command is executed successfully, it must not return any error message.
+. It is not required for you to create any tables in the keyspace; SMSC will create the tables when started.
+  If the keyspace contains old tables you should remove them prior to starting the SMSC. 
+. A new database (keyspace) will be created locally (a single working Cassandra node). It is a Cassandra cluster which has only one node.
+  By adding more nodes, you can make it a multi node cluster.
+
+.Procedure: Destroy a Cassandra database (keyspace)
+. To destroy a Cassandra database (keyspace) you can make use of the `cql` command: 
++
+----
+
+DROP KEYSPACE "RestCommSMSC";
+----		
+. Executing the above `cql` command will result in the immediate, irreversible removal of the keyspace 'RestCommSMSC', including all column families and data contained in the keyspace. 
+
+[[_ss7_smsc_settings]]
+== Configuring the Gateway
+
+Now that you have installed {this-platform} {this-application} to suit your needs, you can go ahead and configure the SS7 Stack and the SMSC Gateway to meet your requirements.
+The {this-platform} jSS7 Stack Admin Guide in the [path]_restcomm-smscgateway-<version>/docs/ss7/_ folder will assist you in configuring and managing the SS7 Stack.
+Only when you have completely configured the SS7 Stack to meet your requirements, you must go ahead with configuring the SMSC Gateway.
+ 
+
+The {this-platform} {this-application} Admin Guide in the [path]_restcomm-smscgateway-<version>/docs/smsc/_ folder will assist you in configuring and managing the SMSC Gateway.
+To configure and manage both the Stack and the Gateway you can use the Command Line Interface (CLI) tool or the GUI Management Console that comes with the platform. 
