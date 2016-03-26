@@ -167,7 +167,14 @@
 						<span class="add-on">Originating ESME Name Mask</span>
 						<input id="origesmenamemask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Originating ESME name mask" />
 					</span>				
-				</div>					
+				</div>
+				
+				<div id="div-originatorsccpaddressmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if SCCP CallingPartyAddress digits match's with this rule's originatorsccpaddressmask. originatorsccpaddressmask is java regular expression. Set value to null or -1 as wild card to match all the digits of CallingPartyAddress digits. Default value is -1">
+						<span class="add-on">Originating (CallingPartyAddress) SCCP Digit Mask</span>
+						<input id="originatorsccpaddressmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Originating (CallingPartyAddress) SCCP digit mask" />
+					</span>				
+				</div>									
 				
 				<div id="div-networkidmask" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if target SMS is origination networkid with this rule's networkidmask. Set value to -1 as wild card to match all the network id's. Default value is -1">
@@ -405,6 +412,7 @@
 										var addestdigprefix = processRuleParameters(ruleparameters, "adddestdigprefix");
 										var makecopy = processRuleParameters(ruleparameters, "makecopy");
 										var origesmenamemask = processRuleParameters(ruleparameters, "origesmenamemask"); 
+										var originatorsccpaddressmask = processRuleParameters(ruleparameters, "originatorsccpaddressmask"); 
 										var dropaftersri = processRuleParameters(ruleparameters, "dropaftersri");
 										
 										$('#esmes-table-wrapper').append('<div id="entities-modal'+id+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
@@ -506,7 +514,23 @@
 																			'</td>'+
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OrigEsmeNameMask"+']\').toggle(); $(\'input[id^='+id+"OrigEsmeNameMask"+']\').focus();"></i>' +
 																			'</td>'+
-																		'</tr>'+																		
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if SCCP CallingPartyAddress digits match\'s with this rule\'s originatorsccpaddressmask. originatorsccpaddressmask is java regular expression. Set value to null or -1 as wild card to match all the digits of CallingPartyAddress digits. Default value is -1">'+
+																		'<td style="font-size: 0.9em;">Originating (CallingPartyAddress) SCCP Digit Mask</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'OriginatorSccpAddressMask-input" class="control-group">'+
+																			'<span id="' + id +'OriginatorSccpAddressMask-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + originatorsccpaddressmask + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'originatorsccpaddressmask\', \'' + id+"OriginatorSccpAddressMask" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginatorSccpAddressMask"+']\').toggle(); $(\'input[id^='+id+"OriginatorSccpAddressMask"+']\').focus();"></i>' + 
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'OriginatorSccpAddressMask-text">' + originatorsccpaddressmask + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginatorSccpAddressMask"+']\').toggle(); $(\'input[id^='+id+"OriginatorSccpAddressMask"+']\').focus();"></i>' +
+																		'</td>'+
+																	'</tr>'+																		
 																		
 																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS origination networkid match\'s with this rule\'s networkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1">'+
 																			'<td style="font-size: 0.9em;">Network Id Mask</td>'+
@@ -846,9 +870,16 @@
 		
 		var origesmenamemask = $("#origesmenamemask").val();
 		if(origesmenamemask.trim() == "") {
-			destdigmask = null;		
+			origesmenamemask = null;		
 		} else {
 			parametersstring = parametersstring + " origesmenamemask "+origesmenamemask;
+		}
+		
+		var originatorsccpaddressmask = $("#originatorsccpaddressmask").val();
+		if(originatorsccpaddressmask.trim() == "") {
+			originatorsccpaddressmask = null;		
+		} else {
+			parametersstring = parametersstring + " originatorsccpaddressmask "+originatorsccpaddressmask;
 		}		
 		
 		var networkidmask = $("#networkidmask").val();
