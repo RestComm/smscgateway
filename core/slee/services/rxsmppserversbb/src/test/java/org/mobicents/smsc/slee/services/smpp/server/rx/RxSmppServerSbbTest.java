@@ -166,12 +166,13 @@ public class RxSmppServerSbbTest {
 //                long windowWaitTimeout, String clusterName, boolean countersEnabled, int enquireLinkDelay, int sourceTon,
 //                int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
 //                int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour, long rateLimitPerDay,
-//                int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength, int maxMessageLength)
+//                int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
+//                int maxMessageLength, boolean enquireServerEnabled)
 //                throws Exception;
 //
         esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null, SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER,
                 SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, -1,
-                -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, 0, 0, 0, 0, -1, -1, -1, -1);
+                -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, 0, 0, 0, 0, -1, -1, -1, -1, true);
 
         SmsSetCache.getInstance().clearProcessingSmsSet();
 

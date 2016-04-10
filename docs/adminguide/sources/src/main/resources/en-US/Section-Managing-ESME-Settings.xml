@@ -54,6 +54,7 @@ SYNOPSIS
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday> 
 	min-message-length <min-message-length value>
 	max-message-length <max-message-length value>
+	enquire-server-enabled <true | false>
 	national-language-locking-shift <NationalLanguageIdentifier value>
 	national-language-single-shift <NationalLanguageIdentifier value>
 
@@ -378,7 +379,12 @@ PARAMETERS
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
-					
+
+    enquire-server-enabled    - This parameter is used to enable or
+                    disable SMPP server sending enquire message.
+
+                    The default value for this parameter is "false".
+
 	national-language-locking-shift - National language locking shift
 					table can be configured for messages that have come
 					via SMPP (this ESME), do not have UDHs inside and
@@ -454,6 +460,7 @@ SYNOPSIS
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
 	min-message-length <min-message-length value>
 	max-message-length <max-message-length value>
+	enquire-server-enabled <true | false>
 	national-language-locking-shift <NationalLanguageIdentifier value>
 	national-language-single-shift <NationalLanguageIdentifier value>
 	
@@ -760,7 +767,12 @@ PARAMETERS
 					
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
-					also implies "no limitations".					  
+					also implies "no limitations".
+
+    enquire-server-enabled    - This parameter is used to enable or
+                    disable SMPP server sending enquire message.
+
+                    The default value for this parameter is "false".
 	
 SEE ALSO
 	smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,

@@ -41,7 +41,8 @@ public interface EsmeManagementMBean {
             long windowWaitTimeout, String clusterName, boolean countersEnabled, int enquireLinkDelay, int sourceTon,
             int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
             int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour, long rateLimitPerDay,
-            int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength, int maxMessageLength)
+            int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength, int maxMessageLength,
+            boolean enquireServerEnabled)
             throws Exception;
 
 	Esme destroyEsme(String esmeName) throws Exception;

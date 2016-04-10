@@ -18,6 +18,7 @@ SYNOPSIS
 	national-language-single-shift <national-language-single-shift>
 	min-message-length <min-message-length value>
 	max-message-length <max-message-length value>
+	enquire-server-enabled <true | false>
 	
 DESCRIPTION
 	This command is used to modify the settings of an existing ESME configuration.
@@ -343,8 +344,13 @@ PARAMETERS
 					
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
-					also implies "no limitations".					  
-	
+					also implies "no limitations".
+
+    enquire-server-enabled    - This parameter is used to enable or
+                    disable SMPP server sending enquire message.
+
+                    The default value for this parameter is "false".
+
 SEE ALSO
 	smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
 	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 

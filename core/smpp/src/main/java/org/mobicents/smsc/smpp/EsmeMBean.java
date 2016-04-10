@@ -305,4 +305,8 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     void setMaxMessageLength(int maxMessageLength);
 
+    boolean getEnquireServerEnabled();
+
+    void setEnquireServerEnabled(boolean enquireServerEnabled);
+
 }
