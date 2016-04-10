@@ -79,6 +79,8 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 	protected FastList<Esme> esmes = new FastList<Esme>();
 
+    protected FastMap<String, Long> esmesServer = new FastMap<String, Long>();
+
 	protected FastMap<String, EsmeCluster> esmeClusters = new FastMap<String, EsmeCluster>();
 
 	private final TextBuilder persistFile = TextBuilder.newInstance();
@@ -206,7 +208,8 @@ public class EsmeManagement implements EsmeManagementMBean {
             long windowWaitTimeout, String clusterName, boolean countersEnabled, int enquireLinkDelay, int sourceTon,
             int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
             int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour, long rateLimitPerDay,
-            int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength, int maxMessageLength)
+            int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
+            int maxMessageLength, boolean enquireServerEnabled)
             throws Exception {
 
 		SmppBindType smppBindTypeOb = SmppBindType.valueOf(smppBindType);
@@ -288,7 +291,7 @@ public class EsmeManagement implements EsmeManagementMBean {
                 windowMonitorInterval, windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay, sourceTon, sourceNpi,
                 sourceAddressRange, routingTon, routingNpi, routingAddressRange, networkId, rateLimitPerSecond,
                 rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay, nationalLanguageSingleShift,
-                nationalLanguageLockingShift, minMessageLength, maxMessageLength);
+                nationalLanguageLockingShift, minMessageLength, maxMessageLength, enquireServerEnabled);
 
 		esme.esmeManagement = this;
 
@@ -323,6 +326,8 @@ public class EsmeManagement implements EsmeManagementMBean {
 		EsmeCluster esmeCluster = this.esmeClusters.get(esme.getClusterName());
 		esmeCluster.removeEsme(esme);
 
+        esmesServer.remove(esme.getName());
+
 		if (!esmeCluster.hasMoreEsmes()) {
 			this.esmeClusters.remove(esme.getClusterName());
 		}
@@ -333,6 +338,14 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 		return esme;
 	}
+
+    public void addEsmesServer(String serverName, Long delay){
+        this.esmesServer.put(serverName, delay);
+    }
+
+    public void removeEsmesServer(String serverName){
+        this.esmesServer.remove(serverName);
+    }
 
 	@Override
 	public void startEsme(String esmeName) throws Exception {

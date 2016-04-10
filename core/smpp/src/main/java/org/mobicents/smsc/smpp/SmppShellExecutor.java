@@ -34,7 +34,7 @@ import com.cloudhopper.smpp.SmppConstants;
 /**
  * @author amit bhayani
  * @author sergey vetyutnev
- * 
+ *
  */
 public class SmppShellExecutor implements ShellExecutor {
 
@@ -79,7 +79,7 @@ public class SmppShellExecutor implements ShellExecutor {
      * <routing address npi> routing-range <routing address range> ratelimit-second <ratelimitsecond> ratelimit-minute
      * <ratelimitminute> ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday> national-language-locking-shift
      * <national-language-locking-shift> national-language-single-shift <national-language-single-shift> min-message-length
-     * <min-message-length> max-message-length <max-message-length>
+     * <min-message-length> max-message-length <max-message-length> enquire-server-enabled <true | false>
      * 
      * @param args
      * @return
@@ -191,6 +191,9 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("max-message-length")) {
                 int val = Integer.parseInt(args[count++]);
                 esme.setMaxMessageLength(val);
+            } else if (key.equals("enquire-server-enabled")) {
+                Boolean val = Boolean.parseBoolean(args[count++]);
+                esme.setEnquireServerEnabled(val);
 
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
@@ -212,7 +215,7 @@ public class SmppShellExecutor implements ShellExecutor {
      * address range> ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> ratelimit-hour <ratelimithour>
      * ratelimit-day <ratelimitday> national-language-locking-shift <national-language-locking-shift>
      * national-language-single-shift <national-language-single-shift> min-message-length <min-message-length>
-     * max-message-length <max-message-length>
+     * max-message-length <max-message-length> enquire-server-enabled <true | false>
      * 
      * @param args
      * @return
@@ -297,6 +300,8 @@ public class SmppShellExecutor implements ShellExecutor {
         int minMessageLength = -1;
         int maxMessageLength = -1;
 
+        boolean enquireServerEnabled = false;
+
         while (count < args.length) {
             // These are all optional parameters for a Tx/Rx/Trx binds
             String key = args[count++];
@@ -366,6 +371,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 minMessageLength = Integer.parseInt(args[count++]);
             } else if (key.equals("max-message-length")) {
                 maxMessageLength = Integer.parseInt(args[count++]);
+            } else if (key.equals("enquire-server-enabled")) {
+                enquireServerEnabled = Boolean.parseBoolean(args[count++]);
 
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
@@ -378,7 +385,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 smppSessionTypeStr, windowSize, connectTimeout, requestExpiryTimeout, windowMonitorInterval, windowWaitTimeout,
                 clusterName, countersEnabled, enquireLinkDelay, sourceTon, sourceNpi, sourceAddressRange, routinigTon,
                 routingNpi, routingAddressRange, networkId, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
-                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, minMessageLength, maxMessageLength);
+                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, minMessageLength,
+                maxMessageLength, enquireServerEnabled);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getSystemId());
     }
 

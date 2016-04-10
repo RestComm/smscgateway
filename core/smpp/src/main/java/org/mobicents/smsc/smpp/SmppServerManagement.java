@@ -109,6 +109,8 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 
 	private SmppSessionHandlerInterface smppSessionHandlerInterface;
 
+	private SmppServerOpsThread smppServerOpsThread;
+
 	public SmppServerManagement(String name, EsmeManagement esmeManagement,
 			SmppSessionHandlerInterface smppSessionHandlerInterface) {
 		super();
@@ -279,10 +281,19 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 		this.defaultSmppServer.start();
 		logger.info("SMPP server started");
 
+		// Start Enquire for Server
+		this.smppServerOpsThread = new SmppServerOpsThread(this.esmeManagement);
+		(new Thread(this.smppServerOpsThread)).start();
 	}
 
 	public void stop() throws Exception {
-		logger.info("Stopping SMPP server...");
+
+        // stop SmppServerOpsThread
+        logger.info("Stopping SmppServerOpsThread...");
+        this.smppServerOpsThread.setStarted(false);
+        logger.info("SmppServerOpsThread stopped");
+
+        logger.info("Stopping SMPP server...");
 		this.defaultSmppServer.stop();
 
 		// this.executor.shutdownNow();
