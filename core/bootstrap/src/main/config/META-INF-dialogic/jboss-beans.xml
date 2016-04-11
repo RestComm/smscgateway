@@ -44,6 +44,9 @@
 			<parameter>RestComm-SMSC</parameter>
 		</constructor>
 		<property name="persistDir">${jboss.server.data.dir}</property>
+		<property name="maxSequenceNumber">256</property>
+		<property name="maxAsForRoute">2</property>
+		<property name="deliveryMessageThreadCount">1</property>
 		<property name="transportManagement">
 			<inject bean="SCTPManagement" />
 		</property>
@@ -90,6 +93,9 @@
 		</constructor>
 		<property name="sourceModuleId">61</property>
 		<property name="destinationModuleId">34</property>
+		<property name="routingLabelFormat">
+			<inject bean="RoutingLabelFormat" />
+		</property>
 	</bean>
 
 	<!-- ==================================================================== -->
@@ -172,6 +178,7 @@
 					<inject bean="TcapExecutor" />
                     <inject bean="SmppShellExecutor" />
                     <inject bean="SMSCShellExecutor" />
+					<!-- <inject bean="LinksetExecutor" /> -->
 				</list>
 			</parameter>
 		</constructor>
