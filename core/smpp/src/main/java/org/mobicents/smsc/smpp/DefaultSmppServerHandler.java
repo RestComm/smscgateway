@@ -178,6 +178,11 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 			SmppSessionHandler smppSessionHandler = this.smppSessionHandlerInterface.createNewSmppSessionHandler(esme);
 			// need to do something it now (flag we're ready)
 			session.serverReady(smppSessionHandler);
+
+            // set esme server bound
+            esme.setServerBound(true);
+            // start enquire message imedialtely
+            this.esmeManagement.addEsmesServer(esme.getName(), 0L);
 		}
 	}
 
@@ -197,6 +202,13 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 			if (session.hasCounters()) {
 				logger.info(String.format("final session rx-submitSM: %s", session.getCounters().getRxSubmitSM()));
 			}
+
+            // remove esmeServer out of enquire list
+            String esmeName = session.getConfiguration().getName();
+            Esme esmeServer = this.esmeManagement.getEsmeByName(esmeName);
+            esmeServer.setServerBound(false);
+			esmeServer.resetEnquireLinkFail();
+            this.esmeManagement.esmesServer.remove(esmeName);
 
 			// make sure it's really shutdown
 			session.destroy();
