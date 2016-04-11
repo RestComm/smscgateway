@@ -9,7 +9,7 @@
 
 	<artifactId>restcomm-smsc-parent</artifactId>
 	<groupId>org.mobicents.smsc</groupId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.0.24</version>
 
 	<packaging>pom</packaging>
 
