@@ -43,7 +43,8 @@
 		<property name="persistDir">${jboss.server.data.dir}</property>
 		<property name="maxSequenceNumber">256</property>
 		<property name="maxAsForRoute">2</property>
-		<property name="deliveryMessageThreadCount">1</property>
+		<property name="useLsbForLinksetSelection">false</property>
+		<property name="deliveryMessageThreadCount">8</property>
 		<property name="transportManagement">
 			<inject bean="SCTPManagement" />
 		</property>
@@ -201,7 +202,7 @@
 	</bean>
 
 	<!-- ==================================================================== -->
-	<!-- Mobicents SS7 Service -->
+	<!-- RestComm SS7 Service -->
 	<!-- ==================================================================== -->
 	<bean name="MAPSS7Service" class="org.mobicents.smsc.server.bootstrap.SS7Service">
 		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.ss7:service=SS7Service",exposedInterface=org.mobicents.smsc.server.bootstrap.SS7ServiceMBean.class,registerDirectly=true)
