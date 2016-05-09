@@ -163,16 +163,16 @@ public class RxSmppServerSbbTest {
 //        public Esme createEsme(String name, String systemId, String password, String host, int port, 
 //                boolean chargingEnabled, String smppBindType, String systemType, String smppIntVersion, byte ton, byte npi, String address,
 //                String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long windowMonitorInterval,
-//                long windowWaitTimeout, String clusterName, boolean countersEnabled, int enquireLinkDelay, int sourceTon,
+//                long windowWaitTimeout, String clusterName, boolean countersEnabled, int enquireLinkDelay, int EnquireLinkDelayServer, int sourceTon,
 //                int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
 //                int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour, long rateLimitPerDay,
 //                int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
-//                int maxMessageLength, boolean enquireServerEnabled)
+//                int maxMessageLength)
 //                throws Exception;
 //
         esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null, SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER,
-                SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, -1,
-                -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, 0, 0, 0, 0, -1, -1, -1, -1, true);
+                SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, 0,
+                -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, 0, 0, 0, 0, -1, -1, -1, -1);
 
         SmsSetCache.getInstance().clearProcessingSmsSet();
 

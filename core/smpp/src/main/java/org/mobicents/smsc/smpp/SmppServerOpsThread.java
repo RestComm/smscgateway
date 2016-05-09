@@ -23,13 +23,11 @@ package org.mobicents.smsc.smpp;
 
 import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.pdu.EnquireLink;
-import com.cloudhopper.smpp.pdu.EnquireLinkResp;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author nhanth87
@@ -39,10 +37,9 @@ public class SmppServerOpsThread implements Runnable {
 
 	protected volatile boolean started = true;
 
-    private static final int MAX_ENNQUIRE_FAILED = 3;
+    private static final int MAX_ENQUIRE_FAILED = 1;
 
-    // Optimize with FastMap
-    private FastMap<String, Long> pendingChanges;
+    private FastMap<String, Long> esmesServer;
 
     private final EsmeManagement esmeManagement;
 
@@ -50,7 +47,7 @@ public class SmppServerOpsThread implements Runnable {
 
 	public SmppServerOpsThread(EsmeManagement esmeManagement) {
         this.esmeManagement = esmeManagement;
-        this.pendingChanges = esmeManagement.esmesServer;
+        this.esmesServer = esmeManagement.esmesServer;
 
 	}
 
@@ -62,9 +59,19 @@ public class SmppServerOpsThread implements Runnable {
 		}
 	}
 
-    protected void scheduleEnquireLink(String esmeServerName, Long delayValue) {
-        synchronized (this.pendingChanges) {
-            this.pendingChanges.put(esmeServerName, delayValue);
+    protected void scheduleEnquireList(String esmeServerName, Long delayValue) {
+        synchronized (this.esmesServer) {
+            this.esmesServer.put(esmeServerName, delayValue);
+        }
+
+        synchronized (this.waitObject) {
+            this.waitObject.notify();
+        }
+    }
+
+    protected void removeEnquireList(String esmeServerName) {
+        synchronized (this.esmesServer) {
+            this.esmesServer.remove (esmeServerName);
         }
 
         synchronized (this.waitObject) {
@@ -80,43 +87,40 @@ public class SmppServerOpsThread implements Runnable {
 
 		while (this.started) {
 
+            FastList<Esme> pendingList = new FastList<>();
+
 			try {
-                synchronized (this.pendingChanges) {
-                    for (String esmeServerName: this.pendingChanges.keySet()) {
+                synchronized (this.esmesServer) {
+                    for (String esmeServerName: this.esmesServer.keySet()) {
                         Esme nextServer =  this.esmeManagement.getEsmeByName(esmeServerName);
 
-                        if (!nextServer.getEnquireServerEnabled()) {
+                        if (!nextServer.isStarted()) {
+                            nextServer.setServerBound(false);
+                        }
+
+                        if (!nextServer.getEnquireServerEnabled() || !nextServer.isServerBound()) {
                             continue;
                         }
 
-                        if (!nextServer.isStarted() || nextServer.isClosed()) {
-                            this.pendingChanges.remove(nextServer);
-                        } else {
+                        // server is always in the list, let send enquire message
+                        Long delay = this.esmesServer.get(nextServer.getName());
 
-                            // try to find and sync the pendingChages
-                            if (!pendingChanges.containsKey(nextServer.getName())) {
-                                this.scheduleEnquireLink(nextServer.getName(), System.currentTimeMillis() +
-                                        nextServer.getEnquireLinkDelay());
-                            } else {
-                                // server is in the list, let send enquire message
-                                Long delay = pendingChanges.get(nextServer.getName());
-
-                                if (delay <= System.currentTimeMillis()) {
-                                    pendingChanges.remove(nextServer.getName());
-                                    enquireLink(nextServer);
-                                }
-                            }
+                        if (delay <= System.currentTimeMillis()) {
+                            pendingList.add(nextServer);
                         }
-                    } // end for
+                    } // for
                 }
-
-				synchronized (this.waitObject) {
-					this.waitObject.wait(5000);
-				}
 
 			} catch (Exception e) {
 				logger.error("Error while looping SmpServerOpsThread thread", e);
 			}
+
+            // Sending Enquire messages
+            Iterator<Esme> changes = pendingList.iterator();
+            while (changes.hasNext()) {
+                Esme change = changes.next();
+                this.enquireLink(change);
+            }
 		}// while
 
 		if (logger.isInfoEnabled()) {
@@ -127,10 +131,6 @@ public class SmppServerOpsThread implements Runnable {
 	private void enquireLink(Esme esme) {
 		SmppSession smppSession = esme.getSmppSession();
 
-		if (!esme.isServerBound()) {
-			return;
-		}
-
 		if (smppSession != null && smppSession.isBound() && esme.isServerBound()) {
 			try {
 				smppSession.enquireLink(new EnquireLink(), 10000);
@@ -140,7 +140,8 @@ public class SmppServerOpsThread implements Runnable {
                 //debug
                 //esme.incEnquireLinkFail();
 
-                this.scheduleEnquireLink(esme.getName(), System.currentTimeMillis() +
+                // Update next sending time
+                this.esmesServer.put(esme.getName(), System.currentTimeMillis() +
                         esme.getEnquireLinkDelay());
 				return;
 
@@ -161,13 +162,13 @@ public class SmppServerOpsThread implements Runnable {
 			if (smppSession != null) {
 				smppSession.close();
 				smppSession.destroy();
+				return;
 			}
 		}
 
-		//Destroy the Server Link
-		if (this.MAX_ENNQUIRE_FAILED <= esme.getEnquireLinkFail()) {
+		if (this.MAX_ENQUIRE_FAILED <= esme.getEnquireLinkFail()) {
 			logger.info("Esme Server destroy due to Enquire for ESME SystemId=" + esme.getSystemId());
-            this.pendingChanges.remove(esme.getName());
+            this.esmesServer.remove(esme.getName());
 			smppSession.close();
 			smppSession.destroy();
 		}
