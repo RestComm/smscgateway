@@ -618,7 +618,7 @@ public abstract class MoSbb extends MoCommonSbb {
 					this.logger.info("Received SMS_DELIVER = " + smsDeliverTpdu);
 				}
 				// AddressField af = smsSubmitTpdu.getDestinationAddress();
-				sms = this.handleSmsDeliverTpdu(smsDeliverTpdu, civ, networkId, isMoOperation, dialog, evt, invokeId);
+				sms = this.handleSmsDeliverTpdu(smsDeliverTpdu, civ, networkId, originatorSccpAddress, isMoOperation, dialog, evt, invokeId);
 				break;
 			default:
 				this.logger.severe("Received non SMS_DELIVER = " + smsTpdu);
