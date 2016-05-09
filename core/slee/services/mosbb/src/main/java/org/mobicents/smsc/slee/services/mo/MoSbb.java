@@ -365,8 +365,15 @@ public abstract class MoSbb extends MoCommonSbb {
         Sms sms = null;
 		try {
             if (isMt) {
+            	String originatorSccpAddress = null;
+                SccpAddress sccpAddress = dialog.getRemoteAddress();
+                if (sccpAddress != null) {
+                    GlobalTitle gt = dialog.getRemoteAddress().getGlobalTitle();
+                    if (gt != null)
+                        originatorSccpAddress = gt.getDigits();
+                }
                 sms = this.processMtMessage(evt.getSM_RP_OA(), evt.getSM_RP_DA(), evt.getSM_RP_UI(), dialog.getNetworkId(),
-                        false, evt.getMAPDialog(), evt, evt.getInvokeId());
+                		originatorSccpAddress, false, evt.getMAPDialog(), evt, evt.getInvokeId());
             } else {
                 String originatorSccpAddress = null;
                 SccpAddress sccpAddress = dialog.getRemoteAddress();
@@ -485,7 +492,14 @@ public abstract class MoSbb extends MoCommonSbb {
         }
 
 		try {
-	        this.processMtMessage(evt.getSM_RP_OA(), evt.getSM_RP_DA(), evt.getSM_RP_UI(), dialog.getNetworkId(), false, evt.getMAPDialog(), evt, evt.getInvokeId());
+			String originatorSccpAddress = null;
+            SccpAddress sccpAddress = dialog.getRemoteAddress();
+            if (sccpAddress != null) {
+                GlobalTitle gt = sccpAddress.getGlobalTitle();
+                if (gt != null)
+                    originatorSccpAddress = gt.getDigits();
+            }
+	        this.processMtMessage(evt.getSM_RP_OA(), evt.getSM_RP_DA(), evt.getSM_RP_UI(), dialog.getNetworkId(), originatorSccpAddress, false, evt.getMAPDialog(), evt, evt.getInvokeId());
 		} catch (SmscProcessingException e1) {
 			this.logger.severe(e1.getMessage(), e1);
 			try {
@@ -563,7 +577,7 @@ public abstract class MoSbb extends MoCommonSbb {
 
 	}
 
-    private Sms processMtMessage(SM_RP_OA smRPOA, SM_RP_DA smRPDA, SmsSignalInfo smsSignalInfo, int networkId,
+    private Sms processMtMessage(SM_RP_OA smRPOA, SM_RP_DA smRPDA, SmsSignalInfo smsSignalInfo, int networkId,String originatorSccpAddress,
             boolean isMoOperation, MAPDialogSms dialog, SmsMessage evt, long invokeId) throws SmscProcessingException {
 
 	    Sms sms = null;
@@ -874,12 +888,12 @@ public abstract class MoSbb extends MoCommonSbb {
 //    }
 
     private Sms handleSmsDeliverTpdu(SmsDeliverTpdu smsDeliverTpdu, CorrelationIdValue civ, int networkId,
-            boolean isMoOperation, MAPDialogSms dialog, SmsMessage evt, long invokeId) throws SmscProcessingException {
+    		String originatorSccpAddress, boolean isMoOperation, MAPDialogSms dialog, SmsMessage evt, long invokeId) throws SmscProcessingException {
 
         TargetAddress ta = createDestTargetAddress(civ.getMsisdn(), networkId);
         PersistenceRAInterface store = obtainStore(ta);
 
-        Sms sms = this.createSmsEvent(smsDeliverTpdu, ta, store, civ, networkId);
+        Sms sms = this.createSmsEvent(smsDeliverTpdu, ta, store, civ, networkId, originatorSccpAddress);
         return this.processSms(sms, store, smscPropertiesManagement.getHrCharging(), isMoOperation, dialog, evt, invokeId);
 	}
 
@@ -1055,7 +1069,7 @@ public abstract class MoSbb extends MoCommonSbb {
 	}
 
 	private Sms createSmsEvent(SmsDeliverTpdu smsDeliverTpdu, TargetAddress ta, PersistenceRAInterface store,
-			AddressField callingPartyAddress, int networkId) throws SmscProcessingException {
+			AddressField callingPartyAddress, int networkId, String originatorSccpAddress) throws SmscProcessingException {
 
 		UserData userData = smsDeliverTpdu.getUserData();
 		try {
@@ -1084,6 +1098,7 @@ public abstract class MoSbb extends MoCommonSbb {
 					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
 		}
 		sms.setSourceAddr(callingPartyAddress.getAddressValue());
+		sms.setOriginatorSccpAddress(originatorSccpAddress);		
 		switch (callingPartyAddress.getTypeOfNumber()) {
 		case Unknown:
 			sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
@@ -1180,7 +1195,7 @@ public abstract class MoSbb extends MoCommonSbb {
 	}
 
     private Sms createSmsEvent(SmsDeliverTpdu smsDeliverTpdu, TargetAddress ta, PersistenceRAInterface store,
-            CorrelationIdValue civ, int networkId) throws SmscProcessingException {
+            CorrelationIdValue civ, int networkId, String originatorSccpAddress) throws SmscProcessingException {
 
         UserData userData = smsDeliverTpdu.getUserData();
         try {
@@ -1211,6 +1226,7 @@ public abstract class MoSbb extends MoCommonSbb {
                     SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
         }
         sms.setSourceAddr(callingPartyAddress.getAddressValue());
+        sms.setOriginatorSccpAddress(originatorSccpAddress);        
         switch (callingPartyAddress.getTypeOfNumber()) {
         case Unknown:
             sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
