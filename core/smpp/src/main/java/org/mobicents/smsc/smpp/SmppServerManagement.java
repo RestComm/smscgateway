@@ -274,15 +274,17 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 			}
 		});
 
+		// create new smppServerOpsThread
+		this.smppServerOpsThread = new SmppServerOpsThread(this.esmeManagement);
+
 		// create a server, start it up
 		this.defaultSmppServer = new DefaultSmppServer(configuration, new DefaultSmppServerHandler(esmeManagement,
-				this.smppSessionHandlerInterface), executor, monitorExecutor);
+				this.smppServerOpsThread, this.smppSessionHandlerInterface), executor, monitorExecutor);
 		logger.info("Starting SMPP server...");
 		this.defaultSmppServer.start();
 		logger.info("SMPP server started");
 
 		// Start Enquire for Server
-		this.smppServerOpsThread = new SmppServerOpsThread(this.esmeManagement);
 		(new Thread(this.smppServerOpsThread)).start();
 	}
 

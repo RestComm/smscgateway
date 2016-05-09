@@ -49,9 +49,12 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 
 	private final EsmeManagement esmeManagement;
 
-	public DefaultSmppServerHandler(EsmeManagement esmeManagement,
+	private final SmppServerOpsThread smppServerOpsThread;
+
+	public DefaultSmppServerHandler(EsmeManagement esmeManagement, SmppServerOpsThread smppServerOpsThread,
 			SmppSessionHandlerInterface smppSessionHandlerInterface) {
 		this.esmeManagement = esmeManagement;
+		this.smppServerOpsThread = smppServerOpsThread;
 		this.smppSessionHandlerInterface = smppSessionHandlerInterface;
 	}
 
@@ -182,7 +185,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
             // set esme server bound
             esme.setServerBound(true);
             // start enquire message imedialtely
-            this.esmeManagement.addEsmesServer(esme.getName(), 0L);
+            this.smppServerOpsThread.scheduleEnquireList(esme.getName(), 0L);
 		}
 	}
 
@@ -208,7 +211,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
             Esme esmeServer = this.esmeManagement.getEsmeByName(esmeName);
             esmeServer.setServerBound(false);
 			esmeServer.resetEnquireLinkFail();
-            this.esmeManagement.esmesServer.remove(esmeName);
+            this.smppServerOpsThread.removeEnquireList(esmeName);
 
 			// make sure it's really shutdown
 			session.destroy();

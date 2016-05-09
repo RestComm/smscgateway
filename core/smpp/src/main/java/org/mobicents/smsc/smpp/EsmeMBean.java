@@ -307,6 +307,4 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     boolean getEnquireServerEnabled();
 
-    void setEnquireServerEnabled(boolean enquireServerEnabled);
-
 }

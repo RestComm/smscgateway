@@ -46,7 +46,7 @@ SYNOPSIS
 	connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> 
 	window-monitor-interval <windowMonitorInterval> 
 	window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> 
-	enquire-link-delay <30000> charging-enabled <true | false> 
+	enquire-link-delay <30000> enquire-link-delay-server <0> charging-enabled <true | false> 
 	source-ton <source address ton> source-npi <source address npi>
 	source-range <source address range> routing-ton <routing address ton>
 	routing-npi <routing address npi> routing-range <routing address range>
@@ -54,7 +54,6 @@ SYNOPSIS
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday> 
 	min-message-length <min-message-length value>
 	max-message-length <max-message-length value>
-	enquire-server-enabled <true | false>
 	national-language-locking-shift <NationalLanguageIdentifier value>
 	national-language-single-shift <NationalLanguageIdentifier value>
 
@@ -219,6 +218,15 @@ PARAMETERS
 				  sends an 'ENQUIRE_LINK' after every configured 
 				  enquire-link-delay.
 
+				  0 means disabled. SMSC will not send ENQUIRE_LINK.
+
+	enquire-link-delay-server - Default value is 0 milli seconds. 
+				  When SMSC connects to a remote server as SERVER, it 
+				  sends an 'ENQUIRE_LINK' after every configured 
+				  enquire-link-delay-server.
+
+				  0 means disabled. SMSC will not send ENQUIRE_LINK.
+
 	charging-enabled	- Flag to enable or disable charging for every SMS 
 				  arriving from SIP.
 
@@ -380,11 +388,6 @@ PARAMETERS
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
 
-    enquire-server-enabled    - This parameter is used to enable or
-                    disable SMPP server sending enquire message.
-
-                    The default value for this parameter is "false".
-
 	national-language-locking-shift - National language locking shift
 					table can be configured for messages that have come
 					via SMPP (this ESME), do not have UDHs inside and
@@ -452,7 +455,7 @@ SYNOPSIS
 	connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> 
 	window-monitor-interval <windowMonitorInterval> 
 	window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> 
-	enquire-link-delay <30000> charging-enabled <true | false> 
+	enquire-link-delay <30000> enquire-link-delay-server <0> charging-enabled <true | false> 
 	source-ton <source address ton> source-npi <source address npi>
 	source-range <source address range> routing-ton <routing address ton>
 	routing-npi <routing address npi> routing-range <routing address range>
@@ -460,7 +463,6 @@ SYNOPSIS
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
 	min-message-length <min-message-length value>
 	max-message-length <max-message-length value>
-	enquire-server-enabled <true | false>
 	national-language-locking-shift <NationalLanguageIdentifier value>
 	national-language-single-shift <NationalLanguageIdentifier value>
 	
@@ -592,6 +594,17 @@ PARAMETERS
 				  sends an 'ENQUIRE_LINK' after every configured 
 				  enquire-link-delay.
 
+				  0 means disabled. SMSC will not send ENQUIRE_LINK.
+
+				  The new value takes effect immediately.
+
+	enquire-link-delay-server - Default value is 0 milli seconds. 
+				  When SMSC connects to a remote server as SERVER, it 
+				  sends an 'ENQUIRE_LINK' after every configured 
+				  enquire-link-delay-server.
+
+				  0 means disabled. SMSC will not send ENQUIRE_LINK.
+	
 				  The new value takes effect immediately.
 
 	charging-enabled	- Flag to enable or disable charging for every SMS 
@@ -768,11 +781,6 @@ PARAMETERS
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
-
-    enquire-server-enabled    - This parameter is used to enable or
-                    disable SMPP server sending enquire message.
-
-                    The default value for this parameter is "false".
 	
 SEE ALSO
 	smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,

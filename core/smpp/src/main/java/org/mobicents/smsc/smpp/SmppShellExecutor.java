@@ -74,12 +74,12 @@ public class SmppShellExecutor implements ShellExecutor {
      * Command is smpp esme modify <name> password <password> networkid <networkid> esme-ton <esme address ton> esme-npi <esme address npi> esme-range
      * <esme address range> window-size <windowSize> connect-timeout <connectTimeout> request-expiry-timeout
      * <requestExpiryTimeout> window-monitor-interval <windowMonitorInterval> window-wait-timeout <windowWaitTimeout>
-     * counters-enabled <true | false> enquire-link-delay <30000> charging-enabled <true | false> source-ton <source address
+     * counters-enabled <true | false> enquire-link-delay <30000> enquire-link-delay-server <0> charging-enabled <true | false> source-ton <source address
      * ton> source-npi <source address npi> source-range <source address range> routing-ton <routing address ton> routing-npi
      * <routing address npi> routing-range <routing address range> ratelimit-second <ratelimitsecond> ratelimit-minute
      * <ratelimitminute> ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday> national-language-locking-shift
      * <national-language-locking-shift> national-language-single-shift <national-language-single-shift> min-message-length
-     * <min-message-length> max-message-length <max-message-length> enquire-server-enabled <true | false>
+     * <min-message-length> max-message-length <max-message-length>
      * 
      * @param args
      * @return
@@ -144,6 +144,9 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("enquire-link-delay")) {
                 int enquireLinkDelay = Integer.parseInt(args[count++]);
                 esme.setEnquireLinkDelay(enquireLinkDelay);
+            } else if (key.equals("enquire-link-delay-server")) {
+                int enquireLinkDelayServer = Integer.parseInt(args[count++]);
+                esme.setEnquireLinkDelayServer(enquireLinkDelayServer);
             } else if (key.equals("charging-enabled")) {
                 boolean chargingEnabled = Boolean.parseBoolean(args[count++]);
                 esme.setChargingEnabled(chargingEnabled);
@@ -191,10 +194,6 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("max-message-length")) {
                 int val = Integer.parseInt(args[count++]);
                 esme.setMaxMessageLength(val);
-            } else if (key.equals("enquire-server-enabled")) {
-                Boolean val = Boolean.parseBoolean(args[count++]);
-                esme.setEnquireServerEnabled(val);
-
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
@@ -210,12 +209,12 @@ public class SmppShellExecutor implements ShellExecutor {
      * esme-npi <esme address npi> esme-range <esme address range> cluster-name <clusterName> window-size <windowSize>
      * connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> window-monitor-interval
      * <windowMonitorInterval> window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> enquire-link-delay
-     * <30000> charging-enabled <true | false> source-ton <source address ton> source-npi <source address npi> source-range
-     * <source address range> routing-ton <routing address ton> routing-npi <routing address npi>, routing-range <routing
-     * address range> ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> ratelimit-hour <ratelimithour>
+     * <30000> enquire-link-delay-server <0> charging-enabled <true | false> source-ton <source address ton> source-npi
+     * <source address npi> source-range <source address range> routing-ton <routing address ton> routing-npi <routing address npi>
+     * routing-range <routing address range> ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> ratelimit-hour <ratelimithour>
      * ratelimit-day <ratelimitday> national-language-locking-shift <national-language-locking-shift>
      * national-language-single-shift <national-language-single-shift> min-message-length <min-message-length>
-     * max-message-length <max-message-length> enquire-server-enabled <true | false>
+     * max-message-length <max-message-length>
      * 
      * @param args
      * @return
@@ -285,6 +284,7 @@ public class SmppShellExecutor implements ShellExecutor {
 
         boolean countersEnabled = true;
         int enquireLinkDelay = 30000;
+        int enquireLinkDelayServer = 0;        
         boolean chargingEnabled = false;
 
         int sourceTon = -1;
@@ -299,8 +299,6 @@ public class SmppShellExecutor implements ShellExecutor {
         int nationalLanguageLockingShift = -1;
         int minMessageLength = -1;
         int maxMessageLength = -1;
-
-        boolean enquireServerEnabled = false;
 
         while (count < args.length) {
             // These are all optional parameters for a Tx/Rx/Trx binds
@@ -339,6 +337,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 countersEnabled = Boolean.parseBoolean(args[count++]);
             } else if (key.equals("enquire-link-delay")) {
                 enquireLinkDelay = Integer.parseInt(args[count++]);
+            } else if (key.equals("enquire-link-delay-server")) {
+                enquireLinkDelayServer = Integer.parseInt(args[count++]);
             } else if (key.equals("charging-enabled")) {
                 chargingEnabled = Boolean.parseBoolean(args[count++]);
             } else if (key.equals("source-ton")) {
@@ -371,9 +371,6 @@ public class SmppShellExecutor implements ShellExecutor {
                 minMessageLength = Integer.parseInt(args[count++]);
             } else if (key.equals("max-message-length")) {
                 maxMessageLength = Integer.parseInt(args[count++]);
-            } else if (key.equals("enquire-server-enabled")) {
-                enquireServerEnabled = Boolean.parseBoolean(args[count++]);
-
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
@@ -383,10 +380,9 @@ public class SmppShellExecutor implements ShellExecutor {
         Esme esme = this.smppManagement.getEsmeManagement().createEsme(name, systemId, password, host, intPort,
                 chargingEnabled, smppBindTypeStr, systemType, smppVersionType, esmeTonType, esmeNpiType, esmeAddrRange,
                 smppSessionTypeStr, windowSize, connectTimeout, requestExpiryTimeout, windowMonitorInterval, windowWaitTimeout,
-                clusterName, countersEnabled, enquireLinkDelay, sourceTon, sourceNpi, sourceAddressRange, routinigTon,
-                routingNpi, routingAddressRange, networkId, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
-                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, minMessageLength,
-                maxMessageLength, enquireServerEnabled);
+                clusterName, countersEnabled, enquireLinkDelay, enquireLinkDelayServer, sourceTon, sourceNpi, sourceAddressRange,
+                routinigTon, routingNpi, routingAddressRange, networkId, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
+                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, minMessageLength, maxMessageLength);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getSystemId());
     }
 

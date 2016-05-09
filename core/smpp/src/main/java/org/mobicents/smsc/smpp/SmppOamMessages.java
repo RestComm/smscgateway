@@ -141,6 +141,6 @@ public interface SmppOamMessages {
 
     public static final String MAX_MESSAGE_LENGTH = " maxMessageLength=";
 
-    public static final String ENQUIRE_SERVER_ENABLED = " enquireServerEnabled=";
+    public static final String ENQUIRE_LINK_DELAY_SERVER = " enquireLinkDelayServer=";
 
 }
