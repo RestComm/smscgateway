@@ -472,6 +472,7 @@ public class MessageUtil {
     private static final String DELIVERY_ACK_TEXT = " text:";
     private static final String DELIVERY_ACK_STATE_DELIVERED = "DELIVRD";
     private static final String DELIVERY_ACK_STATE_UNDELIVERABLE = "UNDELIV";
+    private static final String DELIVERY_ACK_STATE_ENROUTE = "ENROUTE";
     public static final byte ESME_DELIVERY_ACK = 0x04;
     private static final SimpleDateFormat DELIVERY_ACK_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmm");
 
@@ -491,13 +492,26 @@ public class MessageUtil {
             return false;
     }
 
-    public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts) {
-        return createReceiptSms(sms, delivered, ta, origNetworkIdForReceipts, null);
+    public static boolean isReceiptIntermediate(int registeredDelivery) {
+            int code = registeredDelivery & 0x10;
+            if (code == 16 )
+                    return true;
+            else
+                    return false;
     }
 
     public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts,
-            String extraString) {
-        Sms receipt = createReceiptSms(sms, delivered, extraString);
+                    String extraString) {
+            return createReceiptSms(sms, delivered, ta, origNetworkIdForReceipts, extraString, false);
+    }
+
+    public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts) {
+        return createReceiptSms(sms, delivered, ta, origNetworkIdForReceipts, null, false);
+    }
+
+    public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts,
+            String extraString, boolean tempFailure) {
+        Sms receipt = createReceiptSms(sms, delivered, extraString, tempFailure);
         SmsSet backSmsSet = new SmsSet();
         backSmsSet.setDestAddr(ta.getAddr());
         backSmsSet.setDestAddrNpi(ta.getAddrNpi());
@@ -516,6 +530,10 @@ public class MessageUtil {
     }
 
     public static Sms createReceiptSms(Sms sms, boolean delivered, String extraString) {
+            return createReceiptSms(sms, delivered, extraString, false);
+    }
+
+    public static Sms createReceiptSms(Sms sms, boolean delivered, String extraString, boolean tempFailure) {
         Sms receipt = new Sms();
         receipt.setDbId(UUID.randomUUID());
         receipt.setSourceAddr(sms.getSmsSet().getDestAddr());
@@ -547,7 +565,11 @@ public class MessageUtil {
             sb.append(DELIVERY_ACK_ERR);
             sb.append("000");
         } else {
-            sb.append(DELIVERY_ACK_STATE_UNDELIVERABLE);
+                if(!tempFailure) {
+                        sb.append(DELIVERY_ACK_STATE_UNDELIVERABLE);
+                } else {
+                        sb.append(DELIVERY_ACK_STATE_ENROUTE);
+                }
             sb.append(DELIVERY_ACK_ERR);
             ErrorCode errorCode = sms.getSmsSet().getStatus();
             sb.append(errorCode != null ? errorCode.getCodeText() : "null");

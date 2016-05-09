@@ -855,6 +855,12 @@ public abstract class RxSipServerSbb implements Sbb {
 			}
 		}
 
+		// check if we need to send temporary delivery reports
+		if ( errorAction != ErrorAction.permanentFailure &&
+				!smscPropertiesManagement.getReceiptsDisabling() ) {
+			doIntermediateReceipts(smsSet, pers, currentMsgNum, lstFailured);
+		}
+
 		for (Sms sms : lstFailured) {
 			CdrGenerator.generateCdr(sms, CdrGenerator.CDR_FAILED_SIP, reason,
 					smscPropertiesManagement.getGenerateReceiptCdr(),
@@ -968,6 +974,65 @@ public abstract class RxSipServerSbb implements Sbb {
 							this.logger.severe(
 									"PersistenceException when freeSmsSetFailured(SmsSet smsSet) - adding delivery receipt"
 											+ e.getMessage(), e);
+						}
+					}
+				} finally {
+					SmsSetCache.getInstance().removeSmsSet(lock);
+				}
+			}
+		}
+	}
+
+	private void doIntermediateReceipts(SmsSet smsSet, PersistenceRAInterface pers, long currentMsgNum, ArrayList<Sms> lstFailured) {
+		TargetAddress lock;
+		long smsCnt = smsSet.getSmsCount();
+		for (long i1 = currentMsgNum; i1 < smsCnt; i1++) {
+			Sms sms = smsSet.getSms(i1);
+			int registeredDelivery = sms.getRegisteredDelivery();
+			if (MessageUtil.isReceiptIntermediate(registeredDelivery) && lstFailured.indexOf(sms) == -1) {
+				TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(), smsSet.getNetworkId());
+				lock = SmsSetCache.getInstance().addSmsSet(ta);
+				try {
+					synchronized (lock) {
+						try {
+							Sms receipt;
+							if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+								receipt = MessageUtil.createReceiptSms(sms, false);
+								SmsSet backSmsSet = pers.obtainSmsSet(ta);
+								receipt.setSmsSet(backSmsSet);
+								receipt.setStored(true);
+								pers.createLiveSms(receipt);
+								pers.setNewMessageScheduled(receipt.getSmsSet(),
+										MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+							} else {
+								receipt = MessageUtil.createReceiptSms(sms, false, ta, smscPropertiesManagement.getOrigNetworkIdForReceipts(),null,true);
+								boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+								if (!storeAndForwMode) {
+									try {
+										this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
+									} catch (Exception e) {
+										this.logger.severe("Exception when runnung injectSmsOnFly() for receipt in onDeliveryError(): " + e.getMessage(), e);
+									}
+								} else {
+									if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+										try {
+											receipt.setStoringAfterFailure(true);
+											this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
+										} catch (Exception e) {
+											this.logger
+													.severe("Exception when runnung injectSmsOnFly() for receipt in onDeliveryError(): " + e.getMessage(), e);
+										}
+									} else {
+										receipt.setStored(true);
+										this.scheduler.setDestCluster(receipt.getSmsSet());
+										pers.c2_scheduleMessage_ReschedDueSlot(receipt,
+												smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, true);
+									}
+								}
+							}
+							this.logger.info("Adding an error receipt: source=" + receipt.getSourceAddr() + ", dest=" + receipt.getSmsSet().getDestAddr());
+						} catch (PersistenceException e) {
+							this.logger.severe("PersistenceException when freeSmsSetFailured(SmsSet smsSet) - adding delivery receipt" + e.getMessage(), e);
 						}
 					}
 				} finally {

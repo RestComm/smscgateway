@@ -388,7 +388,7 @@ public class SmppSimulatorParameters {
     }
 
     public enum MCDeliveryReceipt {
-        No(0), onSuccessOrFailure(1), onFailure(2), onSuccess(3);
+        No(0), onSuccessOrFailure(1), onFailure(2), onSuccess(3), onSuccessTempOrPermanentFailure(17);
 
         private int code;
 
