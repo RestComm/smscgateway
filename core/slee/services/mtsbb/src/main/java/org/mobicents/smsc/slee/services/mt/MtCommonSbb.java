@@ -740,7 +740,7 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
 		for (long i1 = currentMsgNum; i1 < smsCnt; i1++) {
             Sms sms = smsSet.getSms(i1);
             int registeredDelivery = sms.getRegisteredDelivery();
-            if (MessageUtil.isReceiptOnFailure(registeredDelivery) && lstFailured.indexOf(sms) == -1) {
+            if (MessageUtil.isReceiptIntermediate(registeredDelivery) && lstFailured.indexOf(sms) == -1) {
                 TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(), smsSet.getNetworkId());
                 lock = SmsSetCache.getInstance().addSmsSet(ta);
                 try {
