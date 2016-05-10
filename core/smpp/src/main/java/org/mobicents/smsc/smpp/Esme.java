@@ -794,6 +794,12 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		this.store();
 	}
 
+	@Override
+	public int getEnquireLinkDelayServer() {
+		return this.enquireLinkDelayServer;
+	}
+
+	@Override
 	public void setEnquireLinkDelayServer(int enquireLinkDelayServer) {
 		this.enquireLinkDelayServer = enquireLinkDelayServer;
 		this.store();
@@ -872,6 +878,14 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
 	public void incEnquireLinkFail() {
 		this.enquireLinkFailCnt ++;
+	}
+
+	public boolean getEnquireClientEnabled() {
+		if (this.enquireLinkDelay <= 0) {
+			return false;
+		}
+
+		return true;
 	}
 
     public boolean getEnquireServerEnabled() {
@@ -1113,14 +1127,24 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	@Override
 	public void close() {
 		if (this.defaultSmppSession != null) {
-			this.defaultSmppSession.close();
+			try {
+				defaultSmppSession.close();
+			} catch (Exception e) {
+				logger.error(String.format("Failed to close smpp session for %s.",
+						defaultSmppSession.getConfiguration().getName()));
+			}
 		}
 	}
 
 	@Override
 	public void close(long arg0) {
 		if (this.defaultSmppSession != null) {
-			this.defaultSmppSession.close(arg0);
+			try {
+				defaultSmppSession.close(arg0);
+			} catch (Exception e) {
+				logger.error(String.format("Failed to close smpp session for %s.",
+						defaultSmppSession.getConfiguration().getName()));
+			}
 		}
 	}
 
@@ -1379,7 +1403,12 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	@Override
 	public void unbind(long arg0) {
 		if (this.defaultSmppSession != null) {
-			this.defaultSmppSession.unbind(arg0);
+			try {
+				defaultSmppSession.unbind(arg0);
+			} catch (Exception e) {
+				logger.error(String.format("Failed to unbind smpp session for %s.",
+						defaultSmppSession.getConfiguration().getName()));
+			}
 		}
 
 	}

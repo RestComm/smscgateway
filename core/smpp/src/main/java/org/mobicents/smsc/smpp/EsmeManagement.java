@@ -377,7 +377,12 @@ public class EsmeManagement implements EsmeManagementMBean {
 			if (smppSession != null) {
 				// TODO can server side send UNBIND?
 				// smppSession.unbind(5000);
-				smppSession.close();
+				try {
+					smppSession.close();
+				} catch (Exception e) {
+					logger.error(String.format("Failed to close smpp session for %s.",
+							smppSession.getConfiguration().getName()));
+				}
 				smppSession.destroy();
 			}
 		} else {
