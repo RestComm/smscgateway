@@ -26,6 +26,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.log4j.Logger;
 
 import javolution.util.FastList;
 
@@ -37,6 +38,8 @@ import com.cloudhopper.smpp.impl.DefaultSmppClient;
  * 
  */
 public class SmppClientManagement implements SmppClientManagementMBean {
+
+	private static final Logger logger = Logger.getLogger(SmppClientManagement.class);
 
 	private final EsmeManagement esmeManagement;
 	private final SmppSessionHandlerInterface smppSessionHandlerInterface;
@@ -133,9 +136,20 @@ public class SmppClientManagement implements SmppClientManagementMBean {
 		SmppSession smppSession = esme.getSmppSession();
 		if (smppSession != null) {
 			if (smppSession.isBound()) {
-				smppSession.unbind(5000);
+				try {
+					smppSession.unbind(5000);
+				} catch (Exception e) {
+					logger.error(String.format("Failed to unbind smpp client session for %s.",
+							smppSession.getConfiguration().getName()));
+				}
 			}
-			smppSession.close();
+
+			try {
+				smppSession.close();
+			} catch (Exception e) {
+				logger.error(String.format("Failed to close smpp client session for %s.",
+						smppSession.getConfiguration().getName()));
+			}
 			smppSession.destroy();
 		}
 	}

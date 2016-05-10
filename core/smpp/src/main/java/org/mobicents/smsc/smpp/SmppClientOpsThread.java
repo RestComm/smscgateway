@@ -34,7 +34,6 @@ import com.cloudhopper.smpp.SmppSessionHandler;
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.cloudhopper.smpp.impl.DefaultSmppSession;
 import com.cloudhopper.smpp.pdu.EnquireLink;
-import com.cloudhopper.smpp.pdu.EnquireLinkResp;
 import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;
 import com.cloudhopper.smpp.ssl.SslConfiguration;
@@ -112,10 +111,12 @@ public class SmppClientOpsThread implements Runnable {
 		}
 
 		while (this.started) {
+			FastList<Esme> pendingList = new FastList<>();
 
 			try {
 				synchronized (this.pendingChanges) {
 					Iterator<ChangeRequest> changes = pendingChanges.iterator();
+
 					while (changes.hasNext()) {
 						ChangeRequest change = changes.next();
 						switch (change.getType()) {
@@ -133,14 +134,24 @@ public class SmppClientOpsThread implements Runnable {
 							if (!change.getEsme().isStarted()) {
 								pendingChanges.remove(change);
 							} else {
+								if (!change.getEsme().getEnquireClientEnabled())
+									continue;
+
 								if (change.getExecutionTime() <= System.currentTimeMillis()) {
+									pendingList.add(change.getEsme());
 									pendingChanges.remove(change);
-									enquireLink(change.getEsme());
 								}
 							}
 							break;
 						}
 					}
+				}
+
+				// Sending Enquire messages
+				Iterator<Esme> pendingchanges = pendingList.iterator();
+				while (pendingchanges.hasNext()) {
+					Esme change = pendingchanges.next();
+					this.enquireLink(change);
 				}
 
 				synchronized (this.waitObject) {
@@ -166,9 +177,9 @@ public class SmppClientOpsThread implements Runnable {
 
 		if (smppSession != null && smppSession.isBound()) {
 			try {
-				EnquireLinkResp enquireLinkResp1 = smppSession.enquireLink(new EnquireLink(), 10000);
+				smppSession.enquireLink(new EnquireLink(), 10000);
 
-				// all ok lets scehdule another ENQUIRE_LINK
+				// all ok lets schedule another ENQUIRE_LINK
 				this.scheduleEnquireLink(esme);
 				return;
 
@@ -188,7 +199,12 @@ public class SmppClientOpsThread implements Runnable {
 								esme.getSystemId()), e);
 				// For all other exceptions lets close session and re-try
 				// connect
-				smppSession.close();
+				try {
+					smppSession.close();
+				} catch (Exception ex) {
+					logger.error(String.format("Failed to close smpp client session for %s.",
+							smppSession.getConfiguration().getName()));
+				}
 				this.scheduleConnect(esme);
 			}
 
@@ -198,7 +214,12 @@ public class SmppClientOpsThread implements Runnable {
 					esme.getSystemId(), (smppSession == null ? null : smppSession.getStateName())));
 
 			if (smppSession != null) {
-				smppSession.close();
+				try {
+					smppSession.close();
+				} catch (Exception e) {
+					logger.error(String.format("Failed to close smpp client session for %s.",
+							smppSession.getConfiguration().getName()));
+				}
 			}
 			this.scheduleConnect(esme);
 		}

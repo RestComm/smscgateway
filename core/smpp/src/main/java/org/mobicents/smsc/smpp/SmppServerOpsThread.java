@@ -111,16 +111,21 @@ public class SmppServerOpsThread implements Runnable {
                     } // for
                 }
 
+				// Sending Enquire messages
+				Iterator<Esme> changes = pendingList.iterator();
+				while (changes.hasNext()) {
+					Esme change = changes.next();
+					this.enquireLink(change);
+				}
+				
+				synchronized (this.waitObject) {
+					this.waitObject.wait(5000);
+				}
+
 			} catch (Exception e) {
 				logger.error("Error while looping SmpServerOpsThread thread", e);
 			}
 
-            // Sending Enquire messages
-            Iterator<Esme> changes = pendingList.iterator();
-            while (changes.hasNext()) {
-                Esme change = changes.next();
-                this.enquireLink(change);
-            }
 		}// while
 
 		if (logger.isInfoEnabled()) {
@@ -141,9 +146,8 @@ public class SmppServerOpsThread implements Runnable {
                 //esme.incEnquireLinkFail();
 
                 // Update next sending time
-                this.esmesServer.put(esme.getName(), System.currentTimeMillis() +
+                this.scheduleEnquireList(esme.getName(), System.currentTimeMillis() +
                         esme.getEnquireLinkDelay());
-				return;
 
 			} catch (Exception e) {
 
@@ -160,7 +164,12 @@ public class SmppServerOpsThread implements Runnable {
 					esme.getSystemId(), (smppSession == null ? null : smppSession.getStateName())));
 
 			if (smppSession != null) {
-				smppSession.close();
+				try {
+					smppSession.close();
+				} catch (Exception e) {
+					logger.error(String.format("Failed to close smpp server session for %s.",
+							smppSession.getConfiguration().getName()));
+				}
 				smppSession.destroy();
 				return;
 			}
@@ -169,7 +178,12 @@ public class SmppServerOpsThread implements Runnable {
 		if (this.MAX_ENQUIRE_FAILED <= esme.getEnquireLinkFail()) {
 			logger.info("Esme Server destroy due to Enquire for ESME SystemId=" + esme.getSystemId());
             this.esmesServer.remove(esme.getName());
-			smppSession.close();
+			try {
+				smppSession.close();
+			} catch (Exception e) {
+				logger.error(String.format("Failed to close smpp server session for %s.",
+						smppSession.getConfiguration().getName()));
+			}
 			smppSession.destroy();
 		}
 	}
