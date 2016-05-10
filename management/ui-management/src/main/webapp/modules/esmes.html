@@ -331,7 +331,14 @@
 						<input id="enqLinkDelay" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Enquire Link Delay" value="30000"/>
 					</span>	
 				</div>
-				
+
+				<div id="div-enqLinkDelayServer" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When SMSC connects to remote client as SERVER, it sends ENQUIRE_LINK every configured enquire-link-delay">
+						<span class="add-on">Enquire Link Delay Server</span>
+						<input id="enqLinkDelayServer" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Enquire Link Delay Server" value="0"/>
+					</span>	
+				</div>
+
 				<div id="div-ratelimitSec" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="throttling of SMS per second for this connection. 0 means no limit">
 						<span class="add-on">Rate Limit Per Seconds</span>
@@ -414,6 +421,7 @@
 			document.getElementById("windowWaitTimeout").disabled = true;
 			document.getElementById("countersEnabled").disabled = true;
 			document.getElementById("enqLinkDelay").disabled = true;
+			document.getElementById("enqLinkDelayServer").disabled = false;
 			
 		} else {
 			document.getElementById("windowSize").disabled = false;
@@ -423,6 +431,8 @@
 			document.getElementById("windowWaitTimeout").disabled = false;
 			document.getElementById("countersEnabled").disabled = false;
 			document.getElementById("enqLinkDelay").disabled = false;
+			document.getElementById("enqLinkDelayServer").disabled = true;
+
 		}
 		
 	}
@@ -498,7 +508,8 @@
 									var windowMonitorEnabled = response.value.WindowMonitorEnabled;
 									var countersEnabled = response.value.CountersEnabled;
 									var enquireLinkDelay = response.value.EnquireLinkDelay;
-									
+									var enquireLinkDelayServer = response.value.EnquireLinkDelayServer;
+
 									var boundDuration = response.value.BoundDuration;
 									var rxDataSMCounter = response.value.RxDataSMCounter;
 									var rxDeliverSMCounter = response.value.RxDeliverSMCounter;
@@ -645,6 +656,7 @@
 														'<dt>WindowMonitorEnabled</dt> <dd>' + windowMonitorEnabled + ' </dd>' +
 														'<dt>CountersEnabled</dt> <dd>' + countersEnabled + ' </dd>' +
 														'<dt>EnquireLinkDelay</dt> <dd>' + enquireLinkDelay + ' </dd>' +
+														'<dt>EnquireLinkDelayServer</dt> <dd>' + enquireLinkDelayServer + ' </dd>' +
 													'</dl>'+
 									        '    </div>'+	
 									        '<hr style="margin: 5px 0;"/>' +
@@ -963,6 +975,22 @@
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnquireLinkDelay"+']\').toggle(); $(\'input[id^='+name+"EnquireLinkDelay"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+
+
+																		'<tr data-toggle="tooltip" title="When SMSC connects to a remote client as SERVER, it sends an ENQUIRE_LINK after every configured enquire-link-delay-server.">'+
+																			'<td style="font-size: 0.9em;">Enquire Link Delay SERVER</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'EnquireLinkDelayServer-input" class="control-group">'+
+																				'<span id="' + name +'EnquireLinkDelayServer-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + enquireLinkDelayServer + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EnquireLinkDelayServer\', \'' + name+"EnquireLinkDelayServer" + '\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnquireLinkDelayServer"+']\').toggle(); $(\'input[id^='+name+"EnquireLinkDelayServer"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name + 'EnquireLinkDelayServer-text">' + enquireLinkDelayServer + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnquireLinkDelayServer"+']\').toggle(); $(\'input[id^='+name+"EnquireLinkDelayServer"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
 																		
 																		'<tr data-toggle="tooltip" title="Sets charging for this ESME. If charging is enabled, SMSC will try to deduct the units from charging server. If charging server returns negative response or error, SMS will be dropped and CDR will be logged">'+
 																			'<td style="font-size: 0.9em;">Charging Enabled</td>'+
@@ -1982,7 +2010,12 @@
 		if(enqLinkDelay == null){
 			enqLinkDelay = "30000";
 		}
-		
+
+		var enqLinkDelayServer = $("#enqLinkDelayServer").val();
+		if(enqLinkDelayServer == null){
+			enqLinkDelay = "0";
+		}
+
 		var e6 = document.getElementById("chargingEnabled");
 		var chargingEnabled = e6.options[e5.selectedIndex].text;
 		
@@ -2034,7 +2067,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
+		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
 				{
 					success: function(value) {
 						updateEsmes();
