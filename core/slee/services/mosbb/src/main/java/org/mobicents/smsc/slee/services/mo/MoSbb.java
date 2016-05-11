@@ -372,6 +372,13 @@ public abstract class MoSbb extends MoCommonSbb {
                     originatorSccpAddress = gt.getDigits();
             }
             if (isMt) {
+            	String originatorSccpAddress = null;
+                SccpAddress sccpAddress = dialog.getRemoteAddress();
+                if (sccpAddress != null) {
+                    GlobalTitle gt = dialog.getRemoteAddress().getGlobalTitle();
+                    if (gt != null)
+                        originatorSccpAddress = gt.getDigits();
+                }
                 sms = this.processMtMessage(evt.getSM_RP_OA(), evt.getSM_RP_DA(), evt.getSM_RP_UI(), dialog.getNetworkId(),
                 		originatorSccpAddress, false, evt.getMAPDialog(), evt, evt.getInvokeId());
             } else {
