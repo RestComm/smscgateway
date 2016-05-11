@@ -290,12 +290,12 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 
 	public void stop() throws Exception {
 
-        // stop SmppServerOpsThread
-        logger.info("Stopping SmppServerOpsThread...");
-        this.smppServerOpsThread.setStarted(false);
-        logger.info("SmppServerOpsThread stopped");
+		// stop SmppServerOpsThread
+		logger.info("Stopping SmppServerOpsThread...");
+		this.smppServerOpsThread.setStarted(false);
+		logger.info("SmppServerOpsThread stopped");
 
-        logger.info("Stopping SMPP server...");
+		logger.info("Stopping SMPP server...");
 		this.defaultSmppServer.stop();
 
 		// this.executor.shutdownNow();

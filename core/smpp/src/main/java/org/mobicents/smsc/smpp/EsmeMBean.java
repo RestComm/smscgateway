@@ -260,7 +260,7 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 	 */
 	void setEnquireLinkDelay(int enquireLinkDelay);
 
-    int getEnquireLinkDelay();
+	int getEnquireLinkDelay();
 
 	/**
 	 * Default value is 0 milli seconds (means disabled). When SMSC connects to a remote
@@ -272,7 +272,7 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
 	void setEnquireLinkDelayServer(int enquireLinkDelay);
 
-    int getEnquireLinkDelayServer();
+	int getEnquireLinkDelayServer();
 
     void setPassword(String password);
 

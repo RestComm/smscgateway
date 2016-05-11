@@ -37,17 +37,17 @@ public class SmppServerOpsThread implements Runnable {
 
 	protected volatile boolean started = true;
 
-    private static final int MAX_ENQUIRE_FAILED = 1;
+	private static final int MAX_ENQUIRE_FAILED = 1;
 
-    private FastMap<String, Long> esmesServer;
+	private FastMap<String, Long> esmesServer;
 
-    private final EsmeManagement esmeManagement;
+	private final EsmeManagement esmeManagement;
 
 	private Object waitObject = new Object();
 
 	public SmppServerOpsThread(EsmeManagement esmeManagement) {
-        this.esmeManagement = esmeManagement;
-        this.esmesServer = esmeManagement.esmesServer;
+		this.esmeManagement = esmeManagement;
+		this.esmesServer = esmeManagement.esmesServer;
 
 	}
 
@@ -59,27 +59,27 @@ public class SmppServerOpsThread implements Runnable {
 		}
 	}
 
-    protected void scheduleEnquireList(String esmeServerName, Long delayValue) {
-        synchronized (this.esmesServer) {
-            this.esmesServer.put(esmeServerName, delayValue);
-        }
+	protected void scheduleEnquireList(String esmeServerName, Long delayValue) {
+		synchronized (this.esmesServer) {
+			this.esmesServer.put(esmeServerName, delayValue);
+		}
 
-        synchronized (this.waitObject) {
-            this.waitObject.notify();
-        }
-    }
+		synchronized (this.waitObject) {
+			this.waitObject.notify();
+		}
+	}
 
-    protected void removeEnquireList(String esmeServerName) {
-        synchronized (this.esmesServer) {
-            this.esmesServer.remove (esmeServerName);
-        }
+		protected void removeEnquireList(String esmeServerName) {
+			synchronized (this.esmesServer) {
+				this.esmesServer.remove (esmeServerName);
+			}
 
-        synchronized (this.waitObject) {
-            this.waitObject.notify();
-        }
-    }
+		synchronized (this.waitObject) {
+			this.waitObject.notify();
+		}
+	}
 
-    @Override
+	@Override
 	public void run() {
 		if (logger.isInfoEnabled()) {
 			logger.info("SmppServerOpsThread started.");
@@ -87,29 +87,29 @@ public class SmppServerOpsThread implements Runnable {
 
 		while (this.started) {
 
-            FastList<Esme> pendingList = new FastList<>();
+			FastList<Esme> pendingList = new FastList<>();
 
 			try {
-                synchronized (this.esmesServer) {
-                    for (String esmeServerName: this.esmesServer.keySet()) {
-                        Esme nextServer =  this.esmeManagement.getEsmeByName(esmeServerName);
+				synchronized (this.esmesServer) {
+					for (String esmeServerName: this.esmesServer.keySet()) {
+						Esme nextServer =  this.esmeManagement.getEsmeByName(esmeServerName);
 
-                        if (!nextServer.isStarted()) {
-                            nextServer.setServerBound(false);
-                        }
+						if (!nextServer.isStarted()) {
+							nextServer.setServerBound(false);
+						}
 
-                        if (!nextServer.getEnquireServerEnabled() || !nextServer.isServerBound()) {
-                            continue;
-                        }
+						if (!nextServer.getEnquireServerEnabled() || !nextServer.isServerBound()) {
+							continue;
+						}
 
-                        // server is always in the list, let send enquire message
-                        Long delay = this.esmesServer.get(nextServer.getName());
+						// server is always in the list, let send enquire message
+						Long delay = this.esmesServer.get(nextServer.getName());
 
-                        if (delay <= System.currentTimeMillis()) {
-                            pendingList.add(nextServer);
-                        }
-                    } // for
-                }
+						if (delay <= System.currentTimeMillis()) {
+							pendingList.add(nextServer);
+						}
+					} // for
+				}
 
 				// Sending Enquire messages
 				Iterator<Esme> changes = pendingList.iterator();
@@ -142,12 +142,12 @@ public class SmppServerOpsThread implements Runnable {
 
 				esme.resetEnquireLinkFail();
 
-                //debug
-                //esme.incEnquireLinkFail();
+				//debug
+				//esme.incEnquireLinkFail();
 
-                // Update next sending time
-                this.scheduleEnquireList(esme.getName(), System.currentTimeMillis() +
-                        esme.getEnquireLinkDelay());
+				// Update next sending time
+				this.scheduleEnquireList(esme.getName(), System.currentTimeMillis() +
+						esme.getEnquireLinkDelay());
 
 			} catch (Exception e) {
 
@@ -177,7 +177,6 @@ public class SmppServerOpsThread implements Runnable {
 
 		if (this.MAX_ENQUIRE_FAILED <= esme.getEnquireLinkFail()) {
 			logger.info("Esme Server destroy due to Enquire for ESME SystemId=" + esme.getSystemId());
-            this.esmesServer.remove(esme.getName());
 			try {
 				smppSession.close();
 			} catch (Exception e) {
