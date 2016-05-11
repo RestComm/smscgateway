@@ -88,7 +88,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private static final String WINDOW_WAIT_TIMEOUT = "windowWaitTimeout";
 
 	private static final String ENQUIRE_LINK_DELAY = "enquireLinkDelay";
+<<<<<<< HEAD
+	private static final String ENQUIRE_LINK_DELAY_SERVER = "enquireLinkDelayServer";	
+=======
     private static final String ENQUIRE_LINK_DELAY_SERVER = "enquireLinkDelayServer";	
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 	private static final String COUNTERS_ENABLED = "countersEnabled";
 
     private static final String RATE_LIMIT_PER_SECOND = "rateLimitPerSecond";
@@ -144,7 +148,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private boolean countersEnabled = true;
 
 	private int enquireLinkDelay = 30000;
+<<<<<<< HEAD
+	private int enquireLinkDelayServer = 0;	
+=======
     private int enquireLinkDelayServer = 0;	
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
 	// Default Server
 	private SmppSession.Type smppSessionType = SmppSession.Type.SERVER;
@@ -206,7 +214,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	protected transient EsmeManagement esmeManagement = null;
 
 	private boolean started = false;
+<<<<<<< HEAD
+	private boolean serverBound = false;
+=======
     private boolean serverBound = false;
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 	private int enquireLinkFailCnt = 0;
 
     private String state = SmppSession.STATES[SmppSession.STATE_CLOSED];
@@ -230,6 +242,16 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	 * @param smscManagement
 	 * @param state
 	 */
+<<<<<<< HEAD
+	public Esme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
+		String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
+		SmppBindType smppBindType, Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout,
+		long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
+		int enquireLinkDelay, int enquireLinkDelayServer, int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon,
+		int routingNpi, String routingAddressRange, int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
+		long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
+		int maxMessageLength
+=======
     public Esme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
             String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
             SmppBindType smppBindType, Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout,
@@ -238,6 +260,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             int routingNpi, String routingAddressRange, int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
             int maxMessageLength
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
     ) {
 		this.name = name;
@@ -270,7 +293,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		this.countersEnabled = countersEnabled;
 
 		this.enquireLinkDelay = enquireLinkDelay;
+<<<<<<< HEAD
+		this.enquireLinkDelayServer = enquireLinkDelayServer;
+=======
         this.enquireLinkDelayServer = enquireLinkDelayServer;
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
 		this.sourceTon = sourceTon;
 		this.sourceNpi = sourceNpi;
@@ -946,7 +973,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			esme.windowWaitTimeout = xml.getAttribute(WINDOW_WAIT_TIMEOUT, 0L);
 			esme.countersEnabled = xml.getAttribute(COUNTERS_ENABLED, true);
 			esme.enquireLinkDelay = xml.getAttribute(ENQUIRE_LINK_DELAY, 30000);
+<<<<<<< HEAD
+			esme.enquireLinkDelayServer = xml.getAttribute(ENQUIRE_LINK_DELAY_SERVER, 0);
+=======
             esme.enquireLinkDelayServer = xml.getAttribute(ENQUIRE_LINK_DELAY_SERVER, 0);
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
 			esme.chargingEnabled = xml.getAttribute(CHARGING_ENABLED, false);
 
@@ -1044,7 +1075,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			xml.setAttribute(WINDOW_WAIT_TIMEOUT, esme.windowWaitTimeout);
 			xml.setAttribute(COUNTERS_ENABLED, esme.countersEnabled);
 			xml.setAttribute(ENQUIRE_LINK_DELAY, esme.enquireLinkDelay);
+<<<<<<< HEAD
+			xml.setAttribute(ENQUIRE_LINK_DELAY_SERVER, esme.enquireLinkDelayServer);
+=======
             xml.setAttribute(ENQUIRE_LINK_DELAY_SERVER, esme.enquireLinkDelayServer);
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
 			xml.setAttribute(CHARGING_ENABLED, esme.chargingEnabled);
 

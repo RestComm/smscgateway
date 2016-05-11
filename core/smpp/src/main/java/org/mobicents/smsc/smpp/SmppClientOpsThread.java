@@ -134,12 +134,21 @@ public class SmppClientOpsThread implements Runnable {
 							if (!change.getEsme().isStarted()) {
 								pendingChanges.remove(change);
 							} else {
+<<<<<<< HEAD
+								if (change.getEsme().getEnquireClientEnabled()) {
+
+									if (change.getExecutionTime() <= System.currentTimeMillis()) {
+										pendingList.add(change.getEsme());
+										pendingChanges.remove(change);
+									}
+=======
 								if (!change.getEsme().getEnquireClientEnabled())
 									continue;
 
 								if (change.getExecutionTime() <= System.currentTimeMillis()) {
 									pendingList.add(change.getEsme());
 									pendingChanges.remove(change);
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 								}
 							}
 							break;

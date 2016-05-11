@@ -37,17 +37,30 @@ public class SmppServerOpsThread implements Runnable {
 
 	protected volatile boolean started = true;
 
+<<<<<<< HEAD
+	private static final int MAX_ENQUIRE_FAILED = 1;
+
+	private FastMap<String, Long> esmesServer;
+
+	private final EsmeManagement esmeManagement;
+=======
     private static final int MAX_ENQUIRE_FAILED = 1;
 
     private FastMap<String, Long> esmesServer;
 
     private final EsmeManagement esmeManagement;
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
 	private Object waitObject = new Object();
 
 	public SmppServerOpsThread(EsmeManagement esmeManagement) {
+<<<<<<< HEAD
+		this.esmeManagement = esmeManagement;
+		this.esmesServer = esmeManagement.esmesServer;
+=======
         this.esmeManagement = esmeManagement;
         this.esmesServer = esmeManagement.esmesServer;
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
 	}
 
@@ -59,6 +72,29 @@ public class SmppServerOpsThread implements Runnable {
 		}
 	}
 
+<<<<<<< HEAD
+	protected void scheduleEnquireList(String esmeServerName, Long delayValue) {
+		synchronized (this.esmesServer) {
+			this.esmesServer.put(esmeServerName, delayValue);
+		}
+
+		synchronized (this.waitObject) {
+			this.waitObject.notify();
+		}
+	}
+
+		protected void removeEnquireList(String esmeServerName) {
+			synchronized (this.esmesServer) {
+				this.esmesServer.remove (esmeServerName);
+			}
+
+		synchronized (this.waitObject) {
+			this.waitObject.notify();
+		}
+	}
+
+	@Override
+=======
     protected void scheduleEnquireList(String esmeServerName, Long delayValue) {
         synchronized (this.esmesServer) {
             this.esmesServer.put(esmeServerName, delayValue);
@@ -80,6 +116,7 @@ public class SmppServerOpsThread implements Runnable {
     }
 
     @Override
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 	public void run() {
 		if (logger.isInfoEnabled()) {
 			logger.info("SmppServerOpsThread started.");
@@ -87,6 +124,31 @@ public class SmppServerOpsThread implements Runnable {
 
 		while (this.started) {
 
+<<<<<<< HEAD
+			FastList<Esme> pendingList = new FastList<>();
+
+			try {
+				synchronized (this.esmesServer) {
+					for (String esmeServerName: this.esmesServer.keySet()) {
+						Esme nextServer =  this.esmeManagement.getEsmeByName(esmeServerName);
+
+						if (!nextServer.isStarted()) {
+							nextServer.setServerBound(false);
+						}
+
+						if (!nextServer.getEnquireServerEnabled() || !nextServer.isServerBound()) {
+							continue;
+						}
+
+						// server is always in the list, let send enquire message
+						Long delay = this.esmesServer.get(nextServer.getName());
+
+						if (delay <= System.currentTimeMillis()) {
+							pendingList.add(nextServer);
+						}
+					} // for
+				}
+=======
             FastList<Esme> pendingList = new FastList<>();
 
 			try {
@@ -110,6 +172,7 @@ public class SmppServerOpsThread implements Runnable {
                         }
                     } // for
                 }
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
 				// Sending Enquire messages
 				Iterator<Esme> changes = pendingList.iterator();
@@ -142,12 +205,21 @@ public class SmppServerOpsThread implements Runnable {
 
 				esme.resetEnquireLinkFail();
 
+<<<<<<< HEAD
+				//debug
+				//esme.incEnquireLinkFail();
+
+				// Update next sending time
+				this.scheduleEnquireList(esme.getName(), System.currentTimeMillis() +
+						esme.getEnquireLinkDelay());
+=======
                 //debug
                 //esme.incEnquireLinkFail();
 
                 // Update next sending time
                 this.scheduleEnquireList(esme.getName(), System.currentTimeMillis() +
                         esme.getEnquireLinkDelay());
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
 			} catch (Exception e) {
 
@@ -177,7 +249,10 @@ public class SmppServerOpsThread implements Runnable {
 
 		if (this.MAX_ENQUIRE_FAILED <= esme.getEnquireLinkFail()) {
 			logger.info("Esme Server destroy due to Enquire for ESME SystemId=" + esme.getSystemId());
+<<<<<<< HEAD
+=======
             this.esmesServer.remove(esme.getName());
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 			try {
 				smppSession.close();
 			} catch (Exception e) {

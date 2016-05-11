@@ -260,7 +260,19 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 	 */
 	void setEnquireLinkDelay(int enquireLinkDelay);
 
-    int getEnquireLinkDelay();
+	int getEnquireLinkDelay();
+
+	/**
+	 * Default value is 0 milli seconds (means disabled). When SMSC connects to a remote
+	 * client as SERVER, it sends an 'ENQUIRE_LINK' after every configured
+	 * enquire-link-delay-server.
+	 * 
+	 * @param enquireLinkDelayServer
+	 */
+
+	void setEnquireLinkDelayServer(int enquireLinkDelay);
+
+	int getEnquireLinkDelayServer();
 
 	/**
 	 * Default value is 0 milli seconds (means disabled). When SMSC connects to a remote

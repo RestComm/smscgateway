@@ -35,6 +35,16 @@ public interface EsmeManagementMBean {
 
 	Esme getEsmeByClusterName(String esmeClusterName);
 
+<<<<<<< HEAD
+	Esme createEsme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
+		String smppBindType, String systemType, String smppIntVersion, byte ton, byte npi, String address,
+		String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long windowMonitorInterval,
+		long windowWaitTimeout, String clusterName, boolean countersEnabled, int enquireLinkDelay, int enquireLinkDelayServer,
+		int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
+		int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour, long rateLimitPerDay,
+		int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength, int maxMessageLength
+		) throws Exception;
+=======
     Esme createEsme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
             String smppBindType, String systemType, String smppIntVersion, byte ton, byte npi, String address,
             String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long windowMonitorInterval,
@@ -43,6 +53,7 @@ public interface EsmeManagementMBean {
             int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour, long rateLimitPerDay,
             int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength, int maxMessageLength
             ) throws Exception;
+>>>>>>> b49055ed090e0b51bea0c868fbf331d2f4c67882
 
 	Esme destroyEsme(String esmeName) throws Exception;
 
