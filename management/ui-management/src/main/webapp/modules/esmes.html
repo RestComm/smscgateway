@@ -300,7 +300,14 @@
 						<input id="reqExpTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Request Expiry Timeout" value="-1"/>
 					</span>	
 				</div>
-							
+
+				<div id="div-clientBindTimeout" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Amount of time to wait in milli seconds for an SMPP server to respond to before it expires. This is useful only when ESME is defined as Client Side. For Server side this value is taken from SMPP Server Setting.">
+						<span class="add-on">Client Bind Timeout</span>
+						<input id="clientBindTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Client Bind Timeout" value="5000"/>
+					</span>	
+				</div>
+
 				<div id="div-windowMonitorInterval" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Amount of time between executions of monitoring the window for requests that expire. It's recommended that this generally either matches or is half the value of request-expiry-timeout. Therefore, at worst a request would could take up 1.5X the requestExpiryTimeout to clear out. -1 is disabled. This is useful only when ESME is defined as Client Side. For Server side this value is taken from SMPP Server Setting.">
 						<span class="add-on">Windows Monitor Interval</span>
@@ -417,6 +424,7 @@
 			document.getElementById("windowSize").disabled = true;
 			document.getElementById("connectTimeout").disabled = true;
 			document.getElementById("reqExpTimeout").disabled = true;
+			document.getElementById("clientBindTimeout").disabled = true;
 			document.getElementById("windowMonitorInterval").disabled = true;
 			document.getElementById("windowWaitTimeout").disabled = true;
 			document.getElementById("countersEnabled").disabled = true;
@@ -502,6 +510,7 @@
 									var windowSize = response.value.WindowSize;
 									var connectTimeout = response.value.ConnectTimeout;
 									var requestExpiryTimeout = response.value.RequestExpiryTimeout;
+									var clientBindTimeout = response.value.ClientBindTimeout;
 									var windowMonitorInterval = response.value.WindowMonitorInterval;
 									var windowWaitTimeout = response.value.WindowWaitTimeout;
 									var maxWindowSize = response.value.MaxWindowSize;
@@ -650,6 +659,7 @@
 														'<dt>ConnectTimeout</dt> <dd>' + connectTimeout + ' </dd>' +
 														'<dt>WindowSize</dt> <dd>' + windowSize + ' </dd>' +
 														'<dt>RequestExpiryTimeout</dt> <dd>' + requestExpiryTimeout + ' </dd>' +
+														'<dt>ClientBindTimeout</dt> <dd>' + clientBindTimeout + ' </dd>' +
 														'<dt>WindowMonitorInterval</dt> <dd>' + windowMonitorInterval + ' </dd>' +
 														'<dt>WindowWaitTimeout</dt> <dd>' + windowWaitTimeout + ' </dd>' +
 														'<dt>MaxWindowSize</dt> <dd>' + maxWindowSize + ' </dd>' +
@@ -911,7 +921,23 @@
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"RequestExpiryTimeout"+']\').toggle(); $(\'input[id^='+name+"RequestExpiryTimeout"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+	
-																		
+
+																		'<tr data-toggle="tooltip" title="Value takes effect only when ESME is restarted. Default value is 5000. This parameter is used to specify the time to wait in milli seconds for an SMPP Server to respond to before it expires. This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the SMPP Server Settings">'+
+																			'<td style="font-size: 0.9em;">Client Bind Timeout</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'ClientBindTimeout-input" class="control-group">'+
+																				'<span id="' + name +'ClientBindTimeout-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + clientBindTimeout + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'ClientBindTimeout\', \'' + name+"ClientBindTimeout" + '\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ClientBindTimeout"+']\').toggle(); $(\'input[id^='+name+"ClientBindTimeout"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name + 'ClientBindTimeout-text">' + requestExpiryTimeout + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"ClientBindTimeout"+']\').toggle(); $(\'input[id^='+name+"ClientBindTimeout"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+	
+
 																		'<tr data-toggle="tooltip" title="Value takes effect only when ESME is restarted. Default value is -1 (disabled). This parameter is used to specify the time between executions of monitoring the window for requests that expire. It is recommended that this value, generally, either matches or is half the value of request-expiry-timeout. Therefore, in the worst case scenario, a request could take upto 1.5 times the requestExpiryTimeout to clear out. This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the SMPP Server Settings.">'+
 																			'<td style="font-size: 0.9em;">Window Monitor Interval</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1992,7 +2018,12 @@
 		if(reqExpTimeout == null){
 			reqExpTimeout = "-1";
 		}
-		
+
+		var clientBindTimeout = $("#clientBindTimeout").val();
+		if(clientBindTimeout == null){
+			clientBindTimeout = "5000";
+		}
+
 		var windowMonitorInterval = $("#windowMonitorInterval").val();
 		if(windowMonitorInterval == null){
 			windowMonitorInterval = "-1";
@@ -2067,7 +2098,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
+		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
 				{
 					success: function(value) {
 						updateEsmes();

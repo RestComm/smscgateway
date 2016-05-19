@@ -37,9 +37,8 @@
 	<property name="restcomm-slee-sip11.tag" value="2.8.${restcomm-slee-sip11.build-number}" />
 	<property name="restcomm-slee-sip11.version" value="${restcomm-slee-sip11.tag}" />
 
-	<property name="restcomm-jss7.build-number" value="1356" />
-	<property name="restcomm-jss7.version" value="3.0.${restcomm-jss7.build-number}" />
-	<property name="restcomm-jss7.timestamp" value="1605011445" />
+	<property name="restcomm-jss7.build-number" value="1367" />
+	<property name="restcomm-jss7.version" value="7.0.${restcomm-jss7.build-number}" />
 	<property name="restcomm-jss7.tag" value="${restcomm-jss7.version}" />
 
 
@@ -64,7 +63,7 @@
 	<property name="restcomm-slee.download.distro.file" value="${restcomm-slee.download.distro.name}.zip" />
 	<property name="restcomm-slee.download.url" value="${cloudbees.url}/job/Restcomm-JAIN-SLEE-Release/${restcomm-slee.build-number}/artifact/release/${restcomm-slee.download.distro.file}" />
 	<property name="restcomm-slee.distro.zip.path" value="${checkout.dir}/${restcomm-slee.download.distro.file}" />
-	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm-jss7.version}-${restcomm-jss7.timestamp}.zip" />
+	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm-jss7.version}.zip" />
 	<property name="restcomm-jss7.download.url" value="${cloudbees.url}/job/Restcomm-jSS7/${restcomm-jss7.build-number}/artifact/release/${restcomm-jss7.download.distro.file}" />
 	<property name="restcomm-jss7.distro.zip.path" value="${checkout.dir}/${restcomm-jss7.download.distro.file}" />
 	

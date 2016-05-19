@@ -84,6 +84,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private static final String WINDOW_SIZE = "windowSize";
 	private static final String CONNECT_TIMEOUT = "connectTimeout";
 	private static final String REQUEST_EXPIRY_TIMEOUT = "requestExpiryTimeout";
+	private static final String CLIENT_BIND_TIMEOUT = "clientBindTimeout";	
 	private static final String WINDOW_MONITOR_INTERVAL = "windowMonitorInterval";
 	private static final String WINDOW_WAIT_TIMEOUT = "windowWaitTimeout";
 
@@ -164,6 +165,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	// Client side config. Defaul 100
 	private int windowSize;
 	private long connectTimeout;
+	private long clientBindTimeout;
 
 	/**
 	 * Set the amount of time(ms) to wait for an endpoint to respond to a
@@ -233,7 +235,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	public Esme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
 		String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
 		SmppBindType smppBindType, Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout,
-		long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
+		long clientBindTimeout, long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
 		int enquireLinkDelay, int enquireLinkDelayServer, int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon,
 		int routingNpi, String routingAddressRange, int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
 		long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
@@ -261,6 +263,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		this.windowSize = windowSize;
 		this.connectTimeout = connectTimeout;
 		this.requestExpiryTimeout = requestExpiryTimeout;
+		this.clientBindTimeout = clientBindTimeout;
 
 		this.windowMonitorInterval = windowMonitorInterval;
 		this.windowWaitTimeout = windowWaitTimeout;
@@ -655,6 +658,22 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	}
 
 	/**
+	 * @return the clientBindTimeout
+	 */
+	public long getclientBindTimeout() {
+		return this.clientBindTimeout;
+	}
+
+	/**
+	 * @param clientBindTimeout
+	 *            the clientBindTimeout to set
+	 */
+	public void setclientBindTimeout(long clientBindTimeout) {
+		this.clientBindTimeout = clientBindTimeout;
+		this.store();
+	}
+
+	/**
 	 * @return the windowMonitorInterval
 	 */
 	@Override
@@ -942,6 +961,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			esme.windowSize = xml.getAttribute(WINDOW_SIZE, 0);
 			esme.connectTimeout = xml.getAttribute(CONNECT_TIMEOUT, 0L);
 			esme.requestExpiryTimeout = xml.getAttribute(REQUEST_EXPIRY_TIMEOUT, 0L);
+			esme.clientBindTimeout = xml.getAttribute(CLIENT_BIND_TIMEOUT, 0L);
+
 			esme.windowMonitorInterval = xml.getAttribute(WINDOW_MONITOR_INTERVAL, 0L);
 			esme.windowWaitTimeout = xml.getAttribute(WINDOW_WAIT_TIMEOUT, 0L);
 			esme.countersEnabled = xml.getAttribute(COUNTERS_ENABLED, true);
@@ -1040,6 +1061,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			xml.setAttribute(WINDOW_SIZE, esme.windowSize);
 			xml.setAttribute(CONNECT_TIMEOUT, esme.connectTimeout);
 			xml.setAttribute(REQUEST_EXPIRY_TIMEOUT, esme.requestExpiryTimeout);
+			xml.setAttribute(CLIENT_BIND_TIMEOUT, esme.clientBindTimeout);
+
 			xml.setAttribute(WINDOW_MONITOR_INTERVAL, esme.windowMonitorInterval);
 			xml.setAttribute(WINDOW_WAIT_TIMEOUT, esme.windowWaitTimeout);
 			xml.setAttribute(COUNTERS_ENABLED, esme.countersEnabled);

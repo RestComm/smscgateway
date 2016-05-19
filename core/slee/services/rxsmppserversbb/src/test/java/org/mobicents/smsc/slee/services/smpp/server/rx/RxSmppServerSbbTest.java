@@ -146,6 +146,7 @@ public class RxSmppServerSbbTest {
         int windowSize = SmppConstants.DEFAULT_WINDOW_SIZE;
         long connectTimeout = SmppConstants.DEFAULT_CONNECT_TIMEOUT;
         long requestExpiryTimeout = SmppConstants.DEFAULT_REQUEST_EXPIRY_TIMEOUT;
+        long clientBindTimeout = SmppConstants.DEFAULT_BIND_TIMEOUT;
         long windowMonitorInterval = SmppConstants.DEFAULT_WINDOW_MONITOR_INTERVAL;
         long windowWaitTimeout = SmppConstants.DEFAULT_WINDOW_WAIT_TIMEOUT;
 
@@ -171,7 +172,7 @@ public class RxSmppServerSbbTest {
 //                throws Exception;
 //
         esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null, SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER,
-                SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, 0,
+                SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, 0,
                 -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, 0, 0, 0, 0, -1, -1, -1, -1);
 
         SmsSetCache.getInstance().clearProcessingSmsSet();

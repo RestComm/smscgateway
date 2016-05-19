@@ -244,6 +244,7 @@ public class SmppClientOpsThread implements Runnable {
 			config0.setWindowSize(esme.getWindowSize());
 			config0.setName(esme.getSystemId());
 			config0.setType(esme.getSmppBindType());
+			config0.setBindTimeout(esme.getclientBindTimeout());
 			config0.setHost(esme.getHost());
 			config0.setPort(esme.getPort());
 			config0.setConnectTimeout(esme.getConnectTimeout());
