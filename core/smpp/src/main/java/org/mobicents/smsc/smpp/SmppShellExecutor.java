@@ -73,7 +73,7 @@ public class SmppShellExecutor implements ShellExecutor {
     /**
      * Command is smpp esme modify <name> password <password> networkid <networkid> esme-ton <esme address ton> esme-npi <esme address npi> esme-range
      * <esme address range> window-size <windowSize> connect-timeout <connectTimeout> request-expiry-timeout
-     * <requestExpiryTimeout> window-monitor-interval <windowMonitorInterval> window-wait-timeout <windowWaitTimeout>
+     * <requestExpiryTimeout> client-bind-timeout <clientBindTimeout> window-monitor-interval <windowMonitorInterval> window-wait-timeout <windowWaitTimeout>
      * counters-enabled <true | false> enquire-link-delay <30000> enquire-link-delay-server <0> charging-enabled <true | false> source-ton <source address
      * ton> source-npi <source address npi> source-range <source address range> routing-ton <routing address ton> routing-npi
      * <routing address npi> routing-range <routing address range> ratelimit-second <ratelimitsecond> ratelimit-minute
@@ -132,6 +132,9 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("request-expiry-timeout")) {
                 long requestExpiryTimeout = Long.parseLong(args[count++]);
                 esme.setRequestExpiryTimeout(requestExpiryTimeout);
+            } else if (key.equals("client-bind-timeout")) {
+                long clientBindTimeout = Long.parseLong(args[count++]);
+                esme.setclientBindTimeout(clientBindTimeout);
             } else if (key.equals("window-monitor-interval")) {
                 long windowMonitorInterval = Long.parseLong(args[count++]);
                 esme.setWindowMonitorInterval(windowMonitorInterval);
@@ -207,7 +210,7 @@ public class SmppShellExecutor implements ShellExecutor {
      * Command is smpp esme create name <systemId> <host-ip> <port> <SmppBindType> <SmppSession.Type> password <password>
      * networkid <networkid> system-type <sms | vms | ota > interface-version <3.3 | 3.4 | 5.0> esme-ton <esme address ton>
      * esme-npi <esme address npi> esme-range <esme address range> cluster-name <clusterName> window-size <windowSize>
-     * connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> window-monitor-interval
+     * connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> client-bind-timeout <clientBindTimeout> window-monitor-interval
      * <windowMonitorInterval> window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> enquire-link-delay
      * <30000> enquire-link-delay-server <0> charging-enabled <true | false> source-ton <source address ton> source-npi
      * <source address npi> source-range <source address range> routing-ton <routing address ton> routing-npi <routing address npi>
@@ -279,6 +282,8 @@ public class SmppShellExecutor implements ShellExecutor {
         int windowSize = SmppConstants.DEFAULT_WINDOW_SIZE;
         long connectTimeout = SmppConstants.DEFAULT_CONNECT_TIMEOUT;
         long requestExpiryTimeout = SmppConstants.DEFAULT_REQUEST_EXPIRY_TIMEOUT;
+        long clientBindTimeout = SmppConstants.DEFAULT_BIND_TIMEOUT;
+
         long windowMonitorInterval = SmppConstants.DEFAULT_WINDOW_MONITOR_INTERVAL;
         long windowWaitTimeout = SmppConstants.DEFAULT_WINDOW_WAIT_TIMEOUT;
 
@@ -327,6 +332,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 connectTimeout = Long.parseLong(args[count++]);
             } else if (key.equals("request-expiry-timeout")) {
                 requestExpiryTimeout = Long.parseLong(args[count++]);
+			} else if (key.equals("client-bind-timeout")) {
+				clientBindTimeout = Long.parseLong(args[count++]);
             } else if (key.equals("window-monitor-interval")) {
                 windowMonitorInterval = Long.parseLong(args[count++]);
             } else if (key.equals("window-wait-timeout")) {
@@ -379,9 +386,9 @@ public class SmppShellExecutor implements ShellExecutor {
 
         Esme esme = this.smppManagement.getEsmeManagement().createEsme(name, systemId, password, host, intPort,
                 chargingEnabled, smppBindTypeStr, systemType, smppVersionType, esmeTonType, esmeNpiType, esmeAddrRange,
-                smppSessionTypeStr, windowSize, connectTimeout, requestExpiryTimeout, windowMonitorInterval, windowWaitTimeout,
-                clusterName, countersEnabled, enquireLinkDelay, enquireLinkDelayServer, sourceTon, sourceNpi, sourceAddressRange,
-                routinigTon, routingNpi, routingAddressRange, networkId, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
+                smppSessionTypeStr, windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval,
+                windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay, enquireLinkDelayServer, sourceTon, sourceNpi,
+                sourceAddressRange, routinigTon, routingNpi, routingAddressRange, networkId, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
                 rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, minMessageLength, maxMessageLength);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getSystemId());
     }

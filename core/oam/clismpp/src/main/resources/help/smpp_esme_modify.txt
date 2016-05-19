@@ -107,6 +107,17 @@ PARAMETERS
 
 				  The new value takes effect when SMPP is restarted.
 
+	client-bind-timeout  - Default value is 5000 milli seconds.
+				  This parameter is used to specify the time to wait in
+				  milli seconds for an ESME client bind to a SMPP
+				  server.
+
+				  This is useful only when ESME is defined as Client Side. 
+				  For Server side this value is taken from the
+				  the 'SMPP Server Settings'.
+
+				  The new value takes effect when SMPP is restarted.
+
 	window-monitor-interval	- Default value is -1 (disabled).
 				  This parameter is used to specify the time between 
 				  executions of monitoring the window for requests that 
