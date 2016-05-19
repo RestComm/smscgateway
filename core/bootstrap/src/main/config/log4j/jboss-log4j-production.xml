@@ -5,27 +5,6 @@
 
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
 
-<!--
-Instead of org.jboss.logging.appender.DailyRollingFileAppender you can use org.apache.log4j.RollingFileAppender
-for all appenders.
-In this case you can instead of "DatePattern" parameter use "MaxFileSize" and "MaxBackupIndex" parameters.
-Here is an example for "server.log" appender usage:
-
-	<appender name="FILE" class="org.jboss.logging.appender.RollingFileAppender">
-		<errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler" />
-		<param name="File" value="${jboss.server.log.dir}/server.log" />
-		<param name="Append" value="false" />
-		<param name="Threshold" value="WARN" />
-
-		<param name="MaxFileSize" value="500KB" />
-		<param name="MaxBackupIndex" value="1" />
-
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %-5p [%c] (%t) %m%n" />
-		</layout>
-	</appender>
--->
-
 	<appender name="FILE" class="org.jboss.logging.appender.DailyRollingFileAppender">
 		<errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
 		<param name="File" value="${jboss.server.log.dir}/server.log"/>
@@ -83,6 +62,11 @@ Here is an example for "server.log" appender usage:
 	    <priority value="DEBUG" /> 
 	    <appender-ref ref="CDR"/> 
 	</category> 
+
+	<category name="org.mobicents.protocols.ss7.oam.common.statistics.StatsPrinter" additivity="false">
+		<priority value="DEBUG" /> 
+		<appender-ref ref="STATS"/> 
+	</category> 	
 
 	<category name="org.mobicents">
 		<priority value="INFO" />
