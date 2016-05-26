@@ -6,7 +6,7 @@ SYNOPSIS
 	esme-ton <esme address ton> esme-npi <esme address npi> 
 	esme-range <esme address range> window-size <windowSize> 
 	connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> 
-	window-monitor-interval <windowMonitorInterval> 
+	client-bind-timeout <clientBindTimeout> window-monitor-interval <windowMonitorInterval>
 	window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> 
 	enquire-link-delay <30000> enquire-link-delay-server <0> charging-enabled <true | false> 
 	source-ton <source address ton> source-npi <source address npi>
@@ -108,13 +108,9 @@ PARAMETERS
 				  The new value takes effect when SMPP is restarted.
 
 	client-bind-timeout  - Default value is 5000 milli seconds.
-				  This parameter is used to specify the time to wait in
-				  milli seconds for an ESME client bind to a SMPP
-				  server.
-
+				  This parameter is used to specify the length of time
+				  to wait for a bind response when the client connecting.
 				  This is useful only when ESME is defined as Client Side. 
-				  For Server side this value is taken from the
-				  the 'SMPP Server Settings'.
 
 				  The new value takes effect when SMPP is restarted.
 
