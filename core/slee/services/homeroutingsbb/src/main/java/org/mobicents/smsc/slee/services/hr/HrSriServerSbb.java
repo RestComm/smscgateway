@@ -232,7 +232,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 sb.append(sca);
                 sb.append(" sriBypass: ");
                 sb.append(sriBypass);
-                this.logger.severe(sb.toString());
+                this.logger.fine(sb.toString());
             }
         }
     }
