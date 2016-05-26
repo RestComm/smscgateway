@@ -33,6 +33,7 @@ import javolution.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
 
 import com.cloudhopper.smpp.SmppBindType;
+import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.SmppSession.Type;
 import com.cloudhopper.smpp.impl.DefaultSmppSession;
@@ -660,7 +661,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	/**
 	 * @return the clientBindTimeout
 	 */
-	public long getclientBindTimeout() {
+	public long getClientBindTimeout() {
 		return this.clientBindTimeout;
 	}
 
@@ -668,7 +669,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	 * @param clientBindTimeout
 	 *            the clientBindTimeout to set
 	 */
-	public void setclientBindTimeout(long clientBindTimeout) {
+	public void setClientBindTimeout(long clientBindTimeout) {
 		this.clientBindTimeout = clientBindTimeout;
 		this.store();
 	}
@@ -961,7 +962,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			esme.windowSize = xml.getAttribute(WINDOW_SIZE, 0);
 			esme.connectTimeout = xml.getAttribute(CONNECT_TIMEOUT, 0L);
 			esme.requestExpiryTimeout = xml.getAttribute(REQUEST_EXPIRY_TIMEOUT, 0L);
-			esme.clientBindTimeout = xml.getAttribute(CLIENT_BIND_TIMEOUT, 0L);
+			esme.clientBindTimeout = xml.getAttribute(CLIENT_BIND_TIMEOUT, SmppConstants.DEFAULT_BIND_TIMEOUT);
 
 			esme.windowMonitorInterval = xml.getAttribute(WINDOW_MONITOR_INTERVAL, 0L);
 			esme.windowWaitTimeout = xml.getAttribute(WINDOW_WAIT_TIMEOUT, 0L);

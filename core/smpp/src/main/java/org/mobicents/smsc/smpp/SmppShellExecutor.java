@@ -134,7 +134,7 @@ public class SmppShellExecutor implements ShellExecutor {
                 esme.setRequestExpiryTimeout(requestExpiryTimeout);
             } else if (key.equals("client-bind-timeout")) {
                 long clientBindTimeout = Long.parseLong(args[count++]);
-                esme.setclientBindTimeout(clientBindTimeout);
+                esme.setClientBindTimeout(clientBindTimeout);
             } else if (key.equals("window-monitor-interval")) {
                 long windowMonitorInterval = Long.parseLong(args[count++]);
                 esme.setWindowMonitorInterval(windowMonitorInterval);

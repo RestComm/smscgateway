@@ -210,6 +210,20 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 	long getConnectTimeout();
 
 	/**
+     * Value takes effect only when ESME is restarted.
+     * 
+     * Default value is 5000 milli seconds. This parameter is used to specify
+     * the length of time to wait for a bind response when the client connecting
+     * 
+     * This is useful only when ESME is defined as Client Side
+     * 
+     * @param clientBindTimeout
+     */
+    void setClientBindTimeout(long clientBindTimeout);
+
+    long getClientBindTimeout();
+
+	/**
 	 * Value takes effect only when ESME is restarted.
 	 * 
 	 * Default value is -1 (disabled). This parameter is used to specify the
