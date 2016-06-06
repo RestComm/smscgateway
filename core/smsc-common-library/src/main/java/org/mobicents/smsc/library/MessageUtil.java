@@ -565,11 +565,11 @@ public class MessageUtil {
             sb.append(DELIVERY_ACK_ERR);
             sb.append("000");
         } else {
-                if(!tempFailure) {
-                        sb.append(DELIVERY_ACK_STATE_UNDELIVERABLE);
-                } else {
-                        sb.append(DELIVERY_ACK_STATE_ENROUTE);
-                }
+            if (!tempFailure) {
+                sb.append(DELIVERY_ACK_STATE_UNDELIVERABLE);
+            } else {
+                sb.append(DELIVERY_ACK_STATE_ENROUTE);
+            }
             sb.append(DELIVERY_ACK_ERR);
             ErrorCode errorCode = sms.getSmsSet().getStatus();
             sb.append(errorCode != null ? errorCode.getCodeText() : "null");
