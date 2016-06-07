@@ -2374,6 +2374,44 @@ DESCRIPTION
 . You must click on the button 'Save' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+
+[[_enableintermediatereceipts]]
+=== Allowing of generating of intermediate receipts
+
+[[_enableintermediatereceipts_cli]]
+==== Using CLI
+
+SMCS can generate intermediate receipts (for temporary failures). You can set the 'enableintermediatereceipts' value to true/false by issuing the command `smsc set enableintermediatereceipts` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get enableintermediatereceipts` which will display the value set for this property. 
+
+----
+
+Name
+    smsc set enableintermediatereceipts
+
+SYNOPSIS
+    smsc set enableintermediatereceipts <true | false>
+
+DESCRIPTION
+    The SMSC can be configured to generate or not delivery intermediate receipts
+	(these are receipts for temporary delivery failures).
+	Default value: false (intermediate receipts will not be generated).
+
+----
+
+[[_enableintermediatereceipts_gui]]
+==== Using GUI
+
+.Procedure: Allowing of generating of intermediate receipts using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Processing' tab in the GUI. 
+. You can specify if the SMSC should disable of receipt generating by setting the value for the field 'Enable intermediate receipts' to true or false accordingly.
+  For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
 [[_smsc_gateway_server_routing_dlv]]
 === Routing of delivery receipts
 
