@@ -240,8 +240,12 @@ public interface SmscPropertiesManagementMBean {
     public void setGenerateArchiveTableInt(int generateArchiveTable); 
     
     public boolean getReceiptsDisabling();
-    
+
     public void setReceiptsDisabling(boolean receiptsDisabling);
+
+    public boolean getEnableIntermediateReceipts();
+
+    public void setEnableIntermediateReceipts(boolean enableIntermediateReceipts);
 
     public boolean getOrigNetworkIdForReceipts();
 

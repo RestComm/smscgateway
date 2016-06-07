@@ -430,7 +430,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									</select>
 								</span> 								
 							</div>
-							
+
 							<div id="div-receiptsdisabling" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set to true to disable SMS receipt. Even if SMS carries header for delivery receipt, SMSC will not generate one">
 									<span class="add-on">Disable Delivery Receipt</span>
@@ -440,7 +440,17 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									</select>
 								</span> 								
 							</div>
-							
+
+							<div id="div-enableintermediatereceipts" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set to true to enable intermediate SMS receipt (for temporary failures). When set to false even if SMS carries header for intermediate delivery receipt, SMSC will not generate one">
+									<span class="add-on">Enable intermediate receipts</span>
+									<select id="enableintermediatereceipts" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span> 								
+							</div>
+
 							<div id="div-origNetworkIdForReceipts" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if this option is turned on (true), for each generated delivery receipts networkId will be set to the value of networkId of an ESME from which the original message has come to SMSC. This can help for routing of receipts back to the originated ESME. If this option is turned off (false) then the networkId of receipts will be taken from networkId of ESME / SS7 / SIP via which the original message has left SMSC GW. ">
 									<span class="add-on">Original NetworkId For Receipts</span>
@@ -813,6 +823,14 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 											receiptsdisabling.options[0].selected = true;
 										} else {
 											receiptsdisabling.options[1].selected = true;
+										}
+										
+										var enableintermediatereceiptsVar = response.value.EnableIntermediateReceipts;
+										
+										if(enableintermediatereceiptsVar){
+											enableintermediatereceipts.options[0].selected = true;
+										} else {
+											enableintermediatereceipts.options[1].selected = true;
 										}
 										
 										var origNetworkIdForReceiptsVar = response.value.OrigNetworkIdForReceipts;
@@ -1669,6 +1687,9 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						e = document.getElementById("receiptsdisabling");
 						var receiptsdisabling = e.options[e.selectedIndex].text;
 						
+						e = document.getElementById("enableintermediatereceipts");
+						var enableintermediatereceipts = e.options[e.selectedIndex].text;
+						
 						e = document.getElementById("origNetworkIdForReceipts");
 						var origNetworkIdForReceipts = e.options[e.selectedIndex].text;
 						
@@ -1679,6 +1700,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								[
 									{ type: "write", mbean: mbeanSearch, attribute: "DeliveryPause", value: deliverypauseVar },
 									{ type: "write", mbean: mbeanSearch, attribute: "ReceiptsDisabling", value: receiptsdisabling },
+									{ type: "write", mbean: mbeanSearch, attribute: "EnableIntermediateReceipts", value: enableintermediatereceipts },
 									{ type: "write", mbean: mbeanSearch, attribute: "OrigNetworkIdForReceipts", value: origNetworkIdForReceipts },
 								],
 								{

@@ -87,6 +87,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private static final String PROCESSING_SMS_SET_TIMEOUT = "processingSmsSetTimeout";
     private static final String GENERATE_RECEIPT_CDR = "generateReceiptCdr";
     private static final String RECEIPTS_DISABLING = "receiptsDisabling";
+    private static final String ENABLE_INTERMEDIATE_RECEIPTS = "enableIntermediateReceipts";
     private static final String ORIG_NETWORK_ID_FOR_RECEIPTS = "origNetworkIdForReceipts";
     private static final String GENERATE_CDR = "generateCdr";
     private static final String GENERATE_ARCHIVE_TABLE = "generateArchiveTable";
@@ -206,6 +207,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private boolean generateReceiptCdr = false;
     // true: generating of receipts will be disabled for all messages
     private boolean receiptsDisabling = false;
+    // true: allowing of generating of receipts for temporary failures
+    private boolean enableIntermediateReceipts = false;
     // true: for receipts the original networkId will be assigned
     private boolean origNetworkIdForReceipts = false;
 
@@ -677,6 +680,15 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
+    public boolean getEnableIntermediateReceipts() {
+        return this.enableIntermediateReceipts;
+    }
+
+    public void setEnableIntermediateReceipts(boolean enableIntermediateReceipts) {
+        this.enableIntermediateReceipts = enableIntermediateReceipts;
+        this.store();
+    }
+
     public boolean getOrigNetworkIdForReceipts() {
         return this.origNetworkIdForReceipts;
     }
@@ -1110,6 +1122,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			writer.write(this.processingSmsSetTimeout, PROCESSING_SMS_SET_TIMEOUT, Integer.class);
             writer.write(this.generateReceiptCdr, GENERATE_RECEIPT_CDR, Boolean.class);
             writer.write(this.receiptsDisabling, RECEIPTS_DISABLING, Boolean.class);
+            writer.write(this.enableIntermediateReceipts, ENABLE_INTERMEDIATE_RECEIPTS, Boolean.class);
             writer.write(this.origNetworkIdForReceipts, ORIG_NETWORK_ID_FOR_RECEIPTS, Boolean.class);
             writer.write(this.generateCdr.getValue(), GENERATE_CDR, Integer.class);
             writer.write(this.generateArchiveTable.getValue(), GENERATE_ARCHIVE_TABLE, Integer.class);
@@ -1293,6 +1306,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             valB = reader.read(RECEIPTS_DISABLING, Boolean.class);
             if (valB != null) {
                 this.receiptsDisabling = valB.booleanValue();
+            }
+            valB = reader.read(ENABLE_INTERMEDIATE_RECEIPTS, Boolean.class);
+            if (valB != null) {
+                this.enableIntermediateReceipts = valB.booleanValue();
             }
             valB = reader.read(ORIG_NETWORK_ID_FOR_RECEIPTS, Boolean.class);
             if (valB != null) {

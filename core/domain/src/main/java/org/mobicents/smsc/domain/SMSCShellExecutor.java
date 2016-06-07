@@ -682,6 +682,8 @@ public class SMSCShellExecutor implements ShellExecutor {
                 smscPropertiesManagement.setGenerateReceiptCdr(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("receiptsdisabling")) {
                 smscPropertiesManagement.setReceiptsDisabling(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("enableintermediatereceipts")) {
+                smscPropertiesManagement.setEnableIntermediateReceipts(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("orignetworkidforreceipts")) {
                 smscPropertiesManagement.setOrigNetworkIdForReceipts(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("generatecdr")) {
@@ -913,8 +915,8 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getGenerateReceiptCdr());
             } else if (parName.equals("receiptsdisabling")) {
                 sb.append(smscPropertiesManagement.getReceiptsDisabling());
-            } else if (parName.equals("receiptsdisabling")) {
-                sb.append(smscPropertiesManagement.getReceiptsDisabling());
+            } else if (parName.equals("enableintermediatereceipts")) {
+                sb.append(smscPropertiesManagement.getEnableIntermediateReceipts());
             } else if (parName.equals("orignetworkidforreceipts")) {
                 sb.append(smscPropertiesManagement.getOrigNetworkIdForReceipts());
             } else if (parName.equals("generatearchivetable")) {
@@ -1140,6 +1142,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("receiptsdisabling = ");
             sb.append(smscPropertiesManagement.getReceiptsDisabling());
+            sb.append("\n");
+
+            sb.append("enableintermediatereceipts = ");
+            sb.append(smscPropertiesManagement.getEnableIntermediateReceipts());
             sb.append("\n");
 
             sb.append("orignetworkidforreceipts = ");
