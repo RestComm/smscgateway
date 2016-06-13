@@ -7,8 +7,8 @@ This chapter will explain how to manage the Gateway effectively using both the G
 
 .Configuring the SS7 Stack
 You must configure the SS7 stack prior to configuring SMSC.
-For details on configuring the SS7 Stack please refer to the RestComm SS7 Stack User Guide.
-The RestComm SS7 Stack User Guide lists all available Shell commands and GUI operations to configure SS7.
+For details on configuring the SS7 Stack please refer to the {this-platform} SS7 Stack User Guide.
+The {this-platform} SS7 Stack User Guide lists all available Shell commands and GUI operations to configure SS7.
 In addition, help files are also available for every Shell command providing all details relevant to the command. 
 
 .Configuring the Gateway

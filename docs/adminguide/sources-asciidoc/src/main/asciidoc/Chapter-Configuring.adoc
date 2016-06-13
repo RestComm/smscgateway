@@ -6,7 +6,7 @@ Once you complete setting up the Gateway you must configure the SS7 Stack the SM
 == Memory Settings
 
 You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size.
-These settings are specified in the file [path]_restcomm-smscgateway-version>/jboss-5.1.0.GA/bin/run.conf_. 
+These settings are specified in the file [path]_{this-folder}-smscgateway-version>/jboss-5.1.0.GA/bin/run.conf_. 
 
 -Xms3072m::
   Initial heap size, set in megabytes
@@ -20,7 +20,7 @@ These settings are specified in the file [path]_restcomm-smscgateway-version>/jb
 {this-platform} {this-application} uses `Apache log4j` for logging.
 If you are not familiar with the `log4j` package, you can read more about it at the Jakarta http://jakarta.apache.org/log4j/[website]. 
 
-Logging is controlled from a central configuration file located at [path]_restcomm-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/conf/jboss-log4j.xml_, one for each JBoss AS configuration profile.
+Logging is controlled from a central configuration file located at [path]{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/conf/jboss-log4j.xml_, one for each JBoss AS configuration profile.
 This file defines a set of appenders specifying the log files, what categories of messages should go there, the message format and the level of filtering.
 For more details, please refer to Section 9.6.3, "Logging Service" in the JBoss AS Getting Started Guide available https://community.jboss.org/wiki/JBossAS5InstallationAndGettingStartedGuide[here]. 
 
@@ -448,7 +448,7 @@ public interface MProcRuleMBean {
 | matchesPostArrival(MProcMessage message), matchesPostImsiRequest(MProcMessage message), matchesPostDelivery(MProcMessage message)| These methods must return true if rule should be applied false if not (for onPostArrival, onPostImsi and onPostDelivery requests).
 | onPostArrival(), onPostImsiRequest(), onPostDelivery()| These methods are needed for implementing of rule applying actions.
 |===
-Id parameter and custom rule parameters ("par1" and "par2" in this example) must be stored into xml config file (it is located in [path]_restcomm-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/data/SmscManagement_mproc.xml_). For this user needs to implement several extra methods that will be described later. 
+Id parameter and custom rule parameters ("par1" and "par2" in this example) must be stored into xml config file (it is located in [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/data/SmscManagement_mproc.xml_). For this user needs to implement several extra methods that will be described later. 
 
 . Reusing of base [class]`MProcRuleBaseImpl` class.
   It is recommended for your custom [class]`MProcRuleTestImpl` to extend  [class]`MProcRuleBaseImpl` provided by SMSC. [class]`MProcRuleBaseImpl` class contains some useful methods that cover getter and setter  and code for persisting of this parameter into xml config file (read() and write() methods), default stubs for `matches()` and `onPost*()` methods and a service method for splitting of a parameters plain text string into subparameters (splitParametersString()).  
@@ -919,8 +919,8 @@ public interface PostDeliveryProcessor {
  
 
 * User must compile java code and create a jar library.
-  Copy the created jar into the folder [path]_restcomm-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/lib_. 
-* You need to update [path]_restcomm-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_ config file. 
+  Copy the created jar into the folder [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/lib_. 
+* You need to update [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_ config file. 
 +
 Define factory implementing [class]``MProcRuleFactory``in above example it will be [class]`MProcRuleFactoryTestImpl`: 
 +
@@ -1031,11 +1031,11 @@ Here there is a describtion for the case of Telestax OCS server and as an exampl
 . You can download for testing the Telestax OCS server from https://telestax.zendesk.com/forums/22947518-Product-Downloads.
   Download and unpack it to a separate folder.
 . SMSC GW uses the updated AVP dictionary library.
-  Before using of OCS server copy from SMSC GW the file <smsc gw root folder>/resource/ocs/dictionary.xml to Telestax OCS server to the folder <jboss>/server/default/deploy/RestComm-diameter-mux-6.2.0.GA.sar/config.
+  Before using of OCS server copy from SMSC GW the file <smsc gw root folder>/resource/ocs/dictionary.xml to Telestax OCS server to the folder <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config.
 . for simple test configuring of SMSC GW and OCS server you can copy example config files jdiameter-config.xml 
 
-* from <smsc gw root folder>/resource/ocs/smsc-part to SMSC GW <jboss>/server/default/deploy/RestComm-diameter-mux-6.2.0.GA.sar/config
-* from <smsc gw root folder>/resource/ocs/ocs-part to OCS server <jboss>/server/default/deploy/RestComm-diameter-mux-6.2.0.GA.sar/config
+* from <smsc gw root folder>/resource/ocs/smsc-part to SMSC GW <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config
+* from <smsc gw root folder>/resource/ocs/ocs-part to OCS server <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config
 . Those configs suppose that you use Telestax OCS server and it is on the same host.
 If not you need to make extra configuring.
 In the testing config files SMSC GW plays a role of a diameter client and OCS server - a diameter server.
@@ -1076,7 +1076,7 @@ You need to specify an address of message sender (source address). OCS Server id
 
 == CDR Logging Settings
 
-{this-platform} {this-application} is configured to generate CDR in a plain text file located at [path]_restcomm-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr.log_ and also detailed CDR in Cassandra table `MESSAGES_yyyy_mm_dd`.
+{this-platform} {this-application} is configured to generate CDR in a plain text file located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr.log_ and also detailed CDR in Cassandra table `MESSAGES_yyyy_mm_dd`.
  
 
 {this-platform} {this-application} can be configured to generate CDR for different message processing modes (`datagramm, transactional, storeAndForward`) and also for both receipt and regular messages or generate CDR only for regular messages.

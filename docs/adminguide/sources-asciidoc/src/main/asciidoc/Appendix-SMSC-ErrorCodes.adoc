@@ -6,7 +6,7 @@
 = Error Codes
 
 The following error codes are used to indicate the Error Code value for the last delivery attempt in table field `SM_STATUS`.
-Some error codes are reserved for future use and will be put to use in future versions of RestComm SMSC Gateway. 
+Some error codes are reserved for future use and will be put to use in future versions of {this-platform} SMSC Gateway.
 
 ----
 

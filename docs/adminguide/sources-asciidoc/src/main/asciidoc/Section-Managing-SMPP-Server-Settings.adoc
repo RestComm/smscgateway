@@ -9,7 +9,7 @@
 
 .Procedure: View SMPP Server Details using the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can view the current Session details of the SMPP Server by clicking on the row corresponding to the name of the SMPP Server (`SmscManagement` in this case). 
 
 [[_smpp_server_settings_edit]]
@@ -219,7 +219,7 @@ DESCRIPTION
 
 .Procedure: Edit SMPP Server Properties using GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can edit the properties of the SMPP Server by launching the edit window.
 You can achieve this by clicking on the blue coloured 'edit' button at the end of the row.
 The edit window will display all SMPP properies as shown in the figure below.
@@ -247,7 +247,7 @@ Settingup SSL is only possible from GUI.
 
 .Procedure: Start SMPP Server using GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can start the SMPP Server by clicking on the 'Start' icon lit green in the row corresponding to the SmscManagement unit.
   This icon will be enabled only if the SMPP server is currently stopped. 
 . This action will start the SMPP Server. 
@@ -261,7 +261,7 @@ Settingup SSL is only possible from GUI.
 
 .Procedure: Stop SMPP Server using GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can stop the SMPP Server by clicking on the 'Stop' icon lit red in the row corresponding to the SmscManagement unit.
   This icon will be enabled only if the SMPP server is currently running. 
 . This action will stop the SMPP Server. 
@@ -275,7 +275,7 @@ Settingup SSL is only possible from GUI.
 
 .Procedure: Reset Counters for SMPP Server using GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can view the current Session details of the SMPP Server by clicking on the row corresponding to the name of the SMPP Server (`SmscManagement` in this case). 
 . This action will display the current session details of the SMPP Server.
   If you scroll to the bottom, you will find a button named 'Reset Counters'. Click on it if you wish to reset all counters for SMPP Server. 

@@ -30,22 +30,23 @@ When you download the binary release, you will notice that the top level directo
   Refer to the Admin Guide for instructions on how to start the server in either of the profiles.
 * resources: Contains SLEE MAP RA jars.
 * tools: Contains SLEE tools and SMSC test tools as explained below. 
-** RestComm-hlr-simulator: Command line HLR simulator used for load testing of SMSC.
-  RestComm-hlr-simulator is pre-configured to integrate with SMSC run in simulator profile.
-** RestComm-jss7-simulator: jSS7 Simulator that can be run in GUI or command line mode.
+** {this-folder}-hlr-simulator: Command line HLR simulator used for load testing of SMSC.
+  {this-folder}-hlr-simulator is pre-configured to integrate with SMSC run in simulator profile.
+** {this-folder}-jss7-simulator: jSS7 Simulator that can be run in GUI or command line mode.
   This tool is useful to test `MoForwardSM` and other such functionality of SMSC like "when subscriber absent", etc.
-  For more details on using this tool, please refer to RestComm SS7Stack User Guide.
-  RestComm-jss7-simulator is pre-configured to integrate with SMSC run in simulator profile. 
-** RestComm-smpp-load: smpp-load tool is a Command line simulator to generate SMPP load.
+  For more details on using this tool, please refer to {this-platform} SS7Stack User Guide.
+  {this-folder}-jss7-simulator is pre-configured to integrate with SMSC run in simulator profile. 
+** {this-folder}-smpp-load: smpp-load tool is a Command line simulator to generate SMPP load.
   You must have `ant` installed to be able to run this tool.
   The smpp-load tool can be started to run as a SMPP Server accepting in-coming connection (BIND) from {this-platform}  {this-application}  or run as a SMPP Client to send BIND to {this-platform}  {this-application} .
   You can confiugre this tool by editing the [path]_build.xml_ to define how many SMPP connections should be initiated, what kind of load should be generated, etc.
-** RestComm-smpp-simulator: smpp-simulator is a GUI tool to generate SMPP load.
-  It can only initiate BIND and act as a SMPP Client. You can also use it to test other functionalities like `UCS2`, breaking `SUBMIT_SM` into multiple SMS etc. 				 
+** {this-folder}-smpp-simulator: smpp-simulator is a GUI tool to generate SMPP load.
+  It can only initiate BIND and act as a SMPP Client. You can also use it to test other functionalities like `UCS2`, breaking `SUBMIT_SM` into multiple SMS etc.
 
+[subs="attributes"]
 ----
 
-|- mobicents-smsc-<version>
+|- {this-folder}-smsc-<-version->
 		|- cassandra
 		|- docs
 				|+ container
@@ -74,10 +75,10 @@ When you download the binary release, you will notice that the top level directo
 				|+ jopr-plugin
 				|+ remote-slee-connection
 				|+ snmp
-				|+ RestComm-hlr-simulator
-				|+ RestComm-jss7-simulator
-				|+ RestComm-smpp-load
-				|+ RestComm-smpp-simulator
+				|+ {this-folder}-hlr-simulator
+				|+ {this-folder}-jss7-simulator
+				|+ {this-folder}-smpp-load
+				|+ {this-folder}-smpp-simulator
 				|+ twiddle
 ----
 
@@ -108,8 +109,8 @@ Use GIT to checkout a specific release source, the base URL is {this-trunk-sourc
 [source]
 ----
 
-[usr]$ git clone https://userid@bitbucket.org/telestax/restcomm-smscgateway.git 
-[usr]$ cd restcomm-smscgateway
+[usr]$ git clone https://userid@bitbucket.org/telestax/{this-folder}-smscgateway.git 
+[usr]$ cd {this-folder}-smscgateway
 [usr]$ git checkout <version>
 ----
 

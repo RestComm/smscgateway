@@ -32,7 +32,7 @@ SIGTRAN (M3UA):::
 
 Charging enabled (Diameter):::
   Pre paid based charging is enabled (optional) via Diameter Ro and Base protocol.
-  RestComm SMSC easily integrates with http://telestax.wpengine.netdna-cdn.com/wp-content/uploads/2013/07/PRODUCT-DATASHEET-TELSCALE-Convergent-Charging-Server.pdf[RestComm Convergent Charging Server] over Diameter
+  {this-platform} SMSC easily integrates with http://telestax.wpengine.netdna-cdn.com/wp-content/uploads/2013/07/PRODUCT-DATASHEET-TELSCALE-Convergent-Charging-Server.pdf[{this-platform} Convergent Charging Server] over Diameter
 
 Cloud-ready:::
   {this-platform} {this-application} is cloud-ready and can also be deployed on a private cloud infrastructure.
@@ -86,7 +86,7 @@ However StoreAndForward messages and all SS7/SIP originated messages will be sto
   Then the message will be routed into the port (ESME, SS7, SIP) which belongs to the same networkId (subnetwork). 
 * Additionally, when enabled with proper administrator privileges, {this-platform} {this-application} allows convenient group messaging between subscribers (e.g.
   family, friends, colleagues) .
-* {this-platform} {this-application} is built on the RestComm jSS7 stack which provides advanced SCCP routing rules to map short codes to MSISDN, allowing users to send an SMS to a short-code instead of a complete MSISDN. 
+* {this-platform} {this-application} is built on the {this-platform} jSS7 stack which provides advanced SCCP routing rules to map short codes to MSISDN, allowing users to send an SMS to a short-code instead of a complete MSISDN. 
 * It also enables value added services through integration with OTT social networks and microblogs such as Facebook and Twitter.
 * A single {this-platform} SMSC node can process up to 1000 SMS/sec.
     Multiple SMSC nodes can be arranged in a cluster across one or more geographically distributed data centers to scale up throughput and provide various levels of redundancy, high availability and fault tolerance.                     
@@ -100,6 +100,6 @@ However StoreAndForward messages and all SS7/SIP originated messages will be sto
 IP Short Message Gateway (IP-SM-GW), which is in line with relevant 3GPP 23.824 specifications, acts as a bridge managing the origination and termination of SMS messages between circuit-switched and IP-based networks (over SIP). With this solution, mobile operators can make use of existing messaging platforms such as short message service centers (SMSCs) to deliver IP-based messaging.
 The IP-SM-GW is also essential for rolling out rich communication services (RCS), which enable operators to deliver sticky messaging services like presence-enabled address book, SIP-based chat services and mobile instant messaging. 
 
-RestComm SMSC has support for SIP messagaing and can send short messages from SIP to SS7 or ESME and vice-a-versa.
-RestComm SMSC can easily be integarted with RestComm RestComm via SIP to enable developers to rapidly build voice, video, WebRTC, USSD, SMS, fax and rich messaging applications.
+{this-platform} SMSC has support for SIP messagaing and can send short messages from SIP to SS7 or ESME and vice-a-versa.
+{this-platform} SMSC can easily be integarted with RestComm RestComm via SIP to enable developers to rapidly build voice, video, WebRTC, USSD, SMS, fax and rich messaging applications.
 For more details about RestComm you may refer to, http://www.telestax.com/restcomm/[TeleStax website.]             

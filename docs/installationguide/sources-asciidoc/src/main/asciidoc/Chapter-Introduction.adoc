@@ -12,8 +12,7 @@ Since it is built on a modern and extensible JSLEE platform it automatically pro
 The database is used for storing unsent messages, messages successfully sent and messages that failed to be sent. 
 
 {this-platform} {this-application} is cloud-ready.
-It can be deployed on dedicated hardware, private cloud infrastructure or public laaS such as AWS. {this-platform} {this-application} supports TDM hardware offered by major vendors in the market, namely Intel family boards (Dialogic) and  Zaptel/Dahdi (Digium, Sangoma). TeleStax also has in-house SS7 cards also known as RestComm SS7 Cards.
-RestComm SS7 cards have MTP2/3 support on-board and therefore the processing load on the server hosting the  {this-platform} {this-application} platform will be low when you use these SS7 cards.
+It can be deployed on dedicated hardware, private cloud infrastructure or public laaS such as AWS. {this-platform} {this-application} supports TDM hardware offered by major vendors in the market, namely Intel family boards (Dialogic) and  Zaptel/Dahdi (Digium, Sangoma).
  
 
 A single {this-platform} SMSC node can process up to 1000 SMS/sec.

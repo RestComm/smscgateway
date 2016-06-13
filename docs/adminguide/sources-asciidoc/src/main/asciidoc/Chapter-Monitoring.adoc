@@ -104,7 +104,7 @@ This page gets auto-refreshed every 2.5 seconds and therefore the statistics get
 [[_monitoring_smsc_cdr_log]]
 == CDR Log
 
-{this-platform} {this-application} is configured to generate CDR in a plain text file located at [path]_restcomm-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr.log_.
+{this-platform} {this-application} is configured to generate CDR in a plain text file located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr.log_.
 The CDR generated in the text file is of the below format: 
 ----
 

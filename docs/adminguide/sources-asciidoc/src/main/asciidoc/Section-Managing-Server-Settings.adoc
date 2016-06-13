@@ -1858,7 +1858,7 @@ EXAMPLES
 [[_smsc_gateway_server_hr]]
 == Home Routing Settings
 
-RestComm SMSC Gateway supports Non Transparent Home Routing as explained in 3GPP 23.840 5.2.3.
+{this-platform} SMSC Gateway supports Non Transparent Home Routing as explained in 3GPP 23.840 5.2.3.
 This option can be disabled by setting "hrcharging" option to "reject" (see <<_dest_hrcharging>>). SMSC GW will accept SendRoutinInfo requests from a remote SMSC, then create a unique "correlationId" value for a requested MSISDN, then send SendRoutinInfo request to HLR, store received by HLR info into a cache and sends back to the remote SMSC SendRoutinInfo response with "correlationId" value in IMSI field and SMSC GlobalTytle (or another special configured GlobalTytle value) in LocationInfo field.
 Then SMSC GW will accept MtForwardSM messages from the remote SMSC, seaches in the cache for "correlationId" and HLR subscriber's and use this data for processing a message further. 
 
