@@ -37,7 +37,7 @@
 	<property name="restcomm-slee-sip11.tag" value="2.8.${restcomm-slee-sip11.build-number}" />
 	<property name="restcomm-slee-sip11.version" value="${restcomm-slee-sip11.tag}" />
 
-	<property name="restcomm-jss7.build-number" value="1367" />
+	<property name="restcomm-jss7.build-number" value="1383" />
 	<property name="restcomm-jss7.version" value="7.0.${restcomm-jss7.build-number}" />
 	<property name="restcomm-jss7.tag" value="${restcomm-jss7.version}" />
 
