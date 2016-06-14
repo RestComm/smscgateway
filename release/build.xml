@@ -30,7 +30,7 @@
 	<property name="restcomm-slee.build-number" value="65" />
 	<property name="restcomm-slee.version" value="2.8.31" />
 
-	<property name="restcomm-slee.ss7.tag" value="2.8.26" />
+	<property name="restcomm-slee.ss7.tag" value="7.0.53" />
 
 	<!-- JainSlee SIP RA DU -->
 	<property name="restcomm-slee-sip11.build-number" value="20" />	
