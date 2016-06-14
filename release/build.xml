@@ -589,7 +589,7 @@
 	
     <target name="build-docs">
         <exec failonerror="true" executable="${mvn.executable}" dir="${checkout.restcomm-smsc.dir}/docs">
-                <arg line="${release.build.goals} -Dmaven.test.skip=true" />
+                <arg line="${release.build.goals} -Pall -Dmaven.test.skip=true" />
         </exec>
     </target>
 	
