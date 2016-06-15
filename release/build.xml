@@ -9,6 +9,8 @@
 	<property name="checkout.dir" value="${base.dir}/checkout" />	
 	<property name="checkout.restcomm-slee.dir" value="${checkout.dir}/restcomm-slee" />
 	<property name="checkout.restcomm-jss7.dir" value="${checkout.dir}/restcomm-jss7" />
+	<property name="checkout.restcomm-jss7-ra.dir" value="${checkout.dir}/restcomm-jss7-ra" />
+	<property name="checkout.restcomm-map-ra.dir" value="${checkout.dir}/restcomm-map-ra" />
 	<property name="checkout.restcomm-smsc.dir" value="${base.dir}/.." />
 	<property name="checkout.restcomm-jss7-build.dir" value="${checkout.dir}/restcomm-jss7-build" />
 	<property name="checkout.restcomm-diam.dir" value="${checkout.dir}/restcomm-diam" />
@@ -17,67 +19,68 @@
 	<property name="checkout.restcomm-cloudhopper.smpp.dir" value="${checkout.dir}/restcomm-cloudhopper-smpp-build" />
     <property name="checkout.map.dir" value="${base.dir}/checkout/map" />
     <property name="release.map.dir" value="${base.dir}/checkout/map-release" />
-	
-	<!-- version properties-->
-		<!-- //** change this properties from CLI to build specific versions-->
-		<!-- Eg: 
-			ant -Drestcomm.smsc.git.tag=ts115ga -Drestcomm.smsc.release.version=6.1.5.GA-restcomm
-		-->
+
 	<property name="restcomm.smsc.git.tag" value="master"/>
-	<property name="restcomm.smsc.release.version" value="3.0.0-SNAPSHOT"/>
-		<!-- **//-->
+	<property name="restcomm.smsc.release.version" value="7.0.0-SNAPSHOT"/>
 
-	<property name="restcomm-slee.build-number" value="65" />
-	<property name="restcomm-slee.version" value="2.8.31" />
+	<!-- Options for referring to release resoure verions -->
+	<!-- SLEE staff -->
+	<property name="restcomm-slee.build-number" value="36.73" />
+	<property name="restcomm-slee.version" value="2.8" />
+	<property name="restcomm-slee.release" value="2.8.0.FINAL" />
 
-	<property name="restcomm-slee.ss7.tag" value="7.0.53" />
-
-	<!-- JainSlee SIP RA DU -->
-	<property name="restcomm-slee-sip11.build-number" value="20" />	
-	<property name="restcomm-slee-sip11.tag" value="2.8.${restcomm-slee-sip11.build-number}" />
-	<property name="restcomm-slee-sip11.version" value="${restcomm-slee-sip11.tag}" />
-
+	<!-- jss7 stack and MAP RA -->
 	<property name="restcomm-jss7.build-number" value="1383" />
 	<property name="restcomm-jss7.version" value="7.0.${restcomm-jss7.build-number}" />
-	<property name="restcomm-jss7.tag" value="${restcomm-jss7.version}" />
+	<property name="restcomm-jss7.release" value="7.0.1383" />
 
+	<property name="restcomm-map-ra.build-number" value="53" />
+	<property name="restcomm-map-ra.version" value="7.0.${restcomm-map-ra.build-number}" />
+	<property name="restcomm-map-ra.release" value="7.0.53" />
 
-	<!-- <property name="restcomm-management-hq.version" value="6.1.4.GA" /> -->
+	<!-- Diameter mux and RAs -->
 	<property name="restcomm-diam.build-number" value="89" />
 	<property name="restcomm-diam.version" value="1.7.0" />
 	<property name="restcomm-diam.resources.version" value="2.8.0-SNAPSHOT" />
 
-
 	<!-- Cassandra community version -->
-	<property name="community-cassandra.version" value="2.2.6" />
-	<property name="checkout.community-cassandra.dir" value="${cassandra.dir}/apache-${community-cassandra.version}" />
+	<property name="community-cassandra.version" value="3.7" /> <!-- 2.2.6 -->
+
+
+	<!-- JainSlee SIP RA DU - we do not use it now - getting from SLEE binaries -->
+	<property name="restcomm-slee-sip11.build-number" value="20" />	
+	<property name="restcomm-slee-sip11.tag" value="2.8.${restcomm-slee-sip11.build-number}" />
+	<property name="restcomm-slee-sip11.version" value="${restcomm-slee-sip11.tag}" />
 
 	<!-- Cloudhopper will be removed when the code ready in official github -->
 	<property name="restcomm-cloudhopper.smpp.tag" value="master_submit_multi-2" />
 
 
 	<property name="cloudbees.url" value="https://mobicents.ci.cloudbees.com" />
-	
+	<property name="github.url" value="https://github.com/RestComm" />
+
 	<!--GET restcomm-Slee & restcomm-jss7 & restcomm-diameter & DSE Cassandra - properties-->
+	<property name="restcomm-jss7.tag" value="${restcomm-jss7.version}" />
+	<property name="restcomm-slee.ss7.tag" value="${restcomm-map-ra.version}" />
 	<property name="restcomm-slee.download.distro.name" value="restcomm-slee-${restcomm-slee.version}.${restcomm-slee.build-number}" />
 	<property name="restcomm-slee.download.distro.file" value="${restcomm-slee.download.distro.name}.zip" />
-	<property name="restcomm-slee.download.url" value="${cloudbees.url}/job/Restcomm-JAIN-SLEE-Release/${restcomm-slee.build-number}/artifact/release/${restcomm-slee.download.distro.file}" />
+	<property name="restcomm-slee.download.url" value="${github.url}/jain-slee/releases/download/${restcomm-slee.release}/${restcomm-slee.download.distro.file}" />
 	<property name="restcomm-slee.distro.zip.path" value="${checkout.dir}/${restcomm-slee.download.distro.file}" />
 	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm-jss7.version}.zip" />
-	<property name="restcomm-jss7.download.url" value="${cloudbees.url}/job/Restcomm-jSS7/${restcomm-jss7.build-number}/artifact/release/${restcomm-jss7.download.distro.file}" />
+	<property name="restcomm-jss7.download.url" value="${github.url}/jss7/releases/download/${restcomm-jss7.release}/${restcomm-jss7.download.distro.file}" />
 	<property name="restcomm-jss7.distro.zip.path" value="${checkout.dir}/${restcomm-jss7.download.distro.file}" />
-	
-	<!--
-	<property name="restcomm-management-hq.download.distro.file" value="management-hq-${restcomm-management-hq.version}.zip" />
-	<property name="restcomm-management-hq.distro.zip.path" value="${checkout.dir}/${restcomm-management-hq.download.distro.file}" />
-	<property name="restcomm-management-hq.download.url" />
-	<property name="checkout.restcomm-management-hq.dir" value="${checkout.dir}/restcomm-management-hq" />
-	-->
+	<property name="restcomm-map-ra.download.jar.file" value="restcomm-slee-ra-map-du-${restcomm-map-ra.version}.jar" />
+	<property name="restcomm-map-ra.download.docs.file" value="RA_docs.zip" />
+	<property name="restcomm-map-ra.download.jar.url" value="${github.url}/jain-slee.ss7/releases/download/${restcomm-map-ra.release}/${restcomm-map-ra.download.jar.file}" />
+	<property name="restcomm-map-ra.download.docs.url" value="${github.url}/jain-slee.ss7/releases/download/${restcomm-map-ra.release}/${restcomm-map-ra.download.docs.file}" />
+	<property name="restcomm-map-ra.distro.jar.path" value="${checkout.dir}/${restcomm-map-ra.download.jar.file}" />
+	<property name="restcomm-map-ra.distro.docs.path" value="${checkout.dir}/${restcomm-map-ra.download.docs.file}" />
 
 	<property name="restcomm-diam.download.distro.file" value="restcomm-diameter-${restcomm-diam.version}.${restcomm-diam.build-number}.zip" />
 	<property name="restcomm-diam.download.url" value="${cloudbees.url}/job/RestComm-jDiameter-1.x/${restcomm-diam.build-number}/artifact/release/${restcomm-diam.download.distro.file}" />
 	<property name="restcomm-diam.distro.zip.path" value="${checkout.dir}/${restcomm-diam.download.distro.file}" />
 	
+	<property name="checkout.community-cassandra.dir" value="${cassandra.dir}/apache-${community-cassandra.version}" />
 	<property name="community-cassandra.download.distro.file" value="apache-cassandra-${community-cassandra.version}-bin.tar.gz" />
 	<property name="community-cassandra.untar.distro.file" value="apache-cassandra-${community-cassandra.version}-bin.tar" />
 	<property name="community-cassandra.download.url" value="http://mirror.cc.columbia.edu/pub/software/apache/cassandra/${community-cassandra.version}/${community-cassandra.download.distro.file}" />
@@ -107,10 +110,17 @@
 	<target name="clean">
 	    <delete dir="${release.dir}"/>
 	    <delete dir="${base.dir}/checkout"/>
+	    <delete dir="${base.dir}/docs-bundle"/>
+	    <delete dir="${base.dir}/docs-bundle"/>
+		<delete>
+			<fileset dir="${base.dir}">
+				<include name="restcomm-smsc-*.*" />
+			</fileset>
+		</delete>
 	</target>
 	
 	
-	<target name="release" depends="get-deps,extract-deps,clean-up-restcomm-slee,checkout-ss7-map,build-map-ra,build-clhpp,build-smsc,copy-smsc, build-docs, copy-docs, make-final-zip,bundle-documentation" />
+	<target name="release" depends="get-deps,extract-deps,clean-up-restcomm-slee,build-clhpp,build-smsc,copy-smsc,build-docs,copy-docs,make-final-zip,bundle-documentation" />
 
 	<target name="release-with-jss7-and-ras" depends="build-with-jss7-and-ras.ss7, build-with-jss7-and-ras.ras, release"/>
 	
@@ -172,20 +182,10 @@
     		<property name="release.build.goals" value="${release.ts.deploy.goals.local}" />
     	</ant>
     </target>
-	
-	
-	<!--GET Map & restcomm-Slee & restcomm-jss7 - downloads-->
-	
-	<!--target name="get-map" depends="checkout-ss7-map,build-ss7-map" /-->
-	<!--commented out for dse...prepared for next release up to 6.2.0^ -->
-	<!--target name="get-deps" depends="get-restcomm-slee,get-restcomm-jss7,get-restcomm-management-hq,get-restcomm-diam, get-community-cassandra" />
-	<target name="extract-deps" depends="extract-restcomm-slee,extract-restcomm-jss7,extract-restcomm-management-hq,extract-restcomm-diam, extract-community-cassandra" 
-	<target name="get-deps" depends="get-restcomm-slee,get-restcomm-jss7,get-restcomm-management-hq,get-restcomm-diam" />
-	<target name="extract-deps" depends="extract-restcomm-slee,extract-restcomm-jss7,extract-restcomm-management-hq,extract-restcomm-diam" />
-	-->
 
-	<target name="get-deps" depends="get-restcomm-slee,get-restcomm-jss7,get-restcomm-diam,get-restcomm-sip-ra,get-community-cassandra" />
-	<target name="extract-deps" depends="extract-restcomm-slee,extract-restcomm-jss7,extract-restcomm-diam,extract-community-cassandra" />
+
+	<target name="get-deps" depends="get-restcomm-slee,get-restcomm-jss7,get-restcomm-map-ra,get-restcomm-map-ra-docs,get-restcomm-diam,get-community-cassandra" />
+	<target name="extract-deps" depends="extract-restcomm-slee,extract-restcomm-jss7,extract-restcomm-map-ra-docs,extract-restcomm-diam,extract-community-cassandra" />
 
 	
 	<available file="${restcomm-slee.distro.zip.path}" property="got.restcomm-slee" />
@@ -193,6 +193,7 @@
 		<echo>Downloading RestComm Slee version: ${restcomm-slee.version}</echo>
 		<exec failonerror="true" executable="wget">
 		    <arg value="${restcomm-slee.download.url}" />
+		    <arg value="--output-document=${restcomm-slee.download.distro.file}" />
 		</exec>
 		<move file="${base.dir}/${restcomm-slee.download.distro.file}" todir="${checkout.dir}"/>
 	</target>
@@ -208,12 +209,13 @@
 		<delete dir="${release.dir}/restcomm-slee-${restcomm-slee.version}.${restcomm-slee.build-number}" includeemptydirs="true" failonerror="false" verbose="false"/>
 		<delete dir="${checkout.restcomm-slee.dir}/jboss-5.1.0.GA/server/all" includeemptydirs="true" failonerror="false" verbose="false"/>
 	</target>
-	
+
 	<available file="${restcomm-jss7.distro.zip.path}" property="got.restcomm-jss7" />
 	<target name="get-restcomm-jss7" unless="got.restcomm-jss7">
 		<echo>Downloading RestComm JSS7 version: ${restcomm-jss7.version}</echo>
 		<exec failonerror="true" executable="wget">
 			<arg value="${restcomm-jss7.download.url}" />
+		    <arg value="--output-document=${restcomm-jss7.download.distro.file}" />
 		</exec>
 		<move file="${base.dir}/${restcomm-jss7.download.distro.file}" todir="${checkout.dir}"/>
 	</target>
@@ -222,6 +224,33 @@
 		<delete dir="${checkout.restcomm-jss7.dir}" failonerror="false" />
 		<unzip src="${restcomm-jss7.distro.zip.path}" dest="${checkout.restcomm-jss7.dir}"/>
 		<move file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}-restcomm" tofile="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}" failonerror="false"/>
+	</target>
+
+	<available file="${restcomm-map-ra.distro.jar.path}" property="got.restcomm-map-ra" />
+	<target name="get-restcomm-map-ra" unless="got.restcomm-map-ra">
+		<echo>Downloading RestComm MAP RA version: ${restcomm-map-ra.version}</echo>
+		<exec failonerror="true" executable="wget">
+			<arg value="${restcomm-map-ra.download.jar.url}" />
+		    <arg value="--output-document=${restcomm-map-ra.download.jar.file}" />
+		</exec>
+		<move file="${base.dir}/${restcomm-map-ra.download.jar.file}" todir="${checkout.dir}"/>
+	</target>
+
+	<available file="${restcomm-map-ra.distro.docs.path}" property="got.restcomm-map-ra-docs" />
+	<target name="get-restcomm-map-ra-docs" unless="got.restcomm-map-ra-docs">
+		<echo>Downloading RestComm MAP RA docs version: ${restcomm-map-ra.version}</echo>
+		<exec failonerror="true" executable="wget">
+			<arg value="${restcomm-map-ra.download.docs.url}" />
+		    <arg value="--output-document=${restcomm-map-ra.download.docs.file}" />
+		</exec>
+		<move file="${base.dir}/${restcomm-map-ra.download.docs.file}" todir="${checkout.dir}"/>
+	</target>
+
+	<target name="extract-restcomm-map-ra-docs" depends="get-restcomm-map-ra-docs">
+		<delete dir="${checkout.restcomm-jss7-ra.dir}" failonerror="false" />
+		<delete dir="${checkout.restcomm-map-ra.dir}" failonerror="false" />
+		<unzip src="${restcomm-map-ra.distro.docs.path}" dest="${checkout.restcomm-jss7-ra.dir}"/>
+		<unzip src="${checkout.restcomm-jss7-ra.dir}/MAP/generated-docs.zip" dest="${checkout.restcomm-map-ra.dir}"/>
 	</target>
 
 	<available file="${restcomm-slee-sip11.distro.zip.path}" property="got-restcomm-sip-ra" />
@@ -403,136 +432,125 @@
 		</exec>
 		<ant antfile="build.xml" dir="${checkout.restcomm-smsc.dir}/test/smpp-load/" />
 	</target>
-	
-	
-    <target name="copy-smsc">
-        <echo>Copy RestComm Map RA DU</echo>
-        <copy todir="${release.dir}/resources/map" failonerror="true">
-                <fileset dir="${base.dir}/map-ra/target/map-du">
-                        <include name="restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" />
-                </fileset>
-        </copy>
 
-        <echo>Copy RestComm SIP RA DU</echo>
+
+	<target name="copy-smsc">
+		<echo>Copy RestComm Map RA DU</echo>
+		<copy todir="${release.dir}/resources/map" failonerror="true">
+			<fileset dir="${checkout.dir}">
+				<include name="${restcomm-map-ra.download.jar.file}" />
+			</fileset>
+		</copy>
+
+<!--
+		<echo>Copy RestComm SIP RA DU</echo>
         <copy todir="${release.dir}/resources/sip11" failonerror="true">
                 <fileset dir="${checkout.dir}">
                         <include name="${restcomm-slee-sip11.download.distro.file}" />
                 </fileset>
         </copy>
-    	
-        <echo>Copy Diameter Config Files</echo>
-        <copy todir="${release.dir}/resources/ocs" failonerror="true">
-        	 <fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/ocs">
-                <include name="**" />
-            </fileset>
-        </copy>    	
-    	
-        <echo>Copy SMSC server</echo>
+-->
+
+		<echo>Copy Diameter Config Files</echo>
+		<copy todir="${release.dir}/resources/ocs" failonerror="true">
+			<fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/ocs">
+				<include name="**" />
+			</fileset>
+		</copy>    	
+
+		<echo>Copy SMSC server</echo>
+
 		<!--default-->
-        <copy todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy/restcomm-smsc-server" failonerror="true">
-                <fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/target/restcomm-smsc-server">
-                        <include name="**" />
-                </fileset>
-        </copy>
-        <copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-	    <copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-<!--   	<copy file="${release.dir}/resources/map/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" /> -->
-    	<copy file="${base.dir}/map-ra/target/map-du/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-    	<copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-	    <copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-    	<mkdir dir="${release.dir}/jboss-5.1.0.GA/server/default/data"/>
-	    <copy file="${basedir}/profile.xml" todir="${release.dir}/jboss-5.1.0.GA/server/default/conf/bootstrap" failonerror="true" overwrite="true"/>
+		<copy todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy/restcomm-smsc-server" failonerror="true">
+			<fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/target/restcomm-smsc-server">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+		<copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+		<copy file="${checkout.dir}/${restcomm-map-ra.download.jar.file}" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+		<copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+		<mkdir dir="${release.dir}/jboss-5.1.0.GA/server/default/data"/>
+		<copy file="${basedir}/profile.xml" todir="${release.dir}/jboss-5.1.0.GA/server/default/conf/bootstrap" failonerror="true" overwrite="true"/>
+
 		<!--simulator-->
-        <copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-smsc-server" failonerror="true">
-                <fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/target/restcomm-smsc-server">
-                        <include name="**" />
-                </fileset>
-        </copy>
-        <copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-	    <copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-<!--	    <copy file="${release.dir}/resources/map/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" /> -->
-    	<copy file="${base.dir}/map-ra/target/map-du/restcomm-slee-ra-map-du-${restcomm-slee.ss7.tag}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-	    <copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-        <copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/data" failonerror="true">
-                <fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/data">
-                        <include name="**" />
-                </fileset>
-        </copy>
-    	
-    	<rename src="${release.dir}/jboss-5.1.0.GA/server/simulator/data/SmscManagement_esme.xml" 
-    		    dest="${release.dir}/jboss-5.1.0.GA/server/simulator/data/SmppManagement_esme.xml"/>
-    	<rename src="${release.dir}/jboss-5.1.0.GA/server/simulator/data/SmscManagement_smppserver.xml" 
-    		    dest="${release.dir}/jboss-5.1.0.GA/server/simulator/data/SmppManagement_smppserver.xml"/>
-    	
+		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-smsc-server" failonerror="true">
+			<fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/target/restcomm-smsc-server">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+		<copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+    	<copy file="${checkout.dir}/${restcomm-map-ra.download.jar.file}" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+		<copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/data" failonerror="true">
+			<fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/data">
+				<include name="**" />
+			</fileset>
+		</copy>
 	    <copy file="${basedir}/profile.xml" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/conf/bootstrap" failonerror="true" overwrite="true"/>
+
 		<!--tools-->
 		<copy todir="${release.dir}/tools/restcomm-jss7-simulator" failonerror="true">
-		        <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/restcomm-ss7-simulator">
-		                <include name="**" />
-		        </fileset>
+			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/restcomm-ss7-simulator">
+				<include name="**" />
+			</fileset>
 		</copy>
 		<copy todir="${release.dir}/tools/restcomm-smpp-simulator" failonerror="true">
-		        <fileset dir="${checkout.restcomm-smsc.dir}/tools/smpp-simulator/bootstrap/target/simulator-smpp">
-		                <include name="**" />
-		        </fileset>
+			<fileset dir="${checkout.restcomm-smsc.dir}/tools/smpp-simulator/bootstrap/target/simulator-smpp">
+				<include name="**" />
+			</fileset>
 		</copy>
-    	<!-- tools : smpp-load -->
+
+		<!-- tools : smpp-load -->
 		<copy todir="${release.dir}/tools/restcomm-smpp-load/target/load" failonerror="true">
-		        <fileset dir="${checkout.restcomm-smsc.dir}/test/smpp-load/target/smpp-load">
-		                <include name="**" />
-		        </fileset>
+			<fileset dir="${checkout.restcomm-smsc.dir}/test/smpp-load/target/smpp-load">
+				<include name="**" />
+			</fileset>
 		</copy>
 		<copy todir="${release.dir}/tools/restcomm-smpp-load/src/main/resources" failonerror="true">
-		        <fileset dir="${checkout.restcomm-smsc.dir}/test/smpp-load/src/main/resources">
-		                <include name="**" />
-		        </fileset>
+			<fileset dir="${checkout.restcomm-smsc.dir}/test/smpp-load/src/main/resources">
+				<include name="**" />
+			</fileset>
 		</copy>
-	    <copy file="${checkout.restcomm-smsc.dir}/test/smpp-load/build.xml" todir="${release.dir}/tools/restcomm-smpp-load" failonerror="true" />
-    	
-    	<!-- tools : HLR Simulator is not available anymore 
-		<copy todir="${release.dir}/tools/restcomm-hlr-simulator" failonerror="true">
-		        <fileset dir="${checkout.restcomm-smsc.dir}/test/hlr-simulator/bootstrap/target/hlr-simulator-server">
-		                <include name="**" />
-		        </fileset>
-		</copy>
-		-->
-		                	
-    	<!--CLI-->
-        <copy file="${checkout.restcomm-smsc.dir}/core/oam/clismpp/target/smpp-cli-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/lib" failonerror="true" />
+		<copy file="${checkout.restcomm-smsc.dir}/test/smpp-load/build.xml" todir="${release.dir}/tools/restcomm-smpp-load" failonerror="true" />
+
+		<!--CLI-->
+		<copy file="${checkout.restcomm-smsc.dir}/core/oam/clismpp/target/smpp-cli-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/lib" failonerror="true" />
 		<copy todir="${release.dir}/jboss-5.1.0.GA/" failonerror="true">
-		        <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell">
-		                <include name="**/*" />
-		        </fileset>
+    		<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell">
+				<include name="**/*" />
+			</fileset>
 		</copy>
-        <copy file="${checkout.restcomm-smsc.dir}/core/oam/cli/target/smsc-cli-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/lib" failonerror="true" />
-        <copy todir="${release.dir}/jboss-5.1.0.GA/" failonerror="true">
-                <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell">
-                        <include name="**/*" />
-                </fileset>
-        </copy>
-    	
-    	<!--logs-->
+		<copy file="${checkout.restcomm-smsc.dir}/core/oam/cli/target/smsc-cli-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/lib" failonerror="true" />
+		<copy todir="${release.dir}/jboss-5.1.0.GA/" failonerror="true">
+			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
+		<!--logs-->
 		<echo>Copy jboss-log4j*.xml</echo>
 		<copy todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy/restcomm-smsc-server/log4j-templates" failonerror="true">
-		        <fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/log4j">
-		                <include name="**/*" />
-		        </fileset>
+			<fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/log4j">
+				<include name="**/*" />
+			</fileset>
 		</copy>
 		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-smsc-server/log4j-templates" failonerror="true">
-		        <fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/log4j">
-		                <include name="**/*" />
-		        </fileset>
+			<fileset dir="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/log4j">
+				<include name="**/*" />
+			</fileset>
 		</copy>
-    	
+
     	<copy file="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/log4j/jboss-log4j-default.xml" tofile="${release.dir}/jboss-5.1.0.GA/server/default/conf/jboss-log4j.xml" overwrite="true"></copy>
     	<copy file="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/log4j/jboss-log4j-default.xml" tofile="${release.dir}/jboss-5.1.0.GA/server/simulator/conf/jboss-log4j.xml" overwrite="true"></copy>
-			
+
     	<!-- oam/new-ui - jolokia war & jss7-management-console.war-->
 	    <copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jolokia.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jolokia.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jss7-management-console.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 	    <copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jss7-management-console.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-    	
+
 		<!-- restcomm Management HQ is not needed
 		<echo>restcomm Management Hq</echo>
 		<copy file="${checkout.restcomm-management-hq.dir}/restcomm-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
@@ -542,104 +560,107 @@
 		<!-- Cassandra -->
 		<echo>Copy Cassandra conf</echo>
 		<copy todir="${cassandra.dir}" failonerror="true">
-		        <fileset dir="${checkout.restcomm-smsc.dir}/cassandra">
-		                <include name="**" />
-		        </fileset>
+			<fileset dir="${checkout.restcomm-smsc.dir}/cassandra">
+				<include name="**" />
+			</fileset>
 		</copy>
+
 		<!-- jss7 config-->    	
 		<copy file="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/ss7-simulator/main_simulator2.xml" todir="${release.dir}/tools/restcomm-jss7-simulator/data" failonerror="true" />
 		<copy file="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/ss7-simulator/win_simulator2.xml" todir="${release.dir}/tools/restcomm-jss7-simulator/data" failonerror="true" />
-    	
+
 		<!-- jDiameter - mux & RA's-->    	
 		<copy todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy/restcomm-diameter-mux-${restcomm-diam.version}.sar" failonerror="true">
-		        <fileset dir="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux.sar">
-		                <include name="**" />
-		        </fileset>
-		</copy>
-    	
-		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-diameter-mux-${restcomm-diam.version}-restcomm.sar" failonerror="true">
 	        <fileset dir="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux.sar">
-		                <include name="**" />
-		        </fileset>
+				<include name="**" />
+			</fileset>
 		</copy>
 
-<!--
-		<copy file="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
+		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-diameter-mux-${restcomm-diam.version}-restcomm.sar" failonerror="true">
+			<fileset dir="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux.sar">
+				<include name="**" />
+			</fileset>
+		</copy>
+
+		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux-${restcomm-diam.version}.${restcomm-diam.build-number}.jar" 
+		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
+			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+		<copy file="${checkout.restcomm-diam.dir}/resources/ro/diameter-restcomm-slee-ra-diameter-ro-ra-DU-${restcomm-diam.resources.version}.jar" 
+			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+		<copy file="${checkout.restcomm-diam.dir}/resources/ro/diameter-restcomm-slee-ra-diameter-ro-ra-DU-${restcomm-diam.resources.version}.jar" 
+			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+
+		
+		
+		<copy todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true">
+			<fileset dir="${release.dir}/resources/sip11">
+				<include name="sip11-ra-DU-**.**" />
+			</fileset>
+		</copy>
+		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true">
+			<fileset dir="${release.dir}/resources/sip11">
+				<include name="sip11-ra-DU-**.**" />
+			</fileset>
+		</copy>
+		
+<!--		
+		<copy file="${release.dir}/resources/sip11/sip11-ra-DU-${restcomm-slee-sip11.version}.jar" 
+			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+		<copy file="${release.dir}/resources/sip11/sip11-ra-DU-${restcomm-slee-sip11.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 -->
+    </target>
 
-		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
-			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-diam.dir}/resources/base/diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" 
-			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-diam.dir}/resources/ro/diameter-restcomm-slee-ra-diameter-ro-ra-DU-${restcomm-diam.resources.version}.jar" 
-			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-diam.dir}/resources/ro/diameter-restcomm-slee-ra-diameter-ro-ra-DU-${restcomm-diam.resources.version}.jar" 
-			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-		<copy file="${release.dir}/resources/sip11/sip11-ra-DU-${restcomm-slee-sip11.version}.jar" 
-			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-		<copy file="${release.dir}/resources/sip11/sip11-ra-DU-${restcomm-slee-sip11.version}.jar" 
-			todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
-    	
-    	
-    	
-    </target>
-	
-    <target name="build-docs">
-        <exec failonerror="true" executable="${mvn.executable}" dir="${checkout.restcomm-smsc.dir}/docs">
-                <arg line="${release.build.goals} -Pall -Dmaven.test.skip=true" />
-        </exec>
-    </target>
-	
-    <target name="copy-docs">
+	<target name="build-docs">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.restcomm-smsc.dir}/docs">
+			<arg line="${release.build.goals} -Pall -Dmaven.test.skip=true" />
+		</exec>
+	</target>
+
+	<target name="copy-docs">
 		<!--docs-->
-	    <mkdir dir="${bundle.docs.dir}"/>
-		<!--delete dir="${docs.dir}/resources/map"/>    	
-		<copy todir="${docs.dir}/resources/map" failonerror="true" flatten="true">
-		        <fileset dir="${release.map.dir}/docs/">
-		                <include name="**/*User_Guide.pdf" />
-		        </fileset>
-		</copy-->
-    		
-		<copy toDir="${bundle.docs.dir}/slee" overwrite="true">
-			<fileset dir="${docs.dir}">
-                <include name="**" />
+
+		<delete dir="${docs.dir}/resources/map"/>    	
+
+		<copy todir="${docs.dir}/resources/map/html-book" failonerror="true">
+			<fileset dir="${checkout.restcomm-map-ra.dir}/generated-docs/html-book">
 			</fileset>
 		</copy>
-		<copy toDir="${docs.dir}/slee" overwrite="true" flatten="true">
-			<fileset dir="${bundle.docs.dir}/slee">
-                <include name="**/*.pdf" />
+		<copy todir="${docs.dir}/resources/map/pdf" failonerror="true">
+			<fileset dir="${checkout.restcomm-map-ra.dir}/generated-docs/pdf">
 			</fileset>
 		</copy>
-    	
+
 		<mkdir dir="${docs.dir}/jss7"/>
 		<mkdir dir="${docs.dir}/smsc"/>
 		<copy todir="${docs.dir}/jss7" failonerror="true">
-		        <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/_docs/">
-		                <include name="*.pdf" />
-		        </fileset>
+			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/_docs/">
+			</fileset>
 		</copy>
-		<copy todir="${docs.dir}/smsc" failonerror="true" flatten="true">
-		        <fileset dir="${checkout.restcomm-smsc.dir}/docs/">
-		                <include name="**/*.pdf" />
-		        </fileset>
+		<copy todir="${docs.dir}/smsc/adminguide/html-book" failonerror="true">
+			<fileset dir="${checkout.restcomm-smsc.dir}/docs/adminguide/sources-asciidoc/target/generated-docs/html-book">
+			</fileset>
 		</copy>
-    	
-    	<!--
-		<mkdir dir="${docs.dir}/management-hq" />
-		<copy todir="${docs.dir}/management-hq" failonerror="true" flatten="true">
-			<fileset dir="${checkout.restcomm-management-hq.dir}/docs/">
-				<include name="**/*.pdf" />
-			</fileset>			
-		</copy>		
-    	-->
+		<copy todir="${docs.dir}/smsc/adminguide/pdf" failonerror="true">
+			<fileset dir="${checkout.restcomm-smsc.dir}/docs/adminguide/sources-asciidoc/target/generated-docs/pdf">
+				<include name="*.pdf" />
+			</fileset>
+		</copy>
+		<copy todir="${docs.dir}/smsc/installationguide/html-book" failonerror="true">
+			<fileset dir="${checkout.restcomm-smsc.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/html-book">
+			</fileset>
+		</copy>
+		<copy todir="${docs.dir}/smsc/installationguide/pdf" failonerror="true">
+			<fileset dir="${checkout.restcomm-smsc.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/pdf">
+				<include name="*.pdf" />
+			</fileset>
+		</copy>
     </target>
-	
-	
+
+
 	<target name="make-final-zip" depends="set-time-stamp">
-		<zip destfile="${base.dir}/restcomm-smsc-${restcomm.smsc.release.version}-${time.stamp}.zip" filesonly="false">
+		<zip destfile="${base.dir}/restcomm-smsc-${restcomm.smsc.release.version}.zip" filesonly="false">
 			<zipfileset dir="${release.dir}" prefix="restcomm-smsc-${restcomm.smsc.release.version}">
 				<include name="**" />
 			</zipfileset>
@@ -651,53 +672,23 @@
 			<format property="time.stamp" pattern="yyMMddHHmm" />
 		</tstamp>
 	</target>
-	
-    <target name="bundle-documentation" >
-	    <echo>bundling documentation</echo>
-    	
-		<delete dir="${bundle.docs.dir}/slee/resources/map"/>    	
-		<copy todir="${bundle.docs.dir}/slee/resources/map" failonerror="true">
-		        <fileset dir="${docs.dir}/resources/map">
-		                <include name="**" />
-		        </fileset>
+
+	<target name="bundle-documentation" >
+		<echo>bundling documentation</echo>
+
+		<mkdir dir="${bundle.docs.dir}"/>
+
+		<copy toDir="${bundle.docs.dir}" overwrite="true">
+			<fileset dir="${docs.dir}">
+				<include name="**" />
+			</fileset>
 		</copy>
 
-		<delete dir="${bundle.docs.dir}/slee/tools/slee-management-console"/>    	
-		<mkdir dir="${bundle.docs.dir}/jss7"/>
-		<mkdir dir="${bundle.docs.dir}/smsc"/>
-		<copy todir="${bundle.docs.dir}/jss7" failonerror="true">
-		        <fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/_docs/">
-		                <include name="**" />
-		        </fileset>
-		</copy>
-		<copy todir="${bundle.docs.dir}/smsc/adminguide/html-book" failonerror="true">
-			<fileset dir="${checkout.restcomm-smsc.dir}/docs/adminguide/sources-asciidoc/target/generated-docs/html-book/">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<copy todir="${bundle.docs.dir}/smsc/installationguide/html-book" failonerror="true">
-			<fileset dir="${checkout.restcomm-smsc.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/html-book/">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<copy todir="${bundle.docs.dir}/smsc/adminguide/pdf" failonerror="true">
-			<fileset dir="${checkout.restcomm-smsc.dir}/docs/adminguide/sources-asciidoc/target/generated-docs/pdf/">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<copy todir="${bundle.docs.dir}/smsc/installationguide/pdf" failonerror="true">
-			<fileset dir="${checkout.restcomm-smsc.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/pdf/">
-				<include name="**" />
-			</fileset>
-		</copy>
-    	
-        <zip destfile="${base.dir}/restcomm-smsc-${restcomm.smsc.release.version}-docs-${time.stamp}.zip" filesonly="false">
+        <zip destfile="${base.dir}/restcomm-smsc-${restcomm.smsc.release.version}-docs.zip" filesonly="false">
                 <zipfileset dir="${bundle.docs.dir}" prefix="restcomm-smsc-${restcomm.smsc.release.version}/docs">
                         <include name="**/*" />
                 </zipfileset>
         </zip>
-    </target>
-	
-	
-	
+	</target>
+
 </project>
