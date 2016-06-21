@@ -18,6 +18,9 @@
 
 
 	<properties>
+		<restcomm.tools.mavenplugin.eclipse.version>
+			1.0.0.FINAL
+		</restcomm.tools.mavenplugin.eclipse.version>
 		<testng.version>6.8</testng.version>
 		<javolution.version>5.5.1</javolution.version>
 		<compiler.plugin.version>2.3.1</compiler.plugin.version>
