@@ -410,7 +410,11 @@
 	</target>
 
 	<target name="build-clhpp">
-        <echo>Clone RestComm SMPP</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.restcomm-smsc.dir}">
+			<arg line="-version" />
+		</exec>
+
+		<echo>Clone RestComm SMPP</echo>
         <exec failonerror="true" executable="git">
             <arg value="clone" />
             <arg value="https://github.com/RestComm/cloudhopper-smpp.git" />
