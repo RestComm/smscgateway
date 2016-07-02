@@ -580,7 +580,7 @@
 			</fileset>
 		</copy>
 
-		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-diameter-mux-${restcomm-diam.version}-restcomm.sar" failonerror="true">
+		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-diameter-mux-${restcomm-diam.version}.sar" failonerror="true">
 			<fileset dir="${checkout.restcomm-diam.dir}/core/mux/restcomm-diameter-mux.sar">
 				<include name="**" />
 			</fileset>
@@ -607,7 +607,22 @@
 				<include name="sip11-ra-DU-**.**" />
 			</fileset>
 		</copy>
-		
+
+		<!-- jDiameter - remove SCTP lib - we will reuse the lib from JSS7 -->    	
+		<delete includeemptydirs="true" failonerror="true">
+            <fileset dir="${release.dir}/jboss-5.1.0.GA/server/default/deploy/restcomm-diameter-mux-${restcomm-diam.version}.sar/lib">
+                    <include name="sctp-api-*.jar" />
+                	<include name="sctp-impl-*.jar" />
+            </fileset>
+		</delete>
+		<delete includeemptydirs="true" failonerror="true">
+            <fileset dir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-diameter-mux-${restcomm-diam.version}.sar/lib">
+                    <include name="sctp-api-*.jar" />
+                	<include name="sctp-impl-*.jar" />
+            </fileset>
+		</delete>
+
+
 <!--		
 		<copy file="${release.dir}/resources/sip11/sip11-ra-DU-${restcomm-slee-sip11.version}.jar" 
 			todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
