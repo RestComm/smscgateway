@@ -59,6 +59,7 @@ import org.jboss.netty.channel.Channel;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.slee.SbbLocalObjectExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
+import org.mobicents.smsc.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.StoreAndForwordMode;

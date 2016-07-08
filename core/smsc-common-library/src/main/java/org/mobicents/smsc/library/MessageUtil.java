@@ -64,7 +64,21 @@ import com.cloudhopper.smpp.tlv.TlvConvertException;
 public class MessageUtil {
 
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyy-mm-dd hh:mm:ss");
-	
+
+    public static String stackTraceToString() {
+        StringBuilder sb = new StringBuilder();
+        Thread thread = Thread.currentThread();
+        StackTraceElement[] arr = thread.getStackTrace();
+        if (arr != null) {
+            for (int i1 = 2; i1 < arr.length; i1++) {
+                StackTraceElement element = arr[i1];
+                sb.append(element.toString());
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
 	public static Date parseDate(String val) throws ParseException {
 		return DATE_FORMAT.parse(val);
 	}
