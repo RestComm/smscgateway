@@ -39,6 +39,9 @@ import javolution.util.FastList;
 
 import org.mobicents.protocols.ss7.indicator.NatureOfAddress;
 import org.mobicents.protocols.ss7.indicator.NumberingPlan;
+import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
+import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
+import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
 import org.mobicents.protocols.ss7.map.api.MAPParameterFactory;
 import org.mobicents.protocols.ss7.map.api.MAPProvider;
 import org.mobicents.protocols.ss7.map.api.MAPSmsTpduParameterFactory;
@@ -54,6 +57,7 @@ import org.mobicents.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
 import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
 import org.mobicents.protocols.ss7.tcap.asn.comp.Problem;
+import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.slee.resource.map.MAPContextInterfaceFactory;
 import org.mobicents.slee.resource.map.events.DialogAccept;
@@ -89,6 +93,8 @@ import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.persistence.SmsSubmitData;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
+import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
 
 /**
  * 
@@ -521,7 +527,23 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
                         if (removeSmsSet)
                             SmsSetCache.getInstance().removeProcessingSmsSet(smsSet.getTargetId());
                     }
-					this.decrementDeliveryActivityCount();
+
+                    switch (errorAction) {
+                    case memoryCapacityExceededFlag:
+                        smDeliveryOutcome = SMDeliveryOutcome.memoryCapacityExceeded;
+                        break;
+
+                    case mobileNotReachableFlag:
+                        smDeliveryOutcome = SMDeliveryOutcome.absentSubscriber;
+                        break;
+
+                    case notReachableForGprs:
+                        smDeliveryOutcome = SMDeliveryOutcome.absentSubscriber;
+                        break;
+                    }
+
+                    // TODO: add rsds ..........................
+//					this.decrementDeliveryActivityCount();
 
 					long smsCnt;
                     if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
@@ -559,17 +581,14 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
 						break;
 
 					case memoryCapacityExceededFlag:
-						smDeliveryOutcome = SMDeliveryOutcome.memoryCapacityExceeded;
 						this.rescheduleSmsSet(smsSet, false, pers, currentMsgNum, lstFailured);
 						break;
 
 					case mobileNotReachableFlag:
-						smDeliveryOutcome = SMDeliveryOutcome.absentSubscriber;
 						this.rescheduleSmsSet(smsSet, false, pers, currentMsgNum, lstFailured);
 						break;
 
 					case notReachableForGprs:
-						smDeliveryOutcome = SMDeliveryOutcome.absentSubscriber;
 						this.rescheduleSmsSet(smsSet, false, pers, currentMsgNum, lstFailured);
 						break;
 
@@ -728,10 +747,18 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
             }
 		}
 
-		if (smDeliveryOutcome != null && smsSet.getSmsCount() > lstFailured.size()) {
-            this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(), smDeliveryOutcome,
-                    smsSet.getTargetId(), smsSet.getNetworkId());
-		}
+        // TODO: delete rsds ..........................
+
+        // TODO !!!!- ..........................
+//        this.logger.warning("************: smDeliveryOutcome=" + smDeliveryOutcome + ", smsSet.getSmsCount()="
+//                + smsSet.getSmsCount() + ", lstFailured.size()=" + lstFailured.size());
+        // TODO !!!!- ..........................
+
+        if (smDeliveryOutcome != null && smsSet.getSmsCount() > lstFailured.size() ) {
+            this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(),
+                    smDeliveryOutcome, smsSet.getTargetId(), smsSet.getNetworkId());
+        }
+        this.decrementDeliveryActivityCount();
 	}
 
 	private void doIntermediateReceipts(SmsSet smsSet, PersistenceRAInterface pers, long currentMsgNum, ArrayList<Sms> lstFailured) {
@@ -913,6 +940,84 @@ public abstract class MtCommonSbb implements Sbb, ReportSMDeliveryStatusInterfac
 	public abstract void doSetInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer);
 
 	public abstract InformServiceCenterContainer doGetInformServiceCenterContainer();
+
+    public abstract void setSriMapVersion(int sriMapVersion);
+
+    public abstract int getSriMapVersion();
+
+    /**
+     * Get Rsds child SBB
+     * 
+     * @return
+     */
+    public abstract ChildRelationExt getRsdsSbb();
+
+    public abstract void fireSendRsdsEvent(SendRsdsEvent event, ActivityContextInterface aci, javax.slee.Address address);
+
+
+    private RsdsSbbLocalObject getRsdsSbbObject() {
+        ChildRelationExt relation = getRsdsSbb();
+
+        RsdsSbbLocalObject ret = (RsdsSbbLocalObject) relation.get(ChildRelationExt.DEFAULT_CHILD_NAME);
+        if (ret == null) {
+            try {
+                ret = (RsdsSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
+            } catch (Exception e) {
+                if (this.logger.isSevereEnabled()) {
+                    this.logger.severe("Exception while trying to creat RsdsSbb child", e);
+                }
+            }
+        }
+        return ret;
+    }
+
+    protected void setupReportSMDeliveryStatusRequest(String destinationAddress, int ton, int npi,
+            SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId) {
+        RsdsSbbLocalObject rsdsSbbLocalObject = this.getRsdsSbbObject();
+
+        if (rsdsSbbLocalObject != null) {
+            ActivityContextInterface schedulerActivityContextInterface = this.getSchedulerActivityContextInterface();
+            schedulerActivityContextInterface.attach(rsdsSbbLocalObject);
+
+            SendRsdsEvent event = new SendRsdsEvent();
+            event.setMsisdn(this.getCalledPartyISDNAddressString(destinationAddress, ton, npi));
+            event.setServiceCentreAddress(getServiceCenterAddressString(networkId));
+            event.setSMDeliveryOutcome(sMDeliveryOutcome);
+            event.setDestAddress(this.convertAddressFieldToSCCPAddress(destinationAddress, ton, npi));
+            event.setMapApplicationContext(this.getSRIMAPApplicationContext(MAPApplicationContextVersion.getInstance(this.getSriMapVersion())));
+            event.setTargetId(targetId);
+            event.setNetworkId(networkId);
+
+            // ISDNAddressString isdn = this.getCalledPartyISDNAddressString(destinationAddress, ton, npi);
+            // AddressString serviceCentreAddress = getServiceCenterAddressString(networkId);
+            // SccpAddress destAddress = this.convertAddressFieldToSCCPAddress(destinationAddress, ton, npi);
+            // rsdsSbbLocalObject
+            // .setupReportSMDeliveryStatusRequest(isdn, serviceCentreAddress, sMDeliveryOutcome, destAddress,
+            // this.getSRIMAPApplicationContext(MAPApplicationContextVersion.getInstance(this
+            // .getSriMapVersion())), targetId, networkId);
+
+            this.fireSendRsdsEvent(event, schedulerActivityContextInterface, null);
+        }
+    }
+
+    protected SccpAddress convertAddressFieldToSCCPAddress(String address, int ton, int npi) {
+        return MessageUtil.getSccpAddress(sccpParameterFact, address, ton, npi, smscPropertiesManagement.getHlrSsn(),
+                smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
+
+//        NumberingPlan np = MessageUtil.getSccpNumberingPlan(npi);
+//        NatureOfAddress na = MessageUtil.getSccpNatureOfAddress(ton);
+//
+//        GlobalTitle gt = sccpParameterFact.createGlobalTitle(address, 0, np, null, na);
+//        return sccpParameterFact.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, gt, 0, smscPropertiesManagement.getHlrSsn());
+    }
+
+    protected MAPApplicationContext getSRIMAPApplicationContext(MAPApplicationContextVersion applicationContextVersion) {
+        MAPApplicationContext mapApplicationContext = MAPApplicationContext.getInstance(
+                MAPApplicationContextName.shortMsgGatewayContext, applicationContextVersion);
+        this.setSriMapVersion(applicationContextVersion.getVersion());
+        return mapApplicationContext;
+    }
+
 
 	/**
 	 * Mark a message that its delivery has been started

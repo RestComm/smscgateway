@@ -25,6 +25,8 @@ package org.mobicents.smsc.slee.services.mt;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.slee.ActivityContextInterface;
+import javax.slee.Address;
 import javax.slee.CreateException;
 import javax.slee.NoSuchObjectLocalException;
 import javax.slee.SLEEException;
@@ -52,6 +54,8 @@ import org.mobicents.smsc.slee.resources.persistence.SmsSubmitData;
 import org.mobicents.smsc.slee.resources.persistence.TT_PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
+import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
 
 /**
  * 
@@ -62,6 +66,7 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
 
 	private TT_PersistenceRAInterfaceProxy cassandraSbb;
 	private SriSbbProxy sriSbb;
+    private RsdsSbbProxy rsdsSbb;
 
 	public MtSbbProxy(TT_PersistenceRAInterfaceProxy pers) {
 		this.cassandraSbb = pers;
@@ -77,9 +82,13 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
         this.scheduler = new SchedulerResourceAdaptorProxy();
 	}
 
-	public void setSriSbbProxy(SriSbbProxy sriSbb) {
-		this.sriSbb = sriSbb;
-	}
+    public void setSriSbbProxy(SriSbbProxy sriSbb) {
+        this.sriSbb = sriSbb;
+    }
+
+    public void setRsdsSbbProxy(RsdsSbbProxy rsdsSbb) {
+        this.rsdsSbb = rsdsSbb;
+    }
 
 	@Override
 	public TT_PersistenceRAInterfaceProxy getStore() {
@@ -99,6 +108,7 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
 	private int responseReceived;
 	private SmsSignalInfo[] segments;
 	private int mapApplicationContextVersionsUsed = 0;
+    private int sriMapVersion;
 
 
     protected SmsSignalInfo createSignalInfo(Sms sms, String msg, byte[] udhData, boolean moreMessagesToSend,
@@ -217,6 +227,16 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
 	public SmsSignalInfo[] getSegments() {
 		return this.segments;
 	}
+
+    @Override
+    public void setSriMapVersion(int sriMapVersion) {
+        this.sriMapVersion = sriMapVersion;
+    }
+
+    @Override
+    public int getSriMapVersion() {
+        return this.sriMapVersion;
+    }
 
 	@Override
 	public boolean add(Object arg0) {
@@ -401,5 +421,15 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
 
         }
 
+    }
+
+    @Override
+    public ChildRelationExt getRsdsSbb() {
+        return rsdsSbb;
+    }
+
+    @Override
+    public void fireSendRsdsEvent(SendRsdsEvent event, ActivityContextInterface aci, Address address) {
+        this.rsdsSbb.onSendRsds(event, aci, null);
     }
 }

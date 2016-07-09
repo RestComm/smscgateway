@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.mobicents.smsc.slee.services.mt;
+package org.mobicents.smsc.slee.services.smpp.server.events;
 
 import java.io.Serializable;
 import org.mobicents.protocols.ss7.map.api.service.sms.MWStatus;

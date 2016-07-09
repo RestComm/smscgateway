@@ -22,12 +22,6 @@
 
 package org.mobicents.smsc.slee.services.mt;
 
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
-import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
-import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
-import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
-import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
-
 /**
  * 
  * @author sergey vetyutnev
@@ -35,7 +29,7 @@ import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
  */
 public interface ReportSMDeliveryStatusInterface {
 
-	public void setupReportSMDeliveryStatusRequest(ISDNAddressString msisdn, AddressString serviceCentreAddress, SMDeliveryOutcome sMDeliveryOutcome,
-			SccpAddress destAddress, MAPApplicationContext mapApplicationContext, String targetId, int networkId);
+//	public void setupReportSMDeliveryStatusRequest(ISDNAddressString msisdn, AddressString serviceCentreAddress, SMDeliveryOutcome sMDeliveryOutcome,
+//			SccpAddress destAddress, MAPApplicationContext mapApplicationContext, String targetId, int networkId);
 
 }

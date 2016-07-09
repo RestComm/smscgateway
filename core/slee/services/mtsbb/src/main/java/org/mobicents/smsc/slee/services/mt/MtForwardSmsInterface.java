@@ -22,10 +22,6 @@
 
 package org.mobicents.smsc.slee.services.mt;
 
-import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
-import org.mobicents.protocols.ss7.map.api.primitives.LMSI;
-import org.mobicents.smsc.slee.resources.persistence.SmsSubmitData;
-
 /**
  * 
  * @author amit bhayani
@@ -34,18 +30,18 @@ import org.mobicents.smsc.slee.resources.persistence.SmsSubmitData;
  */
 public interface MtForwardSmsInterface {
 
-	public void setupMtForwardShortMessageRequest(ISDNAddressString networkNode, String imsi, LMSI lmci, int networkId);
+//	public void setupMtForwardShortMessageRequest(ISDNAddressString networkNode, String imsi, LMSI lmci, int networkId);
 
-	public void doSetSmsSubmitData(SmsSubmitData smsDeliveryData);
-
-	public SmsSubmitData doGetSmsSubmitData();
-
-	public void doSetCurrentMsgNum(long currentMsgNum);
-
-	public long doGetCurrentMsgNum();
-
-	public void doSetInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer);
-
-	public InformServiceCenterContainer doGetInformServiceCenterContainer();
+//	public void doSetSmsSubmitData(SmsSubmitData smsDeliveryData);
+//
+//	public SmsSubmitData doGetSmsSubmitData();
+//
+//	public void doSetCurrentMsgNum(long currentMsgNum);
+//
+//	public long doGetCurrentMsgNum();
+//
+//	public void doSetInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer);
+//
+//	public InformServiceCenterContainer doGetInformServiceCenterContainer();
 
 }

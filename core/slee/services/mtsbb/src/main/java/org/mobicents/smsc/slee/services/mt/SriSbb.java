@@ -31,7 +31,6 @@ import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
 
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
 import org.mobicents.protocols.ss7.map.api.MAPException;
 import org.mobicents.protocols.ss7.map.api.dialog.MAPAbortProviderReason;
@@ -44,7 +43,6 @@ import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
 import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
 import org.mobicents.protocols.ss7.map.api.service.sms.MWStatus;
-import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
 import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMRequest;
 import org.mobicents.protocols.ss7.map.api.service.sms.InformServiceCentreRequest;
 import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
@@ -63,12 +61,13 @@ import org.mobicents.smsc.cassandra.DatabaseType;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.ErrorCode;
-import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SriResponseValue;
+import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
+import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
 import org.mobicents.smsc.slee.resources.persistence.SmsSubmitData;
 
@@ -449,25 +448,37 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 	 * SBB Local Object Methods
 	 * 
 	 */
-	@Override
-	public void setupReportSMDeliveryStatusRequest(String destinationAddress, int ton, int npi,
-			SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId) {
-		RsdsSbbLocalObject rsdsSbbLocalObject = this.getRsdsSbbObject();
-		if (rsdsSbbLocalObject != null) {
-			ISDNAddressString isdn = this.getCalledPartyISDNAddressString(destinationAddress, ton, npi);
-			AddressString serviceCentreAddress = getServiceCenterAddressString(networkId);
-			SccpAddress destAddress = this.convertAddressFieldToSCCPAddress(destinationAddress, ton, npi);
-			rsdsSbbLocalObject
-					.setupReportSMDeliveryStatusRequest(isdn, serviceCentreAddress, sMDeliveryOutcome, destAddress,
-							this.getSRIMAPApplicationContext(MAPApplicationContextVersion.getInstance(this
-									.getSriMapVersion())), targetId, networkId);
-		}
-	}
+//	@Override
+//	public void setupReportSMDeliveryStatusRequest(String destinationAddress, int ton, int npi,
+//			SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId) {
+//		RsdsSbbLocalObject rsdsSbbLocalObject = this.getRsdsSbbObject();
+//		if (rsdsSbbLocalObject != null) {
+//			ISDNAddressString isdn = this.getCalledPartyISDNAddressString(destinationAddress, ton, npi);
+//			AddressString serviceCentreAddress = getServiceCenterAddressString(networkId);
+//			SccpAddress destAddress = this.convertAddressFieldToSCCPAddress(destinationAddress, ton, npi);
+//			rsdsSbbLocalObject
+//					.setupReportSMDeliveryStatusRequest(isdn, serviceCentreAddress, sMDeliveryOutcome, destAddress,
+//							this.getSRIMAPApplicationContext(MAPApplicationContextVersion.getInstance(this
+//									.getSriMapVersion())), targetId, networkId);
+//		}
+//	}
 
 	/**
 	 * CMPs
 	 */
-	public abstract void setSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse);
+    public abstract void setSmsSubmitData(SmsSubmitData smsDeliveryData);
+
+    public abstract SmsSubmitData getSmsSubmitData();
+
+    public abstract void setCurrentMsgNum(long currentMsgNum);
+
+    public abstract long getCurrentMsgNum();
+
+    public abstract void setInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer);
+
+    public abstract InformServiceCenterContainer getInformServiceCenterContainer();
+
+    public abstract void setSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse);
 
 	public abstract SendRoutingInfoForSMResponse getSendRoutingInfoForSMResponse();
 
@@ -475,18 +486,12 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 
 	public abstract MAPErrorMessage getErrorResponse();
 
-	public abstract void setSriMapVersion(int sriMapVersion);
-
-	public abstract int getSriMapVersion();
-
 	/**
 	 * Get Mt child SBB
 	 * 
 	 * @return
 	 */
 	public abstract ChildRelationExt getMtSbb();
-
-	public abstract ChildRelationExt getRsdsSbb();
 
 	private MtSbbLocalObject getMtSbbObject() {
 		ChildRelationExt relation = getMtSbb();
@@ -504,69 +509,77 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 		return ret;
 	}
 
-	private RsdsSbbLocalObject getRsdsSbbObject() {
-		ChildRelationExt relation = getRsdsSbb();
-
-		RsdsSbbLocalObject ret = (RsdsSbbLocalObject) relation.get(ChildRelationExt.DEFAULT_CHILD_NAME);
-		if (ret == null) {
-			try {
-				ret = (RsdsSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
-			} catch (Exception e) {
-				if (this.logger.isSevereEnabled()) {
-					this.logger.severe("Exception while trying to creat RsdsSbb child", e);
-				}
-			}
-		}
-		return ret;
-	}
+//	public void doSetSmsSubmitData(SmsSubmitData smsDeliveryData) {
+//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
+//		if (mtSbbLocalObject != null) {
+//			mtSbbLocalObject.doSetSmsSubmitData(smsDeliveryData);
+//		}
+//	}
+//
+//	public SmsSubmitData doGetSmsSubmitData() {
+//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
+//		if (mtSbbLocalObject != null) {
+//			return mtSbbLocalObject.doGetSmsSubmitData();
+//		} else {
+//			return null;
+//		}
+//	}
+//
+//	public void doSetCurrentMsgNum(long currentMsgNum) {
+//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
+//		if (mtSbbLocalObject != null) {
+//			mtSbbLocalObject.doSetCurrentMsgNum(currentMsgNum);
+//		}
+//	}
+//
+//	public long doGetCurrentMsgNum() {
+//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
+//		if (mtSbbLocalObject != null) {
+//			return mtSbbLocalObject.doGetCurrentMsgNum();
+//		} else {
+//			return 0;
+//		}
+//	}
+//
+//	public void doSetInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer) {
+//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
+//		if (mtSbbLocalObject != null) {
+//			mtSbbLocalObject.doSetInformServiceCenterContainer(informServiceCenterContainer);
+//		}
+//	}
+//
+//	public InformServiceCenterContainer doGetInformServiceCenterContainer() {
+//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
+//		if (mtSbbLocalObject != null) {
+//			return mtSbbLocalObject.doGetInformServiceCenterContainer();
+//		} else {
+//			return null;
+//		}
+//	}
 
 	public void doSetSmsSubmitData(SmsSubmitData smsDeliveryData) {
-		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-		if (mtSbbLocalObject != null) {
-			mtSbbLocalObject.doSetSmsSubmitData(smsDeliveryData);
-		}
-	}
+        this.setSmsSubmitData(smsDeliveryData);
+    }
 
-	public SmsSubmitData doGetSmsSubmitData() {
-		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-		if (mtSbbLocalObject != null) {
-			return mtSbbLocalObject.doGetSmsSubmitData();
-		} else {
-			return null;
-		}
-	}
+    public SmsSubmitData doGetSmsSubmitData() {
+        return this.getSmsSubmitData();
+    }
 
-	public void doSetCurrentMsgNum(long currentMsgNum) {
-		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-		if (mtSbbLocalObject != null) {
-			mtSbbLocalObject.doSetCurrentMsgNum(currentMsgNum);
-		}
-	}
+    public void doSetCurrentMsgNum(long currentMsgNum) {
+        this.setCurrentMsgNum(currentMsgNum);
+    }
 
-	public long doGetCurrentMsgNum() {
-		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-		if (mtSbbLocalObject != null) {
-			return mtSbbLocalObject.doGetCurrentMsgNum();
-		} else {
-			return 0;
-		}
-	}
+    public long doGetCurrentMsgNum() {
+        return this.getCurrentMsgNum();
+    }
 
-	public void doSetInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer) {
-		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-		if (mtSbbLocalObject != null) {
-			mtSbbLocalObject.doSetInformServiceCenterContainer(informServiceCenterContainer);
-		}
-	}
+    public void doSetInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer) {
+        this.setInformServiceCenterContainer(informServiceCenterContainer);
+    }
 
-	public InformServiceCenterContainer doGetInformServiceCenterContainer() {
-		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-		if (mtSbbLocalObject != null) {
-			return mtSbbLocalObject.doGetInformServiceCenterContainer();
-		} else {
-			return null;
-		}
-	}
+    public InformServiceCenterContainer doGetInformServiceCenterContainer() {
+        return this.getInformServiceCenterContainer();
+    }
 
 	@Override
 	public void setSbbContext(SbbContext sbbContext) {
@@ -724,47 +737,35 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
         smsSet.setLocationInfoWithLMSI(locationInfoWithLMSI);
         ISDNAddressString networkNodeNumber = locationInfoWithLMSI.getNetworkNodeNumber();
 
-        // apply ImsiRequest mproc rules
-//        MProcResult mProcResult = MProcManagement.getInstance().applyMProcImsiRequest(smsSet, imsi,
-//                networkNodeNumber.getAddress(), networkNodeNumber.getNumberingPlan().getIndicator(),
-//                networkNodeNumber.getAddressNature().getIndicator());
-//        if (mProcResult.isMessageDropped()) {
-//            if (logger.isInfoEnabled()) {
-//                logger.info("Sri-ImsiRequest: incoming messages are dropped by mProc rules, messages=[" + smsSet + "]");
-//            }
-//            this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.MPROC_SRI_REQUEST_DROP,
-//                    "Sri-ImsiRequest: incoming messages are dropped by mProc rules", true, null, true);
-//            return;
-//        }
-
         MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-        if (mtSbbLocalObject != null) {
-        	// Attach MtSbb to Scheduler ActivityContextInterface
-        	ActivityContextInterface schedulerActivityContextInterface = this
-        			.getSchedulerActivityContextInterface();
-        	schedulerActivityContextInterface.attach(mtSbbLocalObject);
+        // if (mtSbbLocalObject != null) {
+        // // Attach MtSbb to Scheduler ActivityContextInterface
+        // ActivityContextInterface schedulerActivityContextInterface = this
+        // .getSchedulerActivityContextInterface();
+        // schedulerActivityContextInterface.attach(mtSbbLocalObject);
+        //
+        // mtSbbLocalObject.setupMtForwardShortMessageRequest(networkNodeNumber, imsi, locationInfoWithLMSI.getLMSI(),
+        // networkId);
+        //
+        // }
 
-            mtSbbLocalObject.setupMtForwardShortMessageRequest(networkNodeNumber, imsi, locationInfoWithLMSI.getLMSI(), networkId);
+        if (mtSbbLocalObject != null) {
+            ActivityContextInterface schedulerActivityContextInterface = this.getSchedulerActivityContextInterface();
+            schedulerActivityContextInterface.attach(mtSbbLocalObject);
+
+            SendMtEvent event = new SendMtEvent();
+            event.setSmsSet(smsSet);
+            event.setImsiData(imsi);
+            event.setLmsi(locationInfoWithLMSI.getLMSI());
+            event.setNetworkNode(networkNodeNumber);
+            event.setInformServiceCenterContainer(this.doGetInformServiceCenterContainer());
+            event.setSriMapVersion(this.getSriMapVersion());
+
+            this.fireSendMtEvent(event, schedulerActivityContextInterface, null);
         }
     }
 
-    private SccpAddress convertAddressFieldToSCCPAddress(String address, int ton, int npi) {
-        return MessageUtil.getSccpAddress(sccpParameterFact, address, ton, npi, smscPropertiesManagement.getHlrSsn(),
-                smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
-
-//        NumberingPlan np = MessageUtil.getSccpNumberingPlan(npi);
-//        NatureOfAddress na = MessageUtil.getSccpNatureOfAddress(ton);
-//
-//        GlobalTitle gt = sccpParameterFact.createGlobalTitle(address, 0, np, null, na);
-//        return sccpParameterFact.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, gt, 0, smscPropertiesManagement.getHlrSsn());
-	}
-
-	private MAPApplicationContext getSRIMAPApplicationContext(MAPApplicationContextVersion applicationContextVersion) {
-        MAPApplicationContext mapApplicationContext = MAPApplicationContext.getInstance(MAPApplicationContextName.shortMsgGatewayContext,
-                applicationContextVersion);
-        this.setSriMapVersion(applicationContextVersion.getVersion());
-        return mapApplicationContext;
-	}
+    public abstract void fireSendMtEvent(SendMtEvent event, ActivityContextInterface aci, javax.slee.Address address);
 
     public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
         ServiceID serviceID = event.getService();

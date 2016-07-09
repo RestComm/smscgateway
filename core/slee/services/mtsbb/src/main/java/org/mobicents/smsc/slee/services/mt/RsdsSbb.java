@@ -26,6 +26,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.slee.ActivityContextInterface;
 import javax.slee.CreateException;
+import javax.slee.EventContext;
 import javax.slee.RolledBackContext;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
@@ -66,6 +67,7 @@ import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
+import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
 
 /**
  * 
@@ -96,6 +98,11 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
     protected static final SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
 
     public RsdsSbb() {
+    }
+
+    public void onSendRsds(SendRsdsEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        setupReportSMDeliveryStatusRequest(event.getMsisdn(), event.getServiceCentreAddress(), event.getSMDeliveryOutcome(),
+                event.getDestAddress(), event.getMapApplicationContext(), event.getTargetId(), event.getNetworkId());
     }
 
     /**
@@ -148,7 +155,6 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
      * 
      * @throws MAPException
      */
-    @Override
     public void setupReportSMDeliveryStatusRequest(ISDNAddressString msisdn, AddressString serviceCentreAddress,
             SMDeliveryOutcome smDeliveryOutcome, SccpAddress destAddress, MAPApplicationContext mapApplicationContext,
             String targetId, int networkId) {

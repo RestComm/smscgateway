@@ -25,6 +25,8 @@ package org.mobicents.smsc.slee.services.mt;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.slee.ActivityContextInterface;
+import javax.slee.Address;
 import javax.slee.ChildRelation;
 import javax.slee.CreateException;
 import javax.slee.NoSuchObjectLocalException;
@@ -42,9 +44,13 @@ import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbLocalObjectExt;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.slee.resources.persistence.MAPProviderProxy;
+import org.mobicents.smsc.slee.resources.persistence.SmsSubmitData;
 import org.mobicents.smsc.slee.resources.persistence.TT_PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
+import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
+import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
 
 /**
  * 
@@ -91,6 +97,18 @@ public class SriSbbProxy extends SriSbb implements ChildRelation, SbbLocalObject
 	private SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse;
 	private int sriMapVersion;
 	private MAPErrorMessage errorContainer;
+    private SmsSubmitData smsDeliveryData;
+    private InformServiceCenterContainer informServiceCenterContainer;
+
+    @Override
+    public void setSmsSubmitData(SmsSubmitData smsDeliveryData) {
+        this.smsDeliveryData = smsDeliveryData;
+    }
+
+    @Override
+    public SmsSubmitData getSmsSubmitData() {
+        return this.smsDeliveryData;
+    }
 	
 	@Override
 	public void setSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse) {
@@ -121,6 +139,16 @@ public class SriSbbProxy extends SriSbb implements ChildRelation, SbbLocalObject
 	public MAPErrorMessage getErrorResponse() {
 		return this.errorContainer;
 	}
+
+    @Override
+    public void setInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer) {
+        this.informServiceCenterContainer = informServiceCenterContainer;
+    }
+
+    @Override
+    public InformServiceCenterContainer getInformServiceCenterContainer() {
+        return this.informServiceCenterContainer;
+    }
 
 
 	@Override
@@ -269,5 +297,29 @@ public class SriSbbProxy extends SriSbb implements ChildRelation, SbbLocalObject
 
         }
 
+    }
+
+    @Override
+    public long getCurrentMsgNum() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void fireSendMtEvent(SendMtEvent event, ActivityContextInterface aci, Address address) {
+        // TODO Auto-generated method stub
+        
+        this.mtSbb.onSendMt(event, aci, null);
+    }
+
+    @Override
+    public void fireSendRsdsEvent(SendRsdsEvent event, ActivityContextInterface aci, Address address) {
+        this.rsdsSbb.onSendRsds(event, aci, null);
+    }
+
+    @Override
+    public void setCurrentMsgNum(long currentMsgNum) {
+        // TODO Auto-generated method stub
+        
     }
 }

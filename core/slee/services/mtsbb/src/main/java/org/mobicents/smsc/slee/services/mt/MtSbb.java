@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import javax.slee.ActivityContextInterface;
+import javax.slee.EventContext;
 
 import javolution.util.FastList;
 
@@ -72,7 +73,6 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeaderElement;
 import org.mobicents.protocols.ss7.map.smstpdu.UserDataImpl;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
 import org.mobicents.protocols.ss7.tcap.asn.ApplicationContextName;
-import org.mobicents.slee.SbbLocalObjectExt;
 import org.mobicents.slee.resource.map.events.DialogAccept;
 import org.mobicents.slee.resource.map.events.DialogClose;
 import org.mobicents.slee.resource.map.events.DialogDelimiter;
@@ -100,6 +100,8 @@ import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.persistence.SmsSubmitData;
+import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
+import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
 
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.tlv.Tlv;
@@ -126,6 +128,27 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	public MtSbb() {
 		super(className);
 	}
+
+    public void onSendMt(SendMtEvent event, ActivityContextInterface aci, EventContext eventContext) {
+
+        // !!!!- ..........................
+//        ActivityContextInterface schedulerActivityContextInterface = this.getSchedulerActivityContextInterface();
+//        this.logger.warning("onSendMt: event=" + event + ", schedulerActivityContextInterface="
+//                + schedulerActivityContextInterface);
+        // !!!!- ..........................
+
+        
+        
+        SmsSubmitData smsDeliveryData = new SmsSubmitData();
+        smsDeliveryData.setTargetId(event.getSmsSet().getTargetId());
+        this.doSetSmsSubmitData(smsDeliveryData);
+        this.doSetCurrentMsgNum(0);
+        this.doSetInformServiceCenterContainer(event.getInformServiceCenterContainer());
+        this.setSriMapVersion(event.getSriMapVersion());
+
+        setupMtForwardShortMessageRequest(event.getNetworkNode(), event.getImsiData(), event.getLmsi(), event.getSmsSet()
+                .getNetworkId());
+    }
 
 	/**
 	 * Components Events override from MtCommonSbb that we care
@@ -693,9 +716,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	 * 
 	 */
 
-	@Override
     public void setupMtForwardShortMessageRequest(ISDNAddressString networkNode, String imsiData, LMSI lmsi, int networkId) {
-        if (this.logger.isFineEnabled()) {
+	    if (this.logger.isFineEnabled()) {
 			this.logger.fine("\nmperforming setupMtForwardShortMessageRequest ISDNAddressString= " + networkNode);
 		}
 
@@ -766,6 +788,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                                 continue;
                             } else {
                                 noMoreMessages = true;
+                                // TODO: add rsds ..........................
+                                setupReportSMDeliveryStatusRequestSuccess(smsSet, true);
                                 this.freeSmsSetSucceded(smsSet, pers);
                                 break;
                             }
@@ -780,7 +804,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         }
 
         if (noMoreMessages) {
-            setupReportSMDeliveryStatusRequestSuccess(smsSet, true);
+            // TODO: delete rsds ..........................
+//            setupReportSMDeliveryStatusRequestSuccess(smsSet, true);
         } else {
             try {
                 this.sendMtSms(this.getMtFoSMSMAPApplicationContext(mapApplicationContextVersion),
@@ -805,13 +830,13 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         }
 	}
 
-	public void setupReportSMDeliveryStatusRequest(String destinationAddress, int ton, int npi,
-			SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId) {
-
-		SbbLocalObjectExt sbbLocalObject = this.sbbContext.getSbbLocalObject().getParent();
-		SriSbbLocalObject sriSbb = (SriSbbLocalObject) sbbLocalObject;
-        sriSbb.setupReportSMDeliveryStatusRequest(destinationAddress, ton, npi, sMDeliveryOutcome, targetId, networkId);
-	}
+//	public void setupReportSMDeliveryStatusRequest(String destinationAddress, int ton, int npi,
+//			SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId) {
+//
+//		SbbLocalObjectExt sbbLocalObject = this.sbbContext.getSbbLocalObject().getParent();
+//		SriSbbLocalObject sriSbb = (SriSbbLocalObject) sbbLocalObject;
+//        sriSbb.setupReportSMDeliveryStatusRequest(destinationAddress, ton, npi, sMDeliveryOutcome, targetId, networkId);
+//	}
 
 	/**
 	 * CMPs
@@ -1223,14 +1248,18 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				}
 
 				// no more messages to send - remove smsSet
+	            // TODO: add rsds ..........................
+                setupReportSMDeliveryStatusRequestSuccess(smsSet, mapDialogSms.getApplicationContext()
+                        .getApplicationContextVersion() != MAPApplicationContextVersion.version1);
 				this.freeSmsSetSucceded(smsSet, pers);
 			}
 		} finally {
 			pers.releaseSynchroObject(lock);
 		}
 
-        setupReportSMDeliveryStatusRequestSuccess(smsSet,
-                mapDialogSms.getApplicationContext().getApplicationContextVersion() != MAPApplicationContextVersion.version1);
+        // TODO: delete rsds ..........................
+//        setupReportSMDeliveryStatusRequestSuccess(smsSet,
+//                mapDialogSms.getApplicationContext().getApplicationContextVersion() != MAPApplicationContextVersion.version1);
 	}
 
     private void setupReportSMDeliveryStatusRequestSuccess(SmsSet smsSet, boolean versionMore1) {

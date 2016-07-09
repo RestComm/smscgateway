@@ -26,6 +26,9 @@
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.mt.SriSbb</sbb-abstract-class-name>
+                <cmp-field><cmp-field-name>smsSubmitData</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>currentMsgNum</cmp-field-name></cmp-field>
+				<cmp-field><cmp-field-name>informServiceCenterContainer</cmp-field-name></cmp-field>
 				<cmp-field><cmp-field-name>sendRoutingInfoForSMResponse</cmp-field-name></cmp-field>
 				<cmp-field><cmp-field-name>errorResponse</cmp-field-name></cmp-field>
 				<cmp-field><cmp-field-name>sriMapVersion</cmp-field-name></cmp-field>
@@ -73,6 +76,24 @@
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
 			<initial-event-select variable="ActivityContext" />
+		</event>
+
+		<event event-direction="Fire">
+			<event-name>SendMtEvent</event-name>
+			<event-type-ref>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SS7_SEND_MT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Fire">
+			<event-name>SendRsdsEvent</event-name>
+			<event-type-ref>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SS7_SEND_RSDS</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
 		</event>
 
 		<!-- MAP Dialog Events -->
@@ -295,6 +316,13 @@
 		<sbb-version>1.0</sbb-version>
 		<sbb-alias>MtSbb</sbb-alias>
 
+        <sbb-ref>
+			<sbb-name>RsdsSbb</sbb-name>
+			<sbb-vendor>org.mobicents</sbb-vendor>
+			<sbb-version>1.0</sbb-version>
+			<sbb-alias>RsdsSbb</sbb-alias>
+        </sbb-ref>        
+
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.mt.MtSbb</sbb-abstract-class-name>
@@ -310,8 +338,19 @@
 				<cmp-field><cmp-field-name>smRpDa</cmp-field-name></cmp-field>
 				<cmp-field><cmp-field-name>smRpOa</cmp-field-name></cmp-field>
 				<cmp-field><cmp-field-name>nnn</cmp-field-name></cmp-field>
+				<cmp-field><cmp-field-name>sriMapVersion</cmp-field-name></cmp-field>
 
 				<cmp-field><cmp-field-name>mapApplicationContextVersionsUsed</cmp-field-name></cmp-field>
+
+				<get-child-relation-method>
+					<sbb-alias-ref>
+						RsdsSbb
+					</sbb-alias-ref>
+					<get-child-relation-method-name>
+						getRsdsSbb
+					</get-child-relation-method-name>
+					<default-priority>0</default-priority>
+				</get-child-relation-method>				
 	
 			</sbb-abstract-class>
 			<sbb-local-interface>
@@ -328,6 +367,25 @@
 			</sbb-activity-context-interface>
 			 -->
 		</sbb-classes>
+
+		<event event-direction="Receive" initial-event="True">
+			<event-name>SendMt</event-name>
+			<event-type-ref>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SS7_SEND_MT</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>
+
+		<event event-direction="Fire">
+			<event-name>SendRsdsEvent</event-name>
+			<event-type-ref>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SS7_SEND_RSDS</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
 
 		<!-- MAP Dialog Events -->
 		<event event-direction="Receive" initial-event="False">
@@ -530,7 +588,6 @@
 		</resource-adaptor-type-binding>		
 	</sbb>
 
-
 	<sbb id="rsdsSbb">
 		<description>SBB for reportSMDeliveryStatus request to HLR</description>
 		<sbb-name>RsdsSbb</sbb-name>
@@ -550,6 +607,16 @@
 				</sbb-local-interface-name>
 			</sbb-local-interface>
 		</sbb-classes>
+
+		<event event-direction="Receive" initial-event="True">
+			<event-name>SendRsds</event-name>
+			<event-type-ref>
+				<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SS7_SEND_RSDS</event-type-name>
+				<event-type-vendor>org.mobicents</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>
 
 		<!-- MAP Dialog Events -->
 		<event event-direction="Receive" initial-event="False">

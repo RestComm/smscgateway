@@ -158,6 +158,7 @@ public class C2_MtTest {
         this.rsdsSbb = new RsdsSbbProxy(this.pers);
         this.sriSbb = new SriSbbProxy(this.pers, this.mtSbb, this.rsdsSbb);
         this.mtSbb.setSriSbbProxy(this.sriSbb);
+        this.mtSbb.setRsdsSbbProxy(rsdsSbb);
         SmsSetCache.getInstance().clearProcessingSmsSet();
         SmscPropertiesManagement.getInstance().setSmscStopped(false);
         SmscPropertiesManagement.getInstance().setStoreAndForwordMode(StoreAndForwordMode.normal);
