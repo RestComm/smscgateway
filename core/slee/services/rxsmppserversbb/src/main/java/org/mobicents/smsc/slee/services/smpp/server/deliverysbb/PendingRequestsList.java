@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.mobicents.smsc.deliverysbb;
+package org.mobicents.smsc.slee.services.smpp.server.deliverysbb;
 
 import java.io.Serializable;
 

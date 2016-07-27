@@ -59,7 +59,6 @@ import org.jboss.netty.channel.Channel;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.slee.SbbLocalObjectExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
-import org.mobicents.smsc.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
@@ -75,6 +74,7 @@ import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppTransaction;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppTransactionACIFactory;
+import org.mobicents.smsc.slee.services.smpp.server.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
 import org.mobicents.smsc.smpp.Esme;
 import org.mobicents.smsc.smpp.EsmeManagement;
@@ -494,6 +494,42 @@ public class RxSmppServerSbbTest {
         @Override
         public PendingRequestsList getPendingRequestsList() {
             return pendingRequestsList;
+        }
+
+        @Override
+        public void setDlvIsInited(boolean deliveringIsInited) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public boolean getDlvIsInited() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void setDlvIsEnded(boolean deliveringIsEnded) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public boolean getDlvIsEnded() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void setSendingPoolMsgCount(int sendingPoolMsgCount) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public int getSendingPoolMsgCount() {
+            // TODO Auto-generated method stub
+            return 0;
         }
     }
 

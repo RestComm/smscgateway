@@ -507,16 +507,16 @@ public class MessageUtil {
     }
 
     public static boolean isReceiptIntermediate(int registeredDelivery) {
-            int code = registeredDelivery & 0x10;
-            if (code == 16 )
-                    return true;
-            else
-                    return false;
+        int code = registeredDelivery & 0x10;
+        if (code == 16)
+            return true;
+        else
+            return false;
     }
 
     public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts,
-                    String extraString) {
-            return createReceiptSms(sms, delivered, ta, origNetworkIdForReceipts, extraString, false);
+            String extraString) {
+        return createReceiptSms(sms, delivered, ta, origNetworkIdForReceipts, extraString, false);
     }
 
     public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts) {
