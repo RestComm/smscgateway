@@ -7,9 +7,9 @@
 		<artifactId>services-parent</artifactId>
 		<version>7.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>mt-sbb</artifactId>
+	<artifactId>sbbs</artifactId>
 
-	<name>Core : SLEE : Services Mt SBB</name>
+	<name>Core : SLEE : Services</name>
 
 	<dependencies>
 		<dependency>

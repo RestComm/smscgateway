@@ -9,7 +9,6 @@
 		<sbb-version>1.0</sbb-version>
 		<sbb-alias>RxSipServerSbb</sbb-alias>
 
-
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.sip.server.rx.RxSipServerSbb</sbb-abstract-class-name>

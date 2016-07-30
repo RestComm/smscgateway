@@ -25,6 +25,7 @@ package org.mobicents.smsc.library;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -436,12 +437,10 @@ public class MessageUtil {
 		sb.append(sec);
 	}
 
-	public static Date checkScheduleDeliveryTime(final SmsSet smsSet, Date newDueDate) {
+	public static Date checkScheduleDeliveryTime(final ArrayList<Sms> lstTempFailured, Date newDueDate) {
 		Date minDate = null;
-		long smsCount = smsSet.getSmsCount();
-		for (int i1 = 0; i1 < smsCount; i1++) {
-			Sms sms = smsSet.getSms(i1);
-			if (sms.getScheduleDeliveryTime() != null) {
+        for (Sms sms : lstTempFailured) {
+            if (sms.getScheduleDeliveryTime() != null) {
 				if (minDate == null)
 					minDate = sms.getScheduleDeliveryTime();
 				else {

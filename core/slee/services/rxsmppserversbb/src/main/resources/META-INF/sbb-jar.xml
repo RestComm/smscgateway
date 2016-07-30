@@ -9,7 +9,6 @@
 		<sbb-version>1.0</sbb-version>
 		<sbb-alias>RxSmppServerSbb</sbb-alias>
 
-
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.smpp.server.rx.RxSmppServerSbb</sbb-abstract-class-name>
