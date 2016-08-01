@@ -87,11 +87,100 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 		super(className);
 	}
 
-	/**
-	 * Event Handlers
-	 */
+    // *********
+    // SBB staff
+
+    @Override
+    public void setSbbContext(SbbContext sbbContext) {
+        super.setSbbContext(sbbContext);
+
+        this.maxMAPApplicationContextVersion = MAPApplicationContextVersion.getInstance(smscPropertiesManagement
+                .getMaxMapVersion());
+    }
+
+    public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        ServiceID serviceID = event.getService();
+        this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
+        SbbStates.setMtServiceState(true);
+    }
+
+    public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
+        if (isServiceActivity) {
+            this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
+            SbbStates.setMtServiceState(false);
+        }
+    }
+
+    // *********
+    // CMPs
+
+    public abstract void setInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer);
+
+    public abstract InformServiceCenterContainer getInformServiceCenterContainer();
+
+    public abstract void setSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse);
+
+    public abstract SendRoutingInfoForSMResponse getSendRoutingInfoForSMResponse();
+
+    public abstract void setErrorResponse(MAPErrorMessage errorResponse);
+
+    public abstract MAPErrorMessage getErrorResponse();
+
+    // *********
+    // Get Mt child SBB
+
+    public abstract ChildRelationExt getMtSbb();
+
+    private MtSbbLocalObject getMtSbbObject() {
+        ChildRelationExt relation = getMtSbb();
+
+        MtSbbLocalObject ret = (MtSbbLocalObject) relation.get(ChildRelationExt.DEFAULT_CHILD_NAME);
+        if (ret == null) {
+            try {
+                ret = (MtSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
+            } catch (Exception e) {
+                if (this.logger.isSevereEnabled()) {
+                    this.logger.severe("Exception while trying to creat MtSbb child", e);
+                }
+            }
+        }
+        return ret;
+    }
+
+    private void executeForwardSM(SmsSet smsSet, LocationInfoWithLMSI locationInfoWithLMSI, String imsi, int networkId) {
+        smsSet.setImsi(imsi);
+        smsSet.setLocationInfoWithLMSI(locationInfoWithLMSI);
+        ISDNAddressString networkNodeNumber = locationInfoWithLMSI.getNetworkNodeNumber();
+
+        MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
+
+        if (mtSbbLocalObject != null) {
+            ActivityContextInterface schedulerActivityContextInterface = this.getSchedulerActivityContextInterface();
+            schedulerActivityContextInterface.attach(mtSbbLocalObject);
+
+            SendMtEvent event = new SendMtEvent();
+            event.setSmsSet(smsSet);
+            event.setImsiData(imsi);
+            event.setLmsi(locationInfoWithLMSI.getLMSI());
+            event.setNetworkNode(networkNodeNumber);
+            event.setInformServiceCenterContainer(this.getInformServiceCenterContainer());
+            event.setSriMapVersion(this.getSriMapVersion());
+            event.setCurrentMsgNum(this.getCurrentMsgNumValue());
+            event.setSendingPoolMsgCount(this.getSendingPoolMsgCountValue());
+
+            this.fireSendMtEvent(event, schedulerActivityContextInterface, null);
+        }
+    }
+
+    public abstract void fireSendMtEvent(SendMtEvent event, ActivityContextInterface aci, javax.slee.Address address);
+
+    // *********
+    // initial event
 
 	public void onSms(SmsSetEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        SmsSet smsSet = event.getSmsSet();
+        this.addInitialMessageSet(smsSet);
 
         try {
             if (this.logger.isFineEnabled()) {
@@ -100,9 +189,6 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             smscStatAggregator.updateMsgOutTryAll();
             smscStatAggregator.updateMsgOutTrySs7();
 
-            SmsSet smsSet = event.getSmsSet();
-            this.addInitialMessageSet(smsSet);
-
             if (smsSet.getDestAddrTon() == SmppConstants.TON_ALPHANUMERIC) {
                 // bad TON at the destination address: alphanumerical is not supported
                 this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.BAD_TYPE_OF_NUMBER,
@@ -110,22 +196,16 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                 return;
             }
 
-//            int curMsg = 0;
-//            Sms sms = smsSet.getSms(curMsg);
-            Sms sms = this.getCurrentMessage(0);
+            Sms sms = this.obtainNextMessage();
+//            Sms sms = this.getCurrentMessage(0);
             if (sms == null) {
                 // this means that no messages with good ScheduleDeliveryTime or
                 // no messages at all we have to reschedule
-                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SUCCESS, "No messages for sending now", true, null, false);
+                this.markDeliveringIsEnded(true);
                 return;
             }
 
-            sms.setDeliveryCount(sms.getDeliveryCount() + 1);
-
-//            this.doSetCurrentMsgNum(curMsg);
-//            SmsSubmitData smsDeliveryData = new SmsSubmitData();
-//            smsDeliveryData.setTargetId(smsSet.getTargetId());
-//            this.doSetSmsSubmitData(smsDeliveryData);
+//            sms.setDeliveryCount(sms.getDeliveryCount() + 1);
 
             // checking for correlationId - may be we do not need SRI
             String correlationID = smsSet.getCorrelationId();
@@ -170,13 +250,15 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             this.sendSRI(smsSet, smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(),
                     this.getSRIMAPApplicationContext(this.maxMAPApplicationContextVersion));
         } catch (Throwable e1) {
-            logger.severe("Exception in SriSbb.onSms when fetching records and issuing events: " + e1.getMessage(), e1);
+            String s = "Exception in SriSbb.onSms when fetching records and issuing events: " + e1.getMessage();
+            logger.severe(s, e1);
+            markDeliveringIsEnded(true);
+//            this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s, true, null, false);
         }
 	}
 
-	/**
-	 * Components Events override from MtCommonSbb that we care
-	 */
+    // *********
+    // MAP Component events
 
 	@Override
 	public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
@@ -202,26 +284,16 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
         }
 	}
 
+    @Override
 	public void onRejectComponent(RejectComponent event, ActivityContextInterface aci) {
 		super.onRejectComponent(event, aci);
 
 		String reason = this.getRejectComponentReason(event);
 
-//        SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//        if (smsDeliveryData == null) {
-//            this.logger.severe("SmsDeliveryData CMP missed");
-//            return;
-//        }
-//        String targetId = smsDeliveryData.getTargetId();
-//        SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//        if (smsSet == null) {
-//            this.logger.severe("In SmsDeliveryData CMP smsSet is missed - SriSbb.onRejectComponent(), targetId=" + targetId);
-//            return;
-//        }
-
         SmsSet smsSet = getSmsSet();
         if (smsSet == null) {
             logger.severe("SriSbb.onRejectComponent(): CMP smsSet is missed");
+            markDeliveringIsEnded(true);
             return;
         }
 
@@ -229,9 +301,8 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                 "onRejectComponent after SRI Request: " + reason != null ? reason.toString() : "", true, null, false);
 	}
 
-	/**
-	 * Dialog Events override from MtCommonSbb that we care
-	 */
+    // *********
+    // MAP Dialog events
 
 	@Override
 	public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
@@ -239,21 +310,10 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
         try {
             MAPRefuseReason mapRefuseReason = evt.getRefuseReason();
 
-//            SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//            if (smsDeliveryData == null) {
-//                this.logger.severe("SmsDeliveryData CMP missed");
-//                return;
-//            }
-//            String targetId = smsDeliveryData.getTargetId();
-//            SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//            if (smsSet == null) {
-//                this.logger.severe("In SmsDeliveryData CMP smsSet is missed - SriSbb.onDialogReject(), targetId=" + targetId);
-//                return;
-//            }
-
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
                 logger.severe("SriSbb.onDialogReject(): CMP smsSet is missed");
+                markDeliveringIsEnded(true);
                 return;
             }
 
@@ -289,6 +349,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                     + mapRefuseReason != null ? mapRefuseReason.toString() : "", true, null, false);
         } catch (Throwable e1) {
             logger.severe("Exception in SriSbb.onDialogReject() when fetching records and issuing events: " + e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
         }
 	}
 
@@ -299,21 +360,10 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 
             MAPAbortProviderReason abortProviderReason = evt.getAbortProviderReason();
 
-//            SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//            if (smsDeliveryData == null) {
-//                this.logger.severe("SmsDeliveryData CMP missed");
-//                return;
-//            }
-//            String targetId = smsDeliveryData.getTargetId();
-//            SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//            if (smsSet == null) {
-//                this.logger.severe("In SmsDeliveryData CMP smsSet is missed - SriSbb.onDialogProviderAbort(), targetId=" + targetId);
-//                return;
-//            }
-
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
                 logger.severe("SriSbb.onDialogProviderAbort(): CMP smsSet is missed");
+                markDeliveringIsEnded(true);
                 return;
             }
 
@@ -321,6 +371,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                     + abortProviderReason != null ? abortProviderReason.toString() : "", true, null, false);
         } catch (Throwable e1) {
             logger.severe("Exception in SriSbb.onDialogProviderAbort() when fetching records and issuing events: " + e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
         }
 	}
 
@@ -331,21 +382,10 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 
             String reason = getUserAbortReason(evt);
 
-//            SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//            if (smsDeliveryData == null) {
-//                this.logger.severe("SmsDeliveryData CMP missed");
-//                return;
-//            }
-//            String targetId = smsDeliveryData.getTargetId();
-//            SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//            if (smsSet == null) {
-//                this.logger.severe("In SmsDeliveryData CMP smsSet is missed - SriSbb.onDialogUserAbort(), targetId=" + targetId);
-//                return;
-//            }
-
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
                 logger.severe("SriSbb.onDialogUserAbort(): CMP smsSet is missed");
+                markDeliveringIsEnded(true);
                 return;
             }
 
@@ -353,6 +393,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                     + reason != null ? reason.toString() : "", true, null, false);
         } catch (Throwable e1) {
             logger.severe("Exception in SriSbb.onDialogUserAbort() when fetching records and issuing events: " + e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
         }
 	}
 
@@ -363,21 +404,10 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
         try {
             super.onDialogTimeout(evt, aci);
 
-//            SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//            if (smsDeliveryData == null) {
-//                this.logger.severe("SmsDeliveryData CMP missed");
-//                return;
-//            }
-//            String targetId = smsDeliveryData.getTargetId();
-//            SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//            if (smsSet == null) {
-//                this.logger.severe("In SmsDeliveryData CMP smsSet is missed - SriSbb.onDialogTimeout(), targetId=" + targetId);
-//                return;
-//            }
-
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
                 logger.severe("SriSbb.onDialogTimeout(): CMP smsSet is missed");
+                markDeliveringIsEnded(true);
                 return;
             }
 
@@ -385,12 +415,36 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                     "onDialogTimeout after SRI Request", true, null, false);
         } catch (Throwable e1) {
             logger.severe("Exception in SriSbb.onDialogTimeout() when fetching records and issuing events: " + e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
         }
 	}
 
-	/**
-	 * MAP SMS Events
-	 */
+    @Override
+    public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
+        super.onDialogDelimiter(evt, aci);
+
+        try {
+            this.onSriFullResponse();
+        } catch (Throwable e1) {
+            logger.severe("Exception in SriSbb.onDialogDelimiter when fetching records and issuing events: " + e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
+        }
+    }
+
+    @Override
+    public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
+        try {
+            super.onDialogClose(evt, aci);
+
+            this.onSriFullResponse();
+        } catch (Throwable e1) {
+            logger.severe("Exception in SriSbb.onDialogClose when fetching records and issuing events: " + e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
+        }
+    }
+
+    // *********
+    // MAP SMS Service events
 
 	/**
 	 * Received SRI request. But this is error, we should never receive this
@@ -436,166 +490,8 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 		this.setInformServiceCenterContainer(informServiceCenterContainer);
 	}
 
-	public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
-        super.onDialogDelimiter(evt, aci);
-
-        try {
-            this.onSriFullResponse();
-        } catch (Throwable e1) {
-            logger.severe("Exception in SriSbb.onDialogDelimiter when fetching records and issuing events: " + e1.getMessage(), e1);
-        }
-	}
-
-	public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
-        try {
-            super.onDialogClose(evt, aci);
-
-            this.onSriFullResponse();
-        } catch (Throwable e1) {
-            logger.severe("Exception in SriSbb.onDialogClose when fetching records and issuing events: " + e1.getMessage(), e1);
-        }
-	}
-
-	/**
-	 * SBB Local Object Methods
-	 * 
-	 */
-//	@Override
-//	public void setupReportSMDeliveryStatusRequest(String destinationAddress, int ton, int npi,
-//			SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId) {
-//		RsdsSbbLocalObject rsdsSbbLocalObject = this.getRsdsSbbObject();
-//		if (rsdsSbbLocalObject != null) {
-//			ISDNAddressString isdn = this.getCalledPartyISDNAddressString(destinationAddress, ton, npi);
-//			AddressString serviceCentreAddress = getServiceCenterAddressString(networkId);
-//			SccpAddress destAddress = this.convertAddressFieldToSCCPAddress(destinationAddress, ton, npi);
-//			rsdsSbbLocalObject
-//					.setupReportSMDeliveryStatusRequest(isdn, serviceCentreAddress, sMDeliveryOutcome, destAddress,
-//							this.getSRIMAPApplicationContext(MAPApplicationContextVersion.getInstance(this
-//									.getSriMapVersion())), targetId, networkId);
-//		}
-//	}
-
-	/**
-	 * CMPs
-	 */
-    public abstract void setInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer);
-
-    public abstract InformServiceCenterContainer getInformServiceCenterContainer();
-
-    public abstract void setSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse);
-
-	public abstract SendRoutingInfoForSMResponse getSendRoutingInfoForSMResponse();
-
-	public abstract void setErrorResponse(MAPErrorMessage errorResponse);
-
-	public abstract MAPErrorMessage getErrorResponse();
-
-	/**
-	 * Get Mt child SBB
-	 * 
-	 * @return
-	 */
-	public abstract ChildRelationExt getMtSbb();
-
-	private MtSbbLocalObject getMtSbbObject() {
-		ChildRelationExt relation = getMtSbb();
-
-		MtSbbLocalObject ret = (MtSbbLocalObject) relation.get(ChildRelationExt.DEFAULT_CHILD_NAME);
-		if (ret == null) {
-			try {
-				ret = (MtSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
-			} catch (Exception e) {
-				if (this.logger.isSevereEnabled()) {
-					this.logger.severe("Exception while trying to creat MtSbb child", e);
-				}
-			}
-		}
-		return ret;
-	}
-
-//	public void doSetSmsSubmitData(SmsSubmitData smsDeliveryData) {
-//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-//		if (mtSbbLocalObject != null) {
-//			mtSbbLocalObject.doSetSmsSubmitData(smsDeliveryData);
-//		}
-//	}
-//
-//	public SmsSubmitData doGetSmsSubmitData() {
-//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-//		if (mtSbbLocalObject != null) {
-//			return mtSbbLocalObject.doGetSmsSubmitData();
-//		} else {
-//			return null;
-//		}
-//	}
-//
-//	public void doSetCurrentMsgNum(long currentMsgNum) {
-//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-//		if (mtSbbLocalObject != null) {
-//			mtSbbLocalObject.doSetCurrentMsgNum(currentMsgNum);
-//		}
-//	}
-//
-//	public long doGetCurrentMsgNum() {
-//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-//		if (mtSbbLocalObject != null) {
-//			return mtSbbLocalObject.doGetCurrentMsgNum();
-//		} else {
-//			return 0;
-//		}
-//	}
-//
-//	public void doSetInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer) {
-//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-//		if (mtSbbLocalObject != null) {
-//			mtSbbLocalObject.doSetInformServiceCenterContainer(informServiceCenterContainer);
-//		}
-//	}
-//
-//	public InformServiceCenterContainer doGetInformServiceCenterContainer() {
-//		MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-//		if (mtSbbLocalObject != null) {
-//			return mtSbbLocalObject.doGetInformServiceCenterContainer();
-//		} else {
-//			return null;
-//		}
-//	}
-
-//	public void doSetSmsSubmitData(SmsSubmitData smsDeliveryData) {
-//        this.setSmsSubmitData(smsDeliveryData);
-//    }
-//
-//    public SmsSubmitData doGetSmsSubmitData() {
-//        return this.getSmsSubmitData();
-//    }
-//
-//    public void doSetCurrentMsgNum(long currentMsgNum) {
-//        this.setCurrentMsgNum(currentMsgNum);
-//    }
-//
-//    public long doGetCurrentMsgNum() {
-//        return this.getCurrentMsgNum();
-//    }
-//
-//    public void doSetInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer) {
-//        this.setInformServiceCenterContainer(informServiceCenterContainer);
-//    }
-//
-//    public InformServiceCenterContainer doGetInformServiceCenterContainer() {
-//        return this.getInformServiceCenterContainer();
-//    }
-
-	@Override
-	public void setSbbContext(SbbContext sbbContext) {
-		super.setSbbContext(sbbContext);
-
-		this.maxMAPApplicationContextVersion = MAPApplicationContextVersion.getInstance(smscPropertiesManagement
-				.getMaxMapVersion());
-	}
-
-	/**
-	 * Private methods
-	 */
+    // *********
+    // Main service methods
 
     private void sendSRI(SmsSet smsSet, String destinationAddress, int ton, int npi, MAPApplicationContext mapApplicationContext) {
 		// Send out SRI
@@ -651,29 +547,13 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 	}
 
 	private void onSriFullResponse() {
-
 		SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse = this.getSendRoutingInfoForSMResponse();
 		MAPErrorMessage errorMessage = this.getErrorResponse();
-
-//        SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//        if (smsDeliveryData == null) {
-//            this.logger.severe("smsDeliveryData CMP is missed - SriSbb.onSriFullResponse()");
-//            return;
-//        }
-//        String targetId = smsDeliveryData.getTargetId();
-//        SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//        if (smsSet == null) {
-//            if (sendRoutingInfoForSMResponse != null || errorMessage != null) {
-//                this.logger.severe("In SmsDeliveryData CMP smsSet is missed - SriSbb.onSriFullResponse(), targetId=" + targetId);
-//            } else {
-//                this.logger.info("In SmsDeliveryData CMP smsSet is missed - SriSbb.onSriFullResponse(), targetId=" + targetId);
-//            }
-//            return;
-//        }
 
         SmsSet smsSet = getSmsSet();
         if (smsSet == null) {
             logger.severe("SriSbb.onSriFullResponse(): CMP smsSet is missed");
+            markDeliveringIsEnded(true);
             return;
         }
 
@@ -741,44 +621,5 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                     "Empty response after SRI Request", false, null, false);
         }
 	}
-
-    private void executeForwardSM(SmsSet smsSet, LocationInfoWithLMSI locationInfoWithLMSI, String imsi, int networkId) {
-        smsSet.setImsi(imsi);
-        smsSet.setLocationInfoWithLMSI(locationInfoWithLMSI);
-        ISDNAddressString networkNodeNumber = locationInfoWithLMSI.getNetworkNodeNumber();
-
-        MtSbbLocalObject mtSbbLocalObject = this.getMtSbbObject();
-
-        if (mtSbbLocalObject != null) {
-            ActivityContextInterface schedulerActivityContextInterface = this.getSchedulerActivityContextInterface();
-            schedulerActivityContextInterface.attach(mtSbbLocalObject);
-
-            SendMtEvent event = new SendMtEvent();
-            event.setSmsSet(smsSet);
-            event.setImsiData(imsi);
-            event.setLmsi(locationInfoWithLMSI.getLMSI());
-            event.setNetworkNode(networkNodeNumber);
-            event.setInformServiceCenterContainer(this.getInformServiceCenterContainer());
-            event.setSriMapVersion(this.getSriMapVersion());
-
-            this.fireSendMtEvent(event, schedulerActivityContextInterface, null);
-        }
-    }
-
-    public abstract void fireSendMtEvent(SendMtEvent event, ActivityContextInterface aci, javax.slee.Address address);
-
-    public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
-        ServiceID serviceID = event.getService();
-        this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
-        SbbStates.setMtServiceState(true);
-    }
-
-    public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
-        boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
-        if (isServiceActivity) {
-            this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
-            SbbStates.setMtServiceState(false);
-        }
-    }
 
 }

@@ -77,10 +77,10 @@ public class SriSbbProxy extends SriSbb implements ChildRelation, SbbLocalObject
         this.scheduler = new SchedulerResourceAdaptorProxy();
 	}
 
-	@Override
-	public TT_PersistenceRAInterfaceProxy getStore() {
-        return (TT_PersistenceRAInterfaceProxy) persistence;
-	}
+//	@Override
+//	public TT_PersistenceRAInterfaceProxy getStore() {
+//        return (TT_PersistenceRAInterfaceProxy) persistence;
+//	}
 
 	@Override
 	public ChildRelationExt getMtSbb() {

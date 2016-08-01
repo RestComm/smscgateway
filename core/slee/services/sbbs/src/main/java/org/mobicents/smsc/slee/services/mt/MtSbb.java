@@ -90,7 +90,6 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
 
@@ -120,51 +119,98 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		super(className);
 	}
 
+    // *********
+    // SBB staff
+
+    // *********
+    // CMPs
+
+    public abstract void setInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer);
+
+    public abstract InformServiceCenterContainer getInformServiceCenterContainer();
+
+    public abstract void setTcEmptySent(int tcEmptySent);
+
+    public abstract int getTcEmptySent();
+
+    public abstract void setResponseReceived(int responseReceived);
+
+    public abstract int getResponseReceived();
+
+    public abstract int getMapApplicationContextVersionsUsed();
+
+    public abstract void setMapApplicationContextVersionsUsed(int mapApplicationContextVersions);
+
+    /**
+     * Set the ISDNAddressString of network node where Mt SMS is to be submitted
+     * 
+     * @param networkNode
+     */
+    public abstract void setNnn(ISDNAddressString nnn);
+
+    public abstract ISDNAddressString getNnn();
+
+    /**
+     * Set the counter as which SMS is sent. Max sending can be equal to
+     * messageSegmentCount
+     * 
+     * @param mesageSegmentNumber
+     */
+    public abstract void setMessageSegmentNumber(int mesageSegmentNumber);
+
+    public abstract int getMessageSegmentNumber();
+
+    public abstract void setSegments(SmsSignalInfo[] segments);
+
+    public abstract SmsSignalInfo[] getSegments();
+
+    /**
+     * Destination Address
+     * 
+     * @param sm_rp_da
+     */
+    public abstract void setSmRpDa(SM_RP_DA sm_rp_da);
+
+    public abstract SM_RP_DA getSmRpDa();
+
+    /**
+     * Originating Address
+     * 
+     * @param sm_rp_oa
+     */
+    public abstract void setSmRpOa(SM_RP_OA sm_rp_oa);
+
+    public abstract SM_RP_OA getSmRpOa();
+
+    /**
+     * NNN
+     * 
+     * @param networkNode
+     */
+    public abstract void setNetworkNode(SccpAddress sm_rp_oa);
+
+    public abstract SccpAddress getNetworkNode();
+
+    // *********
+    // initial event
+
     public void onSendMt(SendMtEvent event, ActivityContextInterface aci, EventContext eventContext) {
         SmsSet smsSet = event.getSmsSet();
-        this.addInitialMessageSet(smsSet);
+        this.addInitialMessageSet(smsSet, event.getCurrentMsgNum(), event.getSendingPoolMsgCount());
 
-//        SmsSubmitData smsDeliveryData = new SmsSubmitData();
-//        smsDeliveryData.setTargetId(event.getSmsSet().getTargetId());
-//        this.doSetSmsSubmitData(smsDeliveryData);
-//        this.doSetCurrentMsgNum(0);
         this.setInformServiceCenterContainer(event.getInformServiceCenterContainer());
         this.setSriMapVersion(event.getSriMapVersion());
 
         setupMtForwardShortMessageRequest(event.getNetworkNode(), event.getImsiData(), event.getLmsi(), smsSet.getNetworkId());
     }
 
-	/**
-	 * Components Events override from MtCommonSbb that we care
-	 */
-
-	@Override
-	public void onDialogAccept(DialogAccept event, ActivityContextInterface aci) {
-		super.onDialogAccept(event, aci);
-
-		if (!this.isNegotiatedMapVersionUsing()) {
-			mapVersionCache.setMAPApplicationContextVersion(this.getNetworkNode().getGlobalTitle().getDigits(), event
-					.getMAPDialog().getApplicationContext().getApplicationContextVersion());
-		}
-	}
+    // *********
+    // MAP Component events
 
 	@Override
 	public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
 		try {
 			super.onErrorComponent(event, aci);
-
-//			SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//			if (smsDeliveryData == null) {
-//				this.logger.severe("smsDeliveryData CMP is missed - MtSbb.onErrorComponent()");
-//				return;
-//			}
-//			String targetId = smsDeliveryData.getTargetId();
-//			SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//			if (smsSet == null) {
-//				this.logger.severe("In SmsDeliveryData CMP smsSet is missed - MtSbb.onErrorComponent(), targetId="
-//						+ targetId);
-//				return;
-//			}
 
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
@@ -254,6 +300,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			logger.severe(
 					"Exception in MtSbb.onErrorComponent() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
 		}
 	}
 
@@ -264,22 +311,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
 			String reason = this.getRejectComponentReason(event);
 
-//			SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//			if (smsDeliveryData == null) {
-//				this.logger.severe("smsDeliveryData CMP is missed - MtSbb.onRejectComponent()");
-//				return;
-//			}
-//			String targetId = smsDeliveryData.getTargetId();
-//			SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//			if (smsSet == null) {
-//				this.logger.severe("In SmsDeliveryData CMP smsSet is missed - MtSbb.onRejectComponent(), targetId="
-//						+ targetId);
-//				return;
-//			}
-
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
                 logger.severe("MtSbb.onRejectComponent(): CMP smsSet is missed");
+                markDeliveringIsEnded(true);
                 return;
             }
 
@@ -290,33 +325,31 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			logger.severe(
 					"Exception in MtSbb.onDialogProviderAbort() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
 		}
 	}
 
-	/**
-	 * Dialog Events override from MtCommonSbb that we care
-	 */
+    // *********
+    // MAP Dialog events
+
+    @Override
+    public void onDialogAccept(DialogAccept event, ActivityContextInterface aci) {
+        super.onDialogAccept(event, aci);
+
+        if (!this.isNegotiatedMapVersionUsing()) {
+            mapVersionCache.setMAPApplicationContextVersion(this.getNetworkNode().getGlobalTitle().getDigits(), event
+                    .getMAPDialog().getApplicationContext().getApplicationContextVersion());
+        }
+    }
 
 	@Override
 	public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
 
 		try {
-//			SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//			if (smsDeliveryData == null) {
-//				this.logger.severe("smsDeliveryData CMP is missed - MtSbb.onDialogReject()");
-//				return;
-//			}
-//			String targetId = smsDeliveryData.getTargetId();
-//			SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//			if (smsSet == null) {
-//				this.logger.severe("In SmsDeliveryData CMP smsSet is missed - MtSbb.onDialogReject(), targetId="
-//						+ targetId);
-//				return;
-//			}
-
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
                 logger.severe("MtSbb.onDialogReject(): CMP smsSet is missed");
+                markDeliveringIsEnded(true);
                 return;
             }
 
@@ -454,6 +487,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			logger.severe(
 					"Exception in MtSbb.onDialogReject() when fetching records and issuing events: " + e1.getMessage(),
 					e1);
+            markDeliveringIsEnded(true);
 		}
 	}
 
@@ -464,22 +498,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
 			MAPAbortProviderReason abortProviderReason = evt.getAbortProviderReason();
 
-//			SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//			if (smsDeliveryData == null) {
-//				this.logger.severe("smsDeliveryData CMP is missed - MtSbb.onDialogProviderAbort()");
-//				return;
-//			}
-//			String targetId = smsDeliveryData.getTargetId();
-//			SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//			if (smsSet == null) {
-//				this.logger.severe("In SmsDeliveryData CMP smsSet is missed - MtSbb.onDialogProviderAbort(), targetId="
-//						+ targetId);
-//				return;
-//			}
-
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
                 logger.severe("MtSbb.onDialogProviderAbort(): CMP smsSet is missed");
+                markDeliveringIsEnded(true);
                 return;
             }
 
@@ -493,6 +515,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			logger.severe(
 					"Exception in MtSbb.onDialogProviderAbort() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
 		}
 	}
 
@@ -503,22 +526,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
 			String reason = getUserAbortReason(evt);
 
-//			SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//			if (smsDeliveryData == null) {
-//				this.logger.severe("smsDeliveryData CMP is missed - MtSbb.onDialogUserAbort()");
-//				return;
-//			}
-//			String targetId = smsDeliveryData.getTargetId();
-//			SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//			if (smsSet == null) {
-//				this.logger.severe("In SmsDeliveryData CMP smsSet is missed - MtSbb.onDialogUserAbort(), targetId="
-//						+ targetId);
-//				return;
-//			}
-
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
                 logger.severe("MtSbb.onDialogUserAbort(): CMP smsSet is missed");
+                markDeliveringIsEnded(true);
                 return;
             }
 
@@ -529,6 +540,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			logger.severe(
 					"Exception in MtSbb.onDialogUserAbort() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
 		}
 	}
 
@@ -539,22 +551,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		try {
 			super.onDialogTimeout(evt, aci);
 
-//			SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//			if (smsDeliveryData == null) {
-//				this.logger.severe("smsDeliveryData CMP is missed - MtSbb.onDialogTimeout()");
-//				return;
-//			}
-//			String targetId = smsDeliveryData.getTargetId();
-//			SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//			if (smsSet == null) {
-//				this.logger.severe("In SmsDeliveryData CMP smsSet is missed - MtSbb.onDialogTimeout(), targetId="
-//						+ targetId);
-//				return;
-//			}
-
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
                 logger.severe("MtSbb.onDialogTimeout(): CMP smsSet is missed");
+                markDeliveringIsEnded(true);
                 return;
             }
 
@@ -564,33 +564,22 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			logger.severe(
 					"Exception in MtSbb.onDialogTimeout() when fetching records and issuing events: " + e1.getMessage(),
 					e1);
+            markDeliveringIsEnded(true);
 		}
 	}
 
 	@Override
 	public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
-		try {
-			super.onDialogDelimiter(evt, aci);
+        super.onDialogDelimiter(evt, aci);
 
-//			SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//			if (smsDeliveryData == null) {
-//				this.logger.severe("smsDeliveryData CMP is missed - MtSbb.onDialogDelimiter()");
-//				return;
-//			}
-//			String targetId = smsDeliveryData.getTargetId();
-//			SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//			if (smsSet == null) {
-//				this.logger.warning("In SmsDeliveryData CMP smsSet is missed - MtSbb.onDialogDelimiter(), targetId="
-//						+ targetId);
-//				return;
-//			}
+        SmsSet smsSet = getSmsSet();
+        if (smsSet == null) {
+            logger.severe("MtSbb.onDialogDelimiter(): CMP smsSet is missed");
+            markDeliveringIsEnded(true);
+            return;
+        }
 
-            SmsSet smsSet = getSmsSet();
-            if (smsSet == null) {
-                logger.severe("MtSbb.onDialogDelimiter(): CMP smsSet is missed");
-                return;
-            }
-
+        try {
 			if (this.getTcEmptySent() != 0) {
 				// Empty TC-BEGIN has been sent
 				// We are sending MtForwardSM
@@ -610,7 +599,6 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 							if (messageSegmentNumber < segments.length - 1) {
 								moreMessagesToSend = true;
 							}
-//                            if (this.doGetCurrentMsgNum() < smsSet.getSmsCount() - 1) {
                             if (this.getTotalUnsentMessageCount() > 1) {
                                 moreMessagesToSend = true;
                             }
@@ -649,9 +637,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				this.handleSmsResponse((MAPDialogSms) evt.getMAPDialog(), true);
 			}
 		} catch (Throwable e1) {
-			logger.severe(
-					"Exception in MtSbb.onDialogDelimiter() when fetching records and issuing events: "
-							+ e1.getMessage(), e1);
+            String s = "Exception in MtSbb.onDialogDelimiter() when fetching records and issuing events: " + e1.getMessage();
+            logger.severe(s, e1);
+            markDeliveringIsEnded(true);
+//            this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s, true, null, false);
 		}
 	}
 
@@ -663,23 +652,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				this.setResponseReceived(0);
 				this.handleSmsResponse((MAPDialogSms) evt.getMAPDialog(), false);
 			} else {
-
-//				SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//				if (smsDeliveryData == null) {
-//					this.logger.severe("smsDeliveryData CMP is missed - MtSbb.onDialogClose()");
-//					return;
-//				}
-//				String targetId = smsDeliveryData.getTargetId();
-//				SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//				if (smsSet == null) {
-//					this.logger.info("In SmsDeliveryData CMP smsSet is missed - MtSbb.onDialogClose(), targetId="
-//							+ targetId);
-//					return;
-//				}
-
 	            SmsSet smsSet = getSmsSet();
 	            if (smsSet == null) {
 	                logger.severe("MtSbb.onDialogClose(): CMP smsSet is missed");
+	                markDeliveringIsEnded(true);
 	                return;
 	            }
 
@@ -687,15 +663,13 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 						"DialogClose after Mt Request", false, null, false);
 			}
 		} catch (Throwable e1) {
-			logger.severe(
-					"Exception in MtSbb.onDialogClose() when fetching records and issuing events: " + e1.getMessage(),
-					e1);
+            logger.severe("Exception in MtSbb.onDialogClose() when fetching records and issuing events: " + e1.getMessage(), e1);
+            markDeliveringIsEnded(true);
 		}
 	}
 
-	/**
-	 * SMS Event Handlers
-	 */
+    // *********
+    // MAP SMS Service events
 
 	/**
 	 * Received MT SMS. This is error we should never receive this
@@ -744,32 +718,17 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		this.setResponseReceived(1);
 	}
 
-	/**
-	 * SBB Local Object Methods
-	 * 
-	 */
+    // *********
+    // Main service methods
 
     public void setupMtForwardShortMessageRequest(ISDNAddressString networkNode, String imsiData, LMSI lmsi, int networkId) {
 	    if (this.logger.isFineEnabled()) {
 			this.logger.fine("\nmperforming setupMtForwardShortMessageRequest ISDNAddressString= " + networkNode);
 		}
 
-//		SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//		if (smsDeliveryData == null) {
-//			this.logger.severe("smsDeliveryData CMP is missed - MtSbb.setupMtForwardShortMessageRequest()");
-//			return;
-//		}
-//		String targetId = smsDeliveryData.getTargetId();
-//		SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//		if (smsSet == null) {
-//			this.logger
-//					.severe("In SmsDeliveryData CMP smsSet is missed - MtSbb.setupMtForwardShortMessageRequest(), targetId="
-//							+ targetId);
-//			return;
-//		}
-
         SmsSet smsSet = getSmsSet();
         if (smsSet == null) {
+            markDeliveringIsEnded(true);
             logger.severe("MtSbb.setupMtForwardShortMessageRequest(): CMP smsSet is missed");
             return;
         }
@@ -798,8 +757,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		this.setMAPVersionTested(mapApplicationContextVersion);
 
         // dropaftersri pmproc rules
-        Sms sms = obtainNextMessage();
-        if (sms != null) {
+        if (this.getTotalUnsentMessageCount() > 0) {
             ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
             ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
             TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
@@ -813,54 +771,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
             }
         }
 
-//		boolean noMoreMessages = false;
-//        PersistenceRAInterface pers = this.getStore();
-//        TargetAddress lock = pers.obtainSynchroObject(new TargetAddress(smsSet));
-//        try {
-//            synchronized (lock) {
-//                long currentMsgNum = this.doGetCurrentMsgNum();
-//                Sms sms = smsSet.getSms(currentMsgNum);
-//                if (sms != null) {
-//                    while (true) {
-//                        MProcResult mProcResult = MProcManagement.getInstance().applyMProcImsiRequest(sms, imsiData,
-//                                networkNode.getAddress(), networkNode.getNumberingPlan().getIndicator(),
-//                                networkNode.getAddressNature().getIndicator());
-//                        if (mProcResult.isMessageDropped()) {
-//                            this.onImsiDrop(sms, imsiData, networkNode);
-//                            if (currentMsgNum < smsSet.getSmsCount() - 1) {
-//                                // there are more messages to send in cache
-//                                currentMsgNum++;
-//                                this.doSetCurrentMsgNum(currentMsgNum);
-//                                sms = smsSet.getSms(currentMsgNum);
-//                                if (sms == null) {
-//                                    break;
-//                                }
-//                                continue;
-//                            } else {
-//                                noMoreMessages = true;
-//                                // TODO: add rsds ..........................
-//                                setupReportSMDeliveryStatusRequestSuccess(smsSet, true);
-//                                this.freeSmsSetSucceded(smsSet, pers);
-//                                break;
-//                            }
-//                        } else {
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//        } finally {
-//            pers.releaseSynchroObject(lock);
-//        }
-
-//        if (noMoreMessages) {
         if (this.getTotalUnsentMessageCount() == 0) {
             smsSet.setStatus(ErrorCode.SUCCESS);
             this.markDeliveringIsEnded(true);
 
-            // this.freeSmsSetSucceded(smsSet, pers);
-
-            // TODO: add rsds ..........................
             setupReportSMDeliveryStatusRequestSuccess(smsSet, true);
         } else {
             try {
@@ -886,167 +800,48 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         }
 	}
 
-	/**
-	 * CMPs
-	 */
-	public abstract void setInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer);
-
-	public abstract InformServiceCenterContainer getInformServiceCenterContainer();
-
-	public abstract void setTcEmptySent(int tcEmptySent);
-
-	public abstract int getTcEmptySent();
-
-	public abstract void setResponseReceived(int responseReceived);
-
-	public abstract int getResponseReceived();
-
-	public abstract int getMapApplicationContextVersionsUsed();
-
-	public abstract void setMapApplicationContextVersionsUsed(int mapApplicationContextVersions);
-
-//	public void doSetSmsSubmitData(SmsSubmitData smsDeliveryData) {
-//		this.setSmsSubmitData(smsDeliveryData);
-//	}
-//
-//	public SmsSubmitData doGetSmsSubmitData() {
-//		return this.getSmsSubmitData();
-//	}
-//
-//	public void doSetCurrentMsgNum(long currentMsgNum) {
-//		this.setCurrentMsgNum(currentMsgNum);
-//	}
-//
-//	public long doGetCurrentMsgNum() {
-//		return this.getCurrentMsgNum();
-//	}
-//
-//	public void doSetInformServiceCenterContainer(InformServiceCenterContainer informServiceCenterContainer) {
-//		this.setInformServiceCenterContainer(informServiceCenterContainer);
-//	}
-//
-//	public InformServiceCenterContainer doGetInformServiceCenterContainer() {
-//		return this.getInformServiceCenterContainer();
-//	}
-
-	/**
-	 * Set the ISDNAddressString of network node where Mt SMS is to be submitted
-	 * 
-	 * @param networkNode
-	 */
-    public abstract void setNnn(ISDNAddressString nnn);
-
-    public abstract ISDNAddressString getNnn();
-
-	/**
-	 * Set the counter as which SMS is sent. Max sending can be equal to
-	 * messageSegmentCount
-	 * 
-	 * @param mesageSegmentNumber
-	 */
-	public abstract void setMessageSegmentNumber(int mesageSegmentNumber);
-
-	public abstract int getMessageSegmentNumber();
-
-	public abstract void setSegments(SmsSignalInfo[] segments);
-
-	public abstract SmsSignalInfo[] getSegments();
-
-	/**
-	 * Destination Address
-	 * 
-	 * @param sm_rp_da
-	 */
-	public abstract void setSmRpDa(SM_RP_DA sm_rp_da);
-
-	public abstract SM_RP_DA getSmRpDa();
-
-    /**
-     * Originating Address
-     * 
-     * @param sm_rp_oa
-     */
-    public abstract void setSmRpOa(SM_RP_OA sm_rp_oa);
-
-    public abstract SM_RP_OA getSmRpOa();
-
-    /**
-     * NNN
-     * 
-     * @param networkNode
-     */
-    public abstract void setNetworkNode(SccpAddress sm_rp_oa);
-
-    public abstract SccpAddress getNetworkNode();
-
-	/**
-	 * Private Methods
-	 */
-
 	private void handleSmsResponse(MAPDialogSms mapDialogSms, boolean continueDialog) {
-
-//		SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//		if (smsDeliveryData == null) {
-//			this.logger.severe("SmsDeliveryData CMP missed");
-//			return;
-//		}
-//		String targetId = smsDeliveryData.getTargetId();
-//		SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//		if (smsSet == null) {
-//			this.logger.severe("In SmsDeliveryData CMP smsSet is missed - MtSbb.handleSmsResponse(), targetId="
-//					+ targetId);
-//			return;
-//		}
-
         SmsSet smsSet = getSmsSet();
         if (smsSet == null) {
             logger.severe("MtSbb.handleSmsResponse(): CMP smsSet is missed");
+            markDeliveringIsEnded(true);
             return;
         }
 
-		smscStatAggregator.updateMsgOutSentAll();
+        smscStatAggregator.updateMsgOutSentAll();
         smscStatAggregator.updateMsgOutSentSs7();
 
-        PersistenceRAInterface pers = this.getStore();
-        Sms sms = this.getCurrentMessage(0);
-//		long currentMsgNum = this.doGetCurrentMsgNum();
-//		Sms sms = smsSet.getSms(currentMsgNum);
+        Sms sms = this.getMessageInSendingPool(0);
 
-		// checking if there are yet message segments
-		int messageSegmentNumber = this.getMessageSegmentNumber();
-		SmsSignalInfo[] segments = this.getSegments();
-		if (segments != null && messageSegmentNumber < segments.length - 1) {
-		    this.generateCDR(sms, CdrGenerator.CDR_PARTIAL, CdrGenerator.CDR_SUCCESS_NO_REASON);
-//            CdrGenerator.generateCdr(sms, CdrGenerator.CDR_PARTIAL, CdrGenerator.CDR_SUCCESS_NO_REASON, smscPropertiesManagement.getGenerateReceiptCdr(),
-//                    MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
+        // checking if there are yet message segments
+        int messageSegmentNumber = this.getMessageSegmentNumber();
+        SmsSignalInfo[] segments = this.getSegments();
+        if (segments != null && messageSegmentNumber < segments.length - 1) {
+            this.generateCDR(sms, CdrGenerator.CDR_PARTIAL, CdrGenerator.CDR_SUCCESS_NO_REASON);
 
-			// we have more message parts to be sent yet
-			messageSegmentNumber++;
-			this.setMessageSegmentNumber(messageSegmentNumber);
-			try {
-	            smscStatAggregator.updateMsgOutTryAll();
-	            smscStatAggregator.updateMsgOutTrySs7();
+            // we have more message parts to be sent yet
+            messageSegmentNumber++;
+            this.setMessageSegmentNumber(messageSegmentNumber);
+            try {
+                smscStatAggregator.updateMsgOutTryAll();
+                smscStatAggregator.updateMsgOutTrySs7();
 
-	            this.sendMtSms(mapDialogSms.getApplicationContext(), MessageProcessingState.nextSegmentSending,
-						continueDialog ? mapDialogSms : null, smsSet.getNetworkId());
-				return;
-			} catch (SmscProcessingException e) {
-				this.logger.severe(
-						"SmscPocessingException when invoking sendMtSms() from handleSmsResponse()-nextSegmentSending: "
-								+ e.toString(), e);
-				this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SYSTEM_FAILURE,
-						"Error sendMtSms in handleSmsResponse(): ", true, null, false);
-				return;
-			}
-		}
+                this.sendMtSms(mapDialogSms.getApplicationContext(), MessageProcessingState.nextSegmentSending,
+                        continueDialog ? mapDialogSms : null, smsSet.getNetworkId());
+                return;
+            } catch (SmscProcessingException e) {
+                this.logger.severe(
+                        "SmscPocessingException when invoking sendMtSms() from handleSmsResponse()-nextSegmentSending: "
+                                + e.toString(), e);
+                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SYSTEM_FAILURE,
+                        "Error sendMtSms in handleSmsResponse(): ", true, null, false);
+                return;
+            }
+        }
 
-		// current message is sent
-		// firstly sending of a positive response for transactional mode
+        // current message is sent
+        // firstly sending of a positive response for transactional mode
         this.sendTransactionalResponseSuccess(sms);
-//        if (sms.getMessageDeliveryResultResponse() != null) {
-//            sms.getMessageDeliveryResultResponse().responseDeliverySuccess();
-//            sms.setMessageDeliveryResultResponse(null);
-//        }
 
         // mproc rules applying for delivery phase
         this.applyMprocRulesOnSuccess(sms);
@@ -1063,141 +858,11 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         // adding a success receipt if it is needed
         this.generateSuccessReceipt(smsSet, sms);
 
-//		Date deliveryDate = new Date();
-//		try {
-	        // pushing current message into an archive
-			// we need to find if it is the last or single segment
-//            boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
-//            this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL : CdrGenerator.CDR_SUCCESS,
-//                    CdrGenerator.CDR_SUCCESS_NO_REASON);
-//            CdrGenerator.generateCdr(sms, isPartial ? CdrGenerator.CDR_PARTIAL : CdrGenerator.CDR_SUCCESS, CdrGenerator.CDR_SUCCESS_NO_REASON,
-//                    smscPropertiesManagement.getGenerateReceiptCdr(), MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
-
-//            pers.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT,
-//                    smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
-//            sms.setDeliveryDate(deliveryDate);
-//            sms.getSmsSet().setStatus(ErrorCode.SUCCESS);
-//            if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
-//                pers.c2_createRecordArchive(sms);
-//            }
-
-//            // mproc rules applying for delivery phase
-//            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, false);
-//            FastList<Sms> addedMessages = mProcResult.getMessageList();
-//            if (addedMessages != null) {
-//                for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
-//                    Sms smst = n.getValue();
-//                    TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(),
-//                            smst.getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
-//                    TargetAddress lock = SmsSetCache.getInstance().addSmsSet(ta);
-//                    try {
-//                        synchronized (lock) {
-//                            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                            } else {
-//                                boolean storeAndForwMode = MessageUtil.isStoreAndForward(smst);
-//                                if (!storeAndForwMode) {
-//                                    try {
-//                                        this.scheduler.injectSmsOnFly(smst.getSmsSet(), true);
-//                                    } catch (Exception e) {
-//                                        this.logger.severe(
-//                                                "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages in handleSmsResponse(): "
-//                                                        + e.getMessage(), e);
-//                                    }
-//                                } else {
-//                                    if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-//                                        try {
-//                                            smst.setStoringAfterFailure(true);
-//                                            this.scheduler.injectSmsOnFly(smst.getSmsSet(), true);
-//                                        } catch (Exception e) {
-//                                            this.logger.severe(
-//                                                    "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages in handleSmsResponse(): "
-//                                                            + e.getMessage(), e);
-//                                        }
-//                                    } else {
-//                                        smst.setStored(true);
-//                                        this.scheduler.setDestCluster(smst.getSmsSet());
-//                                        pers.c2_scheduleMessage_ReschedDueSlot(smst,
-//                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-//                                                true);
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    } finally {
-//                        SmsSetCache.getInstance().removeSmsSet(lock);
-//                    }
-//                }
-//            }
-
-			// adding a success receipt if it is needed
-//            int registeredDelivery = sms.getRegisteredDelivery();
-//            if (!smscPropertiesManagement.getReceiptsDisabling() && MessageUtil.isReceiptOnSuccess(registeredDelivery)) {
-//                TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
-//                        smsSet.getNetworkId());
-//                TargetAddress lock = SmsSetCache.getInstance().addSmsSet(ta);
-//                try {
-//                    synchronized (lock) {
-//                        Sms receipt;
-//                        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                            receipt = MessageUtil.createReceiptSms(sms, true);
-//                            SmsSet backSmsSet = pers.obtainSmsSet(ta);
-//                            receipt.setSmsSet(backSmsSet);
-//                            receipt.setStored(true);
-//                            pers.createLiveSms(receipt);
-//                            pers.setNewMessageScheduled(receipt.getSmsSet(), MessageUtil.computeDueDate(MessageUtil
-//                                    .computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-//                        } else {
-//                            receipt = MessageUtil.createReceiptSms(sms, true, ta,
-//                                    smscPropertiesManagement.getOrigNetworkIdForReceipts());
-//                            boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-//                            if (!storeAndForwMode) {
-//                                try {
-//                                    this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
-//                                } catch (Exception e) {
-//                                    this.logger.severe(
-//                                            "Exception when runnung injectSmsOnFly() for receipt in handleSmsResponse(): "
-//                                                    + e.getMessage(), e);
-//                                }
-//                            } else {
-//                                if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-//                                    try {
-//                                        receipt.setStoringAfterFailure(true);
-//                                        this.scheduler.injectSmsOnFly(receipt.getSmsSet(), true);
-//                                    } catch (Exception e) {
-//                                        this.logger.severe(
-//                                                "Exception when runnung injectSmsOnFly() for receipt in handleSmsResponse(): "
-//                                                        + e.getMessage(), e);
-//                                    }
-//                                } else {
-//                                    receipt.setStored(true);
-//                                    this.scheduler.setDestCluster(receipt.getSmsSet());
-//                                    pers.c2_scheduleMessage_ReschedDueSlot(receipt,
-//                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, true);
-//                                }
-//                            }
-//                        }
-//                        this.logger.info("Adding a delivery receipt: source=" + receipt.getSourceAddr() + ", dest="
-//                                + receipt.getSmsSet().getDestAddr());
-//                    }
-//                } finally {
-//                    SmsSetCache.getInstance().removeSmsSet(lock);
-//                }
-//            }
-//
-//		} catch (PersistenceException e1) {
-//			this.logger.severe(
-//					"PersistenceException when archiveDeliveredSms() in handleSmsResponse(): " + e1.getMessage(), e1);
-//			// we do not "return" here because even if storing into archive
-//			// database is failed
-//			// we will continue delivering process
-//		}
-
-		TargetAddress lock = pers.obtainSynchroObject(new TargetAddress(smsSet));
-		try {
-			synchronized (lock) {
-		        // marking the message in cache as delivered
-			    this.commitSendingPoolMsgCount();
-//		        smsSet.markSmsAsDelivered(currentMsgNum);
+        TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
+        try {
+            synchronized (lock) {
+                // marking the message in cache as delivered
+                this.commitSendingPoolMsgCount();
 
                 // now we are trying to sent other messages
                 sms = obtainNextMessage();
@@ -1208,65 +873,15 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     SM_RP_DA da = this.getSmRpDa();
                     ISDNAddressString networkNodeNumber = this.getNnn();
 
-                    this.applyMprocRulesOnImsiResponse(smsSet, lstPermFailured, lstRerouted, networkNodeNumber, da.getIMSI().getData());
+                    this.applyMprocRulesOnImsiResponse(smsSet, lstPermFailured, lstRerouted, networkNodeNumber, da.getIMSI()
+                            .getData());
                     this.onImsiDrop(smsSet, lstPermFailured, lstRerouted, networkNodeNumber, da.getIMSI().getData());
-			    }
+                }
 
-
-
-//                boolean moreMessages = false;
-//                if (currentMsgNum < smsSet.getSmsCount() - 1) {
-//					// there are more messages to send in cache
-//                    moreMessages = true;
-//					currentMsgNum++;
-//					this.doSetCurrentMsgNum(currentMsgNum);
-//                    sms = smsSet.getSms(currentMsgNum);
-//
-//					// dropaftersri pmproc rules
-//                    if (sms != null) {
-//                        while (true) {
-//                            SM_RP_DA da = this.getSmRpDa();
-//                            ISDNAddressString networkNodeNumber = this.getNnn();
-//                            MProcResult mProcResult = MProcManagement.getInstance().applyMProcImsiRequest(sms,
-//                                    da.getIMSI().getData(), networkNodeNumber.getAddress(),
-//                                    networkNodeNumber.getNumberingPlan().getIndicator(),
-//                                    networkNodeNumber.getAddressNature().getIndicator());
-//                            if (mProcResult.isMessageDropped()) {
-//                                this.onImsiDrop(sms, da.getIMSI().getData(), networkNodeNumber);
-//                                if (currentMsgNum < smsSet.getSmsCount() - 1) {
-//                                    // there are more messages to send in cache
-//                                    currentMsgNum++;
-//                                    this.doSetCurrentMsgNum(currentMsgNum);
-//                                    sms = smsSet.getSms(currentMsgNum);
-//                                    if (sms == null)
-//                                        break;
-//                                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                                        this.startMessageDelivery(sms);
-//                                    } else {
-//                                        sms.setDeliveryCount(sms.getDeliveryCount() + 1);
-//                                    }
-//                                    continue;
-//                                } else {
-//                                    moreMessages = false;
-//                                    break;
-//                                }
-//                            } else {
-//                                break;
-//                            }
-//                        }
-//
-//                        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                            this.startMessageDelivery(sms);
-//                        } else {
-//                            sms.setDeliveryCount(sms.getDeliveryCount() + 1);
-//                        }
-//                    }
-//				}
-
-                sms = this.getCurrentMessage(0);
+                sms = this.getMessageInSendingPool(0);
                 if (sms != null) {
                     try {
-                        sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+//                        sms.setDeliveryCount(sms.getDeliveryCount() + 1);
 
                         smscStatAggregator.updateMsgOutTryAll();
                         smscStatAggregator.updateMsgOutTrySs7();
@@ -1283,31 +898,25 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
                 // no more messages are in cache now - lets check if there are
                 // more messages in a database
-				if (continueDialog) {
-					try {
-						mapDialogSms.close(false);
-					} catch (MAPException e) {
-						this.logger.severe(
-								"MAPException when closing MAP dialog from handleSmsResponse(): " + e.toString(), e);
-					}
-				}
+                if (continueDialog) {
+                    try {
+                        mapDialogSms.close(false);
+                    } catch (MAPException e) {
+                        this.logger.severe("MAPException when closing MAP dialog from handleSmsResponse(): " + e.toString(), e);
+                    }
+                }
 
-				// no more messages to send - remove smsSet
-                // TODO: add rsds ..........................
+                // no more messages to send - remove smsSet
                 setupReportSMDeliveryStatusRequestSuccess(smsSet, mapDialogSms.getApplicationContext()
                         .getApplicationContextVersion() != MAPApplicationContextVersion.version1);
                 smsSet.setStatus(ErrorCode.SUCCESS);
                 this.markDeliveringIsEnded(true);
 
-//                this.freeSmsSetSucceded(smsSet, pers);
-			}
-		} finally {
-			pers.releaseSynchroObject(lock);
-		}
-
-        // TODO: delete rsds ..........................
-//        setupReportSMDeliveryStatusRequestSuccess(smsSet,
-//                mapDialogSms.getApplicationContext().getApplicationContextVersion() != MAPApplicationContextVersion.version1);
+                // this.freeSmsSetSucceded(smsSet, pers);
+            }
+        } finally {
+            persistence.releaseSynchroObject(lock);
+        }
 	}
 
     private void setupReportSMDeliveryStatusRequestSuccess(SmsSet smsSet, boolean versionMore1) {
@@ -1427,29 +1036,16 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	private void sendMtSms(MAPApplicationContext mapApplicationContext, MessageProcessingState messageProcessingState,
 			MAPDialogSms mapDialogSms, int networkId) throws SmscProcessingException {
 
-//		SmsSubmitData smsDeliveryData = this.doGetSmsSubmitData();
-//		if (smsDeliveryData == null) {
-//			throw new SmscProcessingException("SmsDeliveryData CMP missed", -1, -1, null);
-//		}
-//		String targetId = smsDeliveryData.getTargetId();
-//		SmsSet smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
-//		if (smsSet == null) {
-//			throw new SmscProcessingException("SmsSet is missed in ProcessingSmsSet cashe", -1, -1, null);
-//		}
-//		long msgNum = this.doGetCurrentMsgNum();
-//		Sms sms = smsSet.getSms(msgNum);
-
         SmsSet smsSet = getSmsSet();
         if (smsSet == null) {
             throw new SmscProcessingException("CMP smsSet is missed", -1, -1, null);
         }
-        Sms sms = this.getCurrentMessage(0);
+        Sms sms = this.getMessageInSendingPool(0);
         if (sms == null) {
             throw new SmscProcessingException("sms is missed in CMP", -1, -1, null);
         }
 
 		boolean moreMessagesToSend = false;
-//        if (msgNum < smsSet.getSmsCount() - 1) {
         if (this.getTotalUnsentMessageCount() > 1) {
             moreMessagesToSend = true;
         }
@@ -1568,6 +1164,9 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			throw new SmscProcessingException("TlvConvertException when sending MtForwardSM", -1, -1, null, e);
 		}
 	}
+
+    // *********
+    // private service methods
 
 	private MAPApplicationContext getMtFoSMSMAPApplicationContext(
 			MAPApplicationContextVersion mapApplicationContextVersion) {

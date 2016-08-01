@@ -100,157 +100,8 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
     public RsdsSbb() {
     }
 
-    public void onSendRsds(SendRsdsEvent event, ActivityContextInterface aci, EventContext eventContext) {
-        setupReportSMDeliveryStatusRequest(event.getMsisdn(), event.getServiceCentreAddress(), event.getSMDeliveryOutcome(),
-                event.getDestAddress(), event.getMapApplicationContext(), event.getTargetId(), event.getNetworkId());
-    }
-
-    /**
-     * SMS Event Handlers
-     */
-
-    public void onReportSMDeliveryStatusResponse(ReportSMDeliveryStatusResponse evt, ActivityContextInterface aci) {
-        if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived REPORT_SM_DELIVERY_STATUS_RESPONSE = " + evt);
-        }
-
-        if (this.getSmDeliveryOutcome() != SMDeliveryOutcome.successfulTransfer) {
-            try {
-                PersistenceRAInterface pers = this.getStore();
-                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                    pers.setAlertingSupported(this.getTargetId(), true);
-                } else {
-                    // TODO: if we want to support alertingSupport database
-                    // fields
-                    // we need to update (to true) alertingSupport field in
-                    // current table
-                }
-            } catch (PersistenceException e1) {
-                this.logger.severe(
-                        "\nPersistenceException when setAlertingSupported() in onSendRoutingInfoForSMResponse(): "
-                                + e1.getMessage(), e1);
-            }
-        }
-    }
-
-    public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
-        if (this.logger.isInfoEnabled()) {
-            this.logger.info("\nRx :  onErrorComponent after setupReportSMDeliveryStatusRequest " + event + " Dialog="
-                    + event.getMAPDialog());
-        }
-    }
-
-    public void onRejectComponent(RejectComponent event, ActivityContextInterface aci) {
-        this.logger.severe("\nRx :  onRejectComponent " + event);
-    }
-
-    public void onInvokeTimeout(InvokeTimeout evt, ActivityContextInterface aci) {
-        if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx : onInvokeTimeout " + evt);
-        }
-    }   
-    
-    /**
-     * SBB Local Object Methods
-     * 
-     * @throws MAPException
-     */
-    public void setupReportSMDeliveryStatusRequest(ISDNAddressString msisdn, AddressString serviceCentreAddress,
-            SMDeliveryOutcome smDeliveryOutcome, SccpAddress destAddress, MAPApplicationContext mapApplicationContext,
-            String targetId, int networkId) {
-        if (this.logger.isInfoEnabled()) {
-            this.logger.info("\nReceived setupReportSMDeliveryStatus request msisdn= " + msisdn
-                    + ", serviceCentreAddress=" + serviceCentreAddress + ", sMDeliveryOutcome=" + smDeliveryOutcome
-                    + ", mapApplicationContext=" + mapApplicationContext);
-        }
-
-        this.setTargetId(targetId);
-        this.setSmDeliveryOutcome(smDeliveryOutcome);
-
-        MAPDialogSms mapDialogSms;
-        try {
-            mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext,
-                    this.getServiceCenterSccpAddress(networkId), null, destAddress, null);
-            mapDialogSms.setNetworkId(networkId);
-
-            ActivityContextInterface mtFOSmsDialogACI = this.mapAcif.getActivityContextInterface(mapDialogSms);
-            mtFOSmsDialogACI.attach(this.sbbContext.getSbbLocalObject());
-
-            mapDialogSms.addReportSMDeliveryStatusRequest(msisdn, serviceCentreAddress, smDeliveryOutcome, null, null,
-                    false, false, null, null);
-
-            if (this.logger.isInfoEnabled())
-                this.logger
-                        .info("\nSending: ReportSMDeliveryStatusRequest: msisdn=" + msisdn + ", serviceCenterAddress="
-                                + serviceCentreAddress + ", smDeliveryOutcome=" + smDeliveryOutcome);
-
-            mapDialogSms.send();
-        } catch (MAPException e) {
-            this.logger.severe("MAPException when sending reportSMDeliveryStatusRequest: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Dialog Events
-     */
-
-    public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
-        if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx : onDialogReject " + evt);
-        }
-    }
-
-    public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
-        if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx :  onDialogProviderAbort " + evt);
-        }
-    }
-
-    public void onDialogUserAbort(DialogUserAbort evt, ActivityContextInterface aci) {
-        if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx :  onDialogUserAbort " + evt);
-        }
-    }
-
-    public void onDialogTimeout(DialogTimeout evt, ActivityContextInterface aci) {
-        if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx :  onDialogTimeout " + evt);
-        }
-    }
-
-    public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
-        if (logger.isFineEnabled()) {
-            this.logger.fine("\nRx :  onDialogDelimiter " + evt);
-        }
-    }
-
-    public void onDialogAccept(DialogAccept evt, ActivityContextInterface aci) {
-        if (logger.isFineEnabled()) {
-            this.logger.fine("\nRx :  onDialogAccept=" + evt);
-        }
-    }
-
-    public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
-        if (logger.isFineEnabled()) {
-            this.logger.fine("\nRx :  onDialogClose=" + evt);
-        }
-    }
-
-    public void onDialogNotice(DialogNotice evt, ActivityContextInterface aci) {
-        if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx :  onDialogNotice " + evt);
-        }
-    }
-
-    public void onDialogRelease(DialogRelease evt, ActivityContextInterface aci) {
-        if (logger.isInfoEnabled()) {
-            this.logger.info("\nRx :  DialogRelease=" + evt);
-        }
-    }
-
-    /**
-     * Life cycle methods
-     */
+    // *********
+    // SBB staff
 
     @Override
     public void sbbActivate() {
@@ -334,9 +185,9 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
     }
 
-    /**
-     * CMPs
-     */
+    // *********
+    // CMPs
+
     public abstract void setTargetId(String targetId);
 
     public abstract String getTargetId();
@@ -345,12 +196,157 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
     public abstract SMDeliveryOutcome getSmDeliveryOutcome();
 
-    /**
-     * Private Methods
-     */
-    private PersistenceRAInterface getStore() {
-        return this.persistence;
+    // *********
+    // initial event
+
+    public void onSendRsds(SendRsdsEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        setupReportSMDeliveryStatusRequest(event.getMsisdn(), event.getServiceCentreAddress(), event.getSMDeliveryOutcome(),
+                event.getDestAddress(), event.getMapApplicationContext(), event.getTargetId(), event.getNetworkId());
     }
+
+    // *********
+    // MAP Component events
+
+    public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("\nRx :  onErrorComponent after setupReportSMDeliveryStatusRequest " + event + " Dialog="
+                    + event.getMAPDialog());
+        }
+    }
+
+    public void onRejectComponent(RejectComponent event, ActivityContextInterface aci) {
+        this.logger.severe("\nRx :  onRejectComponent " + event);
+    }
+
+    public void onInvokeTimeout(InvokeTimeout evt, ActivityContextInterface aci) {
+        if (logger.isWarningEnabled()) {
+            this.logger.warning("\nRx : onInvokeTimeout " + evt);
+        }
+    }   
+
+    // *********
+    // MAP Dialog events
+
+    public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
+        if (logger.isWarningEnabled()) {
+            this.logger.warning("\nRx : onDialogReject " + evt);
+        }
+    }
+
+    public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
+        if (logger.isWarningEnabled()) {
+            this.logger.warning("\nRx :  onDialogProviderAbort " + evt);
+        }
+    }
+
+    public void onDialogUserAbort(DialogUserAbort evt, ActivityContextInterface aci) {
+        if (logger.isWarningEnabled()) {
+            this.logger.warning("\nRx :  onDialogUserAbort " + evt);
+        }
+    }
+
+    public void onDialogTimeout(DialogTimeout evt, ActivityContextInterface aci) {
+        if (logger.isWarningEnabled()) {
+            this.logger.warning("\nRx :  onDialogTimeout " + evt);
+        }
+    }
+
+    public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
+        if (logger.isFineEnabled()) {
+            this.logger.fine("\nRx :  onDialogDelimiter " + evt);
+        }
+    }
+
+    public void onDialogAccept(DialogAccept evt, ActivityContextInterface aci) {
+        if (logger.isFineEnabled()) {
+            this.logger.fine("\nRx :  onDialogAccept=" + evt);
+        }
+    }
+
+    public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
+        if (logger.isFineEnabled()) {
+            this.logger.fine("\nRx :  onDialogClose=" + evt);
+        }
+    }
+
+    public void onDialogNotice(DialogNotice evt, ActivityContextInterface aci) {
+        if (logger.isWarningEnabled()) {
+            this.logger.warning("\nRx :  onDialogNotice " + evt);
+        }
+    }
+
+    public void onDialogRelease(DialogRelease evt, ActivityContextInterface aci) {
+        if (logger.isInfoEnabled()) {
+            this.logger.info("\nRx :  DialogRelease=" + evt);
+        }
+    }
+
+    // *********
+    // MAP SMS Service events
+
+    public void onReportSMDeliveryStatusResponse(ReportSMDeliveryStatusResponse evt, ActivityContextInterface aci) {
+        if (this.logger.isFineEnabled()) {
+            this.logger.fine("\nReceived REPORT_SM_DELIVERY_STATUS_RESPONSE = " + evt);
+        }
+
+        if (this.getSmDeliveryOutcome() != SMDeliveryOutcome.successfulTransfer) {
+            try {
+                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+                    persistence.setAlertingSupported(this.getTargetId(), true);
+                } else {
+                    // TODO: if we want to support alertingSupport database
+                    // fields
+                    // we need to update (to true) alertingSupport field in
+                    // current table
+                }
+            } catch (PersistenceException e1) {
+                this.logger.severe(
+                        "\nPersistenceException when setAlertingSupported() in onSendRoutingInfoForSMResponse(): "
+                                + e1.getMessage(), e1);
+            }
+        }
+    }
+
+    // *********
+    // Main service methods
+
+    public void setupReportSMDeliveryStatusRequest(ISDNAddressString msisdn, AddressString serviceCentreAddress,
+            SMDeliveryOutcome smDeliveryOutcome, SccpAddress destAddress, MAPApplicationContext mapApplicationContext,
+            String targetId, int networkId) {
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("\nReceived setupReportSMDeliveryStatus request msisdn= " + msisdn
+                    + ", serviceCentreAddress=" + serviceCentreAddress + ", sMDeliveryOutcome=" + smDeliveryOutcome
+                    + ", mapApplicationContext=" + mapApplicationContext);
+        }
+
+        this.setTargetId(targetId);
+        this.setSmDeliveryOutcome(smDeliveryOutcome);
+
+        MAPDialogSms mapDialogSms;
+        try {
+            mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext,
+                    this.getServiceCenterSccpAddress(networkId), null, destAddress, null);
+            mapDialogSms.setNetworkId(networkId);
+
+            ActivityContextInterface mtFOSmsDialogACI = this.mapAcif.getActivityContextInterface(mapDialogSms);
+            mtFOSmsDialogACI.attach(this.sbbContext.getSbbLocalObject());
+
+            mapDialogSms.addReportSMDeliveryStatusRequest(msisdn, serviceCentreAddress, smDeliveryOutcome, null, null,
+                    false, false, null, null);
+
+            if (this.logger.isInfoEnabled())
+                this.logger
+                        .info("\nSending: ReportSMDeliveryStatusRequest: msisdn=" + msisdn + ", serviceCenterAddress="
+                                + serviceCentreAddress + ", smDeliveryOutcome=" + smDeliveryOutcome);
+
+            mapDialogSms.send();
+        } catch (MAPException e) {
+            this.logger.severe("MAPException when sending reportSMDeliveryStatusRequest: " + e.getMessage(), e);
+        }
+    }
+
+    // *********
+    // private service methods
 
     private SccpAddress getServiceCenterSccpAddress(int networkId) {
         if (networkId == 0) {

@@ -220,12 +220,26 @@ public abstract class DeliveryCommonSbb implements Sbb {
     // Methods for starting / ending of processing
 
     /**
-     * This method is used for adding of a initial set of messages for delivering
-     * This method must be invoked firstly before all other methods
+     * This method is used for adding of a initial set of messages for delivering when delivering has not started This method
+     * must be invoked firstly before all other methods
      *
      * @param smsSet An initial set of messages that is added provided to SBB for delivering
      */
     protected void addInitialMessageSet(SmsSet smsSet) {
+        addInitialMessageSet(smsSet, 0, 0);
+    }
+
+    /**
+     * This method is used for adding of a initial set of messages for delivering when delivering has started and we need to
+     * provide current delivering state. This method must be invoked firstly before all other methods
+     *
+     * @param smsSet An initial set of messages that is added provided to SBB for delivering
+     * @param currentMsgNum
+     * 
+     * @param sendingPoolMsgCount
+     */
+    protected void addInitialMessageSet(SmsSet smsSet, long currentMsgNum, int sendingPoolMsgCount) {
+
 //        if (dlvIsInited) {
 //            checkSmsSetLoaded();
 //            checkPendingRequestsListLoaded();
@@ -236,17 +250,17 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
         this.smsSet = smsSet;
 
-        this.currentMsgNum = 0;
+        this.currentMsgNum = currentMsgNum;
         this.targetId = smsSet.getTargetId();
         this.pendingRequestsList = null;
-        this.sendingPoolMsgCount = 0;
+        this.sendingPoolMsgCount = sendingPoolMsgCount;
         this.dlvIsEnded = false;
         this.dlvIsInited = true;
 
-        this.setCurrentMsgNum(currentMsgNum);
+        this.setCurrentMsgNum(this.currentMsgNum);
         this.setTargetId(targetId);
         this.setPendingRequestsList(null);
-        this.setSendingPoolMsgCount(sendingPoolMsgCount);
+        this.setSendingPoolMsgCount(this.sendingPoolMsgCount);
         this.setDlvIsEnded(dlvIsEnded);
         this.setDlvIsInited(dlvIsInited);
 
@@ -321,7 +335,16 @@ public abstract class DeliveryCommonSbb implements Sbb {
     }
 
     /**
-     * @return Total messages that are not yet delivered in SmsSet (including messages in a message sending pool)
+     * @return returns sendingPoolMsgCount for smsSet in processing
+     */
+    protected int getSendingPoolMsgCountValue() {
+        checkPendingRequestsListLoaded();
+        return this.sendingPoolMsgCount;
+    }
+
+    /**
+     * @return Total messages that are not yet delivered in SmsSet (including messages in a message sending pool and not yet
+     *         added to a message sending pool)
      */
     protected int getTotalUnsentMessageCount() {
         checkSmsSetLoaded();
@@ -348,18 +371,55 @@ public abstract class DeliveryCommonSbb implements Sbb {
     }
 
     /**
+     * Returns a message number numUnsent (that is neither sent nor in a message sending pool)
+     *
+     * @param numUnsent Number of an unsent message
+     * @return A message or null if no unsent messages or numUnsent is out of range
+     */
+    protected Sms getUnsentMessage(int numUnsent) {
+        checkSmsSetLoaded();
+        checkPendingRequestsListLoaded();
+
+        if (smsSet != null)
+            return smsSet.getSms(this.currentMsgNum + this.sendingPoolMsgCount + numUnsent);
+        else
+            return null;
+    }
+
+    /**
      * Returns a message number numInSendingPool in a message sending pool
      *
      * @param numInSendingPool Number of message in a message sending pool
-     * @return A message or null if a message sending pool is empty or numInSendingPool is out of a message sending pool range
+     * @return A message or null if a sending pool is empty or numInSendingPool is out of a message sending pool range
      */
-    protected Sms getCurrentMessage(int numInSendingPool) {
+    protected Sms getMessageInSendingPool(int numInSendingPool) {
         checkSmsSetLoaded();
+        checkPendingRequestsListLoaded();
+
+        if (numInSendingPool < 0 || numInSendingPool >= this.sendingPoolMsgCount) {
+            // this is a case when a message number is outside sendingPoolMsgCount
+            return null;
+        }
+
         if (smsSet != null)
             return smsSet.getSms(this.currentMsgNum + numInSendingPool);
         else
             return null;
     }
+    
+//    /**
+//     * Returns a message number numInSendingPool in a message sending pool
+//     *
+//     * @param numInSendingPool Number of message in a message sending pool
+//     * @return A message or null if a message sending pool is empty or numInSendingPool is out of a message sending pool range
+//     */
+//    protected Sms getCurrentMessage(int numInSendingPool) {
+//        checkSmsSetLoaded();
+//        if (smsSet != null)
+//            return smsSet.getSms(this.currentMsgNum + numInSendingPool);
+//        else
+//            return null;
+//    }
 
     /**
      * Marking a previously arranged message sending pool as delivered with resource releasing
@@ -403,6 +463,12 @@ public abstract class DeliveryCommonSbb implements Sbb {
             }
             this.setSendingPoolMsgCount(sendingPoolMsgCount);
             sequenceNumbers = new int[sendingPoolMsgCount];
+
+            for (int i1 = 0; i1 < sendingPoolMsgCount; i1++) {
+                Sms sms = smsSet.getSms(currentMsgNum + i1);
+                sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+            }
+
             return sendingPoolMsgCount;
         } else
             return 0;
@@ -425,6 +491,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             if (sendingPoolMsgCount > 0) {
                 sendingPoolMsgCount = 1;
                 sms = smsSet.getSms(this.currentMsgNum);
+                sms.setDeliveryCount(sms.getDeliveryCount() + 1);
             }
             this.setSendingPoolMsgCount(sendingPoolMsgCount);
             sequenceNumbers = null;
@@ -478,9 +545,9 @@ public abstract class DeliveryCommonSbb implements Sbb {
             if (i1 < 0) {
                 return null;
             }
-            sms = getCurrentMessage(i1);
+            sms = getMessageInSendingPool(i1);
         } else {
-            sms = getCurrentMessage(0);
+            sms = getMessageInSendingPool(0);
         }
         return sms;
     }
@@ -567,7 +634,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         int sendingPoolMessageCount = this.getSendingPoolMessageCount();
         for (int i1 = 0; i1 < sendingPoolMessageCount; i1++) {
             if (!this.isMessageConfirmedInSendingPool(i1)) {
-                Sms sms = this.getCurrentMessage(i1);
+                Sms sms = this.getMessageInSendingPool(i1);
                 if (sms != null) {
                     doCreateFailureLists(lstPermFailured, lstTempFailured, sms, errorAction);
                 }
@@ -580,7 +647,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         // unsent messages outside a message pool
         int totalUnsentMessageCount = this.getTotalUnsentMessageCount();
         for (int i1 = 0; i1 < totalUnsentMessageCount; i1++) {
-            Sms sms = this.getCurrentMessage(i1);
+            Sms sms = this.getUnsentMessage(i1);
             if (sms != null) {
                 doCreateFailureLists(lstPermFailured, lstTempFailured, sms, errorAction);
             }
@@ -764,28 +831,28 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected void applyMprocRulesOnImsiResponse(SmsSet smsSet, ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstRerouted,
             ISDNAddressString networkNode, String imsiData) {
-        Sms sms = this.getCurrentMessage(0);
+        Sms sms = this.getMessageInSendingPool(0);
         if (sms != null) {
             while (true) {
                 MProcResult mProcResult = MProcManagement.getInstance().applyMProcImsiRequest(sms, imsiData,
                         networkNode.getAddress(), networkNode.getNumberingPlan().getIndicator(),
                         networkNode.getAddressNature().getIndicator());
+
                 if (mProcResult.isMessageDropped()) {
                     lstPermFailured.add(sms);
 
                     this.commitSendingPoolMsgCount();
                     sms = this.obtainNextMessage();
-                    if (sms != null) {
-                        continue;
-                    } else {
-                        // TODO: add rsds ..........................
-                        // setupReportSMDeliveryStatusRequestSuccess(smsSet, true);
-                        // this.freeSmsSetSucceded(smsSet, persistence);
+                    if (sms == null)
                         break;
-                    }
-                } else {
-                    break;
+                    else
+                        continue;
                 }
+
+                // TODO: process of message rerouting / new message
+                // .....................
+
+                break;
             }
         }
     }
@@ -803,7 +870,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         int sendingPoolMessageCount = this.getSendingPoolMessageCount();
         for (int i1 = 0; i1 < sendingPoolMessageCount; i1++) {
             if (!this.isMessageConfirmedInSendingPool(i1)) {
-                Sms sms = this.getCurrentMessage(i1);
+                Sms sms = this.getMessageInSendingPool(i1);
                 if (sms != null) {
                     String s1 = reason.replace("\n", "\t");
                     CdrGenerator.generateCdr(sms, status, s1, smscPropertiesManagement.getGenerateReceiptCdr(),
@@ -814,7 +881,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         }
 
         // if no message was sent in a message pool, let's 
-        Sms sms = this.getCurrentMessage(0);
+        Sms sms = this.getUnsentMessage(0);
         if (sms != null) {
             String s1 = reason.replace("\n", "\t");
             CdrGenerator.generateCdr(sms, status, s1, smscPropertiesManagement.getGenerateReceiptCdr(),

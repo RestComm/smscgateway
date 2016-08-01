@@ -3611,6 +3611,7 @@ public class C2_MtTest {
         // initial onSms message
         event = new SmsSetEvent();
         event.setSmsSet(smsSet);
+        this.sriSbb.sbbLoad();
         this.sriSbb.onSms(event, null, null);
 
         dlg = serviceSri.getLastMAPDialogSms();

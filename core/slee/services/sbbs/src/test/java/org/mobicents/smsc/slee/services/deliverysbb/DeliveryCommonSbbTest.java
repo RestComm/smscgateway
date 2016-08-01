@@ -74,7 +74,8 @@ public class DeliveryCommonSbbTest {
 
         assertFalse(sbb.isDeliveringEnded());
         assertEquals(sbb.getTotalUnsentMessageCount(), 20L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 0L);
+        assertNull(sbb.getMessageInSendingPool(0));
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 0L);
         assertEquals(sbb.getSendingPoolMessageCount(), 0);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -87,7 +88,8 @@ public class DeliveryCommonSbbTest {
 
         assertFalse(sbb.isDeliveringEnded());
         assertEquals(sbb.getTotalUnsentMessageCount(), 20L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 0L);
+        assertNull(sbb.getMessageInSendingPool(0));
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 0L);
         assertEquals(sbb.getSendingPoolMessageCount(), 0);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -97,7 +99,8 @@ public class DeliveryCommonSbbTest {
 
         assertFalse(sbb.isDeliveringEnded());
         assertEquals(sbb.getTotalUnsentMessageCount(), 20L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 0L);
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 0L);
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 5L);
         assertEquals(sbb.getSendingPoolMessageCount(), 5);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 5);
         assertFalse(sbb.isMessageConfirmedInSendingPool(1));
@@ -111,7 +114,8 @@ public class DeliveryCommonSbbTest {
 
         assertFalse(sbb.isDeliveringEnded());
         assertEquals(sbb.getTotalUnsentMessageCount(), 20L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 0L);
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 0L);
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 5L);
         assertEquals(sbb.getSendingPoolMessageCount(), 5);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 5);
         assertFalse(sbb.isMessageConfirmedInSendingPool(1));
@@ -124,7 +128,8 @@ public class DeliveryCommonSbbTest {
 
         assertFalse(sbb.isDeliveringEnded());
         assertEquals(sbb.getTotalUnsentMessageCount(), 20L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 0L);
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 0L);
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 5L);
         assertEquals(sbb.getSendingPoolMessageCount(), 5);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 5);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -144,7 +149,8 @@ public class DeliveryCommonSbbTest {
 
         assertFalse(sbb.isDeliveringEnded());
         assertEquals(sbb.getTotalUnsentMessageCount(), 20L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 0L);
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 0L);
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 5L);
         assertEquals(sbb.getSendingPoolMessageCount(), 5);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 4);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -164,7 +170,8 @@ public class DeliveryCommonSbbTest {
 
         assertFalse(sbb.isDeliveringEnded());
         assertEquals(sbb.getTotalUnsentMessageCount(), 15L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 5L);
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 5L);
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 6L);
         assertEquals(sbb.getSendingPoolMessageCount(), 1);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 1);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -177,7 +184,8 @@ public class DeliveryCommonSbbTest {
 
         assertFalse(sbb.isDeliveringEnded());
         assertEquals(sbb.getTotalUnsentMessageCount(), 15L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 5L);
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 5L);
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 6L);
         assertEquals(sbb.getSendingPoolMessageCount(), 1);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 1);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -185,7 +193,8 @@ public class DeliveryCommonSbbTest {
         sbb.commitSendingPoolMsgCount();
 
         assertEquals(sbb.getTotalUnsentMessageCount(), 14L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 6L);
+        assertNull(sbb.getMessageInSendingPool(0));
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 6L);
         assertEquals(sbb.getSendingPoolMessageCount(), 0);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -195,7 +204,8 @@ public class DeliveryCommonSbbTest {
         assertEquals(cnt, 14);
 
         assertEquals(sbb.getTotalUnsentMessageCount(), 14L);
-        assertEquals(sbb.getCurrentMessage(0).getMessageId(), 6L);
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 6L);
+        assertNull(sbb.getUnsentMessage(0));
         assertEquals(sbb.getSendingPoolMessageCount(), 14);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 14);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -204,7 +214,8 @@ public class DeliveryCommonSbbTest {
         sbb.commitSendingPoolMsgCount();
 
         assertEquals(sbb.getTotalUnsentMessageCount(), 0L);
-        assertNull(sbb.getCurrentMessage(0));
+        assertNull(sbb.getMessageInSendingPool(0));
+        assertNull(sbb.getUnsentMessage(0));
         assertEquals(sbb.getSendingPoolMessageCount(), 0);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -213,7 +224,8 @@ public class DeliveryCommonSbbTest {
         sbb.markDeliveringIsEnded(true);
 
         assertEquals(sbb.getTotalUnsentMessageCount(), 0L);
-        assertNull(sbb.getCurrentMessage(0));
+        assertNull(sbb.getMessageInSendingPool(0));
+        assertNull(sbb.getUnsentMessage(0));
         assertEquals(sbb.getSendingPoolMessageCount(), 0);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
@@ -226,7 +238,8 @@ public class DeliveryCommonSbbTest {
         loadSbb(sbb);
 
         assertEquals(sbb.getTotalUnsentMessageCount(), 0L);
-        assertNull(sbb.getCurrentMessage(0));
+        assertNull(sbb.getMessageInSendingPool(0));
+        assertNull(sbb.getUnsentMessage(0));
         assertEquals(sbb.getSendingPoolMessageCount(), 0);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));

@@ -43,6 +43,8 @@ public class SendMtEvent implements Serializable {
     private LMSI lmsi;
     private InformServiceCenterContainer informServiceCenterContainer;
     private int sriMapVersion;
+    private long currentMsgNum;
+    private int sendingPoolMsgCount;
 
     public ISDNAddressString getNetworkNode() {
         return networkNode;
@@ -92,6 +94,22 @@ public class SendMtEvent implements Serializable {
         return sriMapVersion;
     }
 
+    public long getCurrentMsgNum() {
+        return currentMsgNum;
+    }
+
+    public void setCurrentMsgNum(long currentMsgNum) {
+        this.currentMsgNum = currentMsgNum;
+    }
+
+    public int getSendingPoolMsgCount() {
+        return sendingPoolMsgCount;
+    }
+
+    public void setSendingPoolMsgCount(int sendingPoolMsgCount) {
+        this.sendingPoolMsgCount = sendingPoolMsgCount;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -119,6 +137,10 @@ public class SendMtEvent implements Serializable {
         }
         sb.append("sriMapVersion=");
         sb.append(this.sriMapVersion);
+        sb.append("currentMsgNum=");
+        sb.append(this.currentMsgNum);
+        sb.append("sendingPoolMsgCount=");
+        sb.append(this.sendingPoolMsgCount);
         sb.append(", ");
         if (this.smsSet != null) {
             sb.append("smsSet=");

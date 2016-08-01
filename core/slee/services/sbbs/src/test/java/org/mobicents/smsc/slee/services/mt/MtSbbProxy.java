@@ -89,10 +89,10 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
         this.rsdsSbb = rsdsSbb;
     }
 
-	@Override
-	public TT_PersistenceRAInterfaceProxy getStore() {
-		return (TT_PersistenceRAInterfaceProxy)persistence;
-	}
+//	@Override
+//	public TT_PersistenceRAInterfaceProxy getStore() {
+//		return (TT_PersistenceRAInterfaceProxy)persistence;
+//	}
 
 
 	private SccpAddress sccpAddress;
