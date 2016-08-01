@@ -220,40 +220,41 @@ public abstract class DeliveryCommonSbb implements Sbb {
     // Methods for starting / ending of processing
 
     /**
-     * This method is used for adding of a first / next set of messages for delivering
-     * In case of adding of a first set of message this method must be invoked firstly before all other methods
+     * This method is used for adding of a initial set of messages for delivering
+     * This method must be invoked firstly before all other methods
      *
-     * @param smsSet An initial / next set of messages that is added provided to SBB for delivering
+     * @param smsSet An initial set of messages that is added provided to SBB for delivering
      */
-    protected void addMessageSet(SmsSet smsSet) {
-        if (dlvIsInited) {
-            checkSmsSetLoaded();
-            checkPendingRequestsListLoaded();
+    protected void addInitialMessageSet(SmsSet smsSet) {
+//        if (dlvIsInited) {
+//            checkSmsSetLoaded();
+//            checkPendingRequestsListLoaded();
+//
+//            // TODO: implement adding of messages into delivering process ......................
+//            throw new UnsupportedOperationException("addMessageSet() invoke is not implemented for DeliverSbb initialized step");
+//        } else {
 
-            // TODO: implement adding of messages into delivering process ......................
-            throw new UnsupportedOperationException("addMessageSet() invoke is not implemented for DeliverSbb initialized step");
-        } else {
+        this.smsSet = smsSet;
 
-            this.smsSet = smsSet;
+        this.currentMsgNum = 0;
+        this.targetId = smsSet.getTargetId();
+        this.pendingRequestsList = null;
+        this.sendingPoolMsgCount = 0;
+        this.dlvIsEnded = false;
+        this.dlvIsInited = true;
 
-            this.currentMsgNum = 0;
-            this.targetId = smsSet.getTargetId();
-            this.pendingRequestsList = null;
-            this.sendingPoolMsgCount = 0;
-            this.dlvIsEnded = false;
-            this.dlvIsInited = true;
+        this.setCurrentMsgNum(currentMsgNum);
+        this.setTargetId(targetId);
+        this.setPendingRequestsList(null);
+        this.setSendingPoolMsgCount(sendingPoolMsgCount);
+        this.setDlvIsEnded(dlvIsEnded);
+        this.setDlvIsInited(dlvIsInited);
 
-            this.setCurrentMsgNum(currentMsgNum);
-            this.setTargetId(targetId);
-            this.setPendingRequestsList(null);
-            this.setSendingPoolMsgCount(sendingPoolMsgCount);
-            this.setDlvIsEnded(dlvIsEnded);
-            this.setDlvIsInited(dlvIsInited);
+        smsSetIsLoaded = true;
+        pendingRequestsListIsLoaded = true;
+        pendingRequestsListIsDirty = false;
 
-            smsSetIsLoaded = true;
-            pendingRequestsListIsLoaded = true;
-            pendingRequestsListIsDirty = false;
-        }
+//    }
     }
 
     /**
@@ -286,7 +287,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         return dlvIsEnded;
     }
 
-    protected SchedulerActivity getSchedulerActivity() {
+    private SchedulerActivity getSchedulerActivity() {
         ActivityContextInterface[] acis = this.sbbContext.getActivities();
         for (int count = 0; count < acis.length; count++) {
             ActivityContextInterface aci = acis[count];

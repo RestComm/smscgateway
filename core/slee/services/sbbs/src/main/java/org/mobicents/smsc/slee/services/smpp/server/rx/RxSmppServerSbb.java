@@ -85,7 +85,7 @@ import com.cloudhopper.smpp.type.RecoverablePduException;
  * 
  * @author amit bhayani
  * @author sergey vetyutnev
- * 
+ *
  */
 public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private static final String className = RxSmppServerSbb.class.getSimpleName();
@@ -123,7 +123,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 			}
 
             SmsSet smsSet = event.getSmsSet();
-            this.addMessageSet(smsSet);
+            this.addInitialMessageSet(smsSet);
 
 //			if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
 //				try {
@@ -269,6 +269,11 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             smsSet.setDestEsmeName(esme.getName());
 
             int deliveryMsgCnt = this.obtainNextMessagesSendingPool(MAX_MESSAGES_PER_STEP);
+            if (deliveryMsgCnt == 0) {
+                this.markDeliveringIsEnded(true);
+                return;
+            }
+
             for (int i1 = 0; i1 < deliveryMsgCnt; i1++) {
                 smscStatAggregator.updateMsgOutTryAll();
                 smscStatAggregator.updateMsgOutTrySmpp();

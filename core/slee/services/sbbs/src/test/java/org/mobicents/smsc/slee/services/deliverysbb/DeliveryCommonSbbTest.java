@@ -69,7 +69,7 @@ public class DeliveryCommonSbbTest {
             smsSet2.addSms(sms);
             smsSet.addSmsSet(smsSet2);
         }
-        sbb.addMessageSet(smsSet);
+        sbb.addInitialMessageSet(smsSet);
         SmsSetCache.getInstance().addProcessingSmsSet(smsSet.getTargetId(), smsSet, 0);
 
         assertFalse(sbb.isDeliveringEnded());
@@ -257,7 +257,7 @@ public class DeliveryCommonSbbTest {
         smsSet.getSms(7).setStored(true);
         smsSet.getSms(7).setValidityPeriod(new Date(year - 1, 1, 1));
 
-        sbb.addMessageSet(smsSet);
+        sbb.addInitialMessageSet(smsSet);
         SmsSetCache.getInstance().addProcessingSmsSet(smsSet.getTargetId(), smsSet, 0);
 
         storeSbb(sbb);

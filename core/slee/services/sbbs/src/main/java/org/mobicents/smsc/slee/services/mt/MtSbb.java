@@ -122,7 +122,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
     public void onSendMt(SendMtEvent event, ActivityContextInterface aci, EventContext eventContext) {
         SmsSet smsSet = event.getSmsSet();
-        this.addMessageSet(smsSet);
+        this.addInitialMessageSet(smsSet);
 
 //        SmsSubmitData smsDeliveryData = new SmsSubmitData();
 //        smsDeliveryData.setTargetId(event.getSmsSet().getTargetId());
@@ -1447,8 +1447,6 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         if (sms == null) {
             throw new SmscProcessingException("sms is missed in CMP", -1, -1, null);
         }
-
-        // .................................
 
 		boolean moreMessagesToSend = false;
 //        if (msgNum < smsSet.getSmsCount() - 1) {

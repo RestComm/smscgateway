@@ -101,7 +101,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             smscStatAggregator.updateMsgOutTrySs7();
 
             SmsSet smsSet = event.getSmsSet();
-            this.addMessageSet(smsSet);
+            this.addInitialMessageSet(smsSet);
 
             if (smsSet.getDestAddrTon() == SmppConstants.TON_ALPHANUMERIC) {
                 // bad TON at the destination address: alphanumerical is not supported

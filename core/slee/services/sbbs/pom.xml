@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>sbbs</artifactId>
 
-	<name>Core : SLEE : Services</name>
+	<name>Core : SLEE : Services Sbbs</name>
 
 	<dependencies>
 		<dependency>
@@ -76,6 +76,11 @@
 			<groupId>${project.groupId}</groupId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mobicents.resources</groupId>
+			<artifactId>sip11-ratype</artifactId>
+			<version>${restcomm.resources.sip.version}</version>
+		</dependency>
 		<!-- javolution -->
 		<dependency>
 			<groupId>javolution</groupId>
@@ -103,16 +108,22 @@
 					<version>${project.version}</version>
 					<type>test-jar</type>
 				</dependency>			
-                <dependency>
-                    <artifactId>statistics-api</artifactId>
-                    <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${jss7.restcomm.version}</version>
-                </dependency>       
-                <dependency>
-                    <artifactId>statistics-impl</artifactId>
-                    <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${jss7.restcomm.version}</version>
-                </dependency>       
+				<dependency>
+					<artifactId>statistics-api</artifactId>
+					<groupId>org.mobicents.protocols.ss7.statistics</groupId>
+					<version>${jss7.restcomm.version}</version>
+				</dependency>       
+				<dependency>
+					<artifactId>statistics-impl</artifactId>
+					<groupId>org.mobicents.protocols.ss7.statistics</groupId>
+					<version>${jss7.restcomm.version}</version>
+				</dependency>       
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>smpp</artifactId>
+					<version>${project.version}</version>
+					<type>test-jar</type>
+				</dependency>           
 			</dependencies>
 		</profile>
 		<profile>
