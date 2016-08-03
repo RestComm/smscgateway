@@ -7,6 +7,8 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to remove the value configured for ESME default cluster. If 
 	this value is removed, all unrouted messages will be routed into the GSM network.
+	This parameter affects only for DatabaseSmsRoutingRule (not used for default
+	routing). 
 
 SEE ALSO
 	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,

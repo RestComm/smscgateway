@@ -165,8 +165,8 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Cluster Name' value by issuing the command `smsc set esmedefaultcluster` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get esmedefaultcluster` which will display the value set for this property. 
-
+You can verify this by issuing the command `smsc get esmedefaultcluster` which will display the value set for this property.
+This parameter affects only for DatabaseSmsRoutingRule - see <<_db_routing_rule_settings>>.
 ----
 
 Name
@@ -179,6 +179,8 @@ DESCRIPTION
 	This command is used to set a value for ESME default cluster. If the 
 	destination-address does not match to any ESME (any Cluster Name) the message will
 	be routed to the cluster with the name specified here for esme-default-cluster.
+	This parameter affects only for DatabaseSmsRoutingRule (not used for default
+	routing). 
 ----
 
 You can remove an ESME default cluster by issuing a command in the below format:
@@ -194,6 +196,8 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to remove the value configured for ESME default cluster. If 
 	this value is removed, all unrouted messages will be routed into the GSM network.
+	This parameter affects only for DatabaseSmsRoutingRule (not used for default
+	routing). 
 ----
 
 [[_esmedefaultcluster_gui]]
