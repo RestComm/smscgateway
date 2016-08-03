@@ -1200,6 +1200,10 @@ public class SMSCShellExecutor implements ShellExecutor {
             sb.append(smscPropertiesManagement.getRemovingLiveTablesDays());
             sb.append("\n");
 
+            sb.append("removingarchivetablesdays = ");
+            sb.append(smscPropertiesManagement.getRemovingArchiveTablesDays());
+            sb.append("\n");
+
             sb.append("hrhlrnumber : ");
             sb.append("networkId=0 - hrhlrnumber=");
             sb.append(smscPropertiesManagement.getHrHlrNumber());

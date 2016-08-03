@@ -1,13 +1,13 @@
 Name
-	smsc get removinglivetabledays
+	smsc get removinglivetablesdays
 
 SYNOPSIS
-	smsc get removinglivetabledays
+	smsc get removinglivetablesdays
 
 DESCRIPTION
 	This command is used to retrieve the current settings for auto-dropping LIVE 
 	tables from the Cassandra Database. 
 
 SEE ALSO
-	smsc set removinglivetabledays, smsc set removingarchivetabledays
-	smsc get removingarchivetabledays
+	smsc set removinglivetablesdays, smsc set removingarchivetablesdays
+	smsc get removingarchivetablesdays

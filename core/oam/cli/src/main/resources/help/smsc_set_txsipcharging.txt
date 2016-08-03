@@ -2,12 +2,21 @@ Name
 	smsc set txsipcharging
 
 SYNOPSIS
-	smsc set txsipcharging <None | Selected | All>
+	smsc set txsipcharging <None|Selected|All>
 
 DESCRIPTION
 	This command is used to set the value of the parameter 'txsipcharging' 
-	is set to 'none', 'selected' or 'all'. This option defines if SIP originated 
-	messages will be charged by OCS via Diameter before delivery. 
+
+	If this is set to 'All', all SIP Originated messages will be charged by OCS via
+	Diameter, prior to being sent.
+
+	If this is set to 'None' or 'Selected', none of the SIP Originated messages will
+	be charged by OCS via Diameter, prior to being sent. 
+
+    The parameter 'txsipcharging' is set to 'None' by default.
+
+EXAMPLES
+    smsc set txsipcharging Selected
 
 SEE ALSO
 	smsc set diameterdestrealm, smsc set diameterdesthost, smsc set diameterdestport,

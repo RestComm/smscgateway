@@ -2,26 +2,26 @@ Name
 	smsc set txsmppcharging
 
 SYNOPSIS
-	smsc set txsmppcharging <none|selected|all>
+	smsc set txsmppcharging <None|Selected|All>
 
 DESCRIPTION
-	This command is used to set the value of the parameter 'txsmppcharging' to none,
-	selected or all. 
+	This command is used to set the value of the parameter 'txsmppcharging' to None,
+	Selected or All. 
 
-	If this is set to 'all', all ESME Originated messages will be charged by OCS via
+	If this is set to 'All', all ESME Originated messages will be charged by OCS via
 	Diameter, prior to being sent.
 
-	If this is set to 'selected', only those messages originating from ESMEs marked 
+	If this is set to 'Selected', only those messages originating from ESMEs marked 
 	with the parameter 'charging-enabled'=true at the time of ESME creation  will be 
 	charged by OCS via Diameter, prior to being sent.
 
-	If this is set to 'none', none of the ESME Originated messages will be charged by 
+	If this is set to 'None', none of the ESME Originated messages will be charged by 
 	OCS via Diameter, prior to being sent. 
 
-	The parameter 'txsmppcharging' is set to 'none' by default.
+	The parameter 'txsmppcharging' is set to 'None' by default.
 
 EXAMPLES
-	smsc set txsmppcharging selected
+	smsc set txsmppcharging Selected
 
 SEE ALSO
 	smsc set diameterdestrealm, smsc set diameterdesthost, smsc set diameterdestport, 

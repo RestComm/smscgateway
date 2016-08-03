@@ -29,5 +29,5 @@ PARAMETERS
 					  these manually.
 
 SEE ALSO
-	smsc set removingarchivetabledays, smsc get removinglivetablesdays, 
-	smsc get removingarchivetabledays
+	smsc set removingarchivetablesdays, smsc get removinglivetablesdays, 
+	smsc get removingarchivetablesdays

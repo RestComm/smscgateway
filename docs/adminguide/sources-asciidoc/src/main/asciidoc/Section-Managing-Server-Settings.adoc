@@ -1180,8 +1180,8 @@ EXAMPLES
 [[_db_removinglivetablesdays_cli]]
 ==== Using CLI
 
-You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removinglivetabledays` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get removinglivetabledays` which will display the value set for this property. 
+You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removinglivetablesdays` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get removinglivetablesdays` which will display the value set for this property. 
 
 ----
 
@@ -1227,22 +1227,22 @@ PARAMETERS
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
-[[_db_removingarchivetabledays]]
+[[_db_removingarchivetablesdays]]
 === Cassandra Configuration - Removing Live Tables Days
 
-[[_db_removingarchivetabledays_cli]]
+[[_db_removingarchivetablesdays_cli]]
 ==== Using CLI
 
-You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removingarchivetabledays` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get removingarchivetabledays` which will display the value set for this property. 
+You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removingarchivetablesdays` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get removingarchivetablesdays` which will display the value set for this property. 
 
 ----
 
 Name
-	smsc set removingarchivetabledays
+	smsc set removingarchivetablesdays
 
 SYNOPSIS
-	smsc set removingarchivetabledays <value>
+	smsc set removingarchivetablesdays <value>
 
 DESCRIPTION
 	This command is used to configure the SMSC to automatically drop ARCHIVE tables 
@@ -1250,7 +1250,7 @@ DESCRIPTION
 	midnight and after every SMSC restart.
 
 PARAMETERS
-	removingarchivetabledays	- This parameter is used to specify the number
+	removingarchivetablesdays	- This parameter is used to specify the number
 					  of days the ARCHIVE tables should be kept before 
 					  attempting to drop them automatically.
 
@@ -1269,7 +1269,7 @@ PARAMETERS
 					  these manually.
 ----
 
-[[_db_removingarchivetabledays_gui]]
+[[_db_removingarchivetablesdays_gui]]
 ==== Using GUI
 
 .Procedure: Set Cassandra Configuration - Removing Archive Tables Days
@@ -1728,26 +1728,26 @@ Name
 	smsc set txsmppcharging
 
 SYNOPSIS
-	smsc set txsmppcharging <none|selected|all>
+	smsc set txsmppcharging <None|Selected|All>
 
 DESCRIPTION
-	This command is used to set the value of the parameter 'txsmppcharging' to none,
-	selected or all. 
+	This command is used to set the value of the parameter 'txsmppcharging' to None,
+	Selected or All. 
 
-	If this is set to 'all', all ESME Originated messages will be charged by OCS via
+	If this is set to 'Aall', all ESME Originated messages will be charged by OCS via
 	Diameter, prior to being sent.
 
-	If this is set to 'selected', only those messages originating from ESMEs marked 
+	If this is set to 'Selected', only those messages originating from ESMEs marked 
 	with the parameter 'charging-enabled'=true at the time of ESME creation  will be 
 	charged by OCS via Diameter, prior to being sent.
 
-	If this is set to 'none', none of the ESME Originated messages will be charged by 
+	If this is set to 'None', none of the ESME Originated messages will be charged by 
 	OCS via Diameter, prior to being sent. 
 
-	The parameter 'txsmppcharging' is set to 'none' by default.
+	The parameter 'txsmppcharging' is set to 'None' by default.
 
 EXAMPLES
-	smsc set txsmppcharging selected
+	smsc set txsmppcharging Selected
 ----
 
 [[_dest_txsmppcharging_gui]]
@@ -1777,26 +1777,21 @@ Name
     smsc set txsipcharging
 
 SYNOPSIS
-    smsc set txsipcharging <none|selected|all>
+    smsc set txsipcharging <None|Selected|All>
 
 DESCRIPTION
-    This command is used to set the value of the parameter 'txsipcharging' to none,
-    selected or all. 
+	This command is used to set the value of the parameter 'txsipcharging' 
 
-    If this is set to 'all', all SIP Originated messages will be charged by OCS via
-    Diameter, prior to being sent.
+	If this is set to 'All', all SIP Originated messages will be charged by OCS via
+	Diameter, prior to being sent.
 
-    If this is set to 'selected', only those messages originating from SIPs marked 
-    with the parameter 'charging-enabled'=true at the time of SIP creation  will be 
-    charged by OCS via Diameter, prior to being sent.
+	If this is set to 'None' or 'Selected', none of the SIP Originated messages will
+	be charged by OCS via Diameter, prior to being sent. 
 
-    If this is set to 'none', none of the SIP Originated messages will be charged by 
-    OCS via Diameter, prior to being sent. 
-
-    The parameter 'txsipcharging' is set to 'none' by default.
+    The parameter 'txsipcharging' is set to 'None' by default.
 
 EXAMPLES
-    smsc set txsipcharging selected
+    smsc set txsipcharging Selected
 ----
 
 [[_dest_txsipcharging_gui]]
