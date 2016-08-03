@@ -415,16 +415,37 @@ public class SmppShellExecutor implements ShellExecutor {
         return String.format(SmppOamMessages.DELETE_ESME_SUCCESSFUL, esmeName);
     }
 
-    private String showEsme() {
-        List<Esme> esmes = this.smppManagement.getEsmeManagement().getEsmes();
-        if (esmes.size() == 0) {
-            return SmppOamMessages.NO_ESME_DEFINED_YET;
+    private String showEsme(String[] args) {
+        // Minimum is 4
+        if (args.length < 3) {
+            return SmppOamMessages.INVALID_COMMAND;
         }
+
+        String esmeName = null;
+        if (args.length > 3) {
+            esmeName = args[3];
+        }
+
         StringBuffer sb = new StringBuffer();
-        for (Esme esme : esmes) {
-            sb.append(SmppOamMessages.NEW_LINE);
+        if (esmeName == null) {
+            // all ESMEs
+            List<Esme> esmes = this.smppManagement.getEsmeManagement().getEsmes();
+            if (esmes.size() == 0) {
+                return SmppOamMessages.NO_ESME_DEFINED_YET;
+            }
+            for (Esme esme : esmes) {
+                sb.append(SmppOamMessages.NEW_LINE);
+                esme.show(sb);
+            }
+        } else {
+            // a selected ESME
+            Esme esme = this.smppManagement.getEsmeManagement().getEsmeByName(esmeName);
+            if (esme == null) {
+                return String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName);
+            }
             esme.show(sb);
         }
+
         return sb.toString();
     }
 
@@ -643,7 +664,7 @@ public class SmppShellExecutor implements ShellExecutor {
                 } else if (rasCmd.equals("delete")) {
                     return this.destroyEsme(args);
                 } else if (rasCmd.equals("show")) {
-                    return this.showEsme();
+                    return this.showEsme(args);
                 } else if (rasCmd.equals("start")) {
                     return this.startEsme(args);
                 } else if (rasCmd.equals("stop")) {

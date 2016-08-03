@@ -820,7 +820,7 @@ NOTE: Only CLIENT ESME's (one that sends BIND request) can be enabled for SSL.
 [[_esme_settings_view_view_cli]]
 === Using CLI
 
-You can view the details of all configured ESMEs by issuing the command `smpp esme show` as described below. 
+You can view the details of all or concrete configured ESMEs by issuing the command `smpp esme show` as described below. 
 
 ----
 
@@ -828,7 +828,12 @@ Name
 	smpp esme show
 
 SYNOPSIS
-	smpp esme show
+	smpp esme show <esmeName>
+
+PARAMETERS
+	esmeName		- Name of the ESME to show.
+	This parameter is optional. All ESMEs will be displayed in case of
+	no esmeName is specified.
 
 DESCRIPTION
 	This command is used to list all configured ESMEs.
