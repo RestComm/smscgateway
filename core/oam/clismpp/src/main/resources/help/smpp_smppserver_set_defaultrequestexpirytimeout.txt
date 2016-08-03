@@ -1,8 +1,8 @@
 Name
-	smppserver set defaultrequestexpirytimeout
+	smpp smppserver set defaultrequestexpirytimeout
 
 SYNOPSIS
-	smppserver set defaultrequestexpirytimeout <default-request-expiry-timeout>
+	smpp smppserver set defaultrequestexpirytimeout <default-request-expiry-timeout>
 
 DESCRIPTION
 	This command is used to specify the default-request-expiry-timeout for the Server 
@@ -14,6 +14,6 @@ DESCRIPTION
 	You must restart the SMPP Server for the new value to take effect.
 
 SEE ALSO
-	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smpp esme create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
 	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
 	smsc set maxmapv

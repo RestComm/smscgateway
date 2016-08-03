@@ -23,10 +23,10 @@ You can edit the properties of the SMPP Server by issuing appropriate commands f
 ----
 
 Name
-	smppserver set port
+	smpp smppserver set port
 
 SYNOPSIS
-	smppserver set port <port>
+	smpp smppserver set port <port>
 
 DESCRIPTION
 	This command is used to set the port that the SMSC server is listening to for 
@@ -40,10 +40,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set bindtimeout
+	smpp smppserver set bindtimeout
 
 SYNOPSIS
-	smppserver set bindtimeout <bind-timeout>
+	smpp smppserver set bindtimeout <bind-timeout>
 
 DESCRIPTION
 	This command is used to set a value for bind-timeout in milli-seconds. 
@@ -59,10 +59,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set systemid
+	smpp smppserver set systemid
 
 SYNOPSIS
-	smppserver set systemid <system-id>
+	smpp smppserver set systemid <system-id>
 
 DESCRIPTION
 	This command is used to set the value for system-id. This is the 'system-id' 
@@ -74,10 +74,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set autonegotiateversion
+	smpp smppserver set autonegotiateversion
 
 SYNOPSIS
-	smppserver set autonegotiateversion <true/false>
+	smpp smppserver set autonegotiateversion <true/false>
 
 DESCRIPTION
 	This command is used to specify if auto-negotiate-version is enabled or not.
@@ -93,10 +93,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set interfaceversion
+	smpp smppserver set interfaceversion
 
 SYNOPSIS
-	smppserver set interfaceversion <interface-version>
+	smpp smppserver set interfaceversion <interface-version>
 
 DESCRIPTION
 	This command is used to specify the SMPP version that the Server supports. 
@@ -107,10 +107,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set maxconnectionsize
+	smpp smppserver set maxconnectionsize
 
 SYNOPSIS
-	smppserver set maxconnectionsize <max-connection-size>
+	smpp smppserver set maxconnectionsize <max-connection-size>
 
 DESCRIPTION
 	This command is used to specify the maximum number of connections/sessions this 
@@ -122,10 +122,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultwindowsize
+	smpp smppserver set defaultwindowsize
 
 SYNOPSIS
-	smppserver set defaultwindowsize <defaultwindowsize>
+	smpp smppserver set defaultwindowsize <defaultwindowsize>
 
 DESCRIPTION
 	This command is used to specify the default window size for this Server. 
@@ -141,10 +141,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultwindowwaittimeout
+	smpp smppserver set defaultwindowwaittimeout
 
 SYNOPSIS
-	smppserver set defaultwindowwaittimeout <default-window-wait-timeout>
+	smpp smppserver set defaultwindowwaittimeout <default-window-wait-timeout>
 
 DESCRIPTION
 	This command is used to specify the default-window-wait-timeout for this Server
@@ -160,10 +160,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultrequestexpirytimeout
+	smpp smppserver set defaultrequestexpirytimeout
 
 SYNOPSIS
-	smppserver set defaultrequestexpirytimeout <default-request-expiry-timeout>
+	smpp smppserver set defaultrequestexpirytimeout <default-request-expiry-timeout>
 
 DESCRIPTION
 	This command is used to specify the default-request-expiry-timeout for the Server 
@@ -178,10 +178,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultwindowmonitorinterval
+	smpp smppserver set defaultwindowmonitorinterval
 
 SYNOPSIS
-	smppserver set defaultwindowmonitorinterval <default-window-monitor-interval>
+	smpp smppserver set defaultwindowmonitorinterval <default-window-monitor-interval>
 
 DESCRIPTION
 	This command is used to specify the default-window-monitor-interval for the Server 
@@ -199,10 +199,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultsessioncountersenabled
+	smpp smppserver set defaultsessioncountersenabled
 
 SYNOPSIS
-	smppserver set defaultsessioncountersenabled <true/false>
+	smpp smppserver set defaultsessioncountersenabled <true/false>
 
 DESCRIPTION
 	This command is used to set the parameter 'defaultsessioncountersenabled' value 

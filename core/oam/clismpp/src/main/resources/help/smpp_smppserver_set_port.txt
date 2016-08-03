@@ -1,8 +1,8 @@
 Name
-	smppserver set port
+	smpp smppserver set port
 
 SYNOPSIS
-	smppserver set port <port>
+	smpp smppserver set port <port>
 
 DESCRIPTION
 	This command is used to set the port that the SMSC server is listening to for 
@@ -13,6 +13,6 @@ DESCRIPTION
 	You must restart the SMPP Server for the new value to take effect.
 
 SEE ALSO
-	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smpp esme create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
 	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
 	smsc set maxmapv

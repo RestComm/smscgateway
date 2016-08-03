@@ -1,8 +1,8 @@
 Name
-	smppserver set bindtimeout
+	smpp smppserver set bindtimeout
 
 SYNOPSIS
-	smppserver set bindtimeout <bind-timeout>
+	smpp smppserver set bindtimeout <bind-timeout>
 
 DESCRIPTION
 	This command is used to set a value for bind-timeout in milli-seconds. 
@@ -15,6 +15,6 @@ DESCRIPTION
 	You must restart the SMPP Server for the new value to take effect.
 
 SEE ALSO
-	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smpp esme create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
 	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
 	smsc set maxmapv

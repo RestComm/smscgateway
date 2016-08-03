@@ -1,8 +1,8 @@
 Name
-	smppserver set defaultwindowwaittimeout
+	smpp smppserver set defaultwindowwaittimeout
 
 SYNOPSIS
-	smppserver set defaultwindowwaittimeout <default-window-wait-timeout>
+	smpp smppserver set defaultwindowwaittimeout <default-window-wait-timeout>
 
 DESCRIPTION
 	This command is used to specify the default-window-wait-timeout for this Server
@@ -15,6 +15,6 @@ DESCRIPTION
 	You must restart the SMPP Server for the new value to take effect.
 
 SEE ALSO
-	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smpp esme create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
 	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
 	smsc set maxmapv

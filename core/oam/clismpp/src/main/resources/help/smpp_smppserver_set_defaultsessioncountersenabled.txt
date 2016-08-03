@@ -1,8 +1,8 @@
 Name
-	smppserver set defaultsessioncountersenabled
+	smpp smppserver set defaultsessioncountersenabled
 
 SYNOPSIS
-	smppserver set defaultsessioncountersenabled <true/false>
+	smpp smppserver set defaultsessioncountersenabled <true/false>
 
 DESCRIPTION
 	This command is used to set the parameter 'defaultsessioncountersenabled' value 
@@ -14,6 +14,6 @@ DESCRIPTION
 	You must restart the SMPP Server for the new value to take effect.
 
 SEE ALSO
-	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smpp esme create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
 	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
 	smsc set maxmapv
