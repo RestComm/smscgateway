@@ -145,9 +145,9 @@ If you use the model "all JSS7 originated messages must be routed to ESME and al
 * set ESME routing address so it accepts all messages 
 * set mproc rules:
 +
-smsc mproc add mproc 1 networkIdMask=1 newNetworkId=0
+smsc mproc add mproc 1 networkidmask=1 newnetworkid=0
 +
-smsc mproc add mproc 2 networkIdMask=0 newNetworkId=1
+smsc mproc add mproc 2 networkidmask=0 newnetworkid=1
 
 
 If you have several ESMEs that send message to one SS7 connection and you need that delivery receipts come back to an originator ESME (and no more traffic), you can:
@@ -157,11 +157,11 @@ If you have several ESMEs that send message to one SS7 connection and you need t
 * create a set of mproc rules that move ESME originated messages into SS7 network.
   CLI commabd can be like:
 +
-smsc mproc add mproc 1 networkIdMask=1 newNetworkId=0
+smsc mproc add mproc 1 networkidmask=1 newnetworkid=0
 +
-smsc mproc add mproc 2 networkIdMask=2 newNetworkId=0
+smsc mproc add mproc 2 networkidmask=2 newnetworkid=0
 +
-smsc mproc add mproc 3 networkIdMask=3 newNetworkId=0
+smsc mproc add mproc 3 networkidmask=3 newnetworkid=0
 
 * set the option "Delivery receipts will be routed to the origination networkId" is set to true 
 
