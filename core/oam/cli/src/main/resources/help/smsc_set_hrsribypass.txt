@@ -20,7 +20,7 @@ DESCRIPTION
 
 EXAMPLES
 	smsc set hrsribypass true
-	smsc set hrsribypass false networkid <networkId>
+	smsc set hrsribypass false networkid 2
 
 SEE ALSO
 	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,

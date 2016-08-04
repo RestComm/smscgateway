@@ -620,12 +620,12 @@ EXAMPLES
 == SS7 Settings
 
 [[_set_scgt]]
-=== SMSC Global Title
+=== SMSC Gateway Global Title
 
 [[_set_scgt_cli]]
 ==== Using CLI
 
-You can set the 'SMSC Gobal Title' by issuing the command `smsc set scgt` with appropriate parameters as described below.
+You can set the 'SMSC Gateway Global Title' by issuing the command `smsc set scgt` with appropriate parameters as described below.
 You can verify this by issuing the command `smsc get scgt` which will display the value set for this property. 
 
 ----
@@ -666,12 +666,12 @@ DESCRIPTION
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 [[_set_gti]]
-=== SCCP Global Title type
+=== SMSC Gateway Global Title Indicator
 
 [[_set_gti_cli]]
 ==== Using CLI
 
-You can set the 'SCCP Global Title type' by issuing the command `smsc set gti` with appropriate parameters as described below.
+You can set the 'SMSC Gateway Global Title Indicator' by issuing the command `smsc set gti` with appropriate parameters as described below.
 You can verify this by issuing the command `smsc get gti` which will display the value set for this property. 
 
 ----
@@ -683,8 +683,9 @@ SYNOPSIS
         smsc set gti 0001|0010|0011|0100
 
 DESCRIPTION
-        This command is used to set the value of SCCP Global Title type.
-        This Global Title type will be used for SCCP outgoing messages.
+        This command is used to set the value of SMSC Gateway Global Title 
+        Indicator.
+        This Global Title Indicator will be used for SCCP outgoing messages.
         Default value for ITU-T is 0100.
         Global title 0001 - Nature of address indicator included
         Global title 0010 - Translation type included
@@ -701,17 +702,17 @@ DESCRIPTION
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'SS7 Settings' tab in the GUI. 
-. You can specify the SCCP Global Title type by entering the value in the text field 'SCCP Global Title'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You can specify the SCCP Global Title type by entering the value in the text field 'SMSC Gateway Global Title Indicator'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 [[_set_tt]]
-=== SCCP translation type value
+=== SMSC Gateway Global Title - Translation Type
 
 [[_set_tt_cli]]
 ==== Using CLI
 
-You can set the 'SCCP translation type value' by issuing the command `smsc set tt` with appropriate parameters as described below.
+You can set the 'SMSC Gateway Global Title - Translation Type' by issuing the command `smsc set tt` with appropriate parameters as described below.
 You can verify this by issuing the command `smsc get tt` which will display the value set for this property. 
 
 ----
@@ -735,7 +736,7 @@ DESCRIPTION
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'SS7 Settings' tab in the GUI. 
-. You can specify the SCCP translation type value by entering the value in the text field 'SCCP translation type'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You can specify the SCCP translation type value by entering the value in the text field 'SMSC Gateway Global Title - Translation Type'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
@@ -930,12 +931,12 @@ EXAMPLES
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 [[_hrhlrnumber_sri]]
-=== Pre-configured HLR address for SRI messages
+=== Pre-configured HLR address for SRI requests
 
 [[_set_hrhlrnumber_sri_cli]]
 ==== Using CLI
 
-You can set a pre-configured HLR address for SRI messages by issuing the command `smsc set hrhlrnumber` with appropriate parameters as described below.
+You can set a pre-configured HLR address for SRI requests by issuing the command `smsc set hrhlrnumber` with appropriate parameters as described below.
 You can remove this pre-configured address by issuing the command `smsc remove hrhlrnumber`.
 You can verify this by issuing the command `smsc get hrhlrnumber` which will display the value set for this property. 
 
@@ -950,7 +951,7 @@ SYNOPSIS
 	smsc remove hrhlrnumber networkid <networkId>
 
 DESCRIPTION
-	This command is used to set a pre-configured HLR address for SRI messages.
+	This command is used to set a pre-configured HLR address for SRI requests.
 
 	In some scenarios it may be required to set a HLR address instead of a
 	MSISDN address into the SCCP 'CalledPartyAddress' of 'SendRoutingInfo'
@@ -972,11 +973,11 @@ DESCRIPTION
 [[_set_hrhlrnumber_sri_gui]]
 ==== Using GUI
 
-.Procedure: Set Pre-configured HLR address for SRI messages using the GUI
+.Procedure: Set Pre-configured HLR address for SRI requests using the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'SS7 Settings' tab in the GUI. 
-. You can specify (set or remove) the Pre-configured HLR address for SRI messages by entering appropriate values for a specified networkID.
+. You can specify (set or remove) the "Pre-configured HLR address for SRI requests" by entering appropriate values for a specified networkID. Select needed "Pre-configured HLR address for SRI requests Network Id" field value or type a new networkId value if no such value already specifyied. Then type needed HLR address into below field.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
@@ -2012,7 +2013,7 @@ DESCRIPTION
 
 EXAMPLES
     smsc set hrsribypass true
-    smsc set hrsribypass false networkid <networkId>
+    smsc set hrsribypass false networkid 2
 ----
 
 [[_hrsribypass_gui]]
@@ -2022,7 +2023,7 @@ EXAMPLES
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'Home Routing' tab in the GUI. 
-. You can specify hrsribypass option by selecting an appropriate value in the field "Bypassing of SRI request to a local HLR" for a specified networkId.
+. You can specify hrsribypass option by selecting an appropriate value in the field "Bypassing of SRI request to a local HLR" for a specified networkId. Select needed "Bypassing of SRI request to a local HLR Network Id" field value or type a new networkId value if no such value already specifyied. Then select needed value into below field ("Removing value from networkId" means just remove "Bypassing of SRI request" for a selected networkId).
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section. 
 . You must click on the button 'Save' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
