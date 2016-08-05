@@ -2,14 +2,14 @@
 <rule>
 	<id value="1"/>
 	<value ruleType="Solitary" loadSharingAlgo="Undefined" originatingType="LocalOriginated" mask="K" paddress="1" saddress="-1" networkId="0">
-		<patternSccpAddress pc="0" ssn="8">
+		<patternSccpAddress pc="0" ssn="0">
 			<ai value="82"/>
 			<gt type="GT0100" tt="0" es="1" np="1" nai="4" digits="*"/>
 		</patternSccpAddress>
 	</value>
 	<id value="2"/>
 	<value ruleType="Solitary" loadSharingAlgo="Undefined" originatingType="RemoteOriginated" mask="K" paddress="2" saddress="-1" networkId="0">
-		<patternSccpAddress pc="0" ssn="8">
+		<patternSccpAddress pc="0" ssn="0">
 			<ai value="82"/>
 			<gt type="GT0100" tt="0" es="1" np="1" nai="4" digits="*"/>
 		</patternSccpAddress>
