@@ -738,13 +738,14 @@ public class DBOperations_C2 {
                 this.c2_updateDueSlotForTargetId_WithTableCleaning(sms.getSmsSet().getTargetId(), dueSlot);
                 this.do_scheduleMessage(sms, dueSlot, lstFailured, fastStoreAndForwordMode, true);
             } else {
-                lstFailured.add(sms);
+                if (lstFailured != null)
+                    lstFailured.add(sms);
             }
         }
     }
 
-	protected boolean do_scheduleMessage(Sms sms, long dueSlot, ArrayList<Sms> lstFailured, boolean fastStoreAndForwordMode, boolean removeExpiredValidityPeriod)
-            throws PersistenceException {
+    protected boolean do_scheduleMessage(Sms sms, long dueSlot, ArrayList<Sms> lstFailured, boolean fastStoreAndForwordMode,
+            boolean removeExpiredValidityPeriod) throws PersistenceException {
 
 		sms.setDueSlot(dueSlot);
 

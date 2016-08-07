@@ -46,6 +46,11 @@
 			<version>${jslee.ext.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<artifactId>smsc-library</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

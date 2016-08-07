@@ -25,6 +25,7 @@ package org.mobicents.smsc.library;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -64,7 +65,21 @@ import com.cloudhopper.smpp.tlv.TlvConvertException;
 public class MessageUtil {
 
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyy-mm-dd hh:mm:ss");
-	
+
+    public static String stackTraceToString() {
+        StringBuilder sb = new StringBuilder();
+        Thread thread = Thread.currentThread();
+        StackTraceElement[] arr = thread.getStackTrace();
+        if (arr != null) {
+            for (int i1 = 2; i1 < arr.length; i1++) {
+                StackTraceElement element = arr[i1];
+                sb.append(element.toString());
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
 	public static Date parseDate(String val) throws ParseException {
 		return DATE_FORMAT.parse(val);
 	}
@@ -422,12 +437,10 @@ public class MessageUtil {
 		sb.append(sec);
 	}
 
-	public static Date checkScheduleDeliveryTime(final SmsSet smsSet, Date newDueDate) {
+	public static Date checkScheduleDeliveryTime(final ArrayList<Sms> lstTempFailured, Date newDueDate) {
 		Date minDate = null;
-		long smsCount = smsSet.getSmsCount();
-		for (int i1 = 0; i1 < smsCount; i1++) {
-			Sms sms = smsSet.getSms(i1);
-			if (sms.getScheduleDeliveryTime() != null) {
+        for (Sms sms : lstTempFailured) {
+            if (sms.getScheduleDeliveryTime() != null) {
 				if (minDate == null)
 					minDate = sms.getScheduleDeliveryTime();
 				else {
@@ -493,16 +506,16 @@ public class MessageUtil {
     }
 
     public static boolean isReceiptIntermediate(int registeredDelivery) {
-            int code = registeredDelivery & 0x10;
-            if (code == 16 )
-                    return true;
-            else
-                    return false;
+        int code = registeredDelivery & 0x10;
+        if (code == 16)
+            return true;
+        else
+            return false;
     }
 
     public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts,
-                    String extraString) {
-            return createReceiptSms(sms, delivered, ta, origNetworkIdForReceipts, extraString, false);
+            String extraString) {
+        return createReceiptSms(sms, delivered, ta, origNetworkIdForReceipts, extraString, false);
     }
 
     public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts) {
