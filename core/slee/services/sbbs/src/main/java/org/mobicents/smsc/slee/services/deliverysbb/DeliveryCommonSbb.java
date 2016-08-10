@@ -51,6 +51,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
@@ -759,8 +760,10 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * Processing messages that were rescheduled (sms.inSystem=sent in live database).
      *
      * @param lstRerouted
+     * @param lstNewNetworkId
      */
-    protected void postProcessRerouted(ArrayList<Sms> lstRerouted) {
+    protected void postProcessRerouted(ArrayList<Sms> lstRerouted, ArrayList<Integer> lstNewNetworkId) {
+        // firstly we are marking messages that this delivery step has finished
         try {
             for (Sms sms : lstRerouted) {
                 persistence.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT,
@@ -769,6 +772,21 @@ public abstract class DeliveryCommonSbb implements Sbb {
             }
         } catch (PersistenceException e) {
             this.logger.severe("PersistenceException when DeliveryCommonSbb.postProcessRerouted()" + e.getMessage(), e);
+        }
+
+        // next we are initiating another delivering process
+        try {
+            for (int i1 = 0; i1 < lstRerouted.size(); i1++) {
+                Sms sms = lstRerouted.get(i1);
+                int newNetworkId = lstNewNetworkId.get(i1);
+
+                MessageUtil.createNewSmsSetForSms(sms);
+                sms.getSmsSet().setNetworkId(newNetworkId);
+
+                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+            }
+        } catch (Exception e) {
+            this.logger.severe("Exception when DeliveryCommonSbb.postProcessRerouted() - rerouting" + e.getMessage(), e);
         }
     }
 
@@ -779,10 +797,11 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * mproc rules applying for delivery phase for success case
      *
      * @param sms
+     * @param processingType
      */
-    protected void applyMprocRulesOnSuccess(Sms sms) {
+    protected void applyMprocRulesOnSuccess(Sms sms, ProcessingType processingType) {
         // PostDeliveryProcessor - success case
-        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, false);
+        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, false, processingType);
         FastList<Sms> addedMessages = mProcResult.getMessageList();
         if (addedMessages != null) {
             for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
@@ -799,18 +818,50 @@ public abstract class DeliveryCommonSbb implements Sbb {
      *
      * @param lstPermFailured
      * @param lstTempFailured
+     * @param lstPermFailuredNew
+     * @param lstTempFailuredNew
      * @param lstRerouted
+     * @param lstNewNetworkId
+     * @param processingType
      */
-    protected void applyMprocRulesOnFailure(ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstTempFailured, ArrayList<Sms> lstRerouted) {
+    protected void applyMprocRulesOnFailure(ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstTempFailured,
+            ArrayList<Sms> lstPermFailuredNew, ArrayList<Sms> lstTempFailuredNew, ArrayList<Sms> lstRerouted,
+            ArrayList<Integer> lstNewNetworkId, ProcessingType processingType) {
         // TempFailureProcessor
         for (Sms sms : lstTempFailured) {
-            // TODO: implement it
-            // .................................
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDeliveryTempFailure(sms, processingType);
+
+            if (mProcResult.isMessageIsRerouted()) {
+                lstRerouted.add(sms);
+                lstNewNetworkId.add(mProcResult.getNewNetworkId());
+            } else if (mProcResult.isMessageDropped()) {
+                lstPermFailuredNew.add(sms);
+            } else {
+                lstTempFailuredNew.add(sms);
+            }
+
+            FastList<Sms> addedMessages = mProcResult.getMessageList();
+            if (addedMessages != null) {
+                for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
+                    Sms smst = n.getValue();
+                    TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(),
+                            smst.getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
+                    this.sendNewGeneratedMessage(smst, ta);
+                }
+            }
         }
 
         // PostDeliveryProcessor - failure case
         for (Sms sms : lstPermFailured) {
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true, processingType);
+
+            if (mProcResult.isMessageIsRerouted()) {
+                lstRerouted.add(sms);
+                lstNewNetworkId.add(mProcResult.getNewNetworkId());
+            } else {
+                lstPermFailuredNew.add(sms);
+            }
+
             FastList<Sms> addedMessages = mProcResult.getMessageList();
             if (addedMessages != null) {
                 for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
@@ -828,9 +879,10 @@ public abstract class DeliveryCommonSbb implements Sbb {
      *
      * @param smsSet
      * @param lstPermFailured
+     * @param processingType
      */
     protected void applyMprocRulesOnImsiResponse(SmsSet smsSet, ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstRerouted,
-            ISDNAddressString networkNode, String imsiData) {
+            ArrayList<Integer> lstNewNetworkId, ISDNAddressString networkNode, String imsiData) {
         Sms sms = this.getMessageInSendingPool(0);
         if (sms != null) {
             while (true) {
@@ -849,8 +901,17 @@ public abstract class DeliveryCommonSbb implements Sbb {
                         continue;
                 }
 
-                // TODO: process of message rerouting / new message
-                // .....................
+                if (mProcResult.isMessageIsRerouted()) {
+                    lstRerouted.add(sms);
+                    lstNewNetworkId.add(mProcResult.getNewNetworkId());
+
+                    this.commitSendingPoolMsgCount();
+                    sms = this.obtainNextMessage();
+                    if (sms == null)
+                        break;
+                    else
+                        continue;
+                }
 
                 break;
             }

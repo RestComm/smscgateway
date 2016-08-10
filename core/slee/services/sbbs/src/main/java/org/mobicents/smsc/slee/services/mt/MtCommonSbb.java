@@ -74,6 +74,7 @@ import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
 import org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
@@ -383,9 +384,10 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
      * @param removeSmsSet
      * @param errMessage
      * @param isImsiVlrReject
+     * @param processingType
      */
     protected void onDeliveryError(SmsSet smsSet, ErrorAction errorAction, ErrorCode smStatus, String reason,
-            boolean removeSmsSet, MAPErrorMessage errMessage, boolean isImsiVlrReject) {
+            boolean removeSmsSet, MAPErrorMessage errMessage, boolean isImsiVlrReject, ProcessingType processingType) {
         try {
             smscStatAggregator.updateMsgOutFailedAll();
 
@@ -408,7 +410,10 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 
             ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
             ArrayList<Sms> lstTempFailured = new ArrayList<Sms>();
+            ArrayList<Sms> lstPermFailured2 = new ArrayList<Sms>();
+            ArrayList<Sms> lstTempFailured2 = new ArrayList<Sms>();
             ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
+            ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
 
             TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
             synchronized (lock) {
@@ -425,22 +430,23 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     this.sendTransactionalResponseFailure(lstPermFailured, lstTempFailured, errorAction, errMessage);
 
                     // mproc rules applying for delivery phase
-                    this.applyMprocRulesOnFailure(lstPermFailured, lstTempFailured, lstRerouted);
+                    this.applyMprocRulesOnFailure(lstPermFailured, lstTempFailured, lstPermFailured2, lstTempFailured2,
+                            lstRerouted, lstNewNetworkId, processingType);
 
                     // Processing messages that were temp or permanent failed or rerouted
-                    this.postProcessPermFailures(lstPermFailured);
-                    this.postProcessTempFailures(smsSet, lstTempFailured, (errorAction == ErrorAction.subscriberBusy), true);
-                    this.postProcessRerouted(lstRerouted);
+                    this.postProcessPermFailures(lstPermFailured2);
+                    this.postProcessTempFailures(smsSet, lstTempFailured2, (errorAction == ErrorAction.subscriberBusy), true);
+                    this.postProcessRerouted(lstRerouted, lstNewNetworkId);
 
                     // generating CDRs for permanent failure messages
-                    this.generateCDRs(lstPermFailured, (isImsiVlrReject ? CdrGenerator.CDR_FAILED_IMSI
+                    this.generateCDRs(lstPermFailured2, (isImsiVlrReject ? CdrGenerator.CDR_FAILED_IMSI
                             : CdrGenerator.CDR_FAILED), reason);
 
                     // sending of intermediate delivery receipts
-                    this.generateIntermediateReceipts(smsSet, lstTempFailured);
+                    this.generateIntermediateReceipts(smsSet, lstTempFailured2);
 
                     // sending of failure delivery receipts
-                    this.generateFailureReceipts(smsSet, lstPermFailured, null);
+                    this.generateFailureReceipts(smsSet, lstPermFailured2, null);
 
                 } finally {
                     persistence.releaseSynchroObject(lock);
@@ -482,7 +488,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
      * @param imsiData
      */
     protected void onImsiDrop(SmsSet smsSet, ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstRerouted,
-            ISDNAddressString networkNode, String imsiData) {
+            ArrayList<Integer> lstNewNetworkId, ISDNAddressString networkNode, String imsiData) {
         Sms sms;
         if (lstPermFailured.size() != 0) {
             sms = lstPermFailured.get(0);
@@ -512,7 +518,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 
         // Processing messages that were temp or permanent failed or rerouted
         this.postProcessPermFailures(lstPermFailured);
-        this.postProcessRerouted(lstRerouted);
+        this.postProcessRerouted(lstRerouted, lstNewNetworkId);
 
         // adding an error receipt if it is needed
         StringBuilder extraString = new StringBuilder();

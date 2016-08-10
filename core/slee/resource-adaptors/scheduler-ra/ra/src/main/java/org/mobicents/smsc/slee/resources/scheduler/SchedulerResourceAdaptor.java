@@ -635,7 +635,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
                         }
 
                         // mproc rules applying for delivery phase
-                        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true);
+                        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true, null);
                         FastList<Sms> addedMessages = mProcResult.getMessageList();
                         if (addedMessages != null) {
                             for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {

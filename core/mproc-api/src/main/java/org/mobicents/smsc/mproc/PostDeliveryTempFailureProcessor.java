@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 * @author sergey vetyutnev
 *
 */
-public interface PostImsiProcessor {
+public interface PostDeliveryTempFailureProcessor {
 
     // access to environmental parameters
     /**
@@ -48,5 +48,20 @@ public interface PostImsiProcessor {
      * @param newNetworkId
      */
     void rerouteMessage(int newNetworkId) throws MProcRuleException;
+
+    /**
+     * Creating a new message template for filling and sending by postNewMessage() method
+     */
+    MProcNewMessage createNewEmptyMessage(OrigType originationType);
+
+    MProcNewMessage createNewCopyMessage(MProcMessage message);
+
+    MProcNewMessage createNewResponseMessage(MProcMessage message);
+
+    /**
+     * Posting a new message. To post a new message you need: create a message template by invoking of createNewMessage(), fill
+     * it and post it be invoking of postNewMessage(). For this new message no mproc rule and diameter request will be applied.
+     */
+    void postNewMessage(MProcNewMessage message) throws MProcRuleException;
 
 }

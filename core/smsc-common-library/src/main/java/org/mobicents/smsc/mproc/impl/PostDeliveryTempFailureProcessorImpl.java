@@ -30,41 +30,34 @@ import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
 import org.mobicents.smsc.mproc.MProcRuleException;
 import org.mobicents.smsc.mproc.OrigType;
-import org.mobicents.smsc.mproc.PostDeliveryProcessor;
+import org.mobicents.smsc.mproc.PostDeliveryTempFailureProcessor;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class PostDeliveryProcessorImpl implements PostDeliveryProcessor {
+public class PostDeliveryTempFailureProcessorImpl implements PostDeliveryTempFailureProcessor {
 
     private Logger logger;
     private int defaultValidityPeriodHours;
     private int maxValidityPeriodHours;
-    private boolean deliveryFailure;
 
     private boolean actionAdded = false;
+    private boolean needDropMessage = false;
     private int rerouteMessage = -1;
-
     private FastList<MProcNewMessage> postedMessages = new FastList<MProcNewMessage>();
 
-    public PostDeliveryProcessorImpl(int defaultValidityPeriodHours, int maxValidityPeriodHours, Logger logger,
-            boolean deliveryFailure) {
+    public PostDeliveryTempFailureProcessorImpl(int defaultValidityPeriodHours, int maxValidityPeriodHours, Logger logger) {
         this.defaultValidityPeriodHours = defaultValidityPeriodHours;
         this.maxValidityPeriodHours = maxValidityPeriodHours;
         this.logger = logger;
-        this.deliveryFailure = deliveryFailure;
-    }
-
-    @Override
-    public Logger getLogger() {
-        return logger;
     }
 
     // results of message processing
-    public FastList<MProcNewMessage> getPostedMessages() {
-        return postedMessages;
+
+    public boolean isNeedDropMessages() {
+        return needDropMessage;
     }
 
     public boolean isNeedRerouteMessages() {
@@ -73,6 +66,35 @@ public class PostDeliveryProcessorImpl implements PostDeliveryProcessor {
 
     public int getNewNetworkId() {
         return rerouteMessage;
+    }
+
+    public FastList<MProcNewMessage> getPostedMessages() {
+        return postedMessages;
+    }
+
+    // message processing methods
+
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public void dropMessage() throws MProcRuleException {
+        if (actionAdded)
+            throw new MProcRuleException("Another action already added");
+
+        actionAdded = true;
+        needDropMessage = true;
+    }
+
+    @Override
+    public void rerouteMessage(int newNetworkId) throws MProcRuleException {
+        if (actionAdded)
+            throw new MProcRuleException("Another action already added");
+
+        actionAdded = true;
+        rerouteMessage = newNetworkId;
     }
 
     @Override
@@ -94,20 +116,6 @@ public class PostDeliveryProcessorImpl implements PostDeliveryProcessor {
     @Override
     public void postNewMessage(MProcNewMessage message) throws MProcRuleException {
         postedMessages.add(message);
-    }
-
-    @Override
-    public void rerouteMessage(int newNetworkId) throws MProcRuleException {
-        if (actionAdded)
-            throw new MProcRuleException("Another action already added");
-
-        actionAdded = true;
-        rerouteMessage = newNetworkId;
-    }
-
-    @Override
-    public boolean isDeliveryFailure() {
-        return deliveryFailure;
     }
 
 }

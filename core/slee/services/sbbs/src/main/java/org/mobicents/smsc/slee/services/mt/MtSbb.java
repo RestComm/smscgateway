@@ -90,6 +90,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
 
@@ -209,8 +210,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
 	@Override
 	public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
-		try {
-			super.onErrorComponent(event, aci);
+        try {
+            super.onErrorComponent(event, aci);
 
             SmsSet smsSet = getSmsSet();
             if (smsSet == null) {
@@ -223,78 +224,82 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                 MAPErrorMessageSubscriberBusyForMtSms subscriberBusyForMtSms = mapErrorMessage.getEmSubscriberBusyForMtSms();
                 this.onDeliveryError(smsSet, ErrorAction.subscriberBusy, ErrorCode.USER_BUSY,
                         "Error subscriberBusyForMtSms after MtForwardSM Request: " + subscriberBusyForMtSms.toString(), true,
-                        mapErrorMessage, false);
+                        mapErrorMessage, false, ProcessingType.MT_DELIVERY);
             } else if (mapErrorMessage.isEmAbsentSubscriber()) {
                 MAPErrorMessageAbsentSubscriber absentSubscriber = mapErrorMessage.getEmAbsentSubscriber();
                 this.onDeliveryError(smsSet, ErrorAction.mobileNotReachableFlag, ErrorCode.ABSENT_SUBSCRIBER,
                         "Error absentSubscriber after MtForwardSM Request: " + absentSubscriber.toString(), true,
-                        mapErrorMessage, false);
+                        mapErrorMessage, false, ProcessingType.MT_DELIVERY);
             } else if (mapErrorMessage.isEmAbsentSubscriberSM()) {
                 MAPErrorMessageAbsentSubscriberSM absentSubscriber = mapErrorMessage.getEmAbsentSubscriberSM();
                 this.onDeliveryError(smsSet, ErrorAction.mobileNotReachableFlag, ErrorCode.ABSENT_SUBSCRIBER,
                         "Error absentSubscriberSM after MtForwardSM Request: " + absentSubscriber.toString(), true,
-                        mapErrorMessage, false);
+                        mapErrorMessage, false, ProcessingType.MT_DELIVERY);
             } else if (mapErrorMessage.isEmSMDeliveryFailure()) {
                 MAPErrorMessageSMDeliveryFailure smDeliveryFailure = mapErrorMessage.getEmSMDeliveryFailure();
                 if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded) {
                     this.onDeliveryError(smsSet, ErrorAction.memoryCapacityExceededFlag, ErrorCode.MESSAGE_QUEUE_FULL,
                             "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
-                            mapErrorMessage, false);
+                            mapErrorMessage, false, ProcessingType.MT_DELIVERY);
                 } else {
                     this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SENDING_SM_FAILED,
                             "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
-                            mapErrorMessage, false);
+                            mapErrorMessage, false, ProcessingType.MT_DELIVERY);
                 }
             } else if (mapErrorMessage.isEmSystemFailure()) {
                 // TODO: may be it is not a permanent case ???
                 MAPErrorMessageSystemFailure systemFailure = mapErrorMessage.getEmSystemFailure();
                 this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SYSTEM_FAILURE,
-                        "Error systemFailure after MtForwardSM Request: " + systemFailure.toString(), true, mapErrorMessage, false);
+                        "Error systemFailure after MtForwardSM Request: " + systemFailure.toString(), true, mapErrorMessage,
+                        false, ProcessingType.MT_DELIVERY);
             } else if (mapErrorMessage.isEmFacilityNotSup()) {
                 MAPErrorMessageFacilityNotSup facilityNotSup = mapErrorMessage.getEmFacilityNotSup();
                 this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.FACILITY_NOT_SUPPORTED,
-                        "Error facilityNotSup after MtForwardSM Request: " + facilityNotSup.toString(), true, mapErrorMessage, false);
+                        "Error facilityNotSup after MtForwardSM Request: " + facilityNotSup.toString(), true, mapErrorMessage,
+                        false, ProcessingType.MT_DELIVERY);
             } else if (mapErrorMessage.isEmExtensionContainer()) {
                 MAPErrorMessageExtensionContainer extensionContainer = mapErrorMessage.getEmExtensionContainer();
                 switch ((int) (long) extensionContainer.getErrorCode()) {
                     case MAPErrorCode.dataMissing:
                         this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.DATA_MISSING,
                                 "Error dataMissing after MtForwardSM Request: " + extensionContainer.toString(), true,
-                                mapErrorMessage, false);
+                                mapErrorMessage, false, ProcessingType.MT_DELIVERY);
                         break;
                     case MAPErrorCode.unexpectedDataValue:
                         this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.UNEXPECTED_DATA,
                                 "Error unexpectedDataValue after MtForwardSM Request: " + extensionContainer.toString(), true,
-                                mapErrorMessage, false);
+                                mapErrorMessage, false, ProcessingType.MT_DELIVERY);
                         break;
-//                    case MAPErrorCode.facilityNotSupported:
-//                        this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.FACILITY_NOT_SUPPORTED,
-//                                "Error facilityNotSupported after MtForwardSM Request: " + extensionContainer.toString(), true,
-//                                mapErrorMessage);
-//                        break;
+                    // case MAPErrorCode.facilityNotSupported:
+                    // this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.FACILITY_NOT_SUPPORTED,
+                    // "Error facilityNotSupported after MtForwardSM Request: " + extensionContainer.toString(), true,
+                    // mapErrorMessage);
+                    // break;
                     case MAPErrorCode.unidentifiedSubscriber:
                         this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.UNDEFINED_SUBSCRIBER,
                                 "Error unidentifiedSubscriber after MtForwardSM Request: " + extensionContainer.toString(),
-                                true, mapErrorMessage, false);
+                                true, mapErrorMessage, false, ProcessingType.MT_DELIVERY);
                         break;
                     case MAPErrorCode.illegalSubscriber:
                         this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.ILLEGAL_SUBSCRIBER,
                                 "Error illegalSubscriber after MtForwardSM Request: " + extensionContainer.toString(), true,
-                                mapErrorMessage, false);
+                                mapErrorMessage, false, ProcessingType.MT_DELIVERY);
                         break;
                     case MAPErrorCode.illegalEquipment:
                         this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.ILLEGAL_EQUIPMENT,
                                 "Error illegalEquipment after MtForwardSM Request: " + extensionContainer.toString(), true,
-                                mapErrorMessage, false);
+                                mapErrorMessage, false, ProcessingType.MT_DELIVERY);
                         break;
                     default:
                         this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SYSTEM_FAILURE,
-                                "Error after MtForwardSM Request: " + extensionContainer.toString(), true, mapErrorMessage, false);
+                                "Error after MtForwardSM Request: " + extensionContainer.toString(), true, mapErrorMessage,
+                                false, ProcessingType.MT_DELIVERY);
                         break;
                 }
             } else {
                 this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SYSTEM_FAILURE,
-                        "Error after MtForwardSM Request: " + mapErrorMessage, true, mapErrorMessage, false);
+                        "Error after MtForwardSM Request: " + mapErrorMessage, true, mapErrorMessage, false,
+                        ProcessingType.MT_DELIVERY);
             }
 		} catch (Throwable e1) {
 			logger.severe(
@@ -320,7 +325,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
             this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.HLR_REJECT_AFTER_ROUTING_INFO,
                     "onRejectComponent after MtForwardSM Request: " + reason != null ? reason.toString() : "", true, null,
-                    false);
+                    false, ProcessingType.MT_DELIVERY);
 		} catch (Throwable e1) {
 			logger.severe(
 					"Exception in MtSbb.onDialogProviderAbort() when fetching records and issuing events: "
@@ -370,7 +375,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 					this.logger.severe(reason);
 
 					ErrorCode smStatus = ErrorCode.MAP_SERVER_VERSION_ERROR;
-					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false);
+					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false, ProcessingType.MT_DELIVERY);
 					return;
 				}
 				this.setNegotiatedMapVersionUsing(false);
@@ -395,14 +400,14 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 						smStatus = ErrorCode.fromInt(e.getSmppErrorCode());
 					} catch (IllegalArgumentException e1) {
 					}
-					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false);
+					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false, ProcessingType.MT_DELIVERY);
 					return;
 				} catch (Throwable e) {
 					String reason = "Exception when invoking sendMtSms() from onDialogReject()-resendAfterMapProtocolNegotiation: "
 							+ e.toString();
 					this.logger.severe(reason, e);
 					ErrorCode smStatus = ErrorCode.SC_SYSTEM_ERROR;
-					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false);
+					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false, ProcessingType.MT_DELIVERY);
 					return;
 				}
 			}
@@ -440,7 +445,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 								this.logger.severe(reason);
 
 								ErrorCode smStatus = ErrorCode.MAP_SERVER_VERSION_ERROR;
-								this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false);
+								this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false, ProcessingType.MT_DELIVERY);
 								return;
 							}
 						}
@@ -465,14 +470,14 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 						smStatus = ErrorCode.fromInt(e.getSmppErrorCode());
 					} catch (IllegalArgumentException e1) {
 					}
-					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false);
+					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false, ProcessingType.MT_DELIVERY);
 					return;
 				} catch (Throwable e) {
 					String reason = "Exception when invoking sendMtSms() from onDialogReject()-resendAfterMapProtocolNegotiation: "
 							+ e.toString();
 					this.logger.severe(reason, e);
 					ErrorCode smStatus = ErrorCode.SC_SYSTEM_ERROR;
-					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false);
+					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false, ProcessingType.MT_DELIVERY);
 					return;
 				}
 			}
@@ -481,7 +486,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
 			this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.MSC_REFUSES_SM,
 					"onDialogReject after MT Request: " + mapRefuseReason != null ? mapRefuseReason.toString() : "",
-					true, null, false);
+					true, null, false, ProcessingType.MT_DELIVERY);
 
 		} catch (Throwable e1) {
 			logger.severe(
@@ -510,7 +515,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     ErrorAction.permanentFailure,
                     ErrorCode.MSC_REFUSES_SM,
                     "onDialogProviderAbort after MtForwardSM Request: " + abortProviderReason != null ? abortProviderReason
-                            .toString() : "", true, null, false);
+                            .toString() : "", true, null, false, ProcessingType.MT_DELIVERY);
 		} catch (Throwable e1) {
 			logger.severe(
 					"Exception in MtSbb.onDialogProviderAbort() when fetching records and issuing events: "
@@ -535,7 +540,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
             this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.MSC_REFUSES_SM,
                     "onDialogUserAbort after MtForwardSM Request: " + reason != null ? reason.toString() : "", true, null,
-                    false);
+                    false, ProcessingType.MT_DELIVERY);
 		} catch (Throwable e1) {
 			logger.severe(
 					"Exception in MtSbb.onDialogUserAbort() when fetching records and issuing events: "
@@ -559,7 +564,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
             }
 
 			this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.MSC_REFUSES_SM,
-					"onDialogTimeout after MtForwardSM Request", true, null, false);
+					"onDialogTimeout after MtForwardSM Request", true, null, false, ProcessingType.MT_DELIVERY);
 		} catch (Throwable e1) {
 			logger.severe(
 					"Exception in MtSbb.onDialogTimeout() when fetching records and issuing events: " + e1.getMessage(),
@@ -660,7 +665,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	            }
 
 				this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.HLR_REJECT_AFTER_ROUTING_INFO,
-						"DialogClose after Mt Request", false, null, false);
+						"DialogClose after Mt Request", false, null, false, ProcessingType.MT_DELIVERY);
 			}
 		} catch (Throwable e1) {
             logger.severe("Exception in MtSbb.onDialogClose() when fetching records and issuing events: " + e1.getMessage(), e1);
@@ -760,11 +765,13 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         if (this.getTotalUnsentMessageCount() > 0) {
             ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
             ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
+            ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
             TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
             try {
                 synchronized (lock) {
-                    this.applyMprocRulesOnImsiResponse(smsSet, lstPermFailured, lstRerouted, networkNode, imsiData);
-                    this.onImsiDrop(smsSet, lstPermFailured, lstRerouted, networkNode, imsiData);
+                    this.applyMprocRulesOnImsiResponse(smsSet, lstPermFailured, lstRerouted, lstNewNetworkId, networkNode,
+                            imsiData);
+                    this.onImsiDrop(smsSet, lstPermFailured, lstRerouted, lstNewNetworkId, networkNode, imsiData);
                 }
             } finally {
                 persistence.releaseSynchroObject(lock);
@@ -789,13 +796,15 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     smStatus = ErrorCode.fromInt(e.getSmppErrorCode());
                 } catch (IllegalArgumentException e1) {
                 }
-                this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false);
+                this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false,
+                        ProcessingType.MT_DELIVERY);
             } catch (Throwable e) {
                 String reason = "Exception when invoking sendMtSms() from setupMtForwardShortMessageRequest()-firstMessageSending: "
                         + e.toString();
                 this.logger.severe(reason, e);
                 ErrorCode smStatus = ErrorCode.SC_SYSTEM_ERROR;
-                this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false);
+                this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false,
+                        ProcessingType.MT_DELIVERY);
             }
         }
 	}
@@ -834,7 +843,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                         "SmscPocessingException when invoking sendMtSms() from handleSmsResponse()-nextSegmentSending: "
                                 + e.toString(), e);
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SYSTEM_FAILURE,
-                        "Error sendMtSms in handleSmsResponse(): ", true, null, false);
+                        "Error sendMtSms in handleSmsResponse(): ", true, null, false, ProcessingType.MT_DELIVERY);
                 return;
             }
         }
@@ -844,7 +853,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         this.sendTransactionalResponseSuccess(sms);
 
         // mproc rules applying for delivery phase
-        this.applyMprocRulesOnSuccess(sms);
+        this.applyMprocRulesOnSuccess(sms, ProcessingType.MT_DELIVERY);
 
         // Processing succeeded
         sms.getSmsSet().setStatus(ErrorCode.SUCCESS);
@@ -870,12 +879,14 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     // dropaftersri pmproc rules
                     ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
                     ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
+                    ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
                     SM_RP_DA da = this.getSmRpDa();
                     ISDNAddressString networkNodeNumber = this.getNnn();
 
-                    this.applyMprocRulesOnImsiResponse(smsSet, lstPermFailured, lstRerouted, networkNodeNumber, da.getIMSI()
+                    this.applyMprocRulesOnImsiResponse(smsSet, lstPermFailured, lstRerouted, lstNewNetworkId,
+                            networkNodeNumber, da.getIMSI().getData());
+                    this.onImsiDrop(smsSet, lstPermFailured, lstRerouted, lstNewNetworkId, networkNodeNumber, da.getIMSI()
                             .getData());
-                    this.onImsiDrop(smsSet, lstPermFailured, lstRerouted, networkNodeNumber, da.getIMSI().getData());
                 }
 
                 sms = this.getMessageInSendingPool(0);

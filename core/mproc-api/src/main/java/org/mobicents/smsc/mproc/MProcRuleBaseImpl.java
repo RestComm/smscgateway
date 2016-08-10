@@ -63,6 +63,11 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     }
 
     @Override
+    public boolean isForPostDeliveryTempFailureState() {
+        return false;
+    }
+
+    @Override
     public boolean matchesPostArrival(MProcMessage messageDest) {
         return false;
     }
@@ -78,6 +83,11 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     }
 
     @Override
+    public boolean matchesPostDeliveryTempFailure(MProcMessage message) {
+        return false;
+    }
+
+    @Override
     public void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception {
     }
 
@@ -87,6 +97,10 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
 
     @Override
     public void onPostDelivery(PostDeliveryProcessor factory, MProcMessage message) throws Exception {
+    }
+
+    @Override
+    public void onPostDeliveryTempFailure(PostDeliveryTempFailureProcessor factory, MProcMessage message) throws Exception {
     }
 
     /**

@@ -94,6 +94,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.slee.resources.persistence.MAPDialogSmsProxy;
 import org.mobicents.smsc.slee.resources.persistence.MAPServiceSmsProxy;
 import org.mobicents.smsc.slee.resources.persistence.SmsProxy;
@@ -3720,7 +3721,8 @@ public class C2_MtTest {
         this.mtSbb.setTargetId(smsSet.getTargetId());
 
         // SmsSet smsSet, ErrorAction errorAction, ErrorCode smStatus, String reason, boolean removeSmsSet
-        this.sriSbb.onDeliveryError(smsSet, ErrorAction.subscriberBusy, ErrorCode.ABSENT_SUBSCRIBER, "X error", true, null, false);
+        this.sriSbb.onDeliveryError(smsSet, ErrorAction.subscriberBusy, ErrorCode.ABSENT_SUBSCRIBER, "X error", true, null,
+                false, ProcessingType.MT_DELIVERY);
 
         PreparedStatementCollection_C3[] pscc = this.pers.c2_getPscList();
         long l1 = 0;

@@ -31,20 +31,29 @@ public interface MProcRule extends MProcRuleMBean {
 
     void setId(int val);
 
+    // rule matchers - they specifies if this rule processes a trigger
+
     /**
      * @return true if the mproc rule fits to a message when a message has just come to SMSC
      */
     boolean matchesPostArrival(MProcMessage message);
 
     /**
-     * @return true if the mproc rule fits to a message when IMSI / NNN has been received from HLR
+     * @return true if the mproc rule fits to a message when IMSI / NNN has been received from HLR (succeeded SRI response)
      */
     boolean matchesPostImsiRequest(MProcMessage message);
 
     /**
-     * @return true if the mproc rule fits to a message when a message has just been delivered (or delivery failure)
+     * @return true if the mproc rule fits to a message when a message delivery was ended (success or permanent delivery failure)
      */
     boolean matchesPostDelivery(MProcMessage message);
+
+    /**
+     * @return true if the mproc rule fits to a message when a message has temporary delivery failure
+     */
+    boolean matchesPostDeliveryTempFailure(MProcMessage message);
+
+    // rule processors - we will put code for processing there
 
     /**
      * the event occurs when a message has just come to SMSC
@@ -52,14 +61,21 @@ public interface MProcRule extends MProcRuleMBean {
     void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception;
 
     /**
-     * the event occurs when IMSI / NNN has been received from HLR
+     * the event occurs when IMSI / NNN has been received from HLR (succeeded SRI response)
      */
     void onPostImsiRequest(PostImsiProcessor factory, MProcMessage message) throws Exception;
 
     /**
-     * the event occurs when a message has just been delivered (or delivery failure)
+     * the event occurs when a message delivery was ended (success or permanent delivery failure)
      */
     void onPostDelivery(PostDeliveryProcessor factory, MProcMessage message) throws Exception;
+
+    /**
+     * the event occurs when a message has temporary delivery failure
+     */
+    void onPostDeliveryTempFailure(PostDeliveryTempFailureProcessor factory, MProcMessage message) throws Exception;
+
+    // applying of rule parameters from CLI / GUI interfaces
 
     /**
      * this method must implement setting of rule parameters as for provided CLI string at the step of rule creation

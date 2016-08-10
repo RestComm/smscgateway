@@ -54,12 +54,14 @@ import org.mobicents.smsc.mproc.MProcNewMessage;
 import org.mobicents.smsc.mproc.MProcRuleFactory;
 import org.mobicents.smsc.mproc.MProcRule;
 import org.mobicents.smsc.mproc.MProcRuleMBean;
+import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.mproc.impl.MProcMessageImpl;
 import org.mobicents.smsc.mproc.impl.MProcNewMessageImpl;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.mproc.impl.MProcRuleOamMessages;
 import org.mobicents.smsc.mproc.impl.PostArrivalProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostDeliveryProcessorImpl;
+import org.mobicents.smsc.mproc.impl.PostDeliveryTempFailureProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostImsiProcessorImpl;
 
 /**
@@ -232,7 +234,7 @@ public class MProcManagement implements MProcManagementMBean {
         PostArrivalProcessorImpl pap = new PostArrivalProcessorImpl(
                 this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
                 this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger);
-        MProcMessage message = new MProcMessageImpl(sms);
+        MProcMessage message = new MProcMessageImpl(sms, null);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -291,7 +293,7 @@ public class MProcManagement implements MProcManagementMBean {
 
         FastList<MProcRule> cur = this.mprocs;
         PostImsiProcessorImpl pap = new PostImsiProcessorImpl(logger);
-        MProcMessage message = new MProcMessageImpl(sms);
+        MProcMessage message = new MProcMessageImpl(sms, ProcessingType.MT_DELIVERY);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -313,10 +315,16 @@ public class MProcManagement implements MProcManagementMBean {
             res.setMessageDropped(true);
             return res;
         }
+        if (pap.isNeedRerouteMessages()) {
+            MProcResult res = new MProcResult();
+            res.setMessageIsRerouted(true);
+            res.setNewNetworkId(pap.getNewNetworkId());
+            return res;
+        }
         return new MProcResult();
     }
 
-    public MProcResult applyMProcDelivery(Sms sms, boolean deliveryFailure) {
+    public MProcResult applyMProcDelivery(Sms sms, boolean deliveryFailure, ProcessingType processingType) {
         if (this.mprocs.size() == 0) {
             return new MProcResult();
         }
@@ -325,7 +333,7 @@ public class MProcManagement implements MProcManagementMBean {
         PostDeliveryProcessorImpl pap = new PostDeliveryProcessorImpl(
                 this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
                 this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger, deliveryFailure);
-        MProcMessage message = new MProcMessageImpl(sms);
+        MProcMessage message = new MProcMessageImpl(sms, processingType);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -344,17 +352,68 @@ public class MProcManagement implements MProcManagementMBean {
         }
 
         FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
-        if (newMsgs == null || newMsgs.size() == 0) {
-            return new MProcResult();
-        }
+        MProcResult res = new MProcResult();
 
         FastList<Sms> res0 = new FastList<Sms>();
         for (FastList.Node<MProcNewMessage> n = newMsgs.head(), end = newMsgs.tail(); (n = n.getNext()) != end;) {
             MProcNewMessageImpl newMsg = (MProcNewMessageImpl) n.getValue();
             res0.add(newMsg.getSmsContent());
         }
-        MProcResult res = new MProcResult();
         res.setMessageList(res0);
+
+        if (pap.isNeedRerouteMessages()) {
+            res.setMessageIsRerouted(true);
+            res.setNewNetworkId(pap.getNewNetworkId());
+        }
+
+        return res;
+    }
+
+    public MProcResult applyMProcDeliveryTempFailure(Sms sms, ProcessingType processingType) {
+        if (this.mprocs.size() == 0) {
+            return new MProcResult();
+        }
+
+        FastList<MProcRule> cur = this.mprocs;
+        PostDeliveryTempFailureProcessorImpl pap = new PostDeliveryTempFailureProcessorImpl(
+                this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
+                this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger);
+        MProcMessage message = new MProcMessageImpl(sms, processingType);
+
+        try {
+            for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
+                MProcRule rule = n.getValue();
+                if (rule.isForPostDeliveryTempFailureState() && rule.matchesPostDeliveryTempFailure(message)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("MRule matches at DeliveryTempFailure phase to a message:\nrule: " + rule + "\nmessage: " + sms);
+                    }
+                    rule.onPostDeliveryTempFailure(pap, message);
+                }
+            }
+        } catch (Throwable e) {
+            logger.error(
+                    "Exception when invoking rule.matches(message) or onPostDeliveryTempFailure(): " + e.getMessage(), e);
+            return new MProcResult();
+        }
+
+        FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
+        MProcResult res = new MProcResult();
+
+        FastList<Sms> res0 = new FastList<Sms>();
+        for (FastList.Node<MProcNewMessage> n = newMsgs.head(), end = newMsgs.tail(); (n = n.getNext()) != end;) {
+            MProcNewMessageImpl newMsg = (MProcNewMessageImpl) n.getValue();
+            res0.add(newMsg.getSmsContent());
+        }
+        res.setMessageList(res0);
+
+        if (pap.isNeedDropMessages()) {
+            res.setMessageDropped(true);
+        }
+        if (pap.isNeedRerouteMessages()) {
+            res.setMessageIsRerouted(true);
+            res.setNewNetworkId(pap.getNewNetworkId());
+        }
+
         return res;
     }
 

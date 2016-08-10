@@ -42,13 +42,13 @@ import org.mobicents.smsc.mproc.PostArrivalProcessor;
 */
 public class PostArrivalProcessorImpl implements PostArrivalProcessor {
 
+    private Logger logger;
     private int defaultValidityPeriodHours;
     private int maxValidityPeriodHours;
-    private Logger logger;
 
+    private boolean actionAdded = false;
     private boolean needDropMessage = false;
     private boolean needRejectMessage = false;
-
     private FastList<MProcNewMessage> postedMessages = new FastList<MProcNewMessage>();
 
     public PostArrivalProcessorImpl(int defaultValidityPeriodHours, int maxValidityPeriodHours, Logger logger) {
@@ -77,12 +77,20 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     }
 
     @Override
-    public void dropMessage() {
+    public void dropMessage() throws MProcRuleException {
+        if (actionAdded)
+            throw new MProcRuleException("Another action already added");
+
+        actionAdded = true;
         needDropMessage = true;
     }
 
     @Override
-    public void rejectMessage() {
+    public void rejectMessage() throws MProcRuleException {
+        if (actionAdded)
+            throw new MProcRuleException("Another action already added");
+
+        actionAdded = true;
         needRejectMessage = true;
     }
 
@@ -329,7 +337,7 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     }
 
     @Override
-    public void postNewMessage(MProcNewMessage message) {
+    public void postNewMessage(MProcNewMessage message) throws MProcRuleException {
         postedMessages.add(message);
     }
 

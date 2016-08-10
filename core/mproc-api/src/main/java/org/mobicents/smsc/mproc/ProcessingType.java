@@ -22,31 +22,11 @@
 
 package org.mobicents.smsc.mproc;
 
-import org.apache.log4j.Logger;
-
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public interface PostImsiProcessor {
-
-    // access to environmental parameters
-    /**
-     * @return the logger that an application can use for logging info into server.log
-     */
-    Logger getLogger();
-
-    // actions
-    /**
-     * Stopping of message delivery as delivery failure (generating of delivery receipts and CDRs)
-     */
-    void dropMessage() throws MProcRuleException;
-
-    /**
-     * Stopping of message delivery in this networkID and reschedule of message delivery to another networkID area
-     * @param newNetworkId
-     */
-    void rerouteMessage(int newNetworkId) throws MProcRuleException;
-
+public enum ProcessingType {
+    SRI_REQUEST, MT_DELIVERY, SMPP_DELIVERY, SIP_DELIVERY;
 }

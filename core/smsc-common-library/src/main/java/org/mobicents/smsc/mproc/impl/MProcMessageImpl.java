@@ -24,10 +24,14 @@ package org.mobicents.smsc.mproc.impl;
 
 import java.util.Date;
 
+import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
+import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
+import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.OriginationType;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.OrigType;
+import org.mobicents.smsc.mproc.ProcessingType;
 
 /**
 *
@@ -37,9 +41,11 @@ import org.mobicents.smsc.mproc.OrigType;
 public class MProcMessageImpl implements MProcMessage {
 
     private Sms sms;
+    private ProcessingType processingType;
 
-    public MProcMessageImpl(Sms sms) {
+    public MProcMessageImpl(Sms sms, ProcessingType processingType) {
         this.sms = sms;
+        this.processingType = processingType;
     }
 
     protected Sms getSmsContent() {
@@ -149,6 +155,37 @@ public class MProcMessageImpl implements MProcMessage {
     @Override
     public int getRegisteredDelivery() {
         return sms.getRegisteredDelivery();
+    }
+
+    @Override
+    public String getImsiDigits() {
+        return sms.getSmsSet().getImsi();
+    }
+
+    @Override
+    public String getNnnDigits() {
+        LocationInfoWithLMSI locationInfoWithLMSI = sms.getSmsSet().getLocationInfoWithLMSI();
+        if (locationInfoWithLMSI != null) {
+            ISDNAddressString networkNodeNumber = locationInfoWithLMSI.getNetworkNodeNumber();
+            if (networkNodeNumber != null) {
+                return networkNodeNumber.getAddress();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getErrorCode() {
+        ErrorCode errorCode = sms.getSmsSet().getStatus();
+        if (errorCode != null)
+            return errorCode.getCode();
+        else
+            return 0;
+    }
+
+    @Override
+    public ProcessingType getProcessingType() {
+        return processingType;
     }
 
     @Override

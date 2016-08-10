@@ -57,6 +57,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppTransaction;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppTransactionACIFactory;
@@ -491,7 +492,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             sendTransactionalResponseSuccess(sms);
 
             // mproc rules applying for delivery phase
-            this.applyMprocRulesOnSuccess(sms);
+            this.applyMprocRulesOnSuccess(sms, ProcessingType.SMPP_DELIVERY);
 
             // Processing succeeded
             sms.getSmsSet().setStatus(ErrorCode.SUCCESS);
@@ -558,7 +559,10 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
             ArrayList<Sms> lstTempFailured = new ArrayList<Sms>();
+            ArrayList<Sms> lstPermFailured2 = new ArrayList<Sms>();
+            ArrayList<Sms> lstTempFailured2 = new ArrayList<Sms>();
             ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
+            ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
 
             TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
             synchronized (lock) {
@@ -574,21 +578,22 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     this.sendTransactionalResponseFailure(lstPermFailured, lstTempFailured, errorAction, null);
 
                     // mproc rules applying for delivery phase
-                    this.applyMprocRulesOnFailure(lstPermFailured, lstTempFailured, lstRerouted);
+                    this.applyMprocRulesOnFailure(lstPermFailured, lstTempFailured, lstPermFailured2, lstTempFailured2,
+                            lstRerouted, lstNewNetworkId, ProcessingType.SMPP_DELIVERY);
 
                     // Processing messages that were temp or permanent failed or rerouted
-                    this.postProcessPermFailures(lstPermFailured);
-                    this.postProcessTempFailures(smsSet, lstTempFailured, false, false);
-                    this.postProcessRerouted(lstRerouted);
+                    this.postProcessPermFailures(lstPermFailured2);
+                    this.postProcessTempFailures(smsSet, lstTempFailured2, false, false);
+                    this.postProcessRerouted(lstRerouted, lstNewNetworkId);
 
                     // generating CDRs for permanent failure messages
-                    this.generateCDRs(lstPermFailured, CdrGenerator.CDR_FAILED_ESME, reason);
+                    this.generateCDRs(lstPermFailured2, CdrGenerator.CDR_FAILED_ESME, reason);
 
                     // sending of intermediate delivery receipts
-                    this.generateIntermediateReceipts(smsSet, lstTempFailured);
+                    this.generateIntermediateReceipts(smsSet, lstTempFailured2);
 
                     // sending of failure delivery receipts
-                    this.generateFailureReceipts(smsSet, lstPermFailured, null);
+                    this.generateFailureReceipts(smsSet, lstPermFailured2, null);
 
                 } finally {
                     persistence.releaseSynchroObject(lock);

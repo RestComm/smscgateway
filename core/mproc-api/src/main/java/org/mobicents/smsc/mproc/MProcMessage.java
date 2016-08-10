@@ -77,4 +77,18 @@ public interface MProcMessage {
 
     String getOriginatorSccpAddress();
 
+    String getImsiDigits();
+
+    String getNnnDigits();
+
+    /**
+     * @return Procedure that has given an error / success
+     */
+    ProcessingType getProcessingType();
+
+    /**
+     * @return 0 in case of delivery success or error code from ErrorCode in case of delivery failure
+     */
+    int getErrorCode();
+
 }

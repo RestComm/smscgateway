@@ -38,8 +38,16 @@ public interface PostDeliveryProcessor {
     Logger getLogger();
 
     boolean isDeliveryFailure();
-    
+
     // actions
+    /**
+     * Stopping of message delivery in this networkID and reschedule of message delivery to another networkID area. Applyable
+     * only for a permanent failure case (will give Exception in Success case)
+     *
+     * @param newNetworkId
+     */
+    void rerouteMessage(int newNetworkId) throws MProcRuleException;
+
     /**
      * Creating a new message template for filling and sending by postNewMessage() method
      */
@@ -53,6 +61,6 @@ public interface PostDeliveryProcessor {
      * Posting a new message. To post a new message you need: create a message template by invoking of createNewMessage(), fill
      * it and post it be invoking of postNewMessage(). For this new message no mproc rule and diameter request will be applied.
      */
-    void postNewMessage(MProcNewMessage message);
+    void postNewMessage(MProcNewMessage message) throws MProcRuleException;
 
 }

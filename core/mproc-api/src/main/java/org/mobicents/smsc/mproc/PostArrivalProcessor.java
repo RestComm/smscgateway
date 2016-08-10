@@ -43,12 +43,12 @@ public interface PostArrivalProcessor {
     /**
      * Drop the message. Success response (that a message is accepted) will be return to a message originator.
      */
-    void dropMessage();
+    void dropMessage() throws MProcRuleException;
 
     /**
      * Drop the message. A reject will be sent to a message originator.
      */
-    void rejectMessage();
+    void rejectMessage() throws MProcRuleException;
 
     // updating of a message section
     void updateMessageNetworkId(MProcMessage message, int newNetworkId);
@@ -207,6 +207,6 @@ public interface PostArrivalProcessor {
      * Posting a new message. To post a new message you need: create a message template by invoking of createNewMessage(), fill
      * it and post it be invoking of postNewMessage(). For this new message no mproc rule and diameter request will be applied.
      */
-    void postNewMessage(MProcNewMessage message);
+    void postNewMessage(MProcNewMessage message) throws MProcRuleException;
 
 }

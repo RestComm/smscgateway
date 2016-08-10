@@ -613,6 +613,21 @@ public class MessageUtil {
         return first20CharOfSms;
     }
 
+    /**
+     * Creating a new SmsSet for Sms
+     * @param sms
+     */
+    public static void createNewSmsSetForSms(Sms sms) {
+        SmsSet smsSet = new SmsSet();
+        smsSet.setDestAddr(sms.getSmsSet().getDestAddr());
+        smsSet.setDestAddrNpi(sms.getSmsSet().getDestAddrNpi());
+        smsSet.setDestAddrTon(sms.getSmsSet().getDestAddrTon());
+        smsSet.setCorrelationId(sms.getSmsSet().getCorrelationId());
+
+        smsSet.setNetworkId(sms.getSmsSet().getNetworkId());
+        smsSet.addSms(sms);
+    }
+
     public static boolean isSmsNotLastSegment(Sms sms) {
         boolean isPartial = false;
         Tlv sarMsgRefNum = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_MSG_REF_NUM);

@@ -90,6 +90,7 @@ public class Sms implements Serializable {
     private String origMoServiceCentreAddressDA;
 
     private int deliveryCount;
+    private int reroutingCount;
 
     private OriginationType originationType;
 
@@ -483,6 +484,14 @@ public class Sms implements Serializable {
 		this.deliveryCount = deliveryCount;
 	}
 
+    public int getReroutingCount() {
+        return reroutingCount;
+    }
+
+    public void setReroutingCount(int reroutingCount) {
+        this.reroutingCount = reroutingCount;
+    }
+
 	// Optional parameters
 
 	/**
@@ -589,6 +598,8 @@ public class Sms implements Serializable {
         sb.append(origMoServiceCentreAddressDA);
         sb.append(", deliveryCount=");
         sb.append(deliveryCount);
+        sb.append(", reroutingCount=");
+        sb.append(reroutingCount);
         sb.append(", originationType=");
         sb.append(originationType);
         sb.append(", shortMessageText=");
@@ -655,7 +666,4 @@ public class Sms implements Serializable {
         return sb.toString();
     }
 
-//    public enum OriginationType {
-//        SMPP, SS7_MO, SS7_HR, SIP
-//    }
 }
