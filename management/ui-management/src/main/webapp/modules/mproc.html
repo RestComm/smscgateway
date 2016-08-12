@@ -25,9 +25,10 @@
 				<th style="width: 30px;">&nbsp;</th>
 				<th>Id</th>
 				<th>Rule Class Name</th>
-				<th>For Post Arrival</th>
-				<th>For Post Imsi Request</th>
-				<th>For Post Delivery State</th>
+				<th>For Arrival</th>
+				<th>For Imsi Request</th>
+				<th>For Delivery Success PermFail</th>
+				<th>For TempFail</th>
 				<th>Rule Parameters</th>
 				<th style="text-align: center; width: 150px;">Actions</th>
 			</tr>
@@ -105,6 +106,20 @@
 						<input id="id" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Id" />
 					</span>				
 				</div>
+
+				<div id="div-xxx" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom">
+						<span class="add-on">--- Conditions ---</span>
+					</span>				
+				</div>									
+				
+				<div id="div-networkidmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if target SMS is current networkid with this rule's networkidmask. Set value to -1 as wild card to match all the network id's. Default value is -1">
+						<span class="add-on">Network Id Mask</span>
+						<input id="networkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
+					</span>				
+				</div>	
+
 				
 				<div id="div-desttonmask" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if destination type of number (TON) of target SMS match's with this rule's desttonmask. Set value to -1 as wild card to match all the TON. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13; Default value is -1">
@@ -148,6 +163,20 @@
 						<input id="destdigmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
 					</span>				
 				</div>	
+
+				<div id="div-imsidigitsmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if IMSI digits after a successfull SRI request match's with this rule's imsidigitsmask. imsidigitsmask is java regular expression. This condition never fits if a message is not delivering to SS7 or IMSI is not obtained. Set value to null or -1 as wild card to match all the digits of IMSI. Default value is -1.">
+						<span class="add-on">IMSI Digits Mask</span>
+						<input id="imsidigitsmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="IMSI Digits Mask" />
+					</span>				
+				</div>	
+				
+				<div id="div-nnndigitsmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if NetworkNodeNumber digits (VLR address where subscriber is) after a successfull SRI request match's with this rule's nnndigitsmask. nnndigitsmask is java regular expression. This condition never fits if a message is not delivering to SS7 or NetworkNodeNumber is not obtained. Set value to null or -1 as wild card to match all the digits of NetworkNodeNumber. Default value is -1.">
+						<span class="add-on">NetworkNodeNumber (VLR) Digits Mask</span>
+						<input id="nnndigitsmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="NetworkNodeNumber (VLR) Digits Mask" />
+					</span>				
+				</div>	
 				
 				<div id="div-originatingmask" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if target SMS is originated from channel as specified by originatingmask. Select All as wild card to match all the origination type. Valid values are &#13; SMPP &#13; SS7_MO &#13; SS7_HR &#13; SIP &#13; Default value is All (null)">
@@ -160,6 +189,13 @@
 							<option value="SIP">SIP</option>
 						</select>
 					</span>	
+				</div>	
+				
+				<div id="div-originnetworkidmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if SMS origination networkid match\'s with this rule\'s originnetworkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1.">
+						<span class="add-on">Originating Network Id Mask</span>
+						<input id="originnetworkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Originating Network Id Mask" />
+					</span>				
 				</div>	
 				
 				<div id="div-origesmenamemask" class="control-group">
@@ -176,12 +212,33 @@
 					</span>				
 				</div>									
 				
-				<div id="div-networkidmask" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if target SMS is origination networkid with this rule's networkidmask. Set value to -1 as wild card to match all the network id's. Default value is -1">
-						<span class="add-on">Network Id Mask</span>
-						<input id="networkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
-					</span>				
+				<div id="div-processingtype" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if a Delivery step match's with this rule's processingtype. Value -1 will match all steps. Default value is -1. Possible values are:&#13;SMPP - delivery via SMPP channel&#13;SS7_SRI - sending of SRI request to HLR&#13;SS7_MT - MT delivery to SS7 network&#13;SIP - delivery via SIP channel">
+						<span class="add-on">Delivery step</span>
+						<select id="processingtype" >
+							<option value="All">All</option>
+							<option value="SS7_SRI">Delivering via SS7 - SRI Request</option>
+							<option value="SS7_MT">Delivering via SS7 - MT operation</option>
+							<option value="SMPP">Delivering via SMPP</option>
+							<option value="SIP">Delivering via SIP</option>
+						</select>
+					</span>	
 				</div>	
+				
+				<div id="div-errorcode" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if a Delivery error code value match's with this rule's errorcode. Value 0 means a sucessful delivery, non null value means some delivery error. Value -1 will match error codes. Default value is -1.">
+						<span class="add-on">Delivery error code value</span>
+						<input id="errorcode" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Delivery error code value" />
+					</span>				
+				</div>									
+
+
+
+				<div id="div-xxx" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom">
+						<span class="add-on">--- Actions ---</span>
+					</span>				
+				</div>									
 				
 				<div id="div-newnetworkid" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's network id will be change to one set here. This will allow to received SMS from different network and terminate on different network. Set this to -1 to keep original network id. Default value is -1.">
@@ -252,6 +309,40 @@
 						</select>
 					</span>	
 				</div>
+
+
+				
+				<div id="div-newnetworkidaftersri" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's and if a MAP SRI success response is received, message will be rerouted for delivery to another networkId. This action is applied only for SMS that are attempted to be delivered to SS7 network.">
+						<span class="add-on">Reroute after MAP SRI Request</span>
+						<input id="newnetworkidaftersri" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Reroute after MAP SRI Request" />
+					</span>				
+				</div>	
+				
+				<div id="div-newnetworkidafterpermfail" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's and if a message delivery has failed permanently, message will be rerouted for delivery to another networkId.">
+						<span class="add-on">Reroute after permanent failure</span>
+						<input id="newnetworkidafterpermfail" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Reroute after permanent failure" />
+					</span>				
+				</div>	
+							
+				<div id="div-dropaftertempfail" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's and if a message delivery has failed temporary, message will be dropped without delivery attempt.">
+						<span class="add-on">Drop after temporary failure</span>
+						<select id="dropaftertempfail" >
+							<option value="false">False</option>
+							<option value="true">True</option>
+						</select>
+					</span>	
+				</div>
+				
+				<div id="div-newnetworkidaftertempfail" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's and if a message delivery has failed temporary, message will be rerouted for delivery to another networkId.">
+						<span class="add-on">Reroute after temporary failure</span>
+						<input id="newnetworkidaftertempfail" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Reroute after temporary failure" />
+					</span>				
+				</div>	
+
 												
 				<button id="add-entity-button" class="btn btn btn-primary" onclick="createMProc()">Create</button>
 			</span>
@@ -379,6 +470,7 @@
 										var forpostarrivalstate = value.forPostArrivalState;
 										var forpostimsirequeststate = value.forPostImsiRequestState;
 										var forpostdeliverystate = value.forPostDeliveryState;
+										var forpostdeliverytempfailurestate = value.forPostDeliveryTempFailureState;
 										var ruleparameters = value.ruleParameters;
 										
 										serviceClass = 'active-service';
@@ -386,9 +478,10 @@
 										$('#esmes-table').children('tbody').append('<tr class="service-row"><td style="vertical-align: middle; text-align: center;"><i style="color: #51A351;" class="icon-play-circle"></i></td>'+
 												'<td style="cursor: pointer;" >' + id + '</td>' +
 												'<td style="cursor: pointer;" >' + ruleclassname + '</td>' +
-												'<td style="cursor: pointer;" >' + forpostarrivalstate + '</td>' +
-												'<td style="cursor: pointer;" >' + forpostimsirequeststate + '</td>' +
-												'<td style="cursor: pointer;" >' + forpostdeliverystate + '</td>' +
+												'<td style="cursor: pointer;" >' + (forpostarrivalstate==true ? "+" : "-") + '</td>' +
+												'<td style="cursor: pointer;" >' + (forpostimsirequeststate==true ? "+" : "-") + '</td>' +
+												'<td style="cursor: pointer;" >' + (forpostdeliverystate==true ? "+" : "-") + '</td>' +
+												'<td style="cursor: pointer;" >' + (forpostdeliverytempfailurestate==true ? "+" : "-") + '</td>' +
 												'<td style="cursor: pointer;" >' + ruleparameters + '</td>' +
 												'<td style="font-size: 16px; vertical-align: middle; text-align: center; width: 150px;">' + 
 													'<button class="btn btn-small btn-danger"' + ' data-toggle="tooltip" title="Remove MProc" data-placement="bottom" onclick="mprocOperation(\'destroyMProcRule\', \'' + id +  '\')"><i class="icon-remove"> </i></button> ' +
@@ -405,15 +498,30 @@
 										var destnpimask = processRuleParameters(ruleparameters, "destnpimask");
 										var destdigmask = processRuleParameters(ruleparameters, "destdigmask");
 										var originatingmask = processRuleParameters(ruleparameters, "originatingmask");
+										originatingmask = originatingmask.toUpperCase();
 										var networkidmask = processRuleParameters(ruleparameters, "networkidmask");
+										var originnetworkidmask = processRuleParameters(ruleparameters, "originnetworkidmask");
+										var origesmenamemask = processRuleParameters(ruleparameters, "origesmenamemask"); 
+										var originatorsccpaddressmask = processRuleParameters(ruleparameters, "originatorsccpaddressmask"); 
+										var imsidigitsmask = processRuleParameters(ruleparameters, "imsidigitsmask");
+										var nnndigitsmask = processRuleParameters(ruleparameters, "nnndigitsmask");
+										var processingtype = processRuleParameters(ruleparameters, "processingtype");
+										processingtype = processingtype.toUpperCase();
+										var errorcode = processRuleParameters(ruleparameters, "errorcode");
+
 										var newnetworkid = processRuleParameters(ruleparameters, "newnetworkid");
 										var newdestton = processRuleParameters(ruleparameters, "newdestton");
 										var newdestnpi = processRuleParameters(ruleparameters, "newdestnpi");
 										var addestdigprefix = processRuleParameters(ruleparameters, "adddestdigprefix");
 										var makecopy = processRuleParameters(ruleparameters, "makecopy");
-										var origesmenamemask = processRuleParameters(ruleparameters, "origesmenamemask"); 
-										var originatorsccpaddressmask = processRuleParameters(ruleparameters, "originatorsccpaddressmask"); 
+										if(makecopy=="-1") { makecopy = "false"; }
 										var dropaftersri = processRuleParameters(ruleparameters, "dropaftersri");
+										if(dropaftersri=="-1") { dropaftersri = "false"; }
+										var newnetworkidaftersri = processRuleParameters(ruleparameters, "newnetworkidaftersri");
+										var newnetworkidafterpermfail = processRuleParameters(ruleparameters, "newnetworkidafterpermfail");
+										var dropaftertempfail = processRuleParameters(ruleparameters, "dropaftertempfail");
+										if(dropaftertempfail=="-1") { dropaftertempfail = "false"; }
+										var newnetworkidaftertempfail = processRuleParameters(ruleparameters, "newnetworkidaftertempfail");
 										
 										$('#esmes-table-wrapper').append('<div id="entities-modal'+id+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
 												'<div class="modal-header">'+
@@ -435,7 +543,27 @@
 																	'<table id="'+id+'-ESME" class="table table-condensed table-striped">' + 
 																		'<thead><tr><th style="width: 40%;">Name</th><th style="width: 55%;">Value</th><th>&nbsp;</th></tr></thead>' +
 																		'<tbody>'+
-																		
+
+																		'<tr>'+
+																			'<td style="font-size: 0.9em;">--- Conditions ---</td>'+
+																		'</tr>'+
+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS current networkid match\'s with this rule\'s networkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1">'+
+																			'<td style="font-size: 0.9em;">Network Id Mask</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NetworkIdMask-input" class="control-group">'+
+																				'<span id="' + id +'NetworkIdMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + networkidmask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'networkidmask\', \'' + id+"NetworkIdMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"NetworkIdMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NetworkIdMask-text">' + networkidmask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"NetworkIdMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+
 																			'<tr data-toggle="tooltip" title="Rule will be applied only if destination type of number (TON) of target SMS match\'s with this rule\'s desttonmask. Set value to -1 as wild card to match all the TON. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13; Default value is -1">'+
 																				'<td style="font-size: 0.9em;">Destination Type Of Number (TON)</td>'+
 																				'<td style="font-size: 0.9em; padding: 0;">'+
@@ -467,7 +595,7 @@
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DestNpiMask"+']\').toggle(); $(\'input[id^='+id+"DestNpiMask"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+
-																		
+
 																		'<tr data-toggle="tooltip" title="Rule will be applied only if destination number of target SMS match\'s with this rule\'s destdigmask. destdigmask is java regular expression. Set value to -1 or leave blank as wild card to match all the digits of target SMS destination. Default value is -1">'+
 																			'<td style="font-size: 0.9em;">Destination Digits Mask</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -484,8 +612,40 @@
 																			'</td>'+
 																		'</tr>'+	
 																		
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if IMSI digits after a successfull SRI request match\'s with this rule\'s imsidigitsmask. imsidigitsmask is java regular expression. This condition never fits if a message is not delivering to SS7 or IMSI is not obtained. Set value to null or -1 as wild card to match all the digits of IMSI. Default value is -1.">'+
+																		'<td style="font-size: 0.9em;">IMSI Digits Mask</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'ImsiDigitsMask-input" class="control-group">'+
+																			'<span id="' + id +'ImsiDigitsMask-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + imsidigitsmask + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'imsidigitsmask\', \'' + id+"ImsiDigitsMask" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"ImsiDigitsMask"+']\').toggle(); $(\'input[id^='+id+"ImsiDigitsMask"+']\').focus();"></i>' + 
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'ImsiDigitsMask-text">' + imsidigitsmask + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"ImsiDigitsMask"+']\').toggle(); $(\'input[id^='+id+"ImsiDigitsMask"+']\').focus();"></i>' +
+																		'</td>'+
+																		'</tr>'+																		
+																		
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if NetworkNodeNumber digits (VLR address where subscriber is) after a successfull SRI request match\'s with this rule\'s nnndigitsmask. nnndigitsmask is java regular expression. This condition never fits if a message is not delivering to SS7 or NetworkNodeNumber is not obtained. Set value to null or -1 as wild card to match all the digits of NetworkNodeNumber. Default value is -1.">'+
+																		'<td style="font-size: 0.9em;">NetworkNodeNumber (VLR) Digits Mask</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'NnnDigitsMask-input" class="control-group">'+
+																			'<span id="' + id +'NnnDigitsMask-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + nnndigitsmask + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'nnndigitsmask\', \'' + id+"NnnDigitsMask" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NnnDigitsMask"+']\').toggle(); $(\'input[id^='+id+"NnnDigitsMask"+']\').focus();"></i>' + 
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'NnnDigitsMask-text">' + nnndigitsmask + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NnnDigitsMask"+']\').toggle(); $(\'input[id^='+id+"NnnDigitsMask"+']\').focus();"></i>' +
+																		'</td>'+
+																		'</tr>'+																		
+
 																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS is originated from channel as specified by originatingmask. Leave blank as wild card to match all the origination type. Valid values are &#13; SMPP &#13; SS7_MO &#13; SS7_HR &#13; SIP &#13; Default is blank">'+
-																			'<td style="font-size: 0.9em;">Originating Chanel</td>'+
+																			'<td style="font-size: 0.9em;">Originating Channel</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
 																				'<div id="div-' + id +'OriginatingMask-input" class="control-group">'+
 																				'<span id="' + id +'OriginatingMask-input" style="display: none;">'+
@@ -499,7 +659,23 @@
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginatingMask"+']\').toggle(); $(\'input[id^='+id+"OriginatingMask"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+	
-																		
+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if SMS origination networkid match\'s with this rule\'s originnetworkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1.">'+
+																			'<td style="font-size: 0.9em;">Originating Network Id Mask</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'OriginNetworkIdMask-input" class="control-group">'+
+																				'<span id="' + id +'OriginNetworkIdMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + originnetworkidmask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'originnetworkidmask\', \'' + id+"OriginNetworkIdMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginNetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"OriginNetworkIdMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'OriginNetworkIdMask-text">' + originnetworkidmask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginNetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"OriginNetworkIdMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+
 																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS is originated from SMPP channel (ESME) and who\'s name match\'s with originating ESME name mask (Java Regular Expression). Set -1 as wild card to match all the ESME.">'+
 																			'<td style="font-size: 0.9em;">Originating ESME Name Mask</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -530,22 +706,42 @@
 																		'</td>'+
 																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginatorSccpAddressMask"+']\').toggle(); $(\'input[id^='+id+"OriginatorSccpAddressMask"+']\').focus();"></i>' +
 																		'</td>'+
-																	'</tr>'+																		
+																		'</tr>'+																		
+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if a Delivery step match\'s with this rule\'s processingtype. Value -1 will match all steps. Default value is -1. Possible values are:&#13;SMPP - delivery via SMPP channel&#13;SS7_SRI - sending of SRI request to HLR&#13;SS7_MT - MT delivery to SS7 network&#13;SIP - delivery via SIP channel">'+
+																		'<td style="font-size: 0.9em;">Delivery step</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'ProcessingType-input" class="control-group">'+
+																			'<span id="' + id +'ProcessingType-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + processingtype + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'processingtype\', \'' + id+"ProcessingType" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"ProcessingType"+']\').toggle(); $(\'input[id^='+id+"ProcessingType"+']\').focus();"></i>' + 
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'ProcessingType-text">' + processingtype + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"ProcessingType"+']\').toggle(); $(\'input[id^='+id+"ProcessingType"+']\').focus();"></i>' +
+																		'</td>'+
+																		'</tr>'+																		
 																		
-																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS origination networkid match\'s with this rule\'s networkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1">'+
-																			'<td style="font-size: 0.9em;">Network Id Mask</td>'+
-																			'<td style="font-size: 0.9em; padding: 0;">'+
-																				'<div id="div-' + id +'NetworkIdMask-input" class="control-group">'+
-																				'<span id="' + id +'NetworkIdMask-input" style="display: none;">'+
-																					'<input type="text" class="input-small" value="' + networkidmask + '" /> ' +
-																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'networkidmask\', \'' + id+"NetworkIdMask" + '\', \'true\')"></i> ' +
-																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"NetworkIdMask"+']\').focus();"></i>' + 
-																				'</span>'+
-																				'</div>' +
-																				'<span id="' +id + 'NetworkIdMask-text">' + networkidmask + '</span>'+
-																			'</td>'+
-																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"NetworkIdMask"+']\').focus();"></i>' +
-																			'</td>'+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if a Delivery error code value match\'s with this rule\'s errorcode. Value 0 means a sucessful delivery, non null value means some delivery error. Value -1 will match error codes. Default value is -1.">'+
+																		'<td style="font-size: 0.9em;">Delivery error code value</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'ErrorCode-input" class="control-group">'+
+																			'<span id="' + id +'ErrorCode-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + errorcode + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'errorcode\', \'' + id+"ErrorCode" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"ErrorCode"+']\').toggle(); $(\'input[id^='+id+"ErrorCode"+']\').focus();"></i>' + 
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'ErrorCode-text">' + errorcode + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"ErrorCode"+']\').toggle(); $(\'input[id^='+id+"ErrorCode"+']\').focus();"></i>' +
+																		'</td>'+
+																		'</tr>'+																		
+																		
+																		'<tr>'+
+																			'<td style="font-size: 0.9em;">--- Actions ---</td>'+
 																		'</tr>'+
 																		
 																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s network id will be change to one set here. This will allow to received SMS from different network and terminate on different network. Set this to -1 to keep original network id. Default value is -1.">'+
@@ -630,7 +826,7 @@
 																		
 																		
 																		'<tr data-toggle="tooltip" title="Once rule match\'s and if a MAP SRI success response is received, message will be dropped without delivery attempt. A delivery response in this case will contain extra fields (IMSI and NetworkNodeNumber values). This action is applied only for SMS that are attempted to be delivered to SS7 network.">'+
-																			'<td style="font-size: 0.9em;">Drop After MAP SRI Request</td>'+
+																			'<td style="font-size: 0.9em;">Drop after MAP SRI Request</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
 																				'<div id="div-' + id +'DropAfterSri-input" class="control-group">'+
 																				'<span id="' + id +'DropAfterSri-input" style="display: none;">'+
@@ -644,6 +840,76 @@
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropAfterSri"+']\').toggle(); $(\'input[id^='+id+"DropAfterSri"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+																		
+
+																		'<tr data-toggle="tooltip" title="Once rule match\'s and if a MAP SRI success response is received, message will be rerouted for delivery to another networkId. This action is applied only for SMS that are attempted to be delivered to SS7 network.">'+
+																			'<td style="font-size: 0.9em;">Reroute after MAP SRI Request</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewNetworkIdAfterSri-input" class="control-group">'+
+																				'<span id="' + id +'NewNetworkIdAfterSri-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newnetworkidaftersri + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newnetworkidaftersri\', \'' + id+"NewNetworkIdAfterSri" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewNetworkIdAfterSri"+']\').toggle(); $(\'input[id^='+id+"NewNetworkIdAfterSri"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewNetworkIdAfterSri-text">' + newnetworkidaftersri + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewNetworkIdAfterSri"+']\').toggle(); $(\'input[id^='+id+"NewNetworkIdAfterSri"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s and if a message delivery has failed permanently, message will be rerouted for delivery to another networkId.">'+
+																			'<td style="font-size: 0.9em;">Reroute after permanent failure</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewNetworkIdAfterPermFail-input" class="control-group">'+
+																				'<span id="' + id +'NewNetworkIdAfterPermFail-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newnetworkidafterpermfail + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newnetworkidafterpermfail\', \'' + id+"NewNetworkIdAfterPermFail" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewNetworkIdAfterPermFail"+']\').toggle(); $(\'input[id^='+id+"NewNetworkIdAfterPermFail"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewNetworkIdAfterPermFail-text">' + newnetworkidafterpermfail + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewNetworkIdAfterPermFail"+']\').toggle(); $(\'input[id^='+id+"NewNetworkIdAfterPermFail"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s and if a message delivery has failed temporary, message will be dropped without delivery attempt.">'+
+																			'<td style="font-size: 0.9em;">Drop after temporary failure</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'DropAfterTempFail-input" class="control-group">'+
+																				'<span id="' + id +'DropAfterTempFail-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + dropaftertempfail + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'dropaftertempfail\', \'' + id+"DropAfterTempFail" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropAfterTempFail"+']\').toggle(); $(\'input[id^='+id+"DropAfterTempFail"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'DropAfterTempFail-text">' + dropaftertempfail + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropAfterTempFail"+']\').toggle(); $(\'input[id^='+id+"DropAfterTempFail"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s and if a message delivery has failed temporary, message will be rerouted for delivery to another networkId.">'+
+																			'<td style="font-size: 0.9em;">Reroute after temporary failure</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewNetworkIdAfterTempFail-input" class="control-group">'+
+																				'<span id="' + id +'NewNetworkIdAfterTempFail-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newnetworkidaftertempfail + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newnetworkidaftertempfail\', \'' + id+"NewNetworkIdAfterTempFail" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewNetworkIdAfterTempFail"+']\').toggle(); $(\'input[id^='+id+"NewNetworkIdAfterTempFail"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewNetworkIdAfterTempFail-text">' + newnetworkidaftertempfail + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewNetworkIdAfterTempFail"+']\').toggle(); $(\'input[id^='+id+"NewNetworkIdAfterTempFail"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
+
+
+
+
+
+
 																		
 																		'</tbody>' +
 																	'</table>' +	
@@ -851,7 +1117,6 @@
 			parametersstring = parametersstring + " destnpimask "+destnpimask;
 		}
 		
-		
 		var destdigmask = $("#destdigmask").val();
 		if(destdigmask.trim() == "") {
 			destdigmask = null;		
@@ -861,7 +1126,6 @@
 		
 		e = document.getElementById("originatingmask");
 		var originatingmask = e.options[e.selectedIndex].value;
-		
 		if(originatingmask == "All") {
 			originatingmask = null;		
 		} else {
@@ -888,6 +1152,44 @@
 		} else {
 			parametersstring = parametersstring + " networkidmask "+networkidmask;
 		}
+
+		var imsidigitsmask = $("#imsidigitsmask").val();
+		if(imsidigitsmask.trim() == "") {
+			imsidigitsmask = null;		
+		} else {
+			parametersstring = parametersstring + " imsidigitsmask "+imsidigitsmask;
+		}
+		
+		var nnndigitsmask = $("#nnndigitsmask").val();
+
+		if(nnndigitsmask.trim() == "") {
+			nnndigitsmask = null;		
+		} else {
+			parametersstring = parametersstring + " nnndigitsmask "+nnndigitsmask;
+		}
+		
+		e = document.getElementById("processingtype");
+		var processingtype = e.options[e.selectedIndex].value;
+		if(processingtype == "All") {
+			processingtype = null;		
+		} else {
+			parametersstring = parametersstring + " processingtype "+processingtype;
+		}
+		
+		var originnetworkidmask = $("#originnetworkidmask").val();
+		if(originnetworkidmask.trim() == "") {
+			originnetworkidmask = "-1";
+		} else {
+			parametersstring = parametersstring + " originnetworkidmask "+originnetworkidmask;
+		}
+		
+		var errorcode = $("#errorcode").val();
+		if(errorcode.trim() == "") {
+			errorcode = "-1";
+		} else {
+			parametersstring = parametersstring + " errorcode "+errorcode;
+		}
+
 		
 		var newnetworkid = $("#newnetworkid").val();
 		if(newnetworkid.trim() == "") {
@@ -908,14 +1210,12 @@
 			parametersstring = parametersstring + " newdestnpi "+newdestnpi;
 		}
 		
-		
 		var addestdigprefix = $("#addestdigprefix").val();
 		if(addestdigprefix == "") {
 			addestdigprefix = null;
 		} else {
 			parametersstring = parametersstring + " adddestdigprefix "+addestdigprefix;
 		}
-		
 		
 		e = document.getElementById("makecopy");
 		var makecopy = e.options[e.selectedIndex].value;
@@ -924,6 +1224,32 @@
 		e = document.getElementById("dropaftersri");
 		var dropaftersri = e.options[e.selectedIndex].value;
 		parametersstring = parametersstring + " dropaftersri "+dropaftersri;
+		
+		
+		e = document.getElementById("dropaftertempfail");
+		var dropaftertempfail = e.options[e.selectedIndex].value;
+		parametersstring = parametersstring + " dropaftertempfail "+dropaftertempfail;
+		
+		var newnetworkidaftersri = $("#newnetworkidaftersri").val();
+		if(newnetworkidaftersri.trim() == "") {
+			newnetworkidaftersri = "-1";
+		} else {
+			parametersstring = parametersstring + " newnetworkidaftersri "+newnetworkidaftersri;
+		}
+		
+		var newnetworkidafterpermfail = $("#newnetworkidafterpermfail").val();
+		if(newnetworkidafterpermfail.trim() == "") {
+			newnetworkidafterpermfail = "-1";
+		} else {
+			parametersstring = parametersstring + " newnetworkidafterpermfail "+newnetworkidafterpermfail;
+		}
+		
+		var newnetworkidaftertempfail = $("#newnetworkidaftertempfail").val();
+		if(newnetworkidaftertempfail.trim() == "") {
+			newnetworkidaftertempfail = "-1";
+		} else {
+			parametersstring = parametersstring + " newnetworkidaftertempfail "+newnetworkidaftertempfail;
+		}
 		
 		parametersstring = parametersstring.trim();
 		
