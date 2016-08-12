@@ -56,11 +56,18 @@ public interface MProcRuleDefault extends MProcRule {
     void setOriginatingMask(OrigType originatingMask);
 
     /**
-     * @return mask for message original NetworkId. "-1" means any value.
+     * @return mask for message current NetworkId. "-1" means any value.
      */
     int getNetworkIdMask();
 
     void setNetworkIdMask(int networkIdMask);
+
+    /**
+     * @return mask for message original NetworkId. "-1" means any value.
+     */
+    int getOriginNetworkIdMask();
+
+    void setOriginNetworkIdMask(int originNetworkIdMask);
 
     /**
      * @return mask for message original ESME name. This condition never fits if a message comes not from SMPP. "-1" means any
@@ -95,7 +102,7 @@ public interface MProcRuleDefault extends MProcRule {
     void setNnnDigitsMask(String nnnDigitsMask);
 
     /**
-     * @return Value for a delivering step. Possible values: HLR_FAIL | MSC_FAIL | SMPP_FAIL | SIP_FAIL or null.
+     * @return Value for a delivering step. Possible values: SRI_REQ | SS7_DEL | SMPP_DEL | SIP_DEL or null.
      */
     ProcessingType getProcessingType();
 

@@ -161,6 +161,9 @@ public class MProcManagement implements MProcManagementMBean {
 
     @Override
     public MProcRule createMProcRule(int id, String ruleFactoryName, String parametersString) throws Exception {
+        logger.info("createMProcRule: id=" + id + ", ruleFactoryName=" + ruleFactoryName + ", parametersString="
+                + parametersString);
+
         if (ruleFactoryName == null) {
             throw new Exception(String.format(MProcRuleOamMessages.CREATE_MPROC_RULE_FAIL_RULE_CLASS_NAME_NULL_VALUE));
         }
@@ -193,6 +196,8 @@ public class MProcManagement implements MProcManagementMBean {
 
     @Override
     public MProcRule modifyMProcRule(int mProcRuleId, String parametersString) throws Exception {
+        logger.info("modifyMProcRule: id=" + mProcRuleId + ", parametersString=" + parametersString);
+
         MProcRule mProcRule = this.getMProcRuleById(mProcRuleId);
         if (mProcRule == null) {
             throw new Exception(String.format(MProcRuleOamMessages.MODIFY_MPROC_RULE_FAIL_NOT_EXIST, mProcRuleId));
@@ -206,6 +211,8 @@ public class MProcManagement implements MProcManagementMBean {
 
     @Override
     public MProcRule destroyMProcRule(int mProcRuleId) throws Exception {
+        logger.info("destroyMProcRule: id=" + mProcRuleId);
+
         MProcRule mProcRule = this.getMProcRuleById(mProcRuleId);
         if (mProcRule == null) {
             throw new Exception(String.format(MProcRuleOamMessages.DESTROY_MPROC_RULE_FAIL_NOT_EXIST, mProcRuleId));
@@ -293,7 +300,7 @@ public class MProcManagement implements MProcManagementMBean {
 
         FastList<MProcRule> cur = this.mprocs;
         PostImsiProcessorImpl pap = new PostImsiProcessorImpl(logger);
-        MProcMessage message = new MProcMessageImpl(sms, ProcessingType.MT_DELIVERY);
+        MProcMessage message = new MProcMessageImpl(sms, ProcessingType.SS7_SRI);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {

@@ -28,5 +28,5 @@ package org.mobicents.smsc.mproc;
 *
 */
 public enum ProcessingType {
-    SRI_REQUEST, MT_DELIVERY, SMPP_DELIVERY, SIP_DELIVERY;
+    SMPP, SS7_SRI, SS7_MT, SIP;
 }

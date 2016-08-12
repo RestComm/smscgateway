@@ -48,6 +48,8 @@ public class Sms implements Serializable {
     private boolean stored;
     private boolean storingAfterFailure;
     private boolean invokedByAlert;
+    // targetId of a delivery start (for case when we do rerouting)
+    private String targetIdOnDeliveryStart;
 
 	private int sourceAddrTon;
 	private int sourceAddrNpi;
@@ -155,6 +157,17 @@ public class Sms implements Serializable {
 
     public void setInvokedByAlert(boolean invokedByAlert) {
         this.invokedByAlert = invokedByAlert;
+    }
+
+    /**
+     * targetId of a delivery start (for case when we do rerouting)
+     */
+    public String getTargetIdOnDeliveryStart() {
+        return targetIdOnDeliveryStart;
+    }
+
+    public void setTargetIdOnDeliveryStart(String targetIdOnDeliveryStart) {
+        this.targetIdOnDeliveryStart = targetIdOnDeliveryStart;
     }
 
 	/**

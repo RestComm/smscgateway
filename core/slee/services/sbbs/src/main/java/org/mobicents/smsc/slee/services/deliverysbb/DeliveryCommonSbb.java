@@ -763,16 +763,17 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @param lstNewNetworkId
      */
     protected void postProcessRerouted(ArrayList<Sms> lstRerouted, ArrayList<Integer> lstNewNetworkId) {
+        // !!!: c2_updateInSystem will be done at the delivery in another networkID
         // firstly we are marking messages that this delivery step has finished
-        try {
-            for (Sms sms : lstRerouted) {
-                persistence.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT,
-                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
-                sms.setDeliveryDate(new Date());
-            }
-        } catch (PersistenceException e) {
-            this.logger.severe("PersistenceException when DeliveryCommonSbb.postProcessRerouted()" + e.getMessage(), e);
-        }
+//        try {
+//            for (Sms sms : lstRerouted) {
+//                persistence.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT,
+//                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
+//                sms.setDeliveryDate(new Date());
+//            }
+//        } catch (PersistenceException e) {
+//            this.logger.severe("PersistenceException when DeliveryCommonSbb.postProcessRerouted()" + e.getMessage(), e);
+//        }
 
         // next we are initiating another delivering process
         try {
@@ -780,6 +781,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 Sms sms = lstRerouted.get(i1);
                 int newNetworkId = lstNewNetworkId.get(i1);
 
+                sms.setReroutingCount(sms.getReroutingCount() + 1);
+                sms.setTargetIdOnDeliveryStart(smsSet.getTargetId());
                 MessageUtil.createNewSmsSetForSms(sms);
                 sms.getSmsSet().setNetworkId(newNetworkId);
 
@@ -809,6 +812,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(), smst
                         .getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
                 this.sendNewGeneratedMessage(smst, ta);
+
+                if (this.logger.isInfoEnabled()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Posting of a new message after DeliverySuccess: targetId=");
+                    sb.append(smst.getSmsSet().getTargetId());
+                    sb.append(", sms=");
+                    sb.append(smst);
+                    this.logger.info(sb.toString());
+                }
             }
         }
     }
@@ -832,10 +844,44 @@ public abstract class DeliveryCommonSbb implements Sbb {
             MProcResult mProcResult = MProcManagement.getInstance().applyMProcDeliveryTempFailure(sms, processingType);
 
             if (mProcResult.isMessageIsRerouted()) {
-                lstRerouted.add(sms);
-                lstNewNetworkId.add(mProcResult.getNewNetworkId());
+                // firstly we check if rerouting attempts was not too many
+                if (sms.getReroutingCount() >= 9) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Rerouting message attempt after TempFailure, but we have already rerouted 9 times before: targetId=");
+                    sb.append(sms.getSmsSet().getTargetId());
+                    sb.append(", newNetworkId=");
+                    sb.append(mProcResult.getNewNetworkId());
+                    sb.append(", sms=");
+                    sb.append(sms);
+                    this.logger.warning(sb.toString());
+                } else if (mProcResult.getNewNetworkId() == sms.getSmsSet().getNetworkId()) {
+                    // we do not reroute for the same networkId
+                } else {
+                    lstRerouted.add(sms);
+                    lstNewNetworkId.add(mProcResult.getNewNetworkId());
+
+                    if (this.logger.isInfoEnabled()) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Rerouting message after TempFailure: targetId=");
+                        sb.append(sms.getSmsSet().getTargetId());
+                        sb.append(", newNetworkId=");
+                        sb.append(mProcResult.getNewNetworkId());
+                        sb.append(", sms=");
+                        sb.append(sms);
+                        this.logger.info(sb.toString());
+                    }
+                }
             } else if (mProcResult.isMessageDropped()) {
                 lstPermFailuredNew.add(sms);
+
+                if (this.logger.isInfoEnabled()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Dropping message after TempFailure: targetId=");
+                    sb.append(sms.getSmsSet().getTargetId());
+                    sb.append(", sms=");
+                    sb.append(sms);
+                    this.logger.info(sb.toString());
+                }
             } else {
                 lstTempFailuredNew.add(sms);
             }
@@ -847,6 +893,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(),
                             smst.getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
                     this.sendNewGeneratedMessage(smst, ta);
+
+                    if (this.logger.isInfoEnabled()) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Posting of a new message after TempFailure: targetId=");
+                        sb.append(smst.getSmsSet().getTargetId());
+                        sb.append(", sms=");
+                        sb.append(smst);
+                        this.logger.info(sb.toString());
+                    }
                 }
             }
         }
@@ -856,8 +911,32 @@ public abstract class DeliveryCommonSbb implements Sbb {
             MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true, processingType);
 
             if (mProcResult.isMessageIsRerouted()) {
-                lstRerouted.add(sms);
-                lstNewNetworkId.add(mProcResult.getNewNetworkId());
+                if (sms.getReroutingCount() >= 9) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Rerouting message attempt after PermFailure, but we have already rerouted 9 times before: targetId=");
+                    sb.append(sms.getSmsSet().getTargetId());
+                    sb.append(", newNetworkId=");
+                    sb.append(mProcResult.getNewNetworkId());
+                    sb.append(", sms=");
+                    sb.append(sms);
+                    this.logger.warning(sb.toString());
+                } else if (mProcResult.getNewNetworkId() == sms.getSmsSet().getNetworkId()) {
+                    // we do not reroute for the same networkId
+                } else {
+                    lstRerouted.add(sms);
+                    lstNewNetworkId.add(mProcResult.getNewNetworkId());
+
+                    if (this.logger.isInfoEnabled()) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Rerouting message after PermFailure: targetId=");
+                        sb.append(sms.getSmsSet().getTargetId());
+                        sb.append(", newNetworkId=");
+                        sb.append(mProcResult.getNewNetworkId());
+                        sb.append(", sms=");
+                        sb.append(sms);
+                        this.logger.info(sb.toString());
+                    }
+                }
             } else {
                 lstPermFailuredNew.add(sms);
             }
@@ -869,6 +948,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(),
                             smst.getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
                     this.sendNewGeneratedMessage(smst, ta);
+
+                    if (this.logger.isInfoEnabled()) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Posting of a new message after PermFailure: targetId=");
+                        sb.append(smst.getSmsSet().getTargetId());
+                        sb.append(", sms=");
+                        sb.append(smst);
+                        this.logger.info(sb.toString());
+                    }
                 }
             }
         }
@@ -893,6 +981,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 if (mProcResult.isMessageDropped()) {
                     lstPermFailured.add(sms);
 
+                    if (this.logger.isInfoEnabled()) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Dropping message after SRI response: targetId=");
+                        sb.append(sms.getSmsSet().getTargetId());
+                        sb.append(", sms=");
+                        sb.append(sms);
+                        this.logger.info(sb.toString());
+                    }
+
                     this.commitSendingPoolMsgCount();
                     sms = this.obtainNextMessage();
                     if (sms == null)
@@ -902,15 +999,40 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 }
 
                 if (mProcResult.isMessageIsRerouted()) {
-                    lstRerouted.add(sms);
-                    lstNewNetworkId.add(mProcResult.getNewNetworkId());
+                    // firstly we check if rerouting attempts was not too many
+                    if (sms.getReroutingCount() >= 9) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Rerouting message attempt after SRI response, but we have already rerouted 9 times before: targetId=");
+                        sb.append(sms.getSmsSet().getTargetId());
+                        sb.append(", newNetworkId=");
+                        sb.append(mProcResult.getNewNetworkId());
+                        sb.append(", sms=");
+                        sb.append(sms);
+                        this.logger.warning(sb.toString());
+                    } else if (mProcResult.getNewNetworkId() == sms.getSmsSet().getNetworkId()) {
+                        // we do not reroute for the same networkId
+                    } else {
+                        lstRerouted.add(sms);
+                        lstNewNetworkId.add(mProcResult.getNewNetworkId());
 
-                    this.commitSendingPoolMsgCount();
-                    sms = this.obtainNextMessage();
-                    if (sms == null)
-                        break;
-                    else
-                        continue;
+                        if (this.logger.isInfoEnabled()) {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("Rerouting message after SRI response: targetId=");
+                            sb.append(sms.getSmsSet().getTargetId());
+                            sb.append(", newNetworkId=");
+                            sb.append(mProcResult.getNewNetworkId());
+                            sb.append(", sms=");
+                            sb.append(sms);
+                            this.logger.info(sb.toString());
+                        }
+
+                        this.commitSendingPoolMsgCount();
+                        sms = this.obtainNextMessage();
+                        if (sms == null)
+                            break;
+                        else
+                            continue;
+                    }
                 }
 
                 break;

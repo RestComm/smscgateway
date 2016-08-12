@@ -6,7 +6,6 @@ import java.util.Date;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.mobicents.smsc.cassandra.DBOperations_C2;
-import org.mobicents.smsc.cassandra.Schema;
 import org.mobicents.smsc.library.SmsSet;
 
 import com.datastax.driver.core.BoundStatement;

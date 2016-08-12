@@ -60,6 +60,7 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.UserData;
 import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
 import org.mobicents.protocols.ss7.map.errors.MAPErrorMessageAbsentSubscriberSMImpl;
 import org.mobicents.protocols.ss7.map.errors.MAPErrorMessageSMDeliveryFailureImpl;
+import org.mobicents.protocols.ss7.map.errors.MAPErrorMessageUnknownSubscriberImpl;
 import org.mobicents.protocols.ss7.map.primitives.IMSIImpl;
 import org.mobicents.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.mobicents.protocols.ss7.map.service.sms.ForwardShortMessageRequestImpl;
@@ -84,6 +85,7 @@ import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.PreparedStatementCollection_C3;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.MapVersionCache;
+import org.mobicents.smsc.domain.SmscManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
 import org.mobicents.smsc.library.ErrorAction;
@@ -95,6 +97,7 @@ import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.ProcessingType;
+import org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault;
 import org.mobicents.smsc.slee.resources.persistence.MAPDialogSmsProxy;
 import org.mobicents.smsc.slee.resources.persistence.MAPServiceSmsProxy;
 import org.mobicents.smsc.slee.resources.persistence.SmsProxy;
@@ -102,6 +105,7 @@ import org.mobicents.smsc.slee.resources.persistence.MAPDialogSmsProxy.MAPTestEv
 import org.mobicents.smsc.slee.resources.persistence.MAPDialogSmsProxy.MAPTestEventType;
 import org.mobicents.smsc.slee.resources.persistence.TT_PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
+import org.mobicents.smsc.smpp.SmppManagement;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -136,6 +140,16 @@ public class C2_MtTest {
     private String procTargetId;
     private UUID[] procId;
 
+    static {
+        MProcManagement.getInstance("TestMtMProc");
+        try {
+            MProcManagement.getInstance().destroyMProcRule(1);
+            MProcManagement.getInstance().destroyMProcRule(2);
+            MProcManagement.getInstance().destroyMProcRule(3);
+        } catch (Exception e) {
+        }
+    }
+    
     @BeforeMethod
     public void setUpMethod() throws Exception {
         System.out.println("setUpMethod");
@@ -3655,6 +3669,106 @@ public class C2_MtTest {
         assertEquals(vers, MAPApplicationContextVersion.version1);
     }
 
+    @Test(groups = { "Mt" })
+    public void testMProc_TempFail() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        MProcManagement mProcManagement = MProcManagement.getInstance();
+        SmscManagement smscManagement = SmscManagement.getInstance("Test");
+        SmppManagement smppManagement = SmppManagement.getInstance("Test");
+        smscManagement.setSmppManagement(smppManagement);
+        mProcManagement.setSmscManagement(smscManagement);
+        smscManagement.registerRuleFactory(new MProcRuleFactoryDefault());
+        smscManagement.start();
+
+        try {
+            mProcManagement.destroyMProcRule(1);
+        } catch (Exception e) {
+        }
+        try {
+            mProcManagement.destroyMProcRule(2);
+        } catch (Exception e) {
+        }
+
+//        mProcManagement.createMProcRule(1, MProcRuleFactoryDefault.RULE_CLASS_NAME,
+//                "networkidmask 0 newnetworkidaftertempfail 1");
+        mProcManagement.createMProcRule(1, MProcRuleFactoryDefault.RULE_CLASS_NAME,
+                "networkidmask 0 newnetworkidafterpermfail 1");
+
+        MAPServiceSmsProxy serviceSri = (MAPServiceSmsProxy)this.sriSbb.mapProvider.getMAPServiceSms();
+        MAPServiceSmsProxy serviceMt = (MAPServiceSmsProxy)this.mtSbb.mapProvider.getMAPServiceSms();
+        MAPServiceSmsProxy serviceRsds = (MAPServiceSmsProxy)this.rsdsSbb.mapProvider.getMAPServiceSms();
+        SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+        MProcManagement.getInstance("Test");
+
+        ArrayList<SmsDef> lst = new ArrayList<SmsDef>();
+        SmsDef sd1 = new SmsDef();
+        lst.add(sd1);
+
+        SmsSet smsSet = prepareDatabase(lst);
+        Sms sms1 = smsSet.getSms(0);
+
+//        UUID smsId = sms1.getDbId();
+//        SmsProxy smsx1 = this.pers.obtainArchiveSms(procDueSlot, smsSet.getDestAddr(), smsId);
+//        assertNull(smsx1);
+//        SmsSet smsSetX = SmsSetCache.getInstance().getProcessingSmsSet(procTargetId);
+//        assertNotNull(smsSetX);
+//        Sms smsX = this.pers.obtainLiveSms(procDueSlot, procTargetId, procId[0]);
+//        assertEquals(smsX.getSmsSet().getInSystem(), 0);
+//        assertEquals(SmsSetCache.getInstance().getProcessingSmsSetSize(), 1);
+
+        // initial onSms message
+        SmsSetEvent event = new SmsSetEvent();
+        event.setSmsSet(smsSet);
+        this.sriSbb.onSms(event, null, null);
+
+        MAPDialogSmsProxy dlg = serviceSri.getLastMAPDialogSms();
+
+//        assertFalse(this.mtSbb.isMAPVersionTested(MAPApplicationContextVersion.version1));
+//        assertFalse(this.mtSbb.isMAPVersionTested(MAPApplicationContextVersion.version2));
+//        assertFalse(this.mtSbb.isMAPVersionTested(MAPApplicationContextVersion.version3));
+//        assertFalse(this.mtSbb.isNegotiatedMapVersionUsing());
+
+        // SRI response
+        IMSI imsi = new IMSIImpl(imsiDig);
+        ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
+                org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
+        LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        evt1.setMAPDialog(dlg);
+
+//        MAPErrorMessage mapErrorMessage = new MAPErrorMessageAbsentSubscriberSMImpl(null, null, null);
+//        ErrorComponent evt2 = new ErrorComponent(dlg, 0L, mapErrorMessage);
+        MAPErrorMessage mapErrorMessage = new MAPErrorMessageUnknownSubscriberImpl(null, null);
+        ErrorComponent evt2 = new ErrorComponent(dlg, 0L, mapErrorMessage);
+        this.sriSbb.onErrorComponent(evt2, null);
+        this.sriSbb.onDialogDelimiter(null, null);
+
+        // ....................
+//        assertFalse(this.mtSbb.isMAPVersionTested(MAPApplicationContextVersion.version1));
+//        assertFalse(this.mtSbb.isMAPVersionTested(MAPApplicationContextVersion.version2));
+//        assertTrue(this.mtSbb.isMAPVersionTested(MAPApplicationContextVersion.version3));
+//        assertFalse(this.mtSbb.isNegotiatedMapVersionUsing());
+
+        dlg = serviceMt.getLastMAPDialogSms();
+//        MAPApplicationContextVersion vers = dlg.getApplicationContext().getApplicationContextVersion();
+//        assertEquals(vers, MAPApplicationContextVersion.version3);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    }
 
     /**
      * onDeliveryError test
@@ -3722,7 +3836,7 @@ public class C2_MtTest {
 
         // SmsSet smsSet, ErrorAction errorAction, ErrorCode smStatus, String reason, boolean removeSmsSet
         this.sriSbb.onDeliveryError(smsSet, ErrorAction.subscriberBusy, ErrorCode.ABSENT_SUBSCRIBER, "X error", true, null,
-                false, ProcessingType.MT_DELIVERY);
+                false, ProcessingType.SS7_MT);
 
         PreparedStatementCollection_C3[] pscc = this.pers.c2_getPscList();
         long l1 = 0;

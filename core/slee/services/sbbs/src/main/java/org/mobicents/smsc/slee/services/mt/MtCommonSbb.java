@@ -421,7 +421,6 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     Date curDate = new Date();
 
                     smsSet.setStatus(smStatus);
-                    this.markDeliveringIsEnded(removeSmsSet);
 
                     // creating of failure lists
                     this.createFailureLists(lstPermFailured, lstTempFailured, errorAction);
@@ -448,29 +447,31 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     // sending of failure delivery receipts
                     this.generateFailureReceipts(smsSet, lstPermFailured2, null);
 
+                    // sending of ReportSMDeliveryStatusRequest if needed
+                    SMDeliveryOutcome smDeliveryOutcome = null;
+                    switch (errorAction) {
+                        case memoryCapacityExceededFlag:
+                            smDeliveryOutcome = SMDeliveryOutcome.memoryCapacityExceeded;
+                            break;
+
+                        case mobileNotReachableFlag:
+                            smDeliveryOutcome = SMDeliveryOutcome.absentSubscriber;
+                            break;
+
+                        case notReachableForGprs:
+                            smDeliveryOutcome = SMDeliveryOutcome.absentSubscriber;
+                            break;
+                    }
+                    if (smDeliveryOutcome != null && lstTempFailured2.size() > 0) {
+                        this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(),
+                                smDeliveryOutcome, smsSet.getTargetId(), smsSet.getNetworkId());
+                    }
+
+                    this.markDeliveringIsEnded(removeSmsSet);
+
                 } finally {
                     persistence.releaseSynchroObject(lock);
                 }
-            }
-
-            // sending of ReportSMDeliveryStatusRequest if needed
-            SMDeliveryOutcome smDeliveryOutcome = null;
-            switch (errorAction) {
-                case memoryCapacityExceededFlag:
-                    smDeliveryOutcome = SMDeliveryOutcome.memoryCapacityExceeded;
-                    break;
-
-                case mobileNotReachableFlag:
-                    smDeliveryOutcome = SMDeliveryOutcome.absentSubscriber;
-                    break;
-
-                case notReachableForGprs:
-                    smDeliveryOutcome = SMDeliveryOutcome.absentSubscriber;
-                    break;
-            }
-            if (smDeliveryOutcome != null && lstTempFailured.size() > 0) {
-                this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(),
-                        smDeliveryOutcome, smsSet.getTargetId(), smsSet.getNetworkId());
             }
         } catch (Throwable e) {
             logger.severe("Exception in MtCommonSbb.onDeliveryError(): " + e.getMessage(), e);
@@ -489,23 +490,10 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
      */
     protected void onImsiDrop(SmsSet smsSet, ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstRerouted,
             ArrayList<Integer> lstNewNetworkId, ISDNAddressString networkNode, String imsiData) {
-        Sms sms;
-        if (lstPermFailured.size() != 0) {
-            sms = lstPermFailured.get(0);
-        } else if (lstRerouted.size() != 0) {
-            sms = lstRerouted.get(0);
-        } else {
+        if (lstPermFailured.size() == 0 && lstRerouted.size() == 0) {
             // no actions is needed
             return;
         }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("onImsiDrop: targetId=");
-        sb.append(sms.getSmsSet().getTargetId());
-        sb.append(", sms=");
-        sb.append(sms);
-        if (this.logger.isInfoEnabled())
-            this.logger.info(sb.toString());
 
         smsSet.setStatus(ErrorCode.MPROC_SRI_REQUEST_DROP);
 

@@ -1342,10 +1342,18 @@ public class DBOperations_C2 {
         if (sms.getStored()) {
             PreparedStatementCollection_C3 psc = this.getStatementCollection(sms.getDueSlot());
 
+            // in rerouting case we use need to use original networkId
+            String targetId;
+            if (sms.getTargetIdOnDeliveryStart() != null) {
+                targetId = sms.getTargetIdOnDeliveryStart();
+            } else {
+                targetId = sms.getSmsSet().getTargetId();
+            }
+
             try {
                 PreparedStatement ps = psc.updateInSystem;
                 BoundStatement boundStatement = new BoundStatement(ps);
-                boundStatement.bind(isSystemStatus, currentSessionUUID, sms.getDueSlot(), sms.getSmsSet().getTargetId(), sms.getDbId());
+                boundStatement.bind(isSystemStatus, currentSessionUUID, sms.getDueSlot(), targetId, sms.getDbId());
                 ResultSet res = session.execute(boundStatement);
             } catch (Exception e1) {
                 String msg = "Failed to execute updateInSystem() !";

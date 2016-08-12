@@ -492,7 +492,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             sendTransactionalResponseSuccess(sms);
 
             // mproc rules applying for delivery phase
-            this.applyMprocRulesOnSuccess(sms, ProcessingType.SMPP_DELIVERY);
+            this.applyMprocRulesOnSuccess(sms, ProcessingType.SMPP);
 
             // Processing succeeded
             sms.getSmsSet().setStatus(ErrorCode.SUCCESS);
@@ -579,7 +579,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
                     // mproc rules applying for delivery phase
                     this.applyMprocRulesOnFailure(lstPermFailured, lstTempFailured, lstPermFailured2, lstTempFailured2,
-                            lstRerouted, lstNewNetworkId, ProcessingType.SMPP_DELIVERY);
+                            lstRerouted, lstNewNetworkId, ProcessingType.SMPP);
 
                     // Processing messages that were temp or permanent failed or rerouted
                     this.postProcessPermFailures(lstPermFailured2);
