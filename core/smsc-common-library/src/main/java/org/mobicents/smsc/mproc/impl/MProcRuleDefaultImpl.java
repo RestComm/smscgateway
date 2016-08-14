@@ -548,15 +548,13 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             if (!m.matches())
                 return false;
         }
-        // TODO: uncomment it ................................
-//        if (originatorSccpAddressMaskPattern != null) {
-//            if (message.getOriginatorSccpAddress() == null)
-//                return false;
-//            Matcher m = this.originatorSccpAddressMaskPattern.matcher(message.getOriginatorSccpAddress());
-//            if (!m.matches())
-//                return false;
-//        }
-        // TODO: uncomment it ................................
+        if (originatorSccpAddressMaskPattern != null) {
+            if (message.getOriginatorSccpAddress() == null)
+                return false;
+            Matcher m = this.originatorSccpAddressMaskPattern.matcher(message.getOriginatorSccpAddress());
+            if (!m.matches())
+                return false;
+        }
         if (imsiDigitsMaskPattern != null) {
             Matcher m = this.imsiDigitsMaskPattern.matcher(message.getImsiDigits());
             if (!m.matches())
@@ -570,22 +568,15 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (processingType != null && processingType != message.getProcessingType())
             return false;
         if (errorCodePattern != null) {
-            if (this.errorCodePattern.containsKey(message.getErrorCode()))
+            if (!this.errorCodePattern.containsKey(message.getErrorCode()))
                 return false;
         }
 
-        
-        
-        // TODO: remove it ................................
         if (this.originatorSccpAddressMask != null && this.originatorSccpAddressMask.length() > 0
                 && !this.originatorSccpAddressMask.equals("-1") && message.getShortMessageText() != null
                 && message.getShortMessageText().length() > 0
                 && this.originatorSccpAddressMask.charAt(0) != message.getShortMessageText().charAt(0))
             return false;
-        // TODO: remove it ................................
-        
-       
-        
         
         return true;
     }
@@ -681,11 +672,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 //        }
         // TODO: we need proper implementing
 
-        if (this.dropAfterSri)
+        if (this.dropAfterSri) {
             factory.dropMessage();
-
-        if (this.newNetworkIdAfterSri != -1)
-            factory.rerouteMessage(this.newNetworkIdAfterSri);
+        } else {
+            if (this.newNetworkIdAfterSri != -1)
+                factory.rerouteMessage(this.newNetworkIdAfterSri);
+        }
     }
 
     @Override
@@ -714,11 +706,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
     @Override
     public void onPostDeliveryTempFailure(PostDeliveryTempFailureProcessor factory, MProcMessage message) throws Exception {
-        if (this.dropAfterTempFail)
+        if (this.dropAfterTempFail) {
             factory.dropMessage();
-
-        if (this.newNetworkIdAfterTempFail != -1)
-            factory.rerouteMessage(this.newNetworkIdAfterTempFail);
+        } else {
+            if (this.newNetworkIdAfterTempFail != -1)
+                factory.rerouteMessage(this.newNetworkIdAfterTempFail);
+        }
     }
 
     @Override

@@ -1,7 +1,5 @@
 package org.mobicents.smsc.cassandra;
 
-import org.testng.annotations.Test;
-
 import com.datastax.driver.core.Session;
 
 public class CassTest {

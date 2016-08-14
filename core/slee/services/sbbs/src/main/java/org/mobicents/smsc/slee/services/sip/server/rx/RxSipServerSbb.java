@@ -541,12 +541,12 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
                     // creating of failure lists
                     this.createFailureLists(lstPermFailured, lstTempFailured, errorAction);
 
-                    // sending of a failure response for transactional mode
-                    this.sendTransactionalResponseFailure(lstPermFailured, lstTempFailured, errorAction, null);
-
                     // mproc rules applying for delivery phase
                     this.applyMprocRulesOnFailure(lstPermFailured, lstTempFailured, lstPermFailured2, lstTempFailured2,
                             lstRerouted, lstNewNetworkId, ProcessingType.SIP);
+
+                    // sending of a failure response for transactional mode
+                    this.sendTransactionalResponseFailure(lstPermFailured2, lstTempFailured2, errorAction, null);
 
                     // Processing messages that were temp or permanent failed or rerouted
                     this.postProcessPermFailures(lstPermFailured2);

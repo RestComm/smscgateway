@@ -72,6 +72,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
     private static final String PERSISTENCE_LINK = "PersistenceResourceAdaptor";
     private static final String SCHEDULE_LINK = "SchedulerResourceAdaptor";
 
+    private static final int MAX_POSSIBLE_REROUTING = 9;
+
     protected Tracer logger;
     protected SbbContextExt sbbContext;
 
@@ -845,17 +847,21 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
             if (mProcResult.isMessageIsRerouted()) {
                 // firstly we check if rerouting attempts was not too many
-                if (sms.getReroutingCount() >= 9) {
+                if (sms.getReroutingCount() >= MAX_POSSIBLE_REROUTING) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("Rerouting message attempt after TempFailure, but we have already rerouted 9 times before: targetId=");
+                    sb.append("Rerouting message attempt after TempFailure, but we have already rerouted ");
+                    sb.append(MAX_POSSIBLE_REROUTING);
+                    sb.append(" times before: targetId=");
                     sb.append(sms.getSmsSet().getTargetId());
                     sb.append(", newNetworkId=");
                     sb.append(mProcResult.getNewNetworkId());
                     sb.append(", sms=");
                     sb.append(sms);
                     this.logger.warning(sb.toString());
+                    lstTempFailuredNew.add(sms);
                 } else if (mProcResult.getNewNetworkId() == sms.getSmsSet().getNetworkId()) {
                     // we do not reroute for the same networkId
+                    lstTempFailuredNew.add(sms);
                 } else {
                     lstRerouted.add(sms);
                     lstNewNetworkId.add(mProcResult.getNewNetworkId());
@@ -911,17 +917,21 @@ public abstract class DeliveryCommonSbb implements Sbb {
             MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true, processingType);
 
             if (mProcResult.isMessageIsRerouted()) {
-                if (sms.getReroutingCount() >= 9) {
+                if (sms.getReroutingCount() >= MAX_POSSIBLE_REROUTING) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("Rerouting message attempt after PermFailure, but we have already rerouted 9 times before: targetId=");
+                    sb.append("Rerouting message attempt after PermFailure, but we have already rerouted ");
+                    sb.append(MAX_POSSIBLE_REROUTING);
+                    sb.append(" times before: targetId=");
                     sb.append(sms.getSmsSet().getTargetId());
                     sb.append(", newNetworkId=");
                     sb.append(mProcResult.getNewNetworkId());
                     sb.append(", sms=");
                     sb.append(sms);
                     this.logger.warning(sb.toString());
+                    lstPermFailuredNew.add(sms);
                 } else if (mProcResult.getNewNetworkId() == sms.getSmsSet().getNetworkId()) {
                     // we do not reroute for the same networkId
+                    lstPermFailuredNew.add(sms);
                 } else {
                     lstRerouted.add(sms);
                     lstNewNetworkId.add(mProcResult.getNewNetworkId());
@@ -1000,9 +1010,11 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
                 if (mProcResult.isMessageIsRerouted()) {
                     // firstly we check if rerouting attempts was not too many
-                    if (sms.getReroutingCount() >= 9) {
+                    if (sms.getReroutingCount() >= MAX_POSSIBLE_REROUTING) {
                         StringBuilder sb = new StringBuilder();
-                        sb.append("Rerouting message attempt after SRI response, but we have already rerouted 9 times before: targetId=");
+                        sb.append("Rerouting message attempt after SRI response, but we have already rerouted ");
+                        sb.append(MAX_POSSIBLE_REROUTING);
+                        sb.append(" times before: targetId=");
                         sb.append(sms.getSmsSet().getTargetId());
                         sb.append(", newNetworkId=");
                         sb.append(mProcResult.getNewNetworkId());
