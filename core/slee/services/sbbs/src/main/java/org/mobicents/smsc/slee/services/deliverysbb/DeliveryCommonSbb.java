@@ -663,7 +663,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         } else {
             if (sms.getStoringAfterFailure() || sms.getStored()) {
                 // FAS & SAF
-                // checking validity date - if validity date < now, then it is a permanent failure (we confirg a validity period
+                // checking validity date - if validity date < now, then it is a permanent failure (we confirm a validity period
                 // for time for now + 2 min)
                 if (sms.getValidityPeriod() != null
                         && sms.getValidityPeriod().getTime() <= System.currentTimeMillis() + 1000 * 120) {
@@ -765,18 +765,6 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @param lstNewNetworkId
      */
     protected void postProcessRerouted(ArrayList<Sms> lstRerouted, ArrayList<Integer> lstNewNetworkId) {
-        // !!!: c2_updateInSystem will be done at the delivery in another networkID
-        // firstly we are marking messages that this delivery step has finished
-//        try {
-//            for (Sms sms : lstRerouted) {
-//                persistence.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT,
-//                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
-//                sms.setDeliveryDate(new Date());
-//            }
-//        } catch (PersistenceException e) {
-//            this.logger.severe("PersistenceException when DeliveryCommonSbb.postProcessRerouted()" + e.getMessage(), e);
-//        }
-
         // next we are initiating another delivering process
         try {
             for (int i1 = 0; i1 < lstRerouted.size(); i1++) {
