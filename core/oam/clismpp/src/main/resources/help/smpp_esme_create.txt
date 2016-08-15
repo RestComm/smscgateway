@@ -10,7 +10,7 @@ SYNOPSIS
 	connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> 
 	client-bind-timeout <clientBindTimeout> window-monitor-interval <windowMonitorInterval> 
 	window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> 
-	enquire-link-delay <30000> enquire-link-delay-server <0> charging-enabled <true | false> 
+	enquire-link-delay <30000> enquire-link-delay-server <0> link-drop-server <0> charging-enabled <true | false> 
 	source-ton <source address ton> source-npi <source address npi>
 	source-range <source address range> routing-ton <routing address ton>
 	routing-npi <routing address npi> routing-range <routing address range>
@@ -195,6 +195,16 @@ PARAMETERS
 				  enquire-link-delay-server.
 
 				  0 means disabled. SMSC will not send ENQUIRE_LINK.
+
+	link-drop-server - Default value is 0 milli seconds means disabled. 
+				  When SMSC connects to a remote server as SERVER, if it 
+				  isn't received any data after configured link-drop-server,
+				  it will drop the esme session.
+
+				  0 means disabled, SMSC will not drop smpp session.
+
+				  If enquire-link-delay-server is enabled then link-drop-server
+				  always disabled.
 
 	charging-enabled	- Flag to enable or disable charging for every SMS 
 				  arriving from SIP.

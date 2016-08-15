@@ -59,7 +59,7 @@ public class SmppServerOpsThread implements Runnable {
 		}
 	}
 
-	protected void scheduleEnquireList(String esmeServerName, Long delayValue) {
+	protected void scheduleList(String esmeServerName, Long delayValue) {
 		synchronized (this.esmesServer) {
 			this.esmesServer.put(esmeServerName, delayValue);
 		}
@@ -74,9 +74,9 @@ public class SmppServerOpsThread implements Runnable {
 				this.esmesServer.remove (esmeServerName);
 			}
 
-		synchronized (this.waitObject) {
-			this.waitObject.notify();
-		}
+			synchronized (this.waitObject) {
+				this.waitObject.notify();
+			}
 	}
 
 	@Override
@@ -98,7 +98,9 @@ public class SmppServerOpsThread implements Runnable {
 							nextServer.setServerBound(false);
 						}
 
-						if (!nextServer.getEnquireServerEnabled() || !nextServer.isServerBound()) {
+						/* check server is dropped by link */
+						if ((!nextServer.getLinkDropServerEnabled() && !nextServer.getEnquireServerEnabled())
+																	|| !nextServer.isServerBound()) {
 							continue;
 						}
 
@@ -115,7 +117,12 @@ public class SmppServerOpsThread implements Runnable {
 				Iterator<Esme> changes = pendingList.iterator();
 				while (changes.hasNext()) {
 					Esme change = changes.next();
-					this.enquireLink(change);
+
+					if (change.getLinkDropServerEnabled()) {
+						this.serverLinkDown(change);
+					} else {
+						this.enquireLink(change);
+					}
 				}
 				
 				synchronized (this.waitObject) {
@@ -146,7 +153,7 @@ public class SmppServerOpsThread implements Runnable {
 				//esme.incEnquireLinkFail();
 
 				// Update next sending time
-				this.scheduleEnquireList(esme.getName(), System.currentTimeMillis() +
+				this.scheduleList(esme.getName(), System.currentTimeMillis() +
 						esme.getEnquireLinkDelay());
 
 			} catch (Exception e) {
@@ -185,6 +192,35 @@ public class SmppServerOpsThread implements Runnable {
 			}
 			smppSession.destroy();
 		}
+	}
+
+	private void serverLinkDown(Esme esme) {
+		SmppSession smppSession = esme.getSmppSession();
+
+		if (!esme.getLinkStartFirstTime()) {
+			if (!esme.checkLinkRecvMessage()) {
+				logger.info("Esme Server destroy due to Link Dropped for ESME SystemId=" + esme.getSystemId());
+				try {
+					smppSession.close();
+				} catch (Exception e) {
+					logger.error(String.format("Failed to close smpp server session for %s.",
+							smppSession.getConfiguration().getName()));
+				}
+				smppSession.destroy();
+
+			} else {
+				esme.setLinkRecvMessage(false);
+				// Update next sending time
+				this.scheduleList(esme.getName(), System.currentTimeMillis() +
+						esme.getLinkDropServer());
+			}
+		} else {
+			esme.setLinkStartFirstTime(false);
+			// Update next sending time
+			this.scheduleList(esme.getName(), System.currentTimeMillis() +
+					esme.getLinkDropServer());
+		}
+
 	}
 
 

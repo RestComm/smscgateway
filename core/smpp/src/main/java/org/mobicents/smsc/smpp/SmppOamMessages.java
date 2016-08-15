@@ -143,4 +143,6 @@ public interface SmppOamMessages {
 
     public static final String ENQUIRE_LINK_DELAY_SERVER = " enquireLinkDelayServer=";
 
+	public static final String LINK_DROP_SERVER = " linkDropServer=";
+
 }

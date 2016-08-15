@@ -90,7 +90,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private static final String WINDOW_WAIT_TIMEOUT = "windowWaitTimeout";
 
 	private static final String ENQUIRE_LINK_DELAY = "enquireLinkDelay";
-	private static final String ENQUIRE_LINK_DELAY_SERVER = "enquireLinkDelayServer";	
+	private static final String ENQUIRE_LINK_DELAY_SERVER = "enquireLinkDelayServer";
+	private static final String LINK_DROP_SERVER = "linkDropServer";
 	private static final String COUNTERS_ENABLED = "countersEnabled";
 
     private static final String RATE_LIMIT_PER_SECOND = "rateLimitPerSecond";
@@ -146,7 +147,13 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private boolean countersEnabled = true;
 
 	private int enquireLinkDelay = 30000;
-	private int enquireLinkDelayServer = 0;	
+	private int enquireLinkDelayServer = 0;
+
+	private int linkDropServer = 0;
+	private boolean linkRecvMessCheck = false;
+	private boolean linkStartFirstTime = false;
+	private Object linkDropWaitObject = new Object();
+
 
 	// Default Server
 	private SmppSession.Type smppSessionType = SmppSession.Type.SERVER;
@@ -237,7 +244,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
 		SmppBindType smppBindType, Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout,
 		long clientBindTimeout, long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
-		int enquireLinkDelay, int enquireLinkDelayServer, int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon,
+		int enquireLinkDelay, int enquireLinkDelayServer, int linkDropServer, int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon,
 		int routingNpi, String routingAddressRange, int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
 		long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
 		int maxMessageLength
@@ -275,6 +282,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
 		this.enquireLinkDelay = enquireLinkDelay;
 		this.enquireLinkDelayServer = enquireLinkDelayServer;
+		this.linkDropServer = linkDropServer;
 
 		this.sourceTon = sourceTon;
 		this.sourceNpi = sourceNpi;
@@ -824,6 +832,18 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		this.enquireLinkDelayServer = enquireLinkDelayServer;
 		this.store();
 	}
+
+	@Override
+	public int getLinkDropServer() {
+		return this.linkDropServer;
+	}
+
+	@Override
+	public void setLinkDropServer(int linkDropServer) {
+		this.linkDropServer = linkDropServer;
+		this.store();
+	}
+
 	@Override
 	public boolean isCountersEnabled() {
 		return countersEnabled;
@@ -916,6 +936,35 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         return true;
     }
 
+	public boolean getLinkDropServerEnabled() {
+		if (!this.getEnquireServerEnabled() && this.linkDropServer > 0) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean checkLinkRecvMessage() {
+		boolean isRecv;
+		synchronized (linkDropWaitObject) {
+			isRecv = this.linkRecvMessCheck;
+		}
+
+		return isRecv;
+	}
+
+	public void setLinkRecvMessage(boolean recveivedMessage) {
+		this.linkRecvMessCheck = recveivedMessage;
+	}
+
+	public boolean getLinkStartFirstTime () {
+		return linkStartFirstTime;
+	}
+
+	public void setLinkStartFirstTime (boolean linkStarted) {
+		this.linkStartFirstTime = linkStarted;
+	}
+
     /**
 	 * XML Serialization/Deserialization
 	 */
@@ -969,6 +1018,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			esme.countersEnabled = xml.getAttribute(COUNTERS_ENABLED, true);
 			esme.enquireLinkDelay = xml.getAttribute(ENQUIRE_LINK_DELAY, 30000);
 			esme.enquireLinkDelayServer = xml.getAttribute(ENQUIRE_LINK_DELAY_SERVER, 0);
+			esme.linkDropServer = xml.getAttribute(LINK_DROP_SERVER, 0);
 
 			esme.chargingEnabled = xml.getAttribute(CHARGING_ENABLED, false);
 
@@ -1069,6 +1119,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			xml.setAttribute(COUNTERS_ENABLED, esme.countersEnabled);
 			xml.setAttribute(ENQUIRE_LINK_DELAY, esme.enquireLinkDelay);
 			xml.setAttribute(ENQUIRE_LINK_DELAY_SERVER, esme.enquireLinkDelayServer);
+			xml.setAttribute(LINK_DROP_SERVER, esme.linkDropServer);
 
 			xml.setAttribute(CHARGING_ENABLED, esme.chargingEnabled);
 
@@ -1448,6 +1499,15 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
      * @return checking result
      */
 	public CheckMessageLimitResult onMessageReceived(int count) {
+
+		if (getLinkDropServerEnabled()) {
+			synchronized (linkDropWaitObject) {
+				if (!linkRecvMessCheck) {
+					linkRecvMessCheck = true;
+				}
+			}
+		}
+
 	    long cntSecond = this.receivedMsgPerSecond.addAndGet(count);
         if (rateLimitPerSecond > 0 && cntSecond > rateLimitPerSecond) {
             this.receivedMsgPerSecond.addAndGet(-count);
