@@ -288,6 +288,18 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
 	int getEnquireLinkDelayServer();
 
+	/**
+	 * Default value is 0 milli seconds (means disabled). When SMSC connects to a remote client
+	 * as SERVER and SMSC is not received any data during configured time, SMSC will close this
+	 * session. If enquireLinkDelayServer is enabled then linkDropServer is always disabled.
+	 *
+	 * @param linkDropServer
+	 */
+
+	int getLinkDropServer();
+
+	void setLinkDropServer(int linkDropServer);
+
     void setPassword(String password);
 
 
