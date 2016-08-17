@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
+import org.mobicents.smsc.cassandra.Schema;
 import org.mobicents.smsc.smpp.TlvSet;
 
 
@@ -97,6 +98,14 @@ public class Sms implements Serializable {
     private OriginationType originationType;
 
 	private TlvSet tlvSet = new TlvSet();
+
+    private boolean statusReportRequest;
+    private int deliveryAttempt;
+    private String userData;
+    private String extraData;
+    private String extraData_2;
+    private String extraData_3;
+    private String extraData_4;
 
     private MessageDeliveryResultResponseInterface messageDeliveryResultResponse;
 
@@ -547,6 +556,75 @@ public class Sms implements Serializable {
             return false;
     }
 
+    public boolean isStatusReportRequest() {
+        return statusReportRequest;
+    }
+
+
+    public void setStatusReportRequest(boolean statusReportRequest) {
+        this.statusReportRequest = statusReportRequest;
+    }
+
+
+    public int getDeliveryAttempt() {
+        return deliveryAttempt;
+    }
+
+
+    public void setDeliveryAttempt(int deliveryAttempt) {
+        this.deliveryAttempt = deliveryAttempt;
+    }
+
+
+    public String getUserData() {
+        return userData;
+    }
+
+
+    public void setUserData(String userData) {
+        this.userData = userData;
+    }
+
+
+    public String getExtraData() {
+        return extraData;
+    }
+
+
+    public void setExtraData(String extraData) {
+        this.extraData = extraData;
+    }
+
+
+    public String getExtraData_2() {
+        return extraData_2;
+    }
+
+
+    public void setExtraData_2(String extraData_2) {
+        this.extraData_2 = extraData_2;
+    }
+
+
+    public String getExtraData_3() {
+        return extraData_3;
+    }
+
+
+    public void setExtraData_3(String extraData_3) {
+        this.extraData_3 = extraData_3;
+    }
+
+
+    public String getExtraData_4() {
+        return extraData_4;
+    }
+
+
+    public void setExtraData_4(String extraData_4) {
+        this.extraData_4 = extraData_4;
+    }
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -615,6 +693,8 @@ public class Sms implements Serializable {
         sb.append(reroutingCount);
         sb.append(", originationType=");
         sb.append(originationType);
+        sb.append(", originatorSccpAddress=");
+        sb.append(originatorSccpAddress);
         sb.append(", shortMessageText=");
         sb.append(shortMessageText);
         if (shortMessageBin != null) {

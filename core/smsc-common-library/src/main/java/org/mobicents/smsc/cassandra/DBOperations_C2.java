@@ -68,9 +68,9 @@ import com.datastax.driver.core.TableMetadata;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
 
 /**
- * 
+ *
  * @author sergey vetyutnev
- * 
+ *
  */
 public class DBOperations_C2 {
 	private static final Logger logger = Logger.getLogger(DBOperations_C2.class);
@@ -227,11 +227,20 @@ public class DBOperations_C2 {
         } catch (Exception e) {
             logger.error(
                     String.format(
-                            "Failure of connting to cassandra database. : host=%s, port=%d. SMSC GW will work without database support\n",
+                            "Failure of connecting to cassandra database. : host=%s, port=%d. SMSC GW will work without database support\n",
                             hosts, port), e);
             this.started = true;
             return;
         }
+
+        ProtocolVersion protVersion = DBOperations_C2.getProtocolVersion(cluster);
+        if (protVersion == ProtocolVersion.V1) {
+            // we do not support more cassandra database 1.2
+            logger.error("We do not support more cassandra database 1.2. You need to install cassandra database V2.0, 2.1 or 3.0");
+            this.started = true;
+            return;
+        }
+
         databaseAvailable = true;
 
         Metadata metadata = cluster.getMetadata();
@@ -245,6 +254,17 @@ public class DBOperations_C2 {
 		session.execute("USE \"" + keyspace + "\"");
 
 		this.checkCurrentSlotTableExists();
+
+        // let's update tables structure if needed
+//        try {
+//            addFieldsPacket_1(keyspace);
+//        } catch (PersistenceException e) {
+//            // structure update failure - we can not continue
+//            logger.error("Can not update database version !!!!, we can not use it more", e);
+//            databaseAvailable = false;
+//            this.started = true;
+//            return;
+//        }
 
 		String sa = "SELECT \"" + Schema.COLUMN_NEXT_SLOT + "\" FROM \"" + Schema.FAMILY_CURRENT_SLOT_TABLE
 				+ "\" where \"" + Schema.COLUMN_ID + "\"=?;";
@@ -279,8 +299,6 @@ public class DBOperations_C2 {
 				+ "\" where token(\"" + Schema.COLUMN_ADDRESS + "\") >= token(?) LIMIT " + row_count + ";");
 		getSipSmsRoutingRulesRange2 = session.prepare("select * from \"" + Schema.FAMILY_SIP_SMS_ROUTING_RULE
 				+ "\"  LIMIT " + row_count + ";");
-
-//        getTableList = session.prepare("select * from system.schema_columnfamilies;");
 
 		try {
 			currentDueSlot = c2_getCurrentSlotTable(CURRENT_DUE_SLOT);
@@ -794,8 +812,8 @@ public class DBOperations_C2 {
 			PreparedStatement ps = psc.createRecordCurrent;
 			BoundStatement boundStatement = new BoundStatement(ps);
 
-            setSmsFields(sms, dueSlot, boundStatement, false, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(), psc.getAddedNetworkId(),
-                    psc.getAddedOrigNetworkId());
+            setSmsFields(sms, dueSlot, boundStatement, false, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
+                    psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
 
 			ResultSet res = session.execute(boundStatement);
 		} catch (Exception e1) {
@@ -819,8 +837,8 @@ public class DBOperations_C2 {
 			PreparedStatement ps = psc.createRecordArchive;
 			BoundStatement boundStatement = new BoundStatement(ps);
 
-            setSmsFields(sms, dueSlot, boundStatement, true, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(), psc.getAddedNetworkId(),
-                    psc.getAddedOrigNetworkId());
+            setSmsFields(sms, dueSlot, boundStatement, true, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
+                    psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
 
 			ResultSet res = session.execute(boundStatement);
 		} catch (Exception e1) {
@@ -830,8 +848,9 @@ public class DBOperations_C2 {
 		}
 	}
 
-    private void setSmsFields(Sms sms, long dueSlot, BoundStatement boundStatement, boolean archive, boolean shortMessageNewStringFormat, boolean addedCorrId,
-            boolean addedNetworkId, boolean addedOrigNetworkId) throws PersistenceException {
+    private void setSmsFields(Sms sms, long dueSlot, BoundStatement boundStatement, boolean archive,
+            boolean shortMessageNewStringFormat, boolean addedCorrId, boolean addedNetworkId, boolean addedOrigNetworkId,
+            boolean addedPacket1) throws PersistenceException {
 		boundStatement.setUUID(Schema.COLUMN_ID, sms.getDbId());
         boundStatement.setString(Schema.COLUMN_TARGET_ID, sms.getSmsSet().getTargetId());
         if (addedNetworkId) {
@@ -912,18 +931,18 @@ public class DBOperations_C2 {
             byte[] textPart = null;
             DataCodingScheme dcs = new DataCodingSchemeImpl(sms.getDataCoding());
             switch (dcs.getCharacterSet()) {
-            case GSM7:
-                textPart = msg.getBytes();
-                break;
-            case UCS2:
-                Charset ucs2Charset = Charset.forName("UTF-16BE");
-                ByteBuffer bb = ucs2Charset.encode(msg);
-                textPart = new byte[bb.limit()];
-                bb.get(textPart);
-                break;
-            default:
-                // we do not support this yet
-                break;
+                case GSM7:
+                    textPart = msg.getBytes();
+                    break;
+                case UCS2:
+                    Charset ucs2Charset = Charset.forName("UTF-16BE");
+                    ByteBuffer bb = ucs2Charset.encode(msg);
+                    textPart = new byte[bb.limit()];
+                    bb.get(textPart);
+                    break;
+                default:
+                    // we do not support this yet
+                    break;
             }
 
             byte[] data;
@@ -955,6 +974,37 @@ public class DBOperations_C2 {
             boundStatement.setToNull(Schema.COLUMN_VALIDITY_PERIOD);
 
 		boundStatement.setInt(Schema.COLUMN_DELIVERY_COUNT, sms.getDeliveryCount());
+
+        if (addedPacket1) {
+            if (sms.getOriginatorSccpAddress() != null) {
+                boundStatement.setString(Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS, sms.getOriginatorSccpAddress());
+            } else
+                boundStatement.setToNull(Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS);
+
+            // TODO: extra columns for further usage
+            boundStatement.setBool(Schema.COLUMN_STATUS_REPORT_REQUEST, sms.isStatusReportRequest());
+            boundStatement.setInt(Schema.COLUMN_DELIVERY_ATTEMPT, sms.getDeliveryAttempt());
+            if (sms.getUserData() != null) {
+                boundStatement.setString(Schema.COLUMN_USER_DATA, sms.getUserData());
+            } else
+                boundStatement.setToNull(Schema.COLUMN_USER_DATA);
+            if (sms.getExtraData() != null) {
+                boundStatement.setString(Schema.COLUMN_EXTRA_DATA, sms.getExtraData());
+            } else
+                boundStatement.setToNull(Schema.COLUMN_EXTRA_DATA);
+            if (sms.getExtraData_2() != null) {
+                boundStatement.setString(Schema.COLUMN_EXTRA_DATA_2, sms.getExtraData_2());
+            } else
+                boundStatement.setToNull(Schema.COLUMN_EXTRA_DATA_2);
+            if (sms.getExtraData_3() != null) {
+                boundStatement.setString(Schema.COLUMN_EXTRA_DATA_3, sms.getExtraData_3());
+            } else
+                boundStatement.setToNull(Schema.COLUMN_EXTRA_DATA_3);
+            if (sms.getExtraData_4() != null) {
+                boundStatement.setString(Schema.COLUMN_EXTRA_DATA_4, sms.getExtraData_4());
+            } else
+                boundStatement.setToNull(Schema.COLUMN_EXTRA_DATA_4);
+        }
 
 		if (sms.getTlvSet().getOptionalParameterCount() > 0) {
 			try {
@@ -1025,10 +1075,10 @@ public class DBOperations_C2 {
 			ResultSet res = session.execute(boundStatement);
 
 			for (Row row : res) {
-                SmsSet smsSet = this.createSms(row, null, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(), psc.getAddedNetworkId(),
-                        psc.getAddedOrigNetworkId());
-				if (smsSet != null)
-					result.add(smsSet);
+                SmsSet smsSet = this.createSms(row, null, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
+                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
+                if (smsSet != null)
+                    result.add(smsSet);
 			}
 		} catch (Exception e1) {
 			String msg = "Failed getRecordList()";
@@ -1050,8 +1100,8 @@ public class DBOperations_C2 {
 			ResultSet res = session.execute(boundStatement);
 
 			for (Row row : res) {
-                result = this.createSms(row, result, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(), psc.getAddedNetworkId(),
-                        psc.getAddedOrigNetworkId());
+                result = this.createSms(row, result, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
+                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
 			}
 		} catch (Exception e1) {
 			String msg = "Failed getRecordListForTargeId()";
@@ -1062,8 +1112,8 @@ public class DBOperations_C2 {
         return result;
 	}
 
-    protected SmsSet createSms(final Row row, SmsSet smsSet, boolean shortMessageNewStringFormat, boolean addedCorrId, boolean addedNetworkId,
-            boolean addedOrigNetworkId) throws PersistenceException {
+    protected SmsSet createSms(final Row row, SmsSet smsSet, boolean shortMessageNewStringFormat, boolean addedCorrId,
+            boolean addedNetworkId, boolean addedOrigNetworkId, boolean addedPacket1) throws PersistenceException {
         if (row == null) {
             return smsSet;
         }
@@ -1165,6 +1215,18 @@ public class DBOperations_C2 {
         sms.setScheduleDeliveryTime(getRowDate(row, Schema.COLUMN_SCHEDULE_DELIVERY_TIME));
 		sms.setValidityPeriod(getRowDate(row, Schema.COLUMN_VALIDITY_PERIOD));
 		sms.setDeliveryCount(row.getInt(Schema.COLUMN_DELIVERY_COUNT));
+
+        if (addedPacket1) {
+            sms.setOriginatorSccpAddress(row.getString(Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS));
+            // TODO: extra columns for further usage
+            sms.setStatusReportRequest(row.getBool(Schema.COLUMN_STATUS_REPORT_REQUEST));
+            sms.setDeliveryAttempt(row.getInt(Schema.COLUMN_DELIVERY_ATTEMPT));
+            sms.setUserData(row.getString(Schema.COLUMN_USER_DATA));
+            sms.setExtraData(row.getString(Schema.COLUMN_EXTRA_DATA));
+            sms.setExtraData_2(row.getString(Schema.COLUMN_EXTRA_DATA_2));
+            sms.setExtraData_3(row.getString(Schema.COLUMN_EXTRA_DATA_3));
+            sms.setExtraData_4(row.getString(Schema.COLUMN_EXTRA_DATA_4));
+        }
 
 		String s = row.getString(Schema.COLUMN_OPTIONAL_PARAMETERS);
 		if (s != null) {
@@ -1537,39 +1599,48 @@ public class DBOperations_C2 {
 		appendField(sb, Schema.COLUMN_NNN_NP, "int");
 		appendField(sb, Schema.COLUMN_SM_STATUS, "int");
 		appendField(sb, Schema.COLUMN_SM_TYPE, "int");
-		appendField(sb, Schema.COLUMN_DELIVERY_COUNT, "int");
+        appendField(sb, Schema.COLUMN_DELIVERY_COUNT, "int");
+
+        appendField(sb, Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS, "ascii");
+        appendField(sb, Schema.COLUMN_STATUS_REPORT_REQUEST, "boolean");
+        appendField(sb, Schema.COLUMN_DELIVERY_ATTEMPT, "int");
+        appendField(sb, Schema.COLUMN_USER_DATA, "text");
+        appendField(sb, Schema.COLUMN_EXTRA_DATA, "text");
+        appendField(sb, Schema.COLUMN_EXTRA_DATA_2, "text");
+        appendField(sb, Schema.COLUMN_EXTRA_DATA_3, "text");
+        appendField(sb, Schema.COLUMN_EXTRA_DATA_4, "text");
 	}
 
 	private synchronized void checkCurrentSlotTableExists() throws PersistenceException {
-		try {
-			try {
-				// checking of CURRENT_SLOT_TABLE existence
-				String sa = "SELECT \"" + Schema.COLUMN_NEXT_SLOT + "\" FROM \"" + Schema.FAMILY_CURRENT_SLOT_TABLE
-						+ "\" where \"" + Schema.COLUMN_ID + "\"=0;";
-				PreparedStatement ps = session.prepare(sa);
-			} catch (InvalidQueryException e) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("CREATE TABLE \"");
-				sb.append(Schema.FAMILY_CURRENT_SLOT_TABLE);
-				sb.append("\" (");
+        try {
+            try {
+                // checking of CURRENT_SLOT_TABLE existence
+                String sa = "SELECT \"" + Schema.COLUMN_NEXT_SLOT + "\" FROM \"" + Schema.FAMILY_CURRENT_SLOT_TABLE
+                        + "\" where \"" + Schema.COLUMN_ID + "\"=0;";
+                PreparedStatement ps = session.prepare(sa);
+            } catch (InvalidQueryException e) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("CREATE TABLE \"");
+                sb.append(Schema.FAMILY_CURRENT_SLOT_TABLE);
+                sb.append("\" (");
 
-				appendField(sb, Schema.COLUMN_ID, "int");
-				appendField(sb, Schema.COLUMN_NEXT_SLOT, "bigint");
+                appendField(sb, Schema.COLUMN_ID, "int");
+                appendField(sb, Schema.COLUMN_NEXT_SLOT, "bigint");
 
-				sb.append("PRIMARY KEY (\"");
-				sb.append(Schema.COLUMN_ID);
-				sb.append("\"");
-				sb.append("));");
+                sb.append("PRIMARY KEY (\"");
+                sb.append(Schema.COLUMN_ID);
+                sb.append("\"");
+                sb.append("));");
 
-				String s2 = sb.toString();
-				PreparedStatement ps = session.prepare(s2);
-				BoundStatement boundStatement = new BoundStatement(ps);
-				ResultSet res = session.execute(boundStatement);
-			}
-		} catch (Exception e1) {
-			String msg = "Failed to access or create table " + Schema.FAMILY_CURRENT_SLOT_TABLE + "!";
-			throw new PersistenceException(msg, e1);
-		}
+                String s2 = sb.toString();
+                PreparedStatement ps = session.prepare(s2);
+                BoundStatement boundStatement = new BoundStatement(ps);
+                ResultSet res = session.execute(boundStatement);
+            }
+        } catch (Exception e1) {
+            String msg = "Failed to access or create table " + Schema.FAMILY_CURRENT_SLOT_TABLE + "!";
+            throw new PersistenceException(msg, e1);
+        }
 
 		try {
 			try {
@@ -1637,6 +1708,89 @@ public class DBOperations_C2 {
 			throw new PersistenceException(msg, e1);
 		}
 	}
+
+//    private void doUpdateDbSchemaVersion() {
+//        StringBuilder sb;
+//        String s2;
+//        PreparedStatement ps;
+//        BoundStatement boundStatement;
+//        sb = new StringBuilder();
+//        sb.append("INSERT INTO \"");
+//        sb.append(Schema.FAMILY_MASTER_TABLE);
+//        sb.append("\" (\"");
+//        sb.append(Schema.COLUMN_ID);
+//        sb.append("\", \"");
+//        sb.append(Schema.COLUMN_INT_VALUE);
+//        sb.append("\") VALUES (");
+//        sb.append(Schema.MASTER_TABLE_DB_ACTUAL_SCHEMA_VERSION_ID);
+//        sb.append(",");
+//        sb.append(Schema.DB_ACTUAL_SCHEMA_VERSION);
+//        sb.append(");");
+//
+//        s2 = sb.toString();
+//        ps = session.prepare(s2);
+//        boundStatement = new BoundStatement(ps);
+//        session.execute(boundStatement);
+//    }
+//
+//    private synchronized void addFieldsPacket_1(String keyspace) throws PersistenceException {
+//        int currentDbSchemaVersion = 0;
+//
+//        try {
+//            // checking of database schema version
+//            String sa = "SELECT \"" + Schema.COLUMN_INT_VALUE + "\" FROM \"" + Schema.FAMILY_MASTER_TABLE + "\" where \""
+//                    + Schema.COLUMN_ID + "\"=" + Schema.MASTER_TABLE_DB_ACTUAL_SCHEMA_VERSION_ID + ";";
+//            PreparedStatement ps = session.prepare(sa);
+//            BoundStatement boundStatement = new BoundStatement(ps);
+//            ResultSet res = session.execute(boundStatement);
+//            for (Row row : res) {
+//                currentDbSchemaVersion = row.getInt(0);
+//                break;
+//            }
+//            if (currentDbSchemaVersion == Schema.DB_ACTUAL_SCHEMA_VERSION) {
+//                // version is already actual
+//                return;
+//            }
+//        } catch (InvalidQueryException e) {
+//        }
+//
+//        logger.info("Database structure: started of applying of adding fields packet 1");
+//
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_MESSAGE_TEXT, "text");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_MESSAGE_BIN, "blob");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_CORR_ID, "ascii");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_NETWORK_ID, "int");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_ORIG_NETWORK_ID, "int");
+//
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS, "ascii");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_STATUS_REPORT_REQUEST, "boolean");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_DELIVERY_ATTEMPT, "int");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_USER_DATA, "text");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_EXTRA_DATA, "text");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_2, "text");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_3, "text");
+//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_4, "text");
+//
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_MESSAGE_TEXT, "text");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_MESSAGE_BIN, "blob");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_CORR_ID, "ascii");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_NETWORK_ID, "int");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_ORIG_NETWORK_ID, "int");
+//
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS, "ascii");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_STATUS_REPORT_REQUEST, "boolean");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_DELIVERY_ATTEMPT, "int");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_USER_DATA, "text");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_EXTRA_DATA, "text");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_2, "text");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_3, "text");
+//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_4, "text");
+//
+//        // updating of database schema version
+//        doUpdateDbSchemaVersion();
+//
+//        logger.info("Database structure: finished of applying of adding fields packet 1");
+//    }
 
 	protected void appendField(StringBuilder sb, String name, String type) {
 		sb.append("\"");
@@ -2100,32 +2254,118 @@ public class DBOperations_C2 {
             }
         }
         return ss;
+    }
 
+    private String[] getDueSlotTableListAsNames(String keyspace) {
+        String[] ss = this.c2_getTableList(keyspace);
 
-//        ArrayList<String> res = new ArrayList<String>();
+        ArrayList<String> res = new ArrayList<String>();
+        for (String s : ss) {
+            if (s.startsWith("DST_SLOT_TABLE_") && s.length() == 25) {
+                res.add(s);
+            }
+        }
+
+        String[] sss = new String[res.size()];
+        res.toArray(sss);
+        Arrays.sort(sss);
+
+        return sss;
+    }
+
+    protected String[] getLiveTableListAsNames(String keyspace) {
+        String[] ss = this.c2_getTableList(keyspace);
+
+        ArrayList<String> res = new ArrayList<String>();
+        for (String s : ss) {
+            if (s.startsWith("SLOT_MESSAGES_TABLE_") && s.length() == 30) {
+                res.add(s);
+            }
+        }
+
+        String[] sss = new String[res.size()];
+        res.toArray(sss);
+        Arrays.sort(sss);
+
+        return sss;
+    }
+
+    private String[] getArchiveTableListAsNames(String keyspace) {
+        String[] ss = this.c2_getTableList(keyspace);
+
+        ArrayList<String> res = new ArrayList<String>();
+        for (String s : ss) {
+            Date dt = null;
+            if (s.startsWith("MESSAGES_") && s.length() == 19) {
+                res.add(s);
+            }
+        }
+
+        String[] sss = new String[res.size()];
+        res.toArray(sss);
+        Arrays.sort(sss);
+
+        return sss;
+    }
+
+//    protected boolean checkFieldInTable(String tName, String column_name) {
 //        try {
-//            
-//            BoundStatement boundStatement = new BoundStatement(this.getTableList);
-//
-//            ResultSet result = session.execute(boundStatement);
-//
-//            for (Row row : result) {
-//                String keyspace1 = row.getString(Schema.COLUMN_SYSTEM_KEYSPACE_NAME);
-//                String tableName = row.getString(Schema.COLUMN_SYSTEM_COLUMNFAMILY_NAME);
-//
-//                if (keyspace.equals(keyspace1)) {
-//                    res.add(tableName);
-//                }
-//            }
+//            String sa = "select \"" + column_name + "\" from \"" + tName + "\" limit 1";
+//            PreparedStatement ps = session.prepare(sa);
+//            BoundStatement boundStatement = new BoundStatement(ps);
+//            session.execute(boundStatement);
 //        } catch (Exception e) {
-//            logger.info("Can not get a cassandra table list");
-//            return new String[0];
+//            logger.debug("Can not read field \"" + column_name + "\" in table \"" + tName + "\"");
+//            return false;
 //        }
 //
-//        String[] ss = new String[res.size()];
-//        res.toArray(ss);
-//        return ss;
-    }
+//        return true;
+//    }
+//
+//    private void addFieldToTable(String tName, String column_name, String cql_type) throws PersistenceException {
+//        // ALTER TABLE keyspace_name.table_name instruction
+//        // instruction is:ALTER column_name TYPE cql_type
+//        // | ( ADD column_name cql_type )
+//        // | ( DROP column_name )
+//        // | ( RENAME column_name TO column_name )
+//        // | ( WITH property AND property ... )
+//        try {
+//            String sa = "ALTER TABLE \"" + tName + "\" ADD \"" + column_name + "\" " + cql_type;
+//            PreparedStatement ps = session.prepare(sa);
+//            BoundStatement boundStatement = new BoundStatement(ps);
+//            session.execute(boundStatement);
+//        } catch (Exception e) {
+//            String s1 = "Can not add column \"" + column_name + "\" into table \"" + tName + "\"";
+//            logger.error(s1, e);
+//            throw new PersistenceException(s1, e);
+//        }
+//    }
+//
+//    protected void addFieldsToLiveTables(String keyspace, String column_name, String cql_type) throws PersistenceException {
+//        String[] ss = getLiveTableListAsNames(keyspace);
+//
+//        for (String s : ss) {
+//            boolean res = checkFieldInTable(s, column_name);
+//            if (!res) {
+//                logger.warn("Adding column \"" + column_name + "\" type \"" + cql_type + "\" into live table \"" + cql_type
+//                        + "\"");
+//                addFieldToTable(s, column_name, cql_type);
+//            }
+//        }
+//    }
+//
+//    protected void addFieldsToArchiveTables(String keyspace, String column_name, String cql_type) throws PersistenceException {
+//        String[] ss = getArchiveTableListAsNames(keyspace);
+//
+//        for (String s : ss) {
+//            boolean res = checkFieldInTable(s, column_name);
+//            if (!res) {
+//                logger.warn("Adding column \"" + column_name + "\" type \"" + cql_type + "\" into live table \"" + cql_type
+//                        + "\"");
+//                addFieldToTable(s, column_name, cql_type);
+//            }
+//        }
+//    }
 
 	private class DueSlotWritingElement {
 		public long dueSlot;

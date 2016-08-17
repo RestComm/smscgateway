@@ -408,6 +408,30 @@ public class TT_CassandraTest {
 //        sbb.c2_deleteArchiveTablesForDate(dt);
     }
 
+//    @Test(groups = { "cassandra" })
+//    public void testingColumnAdding() throws Exception {
+//        if (!this.cassandraDbInited)
+//            return;
+//
+//        Date dt0 = new Date();
+//        Date dt = new Date(dt0.getTime() - 10 * 24 * 3600 * 1000);
+//        sbb.c2_deleteLiveTablesForDate(dt);
+//        sbb.c2_deleteArchiveTablesForDate(dt);
+//
+//        PreparedStatementCollection_C3 psc = sbb.getStatementCollection(dt);
+//        long newDueSlot = sbb.c2_getDueSlotForTime(dt);
+//        sbb.c2_updateDueSlotForTargetId("222222_1_11", newDueSlot);
+//
+//        String[] ss = sbb.getLiveTableListAsNames(sbb.getKeyspaceName());
+//        String s = ss[0];
+//        boolean res = sbb.checkFieldInTable(s, "extra_col");
+//        assertFalse(res);
+//        sbb.addFieldsToLiveTables(sbb.getKeyspaceName(), "extra_col", "text");
+//
+//        res = sbb.checkFieldInTable(s, "extra_col");
+//        assertTrue(res);
+//    }
+
     public void testOldFormatMessage(TargetAddress ta, DataCodingScheme dcs, String msg, UserDataHeader udh) throws Exception {
         Date dt = new Date();
         PreparedStatementCollection_C3 psc = sbb.getStatementCollection(dt);
@@ -450,7 +474,7 @@ public class TT_CassandraTest {
                     sbb.c2_updateDueSlotForTargetId(ta.getTargetId(), dueSlot);
                 }
                 sms.setDueSlot(dueSlot);
-
+                
                 sbb.c2_registerDueSlotWriting(dueSlot);
                 try {
                     sbb.c2_createRecordCurrent(sms);
@@ -760,6 +784,15 @@ public class TT_CassandraTest {
         smsSet.setDueDelay(510);
         sms.setDeliveryCount(9);
 
+        sms.setOriginatorSccpAddress("11224455");
+        sms.setStatusReportRequest(true);
+        sms.setDeliveryAttempt(321);
+        sms.setUserData("userdata");
+        sms.setExtraData("extradata_1");
+        sms.setExtraData_2("extradata_2");
+        sms.setExtraData_3("extradata_3");
+        sms.setExtraData_4("extradata_4");
+
         return sms;
     }
 
@@ -809,6 +842,15 @@ public class TT_CassandraTest {
         assertEquals(sms.getTlvSet().getOptionalParameterCount(), 2);
         assertEquals(sms.getTlvSet().getOptionalParameter((short) 5).getValue(), new byte[] { (byte) (1 + num), 2, 3, 4, 5 });
         assertEquals(sms.getTlvSet().getOptionalParameter((short) 6).getValue(), new byte[] { (byte) (6 + num), 7, 8 });
+
+        assertEquals(sms.getOriginatorSccpAddress(), "11224455");
+        assertTrue(sms.isStatusReportRequest());
+        assertEquals(sms.getDeliveryAttempt(), 321);
+        assertEquals(sms.getUserData(), "userdata");
+        assertEquals(sms.getExtraData(), "extradata_1");
+        assertEquals(sms.getExtraData_2(), "extradata_2");
+        assertEquals(sms.getExtraData_3(), "extradata_3");
+        assertEquals(sms.getExtraData_4(), "extradata_4");
     }
 
 }

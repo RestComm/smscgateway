@@ -23,6 +23,7 @@ CREATE TABLE "SLOT_MESSAGES_TABLE_YYYY_MM_DD" (
 	"ID" uuid, 
 	"TARGET_ID" ascii,
 	"NETWORK_ID" int,
+	"ORIG_NETWORK_ID" int,
 	"DUE_SLOT" bigint,
 	"IN_SYSTEM" int,
 	"SMSC_UUID" uuid,
@@ -71,9 +72,17 @@ CREATE TABLE "SLOT_MESSAGES_TABLE_YYYY_MM_DD" (
 	"NNN_DIGITS" ascii,
 	"NNN_AN" int,
 	"NNN_NP" int,
-	"SM_STATUS" int,
 	"SM_TYPE" int, 
 	"DELIVERY_COUNT" int, 
+
+	"ORIGINATOR_SCCP_ADDRESS" ascii,
+	"DELIVERY_ATTEMPT" int,
+	"STATUS_REPORT_REQUEST" boolean,
+	"USER_DATA" text,
+	"EXTRA_DATA" text,
+	"EXTRA_DATA_2" text,
+	"EXTRA_DATA_3" text,
+	"EXTRA_DATA_4" text,
 
 	PRIMARY KEY (("DUE_SLOT"), "TARGET_ID", "ID") 
 );
@@ -83,6 +92,7 @@ CREATE TABLE "MESSAGES_YYYY_MM_DD" (
 	"ID" uuid, 
 	"TARGET_ID" ascii,
 	"NETWORK_ID" int,
+	"ORIG_NETWORK_ID" int,
 	"DUE_SLOT" bigint,
 	"IN_SYSTEM" int,
 	"SMSC_UUID" uuid,
@@ -131,9 +141,17 @@ CREATE TABLE "MESSAGES_YYYY_MM_DD" (
 	"NNN_DIGITS" ascii,
 	"NNN_AN" int,
 	"NNN_NP" int,
-	"SM_STATUS" int,
 	"SM_TYPE" int, 
 	"DELIVERY_COUNT" int, 
+
+	"ORIGINATOR_SCCP_ADDRESS" ascii,
+	"STATUS_REPORT_REQUEST" boolean,
+	"DELIVERY_ATTEMPT" int,
+	"USER_DATA" text,
+	"EXTRA_DATA" text,
+	"EXTRA_DATA_2" text,
+	"EXTRA_DATA_3" text,
+	"EXTRA_DATA_4" text,
 
 	PRIMARY KEY (("ADDR_DST_DIGITS"), ID);
 );

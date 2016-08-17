@@ -32,6 +32,7 @@ public class PreparedStatementCollection_C3 {
     private boolean addedCorrId;
     private boolean addedNetworkId;
     private boolean addedOrigNetworkId;
+    private boolean addedPacket1;
 
     protected PreparedStatement createDueSlotForTargetId;
     protected PreparedStatement getDueSlotForTargetId;
@@ -49,30 +50,42 @@ public class PreparedStatementCollection_C3 {
         // check table version format
         try {
             shortMessageNewStringFormat = false;
-            String s1 = "select \"" + Schema.COLUMN_MESSAGE_TEXT + "\" FROM \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName + "\" limit 1;";
+            String s1 = "select \"" + Schema.COLUMN_MESSAGE_TEXT + "\" FROM \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName
+                    + "\" limit 1;";
             dbOperation.session.execute(s1);
             shortMessageNewStringFormat = true;
         } catch (Exception e) {
         }
         try {
             addedCorrId = false;
-            String s1 = "select \"" + Schema.COLUMN_CORR_ID + "\" FROM \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName + "\" limit 1;";
+            String s1 = "select \"" + Schema.COLUMN_CORR_ID + "\" FROM \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName
+                    + "\" limit 1;";
             dbOperation.session.execute(s1);
             addedCorrId = true;
         } catch (Exception e) {
         }
         try {
             addedNetworkId = false;
-            String s1 = "select \"" + Schema.COLUMN_NETWORK_ID + "\" FROM \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName + "\" limit 1;";
+            String s1 = "select \"" + Schema.COLUMN_NETWORK_ID + "\" FROM \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName
+                    + "\" limit 1;";
             dbOperation.session.execute(s1);
             addedNetworkId = true;
         } catch (Exception e) {
         }
         try {
             addedOrigNetworkId = false;
-            String s1 = "select \"" + Schema.COLUMN_ORIG_NETWORK_ID + "\" FROM \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName + "\" limit 1;";
+            String s1 = "select \"" + Schema.COLUMN_ORIG_NETWORK_ID + "\" FROM \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName
+                    + "\" limit 1;";
             dbOperation.session.execute(s1);
             addedOrigNetworkId = true;
+        } catch (Exception e) {
+        }
+        try {
+            addedPacket1 = false;
+            String s1 = "select \"" + Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS + "\" FROM \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName
+                    + "\" limit 1;";
+            dbOperation.session.execute(s1);
+            addedPacket1 = true;
         } catch (Exception e) {
         }
 
@@ -139,6 +152,10 @@ public class PreparedStatementCollection_C3 {
 
     public boolean getAddedOrigNetworkId() {
         return this.addedOrigNetworkId;
+    }
+
+    public boolean getAddedPacket1() {
+        return this.addedPacket1;
     }
 
     private String getFillUpdateFields() {
@@ -236,6 +253,25 @@ public class PreparedStatementCollection_C3 {
             sb.append("\", \"");
             sb.append(Schema.COLUMN_CORR_ID);
         }
+
+        if (this.addedPacket1) {
+            sb.append("\", \"");
+            sb.append(Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS);
+            sb.append("\", \"");
+            sb.append(Schema.COLUMN_STATUS_REPORT_REQUEST);
+            sb.append("\", \"");
+            sb.append(Schema.COLUMN_DELIVERY_ATTEMPT);
+            sb.append("\", \"");
+            sb.append(Schema.COLUMN_USER_DATA);
+            sb.append("\", \"");
+            sb.append(Schema.COLUMN_EXTRA_DATA);
+            sb.append("\", \"");
+            sb.append(Schema.COLUMN_EXTRA_DATA_2);
+            sb.append("\", \"");
+            sb.append(Schema.COLUMN_EXTRA_DATA_3);
+            sb.append("\", \"");
+            sb.append(Schema.COLUMN_EXTRA_DATA_4);
+        }
         sb.append("\"");
 
         return sb.toString();
@@ -270,6 +306,8 @@ public class PreparedStatementCollection_C3 {
             cnt++;
         if (this.addedOrigNetworkId)
             cnt++;
+        if (this.addedPacket1)
+            cnt += 8;
 
         StringBuilder sb = new StringBuilder();
         int i2 = 0;

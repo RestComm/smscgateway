@@ -122,17 +122,19 @@ public class TT_PersistenceRAInterfaceProxy extends DBOperations_C2 implements P
 
                 ProtocolVersion protVersion = DBOperations_C2.getProtocolVersion(cluster);
                 if (protVersion == ProtocolVersion.V1) {
-                    if (tstRes == 0) {
-                        session.execute("CREATE TABLE \"TEST_TABLE\" (id uuid primary key);");
-                    }
+                    throw new Exception("We do not support cassandra databse 1.2 more");
 
-                    // deleting of current tables
-                    try {
-                        session.execute("TRUNCATE \"" + Schema.FAMILY_CURRENT_SLOT_TABLE + "\";");
-                    } catch (Exception e) {
-                        int g1 = 0;
-                        g1++;
-                    }                
+//                    if (tstRes == 0) {
+//                        session.execute("CREATE TABLE \"TEST_TABLE\" (id uuid primary key);");
+//                    }
+//
+//                    // deleting of current tables
+//                    try {
+//                        session.execute("TRUNCATE \"" + Schema.FAMILY_CURRENT_SLOT_TABLE + "\";");
+//                    } catch (Exception e) {
+//                        int g1 = 0;
+//                        g1++;
+//                    }                
                 } else {
                     if (tstRes == 0) {
                         ps = session.prepare("CREATE TABLE \"TEST_TABLE\" (id uuid primary key);");
@@ -246,7 +248,7 @@ public class TT_PersistenceRAInterfaceProxy extends DBOperations_C2 implements P
         ResultSet result = session.execute(boundStatement);
 
         Row row = result.one();
-        SmsSet smsSet = createSms(row, null, true, true, true, true);
+        SmsSet smsSet = createSms(row, null, true, true, true, true, true);
         if (smsSet == null)
             return null;
 
@@ -313,7 +315,7 @@ public class TT_PersistenceRAInterfaceProxy extends DBOperations_C2 implements P
             SmsSet smsSet = null;
             Row row2 = null;
             for (Row row : rs) {
-                smsSet = this.createSms(row, null, true, true, true, true);
+                smsSet = this.createSms(row, null, true, true, true, true, true);
                 row2 = row;
                 break;
             }
@@ -399,6 +401,21 @@ public class TT_PersistenceRAInterfaceProxy extends DBOperations_C2 implements P
         appendField(sb, Schema.COLUMN_SM_STATUS, "int");
         appendField(sb, Schema.COLUMN_SM_TYPE, "int");
         appendField(sb, Schema.COLUMN_DELIVERY_COUNT, "int");
+
+        if (!oldShortMessageDbFormat) {
+            appendField(sb, Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS, "ascii");
+            appendField(sb, Schema.COLUMN_STATUS_REPORT_REQUEST, "boolean");
+            appendField(sb, Schema.COLUMN_DELIVERY_ATTEMPT, "int");
+            appendField(sb, Schema.COLUMN_USER_DATA, "text");
+            appendField(sb, Schema.COLUMN_EXTRA_DATA, "text");
+            appendField(sb, Schema.COLUMN_EXTRA_DATA_2, "text");
+            appendField(sb, Schema.COLUMN_EXTRA_DATA_3, "text");
+            appendField(sb, Schema.COLUMN_EXTRA_DATA_4, "text");
+        }
+    }
+
+    protected String[] getLiveTableListAsNames(String keyspace) {
+        return super.getLiveTableListAsNames(keyspace);
     }
 
     @Override
