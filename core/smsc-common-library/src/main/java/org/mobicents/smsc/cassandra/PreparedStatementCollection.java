@@ -24,9 +24,9 @@ package org.mobicents.smsc.cassandra;
 
 import com.datastax.driver.core.PreparedStatement;
 
-public class PreparedStatementCollection_C3 {
+public class PreparedStatementCollection {
 
-    private DBOperations_C2 dbOperation;
+    private DBOperations dbOperation;
     private String tName;
     private boolean shortMessageNewStringFormat;
     private boolean addedCorrId;
@@ -43,7 +43,7 @@ public class PreparedStatementCollection_C3 {
     protected PreparedStatement updateAlertingSupport;
     protected PreparedStatement createRecordArchive;
 
-    public PreparedStatementCollection_C3(DBOperations_C2 dbOperation, String tName, int ttlCurrent, int ttlArchive) {
+    public PreparedStatementCollection(DBOperations dbOperation, String tName, int ttlCurrent, int ttlArchive) {
         this.dbOperation = dbOperation;
         this.tName = tName;
 

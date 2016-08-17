@@ -50,7 +50,7 @@ import org.mobicents.smsc.slee.resources.persistence.MAPDialogSmsProxy;
 import org.mobicents.smsc.slee.resources.persistence.MAPProviderProxy;
 import org.mobicents.smsc.slee.resources.persistence.MAPServiceSmsProxy;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
-import org.mobicents.smsc.slee.resources.persistence.TT_PersistenceRAInterfaceProxy;
+import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.testng.annotations.AfterMethod;
@@ -66,7 +66,7 @@ import org.testng.annotations.Test;
 public class AlertTest {
 
 	private AlertSbbProxy sbb;
-	private TT_PersistenceRAInterfaceProxy pers;
+	private PersistenceRAInterfaceProxy pers;
 	private boolean cassandraDbInited;
 
 	private TargetAddress ta1 = new TargetAddress(1, 1, "5555", 0);
@@ -81,7 +81,7 @@ public class AlertTest {
 	public void setUpClass() throws Exception {
 		System.out.println("setUpClass");
 
-		this.pers = new TT_PersistenceRAInterfaceProxy();
+		this.pers = new PersistenceRAInterfaceProxy();
 		this.cassandraDbInited = this.pers.testCassandraAccess();
 		if (!this.cassandraDbInited)
 			return;
@@ -223,9 +223,9 @@ public class AlertTest {
 
 	private class AlertSbbProxy extends AlertSbb {
 
-		private TT_PersistenceRAInterfaceProxy cassandraSbb;
+		private PersistenceRAInterfaceProxy cassandraSbb;
 
-		public AlertSbbProxy(TT_PersistenceRAInterfaceProxy cassandraSbb) {
+		public AlertSbbProxy(PersistenceRAInterfaceProxy cassandraSbb) {
 			this.cassandraSbb = cassandraSbb;
 			this.logger = new TraceProxy();
             this.scheduler = new SchedulerResourceAdaptorProxy();

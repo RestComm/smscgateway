@@ -2,7 +2,7 @@ package org.mobicents.smsc.domain;
 
 import java.util.Date;
 
-import org.mobicents.smsc.cassandra.DBOperations_C2;
+import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.domain.SmscDatabaseManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.testng.annotations.AfterMethod;
@@ -17,7 +17,7 @@ public class SmscDatabaseManagementTest {
 
     private String ip = "127.0.0.1";
     private String keyspace = "RestCommSMSC";
-    private DBOperations_C2 db;
+    private DBOperations db;
     private boolean cassandraDbInited;
 
     @BeforeMethod
@@ -28,7 +28,7 @@ public class SmscDatabaseManagementTest {
 
         if (cassandraDbInited) {
             try {
-                this.db = DBOperations_C2.getInstance();
+                this.db = DBOperations.getInstance();
                 this.db.start(ip, 9042, keyspace, 60, 60, 60 * 10);
             } catch (Exception e) {
             }

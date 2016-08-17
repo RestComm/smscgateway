@@ -40,7 +40,6 @@ import javolution.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.mobicents.protocols.ss7.map.primitives.ArrayListSerializingBase;
-import org.mobicents.smsc.cassandra.DatabaseType;
 import org.mobicents.smsc.smpp.GenerateType;
 import org.mobicents.smsc.smpp.SmppEncoding;
 
@@ -130,7 +129,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
 	private final TextBuilder persistFile = TextBuilder.newInstance();
 
-	private DatabaseType databaseType = DatabaseType.Cassandra_2;
+//	private DatabaseType databaseType = DatabaseType.Cassandra_2;
 
     private String serviceCenterGt = "0";
     private FastMap<Integer, String> networkIdVsServiceCenterGt = new FastMap<Integer, String>();
@@ -334,9 +333,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 		this.persistDir = persistDir;
 	}
 
-	public DatabaseType getDatabaseType() {
-		return this.databaseType;
-	}
+//	public DatabaseType getDatabaseType() {
+//		return this.databaseType;
+//	}
 
 	public String getServiceCenterGt() {
 		return serviceCenterGt;

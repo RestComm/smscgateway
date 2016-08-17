@@ -62,7 +62,6 @@ import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
-import org.mobicents.smsc.cassandra.DatabaseType;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
@@ -1085,22 +1084,29 @@ public abstract class TxSmppServerSbb implements Sbb {
 		MessageUtil.applyScheduleDeliveryTime(sms, scheduleDeliveryTime);
 
 		SmsSet smsSet;
-		if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-			try {
-				smsSet = store.obtainSmsSet(ta);
-			} catch (PersistenceException e1) {
-				throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: "
-						+ ta.toString() + "\n" + e1.getMessage(), SmppConstants.STATUS_SUBMITFAIL,
-						MAPErrorCode.systemFailure, null, e1);
-			}
-		} else {
-			smsSet = new SmsSet();
-			smsSet.setDestAddr(ta.getAddr());
-			smsSet.setDestAddrNpi(ta.getAddrNpi());
-			smsSet.setDestAddrTon(ta.getAddrTon());
-            smsSet.setNetworkId(origEsme.getNetworkId());
-			smsSet.addSms(sms);
-		}
+
+
+//		if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//			try {
+//				smsSet = store.obtainSmsSet(ta);
+//			} catch (PersistenceException e1) {
+//				throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: "
+//						+ ta.toString() + "\n" + e1.getMessage(), SmppConstants.STATUS_SUBMITFAIL,
+//						MAPErrorCode.systemFailure, null, e1);
+//			}
+//		} else {
+
+
+        smsSet = new SmsSet();
+        smsSet.setDestAddr(ta.getAddr());
+        smsSet.setDestAddrNpi(ta.getAddrNpi());
+        smsSet.setDestAddrTon(ta.getAddrTon());
+        smsSet.setNetworkId(origEsme.getNetworkId());
+        smsSet.addSms(sms);			
+
+//		}
+
+
 		sms.setSmsSet(smsSet);
 
 		// long messageId = this.smppServerSessions.getNextMessageId();
@@ -1428,22 +1434,29 @@ public abstract class TxSmppServerSbb implements Sbb {
                 }
 
                 SmsSet smsSet;
-                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                    try {
-                        smsSet = store.obtainSmsSet(ta);
-                    } catch (PersistenceException e1) {
-                        throw new SmscProcessingException(
-                                "PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
-                                SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e1);
-                    }
-                } else {
-                    smsSet = new SmsSet();
-                    smsSet.setDestAddr(ta.getAddr());
-                    smsSet.setDestAddrNpi(ta.getAddrNpi());
-                    smsSet.setDestAddrTon(ta.getAddrTon());
-                    smsSet.setNetworkId(origEsme.getNetworkId());
-                    smsSet.addSms(sms);
-                }
+
+
+//                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                    try {
+//                        smsSet = store.obtainSmsSet(ta);
+//                    } catch (PersistenceException e1) {
+//                        throw new SmscProcessingException(
+//                                "PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
+//                                SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e1);
+//                    }
+//                } else {
+
+
+                smsSet = new SmsSet();
+                smsSet.setDestAddr(ta.getAddr());
+                smsSet.setDestAddrNpi(ta.getAddrNpi());
+                smsSet.setDestAddrTon(ta.getAddrTon());
+                smsSet.setNetworkId(origEsme.getNetworkId());
+                smsSet.addSms(sms);                    
+
+//                }
+
+
                 sms.setSmsSet(smsSet);
 
                 sms.setMessageId(messageId);
@@ -1573,18 +1586,27 @@ public abstract class TxSmppServerSbb implements Sbb {
                             } else {
                                 try {
                                     sms.setStored(true);
-                                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                                        store.createLiveSms(sms);
-                                        if (sms.getScheduleDeliveryTime() == null)
-                                            store.setNewMessageScheduled(sms.getSmsSet(),
-                                                    MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-                                        else
-                                            store.setNewMessageScheduled(sms.getSmsSet(), sms.getScheduleDeliveryTime());
-                                    } else {
-                                        this.scheduler.setDestCluster(sms.getSmsSet());
-                                        store.c2_scheduleMessage_ReschedDueSlot(sms,
-                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, false);
-                                    }
+
+
+
+//                                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                                        store.createLiveSms(sms);
+//                                        if (sms.getScheduleDeliveryTime() == null)
+//                                            store.setNewMessageScheduled(sms.getSmsSet(),
+//                                                    MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+//                                        else
+//                                            store.setNewMessageScheduled(sms.getSmsSet(), sms.getScheduleDeliveryTime());
+//                                    } else {
+
+
+                                    this.scheduler.setDestCluster(sms.getSmsSet());
+                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
+                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+                                            false);                                        
+
+//                                    }
+
+
                                 } catch (PersistenceException e) {
                                     throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
                                             SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);

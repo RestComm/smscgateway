@@ -68,7 +68,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.slee.resources.persistence.TT_PersistenceRAInterfaceProxy;
+import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
@@ -108,7 +108,7 @@ import com.cloudhopper.smpp.type.UnrecoverablePduException;
  */
 public class RxSmppServerSbbTest {
     private RxSmppServerSbbProxy sbb;
-    private TT_PersistenceRAInterfaceProxy pers;
+    private PersistenceRAInterfaceProxy pers;
     private boolean cassandraDbInited;
     private Esme esme;
 
@@ -128,7 +128,7 @@ public class RxSmppServerSbbTest {
     public void setUpClass() throws Exception {
         System.out.println("setUpClass");
 
-        this.pers = new TT_PersistenceRAInterfaceProxy();
+        this.pers = new PersistenceRAInterfaceProxy();
         this.cassandraDbInited = this.pers.testCassandraAccess();
         if (!this.cassandraDbInited)
             return;
@@ -444,7 +444,7 @@ public class RxSmppServerSbbTest {
 
     public class RxSmppServerSbbProxy extends RxSmppServerSbb {
 
-        public RxSmppServerSbbProxy(TT_PersistenceRAInterfaceProxy cassandraSbb) {
+        public RxSmppServerSbbProxy(PersistenceRAInterfaceProxy cassandraSbb) {
             this.persistence = cassandraSbb;
             this.logger = new TraceProxy();
             this.scheduler = new SchedulerResourceAdaptorProxy();

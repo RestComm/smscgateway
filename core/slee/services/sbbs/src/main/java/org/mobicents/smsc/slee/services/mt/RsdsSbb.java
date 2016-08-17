@@ -62,8 +62,6 @@ import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
-import org.mobicents.smsc.cassandra.DatabaseType;
-import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
@@ -289,22 +287,29 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
             this.logger.fine("\nReceived REPORT_SM_DELIVERY_STATUS_RESPONSE = " + evt);
         }
 
-        if (this.getSmDeliveryOutcome() != SMDeliveryOutcome.successfulTransfer) {
-            try {
-                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                    persistence.setAlertingSupported(this.getTargetId(), true);
-                } else {
-                    // TODO: if we want to support alertingSupport database
-                    // fields
-                    // we need to update (to true) alertingSupport field in
-                    // current table
-                }
-            } catch (PersistenceException e1) {
-                this.logger.severe(
-                        "\nPersistenceException when setAlertingSupported() in onSendRoutingInfoForSMResponse(): "
-                                + e1.getMessage(), e1);
-            }
-        }
+        // TODO:
+        // if we want to support alertingSupport database fields
+        // we need to update (to true) alertingSupport field in
+        // current table
+        // TODO:
+
+
+//        if (this.getSmDeliveryOutcome() != SMDeliveryOutcome.successfulTransfer) {
+//            try {
+//                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                    persistence.setAlertingSupported(this.getTargetId(), true);
+//                } else {
+//                    // TODO: if we want to support alertingSupport database
+//                    // fields
+//                    // we need to update (to true) alertingSupport field in
+//                    // current table
+//                }
+//            } catch (PersistenceException e1) {
+//                this.logger.severe(
+//                        "\nPersistenceException when setAlertingSupported() in onSendRoutingInfoForSMResponse(): "
+//                                + e1.getMessage(), e1);
+//            }
+//        }
     }
 
     // *********

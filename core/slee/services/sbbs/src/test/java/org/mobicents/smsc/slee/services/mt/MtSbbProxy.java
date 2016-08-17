@@ -50,7 +50,7 @@ import org.mobicents.slee.SbbLocalObjectExt;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.slee.resources.persistence.MAPProviderProxy;
-import org.mobicents.smsc.slee.resources.persistence.TT_PersistenceRAInterfaceProxy;
+import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
@@ -67,7 +67,7 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
 	private SriSbbProxy sriSbb;
     private RsdsSbbProxy rsdsSbb;
 
-	public MtSbbProxy(TT_PersistenceRAInterfaceProxy pers) {
+	public MtSbbProxy(PersistenceRAInterfaceProxy pers) {
         this.persistence = pers;
 		this.logger = new TraceProxy();
 

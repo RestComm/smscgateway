@@ -67,7 +67,6 @@ import net.java.slee.resource.diameter.ro.events.avp.ServiceInformation;
 
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.SbbContextExt;
-import org.mobicents.smsc.cassandra.DatabaseType;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
@@ -609,15 +608,18 @@ public abstract class ChargingSbb implements Sbb {
                                 }
                             } else {
                                 sms.setStored(true);
-                                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                                    persistence.createLiveSms(sms);
-                                    persistence.setNewMessageScheduled(sms.getSmsSet(),
-                                            MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-                                } else {
-                                    this.scheduler.setDestCluster(sms.getSmsSet());
-                                    persistence.c2_scheduleMessage_ReschedDueSlot(sms,
-                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, false);
-                                }
+//                                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                                    persistence.createLiveSms(sms);
+//                                    persistence.setNewMessageScheduled(sms.getSmsSet(),
+//                                            MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+//                                } else {
+
+
+                                this.scheduler.setDestCluster(sms.getSmsSet());
+                                persistence.c2_scheduleMessage_ReschedDueSlot(sms,
+                                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, false);                                    
+
+//                                }
                             }
                         }
                     }
@@ -654,13 +656,16 @@ public abstract class ChargingSbb implements Sbb {
                 sms.setStored(true);
             }
 
-            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                persistence.archiveFailuredSms(sms);
-            } else {
-                if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
-                    persistence.c2_createRecordArchive(sms);
-                }
-            }
+//            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                persistence.archiveFailuredSms(sms);
+//            } else {
+
+
+            if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
+                persistence.c2_createRecordArchive(sms);
+            }                
+
+//            }
 
             smscStatAggregator.updateMsgInRejectedAll();
 
@@ -703,13 +708,17 @@ public abstract class ChargingSbb implements Sbb {
                 sms.setStored(true);
             }
 
-            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                persistence.archiveFailuredSms(sms);
-            } else {
-                if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
-                    persistence.c2_createRecordArchive(sms);
-                }
-            }
+//            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                persistence.archiveFailuredSms(sms);
+//            } else {
+
+
+            if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
+                persistence.c2_createRecordArchive(sms);
+            }                
+
+
+//            }
 
             smscStatAggregator.updateMsgInRejectedAll();
 

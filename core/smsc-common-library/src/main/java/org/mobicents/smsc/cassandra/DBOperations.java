@@ -72,8 +72,8 @@ import com.datastax.driver.core.exceptions.InvalidQueryException;
  * @author sergey vetyutnev
  *
  */
-public class DBOperations_C2 {
-	private static final Logger logger = Logger.getLogger(DBOperations_C2.class);
+public class DBOperations {
+	private static final Logger logger = Logger.getLogger(DBOperations.class);
 
 	public static final String TLV_SET = "tlvSet";
 	public static final UUID emptyUuid = UUID.nameUUIDFromBytes(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -89,7 +89,7 @@ public class DBOperations_C2 {
     public static final long MESSAGE_ID_LAG = 1000;
     public static final long DUE_SLOT_WRITING_POSSIBILITY_DELAY = 10;
 
-	private static final DBOperations_C2 instance = new DBOperations_C2();
+	private static final DBOperations instance = new DBOperations();
 
 	// cassandra access
 	private Cluster cluster;
@@ -130,7 +130,7 @@ public class DBOperations_C2 {
 	private long messageId = 0;
 	private UUID currentSessionUUID;
 
-	private FastMap<String, PreparedStatementCollection_C3> dataTableRead = new FastMap<String, PreparedStatementCollection_C3>();
+	private FastMap<String, PreparedStatementCollection> dataTableRead = new FastMap<String, PreparedStatementCollection>();
 	private FastMap<Long, DueSlotWritingElement> dueSlotWritingArray = new FastMap<Long, DueSlotWritingElement>();
 
 	// prepared general statements
@@ -154,16 +154,16 @@ public class DBOperations_C2 {
 //	private PreparedStatement getTableList;
 
 	private Date pcsDate;
-	private PreparedStatementCollection_C3[] savedPsc;
+	private PreparedStatementCollection[] savedPsc;
 
 	private volatile boolean started = false;
 	private boolean databaseAvailable = false;
 
-	protected DBOperations_C2() {
+	protected DBOperations() {
 		super();
 	}
 
-	public static DBOperations_C2 getInstance() {
+	public static DBOperations getInstance() {
 		return instance;
 	}
 
@@ -233,7 +233,7 @@ public class DBOperations_C2 {
             return;
         }
 
-        ProtocolVersion protVersion = DBOperations_C2.getProtocolVersion(cluster);
+        ProtocolVersion protVersion = DBOperations.getProtocolVersion(cluster);
         if (protVersion == ProtocolVersion.V1) {
             // we do not support more cassandra database 1.2
             logger.error("We do not support more cassandra database 1.2. You need to install cassandra database V2.0, 2.1 or 3.0");
@@ -567,10 +567,10 @@ public class DBOperations_C2 {
 			return "";
 	}
 
-	public PreparedStatementCollection_C3[] c2_getPscList() throws PersistenceException {
+	public PreparedStatementCollection[] c2_getPscList() throws PersistenceException {
 		Date dt = new Date();
 		if (!this.isStarted())
-			return new PreparedStatementCollection_C3[0];
+			return new PreparedStatementCollection[0];
 		if (pcsDate != null && dt.getDate() == pcsDate.getDate()) {
 			return savedPsc;
 		} else {
@@ -584,13 +584,13 @@ public class DBOperations_C2 {
 		Date dtt = new Date(dt.getTime() + 1000 * 60 * 60 * 24);
 		String s1 = this.getTableName(dt);
 		String s2 = this.getTableName(dtt);
-		PreparedStatementCollection_C3[] res;
+		PreparedStatementCollection[] res;
 		if (!s2.equals(s1)) {
-			res = new PreparedStatementCollection_C3[2];
+			res = new PreparedStatementCollection[2];
 			res[0] = this.getStatementCollection(dtt);
 			res[1] = this.getStatementCollection(dt);
 		} else {
-			res = new PreparedStatementCollection_C3[1];
+			res = new PreparedStatementCollection[1];
 			res[0] = this.getStatementCollection(dt);
 		}
 		savedPsc = res;
@@ -599,9 +599,9 @@ public class DBOperations_C2 {
 	}
 
 	public long c2_getDueSlotForTargetId(String targetId) throws PersistenceException {
-		PreparedStatementCollection_C3[] lstPsc = this.c2_getPscList();
+		PreparedStatementCollection[] lstPsc = this.c2_getPscList();
 
-		for (PreparedStatementCollection_C3 psc : lstPsc) {
+		for (PreparedStatementCollection psc : lstPsc) {
 			long dueSlot = this.c2_getDueSlotForTargetId(psc, targetId);
 			if (dueSlot != 0)
 				return dueSlot;
@@ -609,7 +609,7 @@ public class DBOperations_C2 {
 		return 0;
 	}
 
-	public long c2_getDueSlotForTargetId(PreparedStatementCollection_C3 psc, String targetId)
+	public long c2_getDueSlotForTargetId(PreparedStatementCollection psc, String targetId)
 			throws PersistenceException {
 		try {
 			PreparedStatement ps = psc.getDueSlotForTargetId;
@@ -633,7 +633,7 @@ public class DBOperations_C2 {
 	}
 
 	public void c2_updateDueSlotForTargetId(String targetId, long newDueSlot) throws PersistenceException {
-		PreparedStatementCollection_C3 psc = this.getStatementCollection(newDueSlot);
+		PreparedStatementCollection psc = this.getStatementCollection(newDueSlot);
 
 		try {
 			PreparedStatement ps = psc.createDueSlotForTargetId;
@@ -647,7 +647,7 @@ public class DBOperations_C2 {
 	}
 
 	private void c2_clearDueSlotForTargetId(String targetId, long newDueSlot) throws PersistenceException {
-		PreparedStatementCollection_C3 psc = this.getStatementCollection(newDueSlot);
+		PreparedStatementCollection psc = this.getStatementCollection(newDueSlot);
 
 		try {
 			PreparedStatement ps = psc.createDueSlotForTargetId;
@@ -663,11 +663,11 @@ public class DBOperations_C2 {
 	public void c2_updateDueSlotForTargetId_WithTableCleaning(String targetId, long newDueSlot)
 			throws PersistenceException {
 		// removing dueSlot for other time tables is any
-		PreparedStatementCollection_C3[] lstPsc = this.c2_getPscList();
+		PreparedStatementCollection[] lstPsc = this.c2_getPscList();
 		if (lstPsc.length >= 2) {
 			String s1 = this.getTableName(newDueSlot);
 			for (int i1 = 0; i1 < lstPsc.length; i1++) {
-				PreparedStatementCollection_C3 psc = lstPsc[i1];
+				PreparedStatementCollection psc = lstPsc[i1];
 				if (!psc.getTName().equals(s1)) {
 					long dueSlot = this.c2_getDueSlotForTargetId(psc, targetId);
 					if (dueSlot != 0) {
@@ -693,7 +693,7 @@ public class DBOperations_C2 {
             boolean removeExpiredValidityPeriod) throws PersistenceException {
         if (sms.getStored()) {
             long dueSlot = 0;
-            PreparedStatementCollection_C3[] lstPsc = this.c2_getPscList();
+            PreparedStatementCollection[] lstPsc = this.c2_getPscList();
             boolean done = false;
             int cnt = 0;
             while (!done && cnt < 5) {
@@ -701,7 +701,7 @@ public class DBOperations_C2 {
 
                 SmType destType = sms.getSmsSet().getType();
                 if (destType == null || destType == SmType.SMS_FOR_SS7) {
-                    for (PreparedStatementCollection_C3 psc : lstPsc) {
+                    for (PreparedStatementCollection psc : lstPsc) {
                         dueSlot = this.c2_getDueSlotForTargetId(psc, sms.getSmsSet().getTargetId());
                         if (dueSlot != 0)
                             break;
@@ -752,7 +752,7 @@ public class DBOperations_C2 {
                     dueSlot = c2_checkDueSlotWritingPossibility(dueSlot);
                 }
 
-                this.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT, fastStoreAndForwordMode);
+                this.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT, fastStoreAndForwordMode);
                 this.c2_updateDueSlotForTargetId_WithTableCleaning(sms.getSmsSet().getTargetId(), dueSlot);
                 this.do_scheduleMessage(sms, dueSlot, lstFailured, fastStoreAndForwordMode, true);
             } else {
@@ -806,7 +806,7 @@ public class DBOperations_C2 {
 
 	public void c2_createRecordCurrent(Sms sms) throws PersistenceException {
 		long dueSlot = sms.getDueSlot();
-		PreparedStatementCollection_C3 psc = getStatementCollection(dueSlot);
+		PreparedStatementCollection psc = getStatementCollection(dueSlot);
 
 		try {
 			PreparedStatement ps = psc.createRecordCurrent;
@@ -831,7 +831,7 @@ public class DBOperations_C2 {
 		if (deliveryDate == null)
 			deliveryDate = new Date();
 		long dueSlot = this.c2_getDueSlotForTime(deliveryDate);
-		PreparedStatementCollection_C3 psc = getStatementCollection(deliveryDate);
+		PreparedStatementCollection psc = getStatementCollection(deliveryDate);
 
 		try {
 			PreparedStatement ps = psc.createRecordArchive;
@@ -1065,7 +1065,7 @@ public class DBOperations_C2 {
 	}
 
 	public ArrayList<SmsSet> c2_getRecordList(long dueSlot) throws PersistenceException {
-		PreparedStatementCollection_C3 psc = getStatementCollection(dueSlot);
+		PreparedStatementCollection psc = getStatementCollection(dueSlot);
 
 		ArrayList<SmsSet> result = new ArrayList<SmsSet>();
 		try {
@@ -1090,7 +1090,7 @@ public class DBOperations_C2 {
 	}
 
 	public SmsSet c2_getRecordListForTargeId(long dueSlot, String targetId) throws PersistenceException {
-		PreparedStatementCollection_C3 psc = getStatementCollection(dueSlot);
+		PreparedStatementCollection psc = getStatementCollection(dueSlot);
 
 		SmsSet result = null;
 		try {
@@ -1402,7 +1402,7 @@ public class DBOperations_C2 {
         // "updateInSystemForFastMode">)) {
 
         if (sms.getStored()) {
-            PreparedStatementCollection_C3 psc = this.getStatementCollection(sms.getDueSlot());
+            PreparedStatementCollection psc = this.getStatementCollection(sms.getDueSlot());
 
             // in rerouting case we use need to use original networkId
             String targetId;
@@ -1425,7 +1425,7 @@ public class DBOperations_C2 {
 	}
 
 	public void c2_updateAlertingSupport(long dueSlot, String targetId, UUID dbId) throws PersistenceException {
-		PreparedStatementCollection_C3 psc = this.getStatementCollection(dueSlot);
+		PreparedStatementCollection psc = this.getStatementCollection(dueSlot);
 
 		try {
 			PreparedStatement ps = psc.updateAlertingSupport;
@@ -1443,27 +1443,27 @@ public class DBOperations_C2 {
 		// .....................................
 	}
 
-	protected PreparedStatementCollection_C3 getStatementCollection(Date dt) throws PersistenceException {
+	protected PreparedStatementCollection getStatementCollection(Date dt) throws PersistenceException {
 		String tName = this.getTableName(dt);
-		PreparedStatementCollection_C3 psc = dataTableRead.get(tName);
+		PreparedStatementCollection psc = dataTableRead.get(tName);
 		if (psc != null)
 			return psc;
 
 		return doGetStatementCollection(tName);
 	}
 
-	protected PreparedStatementCollection_C3 getStatementCollection(long deuSlot) throws PersistenceException {
+	protected PreparedStatementCollection getStatementCollection(long deuSlot) throws PersistenceException {
 		String tName = this.getTableName(deuSlot);
-		PreparedStatementCollection_C3 psc = dataTableRead.get(tName);
+		PreparedStatementCollection psc = dataTableRead.get(tName);
 		if (psc != null)
 			return psc;
 
 		return doGetStatementCollection(tName);
 	}
 
-	private synchronized PreparedStatementCollection_C3 doGetStatementCollection(String tName)
+	private synchronized PreparedStatementCollection doGetStatementCollection(String tName)
 			throws PersistenceException {
-		PreparedStatementCollection_C3 psc = dataTableRead.get(tName);
+		PreparedStatementCollection psc = dataTableRead.get(tName);
 		if (psc != null)
 			return psc;
 
@@ -1541,7 +1541,7 @@ public class DBOperations_C2 {
 			throw new PersistenceException(msg, e1);
 		}
 
-		psc = new PreparedStatementCollection_C3(this, tName, ttlCurrent, ttlArchive);
+		psc = new PreparedStatementCollection(this, tName, ttlCurrent, ttlArchive);
 		dataTableRead.putEntry(tName, psc);
 		return psc;
 	}

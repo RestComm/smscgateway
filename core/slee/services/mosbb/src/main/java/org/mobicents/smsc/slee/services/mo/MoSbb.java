@@ -81,7 +81,6 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
-import org.mobicents.smsc.cassandra.DatabaseType;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.MoChargingType;
@@ -1031,21 +1030,29 @@ public abstract class MoSbb extends MoCommonSbb {
                 smscPropertiesManagement.getDefaultValidityPeriodHours());
 
         SmsSet smsSet;
-        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-            try {
-                smsSet = store.obtainSmsSet(ta);
-            } catch (PersistenceException e1) {
-                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
-                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
-            }
-        } else {
-            smsSet = new SmsSet();
-            smsSet.setDestAddr(ta.getAddr());
-            smsSet.setDestAddrNpi(ta.getAddrNpi());
-            smsSet.setDestAddrTon(ta.getAddrTon());
 
-            smsSet.setNetworkId(networkId);
-        }
+        
+        
+//        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//            try {
+//                smsSet = store.obtainSmsSet(ta);
+//            } catch (PersistenceException e1) {
+//                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
+//                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
+//            }
+//        } else {
+
+
+        smsSet = new SmsSet();
+        smsSet.setDestAddr(ta.getAddr());
+        smsSet.setDestAddrNpi(ta.getAddrNpi());
+        smsSet.setDestAddrTon(ta.getAddrTon());
+
+        smsSet.setNetworkId(networkId);        
+
+//        }
+        
+        
 		smsSet.addSms(sms);
 
 //        long messageId = this.smppServerSessions.getNextMessageId();
@@ -1157,21 +1164,30 @@ public abstract class MoSbb extends MoCommonSbb {
                 smscPropertiesManagement.getDefaultValidityPeriodHours());
 
         SmsSet smsSet;
-        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-            try {
-                smsSet = store.obtainSmsSet(ta);
-            } catch (PersistenceException e1) {
-                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
-                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
-            }
-        } else {
-            smsSet = new SmsSet();
-            smsSet.setDestAddr(ta.getAddr());
-            smsSet.setDestAddrNpi(ta.getAddrNpi());
-            smsSet.setDestAddrTon(ta.getAddrTon());
-            smsSet.setNetworkId(networkId);
-            smsSet.addSms(sms);
-        }
+        
+        
+//        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//            try {
+//                smsSet = store.obtainSmsSet(ta);
+//            } catch (PersistenceException e1) {
+//                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
+//                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
+//            }
+//        } else {
+
+
+
+        smsSet = new SmsSet();
+        smsSet.setDestAddr(ta.getAddr());
+        smsSet.setDestAddrNpi(ta.getAddrNpi());
+        smsSet.setDestAddrTon(ta.getAddrTon());
+        smsSet.setNetworkId(networkId);
+        smsSet.addSms(sms);            
+
+
+//        }
+        
+        
 		sms.setSmsSet(smsSet);
 
 //		long messageId = this.smppServerSessions.getNextMessageId();
@@ -1289,24 +1305,35 @@ public abstract class MoSbb extends MoCommonSbb {
                 smscPropertiesManagement.getDefaultValidityPeriodHours());
 
         SmsSet smsSet;
-        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-            try {
-                smsSet = store.obtainSmsSet(ta);
-            } catch (PersistenceException e1) {
-                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
-                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
-            }
-        } else {
-            smsSet = new SmsSet();
-            smsSet.setDestAddr(ta.getAddr());
-            smsSet.setDestAddrNpi(ta.getAddrNpi());
-            smsSet.setDestAddrTon(ta.getAddrTon());
 
-            smsSet.setNetworkId(networkId);
-            smsSet.setCorrelationId(civ.getCorrelationID());
 
-            smsSet.addSms(sms);
-        }
+
+//        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//            try {
+//                smsSet = store.obtainSmsSet(ta);
+//            } catch (PersistenceException e1) {
+//                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
+//                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
+//            }
+//        } else {
+
+
+
+        smsSet = new SmsSet();
+        smsSet.setDestAddr(ta.getAddr());
+        smsSet.setDestAddrNpi(ta.getAddrNpi());
+        smsSet.setDestAddrTon(ta.getAddrTon());
+
+        smsSet.setNetworkId(networkId);
+        smsSet.setCorrelationId(civ.getCorrelationID());
+
+        smsSet.addSms(sms);            
+
+
+//        }
+        
+        
+        
         sms.setSmsSet(smsSet);
 
         long messageId = store.c2_getNextMessageId();
@@ -1417,16 +1444,24 @@ public abstract class MoSbb extends MoCommonSbb {
                             } else {
                                 try {
                                     sms.setStored(true);
-                                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                                        store.createLiveSms(sms);
-                                        store.setNewMessageScheduled(sms.getSmsSet(), MessageUtil.computeDueDate(MessageUtil
-                                                .computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-                                    } else {
-                                        this.scheduler.setDestCluster(sms.getSmsSet());
-                                        store.c2_scheduleMessage_ReschedDueSlot(sms,
-                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-                                                false);
-                                    }
+
+
+
+//                                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                                        store.createLiveSms(sms);
+//                                        store.setNewMessageScheduled(sms.getSmsSet(), MessageUtil.computeDueDate(MessageUtil
+//                                                .computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+//                                    } else {
+
+
+                                    this.scheduler.setDestCluster(sms.getSmsSet());
+                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
+                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+                                            false);                                        
+
+//                                    }
+
+
                                 } catch (PersistenceException e) {
                                     throw new SmscProcessingException("MO PersistenceException when storing LIVE_SMS : "
                                             + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,

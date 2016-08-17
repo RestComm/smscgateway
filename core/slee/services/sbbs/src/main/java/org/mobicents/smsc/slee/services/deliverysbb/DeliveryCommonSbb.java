@@ -38,7 +38,7 @@ import javolution.util.FastList;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.slee.SbbContextExt;
-import org.mobicents.smsc.cassandra.DBOperations_C2;
+import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
@@ -688,7 +688,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected void postProcessSucceeded(Sms sms) {
         try {
-            persistence.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT,
+            persistence.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT,
                     smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
             sms.setDeliveryDate(new Date());
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
@@ -707,7 +707,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
     protected void postProcessPermFailures(ArrayList<Sms> lstPermFailured) {
         try {
             for (Sms sms : lstPermFailured) {
-                persistence.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT,
+                persistence.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT,
                         smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
                 sms.setDeliveryDate(new Date());
                 if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {

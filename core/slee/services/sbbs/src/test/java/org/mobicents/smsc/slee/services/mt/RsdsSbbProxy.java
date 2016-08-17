@@ -37,7 +37,7 @@ import org.mobicents.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbLocalObjectExt;
 import org.mobicents.smsc.slee.resources.persistence.MAPProviderProxy;
-import org.mobicents.smsc.slee.resources.persistence.TT_PersistenceRAInterfaceProxy;
+import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 
 /**
@@ -47,11 +47,11 @@ import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
  */
 public class RsdsSbbProxy extends RsdsSbb implements ChildRelationExt, SbbLocalObject, RsdsSbbLocalObject, SbbLocalObjectExt {
 
-	private TT_PersistenceRAInterfaceProxy pers;
+	private PersistenceRAInterfaceProxy pers;
 	private String targetId;
 	private SMDeliveryOutcome smDeliveryOutcome;
 
-	public RsdsSbbProxy(TT_PersistenceRAInterfaceProxy pers) {
+	public RsdsSbbProxy(PersistenceRAInterfaceProxy pers) {
 		this.pers = pers;
 		this.logger = new TraceProxy();
 

@@ -30,8 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.mobicents.smsc.cassandra.DBOperations_C2;
-import org.mobicents.smsc.cassandra.DatabaseType;
+import org.mobicents.smsc.cassandra.DBOperations;
 
 /**
  * 
@@ -46,7 +45,7 @@ public class SmscDatabaseManagement implements SmscDatabaseManagementMBean, Runn
     private boolean isStarted;
 
     private final SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
-    private DBOperations_C2 dbOperations_C2 = null;
+    private DBOperations dbOperations_C2 = null;
 
     private ScheduledExecutorService executor;
     private Future idleTimerFuture;
@@ -75,7 +74,7 @@ public class SmscDatabaseManagement implements SmscDatabaseManagementMBean, Runn
     }
 
     public void start() throws Exception {
-        dbOperations_C2 = DBOperations_C2.getInstance();
+        dbOperations_C2 = DBOperations.getInstance();
 
         this.setUnprocessed();
 
@@ -106,40 +105,48 @@ public class SmscDatabaseManagement implements SmscDatabaseManagementMBean, Runn
             while (true) {
                 if (liveDays > 0) {
                     Date tagDate = new Date(curDate.getTime() - liveDays * 24 * 3600 * 1000);
-                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                        // TODO: implement it
-                    } else {
-                        Date[] dtt = this.getLiveTablesListBeforeDate(tagDate);
-                        boolean processed = true;
-                        for (Date dt : dtt) {
-                            if (!dbOperations_C2.c2_deleteLiveTablesForDate(dt)) {
-                                setUnprocessed();
-                                processed = false;
-                                break;
-                            }
-                        }
-                        if (!processed)
+
+                    // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+                    // // TODO: implement it
+                    // } else {
+
+                    Date[] dtt = this.getLiveTablesListBeforeDate(tagDate);
+                    boolean processed = true;
+                    for (Date dt : dtt) {
+                        if (!dbOperations_C2.c2_deleteLiveTablesForDate(dt)) {
+                            setUnprocessed();
+                            processed = false;
                             break;
+                        }
                     }
+                    if (!processed)
+                        break;
+
+                    // }
+
                 }
 
                 if (archDays > 0) {
                     Date tagDate = new Date(curDate.getTime() - archDays * 24 * 3600 * 1000);
-                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                        // TODO: implement it
-                    } else {
-                        Date[] dtt = this.getArchiveTablesListBeforeDate(tagDate);
-                        boolean processed = true;
-                        for (Date dt : dtt) {
-                            if (!dbOperations_C2.c2_deleteArchiveTablesForDate(dt)) {
-                                setUnprocessed();
-                                processed = false;
-                                break;
-                            }
-                        }
-                        if (!processed)
+
+                    // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+                    // // TODO: implement it
+                    // } else {
+
+                    Date[] dtt = this.getArchiveTablesListBeforeDate(tagDate);
+                    boolean processed = true;
+                    for (Date dt : dtt) {
+                        if (!dbOperations_C2.c2_deleteArchiveTablesForDate(dt)) {
+                            setUnprocessed();
+                            processed = false;
                             break;
+                        }
                     }
+                    if (!processed)
+                        break;
+
+                    // }
+
                 }
                 break;
             }
@@ -174,22 +181,30 @@ public class SmscDatabaseManagement implements SmscDatabaseManagementMBean, Runn
     @Override
     public void deleteLiveTablesForDate(Date date) {
         if (date != null) {
-            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                // TODO: implement it
-            } else {
-                dbOperations_C2.c2_deleteLiveTablesForDate(date);
-            }
+
+            // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+            // // TODO: implement it
+            // } else {
+
+            dbOperations_C2.c2_deleteLiveTablesForDate(date);
+
+            // }
+
         }
     }
 
     @Override
     public void deleteArchiveTablesForDate(Date date) {
         if (date != null) {
-            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                // TODO: implement it
-            } else {
-                dbOperations_C2.c2_deleteArchiveTablesForDate(date);
-            }
+
+            // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+            // // TODO: implement it
+            // } else {
+
+            dbOperations_C2.c2_deleteArchiveTablesForDate(date);
+
+            // }
+
         }
     }
 
@@ -221,15 +236,16 @@ public class SmscDatabaseManagement implements SmscDatabaseManagementMBean, Runn
             maxDate = new Date(500, 1, 1);
         }
 
-        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-            // TODO: implement it
-        } else {
-            Date[] dtt = dbOperations_C2.c2_getLiveTableList(smscPropertiesManagement.getKeyspaceName());
-            Date[] dtt2 = this.performDateFilter(dtt, maxDate);
-            return dtt2;
-        }
+//        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//            // TODO: implement it
+//        } else {
 
-        return null;
+        Date[] dtt = dbOperations_C2.c2_getLiveTableList(smscPropertiesManagement.getKeyspaceName());
+        Date[] dtt2 = this.performDateFilter(dtt, maxDate);
+        return dtt2;
+
+//        }
+//        return null;
     }
 
     @Override
@@ -238,15 +254,16 @@ public class SmscDatabaseManagement implements SmscDatabaseManagementMBean, Runn
             maxDate = new Date(500, 1, 1);
         }
 
-        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-            // TODO: implement it
-        } else {
-            Date[] dtt = dbOperations_C2.c2_getArchiveTableList(smscPropertiesManagement.getKeyspaceName());
-            Date[] dtt2 = this.performDateFilter(dtt, maxDate);
-            return dtt2;
-        }
+//        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//            // TODO: implement it
+//        } else {
 
-        return null;
+        Date[] dtt = dbOperations_C2.c2_getArchiveTableList(smscPropertiesManagement.getKeyspaceName());
+        Date[] dtt2 = this.performDateFilter(dtt, maxDate);
+        return dtt2;
+
+//        }
+//        return null;
     }
 
 }

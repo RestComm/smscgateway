@@ -34,7 +34,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.slee.resources.persistence.TT_PersistenceRAInterfaceProxy;
+import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
@@ -45,7 +45,7 @@ import org.testng.annotations.BeforeMethod;
  */
 public class MtDatabaseCassandraTest {
     private MtSbbProxy sbb;
-    private TT_PersistenceRAInterfaceProxy pers;
+    private PersistenceRAInterfaceProxy pers;
     private boolean cassandraDbInited;
     private Date curDate;
 
@@ -60,7 +60,7 @@ public class MtDatabaseCassandraTest {
     public void setUpClass() throws Exception {
         System.out.println("setUpClass");
 
-        this.pers = new TT_PersistenceRAInterfaceProxy();
+        this.pers = new PersistenceRAInterfaceProxy();
         this.cassandraDbInited = this.pers.testCassandraAccess();
         if (!this.cassandraDbInited)
             return;

@@ -24,972 +24,833 @@ package org.mobicents.smsc.slee.resources.persistence;
 
 import static org.testng.Assert.*;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.UUID;
 
 import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
-import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
-import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan;
-import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
-import org.mobicents.protocols.ss7.map.primitives.IMSIImpl;
+import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
+import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeaderElement;
 import org.mobicents.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.mobicents.protocols.ss7.map.service.sms.LocationInfoWithLMSIImpl;
-import org.mobicents.smsc.cassandra.PersistenceException;
-import org.mobicents.smsc.cassandra.Schema;
-import org.mobicents.smsc.library.ErrorCode;
+import org.mobicents.protocols.ss7.map.smstpdu.ConcatenatedShortMessagesIdentifierImpl;
+import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.mobicents.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
+import org.mobicents.smsc.cassandra.DBOperations;
+import org.mobicents.smsc.cassandra.PreparedStatementCollection;
 import org.mobicents.smsc.library.SmType;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
+import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.TargetAddress;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.tlv.Tlv;
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 
 /**
- * 
+ *
  * @author sergey vetyutnev
- * 
+ *
  */
 public class CassandraTest {
 
-//	private PersistenceRAInterfaceProxy sbb = new PersistenceRAInterfaceProxy();
-//	private boolean cassandraDbInited;
+    private PersistenceRAInterfaceProxy sbb;
+    private boolean cassandraDbInited;
+
+    private UUID id1 = UUID.fromString("59e815dc-49ad-4539-8cff-beb710a7de03");
+    private UUID id2 = UUID.fromString("be26d2e9-1ba0-490c-bd5b-f04848127220");
+    private UUID id3 = UUID.fromString("8bf7279f-3d4a-4494-8acd-cb9572c7ab33");
+    private UUID id4 = UUID.fromString("c3bd98c2-355d-4572-8915-c6d0c767cae1");
+    private UUID id5 = UUID.fromString("59e815dc-49ad-4539-8cff-beb710a7de04");
+
+    private TargetAddress ta1 = new TargetAddress(5, 1, "1111", 9);
+    private TargetAddress ta2 = new TargetAddress(5, 1, "1112", 9);
+
+    @BeforeMethod
+    public void setUpClass() throws Exception {
+        System.out.println("setUpClass");
+
+        this.sbb = new PersistenceRAInterfaceProxy();
+        this.cassandraDbInited = this.sbb.testCassandraAccess();
+        if (!this.cassandraDbInited)
+            return;
+        this.sbb.start();
+    }
+
+    @AfterMethod
+    public void tearDownClass() throws Exception {
+        System.out.println("tearDownClass");
+        this.sbb.stop();
+    }
+
+
+    @Test(groups = { "cassandra" })
+    public void testingDueSlotForTime() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        Date dt = new Date();
+        long dueSlot = sbb.c2_getDueSlotForTime(dt);
+        Date dt2 = sbb.c2_getTimeForDueSlot(dueSlot);
+        long dueSlot2 = sbb.c2_getDueSlotForTime(dt2);
+        Date dt3 = sbb.c2_getTimeForDueSlot(dueSlot);
+
+        assertEquals(dueSlot, dueSlot2);
+        assertTrue(dt2.equals(dt3));
+        
+        long l1 = sbb.c2_getNextMessageId();
+        assertEquals(l1, DBOperations.MESSAGE_ID_LAG + 1);
+    }
+
+    @Test(groups = { "cassandra" })
+    public void testingProcessingDueSlot() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        Date dt = new Date();
+        long l0 = sbb.c2_getDueSlotForTime(dt);
+
+        long l1 = sbb.c2_getCurrentDueSlot();
+        long l2 = 222999;
+        sbb.c2_setCurrentDueSlot(l2);
+        long l3 = sbb.c2_getCurrentDueSlot();
+
+        if (l1 > l0 || l1 < l0 - 100)
+            fail("l1 value is bad");
+        assertEquals(l2, l3);
+
+        int len = (int) (DBOperations.MESSAGE_ID_LAG + DBOperations.MESSAGE_ID_LAG / 2);
+        long lx = 0;
+        for (int i1 = 0; i1 < len; i1++) {
+            lx = sbb.c2_getNextMessageId();
+        }
+        assertEquals(lx, DBOperations.MESSAGE_ID_LAG + len);
+        long ly = sbb.c2_getCurrentSlotTable(DBOperations.NEXT_MESSAGE_ID);
+        assertEquals(ly, DBOperations.MESSAGE_ID_LAG * 2);
+
+        sbb.stop();
+        
+//        Thread.sleep(1000);
+        
+        sbb.start();
+
+        long l4 = sbb.c2_getCurrentDueSlot();
+        assertEquals(l2, l4 + 60);
+
+        lx = sbb.c2_getNextMessageId();
+        assertEquals(lx, DBOperations.MESSAGE_ID_LAG * 3 + 1);
+    }
+
+    @Test(groups = { "cassandra" })
+    public void testingDueSlotWriting() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        long dueSlot = 101;
+        long dueSlot2 = 102;
+        boolean b1 = sbb.c2_checkDueSlotNotWriting(dueSlot);
+        boolean b2 = sbb.c2_checkDueSlotNotWriting(dueSlot2);
+        assertTrue(b1);
+        assertTrue(b2);
+
+        sbb.c2_registerDueSlotWriting(dueSlot);
+        b1 = sbb.c2_checkDueSlotNotWriting(dueSlot);
+        b2 = sbb.c2_checkDueSlotNotWriting(dueSlot2);
+        assertFalse(b1);
+        assertTrue(b2);
+
+        sbb.c2_registerDueSlotWriting(dueSlot);
+        b1 = sbb.c2_checkDueSlotNotWriting(dueSlot);
+        b2 = sbb.c2_checkDueSlotNotWriting(dueSlot2);
+        assertFalse(b1);
+        assertTrue(b2);
+
+        sbb.c2_registerDueSlotWriting(dueSlot2);
+        b1 = sbb.c2_checkDueSlotNotWriting(dueSlot);
+        b2 = sbb.c2_checkDueSlotNotWriting(dueSlot2);
+        assertFalse(b1);
+        assertFalse(b2);
+
+        sbb.c2_unregisterDueSlotWriting(dueSlot);
+        b1 = sbb.c2_checkDueSlotNotWriting(dueSlot);
+        b2 = sbb.c2_checkDueSlotNotWriting(dueSlot2);
+        assertFalse(b1);
+        assertFalse(b2);
+
+        sbb.c2_unregisterDueSlotWriting(dueSlot);
+        b1 = sbb.c2_checkDueSlotNotWriting(dueSlot);
+        b2 = sbb.c2_checkDueSlotNotWriting(dueSlot2);
+        assertTrue(b1);
+        assertFalse(b2);
+
+        sbb.c2_unregisterDueSlotWriting(dueSlot);
+        b1 = sbb.c2_checkDueSlotNotWriting(dueSlot);
+        b2 = sbb.c2_checkDueSlotNotWriting(dueSlot2);
+        assertTrue(b1);
+        assertFalse(b2);
+
+        sbb.c2_unregisterDueSlotWriting(dueSlot2);
+        b1 = sbb.c2_checkDueSlotNotWriting(dueSlot);
+        b2 = sbb.c2_checkDueSlotNotWriting(dueSlot2);
+        assertTrue(b1);
+        assertTrue(b2);
+    }
+
+    @Test(groups = { "cassandra" })
+    public void testingDueSlotForTargetId() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        Date dt = new Date();
+        String targetId = "111333";
+        String targetId2 = "111444";
+        PreparedStatementCollection psc = sbb.getStatementCollection(dt);
+
+        long l1 = sbb.c2_getDueSlotForTargetId(psc, targetId);
+        long l2 = sbb.c2_getDueSlotForTargetId(psc, targetId2);
+        assertEquals(l1, 0);
+        assertEquals(l2, 0);
+
+        long newDueSlot = sbb.c2_getDueSlotForNewSms();
+        sbb.c2_updateDueSlotForTargetId(targetId, newDueSlot);
+
+        l1 = sbb.c2_getDueSlotForTargetId(psc, targetId);
+        l2 = sbb.c2_getDueSlotForTargetId(psc, targetId2);
+        assertEquals(l1, newDueSlot);
+        assertEquals(l2, 0);
+    }
+
+    @Test(groups = { "cassandra" })
+    public void testingDueSlotForTargetId2() throws Exception {
+
+        long dueSlotLen = sbb.getSlotMSecondsTimeArea();
+        
+        if (!this.cassandraDbInited)
+            return;
+
+        Date dt = new Date();
+        String targetId = ta1.getTargetId();
+        Sms sms = this.createTestSms(1, ta1.getAddr(), id1);
+        sms.setStored(true);
+        sms.setValidityPeriod(null);
+
+        long l1 = sbb.c2_getDueSlotForTargetId(targetId);
+        assertEquals(l1, 0);
+
+        // 1 - create with good date
+        sbb.c2_scheduleMessage_ReschedDueSlot(sms, false, true);
+        long newDueSlot = sms.getDueSlot();
+        boolean b1 = sbb.do_scheduleMessage(sms, newDueSlot, null, false, true);
+        assertTrue(b1);
+
+        l1 = sbb.c2_getDueSlotForTargetId(targetId);
+        assertEquals(l1, newDueSlot);
+        assertEquals(sms.getDueSlot(), newDueSlot);
+
+        // 2 - update this good date
+        sbb.c2_scheduleMessage_ReschedDueSlot(sms, false, true);
+        assertEquals(sms.getDueSlot(), newDueSlot);
+        b1 = sbb.do_scheduleMessage(sms, newDueSlot, null, false, true);
+        assertTrue(b1);
+        assertEquals(sms.getDueSlot(), newDueSlot);
+
+        l1 = sbb.c2_getDueSlotForTargetId(targetId);
+        assertEquals(l1, newDueSlot);
+
+        // 3 - date is obsolete
+        long newCurSlot = newDueSlot + 10;
+        sbb.c2_setCurrentDueSlot(newCurSlot);
+
+        l1 = sbb.c2_getDueSlotForTargetId(targetId);
+        assertEquals(l1, newDueSlot);
+
+        b1 = sbb.do_scheduleMessage(sms, newDueSlot, null, false, true);
+        assertFalse(b1);
+        sbb.c2_scheduleMessage_ReschedDueSlot(sms, false, true);
+        long newDueSlot2 = sms.getDueSlot();
+        b1 = sbb.do_scheduleMessage(sms, newDueSlot2, null, false, true);
+//        assertTrue(b1);
+
+        l1 = sbb.c2_getDueSlotForTargetId(targetId);
+        assertEquals(l1, newDueSlot2);
+
+        // 4 - new date is in a new table
+        long newCurSlot2 = newCurSlot + 60 * 60 * 24 * 1000 / dueSlotLen;
+        sbb.c2_setCurrentDueSlot(newCurSlot2);
+
+        l1 = sbb.c2_getDueSlotForTargetId(targetId);
+        assertEquals(l1, newDueSlot2);
+
+        b1 = sbb.do_scheduleMessage(sms, newDueSlot2, null, false, true);
+        assertFalse(b1);
+        long newDueSlot3 = newCurSlot2 + 10;
+        b1 = sbb.do_scheduleMessage(sms, newDueSlot3, null, false, true);
+//        assertTrue(b1);
+
+        sbb.c2_updateDueSlotForTargetId_WithTableCleaning(targetId, newDueSlot3);
+        
+        l1 = sbb.c2_getDueSlotForTargetId(targetId);
+        assertEquals(l1, newDueSlot3);
+    }
+
+    @Test(groups = { "cassandra" })
+    public void testingLifeCycle() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        long dueSlot = this.addingNewMessages();
+
+        this.readAlertMessage();
+
+        SmsSet smsSet = this.readDueSlotMessage(dueSlot, 1);
+
+        archiveMessage(smsSet);
+
+        this.addingNewMessages2(dueSlot + 1);
+
+        smsSet = this.readDueSlotMessage(dueSlot + 1, 2);
+
+        SmsSetCache.getInstance().clearProcessingSmsSet();
+        smsSet = this.readDueSlotMessage(dueSlot, 1);
+        Sms sms = smsSet.getSms(0);
+        assertFalse(smsSet.isAlertingSupported());
+        sbb.c2_updateAlertingSupport(sms.getDueSlot(), sms.getSmsSet().getTargetId(), sms.getDbId());
+
+        SmsSetCache.getInstance().clearProcessingSmsSet();
+        smsSet = this.readDueSlotMessage(dueSlot, 1);
+        assertTrue(smsSet.isAlertingSupported());
+
+    }
+
+    @Test(groups = { "cassandra" })
+    public void testingOldTimeEncoding() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        this.sbb.setOldShortMessageDbFormat(true);
+
+        DataCodingScheme dcsGsm7 = new DataCodingSchemeImpl(0);
+        DataCodingScheme dcsUcs2 = new DataCodingSchemeImpl(8);
+        DataCodingScheme dcsGsm8 = new DataCodingSchemeImpl(4);
+
+        UserDataHeader udh = new UserDataHeaderImpl();
+        UserDataHeaderElement informationElement = new ConcatenatedShortMessagesIdentifierImpl(false, 20, 5, 2);
+        // boolean referenceIs16bit, int reference, int mesageSegmentCount, int
+        // mesageSegmentNumber
+        udh.addInformationElement(informationElement);
+
+        TargetAddress ta = new TargetAddress(1, 1, "1111", 9);
+
+        // GSM7 + UDH
+        this.testOldFormatMessage(ta, dcsGsm7, "Test eng", udh);
+
+        // GSM7
+        this.testOldFormatMessage(ta, dcsGsm7, "Test eng", null);
+
+        // UCS2 + UDH
+        this.testOldFormatMessage(ta, dcsUcs2, "Test rus привет", udh);
+
+        // UCS2
+        this.testOldFormatMessage(ta, dcsUcs2, "Test rus привет", null);
+
+        // GSM8
+        this.testOldFormatMessage(ta, dcsGsm8, null, udh);
+    }
+
+    @Test(groups = { "cassandra" })
+    public void testingTableDeleting() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        Date dt0 = new Date();
+        Date dt = new Date(dt0.getTime() - 3 * 24 * 3600 * 1000);
+        PreparedStatementCollection psc = sbb.getStatementCollection(dt);
+        long newDueSlot = sbb.c2_getDueSlotForTime(dt);
+        sbb.c2_updateDueSlotForTargetId("222222_1_11", newDueSlot);
+
+        sbb.c2_deleteLiveTablesForDate(dt);
+
+//        dt = new Date(114, 3, 16);
+        sbb.c2_deleteArchiveTablesForDate(dt);
+    }
+
+    @Test(groups = { "cassandra" })
+    public void testingTableList() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        Date[] ss = sbb.c2_getArchiveTableList(sbb.getKeyspaceName());
+        int i1 = 0;
+
+
+//        Date dt0 = new Date();
+//        Date dt = new Date(dt0.getTime() - 3 * 24 * 3600 * 1000);
+//        PreparedStatementCollection_C3 psc = sbb.getStatementCollection(dt);
+//        long newDueSlot = sbb.c2_getDueSlotForTime(dt);
+//        sbb.c2_updateDueSlotForTargetId("222222_1_11", newDueSlot);
 //
-//	private UUID id1 = UUID.fromString("59e815dc-49ad-4539-8cff-beb710a7de03");
-//	private UUID id2 = UUID.fromString("be26d2e9-1ba0-490c-bd5b-f04848127220");
-//	private UUID id3 = UUID.fromString("8bf7279f-3d4a-4494-8acd-cb9572c7ab33");
-//	private UUID id4 = UUID.fromString("c3bd98c2-355d-4572-8915-c6d0c767cae1");
+//        sbb.c2_deleteLiveTablesForDate(dt);
 //
-//	private TargetAddress ta1 = new TargetAddress(5, 1, "1111");
-//	private TargetAddress ta2 = new TargetAddress(5, 1, "1112");
-//
-//	private SmsSet smsSetSched1;
-//	private SmsSet smsSetSched2;
-//
-//	@BeforeClass
-//	public void setUpClass() throws Exception {
-//		System.out.println("setUpClass");
-//
-//        this.cassandraDbInited = this.sbb.testCassandraAccess();
+//        sbb.c2_deleteArchiveTablesForDate(dt);
+    }
+
+//    @Test(groups = { "cassandra" })
+//    public void testingColumnAdding() throws Exception {
 //        if (!this.cassandraDbInited)
 //            return;
-//        this.sbb.start("127.0.0.1", 9042, "RestCommSMSC");
-//	}
 //
-//	@AfterClass
-//	public void tearDownClass() throws Exception {
-//		System.out.println("tearDownClass");
-//		this.sbb.stop();
-//	}
+//        Date dt0 = new Date();
+//        Date dt = new Date(dt0.getTime() - 10 * 24 * 3600 * 1000);
+//        sbb.c2_deleteLiveTablesForDate(dt);
+//        sbb.c2_deleteArchiveTablesForDate(dt);
 //
+//        PreparedStatementCollection_C3 psc = sbb.getStatementCollection(dt);
+//        long newDueSlot = sbb.c2_getDueSlotForTime(dt);
+//        sbb.c2_updateDueSlotForTargetId("222222_1_11", newDueSlot);
 //
+//        String[] ss = sbb.getLiveTableListAsNames(sbb.getKeyspaceName());
+//        String s = ss[0];
+//        boolean res = sbb.checkFieldInTable(s, "extra_col");
+//        assertFalse(res);
+//        sbb.addFieldsToLiveTables(sbb.getKeyspaceName(), "extra_col", "text");
 //
+//        res = sbb.checkFieldInTable(s, "extra_col");
+//        assertTrue(res);
+//    }
+
+    public void testOldFormatMessage(TargetAddress ta, DataCodingScheme dcs, String msg, UserDataHeader udh) throws Exception {
+        Date dt = new Date();
+        PreparedStatementCollection psc = sbb.getStatementCollection(dt);
+
+        TargetAddress lock = this.sbb.obtainSynchroObject(ta);
+        long dueSlot;
+        Sms sms;
+        try {
+            synchronized (lock) {
+                SmsSet smsSet = new SmsSet();
+                smsSet.setDestAddr(ta.getAddr());
+                smsSet.setDestAddrNpi(ta.getAddrNpi());
+                smsSet.setDestAddrTon(ta.getAddrTon());
+
+                smsSet.setCorrelationId("CI=0000");
+                smsSet.setNetworkId(9);
+
+                sms = new Sms();
+                sms.setSmsSet(smsSet);
+
+                sms.setDbId(UUID.randomUUID());
+
+                sms.setSourceAddr("11112");
+                sms.setSourceAddrTon(1);
+                sms.setSourceAddrNpi(1);
+                sms.setMessageId(8888888);
+                sms.setOrigNetworkId(49);
+
+                sms.setDataCoding(dcs.getCode());
+
+                sms.setShortMessageText(msg);
+                if (udh != null) {
+                    sms.setEsmClass(SmppConstants.ESM_CLASS_UDHI_MASK);
+                    sms.setShortMessageBin(udh.getEncodedData());
+                }
+
+                dueSlot = this.sbb.c2_getDueSlotForTargetId(psc, ta.getTargetId());
+                if (dueSlot == 0 || dueSlot <= sbb.c2_getCurrentDueSlot()) {
+                    dueSlot = sbb.c2_getDueSlotForNewSms();
+                    sbb.c2_updateDueSlotForTargetId(ta.getTargetId(), dueSlot);
+                }
+                sms.setDueSlot(dueSlot);
+                
+                sbb.c2_registerDueSlotWriting(dueSlot);
+                try {
+                    sbb.c2_createRecordCurrent(sms);
+                } finally {
+                    sbb.c2_unregisterDueSlotWriting(dueSlot);
+                }
+            }
+        } finally {
+            this.sbb.obtainSynchroObject(lock);
+        }
+
+        lock = this.sbb.obtainSynchroObject(ta);
+        try {
+            synchronized (lock) {
+                sbb.c2_registerDueSlotWriting(dueSlot);
+                ArrayList<SmsSet> lst0, lst;
+                try {
+                    lst0 = sbb.c2_getRecordList(dueSlot);
+                    lst = sbb.c2_sortRecordList(lst0);
+                } finally {
+                    sbb.c2_unregisterDueSlotWriting(dueSlot);
+                }
+
+                assertEquals(lst.size(), 1);
+                SmsSet smsSet = lst.get(0);
+                assertEquals(smsSet.getNetworkId(), 9);
+                assertEquals(sms.getOrigNetworkId(), 49);
+                for (Sms sms1 : smsSet.getRawListLastSegment()) {
+                    if (sms1.getDbId().equals(sms.getDbId())) {
+                        assertEquals(sms1.getDataCoding(), dcs.getCode());
+                        if (msg != null)
+                            assertEquals(sms1.getShortMessageText(), msg);
+                        else
+                            assertNull(sms1.getShortMessageText());
+                        if (udh != null)
+                            assertEquals(sms1.getShortMessageBin(), udh.getEncodedData());
+                        else
+                            assertNull(sms1.getShortMessageBin());
+                        assertEquals(smsSet.getCorrelationId(), "CI=0000");
+                    }
+                }
+            }
+        } finally {
+            this.sbb.obtainSynchroObject(lock);
+        }
+    }
+
+//    @Test(groups = { "cassandra" })
+//    public void testingCorrelationId() throws Exception {
 //
-//	@Test(groups = { "cassandra" })
-//	public void testingLifeCycle() throws Exception {
+//        if (!this.cassandraDbInited)
+//            return;
 //
-//		if (!this.cassandraDbInited)
-//			return;
+//        NextCorrelationIdResult s1 = sbb.c2_getNextCorrelationId("1111");
+//        assertEquals(s1.getCorrelationId(), "222000000001001");
+//        assertNull(s1.getSmscAddress());
 //
-//		this.clearDatabase();
-//
-//		this.addingNewMessages();
-//		
-//		this.scheduling();
-//
-//		this.processSuccessDelivery();
-//
-//		this.processFailuredDelivery();
-//	}
-//
-//	public void addingNewMessages() throws Exception {
-//		boolean b1;
-//		boolean b2;
-//		Sms sms_x1;
-//		Sms sms_x2;
-//		Sms sms_x3;
-//		Sms sms_x4;
-//		SmsProxy sms_y1;
-//		SmsProxy sms_y2;
-//		SmsProxy sms_y3;
-//		SmsProxy sms_y4;
-//
-//		// adding two messages for "1111"
-//		TargetAddress lock = this.sbb.obtainSynchroObject(ta1);
-//		try {
-//			synchronized (lock) {
-//				SmsSet smsSet_a = this.sbb.obtainSmsSet(ta1);
-//				Sms sms_a1 = this.createTestSms(1, smsSet_a, id1);
-//				Sms sms_a2 = this.createTestSms(2, smsSet_a, id2);
-//				this.sbb.createLiveSms(sms_a1);
-//				this.sbb.createLiveSms(sms_a2);
-//
-//				// start of result testing
-//				b1 = this.sbb.checkSmsSetExists(ta1);
-//				b2 = this.sbb.checkSmsSetExists(ta2);
-//				sms_x1 = this.sbb.obtainLiveSms(id1);
-//				sms_x2 = this.sbb.obtainLiveSms(id2);
-//				sms_x3 = this.sbb.obtainLiveSms(id3);
-//				sms_x4 = this.sbb.obtainLiveSms(id4);
-//				sms_y1 = this.sbb.obtainArchiveSms(id1);
-//				sms_y2 = this.sbb.obtainArchiveSms(id2);
-//				sms_y3 = this.sbb.obtainArchiveSms(id3);
-//				sms_y4 = this.sbb.obtainArchiveSms(id4);
-//
-//				assertTrue(b1);
-//				assertFalse(b2);
-//				this.checkTestSms(1, sms_x1, id1, false);
-//				this.checkTestSms(2, sms_x2, id2, false);
-//				assertNull(sms_x3);
-//				assertNull(sms_x4);
-//				assertNull(sms_y1);
-//				assertNull(sms_y2);
-//				assertNull(sms_y3);
-//				assertNull(sms_y4);
-//				// end of result testing
-//				
-//				// schedulering
-//				SmsSet smsSet = this.sbb.obtainSmsSet(ta1);
-//				assertEquals(smsSet.getInSystem(), 0);
-//				assertNull(smsSet.getDueDate());
-//				int year = new GregorianCalendar().get(GregorianCalendar.YEAR) - 1;
-//				Date d1 = new GregorianCalendar(year, 1, 20, 10, 00).getTime();
-//				Date d2 = new GregorianCalendar(year, 1, 20, 11, 00).getTime();
-//				Date d3 = new GregorianCalendar(year, 1, 20, 9, 00).getTime();
-//
-//				// first date setting - any date is accepted
-//				this.sbb.setNewMessageScheduled(smsSet_a, d1);
-//				smsSet = this.sbb.obtainSmsSet(ta1);
-//				assertEquals(smsSet.getInSystem(), 1);
-//				assertTrue(smsSet.getDueDate().equals(d1));
-//
-//				// later date setting - not accepted
-//				this.sbb.setNewMessageScheduled(smsSet_a, d2);
-//				smsSet = this.sbb.obtainSmsSet(ta1);
-//				assertEquals(smsSet.getInSystem(), 1);
-//				assertTrue(smsSet.getDueDate().equals(d1));
-//
-//				// previous date setting - not accepted
-//				this.sbb.setNewMessageScheduled(smsSet_a, d3);
-//				smsSet = this.sbb.obtainSmsSet(ta1);
-//				assertEquals(smsSet.getInSystem(), 1);
-//				assertTrue(smsSet.getDueDate().equals(d3));
-//			}
-//		} finally {
-//			this.sbb.obtainSynchroObject(lock);
-//		}
-//
-//		// adding an extra message for "1111"
-//		lock = this.sbb.obtainSynchroObject(ta1);
-//		try {
-//			synchronized (lock) {
-//				SmsSet smsSet_a = this.sbb.obtainSmsSet(ta1);
-//				Sms sms_a3 = this.createTestSms(3, smsSet_a, id3);
-//				this.sbb.createLiveSms(sms_a3);
-//
-//				// start of result testing
-//				b1 = this.sbb.checkSmsSetExists(ta1);
-//				b2 = this.sbb.checkSmsSetExists(ta2);
-//				sms_x1 = this.sbb.obtainLiveSms(id1);
-//				sms_x2 = this.sbb.obtainLiveSms(id2);
-//				sms_x3 = this.sbb.obtainLiveSms(id3);
-//				sms_x4 = this.sbb.obtainLiveSms(id4);
-//				sms_y1 = this.sbb.obtainArchiveSms(id1);
-//				sms_y2 = this.sbb.obtainArchiveSms(id2);
-//				sms_y3 = this.sbb.obtainArchiveSms(id3);
-//				sms_y4 = this.sbb.obtainArchiveSms(id4);
-//
-//				assertTrue(b1);
-//				assertFalse(b2);
-//				this.checkTestSms(1, sms_x1, id1, false);
-//				this.checkTestSms(2, sms_x2, id2, false);
-//				this.checkTestSms(3, sms_x3, id3, false);
-//				assertNull(sms_x4);
-//				assertNull(sms_y1);
-//				assertNull(sms_y2);
-//				assertNull(sms_y3);
-//				assertNull(sms_y4);
-//				// end of result testing
-//			}
-//		} finally {
-//			this.sbb.obtainSynchroObject(lock);
-//		}
-//
-//		// adding a messages for "1112"
-//		lock = this.sbb.obtainSynchroObject(ta2);
-//		try {
-//			synchronized (lock) {
-//				SmsSet smsSet_b = this.sbb.obtainSmsSet(ta2);
-//				Sms sms_a4 = this.createTestSms(4, smsSet_b, id4);
-//				this.sbb.createLiveSms(sms_a4);
-//
-//				// start of result testing
-//				b1 = this.sbb.checkSmsSetExists(ta1);
-//				b2 = this.sbb.checkSmsSetExists(ta2);
-//				sms_x1 = this.sbb.obtainLiveSms(id1);
-//				sms_x2 = this.sbb.obtainLiveSms(id2);
-//				sms_x3 = this.sbb.obtainLiveSms(id3);
-//				sms_x4 = this.sbb.obtainLiveSms(id4);
-//				sms_y1 = this.sbb.obtainArchiveSms(id1);
-//				sms_y2 = this.sbb.obtainArchiveSms(id2);
-//				sms_y3 = this.sbb.obtainArchiveSms(id3);
-//				sms_y4 = this.sbb.obtainArchiveSms(id4);
-//
-//				assertTrue(b1);
-//				assertTrue(b2);
-//				this.checkTestSms(1, sms_x1, id1, false);
-//				this.checkTestSms(2, sms_x2, id2, false);
-//				this.checkTestSms(3, sms_x3, id3, false);
-//				this.checkTestSms(4, sms_x4, id4, false);
-//				assertNull(sms_y1);
-//				assertNull(sms_y2);
-//				assertNull(sms_y3);
-//				assertNull(sms_y4);
-//				// end of result testing
-//
-//				// schedulering
-//				int year = new GregorianCalendar().get(GregorianCalendar.YEAR) + 1;
-//				Date d1 = new GregorianCalendar(year, 11, 20, 10, 00).getTime();
-//				this.sbb.setNewMessageScheduled(smsSet_b, d1);
-//			}
-//		} finally {
-//			this.sbb.obtainSynchroObject(lock);
-//		}
-//
-//		// getting live_sms as messageId
-//		Sms sms_x12 = this.sbb.obtainLiveSms(8888888 + 2);
-//		this.checkTestSms(2, sms_x12, id2, false);
-//	}
-//
-//	public void scheduling() throws Exception {
-//
-////		Date inSystemDate = new Date(113, 3, 20, 10, 20, 30);
-//		Date inSystemDate = new Date();
-//		
-//		// 1 - scheduling by dueTime
-//		int maxRecordCount = 100;
-//		
-//		long currentTime = System.currentTimeMillis();
-//		
-//		List<SmsSet> lst = this.sbb.fetchSchedulableSmsSets(maxRecordCount, null);
-//		
-//		long currentTime1 = System.currentTimeMillis();
-//		
-//		System.err.println("fetchSchedulableSmsSets took "+ (currentTime1 - currentTime));
-//		
-//		assertEquals(lst.size(), 1);
-//
-//		SmsSet smsSet_a = lst.get(0);
-//		this.checkTestSmsSet(smsSet_a, 1, this.ta1);
-//		assertEquals(smsSet_a.getInSystem(), 1);
-//		assertEquals(smsSet_a.getDueDelay(), 0);
-//
-//		for (SmsSet smsSet : lst) {
-//			TargetAddress lock = this.sbb.obtainSynchroObject(new TargetAddress(smsSet));
-//			try {
-//				synchronized (lock) {
-//					this.sbb.setDestination(smsSet, "ClusterName_1", "destSystemId_1", "destEsmeId_1", SmType.SMS_FOR_SS7);
-//					this.sbb.fetchSchedulableSms(smsSet, false);
-//
-//					// checking for sms count
-//					int smsCnt = smsSet.getSmsCount();
-//					for (int i1 = 0; i1 < smsCnt; i1++) {
-//						Sms sms = smsSet.getSms(i1);
-//
-//						assertEquals(sms.getMessageId(), 8888888 + i1 + 1);
-//
-//						assertEquals(sms.getDeliveryCount(), 0);
-//						this.sbb.setDeliveryStart(sms);
-//						assertEquals(sms.getDeliveryCount(), 1);
-//
-//						Sms sms_xx = this.sbb.obtainLiveSms(sms.getDbId());
-//						assertEquals(sms_xx.getDeliveryCount(), 1);
-//					}
-//					assertEquals(smsCnt, 3);
-// 
-//					if (smsSet.getSmsCount() > 0) {
-//						this.smsSetSched1 = smsSet;
-//						this.sbb.setDeliveryStart(smsSet, inSystemDate);
-//
-//						SmsSet smsSet1 = this.sbb.obtainSmsSet(new TargetAddress(smsSet));
-//						assertEquals(smsSet_a.getInSystem(), 2);
-//						assertEquals(smsSet_a.getDueDelay(), 0);
-//						assertEquals(smsSet1.getInSystem(), 2);
-//						assertTrue(smsSet1.getInSystemDate().equals(inSystemDate));
-//						assertEquals(smsSet1.getDueDelay(), 0);
-//					}
-//				}
-//			} finally {
-//				this.sbb.obtainSynchroObject(lock);
-//			}
-//		}
-//
-//		// 2 - scheduling by TargetAddress (after an Alert)
-//		this.smsSetSched2 = this.sbb.obtainSmsSet(ta2);
-//		assertEquals(this.smsSetSched2.getInSystem(), 1);
-//		assertEquals(this.smsSetSched2.getDueDelay(), 0);
-//
-//		if (this.smsSetSched2.getInSystem() == 1) {
-//			TargetAddress lock = this.sbb.obtainSynchroObject(new TargetAddress(this.smsSetSched2));
-//			try {
-//				synchronized (lock) {
-//					this.sbb.setDestination(this.smsSetSched2, "ClusterName_2", "destSystemId_2", "destEsmeId_2", SmType.SMS_FOR_ESME);
-//					this.sbb.fetchSchedulableSms(this.smsSetSched2, false);
-//
-//					// checking for sms count
-//					int smsCnt = this.smsSetSched2.getSmsCount();
-//					for (int i1 = 0; i1 < smsCnt; i1++) {
-//						Sms sms = this.smsSetSched2.getSms(i1);
-//						assertEquals(sms.getDeliveryCount(), 0);
-//						this.sbb.setDeliveryStart(sms);
-//						assertEquals(sms.getDeliveryCount(), 1);
-//					}
-//					assertEquals(smsCnt, 1);
-//
-//					if (this.smsSetSched2.getSmsCount() > 0) {
-//						this.sbb.setDeliveryStart(this.smsSetSched2, inSystemDate);
-//						SmsSet smsSet1 = this.sbb.obtainSmsSet(new TargetAddress(this.smsSetSched2));
-//						assertEquals(smsSet_a.getInSystem(), 2);
-//						assertEquals(smsSet_a.getDueDelay(), 0);
-//						assertEquals(smsSet1.getInSystem(), 2);
-//						assertTrue(smsSet1.getInSystemDate().equals(inSystemDate));
-//						assertEquals(smsSet1.getDueDelay(), 0);
-//					}
-//				}
-//			} finally {
-//				this.sbb.obtainSynchroObject(lock);
-//			}
-//		}
-//		
-//		// 3 - make inSystem==2 and check fetchSchedulableSmsSets()
-////		for (SmsSet smsSet : lst) {
-////			this.sbb;
-////		}
-//
-//		lst = this.sbb.fetchSchedulableSmsSets(maxRecordCount, null);
-//		assertEquals(lst.size(), 0);
-//	}
-//
-//	public void processSuccessDelivery() throws Exception {
-//		boolean b1;
-//		boolean b2;
-//		Sms sms_x1;
-//		Sms sms_x2;
-//		Sms sms_x3;
-//		Sms sms_x4;
-//		SmsProxy sms_y1;
-//		SmsProxy sms_y2;
-//		SmsProxy sms_y3;
-//		SmsProxy sms_y4;
-//
-//		// start of result testing
-//		b1 = this.sbb.checkSmsSetExists(ta1);
-//		b2 = this.sbb.checkSmsSetExists(ta2);
-//		sms_x1 = this.sbb.obtainLiveSms(id1);
-//		sms_x2 = this.sbb.obtainLiveSms(id2);
-//		sms_x3 = this.sbb.obtainLiveSms(id3);
-//		sms_x4 = this.sbb.obtainLiveSms(id4);
-//		sms_y1 = this.sbb.obtainArchiveSms(id1);
-//		sms_y2 = this.sbb.obtainArchiveSms(id2);
-//		sms_y3 = this.sbb.obtainArchiveSms(id3);
-//		sms_y4 = this.sbb.obtainArchiveSms(id4);
-//
-//		assertTrue(b1);
-//		assertTrue(b2);
-//		this.checkTestSms(1, sms_x1, id1, false);
-//		this.checkTestSms(2, sms_x2, id2, false);
-//		this.checkTestSms(3, sms_x3, id3, false);
-//		this.checkTestSms(4, sms_x4, id4, false);
-//		assertEquals(sms_x1.getDeliveryCount(), 1);
-//		assertEquals(sms_x2.getDeliveryCount(), 1);
-//		assertEquals(sms_x3.getDeliveryCount(), 1);
-//		assertEquals(sms_x4.getDeliveryCount(), 1);
-//		assertNull(sms_y1);
-//		assertNull(sms_y2);
-//		assertNull(sms_y3);
-//		assertNull(sms_y4);
-//
-//		TargetAddress lock = this.sbb.obtainSynchroObject(new TargetAddress(this.smsSetSched1));
-//		try {
-//			synchronized (lock) {
-//				// getting routing info (SRI) ...
-//				IMSI imsi = new IMSIImpl("12345678901234");
-//				ISDNAddressString nnn = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "3355778");
-//				LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(nnn, null, null, null, null);
-//				this.sbb.setRoutingInfo(smsSetSched1, imsi, locationInfoWithLMSI);
-//
-//				int smsCnt = smsSetSched1.getSmsCount();
-//				int step = 0;
-//				for (int i1 = 0; i1 < smsCnt; i1++) {
-//					Sms sms = smsSetSched1.getSms(i1);
-//
-//					// process message delivering ...
-//
-//					step++;
-//
-//                    this.sbb.archiveDeliveredSms(sms, new GregorianCalendar(2013, 1, 15, 12, 15 + step).getTime());
-//                    this.testArchiveInSystem(sms.getDbId());
-//
-//					b1 = this.sbb.checkSmsSetExists(ta1);
-//					b2 = this.sbb.checkSmsSetExists(ta2);
-//					sms_x1 = this.sbb.obtainLiveSms(id1);
-//					sms_x2 = this.sbb.obtainLiveSms(id2);
-//					sms_x3 = this.sbb.obtainLiveSms(id3);
-//					sms_x4 = this.sbb.obtainLiveSms(id4);
-//					sms_y1 = this.sbb.obtainArchiveSms(id1);
-//					sms_y2 = this.sbb.obtainArchiveSms(id2);
-//					sms_y3 = this.sbb.obtainArchiveSms(id3);
-//					sms_y4 = this.sbb.obtainArchiveSms(id4);
-//
-//					switch (step) {
-//					case 1:
-//						assertTrue(b1);
-//						assertTrue(b2);
-//						assertNull(sms_x1);
-//						this.checkTestSms(2, sms_x2, id2, false);
-//						this.checkTestSms(3, sms_x3, id3, false);
-//						this.checkTestSms(4, sms_x4, id4, false);
-//						this.checkTestSms(1, sms_y1, id1, true);
-//						assertEquals(sms_x2.getDeliveryCount(), 1);
-//						assertEquals(sms_x3.getDeliveryCount(), 1);
-//						assertEquals(sms_x4.getDeliveryCount(), 1);
-//						assertEquals(sms_y1.sms.getDeliveryCount(), 1);
-//						assertNull(sms_y2);
-//						assertNull(sms_y3);
-//						assertNull(sms_y4);
-//						break;
-//					case 2:
-//						assertTrue(b1);
-//						assertTrue(b2);
-//						assertNull(sms_x1);
-//						assertNull(sms_x2);
-//						this.checkTestSms(3, sms_x3, id3, false);
-//						this.checkTestSms(4, sms_x4, id4, false);
-//						this.checkTestSms(1, sms_y1, id1, true);
-//						this.checkTestSms(2, sms_y2, id2, true);
-//						assertEquals(sms_x3.getDeliveryCount(), 1);
-//						assertEquals(sms_x4.getDeliveryCount(), 1);
-//						assertEquals(sms_y1.sms.getDeliveryCount(), 1);
-//						assertEquals(sms_y2.sms.getDeliveryCount(), 1);
-//						assertNull(sms_y3);
-//						assertNull(sms_y4);
-//						break;
-//					case 3:
-//						assertTrue(b1);
-//						assertTrue(b2);
-//						assertNull(sms_x1);
-//						assertNull(sms_x2);
-//						assertNull(sms_x3);
-//						this.checkTestSms(4, sms_x4, id4, false);
-//						this.checkTestSms(1, sms_y1, id1, true);
-//						this.checkTestSms(2, sms_y2, id2, true);
-//						this.checkTestSms(3, sms_y3, id3, true);
-//						assertEquals(sms_x4.getDeliveryCount(), 1);
-//						assertEquals(sms_y1.sms.getDeliveryCount(), 1);
-//						assertEquals(sms_y2.sms.getDeliveryCount(), 1);
-//						assertEquals(sms_y3.sms.getDeliveryCount(), 1);
-//						assertNull(sms_y4);
-//						break;
-//					}
-//				}
-//
-//				this.sbb.fetchSchedulableSms(smsSetSched1, false);
-//				if (smsSetSched1.getSmsCount() > 0) {
-//					// new message found - continue delivering ......
-//				} else {
-//					b1 = this.sbb.checkSmsSetExists(ta1);
-//					assertTrue(b1);
-//					SmsSet smsSet_b1 = this.sbb.obtainSmsSet(ta1);
-//					assertNull(smsSet_b1.getLastDelivery());
-//					assertEquals(smsSet_b1.getInSystem(), 2);
-//					assertNull(smsSet_b1.getStatus());
-//					assertEquals(smsSet_b1.getDueDelay(), 0);
-//					
-//					this.sbb.setDeliverySuccess(smsSetSched1, new GregorianCalendar(2013, 1, 15, 12, 15 + 3).getTime());
-//
-//					b1 = this.sbb.checkSmsSetExists(ta1);
-//					assertTrue(b1);
-//					SmsSet smsSet_b2 = this.sbb.obtainSmsSet(ta1);
-////					assertTrue(smsSet_b2.getLastDelivery().equals(new GregorianCalendar(2013, 1, 15, 12, 15 + 3).getTime()));
-//					assertEquals(smsSet_b2.getInSystem(), 0);
-//					assertEquals(smsSet_b2.getStatus().getCode(), 0);
-//					assertEquals(smsSet_b2.getDueDelay(), 0);
-//
-//					assertTrue(this.sbb.deleteSmsSet(smsSetSched1));
-//
-//					b1 = this.sbb.checkSmsSetExists(ta1);
-//					assertFalse(b1);
-//				}
-//			}
-//		} finally {
-//			this.sbb.obtainSynchroObject(lock);
-//		}
-//
-//		// testing - deleting absent smsSet
-//		b1 = this.sbb.checkSmsSetExists(ta1);
-//		assertFalse(b1);
-//		assertTrue(this.sbb.deleteSmsSet(smsSetSched1));
-//		b1 = this.sbb.checkSmsSetExists(ta1);
-//		assertFalse(b1);
-//
-//		// testing - we can not delete smsSet with children
-//		b2 = this.sbb.checkSmsSetExists(ta2);
-//		assertTrue(b2);
-//		assertFalse(this.sbb.deleteSmsSet(smsSetSched2));
-//		b2 = this.sbb.checkSmsSetExists(ta2);
-//		assertTrue(b2);
-//
-//	}
-//
-//    private void testArchiveInSystem(UUID id) {
-//        PreparedStatement ps = sbb.getSession().prepare("select * from \"" + Schema.FAMILY_ARCHIVE + "\" where \"" + Schema.COLUMN_ID + "\"=?;");
-//        BoundStatement boundStatement = new BoundStatement(ps);
-//        boundStatement.bind(id);
-//        ResultSet res = sbb.getSession().execute(boundStatement);
-//
-//        Row row = res.one();
-//        if (row != null) {
-//            int val = row.getInt("IN_SYSTEM");
-//            assertEquals(val, 0);
-//        }        
-//
-//
-//
-////        SliceQuery<UUID, Composite, ByteBuffer> query = HFactory.createSliceQuery(this.sbb.getKeyspace(), UUIDSerializer.get(), CompositeSerializer.get(),
-////                ByteBufferSerializer.get());
-////        query.setColumnFamily(Schema.FAMILY_ARCHIVE);
-////        query.setKey(id);
-////
-////        query.setRange(null, null, false, 100);
-////
-////        QueryResult<ColumnSlice<Composite, ByteBuffer>> result = query.execute();
-////        ColumnSlice<Composite, ByteBuffer> cSlice = result.get();
-////
-////        List<HColumn<Composite, ByteBuffer>> coll = cSlice.getColumns();
-////        for (HColumn<Composite, ByteBuffer> col : coll) {
-////            Composite nm = col.getName();
-////            String name = nm.get(0, StringSerializer.get());
-////            if (name.equals("IN_SYSTEM")) {
-////                Integer val = IntegerSerializer.get().fromByteBuffer(col.getValue());
-////                assertNotNull(val);
-////                int vall = val;
-////                assertEquals(vall, 0);
-////            }
-////        }
+//        NextCorrelationIdResult s2 = sbb.c2_getNextCorrelationId("3333");
+//        assertEquals(s2.getCorrelationId(), "444444444444402");
+//        assertEquals(s2.getSmscAddress(), "00001");
 //
 //    }
-//
-//	public void processFailuredDelivery() throws Exception {
-//		boolean b1;
-//		boolean b2;
-//		Sms sms_x1;
-//		Sms sms_x2;
-//		Sms sms_x3;
-//		Sms sms_x4;
-//		SmsProxy sms_y1;
-//		SmsProxy sms_y2;
-//		SmsProxy sms_y3;
-//		SmsProxy sms_y4;
-//
-//		// start of result testing
-//		b1 = this.sbb.checkSmsSetExists(ta1);
-//		b2 = this.sbb.checkSmsSetExists(ta2);
-//		sms_x1 = this.sbb.obtainLiveSms(id1);
-//		sms_x2 = this.sbb.obtainLiveSms(id2);
-//		sms_x3 = this.sbb.obtainLiveSms(id3);
-//		sms_x4 = this.sbb.obtainLiveSms(id4);
-//		sms_y1 = this.sbb.obtainArchiveSms(id1);
-//		sms_y2 = this.sbb.obtainArchiveSms(id2);
-//		sms_y3 = this.sbb.obtainArchiveSms(id3);
-//		sms_y4 = this.sbb.obtainArchiveSms(id4);
-//
-//		assertFalse(b1);
-//		assertTrue(b2);
-//		assertNull(sms_x1);
-//		assertNull(sms_x2);
-//		assertNull(sms_x3);
-//		this.checkTestSms(4, sms_x4, id4, false);
-//		assertNotNull(sms_y1);
-//		assertNotNull(sms_y2);
-//		assertNotNull(sms_y3);
-//		assertNull(sms_y4);
-//
-//		TargetAddress lock = this.sbb.obtainSynchroObject(new TargetAddress(this.smsSetSched2));
-//		try {
-//			synchronized (lock) {
-//				// getting routing info (SRI) ...
-//				IMSI imsi = new IMSIImpl("12345678901234");
-//				ISDNAddressString nnn = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "3355778");
-//				LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(nnn, null, null, null, null);
-//				this.sbb.setRoutingInfo(smsSetSched2, imsi, locationInfoWithLMSI);
-//
-//				b1 = this.sbb.checkSmsSetExists(ta2);
-//				assertTrue(b1);
-//				SmsSet smsSet_b1 = this.sbb.obtainSmsSet(ta2);
-//				assertNull(smsSet_b1.getLastDelivery());
-//				assertEquals(smsSet_b1.getInSystem(), 2);
-//				assertNull(smsSet_b1.getStatus());
-//				assertEquals(smsSet_b1.getDueDelay(), 0);
-//
-//				// we must firstly mark smsSet as failured
-//				this.sbb.setDeliveryFailure(smsSetSched2, ErrorCode.MEMORY_FULL, new GregorianCalendar(2013, 1, 15, 12, 15 + 4).getTime());
-//
-//				b1 = this.sbb.checkSmsSetExists(ta2);
-//				assertTrue(b1);
-//				SmsSet smsSet_b2 = this.sbb.obtainSmsSet(ta2);
-////				assertTrue(smsSet_b2.getLastDelivery().equals(new GregorianCalendar(2013, 1, 15, 12, 15 + 4).getTime()));
-//				assertEquals(smsSet_b2.getInSystem(), 0);
-//				assertEquals(smsSet_b2.getStatus().getCode(), 17);
-//				assertEquals(smsSet_b2.getDueDelay(), 0);
-//				assertFalse(smsSetSched2.isAlertingSupported());
-//				assertFalse(smsSet_b2.isAlertingSupported());
-//
-//				this.sbb.setAlertingSupported(smsSetSched2.getTargetId(), true);
-//				smsSet_b2 = this.sbb.obtainSmsSet(ta2);
-//				assertTrue(smsSet_b2.isAlertingSupported());
-//				
-//				int year = new GregorianCalendar().get(GregorianCalendar.YEAR) - 1;
-//				Date d4 = new GregorianCalendar(year, 1, 20, 10, 00).getTime();
-//				this.sbb.setDeliveringProcessScheduled(smsSetSched2, d4, 900);
-//				assertEquals(smsSetSched2.getDueDelay(), 900);
-//				assertTrue(smsSetSched2.getDueDate().equals(d4));
-//				SmsSet smsSet_yyy = this.sbb.obtainSmsSet(ta2);
-//				assertEquals(smsSet_yyy.getDueDelay(), 900);
-//				assertTrue(smsSet_yyy.getDueDate().equals(d4));
-//
-//				int cnt = smsSetSched2.getSmsCount();
-//				for (int i1 = 0; i1 < cnt; i1++) {
-//					Sms sms = smsSetSched2.getSms(i1);
-//					this.sbb.archiveFailuredSms(sms);
-//                    this.testArchiveInSystem(sms.getDbId());
-//				}
-//
-//				b1 = this.sbb.checkSmsSetExists(ta1);
-//				b2 = this.sbb.checkSmsSetExists(ta2);
-//				sms_x1 = this.sbb.obtainLiveSms(id1);
-//				sms_x2 = this.sbb.obtainLiveSms(id2);
-//				sms_x3 = this.sbb.obtainLiveSms(id3);
-//				sms_x4 = this.sbb.obtainLiveSms(id4);
-//				sms_y1 = this.sbb.obtainArchiveSms(id1);
-//				sms_y2 = this.sbb.obtainArchiveSms(id2);
-//				sms_y3 = this.sbb.obtainArchiveSms(id3);
-//				sms_y4 = this.sbb.obtainArchiveSms(id4);
-//
-//				assertFalse(b1);
-//				assertTrue(b2);
-//				assertNull(sms_x1);
-//				assertNull(sms_x2);
-//				assertNull(sms_x3);
-//				assertNull(sms_x4);
-//				this.checkTestSms(1, sms_y1, id1, true);
-//				this.checkTestSms(2, sms_y2, id2, true);
-//				this.checkTestSms(3, sms_y3, id3, true);
-//				this.checkTestSms(4, sms_y4, id4, true);
-//
-//			}
-//		} finally {
-//			this.sbb.obtainSynchroObject(lock);
-//		}
-//	}
-//
-//	private void clearDatabase() throws PersistenceException, IOException {
-//		this.sbb.deleteArchiveSms(id1);
-//		this.sbb.deleteArchiveSms(id2);
-//		this.sbb.deleteArchiveSms(id3);
-//		this.sbb.deleteArchiveSms(id4);
-//		this.sbb.deleteLiveSms(id1);
-//		this.sbb.deleteLiveSms(id2);
-//		this.sbb.deleteLiveSms(id3);
-//		this.sbb.deleteLiveSms(id4);
-//
-//		SmsSet smsSet_x1 = new SmsSet();
-//		smsSet_x1.setDestAddr(ta1.getAddr());
-//		smsSet_x1.setDestAddrTon(ta1.getAddrTon());
-//		smsSet_x1.setDestAddrNpi(ta1.getAddrNpi());
-//		SmsSet smsSet_x2 = new SmsSet();
-//		smsSet_x2.setDestAddr(ta2.getAddr());
-//		smsSet_x2.setDestAddrTon(ta2.getAddrTon());
-//		smsSet_x2.setDestAddrNpi(ta2.getAddrNpi());
-//		this.sbb.deleteSmsSet(smsSet_x1);
-//		this.sbb.deleteSmsSet(smsSet_x2);
-//
-//		boolean b1 = this.sbb.checkSmsSetExists(ta1);
-//		boolean b2 = this.sbb.checkSmsSetExists(ta2);
-//		Sms sms_x1 = this.sbb.obtainLiveSms(id1);
-//		Sms sms_x2 = this.sbb.obtainLiveSms(id2);
-//		Sms sms_x3 = this.sbb.obtainLiveSms(id3);
-//		Sms sms_x4 = this.sbb.obtainLiveSms(id4);
-//		SmsProxy sms_y1 = this.sbb.obtainArchiveSms(id1);
-//		SmsProxy sms_y2 = this.sbb.obtainArchiveSms(id2);
-//		SmsProxy sms_y3 = this.sbb.obtainArchiveSms(id3);
-//		SmsProxy sms_y4 = this.sbb.obtainArchiveSms(id4);
-//
-//		assertFalse(b1);
-//		assertFalse(b2);
-//		assertNull(sms_x1);
-//		assertNull(sms_x2);
-//		assertNull(sms_x3);
-//		assertNull(sms_x4);
-//		assertNull(sms_y1);
-//		assertNull(sms_y2);
-//		assertNull(sms_y3);
-//		assertNull(sms_y4);
-//	}
-//
-//	@Test(groups = { "cassandra" })
-//	public void testingfetchSchedulableSmsWithExcludeNonScheduleDeliveryTime() throws Exception {
-//
-//		if (!this.cassandraDbInited)
-//			return;
-//
-//		this.clearDatabase();
-//
-//		Date curDate = new Date();
-//		Date scheduleDeliveryTime = MessageUtil.addHours(curDate, 1);
-//		SmsSet smsSet_a = this.sbb.obtainSmsSet(ta1);
-//		Sms sms_a1 = this.createTestSms(1, smsSet_a, id1);
-//		Sms sms_a2 = this.createTestSms(2, smsSet_a, id2);
-//		sms_a1.setScheduleDeliveryTime(null);
-//		sms_a2.setScheduleDeliveryTime(scheduleDeliveryTime);
-//		this.sbb.createLiveSms(sms_a1);
-//		this.sbb.createLiveSms(sms_a2);
-//
-//		this.sbb.fetchSchedulableSms(smsSet_a, false);
-//		assertEquals(smsSet_a.getSmsCount(), 2);
-//
-//		Date newDate = MessageUtil.checkScheduleDeliveryTime(smsSet_a, curDate);
-//		assertTrue(newDate.equals(curDate));
-//
-//		this.sbb.fetchSchedulableSms(smsSet_a, true);
-//		assertEquals(smsSet_a.getSmsCount(), 1);
-//
-//		smsSet_a.clearSmsList();
-//		newDate = MessageUtil.checkScheduleDeliveryTime(smsSet_a, curDate);
-//		assertTrue(newDate.equals(curDate));
-//
-//
-//		this.clearDatabase();
-//
-//		scheduleDeliveryTime = MessageUtil.addHours(curDate, -1);
-//		smsSet_a = this.sbb.obtainSmsSet(ta1);
-//		sms_a1 = this.createTestSms(1, smsSet_a, id1);
-//		sms_a2 = this.createTestSms(2, smsSet_a, id2);
-//		sms_a1.setScheduleDeliveryTime(null);
-//		sms_a2.setScheduleDeliveryTime(scheduleDeliveryTime);
-//		this.sbb.createLiveSms(sms_a1);
-//		this.sbb.createLiveSms(sms_a2);
-//
-//		this.sbb.fetchSchedulableSms(smsSet_a, false);
-//		assertEquals(smsSet_a.getSmsCount(), 2);
-//
-//		this.sbb.fetchSchedulableSms(smsSet_a, true);
-//		assertEquals(smsSet_a.getSmsCount(), 2);
-//
-//
-//		this.clearDatabase();
-//
-//		scheduleDeliveryTime = MessageUtil.addHours(curDate, 1);
-//		smsSet_a = this.sbb.obtainSmsSet(ta1);
-//		sms_a2 = this.createTestSms(2, smsSet_a, id2);
-//		sms_a2.setScheduleDeliveryTime(scheduleDeliveryTime);
-//		this.sbb.createLiveSms(sms_a2);
-//		this.sbb.fetchSchedulableSms(smsSet_a, false);
-//		newDate = MessageUtil.checkScheduleDeliveryTime(smsSet_a, curDate);
-//		assertTrue(newDate.equals(scheduleDeliveryTime));
-//
-//
-//		this.clearDatabase();
-//
-//		scheduleDeliveryTime = MessageUtil.addHours(curDate, -1);
-//		smsSet_a = this.sbb.obtainSmsSet(ta1);
-//		sms_a2 = this.createTestSms(2, smsSet_a, id2);
-//		sms_a2.setScheduleDeliveryTime(scheduleDeliveryTime);
-//		this.sbb.createLiveSms(sms_a2);
-//		this.sbb.fetchSchedulableSms(smsSet_a, false);
-//		newDate = MessageUtil.checkScheduleDeliveryTime(smsSet_a, curDate);
-//		assertTrue(newDate.equals(curDate));
-//
-//
-//		this.clearDatabase();
-//
-//		scheduleDeliveryTime = MessageUtil.addHours(curDate, 1);
-//		Date scheduleDeliveryTime2 = MessageUtil.addHours(curDate, 2);
-//		smsSet_a = this.sbb.obtainSmsSet(ta1);
-//		sms_a1 = this.createTestSms(1, smsSet_a, id1);
-//		sms_a2 = this.createTestSms(2, smsSet_a, id2);
-//		sms_a1.setScheduleDeliveryTime(scheduleDeliveryTime);
-//		sms_a2.setScheduleDeliveryTime(scheduleDeliveryTime2);
-//		this.sbb.createLiveSms(sms_a1);
-//		this.sbb.createLiveSms(sms_a2);
-//		this.sbb.fetchSchedulableSms(smsSet_a, false);
-//		newDate = MessageUtil.checkScheduleDeliveryTime(smsSet_a, curDate);
-//		assertTrue(newDate.equals(scheduleDeliveryTime));
-//
-//
-//		this.clearDatabase();
-//
-//		scheduleDeliveryTime = MessageUtil.addHours(curDate, 1);
-//		scheduleDeliveryTime2 = MessageUtil.addHours(curDate, 2);
-//		smsSet_a = this.sbb.obtainSmsSet(ta1);
-//		sms_a1 = this.createTestSms(1, smsSet_a, id1);
-//		sms_a2 = this.createTestSms(2, smsSet_a, id2);
-//		sms_a1.setScheduleDeliveryTime(scheduleDeliveryTime2);
-//		sms_a2.setScheduleDeliveryTime(scheduleDeliveryTime);
-//		this.sbb.createLiveSms(sms_a1);
-//		this.sbb.createLiveSms(sms_a2);
-//		this.sbb.fetchSchedulableSms(smsSet_a, false);
-//		newDate = MessageUtil.checkScheduleDeliveryTime(smsSet_a, curDate);
-//		assertTrue(newDate.equals(scheduleDeliveryTime));
-//	}
-//
-//
-//	private SmsSet createTestSmsSet(int num, TargetAddress ta) {
-//
-//		SmsSet smsSet = new SmsSet();
-//		smsSet.setDestAddr(ta.getAddr());
-//		smsSet.setDestAddrTon(ta.getAddrTon());
-//		smsSet.setDestAddrNpi(ta.getAddrNpi());
-//
-////		smsSet.setDestClusterName("tag_cluster_" + num);
-////		smsSet.setDestEsmeId("esme_" + num);
-////		smsSet.setDestSystemId("sys_" + num);
-////
-////		smsSet.setImsi(new IMSIImpl("1234567890123_" + num));
-////		ISDNAddressString nnn = new ISDNAddressStringImpl(AddressNature.network_specific_number, NumberingPlan.land_mobile, "335577_" + num);
-////		smsSet.setLocationInfoWithLMSI(new LocationInfoWithLMSIImpl(nnn, null, null, null, null));
-////
-////		smsSet.setStatus(ErrorCode.fromInt(10 + num));
-////		smsSet.setDeliveryCount(78 + num);
-//
-//		return smsSet;
-//	}
-//
-//	private void checkTestSmsSet(SmsSet smsSet, int num, TargetAddress ta) {
-//
-//		assertEquals(smsSet.getDestAddr(), ta.getAddr());
-//		assertEquals(smsSet.getDestAddrTon(), ta.getAddrTon());
-//		assertEquals(smsSet.getDestAddrNpi(), ta.getAddrNpi());
-//	}
-//
-//
-//	private Sms createTestSms(int num, SmsSet smsSet, UUID id) {
-//
-//		Sms sms = new Sms();
-//		sms.setSmsSet(smsSet);
-//
-////		sms.setDbId(UUID.randomUUID());
-//		sms.setDbId(id);
-//		sms.setSourceAddr("11112_" + num);
-//		sms.setSourceAddrTon(14 + num);
-//		sms.setSourceAddrNpi(11 + num);
-//		sms.setMessageId(8888888 + num);
-//		sms.setMoMessageRef(102 + num);
-//
-//		sms.setOrigEsmeName("esme_" + num);
-//		sms.setOrigSystemId("sys_" + num);
-//
-//		sms.setSubmitDate(new GregorianCalendar(2013, 1, 15, 12, 00 + num).getTime());
-//		sms.setDeliveryDate(new GregorianCalendar(2013, 1, 15, 12, 15 + num).getTime());
-//
-//		sms.setServiceType("serv_type__" + num);
-//		sms.setEsmClass(11 + num);
-//		sms.setProtocolId(12 + num);
-//		sms.setPriority(13 + num);
-//		sms.setRegisteredDelivery(14 + num);
-//		sms.setReplaceIfPresent(15 + num);
-//		sms.setDataCoding(16 + num);
-//		sms.setDefaultMsgId(17 + num);
-//
-//		sms.setShortMessage(new byte[] { (byte)(21 + num), 23, 25, 27, 29 });
-//
-//		sms.setScheduleDeliveryTime(new GregorianCalendar(2013, 1, 20, 10, 00 + num).getTime());
-//		sms.setValidityPeriod(new GregorianCalendar(2013, 1, 23, 13, 33 + num).getTime());
-//
-//		// short tag, byte[] value, String tagName
-//		Tlv tlv = new Tlv((short) 5, new byte[] { (byte) (1 + num), 2, 3, 4, 5 });
-//		sms.getTlvSet().addOptionalParameter(tlv);
-//		tlv = new Tlv((short) 6, new byte[] { (byte) (6 + num), 7, 8 });
-//		sms.getTlvSet().addOptionalParameter(tlv);
-//
-//		return sms;
-//	}
-//
-//	private void checkTestSms(int numm, SmsProxy sms, UUID id, boolean isArchive) {
-//		this.checkTestSms(numm, sms.sms, id, isArchive);
-//
-//		int num;
-//		if (numm == 4)
-//			num = 2;
-//		else
-//			num = 1;
-//
-//		if (num == 1)
-//			assertEquals(sms.addrDstDigits, "1111");
-//		else
-//			assertEquals(sms.addrDstDigits, "1112");
-//
-//		assertEquals(sms.addrDstTon, 5);
-//		assertEquals(sms.addrDstNpi, 1);
-//
-//		if (isArchive) {
-//			assertTrue(sms.deliveryDate.equals(new GregorianCalendar(2013, 1, 15, 12, 15 + numm).getTime()));
-//
-//			assertEquals(sms.destClusterName, "ClusterName_" + num);
-//			assertEquals(sms.destEsmeName, "destEsmeId_" + num);
-//			assertEquals(sms.destSystemId, "destSystemId_" + num);
-//
-//			assertEquals(sms.imsi, "12345678901234");
-//			assertEquals(sms.nnnDigits, "3355778");
-//			assertEquals(sms.smStatus, (num == 1 ? 0 : ErrorCode.MEMORY_FULL.getCode()));
-//			assertEquals(sms.smType, (num == 1 ? SmType.SMS_FOR_SS7.getCode() : SmType.SMS_FOR_ESME.getCode()));
-//			assertEquals(sms.deliveryCount, 1);
-//		}
-//	}
-//
-//	private void checkTestSms(int num, Sms sms, UUID id, boolean isArchive) {
-//
-//		assertTrue(sms.getDbId().equals(id));
-//
-//		assertEquals(sms.getSourceAddr(), "11112_" + num);
-//		assertEquals(sms.getSourceAddrTon(), 14 + num);
-//		assertEquals(sms.getSourceAddrNpi(), 11 + num);
-//
-//		assertEquals(sms.getMessageId(), 8888888 + num);
-//		assertEquals(sms.getMoMessageRef(), 102 + num);
-//		assertEquals(sms.getOrigEsmeName(), "esme_" + num);
-//		assertEquals(sms.getOrigSystemId(), "sys_" + num);
-//
-//		assertTrue(sms.getSubmitDate().equals(new GregorianCalendar(2013, 1, 15, 12, 00 + num).getTime()));
-//
-//		assertEquals(sms.getServiceType(), "serv_type__" + num);
-//		assertEquals(sms.getEsmClass(), 11 + num);
-//		assertEquals(sms.getProtocolId(), 12 + num);
-//		assertEquals(sms.getPriority(), 13 + num);
-//		assertEquals(sms.getRegisteredDelivery(), 14 + num);
-//		assertEquals(sms.getReplaceIfPresent(), 15 + num);
-//		assertEquals(sms.getDataCoding(), 16 + num);
-//		assertEquals(sms.getDefaultMsgId(), 17 + num);
-//
-//		assertEquals(sms.getShortMessage(), new byte[] { (byte) (21 + num), 23, 25, 27, 29 });
-//
-//		assertEquals(sms.getScheduleDeliveryTime(), new GregorianCalendar(2013, 1, 20, 10, 00 + num).getTime());
-//		assertEquals(sms.getValidityPeriod(), new GregorianCalendar(2013, 1, 23, 13, 33 + num).getTime());
-//
-//		// short tag, byte[] value, String tagName
-//		assertEquals(sms.getTlvSet().getOptionalParameterCount(), 2);
-//		assertEquals(sms.getTlvSet().getOptionalParameter((short) 5).getValue(), new byte[] { (byte) (1 + num), 2, 3, 4, 5 });
-//		assertEquals(sms.getTlvSet().getOptionalParameter((short) 6).getValue(), new byte[] { (byte) (6 + num), 7, 8 });
-//	}
+
+    public long addingNewMessages() throws Exception {
+        Date dt = new Date();
+        PreparedStatementCollection psc = sbb.getStatementCollection(dt);
+
+        // adding 3 messages for "1111"
+        TargetAddress lock = this.sbb.obtainSynchroObject(ta1);
+        long dueSlot;
+        try {
+            synchronized (lock) {
+                Sms sms_a1 = this.createTestSms(1, ta1.getAddr(), id1);
+                Sms sms_a2 = this.createTestSms(2, ta1.getAddr(), id2);
+                Sms sms_a3 = this.createTestSms(3, ta1.getAddr(), id3);
+
+                dueSlot = this.sbb.c2_getDueSlotForTargetId(psc, ta1.getTargetId());
+                if (dueSlot == 0 || dueSlot <= sbb.c2_getCurrentDueSlot()) {
+                    dueSlot = sbb.c2_getDueSlotForNewSms();
+                    sbb.c2_updateDueSlotForTargetId(ta1.getTargetId(), dueSlot);
+                }
+                sms_a1.setDueSlot(dueSlot);
+                sms_a2.setDueSlot(dueSlot);
+                sms_a3.setDueSlot(dueSlot);
+
+                sbb.c2_registerDueSlotWriting(dueSlot);
+                try {
+                    sbb.c2_createRecordCurrent(sms_a1);
+                    sbb.c2_createRecordCurrent(sms_a2);
+                    sbb.c2_createRecordCurrent(sms_a3);
+                } finally {
+                    sbb.c2_unregisterDueSlotWriting(dueSlot);
+                }
+            }
+        } finally {
+            this.sbb.obtainSynchroObject(lock);
+        }
+
+        // adding a messages for "1112"
+        lock = this.sbb.obtainSynchroObject(ta2);
+        try {
+            synchronized (lock) {
+                Sms sms_a1 = this.createTestSms(4, ta2.getAddr(), id4);
+
+                sbb.c2_updateDueSlotForTargetId(ta2.getTargetId(), dueSlot);
+                sms_a1.setDueSlot(dueSlot);
+
+                sbb.c2_registerDueSlotWriting(dueSlot);
+                try {
+                    sbb.c2_createRecordCurrent(sms_a1);
+                } finally {
+                    sbb.c2_unregisterDueSlotWriting(dueSlot);
+                }
+            }
+        } finally {
+            this.sbb.obtainSynchroObject(lock);
+        }
+
+        return dueSlot;
+    }
+
+    public void addingNewMessages2(long dueSlot) throws Exception {
+        Date dt = new Date();
+        PreparedStatementCollection psc = sbb.getStatementCollection(dt);
+
+        // adding an extra messages for "1111"
+        TargetAddress lock = this.sbb.obtainSynchroObject(ta1);
+        try {
+            synchronized (lock) {
+                Sms sms_a5 = this.createTestSms(5, ta1.getAddr(), id5);
+
+                sms_a5.setDueSlot(dueSlot);
+
+                sbb.c2_registerDueSlotWriting(dueSlot);
+                try {
+                    sbb.c2_createRecordCurrent(sms_a5);
+                } finally {
+                    sbb.c2_unregisterDueSlotWriting(dueSlot);
+                }
+            }
+        } finally {
+            this.sbb.obtainSynchroObject(lock);
+        }
+    }
+
+    public void readAlertMessage() throws Exception {
+        Date dt = new Date();
+        PreparedStatementCollection psc = sbb.getStatementCollection(dt);
+
+        // reading "1112" for Alert
+        TargetAddress lock = this.sbb.obtainSynchroObject(ta2);
+        try {
+            synchronized (lock) {
+                long dueSlot = this.sbb.c2_getDueSlotForTargetId(psc, ta2.getTargetId());
+                if (dueSlot == 0) {
+                    fail("Bad dueSlot for reading of ta2");
+                }
+
+                sbb.c2_registerDueSlotWriting(dueSlot);
+                SmsSet smsSet;
+                try {
+                    smsSet = sbb.c2_getRecordListForTargeId(dueSlot, ta2.getTargetId());
+                    ArrayList<SmsSet> lst0 = new ArrayList<SmsSet>();
+                    lst0.add(smsSet);
+                    ArrayList<SmsSet> lst = sbb.c2_sortRecordList(lst0);
+                } finally {
+                    sbb.c2_unregisterDueSlotWriting(dueSlot);
+                }
+                assertEquals(smsSet.getSmsCount(), 1);
+                Sms sms = smsSet.getSms(0);
+                assertEquals(sms.getDueSlot(), dueSlot);
+                this.checkTestSms(4, sms, id4, false);
+
+                sbb.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_INPROCESS, false);
+            }
+        } finally {
+            this.sbb.obtainSynchroObject(lock);
+        }
+    }
+
+    public SmsSet readDueSlotMessage(long dueSlot, int opt) throws Exception {
+        // reading dueSlot
+        TargetAddress lock = this.sbb.obtainSynchroObject(ta2);
+        try {
+            synchronized (lock) {
+                sbb.c2_registerDueSlotWriting(dueSlot);
+                ArrayList<SmsSet> lst0, lst;
+                try {
+                    lst0 = sbb.c2_getRecordList(dueSlot);
+                    lst = sbb.c2_sortRecordList(lst0);
+                } finally {
+                    sbb.c2_unregisterDueSlotWriting(dueSlot);
+                }
+
+                assertEquals(lst.size(), 1);
+                SmsSet smsSet = lst.get(0);
+                if (opt == 1) {
+                    assertEquals(smsSet.getSmsCount(), 3);
+
+                    Sms sms1 = smsSet.getSms(0);
+                    Sms sms2 = smsSet.getSms(1);
+                    Sms sms3 = smsSet.getSms(2);
+                    assertEquals(sms1.getDueSlot(), dueSlot);
+                    assertEquals(sms2.getDueSlot(), dueSlot);
+                    assertEquals(sms3.getDueSlot(), dueSlot);
+                    this.checkTestSms(1, sms1, id1, false);
+                    this.checkTestSms(2, sms2, id2, false);
+                    this.checkTestSms(3, sms3, id3, false);
+                    assertEquals(smsSet.getCorrelationId(), "CI=100001000022222");
+                } else {
+                    assertEquals(smsSet.getSmsCount(), 4);
+
+                    Sms sms1 = smsSet.getSms(0);
+                    Sms sms2 = smsSet.getSms(1);
+                    Sms sms3 = smsSet.getSms(2);
+                    assertEquals(sms1.getDueSlot(), dueSlot - 1);
+                    assertEquals(sms2.getDueSlot(), dueSlot - 1);
+                    assertEquals(sms3.getDueSlot(), dueSlot - 1);
+                    this.checkTestSms(1, sms1, id1, false);
+                    this.checkTestSms(2, sms2, id2, false);
+                    this.checkTestSms(3, sms3, id3, false);
+                    Sms sms5 = smsSet.getSms(3);
+                    assertEquals(sms5.getDueSlot(), dueSlot);
+                    this.checkTestSms(5, sms5, id5, false);
+                }
+
+                return smsSet;
+            }
+        } finally {
+            this.sbb.obtainSynchroObject(lock);
+        }
+    }
+
+    public void archiveMessage(SmsSet smsSet) throws Exception {
+        for (int i1 = 0; i1 < 3; i1++) {
+            Sms sms = smsSet.getSms(i1);
+            
+            sms.getSmsSet().setType(SmType.SMS_FOR_SS7);
+            sms.getSmsSet().setImsi("12345678900000");
+            ISDNAddressStringImpl networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "2223334444");
+            LocationInfoWithLMSIImpl locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
+
+            sms.getSmsSet().setLocationInfoWithLMSI(locationInfoWithLMSI);
+            
+            sbb.c2_createRecordArchive(sms);
+        }
+
+        Sms sms = smsSet.getSms(0);
+        SmsProxy smsx = sbb.obtainArchiveSms(sms.getDueSlot(), sms.getSmsSet().getDestAddr(), sms.getDbId());
+
+        this.checkTestSms(1, smsx.sms, sms.getDbId(), true);
+    }
+
+    private Sms createTestSms(int num, String number, UUID id) throws Exception {
+        PreparedStatementCollection psc = sbb.getStatementCollection(new Date());
+
+        SmsSet smsSet = new SmsSet();
+        smsSet.setDestAddr(number);
+        smsSet.setDestAddrNpi(1);
+        smsSet.setDestAddrTon(5);
+        smsSet.setNetworkId(9);
+        if (num == 1)
+            smsSet.setCorrelationId("CI=100001000022222");
+
+        Sms sms = new Sms();
+        sms.setSmsSet(smsSet);
+
+//      sms.setDbId(UUID.randomUUID());
+        sms.setDbId(id);
+        sms.setSourceAddr("11112_" + num);
+        sms.setSourceAddrTon(14 + num);
+        sms.setSourceAddrNpi(11 + num);
+        sms.setMessageId(8888888 + num);
+        sms.setMoMessageRef(102 + num);
+        sms.setOrigNetworkId(49);
+
+        sms.setOrigEsmeName("esme_" + num);
+        sms.setOrigSystemId("sys_" + num);
+
+        sms.setSubmitDate(new GregorianCalendar(2013, 1, 15, 12, 00 + num).getTime());
+        sms.setDeliveryDate(new GregorianCalendar(2013, 1, 15, 12, 15 + num).getTime());
+
+        sms.setServiceType("serv_type__" + num);
+        sms.setEsmClass(11 + num);
+        sms.setProtocolId(12 + num);
+        sms.setPriority(13 + num);
+        sms.setRegisteredDelivery(14 + num);
+        sms.setReplaceIfPresent(15 + num);
+        sms.setDataCoding(16 + num);
+        sms.setDefaultMsgId(17 + num);
+
+//        sms.setShortMessage(new byte[] { (byte)(21 + num), 23, 25, 27, 29 });
+        if (num != 2)
+            sms.setShortMessageText("Mes text" + num);
+        if (num != 3)
+            sms.setShortMessageBin(new byte[] { (byte) (21 + num), 23, 25, 27, 29 });
+
+        sms.setScheduleDeliveryTime(new GregorianCalendar(2013, 1, 20, 10, 00 + num).getTime());
+        sms.setValidityPeriod(new GregorianCalendar(2013, 1, 23, 13, 33 + num).getTime());
+
+        // short tag, byte[] value, String tagName
+        Tlv tlv = new Tlv((short) 5, new byte[] { (byte) (1 + num), 2, 3, 4, 5 });
+        sms.getTlvSet().addOptionalParameter(tlv);
+        tlv = new Tlv((short) 6, new byte[] { (byte) (6 + num), 7, 8 });
+        sms.getTlvSet().addOptionalParameter(tlv);
+
+        smsSet.setDueDelay(510);
+        sms.setDeliveryCount(9);
+
+        sms.setOriginatorSccpAddress("11224455");
+        sms.setStatusReportRequest(true);
+        sms.setDeliveryAttempt(321);
+        sms.setUserData("userdata");
+        sms.setExtraData("extradata_1");
+        sms.setExtraData_2("extradata_2");
+        sms.setExtraData_3("extradata_3");
+        sms.setExtraData_4("extradata_4");
+
+        return sms;
+    }
+
+    private void checkTestSms(int num, Sms sms, UUID id, boolean isArchive) {
+
+        assertTrue(sms.getDbId().equals(id));
+
+        assertEquals(sms.getSmsSet().getDueDelay(), 510);
+        assertEquals(sms.getSmsSet().getNetworkId(), 9);
+        assertEquals(sms.getDeliveryCount(), 9);
+
+        assertEquals(sms.getSourceAddr(), "11112_" + num);
+        assertEquals(sms.getSourceAddrTon(), 14 + num);
+        assertEquals(sms.getSourceAddrNpi(), 11 + num);
+        assertEquals(sms.getOrigNetworkId(), 49);
+
+        assertEquals(sms.getMessageId(), 8888888 + num);
+        assertEquals(sms.getMoMessageRef(), 102 + num);
+        assertEquals(sms.getOrigEsmeName(), "esme_" + num);
+        assertEquals(sms.getOrigSystemId(), "sys_" + num);
+
+        assertTrue(sms.getSubmitDate().equals(new GregorianCalendar(2013, 1, 15, 12, 00 + num).getTime()));
+
+        assertEquals(sms.getServiceType(), "serv_type__" + num);
+        assertEquals(sms.getEsmClass(), 11 + num);
+        assertEquals(sms.getProtocolId(), 12 + num);
+        assertEquals(sms.getPriority(), 13 + num);
+        assertEquals(sms.getRegisteredDelivery(), 14 + num);
+        assertEquals(sms.getReplaceIfPresent(), 15 + num);
+        assertEquals(sms.getDataCoding(), 16 + num);
+        assertEquals(sms.getDefaultMsgId(), 17 + num);
+
+//        assertEquals(sms.getShortMessage(), new byte[] { (byte) (21 + num), 23, 25, 27, 29 });
+        if (num != 2)
+            assertEquals(sms.getShortMessageText(), "Mes text" + num);
+        else
+            assertNull(sms.getShortMessageText());
+        if (num != 3)
+            assertEquals(sms.getShortMessageBin(), new byte[] { (byte) (21 + num), 23, 25, 27, 29 });
+        else
+            assertNull(sms.getShortMessageBin());
+
+        assertEquals(sms.getScheduleDeliveryTime(), new GregorianCalendar(2013, 1, 20, 10, 00 + num).getTime());
+        assertEquals(sms.getValidityPeriod(), new GregorianCalendar(2013, 1, 23, 13, 33 + num).getTime());
+
+        // short tag, byte[] value, String tagName
+        assertEquals(sms.getTlvSet().getOptionalParameterCount(), 2);
+        assertEquals(sms.getTlvSet().getOptionalParameter((short) 5).getValue(), new byte[] { (byte) (1 + num), 2, 3, 4, 5 });
+        assertEquals(sms.getTlvSet().getOptionalParameter((short) 6).getValue(), new byte[] { (byte) (6 + num), 7, 8 });
+
+        assertEquals(sms.getOriginatorSccpAddress(), "11224455");
+        assertTrue(sms.isStatusReportRequest());
+        assertEquals(sms.getDeliveryAttempt(), 321);
+        assertEquals(sms.getUserData(), "userdata");
+        assertEquals(sms.getExtraData(), "extradata_1");
+        assertEquals(sms.getExtraData_2(), "extradata_2");
+        assertEquals(sms.getExtraData_3(), "extradata_3");
+        assertEquals(sms.getExtraData_4(), "extradata_4");
+    }
 
 }
-

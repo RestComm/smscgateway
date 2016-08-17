@@ -13,9 +13,9 @@ import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
 import org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan;
 import org.mobicents.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.mobicents.protocols.ss7.map.service.sms.LocationInfoWithLMSIImpl;
-import org.mobicents.smsc.cassandra.DBOperations_C2;
+import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
-import org.mobicents.smsc.cassandra.PreparedStatementCollection_C3;
+import org.mobicents.smsc.cassandra.PreparedStatementCollection;
 import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.SmType;
 import org.mobicents.smsc.library.Sms;
@@ -280,7 +280,7 @@ public class StressTool3 {
 
                     int cnt = 3;
                     try {
-                        PreparedStatementCollection_C3 psc = dbOperations.getStatementCollection(new Date());
+                        PreparedStatementCollection psc = dbOperations.getStatementCollection(new Date());
 
                         SmsSet smsSet = new SmsSet();
                         smsSet.setDestAddr(s1);
@@ -397,7 +397,7 @@ public class StressTool3 {
                     int num = rnd.nextInt(endNum - startNum) + startNum;
 
                     try {
-                        PreparedStatementCollection_C3 psc = dbOperations.getStatementCollection(new Date());
+                        PreparedStatementCollection psc = dbOperations.getStatementCollection(new Date());
 
                         long dueSlot;
                         Integer ii1 = num;
@@ -423,7 +423,7 @@ public class StressTool3 {
 
                                                 for (int i1 = 0; i1 < smsSet.getSmsCount(); i1++) {
                                                     Sms sms = smsSet.getSms(i1);
-                                                    dbOperations.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_INPROCESS, false);
+                                                    dbOperations.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_INPROCESS, false);
                                                 }
 
                                                 this.numProcessed += smsSet.getSmsCount();
@@ -573,7 +573,7 @@ public class StressTool3 {
                                         Sms sms = smsSet.getSms(i1);
                                         sms.setDeliveryDate(new Date());
 
-                                        dbOperations.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT, false);
+                                        dbOperations.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT, false);
 
                                         // + 10 min
                                         sms.setDueSlot(dbOperations.c2_getDueSlotForTime(dt));
@@ -596,7 +596,7 @@ public class StressTool3 {
                                         Sms sms = smsSet.getSms(i1);
                                         sms.setDeliveryDate(new Date());
 
-                                        dbOperations.c2_updateInSystem(sms, DBOperations_C2.IN_SYSTEM_SENT, false);
+                                        dbOperations.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT, false);
                                         dbOperations.c2_createRecordArchive(sms);
                                     }
                                 }

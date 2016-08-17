@@ -5,7 +5,7 @@ import java.util.Date;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.mobicents.smsc.cassandra.DBOperations_C2;
+import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.library.SmsSet;
 
 import com.datastax.driver.core.BoundStatement;
@@ -23,7 +23,7 @@ public class DBOperTesting {
 
     public void run() {
         BasicConfigurator.configure();
-        Logger logger = Logger.getLogger(DBOperations_C2.class);
+        Logger logger = Logger.getLogger(DBOperations.class);
 
         try {
             logger.info("stating ...");
@@ -77,7 +77,7 @@ public class DBOperTesting {
         }
     }
 
-    public class DBOperations_C2_Proxy extends DBOperations_C2 {
+    public class DBOperations_C2_Proxy extends DBOperations {
         public Session getSession() {
             return super.session;
         }
