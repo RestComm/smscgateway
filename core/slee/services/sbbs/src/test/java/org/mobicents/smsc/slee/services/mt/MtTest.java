@@ -2991,52 +2991,55 @@ public class MtTest {
         this.sriSbb.onSms(event, null, null);
 
         MAPDialogSmsProxy dlg = serviceSri.getLastMAPDialogSms();
-        MAPApplicationContextVersion acv =  dlg.getApplicationContext().getApplicationContextVersion();
-        assertEquals(acv, MAPApplicationContextVersion.version3);
-        ArrayList<MAPTestEvent> lstEvt = dlg.getEventList();
-        assertEquals(lstEvt.size(), 2);
-        assertNull(serviceMt.getLastMAPDialogSms());
-
-        lstEvt = dlg.getEventList();
-        assertEquals(lstEvt.size(), 2);
-        assertEquals(dlg.getLocalAddress().getGlobalTitle().getDigits(), smscPropertiesManagement.getServiceCenterGt());
-        assertEquals(dlg.getRemoteAddress().getGlobalTitle().getDigits(), msdnDig);
-
-        MAPTestEvent evt = lstEvt.get(0);
-        assertEquals(evt.testEventType, MAPTestEventType.componentAdded);
-        SendRoutingInfoForSMRequest sriReq = (SendRoutingInfoForSMRequest) evt.event;
-        assertEquals(sriReq.getMsisdn().getAddress(), msdnDig);
-        assertEquals(sriReq.getServiceCentreAddress().getAddress(), smscPropertiesManagement.getServiceCenterGt());
-
-        evt = lstEvt.get(1);
-        assertEquals(evt.testEventType, MAPTestEventType.send);
-
-        assertNull(serviceRsds.getLastMAPDialogSms());
-
-        // SRI response
-        MAPErrorMessage mapErrorMessage = new MAPErrorMessageAbsentSubscriberSMImpl(null, null, null);
-        ErrorComponent evt2 = new ErrorComponent(dlg, 0L, mapErrorMessage);
-        this.sriSbb.onErrorComponent(evt2, null);
-        this.sriSbb.onDialogDelimiter(null, null);
-
-        PreparedStatementCollection[] pscc = this.pers.c2_getPscList();
-        long l1 = 0;
-        for (PreparedStatementCollection psc : pscc) {
-            l1 = this.pers.c2_getDueSlotForTargetId(psc, procTargetId);
-            if (l1 != 0)
-                break;
-        }
-        smsId = sms1.getDbId();
-        smsx1 = this.pers.obtainArchiveSms(l1, smsSet.getDestAddr(), smsId);
-        assertNotNull(smsx1);
-        smsSetX = SmsSetCache.getInstance().getProcessingSmsSet(procTargetId);
-        assertNull(smsSetX);
-        smsX = this.pers.obtainLiveSms(l1, procTargetId, procId[0]);
-        assertNull(smsX);
-        assertEquals(SmsSetCache.getInstance().getProcessingSmsSetSize(), 0);
-
-        dlg = serviceRsds.getLastMAPDialogSms();
+        // now ano message delivery because of a message ValidityPeriod is expired
         assertNull(dlg);
+        
+//        MAPApplicationContextVersion acv =  dlg.getApplicationContext().getApplicationContextVersion();
+//        assertEquals(acv, MAPApplicationContextVersion.version3);
+//        ArrayList<MAPTestEvent> lstEvt = dlg.getEventList();
+//        assertEquals(lstEvt.size(), 2);
+//        assertNull(serviceMt.getLastMAPDialogSms());
+//
+//        lstEvt = dlg.getEventList();
+//        assertEquals(lstEvt.size(), 2);
+//        assertEquals(dlg.getLocalAddress().getGlobalTitle().getDigits(), smscPropertiesManagement.getServiceCenterGt());
+//        assertEquals(dlg.getRemoteAddress().getGlobalTitle().getDigits(), msdnDig);
+//
+//        MAPTestEvent evt = lstEvt.get(0);
+//        assertEquals(evt.testEventType, MAPTestEventType.componentAdded);
+//        SendRoutingInfoForSMRequest sriReq = (SendRoutingInfoForSMRequest) evt.event;
+//        assertEquals(sriReq.getMsisdn().getAddress(), msdnDig);
+//        assertEquals(sriReq.getServiceCentreAddress().getAddress(), smscPropertiesManagement.getServiceCenterGt());
+//
+//        evt = lstEvt.get(1);
+//        assertEquals(evt.testEventType, MAPTestEventType.send);
+//
+//        assertNull(serviceRsds.getLastMAPDialogSms());
+//
+//        // SRI response
+//        MAPErrorMessage mapErrorMessage = new MAPErrorMessageAbsentSubscriberSMImpl(null, null, null);
+//        ErrorComponent evt2 = new ErrorComponent(dlg, 0L, mapErrorMessage);
+//        this.sriSbb.onErrorComponent(evt2, null);
+//        this.sriSbb.onDialogDelimiter(null, null);
+//
+//        PreparedStatementCollection[] pscc = this.pers.c2_getPscList();
+//        long l1 = 0;
+//        for (PreparedStatementCollection psc : pscc) {
+//            l1 = this.pers.c2_getDueSlotForTargetId(psc, procTargetId);
+//            if (l1 != 0)
+//                break;
+//        }
+//        smsId = sms1.getDbId();
+//        smsx1 = this.pers.obtainArchiveSms(l1, smsSet.getDestAddr(), smsId);
+//        assertNotNull(smsx1);
+//        smsSetX = SmsSetCache.getInstance().getProcessingSmsSet(procTargetId);
+//        assertNull(smsSetX);
+//        smsX = this.pers.obtainLiveSms(l1, procTargetId, procId[0]);
+//        assertNull(smsX);
+//        assertEquals(SmsSetCache.getInstance().getProcessingSmsSetSize(), 0);
+//
+//        dlg = serviceRsds.getLastMAPDialogSms();
+//        assertNull(dlg);
     }
 
     /**
@@ -3087,65 +3090,68 @@ public class MtTest {
         this.sriSbb.onSms(event, null, null);
 
         MAPDialogSmsProxy dlg = serviceSri.getLastMAPDialogSms();
-        MAPApplicationContextVersion acv =  dlg.getApplicationContext().getApplicationContextVersion();
-        assertEquals(acv, MAPApplicationContextVersion.version3);
-        ArrayList<MAPTestEvent> lstEvt = dlg.getEventList();
-        assertEquals(lstEvt.size(), 2);
-        assertNull(serviceMt.getLastMAPDialogSms());
-
-        lstEvt = dlg.getEventList();
-        assertEquals(lstEvt.size(), 2);
-        assertEquals(dlg.getLocalAddress().getGlobalTitle().getDigits(), smscPropertiesManagement.getServiceCenterGt());
-        assertEquals(dlg.getRemoteAddress().getGlobalTitle().getDigits(), msdnDig);
-
-        MAPTestEvent evt = lstEvt.get(0);
-        assertEquals(evt.testEventType, MAPTestEventType.componentAdded);
-        SendRoutingInfoForSMRequest sriReq = (SendRoutingInfoForSMRequest) evt.event;
-        assertEquals(sriReq.getMsisdn().getAddress(), msdnDig);
-        assertEquals(sriReq.getServiceCentreAddress().getAddress(), smscPropertiesManagement.getServiceCenterGt());
-
-        evt = lstEvt.get(1);
-        assertEquals(evt.testEventType, MAPTestEventType.send);
-
-        assertNull(serviceRsds.getLastMAPDialogSms());
-
-        // SRI response
-        MAPErrorMessage mapErrorMessage = new MAPErrorMessageAbsentSubscriberSMImpl(null, null, null);
-        ErrorComponent evt2 = new ErrorComponent(dlg, 0L, mapErrorMessage);
-        this.sriSbb.onErrorComponent(evt2, null);
-        this.sriSbb.onDialogDelimiter(null, null);
-
-        PreparedStatementCollection[] pscc = this.pers.c2_getPscList();
-        long l1 = 0;
-        for (PreparedStatementCollection psc : pscc) {
-            l1 = this.pers.c2_getDueSlotForTargetId(psc, procTargetId);
-            if (l1 != 0)
-                break;
-        }
-        smsId = sms1.getDbId();
-        smsx1 = this.pers.obtainArchiveSms(l1, smsSet.getDestAddr(), smsId);
-        assertNotNull(smsx1);
-        smsSetX = SmsSetCache.getInstance().getProcessingSmsSet(procTargetId);
-        assertNull(smsSetX);
-        smsX = this.pers.obtainLiveSms(l1, procTargetId, procId[0]);
-        assertNull(smsX);
-        assertEquals(SmsSetCache.getInstance().getProcessingSmsSetSize(), 0);
-
-        for (PreparedStatementCollection psc : pscc) {
-            l1 = this.pers.c2_getDueSlotForTargetId(psc, taR.getTargetId());
-            if (l1 != 0)
-                break;
-        }
-        // here we are checking of existence of failure receipt
-        ArrayList<SmsSet> lst01 = pers.c2_getRecordList(l1);
-        assertEquals(lst01.size(), 1);
-        SmsSet smsSet2 = lst01.get(0);
-        assertEquals(smsSet2.getSmsCount(), 1);
-        Sms sms2 = smsSet2.getSms(0);
-        UUID idReceipt = sms2.getDbId();
-
-        dlg = serviceRsds.getLastMAPDialogSms();
+        // now ano message delivery because of a message ValidityPeriod is expired
         assertNull(dlg);
+
+//        MAPApplicationContextVersion acv =  dlg.getApplicationContext().getApplicationContextVersion();
+//        assertEquals(acv, MAPApplicationContextVersion.version3);
+//        ArrayList<MAPTestEvent> lstEvt = dlg.getEventList();
+//        assertEquals(lstEvt.size(), 2);
+//        assertNull(serviceMt.getLastMAPDialogSms());
+//
+//        lstEvt = dlg.getEventList();
+//        assertEquals(lstEvt.size(), 2);
+//        assertEquals(dlg.getLocalAddress().getGlobalTitle().getDigits(), smscPropertiesManagement.getServiceCenterGt());
+//        assertEquals(dlg.getRemoteAddress().getGlobalTitle().getDigits(), msdnDig);
+//
+//        MAPTestEvent evt = lstEvt.get(0);
+//        assertEquals(evt.testEventType, MAPTestEventType.componentAdded);
+//        SendRoutingInfoForSMRequest sriReq = (SendRoutingInfoForSMRequest) evt.event;
+//        assertEquals(sriReq.getMsisdn().getAddress(), msdnDig);
+//        assertEquals(sriReq.getServiceCentreAddress().getAddress(), smscPropertiesManagement.getServiceCenterGt());
+//
+//        evt = lstEvt.get(1);
+//        assertEquals(evt.testEventType, MAPTestEventType.send);
+//
+//        assertNull(serviceRsds.getLastMAPDialogSms());
+//
+//        // SRI response
+//        MAPErrorMessage mapErrorMessage = new MAPErrorMessageAbsentSubscriberSMImpl(null, null, null);
+//        ErrorComponent evt2 = new ErrorComponent(dlg, 0L, mapErrorMessage);
+//        this.sriSbb.onErrorComponent(evt2, null);
+//        this.sriSbb.onDialogDelimiter(null, null);
+//
+//        PreparedStatementCollection[] pscc = this.pers.c2_getPscList();
+//        long l1 = 0;
+//        for (PreparedStatementCollection psc : pscc) {
+//            l1 = this.pers.c2_getDueSlotForTargetId(psc, procTargetId);
+//            if (l1 != 0)
+//                break;
+//        }
+//        smsId = sms1.getDbId();
+//        smsx1 = this.pers.obtainArchiveSms(l1, smsSet.getDestAddr(), smsId);
+//        assertNotNull(smsx1);
+//        smsSetX = SmsSetCache.getInstance().getProcessingSmsSet(procTargetId);
+//        assertNull(smsSetX);
+//        smsX = this.pers.obtainLiveSms(l1, procTargetId, procId[0]);
+//        assertNull(smsX);
+//        assertEquals(SmsSetCache.getInstance().getProcessingSmsSetSize(), 0);
+//
+//        for (PreparedStatementCollection psc : pscc) {
+//            l1 = this.pers.c2_getDueSlotForTargetId(psc, taR.getTargetId());
+//            if (l1 != 0)
+//                break;
+//        }
+//        // here we are checking of existence of failure receipt
+//        ArrayList<SmsSet> lst01 = pers.c2_getRecordList(l1);
+//        assertEquals(lst01.size(), 1);
+//        SmsSet smsSet2 = lst01.get(0);
+//        assertEquals(smsSet2.getSmsCount(), 1);
+//        Sms sms2 = smsSet2.getSms(0);
+//        UUID idReceipt = sms2.getDbId();
+//
+//        dlg = serviceRsds.getLastMAPDialogSms();
+//        assertNull(dlg);
     }
 
     /**
