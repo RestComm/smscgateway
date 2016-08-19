@@ -60,6 +60,8 @@ import javax.swing.ListSelectionModel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.SortedMap;
@@ -135,20 +137,30 @@ public class CassandraToolForm {
         
         tResult = new JTable();
         tResult.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "TargetId", "DueSLot", "MessageId",
-                "InSystem", "DeliveryCount", "Text", }) {
+                "InSystem", "DeliveryCount", "SmStatus", "ValidityPeriod", "SchedulerDeliveryTime", "Text", }) {
             Class[] columnTypes = new Class[] { String.class, String.class, String.class, String.class, String.class,
-                    String.class };
+                    String.class, String.class, String.class, String.class };
 
             public Class getColumnClass(int columnIndex) {
                 return columnTypes[columnIndex];
             }
 
-            boolean[] columnEditables = new boolean[] { false, false, false, false, false, false };
+            boolean[] columnEditables = new boolean[] { false, false, false, false, false, false, false, false, false };
 
             public boolean isCellEditable(int row, int column) {
                 return columnEditables[column];
             }
         });
+        tResult.getColumnModel().getColumn(0).setPreferredWidth(80);
+        tResult.getColumnModel().getColumn(1).setPreferredWidth(140);
+        tResult.getColumnModel().getColumn(2).setPreferredWidth(20);
+        tResult.getColumnModel().getColumn(3).setPreferredWidth(20);
+        tResult.getColumnModel().getColumn(4).setPreferredWidth(20);
+        tResult.getColumnModel().getColumn(5).setPreferredWidth(80);
+        tResult.getColumnModel().getColumn(6).setPreferredWidth(80);
+        tResult.getColumnModel().getColumn(7).setPreferredWidth(80);
+        tResult.getColumnModel().getColumn(8).setPreferredWidth(120);
+
         tResult.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tResult.setFillsViewportHeight(true);
         tResult.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -299,16 +311,31 @@ public class CassandraToolForm {
             model.getDataVector().clear();
             model.rowsRemoved(new TableModelEvent(model));
 
+            DateFormat df = new SimpleDateFormat("MM.dd HH:mm:ss");
             for (ArrayList<SmsSet> al : result.values()) {
                 for (SmsSet smsSet : al) {
                     ListSelectionModel l = tResult.getSelectionModel();
 
                     Vector newRow = new Vector();
                     newRow.add(smsSet.getTargetId());
-                    newRow.add(smsSet.getSms(0).getDueSlot());
+                    String reportDate = df.format(this.dbOperations.c2_getTimeForDueSlot(smsSet.getSms(0).getDueSlot()));
+                    newRow.add(smsSet.getSms(0).getDueSlot() + " - " + reportDate);
                     newRow.add(smsSet.getSms(0).getMessageId());
                     newRow.add(smsSet.getInSystem());
                     newRow.add(smsSet.getSms(0).getDeliveryCount());
+                    newRow.add(smsSet.getStatus());
+                    Date dt = smsSet.getSms(0).getValidityPeriod();
+                    if (dt != null)
+                        reportDate = df.format(dt);
+                    else
+                        reportDate = "";
+                    newRow.add(reportDate);
+                    dt = smsSet.getSms(0).getScheduleDeliveryTime();
+                    if (dt != null)
+                        reportDate = df.format(dt);
+                    else
+                        reportDate = "";
+                    newRow.add(reportDate);
                     newRow.add(smsSet.getSms(0).getShortMessageText());
                     model.getDataVector().add(0, newRow);
 

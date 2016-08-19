@@ -271,6 +271,12 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         // if not - skip sending and set temporary error
 
         try {
+            int deliveryMsgCnt = this.obtainNextMessagesSendingPool(MAX_MESSAGES_PER_STEP, ProcessingType.SMPP);
+            if (deliveryMsgCnt == 0) {
+                this.markDeliveringIsEnded(true);
+                return;
+            }
+
             EsmeManagement esmeManagement = EsmeManagement.getInstance();
 			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
 			if (esme == null) {
@@ -283,12 +289,6 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
 			smsSet.setDestSystemId(esme.getSystemId());
             smsSet.setDestEsmeName(esme.getName());
-
-            int deliveryMsgCnt = this.obtainNextMessagesSendingPool(MAX_MESSAGES_PER_STEP, ProcessingType.SMPP);
-            if (deliveryMsgCnt == 0) {
-                this.markDeliveringIsEnded(true);
-                return;
-            }
 
             for (int i1 = 0; i1 < deliveryMsgCnt; i1++) {
                 smscStatAggregator.updateMsgOutTryAll();

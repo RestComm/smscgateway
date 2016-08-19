@@ -45,6 +45,7 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.library.DbSmsRoutingRule;
+import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.SmType;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
@@ -1272,6 +1273,7 @@ public class DBOperations {
 
             if (getMessageInProcessing) {
                 smsSet.setInSystem(inSystem);
+                smsSet.setStatus(ErrorCode.fromInt(row.getInt(Schema.COLUMN_SM_STATUS)));
             }
 
             if (addedNetworkId) {

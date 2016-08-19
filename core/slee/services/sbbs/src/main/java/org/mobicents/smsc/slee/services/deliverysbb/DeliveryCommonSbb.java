@@ -491,6 +491,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 sms = smsSet.getSms(currentMsgNum + i1);
                 if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
                     this.endDeliveryAfterValidityPeriod(sms, processingType);
+                    sms = null;
                 } else {
                     addedMessageCnt++;
                     sms.setDeliveryCount(sms.getDeliveryCount() + 1);

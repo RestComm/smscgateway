@@ -183,12 +183,17 @@ public class SmsSetCache {
     }
 
     public int getProcessingSmsSetSize() {
-        int res = lstSmsSetInProcessing.size();
-        for (FastMap.Entry<String, SmsSet> n = this.lstSmsSetWithBigMessageCount.head(), end = this.lstSmsSetWithBigMessageCount
-                .tail(); (n = n.getNext()) != end && n != null;) {
-            res += n.getValue().getSmsCountWithoutDelivered();
+        try {
+            int res = lstSmsSetInProcessing.size();
+            for (FastMap.Entry<String, SmsSet> n = this.lstSmsSetWithBigMessageCount.head(), end = this.lstSmsSetWithBigMessageCount
+                    .tail(); (n = n.getNext()) != end && n != null;) {
+                res += n.getValue().getSmsCountWithoutDelivered();
+            }
+            return res;
+        } catch (Exception e) {
+            // this block is not synchronized. We will return 0 in any Exception
+            return 0;
         }
-        return res;
     }
 
     public String getLstSmsSetWithBigMessageCountState() {
