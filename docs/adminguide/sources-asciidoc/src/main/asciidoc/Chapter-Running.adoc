@@ -308,8 +308,8 @@ Once console starts, it will print following information and await further comma
 
 ----
 
-version=2.0.0-SNAPSHOT,name=mobicents CLI,prefix=mobicents,vendor=TeleStax
-mobicents>
+version=6.2.8.493,name={this-platform} CLI,prefix={this-folder},vendor=TeleStax
+{this-folder}>
 ----
 
 Before issuing further commands you must connect to a managed instance.
@@ -319,7 +319,7 @@ For more details on connecting to an instance and for a list of all supported co
 [[_using_gui]]
 == Running the Graphical User Interface
 
-Open a Web Browser and navigate to http://IP:8080/mobicents-management/ (where IP is the IP Address to which the SMSC is bound to). This will launch the {this-platform} GUI Management Console which is horizontally segregated into multiple tabs, one tab for each product in the {this-platform} Suite.
+Open a Web Browser and navigate to http://IP:8080/{this-folder}-management/ (where IP is the IP Address to which the SMSC is bound to). This will launch the {this-platform} GUI Management Console which is horizontally segregated into multiple tabs, one tab for each product in the {this-platform} Suite.
 You will notice that only the tabs of products whose binaries are installed already will be shown enabled and active in the GUI.
 If you have successfully installed the {this-platform} {this-application} you will find the tabs for JAIN-SLEE, JMX, SS7 and SMSC GW active and enabled.
 For more details on using the GUI for SS7 or JAIN-SLEE please refer to their respective user guides.
