@@ -37,7 +37,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 

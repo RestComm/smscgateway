@@ -44,7 +44,7 @@ public class SendMtEvent implements Serializable {
     private InformServiceCenterContainer informServiceCenterContainer;
     private int sriMapVersion;
     private long currentMsgNum;
-    private int sendingPoolMsgCount;
+//    private int sendingPoolMsgCount;
 
     public ISDNAddressString getNetworkNode() {
         return networkNode;
@@ -102,13 +102,13 @@ public class SendMtEvent implements Serializable {
         this.currentMsgNum = currentMsgNum;
     }
 
-    public int getSendingPoolMsgCount() {
-        return sendingPoolMsgCount;
-    }
-
-    public void setSendingPoolMsgCount(int sendingPoolMsgCount) {
-        this.sendingPoolMsgCount = sendingPoolMsgCount;
-    }
+//    public int getSendingPoolMsgCount() {
+//        return sendingPoolMsgCount;
+//    }
+//
+//    public void setSendingPoolMsgCount(int sendingPoolMsgCount) {
+//        this.sendingPoolMsgCount = sendingPoolMsgCount;
+//    }
 
     @Override
     public String toString() {
@@ -139,8 +139,8 @@ public class SendMtEvent implements Serializable {
         sb.append(this.sriMapVersion);
         sb.append("currentMsgNum=");
         sb.append(this.currentMsgNum);
-        sb.append("sendingPoolMsgCount=");
-        sb.append(this.sendingPoolMsgCount);
+//        sb.append("sendingPoolMsgCount=");
+//        sb.append(this.sendingPoolMsgCount);
         sb.append(", ");
         if (this.smsSet != null) {
             sb.append("smsSet=");

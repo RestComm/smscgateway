@@ -93,8 +93,8 @@ import com.cloudhopper.smpp.type.RecoverablePduException;
 public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private static final String className = RxSmppServerSbb.class.getSimpleName();
 
-    // TODO: default value==100
-	protected static int MAX_MESSAGES_PER_STEP = 2;
+    // TODO: default value==100 / 2
+	protected static int MAX_MESSAGES_PER_STEP = 100;
 
 	protected SmppTransactionACIFactory smppServerTransactionACIFactory = null;
 	protected SmppSessions smppServerSessions = null;
@@ -284,7 +284,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 			smsSet.setDestSystemId(esme.getSystemId());
             smsSet.setDestEsmeName(esme.getName());
 
-            int deliveryMsgCnt = this.obtainNextMessagesSendingPool(MAX_MESSAGES_PER_STEP);
+            int deliveryMsgCnt = this.obtainNextMessagesSendingPool(MAX_MESSAGES_PER_STEP, ProcessingType.SMPP);
             if (deliveryMsgCnt == 0) {
                 this.markDeliveringIsEnded(true);
                 return;
@@ -478,8 +478,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             if (sms == null) {
 
                 // !!!! !!!!-
-                this.logger.severe("nul sms =========: UnconfirmedCnt=" + this.getSendingPoolMsgCount() + ", sequenceNumber="
-                        + event.getSequenceNumber());
+                this.logger.severe("nul sms =========: UnconfirmedCnt=" + this.getUnconfirmedMessageCountInSendingPool()
+                        + ", sequenceNumber=" + event.getSequenceNumber());
                 // !!!! !!!!-
 
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,

@@ -78,6 +78,8 @@ public class SmsSet implements Serializable {
 
     private Date lastUpdateTime = new Date();
 
+    private ArrayList<Sms> sendingMessagePool = new ArrayList<Sms>();
+
     public SmsSet() {
 	}
 
@@ -492,6 +494,22 @@ public class SmsSet implements Serializable {
 
     public void updateLastUpdateTime() {
         lastUpdateTime = new Date();
+    }
+
+    public void clearSendingPool() {
+        this.sendingMessagePool.clear();
+    }
+
+    public void addMessageToSendingPool(Sms sms) {
+        this.sendingMessagePool.add(sms);
+    }
+
+    public Sms getMessageFromSendingPool(int number) {
+        return this.sendingMessagePool.get(number);
+    }
+
+    public int getSendingPoolMsgCount() {
+        return this.sendingMessagePool.size();
     }
 
 	@Override

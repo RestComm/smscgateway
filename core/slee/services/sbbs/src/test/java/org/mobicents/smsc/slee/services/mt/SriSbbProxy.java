@@ -362,14 +362,4 @@ public class SriSbbProxy extends SriSbb implements ChildRelation, SbbLocalObject
         // TODO Auto-generated method stub
         return null;
     }
-    
-    @Override
-    public void setSendingPoolMsgCount(int sendingPoolMsgCount) {
-        this.sendingPoolMsgCount = sendingPoolMsgCount;
-    }
-
-    @Override
-    public int getSendingPoolMsgCount() {
-        return sendingPoolMsgCount;
-    }
 }

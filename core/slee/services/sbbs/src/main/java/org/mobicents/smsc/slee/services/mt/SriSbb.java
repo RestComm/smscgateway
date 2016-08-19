@@ -168,7 +168,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             event.setInformServiceCenterContainer(this.getInformServiceCenterContainer());
             event.setSriMapVersion(this.getSriMapVersion());
             event.setCurrentMsgNum(this.getCurrentMsgNumValue());
-            event.setSendingPoolMsgCount(this.getSendingPoolMsgCountValue());
+//            event.setSendingPoolMsgCount(this.getSendingPoolMsgCountValue());
 
             this.fireSendMtEvent(event, schedulerActivityContextInterface, null);
         }
@@ -197,7 +197,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                 return;
             }
 
-            Sms sms = this.obtainNextMessage();
+            Sms sms = this.obtainNextMessage(ProcessingType.SS7_SRI);
 //            Sms sms = this.getCurrentMessage(0);
             if (sms == null) {
                 // this means that no messages with good ScheduleDeliveryTime or

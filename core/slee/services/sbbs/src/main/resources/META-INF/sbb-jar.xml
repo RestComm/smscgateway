@@ -18,7 +18,9 @@
                 <cmp-field><cmp-field-name>pendingRequestsList</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
+<!--
                 <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
+-->
 			</sbb-abstract-class>
 		</sbb-classes>
 
@@ -158,7 +160,9 @@
                 <cmp-field><cmp-field-name>pendingRequestsList</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
+<!--
                 <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
+-->
 
 				<cmp-field><cmp-field-name>informServiceCenterContainer</cmp-field-name></cmp-field>
 				<cmp-field><cmp-field-name>sriMapVersion</cmp-field-name></cmp-field>
@@ -465,7 +469,9 @@
                 <cmp-field><cmp-field-name>pendingRequestsList</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
+<!--
                 <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
+-->
 
 				<cmp-field><cmp-field-name>sriMapVersion</cmp-field-name></cmp-field>
 
@@ -931,7 +937,9 @@
                 <cmp-field><cmp-field-name>pendingRequestsList</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
+<!--
                 <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
+-->
 			</sbb-abstract-class>
 		</sbb-classes>
 

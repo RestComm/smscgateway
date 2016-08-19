@@ -197,9 +197,13 @@ public class DBOperations {
         return databaseAvailable;
     }
 
-	protected Session getSession() {
-		return this.session;
-	}
+    protected Cluster getCluster() {
+        return this.cluster;
+    }
+
+    protected Session getSession() {
+        return this.session;
+    }
 
 	public void start(String hosts, int port, String keyspace, int secondsForwardStoring, int reviseSecondsOnSmscStart,
 			int processingSmsSetTimeout) throws Exception {
@@ -777,11 +781,13 @@ public class DBOperations {
 		}
 
 		// checking validity date
-		if (sms.getValidityPeriod() != null && sms.getValidityPeriod().before(dt)) {
-			if (lstFailured != null)
-				lstFailured.add(sms);
-			return true;
-		}
+        // TODO: ValidityPeriod was removed !!!
+//		if (sms.getValidityPeriod() != null && sms.getValidityPeriod().before(dt)) {
+//			if (lstFailured != null)
+//				lstFailured.add(sms);
+//			return true;
+//		}
+        // TODO: ValidityPeriod was removed !!!
 
         if (fastStoreAndForwordMode) {
             return doCreateRecordCurrent(sms, dueSlot);
@@ -1076,7 +1082,7 @@ public class DBOperations {
 
 			for (Row row : res) {
                 SmsSet smsSet = this.createSms(row, null, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
-                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
+                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1(), false);
                 if (smsSet != null)
                     result.add(smsSet);
 			}
@@ -1101,7 +1107,7 @@ public class DBOperations {
 
 			for (Row row : res) {
                 result = this.createSms(row, result, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
-                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
+                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1(), false);
 			}
 		} catch (Exception e1) {
 			String msg = "Failed getRecordListForTargeId()";
@@ -1113,16 +1119,18 @@ public class DBOperations {
 	}
 
     protected SmsSet createSms(final Row row, SmsSet smsSet, boolean shortMessageNewStringFormat, boolean addedCorrId,
-            boolean addedNetworkId, boolean addedOrigNetworkId, boolean addedPacket1) throws PersistenceException {
+            boolean addedNetworkId, boolean addedOrigNetworkId, boolean addedPacket1, boolean getMessageInProcessing)
+            throws PersistenceException {
         if (row == null) {
             return smsSet;
         }
 
 		int inSystem = row.getInt(Schema.COLUMN_IN_SYSTEM);
 		UUID smscUuid = row.getUUID(Schema.COLUMN_SMSC_UUID);
-		if (inSystem == IN_SYSTEM_SENT || inSystem == IN_SYSTEM_INPROCESS && smscUuid.equals(currentSessionUUID)) {
-		    // inSystem it is in processing or processed - skip this
-			return smsSet;
+        if (!getMessageInProcessing
+                && (inSystem == IN_SYSTEM_SENT || inSystem == IN_SYSTEM_INPROCESS && smscUuid.equals(currentSessionUUID))) {
+            // inSystem it is in processing or processed - skip this
+            return smsSet;
 		}
 
 		Sms sms = new Sms();
@@ -1261,6 +1269,10 @@ public class DBOperations {
 			smsSet.setDestAddr(destAddr);
 			smsSet.setDestAddrTon(destAddrTon);
             smsSet.setDestAddrNpi(destAddrNpi);
+
+            if (getMessageInProcessing) {
+                smsSet.setInSystem(inSystem);
+            }
 
             if (addedNetworkId) {
                 smsSet.setNetworkId(row.getInt(Schema.COLUMN_NETWORK_ID));

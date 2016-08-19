@@ -197,7 +197,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
     public void onSendMt(SendMtEvent event, ActivityContextInterface aci, EventContext eventContext) {
         SmsSet smsSet = event.getSmsSet();
-        this.addInitialMessageSet(smsSet, event.getCurrentMsgNum(), event.getSendingPoolMsgCount());
+        this.addInitialMessageSet(smsSet, event.getCurrentMsgNum());
 
         this.setInformServiceCenterContainer(event.getInformServiceCenterContainer());
         this.setSriMapVersion(event.getSriMapVersion());
@@ -874,7 +874,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                 this.commitSendingPoolMsgCount();
 
                 // now we are trying to sent other messages
-                sms = obtainNextMessage();
+                sms = obtainNextMessage(ProcessingType.SS7_MT);
                 if (sms != null) {
                     // dropaftersri pmproc rules
                     ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
@@ -1106,7 +1106,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     segments = new SmsSignalInfo[segmentsByte.length];
 
 					// TODO messageReferenceNumber should be generated
-                    int messageReferenceNumber = (int) (this.getCurrentMsgNumValue() + 1);
+//                    int messageReferenceNumber = (int) (this.getCurrentMsgNumValue() + 1);
+                    int messageReferenceNumber = (int) (this.getCurrentMsgNumValue());
 
 					for (int i1 = 0; i1 < segmentsByte.length; i1++) {
                         segments[i1] = this.createSignalInfo(sms, segmentsByte[i1], null, (i1 < segmentsByte.length - 1 ? true

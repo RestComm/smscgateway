@@ -39,12 +39,19 @@ import javax.slee.facilities.FacilityException;
 import javax.slee.facilities.TraceLevel;
 import javax.slee.facilities.Tracer;
 
+import org.mobicents.smsc.domain.MProcManagement;
+import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.library.ErrorAction;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
+import org.mobicents.smsc.mproc.ProcessingType;
+import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
+import org.mobicents.smsc.smpp.GenerateType;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -54,8 +61,41 @@ import org.testng.annotations.Test;
 */
 public class DeliveryCommonSbbTest {
 
+    private PersistenceRAInterfaceProxy pers;
+    private boolean cassandraDbInited;
+
+    @BeforeMethod
+    public void setUpClass() throws Exception {
+        System.out.println("setUpClass");
+
+        this.pers = new PersistenceRAInterfaceProxy();
+        this.cassandraDbInited = this.pers.testCassandraAccess();
+        if (!this.cassandraDbInited)
+            return;
+        this.pers.start();
+
+        MProcManagement.getInstance("TestDeliveryCommonSbb");
+
+        SmscPropertiesManagement.getInstance("TestDeliveryCommonSbb");
+        SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+        smscPropertiesManagement.setGenerateArchiveTable(new GenerateType(0));
+        smscPropertiesManagement.setGenerateCdr(new GenerateType(0));
+    }
+
+    @AfterMethod
+    public void tearDownClass() throws Exception {
+        System.out.println("tearDownClass");
+
+        SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+        smscPropertiesManagement.setGenerateArchiveTable(new GenerateType(7));
+        smscPropertiesManagement.setGenerateCdr(new GenerateType(7));
+    }
+
     @Test(groups = { "DeliveryCommonSbb" })
     public void testCore() {
+        if (!this.cassandraDbInited)
+            return;
+
         SmsSetCache.SMSSET_MSG_PRO_SEGMENT_LIMIT = 3;
 
         // 01
@@ -94,7 +134,7 @@ public class DeliveryCommonSbbTest {
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
 
-        int cnt = sbb.obtainNextMessagesSendingPool(5);
+        int cnt = sbb.obtainNextMessagesSendingPool(5, ProcessingType.SMPP);
         assertEquals(cnt, 5);
 
         assertFalse(sbb.isDeliveringEnded());
@@ -165,7 +205,7 @@ public class DeliveryCommonSbbTest {
         assertTrue(sbb.isMessageConfirmedInSendingPool(1));
 
         sbb.commitSendingPoolMsgCount();
-        Sms sms = sbb.obtainNextMessage();
+        Sms sms = sbb.obtainNextMessage(ProcessingType.SMPP);
         assertEquals(sms.getMessageId(), 5L);
 
         assertFalse(sbb.isDeliveringEnded());
@@ -200,7 +240,7 @@ public class DeliveryCommonSbbTest {
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
         assertFalse(sbb.isDeliveringEnded());
 
-        cnt = sbb.obtainNextMessagesSendingPool(50);
+        cnt = sbb.obtainNextMessagesSendingPool(50, ProcessingType.SMPP);
         assertEquals(cnt, 14);
 
         assertEquals(sbb.getTotalUnsentMessageCount(), 14L);
@@ -233,7 +273,7 @@ public class DeliveryCommonSbbTest {
 
         storeSbb(sbb);
 
-        // 05
+        // 06
         sbb = initiateSbb(sbb);
         loadSbb(sbb);
 
@@ -248,6 +288,9 @@ public class DeliveryCommonSbbTest {
 
     @Test(groups = { "DeliveryCommonSbb" })
     public void testFailureLists() {
+        if (!this.cassandraDbInited)
+            return;
+
         SmsSetCache.SMSSET_MSG_PRO_SEGMENT_LIMIT = 3;
 
         DeliveryCommonSbbProxy sbb = initiateSbb(null);
@@ -262,13 +305,15 @@ public class DeliveryCommonSbbTest {
         }
 
         smsSet.getSms(3).setStoringAfterFailure(true);
-        smsSet.getSms(4).setStored(true);
+        smsSet.getSms(5).setStoringAfterFailure(true);
 
         int year = (new Date()).getYear();
+        smsSet.getSms(1).setStored(true);
+        smsSet.getSms(1).setValidityPeriod(new Date(year + 1, 1, 1));
+        smsSet.getSms(2).setStored(true);
+        smsSet.getSms(2).setValidityPeriod(new Date(year - 1, 1, 1));
         smsSet.getSms(6).setStored(true);
-        smsSet.getSms(6).setValidityPeriod(new Date(year + 1, 1, 1));
-        smsSet.getSms(7).setStored(true);
-        smsSet.getSms(7).setValidityPeriod(new Date(year - 1, 1, 1));
+        smsSet.getSms(6).setValidityPeriod(new Date(year - 1, 1, 1));
 
         sbb.addInitialMessageSet(smsSet);
         SmsSetCache.getInstance().addProcessingSmsSet(smsSet.getTargetId(), smsSet, 0);
@@ -279,13 +324,25 @@ public class DeliveryCommonSbbTest {
         sbb = initiateSbb(sbb);
         loadSbb(sbb);
 
-        int cnt = sbb.obtainNextMessagesSendingPool(5);
+        int cnt = sbb.obtainNextMessagesSendingPool(5, ProcessingType.SMPP);
         sbb.registerMessageInSendingPool(0, 100);
         sbb.registerMessageInSendingPool(1, 101);
         sbb.registerMessageInSendingPool(2, 102);
         sbb.registerMessageInSendingPool(3, 103);
         sbb.registerMessageInSendingPool(4, 104);
         sbb.endRegisterMessageInSendingPool();
+
+        assertEquals(sbb.getCurrentMsgNumValue(), 6);
+        assertEquals(sbb.getSendingPoolMessageCount(), 5);
+        assertEquals(sbb.getTotalUnsentMessageCount(), 19);
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 5);
+
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 0);
+        assertEquals(sbb.getMessageInSendingPool(1).getMessageId(), 1);
+        assertEquals(sbb.getMessageInSendingPool(2).getMessageId(), 3);
+        assertEquals(sbb.getMessageInSendingPool(3).getMessageId(), 4);
+        assertEquals(sbb.getMessageInSendingPool(4).getMessageId(), 5);
+        assertNull(sbb.getMessageInSendingPool(5));
 
         sbb.confirmMessageInSendingPool(100);
         sbb.confirmMessageInSendingPool(102);
@@ -295,17 +352,86 @@ public class DeliveryCommonSbbTest {
         sbb.createFailureLists(lstPermFailured, lstTempFailured, ErrorAction.temporaryFailure);
 
         assertEquals(lstTempFailured.size(), 3);
-        assertEquals(lstPermFailured.size(), 15);
+        assertEquals(lstPermFailured.size(), 14);
+
+        assertEquals(lstTempFailured.get(0).getMessageId(), 1);
+        assertEquals(lstTempFailured.get(1).getMessageId(), 5);
+        assertEquals(lstTempFailured.get(2).getMessageId(), 6);
+
+        assertEquals(lstPermFailured.get(0).getMessageId(), 4);
+        assertEquals(lstPermFailured.get(1).getMessageId(), 7);
+        assertEquals(lstPermFailured.get(2).getMessageId(), 8);
+        assertEquals(lstPermFailured.get(3).getMessageId(), 9);
+        assertEquals(lstPermFailured.get(13).getMessageId(), 19);
+    }
+
+    @Test(groups = { "DeliveryCommonSbb" })
+    public void testFailureLists2() {
+        if (!this.cassandraDbInited)
+            return;
+
+        SmsSetCache.SMSSET_MSG_PRO_SEGMENT_LIMIT = 100;
+
+        DeliveryCommonSbbProxy sbb = initiateSbb(null);
+        loadSbb(sbb);
+
+        SmsSet smsSet = new SmsSet();
+        for (int i1 = 0; i1 < 5; i1++) {
+            Sms sms = createSms(i1);
+            SmsSet smsSet2 = new SmsSet();
+            smsSet2.addSms(sms);
+            smsSet.addSmsSet(smsSet2);
+        }
+
+        smsSet.getSms(3).setStored(true);
+        smsSet.getSms(4).setStored(true);
+
+        int year = (new Date()).getYear();
+        smsSet.getSms(1).setValidityPeriod(new Date(year - 1, 1, 1));
+        smsSet.getSms(3).setValidityPeriod(new Date(year - 1, 1, 1));
+
+        sbb.addInitialMessageSet(smsSet);
+        SmsSetCache.getInstance().addProcessingSmsSet(smsSet.getTargetId(), smsSet, 0);
+
+        storeSbb(sbb);
+
+        // 02
+        sbb = initiateSbb(sbb);
+        loadSbb(sbb);
+
+        Sms sms = sbb.obtainNextMessage(ProcessingType.SMPP);
+        assertEquals(sms.getMessageId(), 0);
+
+        assertEquals(sbb.getCurrentMsgNumValue(), 1);
+        assertEquals(sbb.getSendingPoolMessageCount(), 1);
+        assertEquals(sbb.getTotalUnsentMessageCount(), 5);
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 1);
+
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 0);
+        assertNull(sbb.getMessageInSendingPool(1));
+
+        sms = sbb.obtainNextMessage(ProcessingType.SMPP);
+        assertEquals(sms.getMessageId(), 2);
+
+        assertEquals(sbb.getCurrentMsgNumValue(), 3);
+        assertEquals(sbb.getSendingPoolMessageCount(), 1);
+        assertEquals(sbb.getTotalUnsentMessageCount(), 3);
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 1);
+
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 2);
+        assertNull(sbb.getMessageInSendingPool(1));
+
+        ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
+        ArrayList<Sms> lstTempFailured = new ArrayList<Sms>();
+        sbb.createFailureLists(lstPermFailured, lstTempFailured, ErrorAction.temporaryFailure);
+
+        assertEquals(lstTempFailured.size(), 2);
+        assertEquals(lstPermFailured.size(), 1);
 
         assertEquals(lstTempFailured.get(0).getMessageId(), 3);
         assertEquals(lstTempFailured.get(1).getMessageId(), 4);
-        assertEquals(lstTempFailured.get(2).getMessageId(), 6);
 
-        assertEquals(lstPermFailured.get(0).getMessageId(), 1);
-        assertEquals(lstPermFailured.get(1).getMessageId(), 5);
-        assertEquals(lstPermFailured.get(2).getMessageId(), 7);
-        assertEquals(lstPermFailured.get(3).getMessageId(), 8);
-        assertEquals(lstPermFailured.get(14).getMessageId(), 19);
+        assertEquals(lstPermFailured.get(0).getMessageId(), 2);
     }
 
     private Sms createSms(int num) {
@@ -316,7 +442,7 @@ public class DeliveryCommonSbbTest {
     }
 
     private DeliveryCommonSbbProxy initiateSbb(DeliveryCommonSbbProxy orig) {
-        DeliveryCommonSbbProxy res = new DeliveryCommonSbbProxy();
+        DeliveryCommonSbbProxy res = new DeliveryCommonSbbProxy(pers);
 
         if (orig != null) {
             res.targetIdStored = orig.targetIdStored;
@@ -340,11 +466,13 @@ public class DeliveryCommonSbbTest {
 
     public class DeliveryCommonSbbProxy extends DeliveryCommonSbb {
 
-        public DeliveryCommonSbbProxy() {
+        public DeliveryCommonSbbProxy(PersistenceRAInterfaceProxy cassandraSbb) {
             super(DeliveryCommonSbbProxy.class.getSimpleName());
-        }
 
-        protected Tracer tracer = new TracerImpl();
+            persistence = cassandraSbb;
+            smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+            logger = new TracerImpl();
+        }
 
         protected String targetIdStored;
         protected long currentMsgNumStored;
@@ -406,16 +534,6 @@ public class DeliveryCommonSbbTest {
         @Override
         public PendingRequestsList getPendingRequestsList() {
             return pendingRequestsListStored;
-        }
-
-        @Override
-        public void setSendingPoolMsgCount(int sendingPoolMsgCount) {
-            this.sendingPoolMsgCountStored = sendingPoolMsgCount;
-        }
-
-        @Override
-        public int getSendingPoolMsgCount() {
-            return sendingPoolMsgCountStored;
         }
 
 

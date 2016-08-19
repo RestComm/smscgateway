@@ -3833,11 +3833,6 @@ public class MtTest {
         event.setSmsSet(smsSet);
         this.sriSbb.onSms(event, null, null);
 
-        // !!!! - smsSubmitData.setTargetId(smsSet.getTargetId());
-//        SmsSubmitData smsSubmitData = new SmsSubmitData();
-////        smsSubmitData.setSmsSet(smsSet);
-//        smsSubmitData.setTargetId(smsSet.getTargetId());
-//        this.mtSbb.setSmsSubmitData(smsSubmitData);
         this.mtSbb.setTargetId(smsSet.getTargetId());
 
         // SmsSet smsSet, ErrorAction errorAction, ErrorCode smStatus, String reason, boolean removeSmsSet
@@ -3989,8 +3984,8 @@ public class MtTest {
         }
 
         if (smsDef.valididtyPeriodIsOver) {
-//            Date validityPeriod = MessageUtil.addHours(new Date(), -1);
-            Date validityPeriod = new Date(new Date().getTime() + 1000 * 90);
+            Date validityPeriod = MessageUtil.addHours(new Date(), -1);
+//            Date validityPeriod = new Date(new Date().getTime() + 1000 * 90);
             sms.setValidityPeriod(validityPeriod);
         } else {
             Date validityPeriod = MessageUtil.addHours(new Date(), 24);

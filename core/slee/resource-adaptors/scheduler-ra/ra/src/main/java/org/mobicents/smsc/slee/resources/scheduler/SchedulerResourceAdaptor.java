@@ -51,26 +51,16 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
-import javolution.util.FastList;
-
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
-import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmsRouteManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
-import org.mobicents.smsc.domain.StoreAndForwordMode;
-import org.mobicents.smsc.library.CdrGenerator;
-import org.mobicents.smsc.library.ErrorCode;
-import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.SmType;
-import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
-import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.common.ra.EventIDCache;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
 
@@ -595,239 +585,244 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
     }
 
 	protected boolean doInjectSmsDatabase(SmsSet smsSet, Date curDate, boolean callFromSbb) throws Exception {
-	    // removing SMS that are out of validity period
-	    boolean withValidityTimeout = false;
-        for (int i1 = 0; i1 < smsSet.getSmsCount(); i1++) {
-            Sms sms = smsSet.getSms(i1);
-            if (sms.getValidityPeriod() != null && sms.getValidityPeriod().before(curDate)) {
-                withValidityTimeout = true;
-                break;
-            }
-        }
 
-        if (withValidityTimeout) {
-            SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+        // TODO: ValidityPeriod was removed !!!
 
-            ArrayList<Sms> good = new ArrayList<Sms>();
-            ArrayList<Sms> expired = new ArrayList<Sms>();
-            TargetAddress lock = SmsSetCache.getInstance().addSmsSet(new TargetAddress(smsSet));
-            synchronized (lock) {
-                try {
-                    for (int i1 = 0; i1 < smsSet.getSmsCount(); i1++) {
-                        Sms sms = smsSet.getSms(i1);
-                        if (sms.getValidityPeriod() != null && sms.getValidityPeriod().before(curDate)) {
-                            expired.add(sms);
-                        } else {
-                            good.add(sms);
-                        }
-                    }
-
-                    ErrorCode smStatus = ErrorCode.RESERVED_127;
-                    String reason = "Validity period is expired";
-
-                    if (expired.size() > 0) {
-                        smsSet.setStatus(smStatus);
-                    }
-                    if (good.size() == 0) {
-                        // no good nonexpired messages - we need to remove
-                        // SmsSet record
-
-//                        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                            dbOperations_C1.fetchSchedulableSms(smsSet, false);
+//	    // removing SMS that are out of validity period
+//	    boolean withValidityTimeout = false;
+//        for (int i1 = 0; i1 < smsSet.getSmsCount(); i1++) {
+//            Sms sms = smsSet.getSms(i1);
+//            if (sms.getValidityPeriod() != null && sms.getValidityPeriod().before(curDate)) {
+//                withValidityTimeout = true;
+//                break;
+//            }
+//        }
 //
-//                            dbOperations_C1.setDeliveryFailure(smsSet, smStatus, curDate);
+//        if (withValidityTimeout) {
+//            SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+//
+//            ArrayList<Sms> good = new ArrayList<Sms>();
+//            ArrayList<Sms> expired = new ArrayList<Sms>();
+//            TargetAddress lock = SmsSetCache.getInstance().addSmsSet(new TargetAddress(smsSet));
+//            synchronized (lock) {
+//                try {
+//                    for (int i1 = 0; i1 < smsSet.getSmsCount(); i1++) {
+//                        Sms sms = smsSet.getSms(i1);
+//                        if (sms.getValidityPeriod() != null && sms.getValidityPeriod().before(curDate)) {
+//                            expired.add(sms);
 //                        } else {
-
-                        // TODO: remove it !!!!
-                        // smsSet.setStatus(smStatus);
-                        // TODO: remove it !!!!
-                        SmsSetCache.getInstance().removeProcessingSmsSet(smsSet.getTargetId());
-
+//                            good.add(sms);
+//                        }
 //                    }
-                    }
-
-                    for (Sms sms : expired) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("onDeliveryError: errorAction=validityExpired");
-                        sb.append(", smStatus=");
-                        sb.append(smStatus);
-                        sb.append(", targetId=");
-                        sb.append(smsSet.getTargetId());
-                        sb.append(", smsSet=");
-                        sb.append(smsSet);
-                        sb.append(", reason=");
-                        sb.append(reason);
-                        if (this.tracer.isInfoEnabled())
-                            this.tracer.info(sb.toString());
-
-                        CdrGenerator.generateCdr(sms, CdrGenerator.CDR_FAILED, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
-                                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
-
-                        // adding an error receipt if it is needed
-                        if (sms.getStored()) {
-//                            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                                dbOperations_C1.archiveFailuredSms(sms);
-//                                dbOperations_C1.deleteSmsSet(smsSet);
-//                            } else {
-
-                            if (sms.getStored()) {
-                                dbOperations_C2.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT,
-                                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
-                                sms.setDeliveryDate(curDate);
-                                if (MessageUtil.isNeedWriteArchiveMessage(sms,
-                                        smscPropertiesManagement.getGenerateArchiveTable())) {
-                                    dbOperations_C2.c2_createRecordArchive(sms);
-                                }
-                            }
-
+//
+//                    ErrorCode smStatus = ErrorCode.RESERVED_127;
+//                    String reason = "Validity period is expired";
+//
+//                    if (expired.size() > 0) {
+//                        smsSet.setStatus(smStatus);
+//                    }
+//                    if (good.size() == 0) {
+//                        // no good nonexpired messages - we need to remove
+//                        // SmsSet record
+//
+////                        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+////                            dbOperations_C1.fetchSchedulableSms(smsSet, false);
+////
+////                            dbOperations_C1.setDeliveryFailure(smsSet, smStatus, curDate);
+////                        } else {
+//
+//                        // TODO: remove it !!!!
+//                        // smsSet.setStatus(smStatus);
+//                        // TODO: remove it !!!!
+//                        SmsSetCache.getInstance().removeProcessingSmsSet(smsSet.getTargetId());
+//
+////                    }
+//                    }
+//
+//                    for (Sms sms : expired) {
+//                        StringBuilder sb = new StringBuilder();
+//                        sb.append("onDeliveryError: errorAction=validityExpired");
+//                        sb.append(", smStatus=");
+//                        sb.append(smStatus);
+//                        sb.append(", targetId=");
+//                        sb.append(smsSet.getTargetId());
+//                        sb.append(", smsSet=");
+//                        sb.append(smsSet);
+//                        sb.append(", reason=");
+//                        sb.append(reason);
+//                        if (this.tracer.isInfoEnabled())
+//                            this.tracer.info(sb.toString());
+//
+//                        CdrGenerator.generateCdr(sms, CdrGenerator.CDR_FAILED, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+//                                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
+//
+//                        // adding an error receipt if it is needed
+//                        if (sms.getStored()) {
+////                            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+////                                dbOperations_C1.archiveFailuredSms(sms);
+////                                dbOperations_C1.deleteSmsSet(smsSet);
+////                            } else {
+//
+//                            if (sms.getStored()) {
+//                                dbOperations_C2.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT,
+//                                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
+//                                sms.setDeliveryDate(curDate);
+//                                if (MessageUtil.isNeedWriteArchiveMessage(sms,
+//                                        smscPropertiesManagement.getGenerateArchiveTable())) {
+//                                    dbOperations_C2.c2_createRecordArchive(sms);
+//                                }
 //                            }
-                        }
-
-                        // mproc rules applying for delivery phase
-                        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true, null);
-                        FastList<Sms> addedMessages = mProcResult.getMessageList();
-                        if (addedMessages != null) {
-                            for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
-                                Sms smst = n.getValue();
-                                TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(),
-                                        smst.getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
-                                TargetAddress lock2 = SmsSetCache.getInstance().addSmsSet(ta);
-                                try {
-                                    synchronized (lock2) {
-
-//                                        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//
+////                            }
+//                        }
+//
+//                        // mproc rules applying for delivery phase
+//                        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true, null);
+//                        FastList<Sms> addedMessages = mProcResult.getMessageList();
+//                        if (addedMessages != null) {
+//                            for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
+//                                Sms smst = n.getValue();
+//                                TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(),
+//                                        smst.getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
+//                                TargetAddress lock2 = SmsSetCache.getInstance().addSmsSet(ta);
+//                                try {
+//                                    synchronized (lock2) {
+//
+////                                        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+////                                        } else {
+//
+//                                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(smst);
+//                                        if (!storeAndForwMode) {
+//                                            try {
+//                                                this.schedulerRaSbbInterface.injectSmsOnFly(smst.getSmsSet(), false);
+//                                            } catch (Exception e) {
+//                                                this.tracer.severe(
+//                                                        "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
+//                                                                + e.getMessage(), e);
+//                                            }
 //                                        } else {
-
-                                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(smst);
-                                        if (!storeAndForwMode) {
-                                            try {
-                                                this.schedulerRaSbbInterface.injectSmsOnFly(smst.getSmsSet(), false);
-                                            } catch (Exception e) {
-                                                this.tracer.severe(
-                                                        "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
-                                                                + e.getMessage(), e);
-                                            }
-                                        } else {
-                                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-                                                try {
-                                                    smst.setStoringAfterFailure(true);
-                                                    this.schedulerRaSbbInterface.injectSmsOnFly(smst.getSmsSet(), false);
-                                                } catch (Exception e) {
-                                                    this.tracer.severe(
-                                                            "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
-                                                                    + e.getMessage(), e);
-                                                }
-                                            } else {
-                                                smst.setStored(true);
-                                                this.schedulerRaSbbInterface.setDestCluster(smst.getSmsSet());
-                                                try {
-                                                    dbOperations_C2
-                                                            .c2_scheduleMessage_ReschedDueSlot(
-                                                                    smst,
-                                                                    smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-                                                                    true);
-                                                } catch (PersistenceException e) {
-                                                    this.tracer.severe(
-                                                            "PersistenceException when adding applyMProcDelivery created messages"
-                                                                    + e.getMessage(), e);
-                                                }
-                                            }
-                                        }
-
+//                                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+//                                                try {
+//                                                    smst.setStoringAfterFailure(true);
+//                                                    this.schedulerRaSbbInterface.injectSmsOnFly(smst.getSmsSet(), false);
+//                                                } catch (Exception e) {
+//                                                    this.tracer.severe(
+//                                                            "Exception when runnung injectSmsOnFly() for applyMProcDelivery created messages: "
+//                                                                    + e.getMessage(), e);
+//                                                }
+//                                            } else {
+//                                                smst.setStored(true);
+//                                                this.schedulerRaSbbInterface.setDestCluster(smst.getSmsSet());
+//                                                try {
+//                                                    dbOperations_C2
+//                                                            .c2_scheduleMessage_ReschedDueSlot(
+//                                                                    smst,
+//                                                                    smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+//                                                                    true);
+//                                                } catch (PersistenceException e) {
+//                                                    this.tracer.severe(
+//                                                            "PersistenceException when adding applyMProcDelivery created messages"
+//                                                                    + e.getMessage(), e);
+//                                                }
+//                                            }
 //                                        }
-
-                                    }
-                                } finally {
-                                    SmsSetCache.getInstance().removeSmsSet(lock2);
-                                }
-                            }
-                        }
-
-                        int registeredDelivery = sms.getRegisteredDelivery();
-                        if (!smscPropertiesManagement.getReceiptsDisabling() && MessageUtil.isReceiptOnFailure(registeredDelivery)) {
-                            TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(), smsSet.getNetworkId());
-                            TargetAddress lock2 = SmsSetCache.getInstance().addSmsSet(ta);
-                            try {
-                                synchronized (lock2) {
-                                    try {
-                                        Sms receipt;
-
-
-//                                        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                                            receipt = MessageUtil.createReceiptSms(sms, false);
-//                                            SmsSet backSmsSet = dbOperations_C1.obtainSmsSet(ta);
-//                                            receipt.setSmsSet(backSmsSet);
-//                                            receipt.setStored(true);
-//                                            dbOperations_C1.createLiveSms(receipt);
-//                                            dbOperations_C1.setNewMessageScheduled(receipt.getSmsSet(),
-//                                                    MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+//
+////                                        }
+//
+//                                    }
+//                                } finally {
+//                                    SmsSetCache.getInstance().removeSmsSet(lock2);
+//                                }
+//                            }
+//                        }
+//
+//                        int registeredDelivery = sms.getRegisteredDelivery();
+//                        if (!smscPropertiesManagement.getReceiptsDisabling() && MessageUtil.isReceiptOnFailure(registeredDelivery)) {
+//                            TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(), smsSet.getNetworkId());
+//                            TargetAddress lock2 = SmsSetCache.getInstance().addSmsSet(ta);
+//                            try {
+//                                synchronized (lock2) {
+//                                    try {
+//                                        Sms receipt;
+//
+//
+////                                        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+////                                            receipt = MessageUtil.createReceiptSms(sms, false);
+////                                            SmsSet backSmsSet = dbOperations_C1.obtainSmsSet(ta);
+////                                            receipt.setSmsSet(backSmsSet);
+////                                            receipt.setStored(true);
+////                                            dbOperations_C1.createLiveSms(receipt);
+////                                            dbOperations_C1.setNewMessageScheduled(receipt.getSmsSet(),
+////                                                    MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+////                                        } else {
+//
+//
+//                                        receipt = MessageUtil.createReceiptSms(sms, false, ta,
+//                                                smscPropertiesManagement.getOrigNetworkIdForReceipts());
+//                                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+//                                        if (!storeAndForwMode) {
+//                                            try {
+//                                                this.schedulerRaSbbInterface.injectSmsOnFly(receipt.getSmsSet(), false);
+//                                            } catch (Exception e) {
+//                                                this.tracer.severe(
+//                                                        "Exception when runnung injectSmsOnFly() for receipt in doInjectSmsDatabase(): "
+//                                                                + e.getMessage(), e);
+//                                            }
 //                                        } else {
-
-
-                                        receipt = MessageUtil.createReceiptSms(sms, false, ta,
-                                                smscPropertiesManagement.getOrigNetworkIdForReceipts());
-                                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-                                        if (!storeAndForwMode) {
-                                            try {
-                                                this.schedulerRaSbbInterface.injectSmsOnFly(receipt.getSmsSet(), false);
-                                            } catch (Exception e) {
-                                                this.tracer.severe(
-                                                        "Exception when runnung injectSmsOnFly() for receipt in doInjectSmsDatabase(): "
-                                                                + e.getMessage(), e);
-                                            }
-                                        } else {
-                                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-                                                try {
-                                                    receipt.setStoringAfterFailure(true);
-                                                    this.schedulerRaSbbInterface.injectSmsOnFly(receipt.getSmsSet(), false);
-                                                } catch (Exception e) {
-                                                    this.tracer.severe(
-                                                            "Exception when runnung injectSmsOnFly() for receipt in doInjectSmsDatabase(): "
-                                                                    + e.getMessage(), e);
-                                                }
-                                            } else {
-                                                receipt.setStored(true);
-                                                this.setDestCluster(receipt.getSmsSet());
-                                                dbOperations_C2
-                                                        .c2_scheduleMessage_ReschedDueSlot(
-                                                                receipt,
-                                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-                                                                true);
-                                            }
-                                        }
-
+//                                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+//                                                try {
+//                                                    receipt.setStoringAfterFailure(true);
+//                                                    this.schedulerRaSbbInterface.injectSmsOnFly(receipt.getSmsSet(), false);
+//                                                } catch (Exception e) {
+//                                                    this.tracer.severe(
+//                                                            "Exception when runnung injectSmsOnFly() for receipt in doInjectSmsDatabase(): "
+//                                                                    + e.getMessage(), e);
+//                                                }
+//                                            } else {
+//                                                receipt.setStored(true);
+//                                                this.setDestCluster(receipt.getSmsSet());
+//                                                dbOperations_C2
+//                                                        .c2_scheduleMessage_ReschedDueSlot(
+//                                                                receipt,
+//                                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+//                                                                true);
+//                                            }
 //                                        }
-                                        
-                                        
-                                        this.tracer.info("Adding an error receipt: source=" + receipt.getSourceAddr() + ", dest="
-                                                + receipt.getSmsSet().getDestAddr());
-                                    } catch (PersistenceException e) {
-                                        this.tracer.severe(
-                                                "PersistenceException when freeSmsSetFailured(SmsSet smsSet) - adding delivery receipt" + e.getMessage(), e);
-                                    }
-                                }
-                            } finally {
-                                SmsSetCache.getInstance().removeSmsSet(lock2);
-                            }
-                        }
-                    }
+//
+////                                        }
+//                                        
+//                                        
+//                                        this.tracer.info("Adding an error receipt: source=" + receipt.getSourceAddr() + ", dest="
+//                                                + receipt.getSmsSet().getDestAddr());
+//                                    } catch (PersistenceException e) {
+//                                        this.tracer.severe(
+//                                                "PersistenceException when freeSmsSetFailured(SmsSet smsSet) - adding delivery receipt" + e.getMessage(), e);
+//                                    }
+//                                }
+//                            } finally {
+//                                SmsSetCache.getInstance().removeSmsSet(lock2);
+//                            }
+//                        }
+//                    }
+//
+//                    if (good.size() == 0) {
+//                        // all messages are expired
+//                        return true;
+//                    } else {
+//                        smsSet.clearSmsList();
+//                        for (Sms sms : good) {
+//                            smsSet.addSms(sms);
+//                        }
+//                    }
+//                } finally {
+//                    SmsSetCache.getInstance().removeSmsSet(lock);
+//                }
+//            }
+//        }
 
-                    if (good.size() == 0) {
-                        // all messages are expired
-                        return true;
-                    } else {
-                        smsSet.clearSmsList();
-                        for (Sms sms : good) {
-                            smsSet.addSms(sms);
-                        }
-                    }
-                } finally {
-                    SmsSetCache.getInstance().removeSmsSet(lock);
-                }
-            }
-        }
 
-		return doInjectSms(smsSet, callFromSbb);
+
+	    return doInjectSms(smsSet, callFromSbb);
 	}
 
     private boolean doInjectSms(SmsSet smsSet, boolean callFromSbb) throws NotSupportedException, SystemException, Exception, RollbackException, HeuristicMixedException,

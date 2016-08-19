@@ -365,7 +365,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
         smscStatAggregator.updateMsgOutTryAll();
         smscStatAggregator.updateMsgOutTrySip();
 
-        Sms sms = this.obtainNextMessage();
+        Sms sms = this.obtainNextMessage(ProcessingType.SIP);
         if (sms == null) {
             this.markDeliveringIsEnded(true);
             return;

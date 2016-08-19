@@ -519,18 +519,6 @@ public class RxSmppServerSbbTest {
             // TODO Auto-generated method stub
             return false;
         }
-
-        @Override
-        public void setSendingPoolMsgCount(int sendingPoolMsgCount) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        @Override
-        public int getSendingPoolMsgCount() {
-            // TODO Auto-generated method stub
-            return 0;
-        }
     }
 
     private class SmppTransactionProxy implements SmppTransaction, ActivityContextInterface {

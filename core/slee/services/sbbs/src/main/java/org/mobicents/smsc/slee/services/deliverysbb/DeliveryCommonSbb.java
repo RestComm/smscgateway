@@ -45,6 +45,7 @@ import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
 import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorAction;
+import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.Sms;
@@ -89,7 +90,6 @@ public abstract class DeliveryCommonSbb implements Sbb {
     private boolean dlvIsEnded;
     private boolean smsSetIsLoaded;
 
-    private int sendingPoolMsgCount;
     private PendingRequestsList pendingRequestsList;
     private int[] sequenceNumbers;
     private boolean pendingRequestsListIsLoaded;
@@ -130,7 +130,6 @@ public abstract class DeliveryCommonSbb implements Sbb {
         if (!pendingRequestsListIsLoaded) {
             pendingRequestsListIsLoaded = true;
 
-            sendingPoolMsgCount = this.getSendingPoolMsgCount();
             pendingRequestsList = this.getPendingRequestsList();
         }
     }
@@ -229,7 +228,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @param smsSet An initial set of messages that is added provided to SBB for delivering
      */
     protected void addInitialMessageSet(SmsSet smsSet) {
-        addInitialMessageSet(smsSet, 0, 0);
+        addInitialMessageSet(smsSet, 0);
     }
 
     /**
@@ -238,10 +237,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
      *
      * @param smsSet An initial set of messages that is added provided to SBB for delivering
      * @param currentMsgNum
-     * 
-     * @param sendingPoolMsgCount
      */
-    protected void addInitialMessageSet(SmsSet smsSet, long currentMsgNum, int sendingPoolMsgCount) {
+    protected void addInitialMessageSet(SmsSet smsSet, long currentMsgNum) {
 
 //        if (dlvIsInited) {
 //            checkSmsSetLoaded();
@@ -256,14 +253,12 @@ public abstract class DeliveryCommonSbb implements Sbb {
         this.currentMsgNum = currentMsgNum;
         this.targetId = smsSet.getTargetId();
         this.pendingRequestsList = null;
-        this.sendingPoolMsgCount = sendingPoolMsgCount;
         this.dlvIsEnded = false;
         this.dlvIsInited = true;
 
         this.setCurrentMsgNum(this.currentMsgNum);
         this.setTargetId(targetId);
         this.setPendingRequestsList(null);
-        this.setSendingPoolMsgCount(this.sendingPoolMsgCount);
         this.setDlvIsEnded(dlvIsEnded);
         this.setDlvIsInited(dlvIsInited);
 
@@ -338,21 +333,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
     }
 
     /**
-     * @return returns sendingPoolMsgCount for smsSet in processing
-     */
-    protected int getSendingPoolMsgCountValue() {
-        checkPendingRequestsListLoaded();
-        return this.sendingPoolMsgCount;
-    }
-
-    /**
      * @return Total messages that are not yet delivered in SmsSet (including messages in a message sending pool and not yet
      *         added to a message sending pool)
      */
     protected int getTotalUnsentMessageCount() {
         checkSmsSetLoaded();
         if (smsSet != null)
-            return (int) (smsSet.getSmsCount() - this.currentMsgNum);
+            return (int) (smsSet.getSmsCount() - this.currentMsgNum + getSendingPoolMessageCount());
         else
             return 0;
     }
@@ -361,8 +348,12 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @return Total message count in a message sending pool
      */
     protected int getSendingPoolMessageCount() {
-        checkPendingRequestsListLoaded();
-        return sendingPoolMsgCount;
+        checkSmsSetLoaded();
+
+        if (this.smsSet != null)
+            return this.smsSet.getSendingPoolMsgCount();
+        else
+            return 0;
     }
 
     /**
@@ -384,7 +375,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         checkPendingRequestsListLoaded();
 
         if (smsSet != null)
-            return smsSet.getSms(this.currentMsgNum + this.sendingPoolMsgCount + numUnsent);
+            return smsSet.getSms(this.currentMsgNum + numUnsent);
         else
             return null;
     }
@@ -399,30 +390,16 @@ public abstract class DeliveryCommonSbb implements Sbb {
         checkSmsSetLoaded();
         checkPendingRequestsListLoaded();
 
-        if (numInSendingPool < 0 || numInSendingPool >= this.sendingPoolMsgCount) {
+        if (numInSendingPool < 0 || numInSendingPool >= this.getSendingPoolMessageCount()) {
             // this is a case when a message number is outside sendingPoolMsgCount
             return null;
         }
 
-        if (smsSet != null)
-            return smsSet.getSms(this.currentMsgNum + numInSendingPool);
-        else
+        if (smsSet != null) {
+            return smsSet.getMessageFromSendingPool(numInSendingPool);
+        } else
             return null;
     }
-    
-//    /**
-//     * Returns a message number numInSendingPool in a message sending pool
-//     *
-//     * @param numInSendingPool Number of message in a message sending pool
-//     * @return A message or null if a message sending pool is empty or numInSendingPool is out of a message sending pool range
-//     */
-//    protected Sms getCurrentMessage(int numInSendingPool) {
-//        checkSmsSetLoaded();
-//        if (smsSet != null)
-//            return smsSet.getSms(this.currentMsgNum + numInSendingPool);
-//        else
-//            return null;
-//    }
 
     /**
      * Marking a previously arranged message sending pool as delivered with resource releasing
@@ -431,15 +408,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
         checkSmsSetLoaded();
         checkPendingRequestsListLoaded();
 
-        if (smsSet != null && sendingPoolMsgCount > 0) {
-            for (int i1 = 0; i1 < sendingPoolMsgCount; i1++) {
-                smsSet.markSmsAsDelivered(currentMsgNum + i1);
-            }
-
-            currentMsgNum += sendingPoolMsgCount;
-            this.setCurrentMsgNum(currentMsgNum);
-            sendingPoolMsgCount = 0;
-            this.setSendingPoolMsgCount(sendingPoolMsgCount);
+        if (smsSet != null && getSendingPoolMessageCount() > 0) {
+            smsSet.clearSendingPool();
 
             pendingRequestsListIsDirty = true;
             pendingRequestsList = null;
@@ -451,28 +421,45 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * Arrange a new message sending pool with the poolMessageCount message count in it. If pending message count is less then
      * poolMessageCount then all pending message will be arranged to a message sending pool. Previous arranging pool will be
      * removed by this operation and pending messages in it will be marked as already processed. If you need to arrange only one
-     * message in message sending pool you can use obtainNextMessage() method.
+     * message in message sending pool you can use obtainNextMessage() method. Messages wit expired ValidityPeriod are not added
+     * to a sendingPoolMsg but are processed as perm failed.
      *
      * @param poolMessageCount Max message count that must be included into a a new message sending pool
+     * @param processingType
      * @return a count of messages in a new message pool
      */
-    protected int obtainNextMessagesSendingPool(int poolMessageCount) {
+    protected int obtainNextMessagesSendingPool(int poolMessageCount, ProcessingType processingType) {
         commitSendingPoolMsgCount();
 
         if (smsSet != null) {
-            sendingPoolMsgCount = this.getTotalUnsentMessageCount();
-            if (sendingPoolMsgCount > poolMessageCount) {
-                sendingPoolMsgCount = poolMessageCount;
-            }
-            this.setSendingPoolMsgCount(sendingPoolMsgCount);
-            sequenceNumbers = new int[sendingPoolMsgCount];
-
+            int addedMessageCnt = 0;
+            int gotMessageCnt = 0;
+            int sendingPoolMsgCount = this.getTotalUnsentMessageCount();
             for (int i1 = 0; i1 < sendingPoolMsgCount; i1++) {
+                if (addedMessageCnt >= poolMessageCount) {
+                    break;
+                }
+
+                gotMessageCnt++;
                 Sms sms = smsSet.getSms(currentMsgNum + i1);
-                sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+                if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
+                    this.endDeliveryAfterValidityPeriod(sms, processingType);
+                } else {
+                    addedMessageCnt++;
+                    sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+                    smsSet.markSmsAsDelivered(currentMsgNum + i1);
+                    smsSet.addMessageToSendingPool(sms);
+                }
+            }            
+
+            sequenceNumbers = new int[addedMessageCnt];
+
+            if (gotMessageCnt > 0) {
+                currentMsgNum += gotMessageCnt;
+                this.setCurrentMsgNum(currentMsgNum);
             }
 
-            return sendingPoolMsgCount;
+            return addedMessageCnt;
         } else
             return 0;
     }
@@ -481,22 +468,42 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * Arrange a new message sending pool with only one message in it. If no pending message then no message will be arranged to
      * a message sending pool. Previous arranging pool will be removed by this operation and pending messages in it will be
      * marked as already processed. If you need to arrange more then one message in message sending pool you can use
-     * obtainNextMessagesSendingPool() method.
+     * obtainNextMessagesSendingPool() method. Messages wit expired ValidityPeriod are not added to a sendingPoolMsg but are
+     * processed as perm failed.
      *
+     * @param processingType
      * @return a message for sending or null if no more message to send
      */
-    protected Sms obtainNextMessage() {
+    protected Sms obtainNextMessage(ProcessingType processingType) {
         commitSendingPoolMsgCount();
 
         if (smsSet != null) {
-            sendingPoolMsgCount = this.getTotalUnsentMessageCount();
+            int addedMessageCnt = 0;
+            int gotMessageCnt = 0;
+            int sendingPoolMsgCount = this.getTotalUnsentMessageCount();
             Sms sms = null;
-            if (sendingPoolMsgCount > 0) {
-                sendingPoolMsgCount = 1;
-                sms = smsSet.getSms(this.currentMsgNum);
-                sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+            for (int i1 = 0; i1 < sendingPoolMsgCount; i1++) {
+                if (addedMessageCnt >= 1) {
+                    break;
+                }
+
+                gotMessageCnt++;
+                sms = smsSet.getSms(currentMsgNum + i1);
+                if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
+                    this.endDeliveryAfterValidityPeriod(sms, processingType);
+                } else {
+                    addedMessageCnt++;
+                    sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+                    smsSet.markSmsAsDelivered(currentMsgNum + i1);
+                    smsSet.addMessageToSendingPool(sms);
+                }
+            }            
+
+            if (gotMessageCnt > 0) {
+                currentMsgNum += gotMessageCnt;
+                this.setCurrentMsgNum(currentMsgNum);
             }
-            this.setSendingPoolMsgCount(sendingPoolMsgCount);
+
             sequenceNumbers = null;
             return sms;
         } else
@@ -665,17 +672,96 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 // FAS & SAF
                 // checking validity date - if validity date < now, then it is a permanent failure (we confirm a validity period
                 // for time for now + 2 min)
-                if (sms.getValidityPeriod() != null
-                        && sms.getValidityPeriod().getTime() <= System.currentTimeMillis() + 1000 * 120) {
-                    lstPermFailured.add(sms);
-                } else {
-                    lstTempFailured.add(sms);
-                }
+
+                // TODO: ValidityPeriod was removed !!!
+
+                // if (sms.getValidityPeriod() != null
+                // && sms.getValidityPeriod().getTime() <= System.currentTimeMillis() + 1000 * 120) {
+                // lstPermFailured.add(sms);
+                // } else {
+
+                lstTempFailured.add(sms);
+
+                // }
+
             } else {
                 // datagramm or transactional
                 lstPermFailured.add(sms);
             }
         }
+    }
+
+    /**
+     * Finishing delivering of a message which validity period is over at the start of delivery time.
+     *
+     * @param sms
+     * @param processingType
+     */
+    protected void endDeliveryAfterValidityPeriod(Sms sms, ProcessingType processingType) {
+        // ending of delivery process in this SBB
+        ErrorCode smStatus = ErrorCode.RESERVED_127;
+        ErrorAction errorAction = ErrorAction.permanentFailure;
+        String reason = "Validity period is expired";
+
+        smsSet.setStatus(smStatus);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("onDeliveryError: errorAction=validityExpired");
+        sb.append(", smStatus=");
+        sb.append(smStatus);
+        sb.append(", targetId=");
+        sb.append(smsSet.getTargetId());
+        sb.append(", smsSet=");
+        sb.append(smsSet);
+        sb.append(", reason=");
+        sb.append(reason);
+        if (this.logger.isInfoEnabled())
+            this.logger.info(sb.toString());
+
+        // mproc rules applying for delivery phase
+        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true, processingType);
+
+        if (mProcResult.isMessageIsRerouted()) {
+            // we do not reroute a message with expired validity period
+            sb = new StringBuilder();
+            sb.append("Can not reroute of a message with expired ValidityPeriod, sms=");
+            sb.append(sms);
+            this.logger.warning(sb.toString());
+        }
+
+        FastList<Sms> addedMessages = mProcResult.getMessageList();
+        if (addedMessages != null) {
+            for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
+                Sms smst = n.getValue();
+                TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(),
+                        smst.getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
+                this.sendNewGeneratedMessage(smst, ta);
+
+                if (this.logger.isInfoEnabled()) {
+                    sb = new StringBuilder();
+                    sb.append("Posting of a new message after PermFailure-ValidityPeriod: targetId=");
+                    sb.append(smst.getSmsSet().getTargetId());
+                    sb.append(", sms=");
+                    sb.append(smst);
+                    this.logger.info(sb.toString());
+                }
+            }
+        }
+
+        ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
+        lstPermFailured.add(sms);
+
+        // sending of a failure response for transactional mode
+        this.sendTransactionalResponseFailure(lstPermFailured, null, errorAction, null);
+
+        // Processing messages that were temp or permanent failed or rerouted
+        this.postProcessPermFailures(lstPermFailured);
+
+        // generating CDRs for permanent failure messages
+        this.generateCDRs(lstPermFailured, CdrGenerator.CDR_FAILED, reason);
+
+        // sending of failure delivery receipts
+        this.generateFailureReceipts(smsSet, lstPermFailured, null);
     }
 
     // *********
@@ -989,7 +1075,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     }
 
                     this.commitSendingPoolMsgCount();
-                    sms = this.obtainNextMessage();
+                    sms = this.obtainNextMessage(ProcessingType.SS7_SRI);
                     if (sms == null)
                         break;
                     else
@@ -1027,7 +1113,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                         }
 
                         this.commitSendingPoolMsgCount();
-                        sms = this.obtainNextMessage();
+                        sms = this.obtainNextMessage(ProcessingType.SS7_SRI);
                         if (sms == null)
                             break;
                         else
@@ -1235,9 +1321,5 @@ public abstract class DeliveryCommonSbb implements Sbb {
     public abstract void setPendingRequestsList(PendingRequestsList pendingRequestsList);
 
     public abstract PendingRequestsList getPendingRequestsList();
-
-    public abstract void setSendingPoolMsgCount(int sendingPoolMsgCount);
-
-    public abstract int getSendingPoolMsgCount();
 
 }

@@ -470,14 +470,4 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
     public PendingRequestsList getPendingRequestsList() {
         return pendingRequestsList;
     }
-
-    @Override
-    public void setSendingPoolMsgCount(int sendingPoolMsgCount) {
-        this.sendingPoolMsgCount = sendingPoolMsgCount;
-    }
-
-    @Override
-    public int getSendingPoolMsgCount() {
-        return sendingPoolMsgCount;
-    }
 }

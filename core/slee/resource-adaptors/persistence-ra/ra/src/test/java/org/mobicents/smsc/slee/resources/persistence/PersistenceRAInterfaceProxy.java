@@ -25,20 +25,14 @@ package org.mobicents.smsc.slee.resources.persistence;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
-import javax.slee.facilities.Tracer;
-
 import org.apache.log4j.Logger;
-import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
-import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.PreparedStatementCollection;
 import org.mobicents.smsc.cassandra.Schema;
 import org.mobicents.smsc.library.ErrorCode;
-import org.mobicents.smsc.library.SmType;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
@@ -248,7 +242,7 @@ public class PersistenceRAInterfaceProxy extends DBOperations implements Persist
         ResultSet result = session.execute(boundStatement);
 
         Row row = result.one();
-        SmsSet smsSet = createSms(row, null, true, true, true, true, true);
+        SmsSet smsSet = createSms(row, null, true, true, true, true, true, false);
         if (smsSet == null)
             return null;
 
@@ -315,7 +309,7 @@ public class PersistenceRAInterfaceProxy extends DBOperations implements Persist
             SmsSet smsSet = null;
             Row row2 = null;
             for (Row row : rs) {
-                smsSet = this.createSms(row, null, true, true, true, true, true);
+                smsSet = this.createSms(row, null, true, true, true, true, true, false);
                 row2 = row;
                 break;
             }
