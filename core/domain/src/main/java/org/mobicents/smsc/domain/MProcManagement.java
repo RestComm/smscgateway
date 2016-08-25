@@ -63,6 +63,7 @@ import org.mobicents.smsc.mproc.impl.PostArrivalProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostDeliveryProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostDeliveryTempFailureProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostImsiProcessorImpl;
+import org.mobicents.smsc.mproc.impl.PostPreDeliveryProcessorImpl;
 
 /**
 *
@@ -290,6 +291,53 @@ public class MProcManagement implements MProcManagementMBean {
         }
         MProcResult res = new MProcResult();
         res.setMessageList(res0);
+        return res;
+    }
+
+    public MProcResult applyMProcPreDelivery(Sms sms, ProcessingType processingType) {
+        if (this.mprocs.size() == 0) {
+            return new MProcResult();
+        }
+
+        FastList<MProcRule> cur = this.mprocs;
+        PostPreDeliveryProcessorImpl pap = new PostPreDeliveryProcessorImpl(this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
+                this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger);
+        MProcMessage message = new MProcMessageImpl(sms, processingType);
+
+        try {
+            for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
+                MProcRule rule = n.getValue();
+                if (rule.isForPostDeliveryTempFailureState() && rule.matchesPostDeliveryTempFailure(message)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("MRule matches at PreDelivery phase to a message:\nrule: " + rule + "\nmessage: " + sms);
+                    }
+                    rule.onPostPreDelivery(pap, message);
+                }
+            }
+        } catch (Throwable e) {
+            logger.error(
+                    "Exception when invoking rule.matches(message) or onPostPreDelivery(): " + e.getMessage(), e);
+            return new MProcResult();
+        }
+
+        FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
+        MProcResult res = new MProcResult();
+
+        FastList<Sms> res0 = new FastList<Sms>();
+        for (FastList.Node<MProcNewMessage> n = newMsgs.head(), end = newMsgs.tail(); (n = n.getNext()) != end;) {
+            MProcNewMessageImpl newMsg = (MProcNewMessageImpl) n.getValue();
+            res0.add(newMsg.getSmsContent());
+        }
+        res.setMessageList(res0);
+
+        if (pap.isNeedDropMessages()) {
+            res.setMessageDropped(true);
+        }
+        if (pap.isNeedRerouteMessages()) {
+            res.setMessageIsRerouted(true);
+            res.setNewNetworkId(pap.getNewNetworkId());
+        }
+
         return res;
     }
 

@@ -39,6 +39,11 @@ public interface MProcRule extends MProcRuleMBean {
     boolean matchesPostArrival(MProcMessage message);
 
     /**
+     * @return true if the mproc rule fits to a message before a message delivery will start
+     */
+    boolean matchesPostPreDelivery(MProcMessage message);
+
+    /**
      * @return true if the mproc rule fits to a message when IMSI / NNN has been received from HLR (succeeded SRI response)
      */
     boolean matchesPostImsiRequest(MProcMessage message);
@@ -59,6 +64,11 @@ public interface MProcRule extends MProcRuleMBean {
      * the event occurs when a message has just come to SMSC
      */
     void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception;
+
+    /**
+     * the event occurs before a message delivery will start
+     */
+    void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception;
 
     /**
      * the event occurs when IMSI / NNN has been received from HLR (succeeded SRI response)

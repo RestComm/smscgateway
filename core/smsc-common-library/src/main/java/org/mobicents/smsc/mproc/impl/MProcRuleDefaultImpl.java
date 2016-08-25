@@ -38,6 +38,7 @@ import org.mobicents.smsc.mproc.PostArrivalProcessor;
 import org.mobicents.smsc.mproc.PostDeliveryProcessor;
 import org.mobicents.smsc.mproc.PostDeliveryTempFailureProcessor;
 import org.mobicents.smsc.mproc.PostImsiProcessor;
+import org.mobicents.smsc.mproc.PostPreDeliveryProcessor;
 import org.mobicents.smsc.mproc.ProcessingType;
 
 /**
@@ -497,6 +498,11 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     @Override
+    public boolean isForPostPreDeliveryState() {
+        return false;
+    }
+
+    @Override
     public boolean isForPostImsiRequestState() {
         if (this.dropAfterSri || this.newNetworkIdAfterSri != -1) {
             return true;
@@ -593,6 +599,11 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     @Override
+    public boolean matchesPostPreDelivery(MProcMessage message) {
+        return matches(message);
+    }
+
+    @Override
     public boolean matchesPostImsiRequest(MProcMessage message) {
         // TODO: we need proper implementing
 //        if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
@@ -660,6 +671,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (this.newDestTon != -1) {
             factory.updateMessageDestAddrTon(message, this.newDestTon);
         }
+    }
+
+    @Override
+    public void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception {
     }
 
     @Override

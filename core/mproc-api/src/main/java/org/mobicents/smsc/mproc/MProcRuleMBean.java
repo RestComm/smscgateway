@@ -45,6 +45,11 @@ public interface MProcRuleMBean {
     boolean isForPostArrivalState();
 
     /**
+     * @return true if the mproc rule is used for the phase before a message delivery will start
+     */
+    boolean isForPostPreDeliveryState();
+
+    /**
      * @return true if the mproc rule is used for the phase when IMSI / NNN has been received from HLR (succeeded SRI response)
      */
     boolean isForPostImsiRequestState();

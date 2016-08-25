@@ -53,6 +53,11 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     }
 
     @Override
+    public boolean isForPostPreDeliveryState() {
+        return false;
+    }
+
+    @Override
     public boolean isForPostImsiRequestState() {
         return false;
     }
@@ -73,6 +78,11 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     }
 
     @Override
+    public boolean matchesPostPreDelivery(MProcMessage messageDest) {
+        return false;
+    }
+
+    @Override
     public boolean matchesPostImsiRequest(MProcMessage messageDest) {
         return false;
     }
@@ -89,6 +99,10 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
 
     @Override
     public void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception {
+    }
+
+    @Override
+    public void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception {
     }
 
     @Override
