@@ -296,9 +296,9 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 	 * @param linkDropServer
 	 */
 
-	int getLinkDropServer();
+	long getLinkDropServer();
 
-	void setLinkDropServer(int linkDropServer);
+	void setLinkDropServer(long linkDropServer);
 
     void setPassword(String password);
 

@@ -151,7 +151,7 @@ public class SmppShellExecutor implements ShellExecutor {
                 int enquireLinkDelayServer = Integer.parseInt(args[count++]);
                 esme.setEnquireLinkDelayServer(enquireLinkDelayServer);
             } else if (key.equals("link-drop-server")) {
-                int linkDropServer = Integer.parseInt(args[count++]);
+                long linkDropServer = Long.parseLong(args[count++]);
                 esme.setLinkDropServer(linkDropServer);
             } else if (key.equals("charging-enabled")) {
                 boolean chargingEnabled = Boolean.parseBoolean(args[count++]);
@@ -293,7 +293,7 @@ public class SmppShellExecutor implements ShellExecutor {
         boolean countersEnabled = true;
         int enquireLinkDelay = 30000;
         int enquireLinkDelayServer = 0;
-        int linkDropServer = 0;
+        long linkDropServer = 0L;
         boolean chargingEnabled = false;
 
         int sourceTon = -1;
@@ -351,7 +351,7 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("enquire-link-delay-server")) {
                 enquireLinkDelayServer = Integer.parseInt(args[count++]);
             } else if (key.equals("link-drop-server")) {
-                linkDropServer = Integer.parseInt(args[count++]);
+                linkDropServer = Long.parseLong(args[count++]);
             } else if (key.equals("charging-enabled")) {
                 chargingEnabled = Boolean.parseBoolean(args[count++]);
             } else if (key.equals("source-ton")) {

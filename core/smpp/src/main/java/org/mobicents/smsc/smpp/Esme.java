@@ -149,7 +149,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private int enquireLinkDelay = 30000;
 	private int enquireLinkDelayServer = 0;
 
-	private int linkDropServer = 0;
+	private long linkDropServer = 0L;
 	private boolean linkRecvMessCheck = false;
 	private boolean linkStartFirstTime = false;
 	private Object linkDropWaitObject = new Object();
@@ -244,7 +244,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
 		SmppBindType smppBindType, Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout,
 		long clientBindTimeout, long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
-		int enquireLinkDelay, int enquireLinkDelayServer, int linkDropServer, int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon,
+		int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon,
 		int routingNpi, String routingAddressRange, int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
 		long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
 		int maxMessageLength
@@ -834,12 +834,12 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	}
 
 	@Override
-	public int getLinkDropServer() {
+	public long getLinkDropServer() {
 		return this.linkDropServer;
 	}
 
 	@Override
-	public void setLinkDropServer(int linkDropServer) {
+	public void setLinkDropServer(long linkDropServer) {
 		this.linkDropServer = linkDropServer;
 		this.store();
 	}
@@ -937,7 +937,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     }
 
 	public boolean getLinkDropServerEnabled() {
-		if (!this.getEnquireServerEnabled() && this.linkDropServer > 0) {
+		if (!this.getEnquireServerEnabled() && this.linkDropServer > 0L) {
 			return true;
 		}
 
@@ -1018,7 +1018,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			esme.countersEnabled = xml.getAttribute(COUNTERS_ENABLED, true);
 			esme.enquireLinkDelay = xml.getAttribute(ENQUIRE_LINK_DELAY, 30000);
 			esme.enquireLinkDelayServer = xml.getAttribute(ENQUIRE_LINK_DELAY_SERVER, 0);
-			esme.linkDropServer = xml.getAttribute(LINK_DROP_SERVER, 0);
+			esme.linkDropServer = xml.getAttribute(LINK_DROP_SERVER, 0L);
 
 			esme.chargingEnabled = xml.getAttribute(CHARGING_ENABLED, false);
 
