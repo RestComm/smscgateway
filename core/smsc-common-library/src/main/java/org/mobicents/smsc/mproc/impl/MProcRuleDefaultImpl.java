@@ -562,11 +562,15 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 return false;
         }
         if (imsiDigitsMaskPattern != null) {
+            if (message.getImsiDigits() == null)
+                return false;
             Matcher m = this.imsiDigitsMaskPattern.matcher(message.getImsiDigits());
             if (!m.matches())
                 return false;
         }
         if (nnnDigitsMaskPattern != null) {
+            if (message.getNnnDigits() == null)
+                return false;
             Matcher m = this.nnnDigitsMaskPattern.matcher(message.getNnnDigits());
             if (!m.matches())
                 return false;
