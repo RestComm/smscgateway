@@ -29,6 +29,7 @@ import javolution.util.FastMap;
 import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
 
+import org.apache.log4j.Logger;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
 import org.mobicents.smsc.mproc.MProcRuleBaseImpl;
@@ -47,6 +48,8 @@ import org.mobicents.smsc.mproc.ProcessingType;
 *
 */
 public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRuleDefault {
+
+    private static final Logger logger = Logger.getLogger(MProcRuleDefaultImpl.class);
 
     private static final String DEST_TON_MASK = "destTonMask";
     private static final String DEST_NPI_MASK = "destNpiMask";
@@ -679,6 +682,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
     @Override
     public void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception {
+        factory.dropMessage();
     }
 
     @Override

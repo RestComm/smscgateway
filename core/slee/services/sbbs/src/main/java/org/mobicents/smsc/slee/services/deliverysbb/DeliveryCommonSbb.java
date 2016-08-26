@@ -445,10 +445,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
                     this.endDeliveryAfterValidityPeriod(sms, processingType);
                 } else {
-                    addedMessageCnt++;
-                    sms.setDeliveryCount(sms.getDeliveryCount() + 1);
-                    smsSet.markSmsAsDelivered(currentMsgNum + i1);
-                    smsSet.addMessageToSendingPool(sms);
+                    boolean res1 = applyMProcPreDelivery(sms, processingType);
+                    if (res1) {
+                        addedMessageCnt++;
+                        sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+                        smsSet.markSmsAsDelivered(currentMsgNum + i1);
+                        smsSet.addMessageToSendingPool(sms);
+                    }
                 }
             }            
 
@@ -493,10 +496,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     this.endDeliveryAfterValidityPeriod(sms, processingType);
                     sms = null;
                 } else {
-                    addedMessageCnt++;
-                    sms.setDeliveryCount(sms.getDeliveryCount() + 1);
-                    smsSet.markSmsAsDelivered(currentMsgNum + i1);
-                    smsSet.addMessageToSendingPool(sms);
+                    boolean res1 = applyMProcPreDelivery(sms, processingType);
+                    if (!res1) {
+                        sms = null;
+                    } else {
+                        addedMessageCnt++;
+                        sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+                        smsSet.markSmsAsDelivered(currentMsgNum + i1);
+                        smsSet.addMessageToSendingPool(sms);
+                    }
                 }
             }            
 
@@ -509,6 +517,100 @@ public abstract class DeliveryCommonSbb implements Sbb {
             return sms;
         } else
             return null;
+    }
+
+    private boolean applyMProcPreDelivery(Sms sms, ProcessingType processingType) {
+        MProcResult mProcResult = MProcManagement.getInstance().applyMProcPreDelivery(sms, processingType);
+
+        if (mProcResult.isMessageIsRerouted()) {
+            // firstly we check if rerouting attempts was not too many
+            if (sms.getReroutingCount() >= MAX_POSSIBLE_REROUTING) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Rerouting message attempt in PreDelivery, but we have already rerouted ");
+                sb.append(MAX_POSSIBLE_REROUTING);
+                sb.append(" times before: targetId=");
+                sb.append(sms.getSmsSet().getTargetId());
+                sb.append(", newNetworkId=");
+                sb.append(mProcResult.getNewNetworkId());
+                sb.append(", sms=");
+                sb.append(sms);
+                this.logger.warning(sb.toString());
+                return false;
+            } else if (mProcResult.getNewNetworkId() == sms.getSmsSet().getNetworkId()) {
+                // we do not reroute for the same networkId
+                return true;
+            } else {
+                ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
+                ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
+                lstRerouted.add(sms);
+                lstNewNetworkId.add(mProcResult.getNewNetworkId());
+
+                if (this.logger.isInfoEnabled()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Rerouting message in PreDelivery: targetId=");
+                    sb.append(sms.getSmsSet().getTargetId());
+                    sb.append(", newNetworkId=");
+                    sb.append(mProcResult.getNewNetworkId());
+                    sb.append(", sms=");
+                    sb.append(sms);
+                    this.logger.info(sb.toString());
+                }
+                postProcessRerouted(lstRerouted, lstNewNetworkId);
+                return false;
+            }
+        } else if (mProcResult.isMessageDropped()) {
+            if (this.logger.isInfoEnabled()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Dropping message after in PreDelivery: targetId=");
+                sb.append(sms.getSmsSet().getTargetId());
+                sb.append(", sms=");
+                sb.append(sms);
+                this.logger.info(sb.toString());
+            }
+
+            ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
+            lstPermFailured.add(sms);
+            ErrorCode smStatus = ErrorCode.MPROC_PRE_DELIVERY_DROP;
+            ErrorAction errorAction = ErrorAction.permanentFailure;
+            String reason = "Message drop in PreDelivery";
+
+            smsSet.setStatus(smStatus);
+
+            // sending of a failure response for transactional mode
+            this.sendTransactionalResponseFailure(lstPermFailured, null, errorAction, null);
+
+            // Processing messages that were temp or permanent failed or rerouted
+            this.postProcessPermFailures(lstPermFailured);
+
+            // generating CDRs for permanent failure messages
+            this.generateCDRs(lstPermFailured, CdrGenerator.CDR_MPROC_DROP_PRE_DELIVERY, reason);
+
+            // sending of failure delivery receipts
+            this.generateFailureReceipts(smsSet, lstPermFailured, null);
+
+            return false;
+        }
+
+        FastList<Sms> addedMessages = mProcResult.getMessageList();
+        if (addedMessages != null) {
+            for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
+                Sms smst = n.getValue();
+                TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(),
+                        smst.getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
+                this.sendNewGeneratedMessage(smst, ta);
+
+                if (this.logger.isInfoEnabled()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Posting of a new message after PreDelivery: targetId=");
+                    sb.append(smst.getSmsSet().getTargetId());
+                    sb.append(", sms=");
+                    sb.append(smst);
+                    this.logger.info(sb.toString());
+                }
+            }
+        }
+
+        return true;
     }
 
     // *********
@@ -700,7 +802,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected void endDeliveryAfterValidityPeriod(Sms sms, ProcessingType processingType) {
         // ending of delivery process in this SBB
-        ErrorCode smStatus = ErrorCode.RESERVED_127;
+        ErrorCode smStatus = ErrorCode.VALIDITY_PERIOD_EXPIRED;
         ErrorAction errorAction = ErrorAction.permanentFailure;
         String reason = "Validity period is expired";
 

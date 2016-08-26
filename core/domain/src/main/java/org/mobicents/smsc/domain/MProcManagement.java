@@ -307,7 +307,7 @@ public class MProcManagement implements MProcManagementMBean {
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
                 MProcRule rule = n.getValue();
-                if (rule.isForPostDeliveryTempFailureState() && rule.matchesPostDeliveryTempFailure(message)) {
+                if (rule.isForPostPreDeliveryState() && rule.matchesPostPreDelivery(message)) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("MRule matches at PreDelivery phase to a message:\nrule: " + rule + "\nmessage: " + sms);
                     }
