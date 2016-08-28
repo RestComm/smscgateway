@@ -425,9 +425,9 @@
 		
         <echo>Building RestComm SMPP from source</echo>
 		
-        <exec failonerror="true" executable="${mvn.executable}" dir="${checkout.restcomm-cloudhopper.smpp.dir}">
-                <arg line="clean install -Prelease -Dmaven.test.skip=true" />
-        </exec>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.restcomm-cloudhopper.smpp.dir}">
+			<arg line="clean install -Dmaven.test.skip=true" /> <!-- -Prelease -->
+		</exec>
 	</target>
 
 	<target name="build-smsc">
