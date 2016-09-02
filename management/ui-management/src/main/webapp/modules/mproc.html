@@ -25,10 +25,7 @@
 				<th style="width: 30px;">&nbsp;</th>
 				<th>Id</th>
 				<th>Rule Class Name</th>
-				<th>For Arrival</th>
-				<th>For Imsi Request</th>
-				<th>For Delivery Success PermFail</th>
-				<th>For TempFail</th>
+				<th>Trigger point</th>
 				<th>Rule Parameters</th>
 				<th style="text-align: center; width: 150px;">Actions</th>
 			</tr>
@@ -299,6 +296,16 @@
 						</select>
 					</span>	
 				</div>	
+
+				<div id="div-hrbypass" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's inside Home Routing procedure after SMSC GW receives a response from a local HLR then SMSC GW will bypass HR procedure by sending back to an original SMSC GW origin orininal IMSI and NNN. ">
+						<span class="add-on">ByPass HR procedure after SRI to a local HLR</span>
+						<select id="hrbypass" >
+							<option value="false">False</option>
+							<option value="true">True</option>
+						</select>
+					</span>	
+				</div>
 							
 				<div id="div-dropaftersri" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's and if a MAP SRI success response is received, message will be dropped without delivery attempt. A delivery response in this case will contain extra fields (IMSI and NetworkNodeNumber values). This action is applied only for SMS that are attempted to be delivered to SS7 network. ">
@@ -309,7 +316,6 @@
 						</select>
 					</span>	
 				</div>
-
 
 				
 				<div id="div-newnetworkidaftersri" class="control-group">
@@ -468,20 +474,26 @@
 										var id = value.id;
 										var ruleclassname = value.ruleClassName;
 										var forpostarrivalstate = value.forPostArrivalState;
+
+										var forposthrsristate = value.forPostHrSriState;
+										var forpostpredeliverystate = value.forPostPreDeliveryState;
+
 										var forpostimsirequeststate = value.forPostImsiRequestState;
 										var forpostdeliverystate = value.forPostDeliveryState;
 										var forpostdeliverytempfailurestate = value.forPostDeliveryTempFailureState;
 										var ruleparameters = value.ruleParameters;
-										
+
+										var fortrigger = "" + (forpostarrivalstate==true ? "Arriv " : "") + (forposthrsristate==true ? "HrSri " : "") + (forpostpredeliverystate==true ? "PreDlv " : "") +
+										                 (forpostimsirequeststate==true ? "ImsiReq " : "") + (forpostdeliverystate==true ? "FailSucc " : "") + (forpostdeliverytempfailurestate==true ? "TempFail " : "");
+										var fortriggertt = "Triggers: " + (forpostarrivalstate==true ? "For Arrival : " : "") + (forposthrsristate==true ? "For HR SRI Request : " : "") + (forpostpredeliverystate==true ? "For Pre Delivery : " : "") +
+										                 (forpostimsirequeststate==true ? "For Imsi Request : " : "") + (forpostdeliverystate==true ? "For Delivery Success PermFail : " : "") + (forpostdeliverytempfailurestate==true ? "For Delivery TempFail : " : "");
+
 										serviceClass = 'active-service';
 										
 										$('#esmes-table').children('tbody').append('<tr class="service-row"><td style="vertical-align: middle; text-align: center;"><i style="color: #51A351;" class="icon-play-circle"></i></td>'+
 												'<td style="cursor: pointer;" >' + id + '</td>' +
 												'<td style="cursor: pointer;" >' + ruleclassname + '</td>' +
-												'<td style="cursor: pointer;" >' + (forpostarrivalstate==true ? "+" : "-") + '</td>' +
-												'<td style="cursor: pointer;" >' + (forpostimsirequeststate==true ? "+" : "-") + '</td>' +
-												'<td style="cursor: pointer;" >' + (forpostdeliverystate==true ? "+" : "-") + '</td>' +
-												'<td style="cursor: pointer;" >' + (forpostdeliverytempfailurestate==true ? "+" : "-") + '</td>' +
+												'<td style="cursor: pointer;" data-toggle="tooltip" title="' + fortriggertt + '">' + fortrigger + '</td>' + 
 												'<td style="cursor: pointer;" >' + ruleparameters + '</td>' +
 												'<td style="font-size: 16px; vertical-align: middle; text-align: center; width: 150px;">' + 
 													'<button class="btn btn-small btn-danger"' + ' data-toggle="tooltip" title="Remove MProc" data-placement="bottom" onclick="mprocOperation(\'destroyMProcRule\', \'' + id +  '\')"><i class="icon-remove"> </i></button> ' +
@@ -515,6 +527,8 @@
 										var addestdigprefix = processRuleParameters(ruleparameters, "adddestdigprefix");
 										var makecopy = processRuleParameters(ruleparameters, "makecopy");
 										if(makecopy=="-1") { makecopy = "false"; }
+										var hrbypass = processRuleParameters(ruleparameters, "hrbypass");
+										if(hrbypass=="-1") { hrbypass = "false"; }
 										var dropaftersri = processRuleParameters(ruleparameters, "dropaftersri");
 										if(dropaftersri=="-1") { dropaftersri = "false"; }
 										var newnetworkidaftersri = processRuleParameters(ruleparameters, "newnetworkidaftersri");
@@ -824,6 +838,21 @@
 																			'</td>'+
 																		'</tr>'+
 																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s inside Home Routing procedure after SMSC GW receives a response from a local HLR then SMSC GW will bypass HR procedure by sending back to an original SMSC GW origin orininal IMSI and NNN.">'+
+																			'<td style="font-size: 0.9em;">ByPass HR procedure after SRI to a local HLR</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'HrByPass-input" class="control-group">'+
+																				'<span id="' + id +'HrByPass-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + hrbypass + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'hrbypass\', \'' + id+"HrByPass" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"HrByPass"+']\').toggle(); $(\'input[id^='+id+"HrByPass"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'HrByPass-text">' + hrbypass + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"HrByPass"+']\').toggle(); $(\'input[id^='+id+"HrByPass"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																		
 																		
 																		'<tr data-toggle="tooltip" title="Once rule match\'s and if a MAP SRI success response is received, message will be dropped without delivery attempt. A delivery response in this case will contain extra fields (IMSI and NetworkNodeNumber values). This action is applied only for SMS that are attempted to be delivered to SS7 network.">'+
 																			'<td style="font-size: 0.9em;">Drop after MAP SRI Request</td>'+
@@ -1220,6 +1249,10 @@
 		e = document.getElementById("makecopy");
 		var makecopy = e.options[e.selectedIndex].value;
 		parametersstring = parametersstring + " makecopy "+makecopy;
+		
+		e = document.getElementById("hrbypass");
+		var hrbypass = e.options[e.selectedIndex].value;
+		parametersstring = parametersstring + " hrbypass "+hrbypass;
 		
 		e = document.getElementById("dropaftersri");
 		var dropaftersri = e.options[e.selectedIndex].value;
