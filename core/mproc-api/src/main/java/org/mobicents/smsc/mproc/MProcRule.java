@@ -34,6 +34,12 @@ public interface MProcRule extends MProcRuleMBean {
     // rule matchers - they specifies if this rule processes a trigger
 
     /**
+     * @return true if the mproc rule fits to a message for the phase SMSC GW receives SRI response from a local HLR in HR
+     *         procedure
+     */
+    boolean matchesPostHrSri(MProcMessage message);
+
+    /**
      * @return true if the mproc rule fits to a message when a message has just come to SMSC
      */
     boolean matchesPostArrival(MProcMessage message);
@@ -59,6 +65,11 @@ public interface MProcRule extends MProcRuleMBean {
     boolean matchesPostDeliveryTempFailure(MProcMessage message);
 
     // rule processors - we will put code for processing there
+
+    /**
+     * the event occurs when SMSC GW receives SRI response from a local HLR in HR procedure
+     */
+    void onPostHrSri(PostHrSriProcessor factory, MProcMessage message) throws Exception;
 
     /**
      * the event occurs when a message has just come to SMSC

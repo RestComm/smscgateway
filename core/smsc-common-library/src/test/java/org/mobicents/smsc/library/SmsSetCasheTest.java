@@ -51,7 +51,7 @@ public class SmsSetCasheTest {
         String correlationID = "000000000011111";
         ISDNAddressString msisdn = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "11111111");
         AddressString serviceCentreAddress = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "22222222");
-        CorrelationIdValue elem = new CorrelationIdValue(correlationID, msisdn, serviceCentreAddress, 0);
+        CorrelationIdValue elem = new CorrelationIdValue(correlationID, msisdn, serviceCentreAddress, 0, null);
         ssc.putCorrelationIdCacheElement(elem, correlationIdLiveTime);
 
         String targetID = "22222_1_1_2";

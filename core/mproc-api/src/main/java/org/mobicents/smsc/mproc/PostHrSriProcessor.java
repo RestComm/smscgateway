@@ -1,6 +1,6 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
+ * TeleStax, Open Source Cloud Communications  
+ * Copyright 2012, Telestax Inc and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -20,22 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.mobicents.smsc.slee.services.hr;
+package org.mobicents.smsc.mproc;
 
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
-import org.mobicents.smsc.library.CorrelationIdValue;
+import org.apache.log4j.Logger;
 
 /**
- * 
- * @author sergey vetyutnev
- * 
- */
-public interface HrSriResultInterface {
+*
+* @author sergey vetyutnev
+*
+*/
+public interface PostHrSriProcessor {
 
-    public void onSriSuccess(CorrelationIdValue correlationIdValue, boolean sriBypass);
+    // access to environmental parameters
+    /**
+     * @return the logger that an application can use for logging info into server.log
+     */
+    Logger getLogger();
 
-    public void onSriHrByPass(CorrelationIdValue correlationIdValue);
-
-    public void onSriFailure(CorrelationIdValue correlationIdValue, MAPErrorMessage errorResponse, String cause);
+    // actions
+    /**
+     * HR procedure will be bypassed (original IMSI and NNN will be sent as SRI response).
+     *
+     * @param newNetworkId
+     */
+    void byPassHr() throws MProcRuleException;
 
 }

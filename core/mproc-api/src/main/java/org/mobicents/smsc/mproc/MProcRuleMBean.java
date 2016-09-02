@@ -45,6 +45,11 @@ public interface MProcRuleMBean {
     boolean isForPostArrivalState();
 
     /**
+     * @return true if the mproc rule is used for the phase SMSC GW receives SRI response from a local HLR in HR procedure 
+     */
+    boolean isForPostHrSriState();
+
+    /**
      * @return true if the mproc rule is used for the phase before a message delivery will start
      */
     boolean isForPostPreDeliveryState();

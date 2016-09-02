@@ -129,6 +129,8 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Summary, "MsgInHrSriPosReq", "Home routing SRI positive responses");
         cds.addCounterDef(cd);
+        cd = new CounterDefImpl(CounterType.Summary, "MsgInHrSriHrByPass", "ByPass HomeRouting procedure after SRI to a local HLR");
+        cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Summary, "MsgInHrSriNegReq", "Home routing SRI negative responses");
         cds.addCounterDef(cd);
 
@@ -241,6 +243,8 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                     svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriReq());
                 } else if (cd.getCounterName().equals("MsgInHrSriPosReq")) {
                     svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriPosReq());
+                } else if (cd.getCounterName().equals("MsgInHrSriHrByPass")) {
+                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriHrByPass());
                 } else if (cd.getCounterName().equals("MsgInHrSriNegReq")) {
                     svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriNegReq());
 

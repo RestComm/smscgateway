@@ -37,6 +37,7 @@ public class MProcResult {
     private boolean messageIsRejected;
     private boolean messageIsDropped;
     private boolean messageIsRerouted;
+    private boolean hrIsByPassed;
     private int newNetworkId;
 
     public MProcResult() {
@@ -68,6 +69,14 @@ public class MProcResult {
 
     public boolean isMessageIsRerouted() {
         return messageIsRerouted;
+    }
+
+    public boolean isHrIsByPassed() {
+        return hrIsByPassed;
+    }
+
+    public void setHrIsByPassed(boolean hrIsByPassed) {
+        this.hrIsByPassed = hrIsByPassed;
     }
 
     public void setMessageIsRerouted(boolean messageIsRerouted) {

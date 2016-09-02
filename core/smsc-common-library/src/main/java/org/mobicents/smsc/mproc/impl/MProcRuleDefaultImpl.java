@@ -38,6 +38,7 @@ import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.PostArrivalProcessor;
 import org.mobicents.smsc.mproc.PostDeliveryProcessor;
 import org.mobicents.smsc.mproc.PostDeliveryTempFailureProcessor;
+import org.mobicents.smsc.mproc.PostHrSriProcessor;
 import org.mobicents.smsc.mproc.PostImsiProcessor;
 import org.mobicents.smsc.mproc.PostPreDeliveryProcessor;
 import org.mobicents.smsc.mproc.ProcessingType;
@@ -74,6 +75,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String NEW_NETWORK_ID_AFTER_SRI = "newNetworkIdAfterSri";
     private static final String NEW_NETWORK_ID_AFTER_PERM_FAIL = "newNetworkIdAfterPermFail";
     private static final String NEW_NETWORK_ID_AFTER_TEMP_FAIL = "newNetworkIdAfterTempFail";
+    private static final String HR_BY_PASS = "hrByPass";
 
     // TODO: we need proper implementing
 //    // test magic mproc rules - we need to remove then later after proper implementing
@@ -112,6 +114,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private int newNetworkIdAfterSri = -1;
     private int newNetworkIdAfterPermFail = -1;
     private int newNetworkIdAfterTempFail = -1;
+    private boolean hrByPass = false;
 
     private Pattern destDigMaskPattern;
     private Pattern origEsmeNameMaskPattern;
@@ -348,6 +351,19 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     /**
+     * @return if true - drops a message after temporary failure
+     */
+    @Override
+    public boolean isHrByPass() {
+        return hrByPass;
+    }
+
+    @Override
+    public void setHrByPass(boolean hrByPass) {
+        this.hrByPass = hrByPass;
+    }
+
+    /**
      * @return if true - drops a message after succeeded SRI response
      */
     @Override
@@ -387,7 +403,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     /**
-     * @return if true - drops a message after temporary failure
+     * @return if true - HR procedure will be bypassed (original IMSI and NNN will be sent as SRI response).
      */
     @Override
     public boolean isDropAfterTempFail() {
@@ -399,6 +415,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.dropAfterTempFail = dropAfterTempFail;
     }
 
+    /**
+     * @return if !=-1: reroute a message to this networkId a message after temporary failure
+     */
     @Override
     public int getNewNetworkIdAfterTempFail() {
         return newNetworkIdAfterTempFail;
@@ -460,7 +479,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     protected void setRuleParameters(int destTonMask, int destNpiMask, String destDigMask, OrigType originatingMask,
             int networkIdMask, int originNetworkIdMask, String origEsmeNameMask, String originatorSccpAddressMask,
             String imsiDigitsMask, String nnnDigitsMask, ProcessingType processingType, String errorCode, int newNetworkId,
-            int newDestTon, int newDestNpi, String addDestDigPrefix, boolean makeCopy, boolean dropAfterSri,
+            int newDestTon, int newDestNpi, String addDestDigPrefix, boolean makeCopy, boolean hrByPass, boolean dropAfterSri,
             boolean dropAfterTempFail, int newNetworkIdAfterSri, int newNetworkIdAfterPermFail, int newNetworkIdAfterTempFail) {
         this.destTonMask = destTonMask;
         this.destNpiMask = destNpiMask;
@@ -480,6 +499,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.newDestNpi = newDestNpi;
         this.addDestDigPrefix = addDestDigPrefix;
         this.makeCopy = makeCopy;
+        this.hrByPass = hrByPass;
         this.dropAfterSri = dropAfterSri;
         this.dropAfterTempFail = dropAfterTempFail;
         this.newNetworkIdAfterSri = newNetworkIdAfterSri;
@@ -495,6 +515,14 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (this.makeCopy || this.newNetworkId != -1
                 || (this.addDestDigPrefix != null && !this.addDestDigPrefix.equals("") && !this.addDestDigPrefix.equals("-1"))
                 || this.newDestNpi != -1 || this.newDestTon != -1) {
+            return true;
+        } else
+            return false;
+    }
+
+    @Override
+    public boolean isForPostHrSriState() {
+        if (this.hrByPass) {
             return true;
         } else
             return false;
@@ -540,6 +568,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (destNpiMask != -1 && destNpiMask != message.getDestAddrNpi())
             return false;
         if (destDigMaskPattern != null) {
+            if (message.getDestAddr() == null)
+                return false;
             Matcher m = this.destDigMaskPattern.matcher(message.getDestAddr());
             if (!m.matches())
                 return false;
@@ -592,6 +622,11 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             return false;
         
         return true;
+    }
+
+    @Override
+    public boolean matchesPostHrSri(MProcMessage message) {
+        return matches(message);
     }
 
     @Override
@@ -681,8 +716,13 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     @Override
+    public void onPostHrSri(PostHrSriProcessor factory, MProcMessage message) throws Exception {
+        if (this.hrByPass)
+            factory.byPassHr();
+    }
+
+    @Override
     public void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception {
-        factory.dropMessage();
     }
 
     @Override
@@ -769,6 +809,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int newDestNpi = -1;
         String addDestDigPrefix = "-1";
         boolean makeCopy = false;
+        boolean hrByPass = false;
         boolean dropAfterSri = false;
         boolean dropAfterTempFail = false;
         int newNetworkIdAfterSri = -1;
@@ -819,6 +860,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } else if (command.equals("makecopy")) {
                     makeCopy = Boolean.parseBoolean(value);
                     success = true;
+                } else if (command.equals("hrbypass")) {
+                    hrByPass = Boolean.parseBoolean(value);
+                    success = true;
                 } else if (command.equals("dropaftersri")) {
                     dropAfterSri = Boolean.parseBoolean(value);
                     success = true;
@@ -855,7 +899,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
         this.setRuleParameters(destTonMask, destNpiMask, destDigMask, originatingMaskVal, networkIdMask, originNetworkIdMask,
                 origEsmeNameMask, originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode,
-                newNetworkId, newDestTon, newDestNpi, addDestDigPrefix, makeCopy, dropAfterSri, dropAfterTempFail,
+                newNetworkId, newDestTon, newDestNpi, addDestDigPrefix, makeCopy, hrByPass, dropAfterSri, dropAfterTempFail,
                 newNetworkIdAfterSri, newNetworkIdAfterPermFail, newNetworkIdAfterTempFail);
     }
 
@@ -940,6 +984,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } else if (command.equals("makecopy")) {
                     boolean val = Boolean.parseBoolean(value);
                     this.setMakeCopy(val);
+                    success = true;
+                } else if (command.equals("hrbypass")) {
+                    boolean val = Boolean.parseBoolean(value);
+                    this.setHrByPass(val);
                     success = true;
                 } else if (command.equals("dropaftersri")) {
                 	boolean val = Boolean.parseBoolean(value);
@@ -1040,6 +1088,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (makeCopy) {
             writeParameter(sb, parNumber++, "makeCopy", makeCopy);
         }
+        if (hrByPass) {
+            writeParameter(sb, parNumber++, "hrByPass", hrByPass);
+        }
         if (dropAfterSri) {
             writeParameter(sb, parNumber++, "dropAfterSri", dropAfterSri);
         }
@@ -1102,6 +1153,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.newDestNpi = xml.getAttribute(NEW_DEST_NPI, -1);
             mProcRule.addDestDigPrefix = xml.getAttribute(ADD_DEST_DIG_PREFIX, "-1");
             mProcRule.makeCopy = xml.getAttribute(MAKE_COPY, false);
+            mProcRule.hrByPass = xml.getAttribute(HR_BY_PASS, false);
             mProcRule.dropAfterSri = xml.getAttribute(DROP_AFTER_SRI, false);
             mProcRule.dropAfterTempFail = xml.getAttribute(DROP_AFTER_TEMP_FAIL, false);
             mProcRule.newNetworkIdAfterSri = xml.getAttribute(NEW_NETWORK_ID_AFTER_SRI, -1);
@@ -1159,6 +1211,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
             if (mProcRule.makeCopy)
                 xml.setAttribute(MAKE_COPY, mProcRule.makeCopy);
+            if (mProcRule.hrByPass)
+                xml.setAttribute(HR_BY_PASS, mProcRule.hrByPass);
             if (mProcRule.dropAfterSri)
                 xml.setAttribute(DROP_AFTER_SRI, mProcRule.dropAfterSri);
 

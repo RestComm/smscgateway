@@ -48,6 +48,7 @@ import javolution.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
 import org.jboss.mx.util.MBeanServerLocator;
 import org.mobicents.smsc.domain.SmscManagement;
+import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
@@ -55,6 +56,7 @@ import org.mobicents.smsc.mproc.MProcRuleFactory;
 import org.mobicents.smsc.mproc.MProcRule;
 import org.mobicents.smsc.mproc.MProcRuleMBean;
 import org.mobicents.smsc.mproc.ProcessingType;
+import org.mobicents.smsc.mproc.impl.MProcMessageHrImpl;
 import org.mobicents.smsc.mproc.impl.MProcMessageImpl;
 import org.mobicents.smsc.mproc.impl.MProcNewMessageImpl;
 import org.mobicents.smsc.mproc.impl.MProcResult;
@@ -62,6 +64,7 @@ import org.mobicents.smsc.mproc.impl.MProcRuleOamMessages;
 import org.mobicents.smsc.mproc.impl.PostArrivalProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostDeliveryProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostDeliveryTempFailureProcessorImpl;
+import org.mobicents.smsc.mproc.impl.PostHrSriProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostImsiProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostPreDeliveryProcessorImpl;
 
@@ -291,6 +294,41 @@ public class MProcManagement implements MProcManagementMBean {
         }
         MProcResult res = new MProcResult();
         res.setMessageList(res0);
+        return res;
+    }
+
+    public MProcResult applyMProcHrSri(CorrelationIdValue correlationIdValue) {
+        if (this.mprocs.size() == 0) {
+            return new MProcResult();
+        }
+
+        FastList<MProcRule> cur = this.mprocs;
+        PostHrSriProcessorImpl pap = new PostHrSriProcessorImpl(logger);
+        MProcMessage message = new MProcMessageHrImpl(correlationIdValue);
+
+        try {
+            for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
+                MProcRule rule = n.getValue();
+                if (rule.isForPostHrSriState() && rule.matchesPostHrSri(message)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("MRule matches at HrSri phase to a message:\nrule: " + rule + "\ncorrelationIdValue: "
+                                + correlationIdValue);
+                    }
+
+                    rule.onPostHrSri(pap, message);
+                }
+            }
+        } catch (Throwable e) {
+            logger.error("Exception when invoking rule.matches(message) or onPostHrSri(): " + e.getMessage(), e);
+            return new MProcResult();
+        }
+
+        MProcResult res = new MProcResult();
+
+        if (pap.isHrByPassed()) {
+            res.setHrIsByPassed(true);
+        }
+
         return res;
     }
 

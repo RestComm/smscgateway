@@ -201,4 +201,11 @@ public interface MProcRuleDefault extends MProcRule {
 
     void setNewNetworkIdAfterTempFail(int newNetworkIdAfterTempFail);
 
+    /**
+     * @return if true - HR procedure will be bypassed (original IMSI and NNN will be sent as SRI response).
+     */
+    boolean isHrByPass();
+
+    void setHrByPass(boolean hrByPass);
+
 }

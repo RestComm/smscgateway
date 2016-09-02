@@ -48,6 +48,11 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     }
 
     @Override
+    public boolean isForPostHrSriState() {
+        return false;
+    }
+
+    @Override
     public boolean isForPostArrivalState() {
         return false;
     }
@@ -69,6 +74,11 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
 
     @Override
     public boolean isForPostDeliveryTempFailureState() {
+        return false;
+    }
+
+    @Override
+    public boolean matchesPostHrSri(MProcMessage messageDest) {
         return false;
     }
 
@@ -95,6 +105,10 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     @Override
     public boolean matchesPostDeliveryTempFailure(MProcMessage message) {
         return false;
+    }
+
+    @Override
+    public void onPostHrSri(PostHrSriProcessor factory, MProcMessage message) throws Exception {
     }
 
     @Override

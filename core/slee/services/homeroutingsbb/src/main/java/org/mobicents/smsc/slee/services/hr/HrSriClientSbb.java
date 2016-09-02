@@ -52,8 +52,10 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.MessageUtil;
+import org.mobicents.smsc.mproc.impl.MProcResult;
 
 /**
  * 
@@ -399,7 +401,6 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
     }
 
     private void onSriFullResponse() {
-
         SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse = this.getSendRoutingInfoForSMResponse();
         MAPErrorMessage errorMessage = this.getErrorResponse();
 
@@ -413,8 +414,15 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
             // we have positive response to SRI request
             correlationIdValue.setImsi(sendRoutingInfoForSMResponse.getIMSI().getData());
             correlationIdValue.setLocationInfoWithLMSI(sendRoutingInfoForSMResponse.getLocationInfoWithLMSI());
+            correlationIdValue.setSendRoutingInfoForSMResponse(sendRoutingInfoForSMResponse);
 
-            this.returnSriSuccess(correlationIdValue);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcHrSri(correlationIdValue);
+
+            if (mProcResult.isHrIsByPassed()) {
+                this.returnSriHrByPass(correlationIdValue);
+            } else {
+                this.returnSriSuccess(correlationIdValue);
+            }
             return;
         }
 
@@ -435,6 +443,16 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
         HrSriClientSbbLocalObject local = (HrSriClientSbbLocalObject) super.sbbContext.getSbbLocalObject();
         HrSriResultInterface parent = (HrSriResultInterface) local.getParent();
         parent.onSriSuccess(correlationIdValue, false);
+    }
+
+    private void returnSriHrByPass(CorrelationIdValue correlationIdValue) {
+        int inProcess = this.getInProcess();
+        if (inProcess == 0) // SriSucess or Failure is already processed
+            return;
+
+        HrSriClientSbbLocalObject local = (HrSriClientSbbLocalObject) super.sbbContext.getSbbLocalObject();
+        HrSriResultInterface parent = (HrSriResultInterface) local.getParent();
+        parent.onSriHrByPass(correlationIdValue);
     }
 
     private void returnSriFailure(CorrelationIdValue correlationIdValue, MAPErrorMessage errorResponse, String cause) {
