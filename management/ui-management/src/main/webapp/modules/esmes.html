@@ -346,6 +346,13 @@
 					</span>	
 				</div>
 
+				<div id="div-lnkDropServer" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When SMSC connects to a remote client as SERVER, if it isn't received any data in configured link-drop-server, this esme session will drop.">
+						<span class="add-on">Link Drop Server</span>
+						<input id="lnkDropServer" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Link Drop Server" value="0"/>
+					</span>	
+				</div>
+
 				<div id="div-ratelimitSec" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="throttling of SMS per second for this connection. 0 means no limit">
 						<span class="add-on">Rate Limit Per Seconds</span>
@@ -430,6 +437,7 @@
 			document.getElementById("countersEnabled").disabled = true;
 			document.getElementById("enqLinkDelay").disabled = true;
 			document.getElementById("enqLinkDelayServer").disabled = false;
+			document.getElementById("lnkDropServer").disabled = false;			
 			
 		} else {
 			document.getElementById("windowSize").disabled = false;
@@ -440,6 +448,7 @@
 			document.getElementById("countersEnabled").disabled = false;
 			document.getElementById("enqLinkDelay").disabled = false;
 			document.getElementById("enqLinkDelayServer").disabled = true;
+			document.getElementById("lnkDropServer").disabled = true;
 
 		}
 		
@@ -518,6 +527,7 @@
 									var countersEnabled = response.value.CountersEnabled;
 									var enquireLinkDelay = response.value.EnquireLinkDelay;
 									var enquireLinkDelayServer = response.value.EnquireLinkDelayServer;
+									var linkDropServer =  response.value.LinkDropServer;
 
 									var boundDuration = response.value.BoundDuration;
 									var rxDataSMCounter = response.value.RxDataSMCounter;
@@ -667,6 +677,7 @@
 														'<dt>CountersEnabled</dt> <dd>' + countersEnabled + ' </dd>' +
 														'<dt>EnquireLinkDelay</dt> <dd>' + enquireLinkDelay + ' </dd>' +
 														'<dt>EnquireLinkDelayServer</dt> <dd>' + enquireLinkDelayServer + ' </dd>' +
+														'<dt>LinkDropServer</dt> <dd>' + linkDropServer + ' </dd>' +
 													'</dl>'+
 									        '    </div>'+	
 									        '<hr style="margin: 5px 0;"/>' +
@@ -1016,8 +1027,24 @@
 																			'</td>'+
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnquireLinkDelayServer"+']\').toggle(); $(\'input[id^='+name+"EnquireLinkDelayServer"+']\').focus();"></i>' +
 																			'</td>'+
-																		'</tr>'+																		
-																		
+																		'</tr>'+
+
+																		'<tr data-toggle="tooltip" title="When SMSC connects to a remote client as SERVER, if it isnt received any data in configured link-drop-server, this esme session will drop.">'+
+																			'<td style="font-size: 0.9em;">Link Drop SERVER</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + name +'linkDropServer-input" class="control-group">'+
+																				'<span id="' + name +'LinkDropServer-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + linkDropServer + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'LinkDropServer\', \'' + name+"LinkDropServer" + '\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"LinkDropServer"+']\').toggle(); $(\'input[id^='+name+"LinkDropServer"+']\').focus();"></i>' +
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +name + 'LinkDropServer-text">' + linkDropServer + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"LinkDropServer"+']\').toggle(); $(\'input[id^='+name+"LinkDropServer"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+
 																		'<tr data-toggle="tooltip" title="Sets charging for this ESME. If charging is enabled, SMSC will try to deduct the units from charging server. If charging server returns negative response or error, SMS will be dropped and CDR will be logged">'+
 																			'<td style="font-size: 0.9em;">Charging Enabled</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -2044,7 +2071,12 @@
 
 		var enqLinkDelayServer = $("#enqLinkDelayServer").val();
 		if(enqLinkDelayServer == null){
-			enqLinkDelay = "0";
+			enqLinkDelayServer = "0";
+		}
+
+		var lnkDropServer = $("#lnkDropServer").val();
+		if(lnkDropServer == null){
+			lnkDropServer = "0";
 		}
 
 		var e6 = document.getElementById("chargingEnabled");
@@ -2098,7 +2130,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
+		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
 				{
 					success: function(value) {
 						updateEsmes();
