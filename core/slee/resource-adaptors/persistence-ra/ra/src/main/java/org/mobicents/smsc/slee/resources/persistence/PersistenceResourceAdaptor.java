@@ -24,11 +24,7 @@ package org.mobicents.smsc.slee.resources.persistence;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
-
-import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
-import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
 
 import javax.slee.Address;
 import javax.slee.facilities.Tracer;
@@ -45,8 +41,6 @@ import javax.slee.resource.ResourceAdaptorContext;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.PreparedStatementCollection;
-import org.mobicents.smsc.library.ErrorCode;
-import org.mobicents.smsc.library.SmType;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
@@ -328,6 +322,11 @@ public class PersistenceResourceAdaptor implements ResourceAdaptor {
             @Override
             public long c2_checkDueSlotWritingPossibility(long dueSlot) {
                 return dbOperations_C2.c2_checkDueSlotWritingPossibility(dueSlot);
+            }
+
+            @Override
+            public Sms c2_getRecordArchiveForMessageId(long messageId) throws PersistenceException {
+                return dbOperations_C2.c2_getRecordArchiveForMessageId(messageId);
             }
 
 		};

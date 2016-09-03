@@ -336,4 +336,6 @@ public interface PersistenceRAInterface {
 
     void c2_updateAlertingSupport(long dueSlot, String targetId, UUID dbId) throws PersistenceException;
 
+    Sms c2_getRecordArchiveForMessageId(long messageId) throws PersistenceException;
+
 }

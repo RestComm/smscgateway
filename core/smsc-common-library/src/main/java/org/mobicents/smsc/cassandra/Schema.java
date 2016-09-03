@@ -123,10 +123,12 @@ public class Schema {
     public static final String FAMILY_DST_SLOT_TABLE = "DST_SLOT_TABLE";
     public static final String FAMILY_SLOT_MESSAGES_TABLE = "SLOT_MESSAGES_TABLE";
     public static final String FAMILY_MESSAGES = "MESSAGES";
+    public static final String FAMILY_MES_ID = "MES_ID";
 
     public static final List<String> COLUMNS_LIVE;
     public static final List<String> COLUMNS_LIVE_SMS;
     public static final List<String> COLUMNS_ARCHIVE;
+    public static final List<String> COLUMNS_MES_ID;
     public static final List<String> COLUMNS_SMPP_SMS_ROUTING_RULE;
     public static final List<String> COLUMNS_SIP_SMS_ROUTING_RULE;
 
@@ -248,6 +250,12 @@ public class Schema {
         tmp.add(COLUMN_EXTRA_DATA_4);
 
         COLUMNS_ARCHIVE = Collections.unmodifiableList(tmp);
+
+        tmp = new ArrayList<String>();
+        tmp.add(COLUMN_MESSAGE_ID);
+        tmp.add(COLUMN_ADDR_DST_DIGITS);
+        tmp.add(COLUMN_ID);
+        COLUMNS_MES_ID = Collections.unmodifiableList(tmp);
 
         tmp = new ArrayList<String>();
         tmp.add(COLUMN_ADDRESS);

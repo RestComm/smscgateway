@@ -155,71 +155,19 @@ public class PersistenceRAInterfaceProxy extends DBOperations implements Persist
 
                 // 1
                 Date dt = new Date();
+                Date dt2 = new Date(new Date().getTime() + 1000 * 60 * 60 * 24);
+                Date dt3 = new Date(new Date().getTime() - 1000 * 60 * 60 * 24);
                 String tName = this.getTableName(dt);
 
-                ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_DST_SLOT_TABLE + tName + "\";");
-                boundStatement = new BoundStatement(ps);
-                boundStatement.bind();
-                try {
-                    session.execute(boundStatement);
-                } catch (Exception e) {
-                    int g1 = 0;
-                    g1++;
-                }
-
-                ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName + "\";");
-                boundStatement = new BoundStatement(ps);
-                boundStatement.bind();
-                try {
-                    session.execute(boundStatement);
-                } catch (Exception e) {
-                    int g1 = 0;
-                    g1++;
-                }
-
-                ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_MESSAGES + tName + "\";");
-                boundStatement = new BoundStatement(ps);
-                boundStatement.bind();
-                try {
-                    session.execute(boundStatement);
-                } catch (Exception e) {
-                    int g1 = 0;
-                    g1++;
-                }
+                doTrauncateTables(session, tName);
 
                 // 2
-                dt = new Date(new Date().getTime() + 1000 * 60 * 60 * 24);
-                tName = this.getTableName(dt);
+                tName = this.getTableName(dt2);
+                doTrauncateTables(session, tName);
 
-                ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_DST_SLOT_TABLE + tName + "\";");
-                boundStatement = new BoundStatement(ps);
-                boundStatement.bind();
-                try {
-                    session.execute(boundStatement);
-                } catch (Exception e) {
-                    int g1 = 0;
-                    g1++;
-                }
-
-                ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName + "\";");
-                boundStatement = new BoundStatement(ps);
-                boundStatement.bind();
-                try {
-                    session.execute(boundStatement);
-                } catch (Exception e) {
-                    int g1 = 0;
-                    g1++;
-                }
-
-                ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_MESSAGES + tName + "\";");
-                boundStatement = new BoundStatement(ps);
-                boundStatement.bind();
-                try {
-                    session.execute(boundStatement);
-                } catch (Exception e) {
-                    int g1 = 0;
-                    g1++;
-                }
+                // 3
+                tName = this.getTableName(dt3);
+                doTrauncateTables(session, tName);
 
                 return true;
             } finally {
@@ -230,6 +178,50 @@ public class PersistenceRAInterfaceProxy extends DBOperations implements Persist
             e.printStackTrace();            
             
             return false;
+        }
+    }
+
+    private void doTrauncateTables(Session session, String tName) {
+        PreparedStatement ps;
+        BoundStatement boundStatement;
+        ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_DST_SLOT_TABLE + tName + "\";");
+        boundStatement = new BoundStatement(ps);
+        boundStatement.bind();
+        try {
+            session.execute(boundStatement);
+        } catch (Exception e) {
+            int g1 = 0;
+            g1++;
+        }
+
+        ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName + "\";");
+        boundStatement = new BoundStatement(ps);
+        boundStatement.bind();
+        try {
+            session.execute(boundStatement);
+        } catch (Exception e) {
+            int g1 = 0;
+            g1++;
+        }
+
+        ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_MESSAGES + tName + "\";");
+        boundStatement = new BoundStatement(ps);
+        boundStatement.bind();
+        try {
+            session.execute(boundStatement);
+        } catch (Exception e) {
+            int g1 = 0;
+            g1++;
+        }
+
+        ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_MES_ID + tName + "\";");
+        boundStatement = new BoundStatement(ps);
+        boundStatement.bind();
+        try {
+            session.execute(boundStatement);
+        } catch (Exception e) {
+            int g1 = 0;
+            g1++;
         }
     }
 

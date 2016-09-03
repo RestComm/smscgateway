@@ -334,6 +334,16 @@ public class CassandraTest {
     }
 
     @Test(groups = { "cassandra" })
+    public void testingMsgIsArchive() throws Exception {
+        if (!this.cassandraDbInited)
+            return;
+
+        Sms sms_a1 = this.createTestSms(1, ta1.getAddr(), id1);
+        SmsSet smsSet = sms_a1.getSmsSet();
+        archiveMessage2(smsSet);
+    }
+
+    @Test(groups = { "cassandra" })
     public void testingOldTimeEncoding() throws Exception {
 
         if (!this.cassandraDbInited)
@@ -726,6 +736,36 @@ public class CassandraTest {
         SmsProxy smsx = sbb.obtainArchiveSms(sms.getDueSlot(), sms.getSmsSet().getDestAddr(), sms.getDbId());
 
         this.checkTestSms(1, smsx.sms, sms.getDbId(), true);
+
+        Sms smsy = sbb.c2_getRecordArchiveForMessageId(sms.getMessageId());
+
+        this.checkTestSms(1, smsy, sms.getDbId(), true);
+    }
+
+    public void archiveMessage2(SmsSet smsSet) throws Exception {
+        Sms sms = smsSet.getSms(0);
+
+        Date date = new Date();
+        Date date2 = new Date(date.getTime() - 1000 * 3600 * 24);
+        sms.setDeliveryDate(date2);
+
+        sms.getSmsSet().setType(SmType.SMS_FOR_SS7);
+        sms.getSmsSet().setImsi("12345678900000");
+        ISDNAddressStringImpl networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
+                NumberingPlan.ISDN, "2223334444");
+        LocationInfoWithLMSIImpl locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
+
+        sms.getSmsSet().setLocationInfoWithLMSI(locationInfoWithLMSI);
+
+        sbb.c2_createRecordArchive(sms);
+
+        Sms smsy = sbb.c2_getRecordArchiveForMessageId(sms.getMessageId());
+
+        this.checkTestSms(1, smsy, sms.getDbId(), true);
+
+        // bad MessageId
+        smsy = sbb.c2_getRecordArchiveForMessageId(sms.getMessageId() + 1234124124);
+        assertNull(smsy);
     }
 
     private Sms createTestSms(int num, String number, UUID id) throws Exception {
@@ -740,7 +780,8 @@ public class CassandraTest {
             smsSet.setCorrelationId("CI=100001000022222");
 
         Sms sms = new Sms();
-        sms.setSmsSet(smsSet);
+//        sms.setSmsSet(smsSet);
+        smsSet.addSms(sms);
 
 //      sms.setDbId(UUID.randomUUID());
         sms.setDbId(id);

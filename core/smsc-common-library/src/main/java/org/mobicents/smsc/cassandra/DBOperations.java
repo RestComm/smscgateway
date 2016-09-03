@@ -368,7 +368,7 @@ public class DBOperations {
 	}
 
 	/**
-	 * Returns due_slop that SMSC is processing now
+	 * Returns due_slot that SMSC is processing now
 	 */
 	public long c2_getCurrentDueSlot() {
 		return currentDueSlot;
@@ -841,6 +841,7 @@ public class DBOperations {
 		PreparedStatementCollection psc = getStatementCollection(deliveryDate);
 
 		try {
+		    // we are storing data into MESSAGES_YYYY_MM_DD table
 			PreparedStatement ps = psc.createRecordArchive;
 			BoundStatement boundStatement = new BoundStatement(ps);
 
@@ -848,6 +849,15 @@ public class DBOperations {
                     psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
 
 			ResultSet res = session.execute(boundStatement);
+
+            // and created a record in MES_ID_YYYY_MM_DD table
+            ps = psc.createRecordArchiveMesId;
+            boundStatement = new BoundStatement(ps);
+            boundStatement.setLong(Schema.COLUMN_MESSAGE_ID, sms.getMessageId());
+            boundStatement.setString(Schema.COLUMN_ADDR_DST_DIGITS, sms.getSmsSet().getDestAddr());
+            boundStatement.setUUID(Schema.COLUMN_ID, sms.getDbId());
+
+            res = session.execute(boundStatement);
 		} catch (Exception e1) {
 			String msg = "Failed createRecordArchive !" + e1.getMessage();
 
@@ -1118,6 +1128,63 @@ public class DBOperations {
 
         return result;
 	}
+
+    public Sms c2_getRecordArchiveForMessageId(long messageId) throws PersistenceException {
+
+        SmsSet result = null;
+        try {
+            // first step - today search
+            Date date = new Date();
+            PreparedStatementCollection psc = getStatementCollection(date);
+            result = this.doGetArchiveMsg(messageId, psc);
+
+            if (result == null) {
+                // second step - yesterday search
+                Date date2 = new Date(date.getTime() - 1000 * 3600 * 24);
+                psc = getStatementCollection(date2);
+                result = this.doGetArchiveMsg(messageId, psc);
+            }
+        } catch (Exception e1) {
+            String msg = "Failed getRecordArchiveForMessageId()";
+
+            throw new PersistenceException(msg, e1);
+        }
+
+        if (result != null)
+            return result.getSms(0);
+        else
+            return null;
+    }
+
+    private SmsSet doGetArchiveMsg(long messageId, PreparedStatementCollection psc) throws PersistenceException {
+        PreparedStatement ps = psc.getRecordArchiveMesId;
+        BoundStatement boundStatement = new BoundStatement(ps);
+        boundStatement.bind(messageId);
+        ResultSet res = session.execute(boundStatement);
+
+        String addr = null;
+        UUID id = null;
+        for (Row row : res) {
+            addr = row.getString(Schema.COLUMN_ADDR_DST_DIGITS);
+            id = row.getUUID(Schema.COLUMN_ID);
+            break;
+        }
+
+        SmsSet result = null;
+        if (addr != null && id != null) {
+            ps = psc.getRecordArchive;
+            boundStatement = new BoundStatement(ps);
+            boundStatement.bind(addr, id);
+            res = session.execute(boundStatement);
+
+            for (Row row : res) {
+                result = this.createSms(row, null, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
+                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1(), false);
+                break;
+            }
+        }
+        return result;
+    }
 
     protected SmsSet createSms(final Row row, SmsSet smsSet, boolean shortMessageNewStringFormat, boolean addedCorrId,
             boolean addedNetworkId, boolean addedOrigNetworkId, boolean addedPacket1, boolean getMessageInProcessing)
@@ -1555,6 +1622,39 @@ public class DBOperations {
 			throw new PersistenceException(msg, e1);
 		}
 
+        try {
+            try {
+                // checking if a datatable MES_ID_YYYY_MM_DD exists
+                String s1 = "SELECT * FROM \"" + Schema.FAMILY_MES_ID + tName + "\";";
+                PreparedStatement ps = session.prepare(s1);
+            } catch (InvalidQueryException e) {
+                // datatable does not exist
+
+                // FAMILY_MES_ID
+                StringBuilder sb = new StringBuilder();
+                sb.append("CREATE TABLE \"" + Schema.FAMILY_MES_ID);
+                sb.append(tName);
+                sb.append("\" (");
+
+                appendField(sb, Schema.COLUMN_MESSAGE_ID, "bigint");
+                appendField(sb, Schema.COLUMN_ADDR_DST_DIGITS, "ascii");
+                appendField(sb, Schema.COLUMN_ID, "uuid");
+
+                sb.append("PRIMARY KEY (\"");
+                sb.append(Schema.COLUMN_MESSAGE_ID);
+                sb.append("\"");
+                sb.append("));");
+
+                String s2 = sb.toString();
+                PreparedStatement ps = session.prepare(s2);
+                BoundStatement boundStatement = new BoundStatement(ps);
+                ResultSet res = session.execute(boundStatement);
+            }
+        } catch (Exception e1) {
+            String msg = "Failed to access or create table " + tName + "!";
+            throw new PersistenceException(msg, e1);
+        }
+
 		psc = new PreparedStatementCollection(this, tName, ttlCurrent, ttlArchive);
 		dataTableRead.putEntry(tName, psc);
 		return psc;
@@ -1722,89 +1822,6 @@ public class DBOperations {
 			throw new PersistenceException(msg, e1);
 		}
 	}
-
-//    private void doUpdateDbSchemaVersion() {
-//        StringBuilder sb;
-//        String s2;
-//        PreparedStatement ps;
-//        BoundStatement boundStatement;
-//        sb = new StringBuilder();
-//        sb.append("INSERT INTO \"");
-//        sb.append(Schema.FAMILY_MASTER_TABLE);
-//        sb.append("\" (\"");
-//        sb.append(Schema.COLUMN_ID);
-//        sb.append("\", \"");
-//        sb.append(Schema.COLUMN_INT_VALUE);
-//        sb.append("\") VALUES (");
-//        sb.append(Schema.MASTER_TABLE_DB_ACTUAL_SCHEMA_VERSION_ID);
-//        sb.append(",");
-//        sb.append(Schema.DB_ACTUAL_SCHEMA_VERSION);
-//        sb.append(");");
-//
-//        s2 = sb.toString();
-//        ps = session.prepare(s2);
-//        boundStatement = new BoundStatement(ps);
-//        session.execute(boundStatement);
-//    }
-//
-//    private synchronized void addFieldsPacket_1(String keyspace) throws PersistenceException {
-//        int currentDbSchemaVersion = 0;
-//
-//        try {
-//            // checking of database schema version
-//            String sa = "SELECT \"" + Schema.COLUMN_INT_VALUE + "\" FROM \"" + Schema.FAMILY_MASTER_TABLE + "\" where \""
-//                    + Schema.COLUMN_ID + "\"=" + Schema.MASTER_TABLE_DB_ACTUAL_SCHEMA_VERSION_ID + ";";
-//            PreparedStatement ps = session.prepare(sa);
-//            BoundStatement boundStatement = new BoundStatement(ps);
-//            ResultSet res = session.execute(boundStatement);
-//            for (Row row : res) {
-//                currentDbSchemaVersion = row.getInt(0);
-//                break;
-//            }
-//            if (currentDbSchemaVersion == Schema.DB_ACTUAL_SCHEMA_VERSION) {
-//                // version is already actual
-//                return;
-//            }
-//        } catch (InvalidQueryException e) {
-//        }
-//
-//        logger.info("Database structure: started of applying of adding fields packet 1");
-//
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_MESSAGE_TEXT, "text");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_MESSAGE_BIN, "blob");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_CORR_ID, "ascii");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_NETWORK_ID, "int");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_ORIG_NETWORK_ID, "int");
-//
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS, "ascii");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_STATUS_REPORT_REQUEST, "boolean");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_DELIVERY_ATTEMPT, "int");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_USER_DATA, "text");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_EXTRA_DATA, "text");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_2, "text");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_3, "text");
-//        this.addFieldsToLiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_4, "text");
-//
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_MESSAGE_TEXT, "text");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_MESSAGE_BIN, "blob");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_CORR_ID, "ascii");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_NETWORK_ID, "int");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_ORIG_NETWORK_ID, "int");
-//
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_ORIGINATOR_SCCP_ADDRESS, "ascii");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_STATUS_REPORT_REQUEST, "boolean");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_DELIVERY_ATTEMPT, "int");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_USER_DATA, "text");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_EXTRA_DATA, "text");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_2, "text");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_3, "text");
-//        this.addFieldsToArchiveTables(keyspace, Schema.COLUMN_EXTRA_DATA_4, "text");
-//
-//        // updating of database schema version
-//        doUpdateDbSchemaVersion();
-//
-//        logger.info("Database structure: finished of applying of adding fields packet 1");
-//    }
 
 	protected void appendField(StringBuilder sb, String name, String type) {
 		sb.append("\"");
@@ -2321,65 +2338,6 @@ public class DBOperations {
 
         return sss;
     }
-
-//    protected boolean checkFieldInTable(String tName, String column_name) {
-//        try {
-//            String sa = "select \"" + column_name + "\" from \"" + tName + "\" limit 1";
-//            PreparedStatement ps = session.prepare(sa);
-//            BoundStatement boundStatement = new BoundStatement(ps);
-//            session.execute(boundStatement);
-//        } catch (Exception e) {
-//            logger.debug("Can not read field \"" + column_name + "\" in table \"" + tName + "\"");
-//            return false;
-//        }
-//
-//        return true;
-//    }
-//
-//    private void addFieldToTable(String tName, String column_name, String cql_type) throws PersistenceException {
-//        // ALTER TABLE keyspace_name.table_name instruction
-//        // instruction is:ALTER column_name TYPE cql_type
-//        // | ( ADD column_name cql_type )
-//        // | ( DROP column_name )
-//        // | ( RENAME column_name TO column_name )
-//        // | ( WITH property AND property ... )
-//        try {
-//            String sa = "ALTER TABLE \"" + tName + "\" ADD \"" + column_name + "\" " + cql_type;
-//            PreparedStatement ps = session.prepare(sa);
-//            BoundStatement boundStatement = new BoundStatement(ps);
-//            session.execute(boundStatement);
-//        } catch (Exception e) {
-//            String s1 = "Can not add column \"" + column_name + "\" into table \"" + tName + "\"";
-//            logger.error(s1, e);
-//            throw new PersistenceException(s1, e);
-//        }
-//    }
-//
-//    protected void addFieldsToLiveTables(String keyspace, String column_name, String cql_type) throws PersistenceException {
-//        String[] ss = getLiveTableListAsNames(keyspace);
-//
-//        for (String s : ss) {
-//            boolean res = checkFieldInTable(s, column_name);
-//            if (!res) {
-//                logger.warn("Adding column \"" + column_name + "\" type \"" + cql_type + "\" into live table \"" + cql_type
-//                        + "\"");
-//                addFieldToTable(s, column_name, cql_type);
-//            }
-//        }
-//    }
-//
-//    protected void addFieldsToArchiveTables(String keyspace, String column_name, String cql_type) throws PersistenceException {
-//        String[] ss = getArchiveTableListAsNames(keyspace);
-//
-//        for (String s : ss) {
-//            boolean res = checkFieldInTable(s, column_name);
-//            if (!res) {
-//                logger.warn("Adding column \"" + column_name + "\" type \"" + cql_type + "\" into live table \"" + cql_type
-//                        + "\"");
-//                addFieldToTable(s, column_name, cql_type);
-//            }
-//        }
-//    }
 
 	private class DueSlotWritingElement {
 		public long dueSlot;
