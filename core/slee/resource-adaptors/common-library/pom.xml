@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>resource-adaptors-parent</artifactId>
 		<groupId>org.mobicents.smsc</groupId>
-		<version>7.0.0-SNAPSHOT</version>
+		<version>7.1.57</version>
 	</parent>
 
 	<artifactId>common-library</artifactId>
