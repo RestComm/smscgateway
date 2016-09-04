@@ -87,8 +87,10 @@ public class DeliveryCommonSbbTest {
         System.out.println("tearDownClass");
 
         SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
-        smscPropertiesManagement.setGenerateArchiveTable(new GenerateType(7));
-        smscPropertiesManagement.setGenerateCdr(new GenerateType(7));
+        if (smscPropertiesManagement != null) {
+            smscPropertiesManagement.setGenerateArchiveTable(new GenerateType(7));
+            smscPropertiesManagement.setGenerateCdr(new GenerateType(7));
+        }
     }
 
     @Test(groups = { "DeliveryCommonSbb" })
