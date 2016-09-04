@@ -152,7 +152,6 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private long linkDropServer = 0L;
 	private boolean linkRecvMessCheck = false;
 	private boolean linkStartFirstTime = false;
-	private Object linkDropWaitObject = new Object();
 
 
 	// Default Server
@@ -945,12 +944,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	}
 
 	public boolean checkLinkRecvMessage() {
-		boolean isRecv;
-		synchronized (linkDropWaitObject) {
-			isRecv = this.linkRecvMessCheck;
-		}
-
-		return isRecv;
+        return this.linkRecvMessCheck;
 	}
 
 	public void setLinkRecvMessage(boolean recveivedMessage) {
@@ -1500,13 +1494,14 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
      */
 	public CheckMessageLimitResult onMessageReceived(int count) {
 
-		if (getLinkDropServerEnabled()) {
-			synchronized (linkDropWaitObject) {
-				if (!linkRecvMessCheck) {
-					linkRecvMessCheck = true;
-				}
-			}
-		}
+//		if (getLinkDropServerEnabled()) {
+//			synchronized (linkDropWaitObject) {
+//				if (!linkRecvMessCheck) {
+//					linkRecvMessCheck = true;
+//				}
+//			}
+//		}
+        linkRecvMessCheck = true;
 
 	    long cntSecond = this.receivedMsgPerSecond.addAndGet(count);
         if (rateLimitPerSecond > 0 && cntSecond > rateLimitPerSecond) {

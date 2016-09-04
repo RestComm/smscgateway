@@ -99,9 +99,9 @@ public class SmppServerOpsThread implements Runnable {
 						}
 
 						/* check server is dropped by link */
-						if ((!nextServer.getLinkDropServerEnabled() && !nextServer.getEnquireServerEnabled())
-																	|| !nextServer.isServerBound()) {
-							continue;
+                        if ((!nextServer.getLinkDropServerEnabled() && !nextServer.getEnquireServerEnabled())
+                                || !nextServer.isServerBound()) {
+                            continue;
 						}
 
 						// server is always in the list, let send enquire message

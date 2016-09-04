@@ -152,6 +152,7 @@ public class SmppShellExecutor implements ShellExecutor {
                 esme.setEnquireLinkDelayServer(enquireLinkDelayServer);
             } else if (key.equals("link-drop-server")) {
                 long linkDropServer = Long.parseLong(args[count++]);
+                esme.setLinkStartFirstTime(true);
                 esme.setLinkDropServer(linkDropServer);
             } else if (key.equals("charging-enabled")) {
                 boolean chargingEnabled = Boolean.parseBoolean(args[count++]);
