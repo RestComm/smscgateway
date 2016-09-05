@@ -108,6 +108,12 @@
 			<artifactId>restcomm-dialogic</artifactId>
 			<groupId>org.mobicents.protocols.ss7.hardware</groupId>
 			<version>${jss7.restcomm.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.vendor.dialogic</groupId>
+					<artifactId>gctapi</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- MTP -->
