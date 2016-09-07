@@ -45,7 +45,8 @@ public class SmsSetCasheTest {
 
         int correlationIdLiveTime = 2;
         int sriResponseLiveTime = 3;
-        SmsSetCache.start(correlationIdLiveTime, sriResponseLiveTime);
+        int deliveredMsgLiveTime = 3;
+        SmsSetCache.start(correlationIdLiveTime, sriResponseLiveTime, deliveredMsgLiveTime);
         SmsSetCache ssc = SmsSetCache.getInstance();
 
         String correlationID = "000000000011111";
@@ -53,6 +54,12 @@ public class SmsSetCasheTest {
         AddressString serviceCentreAddress = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "22222222");
         CorrelationIdValue elem = new CorrelationIdValue(correlationID, msisdn, serviceCentreAddress, 0, null);
         ssc.putCorrelationIdCacheElement(elem, correlationIdLiveTime);
+
+        Sms sms = new Sms();
+        long mId = 222L;
+        sms.setMessageId(mId);
+        sms.setShortMessageText("textxxx");
+        ssc.putDeliveredMsgValue(sms, deliveredMsgLiveTime);
 
         String targetID = "22222_1_1_2";
         LocationInfoWithLMSI locationInfoWithLMSI = null;
@@ -64,18 +71,24 @@ public class SmsSetCasheTest {
         assertNotNull(v1);
         SriResponseValue vv1 = ssc.getSriResponseValue(targetID);
         assertNotNull(vv1);
+        Sms sms2 = ssc.getDeliveredMsgValue(mId);
+        assertNotNull(sms2);
 
         Thread.sleep(2500);
         CorrelationIdValue v2 = ssc.getCorrelationIdCacheElement(correlationID);
         assertNull(v2);
         SriResponseValue vv2 = ssc.getSriResponseValue(targetID);
         assertNotNull(vv2);
+        sms2 = ssc.getDeliveredMsgValue(mId);
+        assertNotNull(sms2);
 
         Thread.sleep(2000);
         CorrelationIdValue v3 = ssc.getCorrelationIdCacheElement(correlationID);
         assertNull(v3);
         SriResponseValue vv3 = ssc.getSriResponseValue(targetID);
         assertNull(vv3);
+        sms2 = ssc.getDeliveredMsgValue(mId);
+        assertNull(sms2);
 
         SmsSetCache.stop();
     }

@@ -46,6 +46,8 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.library.DbSmsRoutingRule;
 import org.mobicents.smsc.library.ErrorCode;
+import org.mobicents.smsc.library.MessageState;
+import org.mobicents.smsc.library.QuerySmResponse;
 import org.mobicents.smsc.library.SmType;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
@@ -837,6 +839,9 @@ public class DBOperations {
 		Date deliveryDate = sms.getDeliverDate();
 		if (deliveryDate == null)
 			deliveryDate = new Date();
+
+        SmsSetCache.getInstance().putDeliveredMsgValue(sms, 30);
+
 		long dueSlot = this.c2_getDueSlotForTime(deliveryDate);
 		PreparedStatementCollection psc = getStatementCollection(deliveryDate);
 
@@ -1845,6 +1850,27 @@ public class DBOperations {
 		ResultSet res = session.execute(boundStatement);
 	}
 
+    public QuerySmResponse c2_getQuerySmResponse(long messageId) throws PersistenceException {
+        Sms sms = SmsSetCache.getInstance().getDeliveredMsgValue(messageId);
+        if (sms == null) {
+            sms = c2_getRecordArchiveForMessageId(messageId);
+        }
+        if (sms == null) {
+            // TODO: we need to check if we have a message in a list of "in progress message"
+            // we do not have implemented it now and treated all undelivered messages as "ENROUTE"
+            return new QuerySmResponse(MessageState.ENROUTE, null, 0);
+        } else {
+            ErrorCode code = sms.getSmsSet().getStatus();
+            if (code == ErrorCode.SUCCESS) {
+                return new QuerySmResponse(MessageState.DELIVERED, sms.getDeliverDate(), 0);
+            } else if (code == ErrorCode.VALIDITY_PERIOD_EXPIRED) {
+                return new QuerySmResponse(MessageState.EXPIRED, sms.getDeliverDate(), code.getCode());
+            } else {
+                return new QuerySmResponse(MessageState.UNDELIVERABLE, sms.getDeliverDate(), code.getCode());
+            }
+        }
+    }
+
 	/**
 	 * Returns the SMPP Cluster name for passed address. If not found returns
 	 * null
@@ -2102,10 +2128,12 @@ public class DBOperations {
             return false;
         }
 
-        String tName = "DST_SLOT_TABLE" + getTableName(dt);
+//        String tName = "DST_SLOT_TABLE" + getTableName(dt);
+        String tName = Schema.FAMILY_DST_SLOT_TABLE + getTableName(dt);
         this.doDeleteTable(tName);
 
-        tName = "SLOT_MESSAGES_TABLE" + getTableName(dt);
+//        tName = "SLOT_MESSAGES_TABLE" + getTableName(dt);
+        tName = Schema.FAMILY_SLOT_MESSAGES_TABLE + getTableName(dt);
         this.doDeleteTable(tName);
 
         String tName2 = this.getTableName(dt);
@@ -2135,7 +2163,11 @@ public class DBOperations {
             return false;
         }
 
-        String tName = "MESSAGES" + getTableName(dt);
+//        String tName = "MESSAGES" + getTableName(dt);
+        String tName = Schema.FAMILY_MESSAGES + getTableName(dt);
+        this.doDeleteTable(tName);
+
+        tName = Schema.FAMILY_MES_ID + getTableName(dt);
         this.doDeleteTable(tName);
 
         String tName2 = this.getTableName(dt);
@@ -2198,7 +2230,8 @@ public class DBOperations {
         FastMap<Date, Date> res = new FastMap<Date, Date>();
         for (String s : ss) {
             Date dt = null;
-            if (s.startsWith("DST_SLOT_TABLE_") && s.length() == 25) {
+//            if (s.startsWith("DST_SLOT_TABLE_") && s.length() == 25) {
+            if (s.startsWith(Schema.FAMILY_DST_SLOT_TABLE) && s.length() == 25) {
                 String sYear = s.substring(15, 19);
                 String sMon = s.substring(20, 22);
                 String sDay = s.substring(23, 25);
@@ -2210,7 +2243,8 @@ public class DBOperations {
                 } catch (Exception e) {
                 }
             }
-            if (s.startsWith("SLOT_MESSAGES_TABLE_") && s.length() == 30) {
+//            if (s.startsWith("SLOT_MESSAGES_TABLE_") && s.length() == 30) {
+            if (s.startsWith(Schema.FAMILY_SLOT_MESSAGES_TABLE) && s.length() == 30) {
                 String sYear = s.substring(20, 24);
                 String sMon = s.substring(25, 27);
                 String sDay = s.substring(28, 30);
@@ -2243,10 +2277,23 @@ public class DBOperations {
         FastMap<Date, Date> res = new FastMap<Date, Date>();
         for (String s : ss) {
             Date dt = null;
-            if (s.startsWith("MESSAGES_") && s.length() == 19) {
+//            if (s.startsWith("MESSAGES_") && s.length() == 19) {
+            if (s.startsWith(Schema.FAMILY_MESSAGES) && s.length() == 19) {
                 String sYear = s.substring(9, 13);
                 String sMon = s.substring(14, 16);
                 String sDay = s.substring(17, 19);
+                try {
+                    int year = Integer.parseInt(sYear);
+                    int mon = Integer.parseInt(sMon);
+                    int day = Integer.parseInt(sDay);
+                    dt = new Date(year - 1900, mon - 1, day);
+                } catch (Exception e) {
+                }
+            }
+            if (s.startsWith(Schema.FAMILY_MES_ID) && s.length() == 17) {
+                String sYear = s.substring(7, 11);
+                String sMon = s.substring(12, 14);
+                String sDay = s.substring(15, 17);
                 try {
                     int year = Integer.parseInt(sYear);
                     int mon = Integer.parseInt(sMon);

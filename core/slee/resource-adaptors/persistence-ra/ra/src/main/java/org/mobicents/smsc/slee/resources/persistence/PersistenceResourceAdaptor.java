@@ -41,6 +41,7 @@ import javax.slee.resource.ResourceAdaptorContext;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.PreparedStatementCollection;
+import org.mobicents.smsc.library.QuerySmResponse;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
@@ -327,6 +328,11 @@ public class PersistenceResourceAdaptor implements ResourceAdaptor {
             @Override
             public Sms c2_getRecordArchiveForMessageId(long messageId) throws PersistenceException {
                 return dbOperations_C2.c2_getRecordArchiveForMessageId(messageId);
+            }
+
+            @Override
+            public QuerySmResponse c2_getQuerySmResponse(long messageId) throws PersistenceException {
+                return dbOperations_C2.c2_getQuerySmResponse(messageId);
             }
 
 		};

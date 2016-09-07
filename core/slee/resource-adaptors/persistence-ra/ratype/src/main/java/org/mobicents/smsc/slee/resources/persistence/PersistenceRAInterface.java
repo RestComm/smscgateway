@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.PreparedStatementCollection;
+import org.mobicents.smsc.library.QuerySmResponse;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.TargetAddress;
@@ -337,5 +338,7 @@ public interface PersistenceRAInterface {
     void c2_updateAlertingSupport(long dueSlot, String targetId, UUID dbId) throws PersistenceException;
 
     Sms c2_getRecordArchiveForMessageId(long messageId) throws PersistenceException;
+
+    QuerySmResponse c2_getQuerySmResponse(long messageId) throws PersistenceException;
 
 }

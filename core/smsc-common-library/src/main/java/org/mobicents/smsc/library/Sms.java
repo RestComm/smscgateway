@@ -26,7 +26,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-import org.mobicents.smsc.cassandra.Schema;
 import org.mobicents.smsc.smpp.TlvSet;
 
 
