@@ -29,6 +29,8 @@
 		<module>homeroutingsbb</module>
 		<module>sbbs</module>
 		<module>du</module>
+
+		<module>txhttpserversbb</module>
 	</modules>
 
 	<dependencyManagement>
