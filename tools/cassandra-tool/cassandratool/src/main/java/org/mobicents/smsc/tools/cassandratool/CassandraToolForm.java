@@ -68,7 +68,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import javax.swing.JCheckBox;
+import javax.swing.JRadioButton;
+import javax.swing.ButtonGroup;
 
 /**
  * 
@@ -85,10 +86,14 @@ public class CassandraToolForm {
     private JButton btConnect;
     private JButton btDisconnect;
     private JButton btGetData;
-    private JCheckBox cbArchTbl;
+    private JRadioButton rbLive;
+    private JRadioButton rbArchive;
+    private JRadioButton rbMsgId;
+    private JRadioButton rbDlvMsgId;
     private DefaultTableModel model = new DefaultTableModel();
 
     private DBOperationsProxy dbOperations;
+    private final ButtonGroup buttonGroup = new ButtonGroup();
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -208,7 +213,7 @@ public class CassandraToolForm {
                 connect();
             }
         });
-        btConnect.setBounds(10, 120, 105, 23);
+        btConnect.setBounds(10, 135, 105, 23);
         panel_2.add(btConnect);
         
         btDisconnect = new JButton("Disconnect");
@@ -218,7 +223,7 @@ public class CassandraToolForm {
                 disConnect();
             }
         });
-        btDisconnect.setBounds(125, 120, 105, 23);
+        btDisconnect.setBounds(125, 135, 105, 23);
         panel_2.add(btDisconnect);
         
         btGetData = new JButton("Get data");
@@ -228,12 +233,29 @@ public class CassandraToolForm {
                 getData();
             }
         });
-        btGetData.setBounds(240, 120, 105, 23);
+        btGetData.setBounds(240, 135, 105, 23);
         panel_2.add(btGetData);
 
-        cbArchTbl = new JCheckBox("Archive table");
-        cbArchTbl.setBounds(6, 91, 264, 23);
-        panel_2.add(cbArchTbl);
+        rbLive = new JRadioButton("Live table");
+        rbLive.setSelected(true);
+        buttonGroup.add(rbLive);
+        rbLive.setBounds(6, 91, 109, 23);
+        panel_2.add(rbLive);
+
+        rbArchive = new JRadioButton("Archive table");
+        buttonGroup.add(rbArchive);
+        rbArchive.setBounds(117, 91, 109, 23);
+        panel_2.add(rbArchive);
+
+        rbMsgId = new JRadioButton("MsgId table");
+        buttonGroup.add(rbMsgId);
+        rbMsgId.setBounds(228, 91, 109, 23);
+        panel_2.add(rbMsgId);
+
+        rbDlvMsgId = new JRadioButton("DlvMsgId table");
+        buttonGroup.add(rbDlvMsgId);
+        rbDlvMsgId.setBounds(339, 91, 109, 23);
+        panel_2.add(rbDlvMsgId);
     }
 
     private void connect() {
@@ -284,10 +306,17 @@ public class CassandraToolForm {
         try {
             String tName = this.dbOperations.getTableName(new Date());
             String tbFam;
-            if (this.cbArchTbl.isSelected()) {
-                tbFam = Schema.FAMILY_MESSAGES;
-            } else {
+            int option = 0;
+            if (this.rbLive.isSelected()) {
                 tbFam = Schema.FAMILY_SLOT_MESSAGES_TABLE;
+            } else if (this.rbArchive.isSelected()) {
+                tbFam = Schema.FAMILY_MESSAGES;
+            } else if (this.rbMsgId.isSelected()) {
+                tbFam = Schema.FAMILY_MES_ID;
+                option = 1;
+            } else {
+                tbFam = Schema.FAMILY_DLV_MES_ID;
+                option = 2;
             }
             String s1 = "SELECT * FROM \"" + tbFam + tName + "\";";
             Session session = this.dbOperations.getSession();
@@ -295,53 +324,89 @@ public class CassandraToolForm {
             BoundStatement boundStatement = new BoundStatement(ps);
             ResultSet res = session.execute(boundStatement);
 
-            SortedMap<Long, ArrayList<SmsSet>> result = new TreeMap<Long, ArrayList<SmsSet>>();
-            for (Row row : res) {
-                SmsSet smsSet = this.dbOperations.createSms(row, null);
-                if (smsSet != null) {
-                    ArrayList<SmsSet> al = result.get(smsSet.getSms(0).getMessageId());
-                    if (al == null) {
-                        al = new ArrayList<SmsSet>();
-                        result.put(smsSet.getSms(0).getMessageId(), al);
-                    }
-                    al.add(smsSet);
-                }
-            }
-
             model.getDataVector().clear();
             model.rowsRemoved(new TableModelEvent(model));
 
             DateFormat df = new SimpleDateFormat("MM.dd HH:mm:ss");
-            for (ArrayList<SmsSet> al : result.values()) {
-                for (SmsSet smsSet : al) {
+            if (option == 0) {
+                SortedMap<Long, ArrayList<SmsSet>> result = new TreeMap<Long, ArrayList<SmsSet>>();
+                for (Row row : res) {
+                    SmsSet smsSet = this.dbOperations.createSms(row, null);
+                    if (smsSet != null) {
+                        ArrayList<SmsSet> al = result.get(smsSet.getSms(0).getMessageId());
+                        if (al == null) {
+                            al = new ArrayList<SmsSet>();
+                            result.put(smsSet.getSms(0).getMessageId(), al);
+                        }
+                        al.add(smsSet);
+                    }
+                }
+
+                for (ArrayList<SmsSet> al : result.values()) {
+                    for (SmsSet smsSet : al) {
+                        ListSelectionModel l = tResult.getSelectionModel();
+
+                        Vector newRow = new Vector();
+                        newRow.add(smsSet.getTargetId());
+                        String reportDate = df.format(this.dbOperations.c2_getTimeForDueSlot(smsSet.getSms(0).getDueSlot()));
+                        newRow.add(smsSet.getSms(0).getDueSlot() + " - " + reportDate);
+                        newRow.add(smsSet.getSms(0).getMessageId());
+                        newRow.add(smsSet.getInSystem());
+                        newRow.add(smsSet.getSms(0).getDeliveryCount());
+                        newRow.add(smsSet.getStatus());
+                        Date dt = smsSet.getSms(0).getValidityPeriod();
+                        if (dt != null)
+                            reportDate = df.format(dt);
+                        else
+                            reportDate = "";
+                        newRow.add(reportDate);
+                        dt = smsSet.getSms(0).getScheduleDeliveryTime();
+                        if (dt != null)
+                            reportDate = df.format(dt);
+                        else
+                            reportDate = "";
+                        newRow.add(reportDate);
+                        newRow.add(smsSet.getSms(0).getShortMessageText());
+                        model.getDataVector().add(0, newRow);
+                        model.newRowsAdded(new TableModelEvent(model));
+                    }
+                }
+            } else if (option == 1) {
+                for (Row row : res) {
                     ListSelectionModel l = tResult.getSelectionModel();
 
                     Vector newRow = new Vector();
-                    newRow.add(smsSet.getTargetId());
-                    String reportDate = df.format(this.dbOperations.c2_getTimeForDueSlot(smsSet.getSms(0).getDueSlot()));
-                    newRow.add(smsSet.getSms(0).getDueSlot() + " - " + reportDate);
-                    newRow.add(smsSet.getSms(0).getMessageId());
-                    newRow.add(smsSet.getInSystem());
-                    newRow.add(smsSet.getSms(0).getDeliveryCount());
-                    newRow.add(smsSet.getStatus());
-                    Date dt = smsSet.getSms(0).getValidityPeriod();
-                    if (dt != null)
-                        reportDate = df.format(dt);
-                    else
-                        reportDate = "";
-                    newRow.add(reportDate);
-                    dt = smsSet.getSms(0).getScheduleDeliveryTime();
-                    if (dt != null)
-                        reportDate = df.format(dt);
-                    else
-                        reportDate = "";
-                    newRow.add(reportDate);
-                    newRow.add(smsSet.getSms(0).getShortMessageText());
+                    newRow.add(row.getString(Schema.COLUMN_ADDR_DST_DIGITS));
+                    newRow.add(row.getUUID(Schema.COLUMN_ID));
+                    newRow.add(row.getLong(Schema.COLUMN_MESSAGE_ID));
+                    newRow.add("");
+                    newRow.add("");
+                    newRow.add("");
+                    newRow.add("");
+                    newRow.add("");
+                    newRow.add("");
                     model.getDataVector().add(0, newRow);
+                    model.newRowsAdded(new TableModelEvent(model));
+                }
+            } else {
+                for (Row row : res) {
+                    ListSelectionModel l = tResult.getSelectionModel();
 
+                    Vector newRow = new Vector();
+                    newRow.add(row.getString(Schema.COLUMN_REMOTE_MESSAGE_ID));
+                    newRow.add(row.getString(Schema.COLUMN_DEST_ID));
+                    newRow.add(row.getLong(Schema.COLUMN_MESSAGE_ID));
+                    newRow.add("");
+                    newRow.add("");
+                    newRow.add("");
+                    newRow.add("");
+                    newRow.add("");
+                    newRow.add("");
+                    model.getDataVector().add(0, newRow);
                     model.newRowsAdded(new TableModelEvent(model));
                 }
             }
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(getJFrame(), "Can not get data from cassandra database:\n" + e.getMessage());
         }
