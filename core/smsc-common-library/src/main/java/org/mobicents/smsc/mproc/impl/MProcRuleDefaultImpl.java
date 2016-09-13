@@ -693,25 +693,21 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 //        }
         // TODO: we need proper implementing
 
-        // ...................................
-        this.logger.info("**************** 200000");                
-        if (message.isDeliveryReceipt()) {
-            Long receiptLocalMessageId = message.getReceiptLocalMessageId();
-            DeliveryReceiptData deliveryReceiptData = message.getDeliveryReceiptData();
-            if (receiptLocalMessageId != null && deliveryReceiptData != null) {
-                MProcMessage sentMsg = message.getOriginMessageForDeliveryReceipt(receiptLocalMessageId);
-                
-                
-                this.logger.info("**************** 200001 sentMsg:" + sentMsg);                
-
-                
-                if (sentMsg != null) {
-                    MProcNewMessage newMsg = factory.createNewCopyMessage(sentMsg);
-                    factory.postNewMessage(newMsg);
-                }
-            }
-        }
-        // ...................................
+        // TODO: we need proper implementing
+//        if (message.isDeliveryReceipt()) {
+//            Long receiptLocalMessageId = message.getReceiptLocalMessageId();
+//            DeliveryReceiptData deliveryReceiptData = message.getDeliveryReceiptData();
+//            if (receiptLocalMessageId != null && deliveryReceiptData != null) {
+//                MProcMessage sentMsg = message.getOriginMessageForDeliveryReceipt(receiptLocalMessageId);
+//                factory.dropMessage();
+//                if (sentMsg != null) {
+//                    MProcNewMessage newMsg = factory.createNewCopyMessage(sentMsg);
+//                    newMsg.setNetworkId(11);
+//                    factory.postNewMessage(newMsg);
+//                }
+//            }
+//        }
+        // TODO: we need proper implementing
 
         if (this.makeCopy) {
             MProcNewMessage copy = factory.createNewCopyMessage(message);

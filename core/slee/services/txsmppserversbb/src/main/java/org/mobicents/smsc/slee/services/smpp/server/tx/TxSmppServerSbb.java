@@ -1532,15 +1532,8 @@ public abstract class TxSmppServerSbb implements Sbb {
         }
 
         // delivery receipt transit - replacing of messageId in delivery receipt with local messageId
-
-        this.logger.info("**************** 00001: smscPropertiesManagement.getIncomeReceiptsProcessing()="
-                + smscPropertiesManagement.getIncomeReceiptsProcessing() + ", MessageUtil.isDeliveryReceipt(sms0)="
-                + MessageUtil.isDeliveryReceipt(sms0));
-
         if (smscPropertiesManagement.getIncomeReceiptsProcessing() && MessageUtil.isDeliveryReceipt(sms0)) {
             DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(sms0.getShortMessageText());
-
-            this.logger.info("**************** 00002: deliveryReceiptData=" + deliveryReceiptData);
 
             if (deliveryReceiptData != null) {
                 String clusterName = esme.getClusterName();
@@ -1551,9 +1544,6 @@ public abstract class TxSmppServerSbb implements Sbb {
                 } catch (PersistenceException e) {
                     logger.severe("Exception when runnung c2_getMessageIdByRemoteMessageId(): " + e.getMessage(), e);
                 }
-
-                this.logger.info("**************** 00003: clusterName=" + clusterName + ", dlvMessageId=" + dlvMessageId
-                        + ", messageId=" + messageId);
 
                 if (messageId != null) {
                     // we found in local cache / database a reference to an origin
@@ -1580,27 +1570,6 @@ public abstract class TxSmppServerSbb implements Sbb {
         } else {
             // applying of MProc
             MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
-            if (mProcResult.isMessageRejected()) {
-                sms0.setMessageDeliveryResultResponse(null);
-                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-                        SmppConstants.STATUS_SUBMITFAIL, 0, null);
-                e.setSkipErrorLogging(true);
-                if (logger.isInfoEnabled()) {
-                    logger.info("TxSmpp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
-                }
-                throw e;
-            }
-            if (mProcResult.isMessageDropped()) {
-                sms0.setMessageDeliveryResultResponse(null);
-                smscStatAggregator.updateMsgInFailedAll();
-                if (logger.isInfoEnabled()) {
-                    logger.info("TxSmpp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
-                }
-                return;
-            }
-
-            smscStatAggregator.updateMsgInReceivedAll();
-            smscStatAggregator.updateMsgInReceivedSmpp();
 
             FastList<Sms> smss = mProcResult.getMessageList();
             for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
@@ -1663,6 +1632,28 @@ public abstract class TxSmppServerSbb implements Sbb {
                     store.releaseSynchroObject(lock);
                 }
             }
+            
+            if (mProcResult.isMessageRejected()) {
+                sms0.setMessageDeliveryResultResponse(null);
+                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
+                        SmppConstants.STATUS_SUBMITFAIL, 0, null);
+                e.setSkipErrorLogging(true);
+                if (logger.isInfoEnabled()) {
+                    logger.info("TxSmpp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
+                }
+                throw e;
+            }
+            if (mProcResult.isMessageDropped()) {
+                sms0.setMessageDeliveryResultResponse(null);
+                smscStatAggregator.updateMsgInFailedAll();
+                if (logger.isInfoEnabled()) {
+                    logger.info("TxSmpp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+                }
+                return;
+            }
+
+            smscStatAggregator.updateMsgInReceivedAll();
+            smscStatAggregator.updateMsgInReceivedSmpp();
         }
 	}
 

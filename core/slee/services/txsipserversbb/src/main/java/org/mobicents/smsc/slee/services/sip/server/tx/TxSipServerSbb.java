@@ -591,6 +591,54 @@ public abstract class TxSipServerSbb implements Sbb {
 		} else {
             // applying of MProc
             MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+
+            FastList<Sms> smss = mProcResult.getMessageList();
+            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
+                Sms sms = n.getValue();
+                TargetAddress ta = new TargetAddress(sms.getSmsSet());
+                TargetAddress lock = store.obtainSynchroObject(ta);
+
+                try {
+                    synchronized (lock) {
+                        // store and forward
+                        if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+                            try {
+                                sms.setStoringAfterFailure(true);
+                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+                            } catch (Exception e) {
+                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+                                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+                            }
+                        } else {
+                            try {
+                                sms.setStored(true);
+
+                                // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+                                // store.createLiveSms(sms);
+                                // if (sms.getScheduleDeliveryTime() == null)
+                                // store.setNewMessageScheduled(sms.getSmsSet(),
+                                // MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+                                // else
+                                // store.setNewMessageScheduled(sms.getSmsSet(), sms.getScheduleDeliveryTime());
+                                // } else {
+
+                                this.scheduler.setDestCluster(sms.getSmsSet());
+                                store.c2_scheduleMessage_ReschedDueSlot(sms,
+                                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, false);
+
+                                // }
+
+                            } catch (PersistenceException e) {
+                                throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : "
+                                        + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
+                            }
+                        }
+                    }
+                } finally {
+                    store.releaseSynchroObject(lock);
+                }
+            }
+
             if (mProcResult.isMessageRejected()) {
                 SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
                         SmppConstants.STATUS_SUBMITFAIL, 0, null);
@@ -610,56 +658,6 @@ public abstract class TxSipServerSbb implements Sbb {
 
             smscStatAggregator.updateMsgInReceivedAll();
             smscStatAggregator.updateMsgInReceivedSip();
-
-            FastList<Sms> smss = mProcResult.getMessageList();
-            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
-                Sms sms = n.getValue();
-                TargetAddress ta = new TargetAddress(sms.getSmsSet());
-                TargetAddress lock = store.obtainSynchroObject(ta);
-
-                try {
-                    synchronized (lock) {
-                        // store and forward
-                        if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-                            try {
-                                sms.setStoringAfterFailure(true);
-                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                            } catch (Exception e) {
-                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(), SmppConstants.STATUS_SYSERR,
-                                        MAPErrorCode.systemFailure, null, e);
-                            }
-                        } else {
-                            try {
-                                sms.setStored(true);
-
-
-//                                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                                    store.createLiveSms(sms);
-//                                    if (sms.getScheduleDeliveryTime() == null)
-//                                        store.setNewMessageScheduled(sms.getSmsSet(),
-//                                                MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-//                                    else
-//                                        store.setNewMessageScheduled(sms.getSmsSet(), sms.getScheduleDeliveryTime());
-//                                } else {
-
-
-                                this.scheduler.setDestCluster(sms.getSmsSet());
-                                store.c2_scheduleMessage_ReschedDueSlot(sms,
-                                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, false);                                    
-
-//                                }
-
-
-                            } catch (PersistenceException e) {
-                                throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
-                                        SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
-                            }
-                        }
-                    }
-                } finally {
-                    store.releaseSynchroObject(lock);
-                }
-            }
 		}
 	}
 

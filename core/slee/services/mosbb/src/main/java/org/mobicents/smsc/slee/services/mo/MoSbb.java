@@ -1400,6 +1400,51 @@ public abstract class MoSbb extends MoCommonSbb {
                 // applying of MProc
                 MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
 
+                FastList<Sms> smss = mProcResult.getMessageList();
+                for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
+                    Sms sms = n.getValue();
+                    TargetAddress ta = new TargetAddress(sms.getSmsSet());
+                    TargetAddress lock = store.obtainSynchroObject(ta);
+
+                    try {
+                        synchronized (lock) {
+                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+                                try {
+                                    sms.setStoringAfterFailure(true);
+                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+                                } catch (Exception e) {
+                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
+                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+                                }
+                            } else {
+                                try {
+                                    sms.setStored(true);
+
+                                    // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+                                    // store.createLiveSms(sms);
+                                    // store.setNewMessageScheduled(sms.getSmsSet(), MessageUtil.computeDueDate(MessageUtil
+                                    // .computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+                                    // } else {
+
+                                    this.scheduler.setDestCluster(sms.getSmsSet());
+                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
+                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+                                            false);
+
+                                    // }
+
+                                } catch (PersistenceException e) {
+                                    throw new SmscProcessingException("MO PersistenceException when storing LIVE_SMS : "
+                                            + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+                                            null, e);
+                                }
+                            }
+                        }
+                    } finally {
+                        store.releaseSynchroObject(lock);
+                    }
+                }
+
                 if (mProcResult.isMessageRejected()) {
                     sms0.setMessageDeliveryResultResponse(null);
                     SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
@@ -1427,54 +1472,6 @@ public abstract class MoSbb extends MoCommonSbb {
                     smscStatAggregator.updateMsgInReceivedSs7Hr();
                 }
 
-                FastList<Sms> smss = mProcResult.getMessageList();
-                for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
-                    Sms sms = n.getValue();
-                    TargetAddress ta = new TargetAddress(sms.getSmsSet());
-                    TargetAddress lock = store.obtainSynchroObject(ta);
-
-                    try {
-                        synchronized (lock) {
-                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-                                try {
-                                    sms.setStoringAfterFailure(true);
-                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                                } catch (Exception e) {
-                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
-                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
-                                }
-                            } else {
-                                try {
-                                    sms.setStored(true);
-
-
-
-//                                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                                        store.createLiveSms(sms);
-//                                        store.setNewMessageScheduled(sms.getSmsSet(), MessageUtil.computeDueDate(MessageUtil
-//                                                .computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-//                                    } else {
-
-
-                                    this.scheduler.setDestCluster(sms.getSmsSet());
-                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
-                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-                                            false);                                        
-
-//                                    }
-
-
-                                } catch (PersistenceException e) {
-                                    throw new SmscProcessingException("MO PersistenceException when storing LIVE_SMS : "
-                                            + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
-                                            null, e);
-                                }
-                            }
-                        }
-                    } finally {
-                        store.releaseSynchroObject(lock);
-                    }
-                }
                 return sms0;
             case reject:
                 // this case is already processed

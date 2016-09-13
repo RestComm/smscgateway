@@ -266,35 +266,23 @@ public class MProcManagement implements MProcManagementMBean {
             return res;
         }
 
-        if (pap.isNeedDropMessage()) {
-            MProcResult res = new MProcResult();
-            res.setMessageDropped(true);
-            return res;
-        }
-
-        if (pap.isNeedRejectMessage()) {
-            MProcResult res = new MProcResult();
-            res.setMessageRejected(true);
-            return res;
-        }
-
-        FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
-        if (newMsgs == null || newMsgs.size() == 0) {
-            FastList<Sms> res0 = new FastList<Sms>();
-            res0.add(sms);
-            MProcResult res = new MProcResult();
-            res.setMessageList(res0);
-            return res;
-        }
-
+        MProcResult res = new MProcResult();;
         FastList<Sms> res0 = new FastList<Sms>();
-        res0.add(sms);
+        res.setMessageList(res0);
+        FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
+        if (pap.isNeedDropMessage()) {
+            res.setMessageDropped(true);
+        } else if (pap.isNeedRejectMessage()) {
+            res.setMessageRejected(true);
+        } else {
+            res0.add(sms);
+        }
+
         for (FastList.Node<MProcNewMessage> n = newMsgs.head(), end = newMsgs.tail(); (n = n.getNext()) != end;) {
             MProcNewMessageImpl newMsg = (MProcNewMessageImpl) n.getValue();
             res0.add(newMsg.getSmsContent());
         }
-        MProcResult res = new MProcResult();
-        res.setMessageList(res0);
+
         return res;
     }
 

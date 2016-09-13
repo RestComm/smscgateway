@@ -1214,9 +1214,6 @@ public class DBOperations {
         if (result != null)
             return result;
 
-        this.logger.info("**************** 10001: c2_getMessageIdByRemoteMessageId database, remoteMessageId="
-                + remoteMessageId + ", destId=" + destId + ", xxxxxx=" + SmsSetCache.getInstance().getXxxxx());
-
         try {
             // first step - today search
             Date date = new Date();
