@@ -116,6 +116,13 @@
 						<input id="networkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
 					</span>				
 				</div>	
+				
+				<div id="div-originnetworkidmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if SMS origination networkid match\'s with this rule\'s originnetworkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1.">
+						<span class="add-on">Originating Network Id Mask</span>
+						<input id="originnetworkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Originating Network Id Mask" />
+					</span>				
+				</div>	
 
 				
 				<div id="div-desttonmask" class="control-group">
@@ -186,13 +193,6 @@
 							<option value="SIP">SIP</option>
 						</select>
 					</span>	
-				</div>	
-				
-				<div id="div-originnetworkidmask" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if SMS origination networkid match\'s with this rule\'s originnetworkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1.">
-						<span class="add-on">Originating Network Id Mask</span>
-						<input id="originnetworkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Originating Network Id Mask" />
-					</span>				
 				</div>	
 				
 				<div id="div-origesmenamemask" class="control-group">
@@ -578,6 +578,22 @@
 																			'</td>'+
 																		'</tr>'+
 
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if SMS origination networkid match\'s with this rule\'s originnetworkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1.">'+
+																			'<td style="font-size: 0.9em;">Originating Network Id Mask</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'OriginNetworkIdMask-input" class="control-group">'+
+																				'<span id="' + id +'OriginNetworkIdMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + originnetworkidmask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'originnetworkidmask\', \'' + id+"OriginNetworkIdMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginNetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"OriginNetworkIdMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'OriginNetworkIdMask-text">' + originnetworkidmask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginNetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"OriginNetworkIdMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+
 																			'<tr data-toggle="tooltip" title="Rule will be applied only if destination type of number (TON) of target SMS match\'s with this rule\'s desttonmask. Set value to -1 as wild card to match all the TON. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13; Default value is -1">'+
 																				'<td style="font-size: 0.9em;">Destination Type Of Number (TON)</td>'+
 																				'<td style="font-size: 0.9em; padding: 0;">'+
@@ -673,22 +689,6 @@
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginatingMask"+']\').toggle(); $(\'input[id^='+id+"OriginatingMask"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+	
-
-																		'<tr data-toggle="tooltip" title="Rule will be applied only if SMS origination networkid match\'s with this rule\'s originnetworkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1.">'+
-																			'<td style="font-size: 0.9em;">Originating Network Id Mask</td>'+
-																			'<td style="font-size: 0.9em; padding: 0;">'+
-																				'<div id="div-' + id +'OriginNetworkIdMask-input" class="control-group">'+
-																				'<span id="' + id +'OriginNetworkIdMask-input" style="display: none;">'+
-																					'<input type="text" class="input-small" value="' + originnetworkidmask + '" /> ' +
-																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'originnetworkidmask\', \'' + id+"OriginNetworkIdMask" + '\', \'true\')"></i> ' +
-																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginNetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"OriginNetworkIdMask"+']\').focus();"></i>' + 
-																				'</span>'+
-																				'</div>' +
-																				'<span id="' +id + 'OriginNetworkIdMask-text">' + originnetworkidmask + '</span>'+
-																			'</td>'+
-																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginNetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"OriginNetworkIdMask"+']\').focus();"></i>' +
-																			'</td>'+
-																		'</tr>'+
 
 																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS is originated from SMPP channel (ESME) and who\'s name match\'s with originating ESME name mask (Java Regular Expression). Set -1 as wild card to match all the ESME.">'+
 																			'<td style="font-size: 0.9em;">Originating ESME Name Mask</td>'+

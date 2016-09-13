@@ -470,6 +470,16 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								</span> 								
 							</div>
 
+							<div id="div-incomereceiptsprocessing" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set to true to enable of processing of incoming delivery receipts from remote SMSC GW: replacing of messageId in a receipt by a local messageId">
+									<span class="add-on">Income receipts processing</span>
+									<select id="incomereceiptsprocessing" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span> 								
+							</div>
+
 							<div id="div-origNetworkIdForReceipts" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if this option is turned on (true), for each generated delivery receipts networkId will be set to the value of networkId of an ESME from which the original message has come to SMSC. This can help for routing of receipts back to the originated ESME. If this option is turned off (false) then the networkId of receipts will be taken from networkId of ESME / SS7 / SIP via which the original message has left SMSC GW. ">
 									<span class="add-on">Original NetworkId For Receipts</span>
@@ -868,7 +878,15 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										} else {
 											enableintermediatereceipts.options[1].selected = true;
 										}
+
+										var incomereceiptsprocessingVar = response.value.IncomeReceiptsProcessing;
 										
+										if(incomereceiptsprocessingVar){
+											incomereceiptsprocessing.options[0].selected = true;
+										} else {
+											incomereceiptsprocessing.options[1].selected = true;
+										}
+
 										var origNetworkIdForReceiptsVar = response.value.OrigNetworkIdForReceipts;
 										
 										if(origNetworkIdForReceiptsVar){
@@ -1770,6 +1788,9 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						e = document.getElementById("enableintermediatereceipts");
 						var enableintermediatereceipts = e.options[e.selectedIndex].text;
 						
+						e = document.getElementById("incomereceiptsprocessing");
+						var incomereceiptsprocessing = e.options[e.selectedIndex].text;
+						
 						e = document.getElementById("origNetworkIdForReceipts");
 						var origNetworkIdForReceipts = e.options[e.selectedIndex].text;
 						
@@ -1781,6 +1802,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "DeliveryPause", value: deliverypauseVar },
 									{ type: "write", mbean: mbeanSearch, attribute: "ReceiptsDisabling", value: receiptsdisabling },
 									{ type: "write", mbean: mbeanSearch, attribute: "EnableIntermediateReceipts", value: enableintermediatereceipts },
+									{ type: "write", mbean: mbeanSearch, attribute: "IncomeReceiptsProcessing", value: incomereceiptsprocessing },
 									{ type: "write", mbean: mbeanSearch, attribute: "OrigNetworkIdForReceipts", value: origNetworkIdForReceipts },
 								],
 								{
