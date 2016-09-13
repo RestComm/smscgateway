@@ -49,6 +49,7 @@ import javax.swing.JTabbedPane;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import javax.swing.JCheckBox;
 
 /**
  * 
@@ -89,6 +90,12 @@ public class SmppMessageParamForm extends JDialog {
 	private JTextField tbSubmitMultiMessageCnt;
 	private JTextField tbSegmentLength;
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
+	private JCheckBox cbRejectIncomingDeliveryMessage;
+	private JRadioButton rbDR_No;
+	private JRadioButton rbDR_Success;
+	private JRadioButton rbDR_Error8;
+	private JCheckBox cbDRAfter2Min;
+	private final ButtonGroup buttonGroup_2 = new ButtonGroup();
 
 	public SmppMessageParamForm(JDialog owner) {
 		super(owner, true);
@@ -336,6 +343,37 @@ public class SmppMessageParamForm extends JDialog {
                 }
 																}});
 						
+						JPanel panel_resp = new JPanel();
+						tabbedPane.addTab("Response", null, panel_resp, null);
+						panel_resp.setLayout(null);
+						
+						cbRejectIncomingDeliveryMessage = new JCheckBox("Rejecting of incoming SMPP delivery messages");
+						cbRejectIncomingDeliveryMessage.setBounds(6, 7, 247, 23);
+						panel_resp.add(cbRejectIncomingDeliveryMessage);
+						
+						rbDR_Success = new JRadioButton("Success receipt");
+						buttonGroup_2.add(rbDR_Success);
+						rbDR_Success.setBounds(119, 65, 126, 23);
+						panel_resp.add(rbDR_Success);
+						
+						rbDR_Error8 = new JRadioButton("Receipt with error 8");
+						buttonGroup_2.add(rbDR_Error8);
+						rbDR_Error8.setBounds(253, 65, 146, 23);
+						panel_resp.add(rbDR_Error8);
+						
+						JLabel lblGeneratingOfDelivery = new JLabel("Generating of delivery receipts");
+						lblGeneratingOfDelivery.setBounds(6, 44, 247, 14);
+						panel_resp.add(lblGeneratingOfDelivery);
+						
+						rbDR_No = new JRadioButton("Disabled");
+						buttonGroup_2.add(rbDR_No);
+						rbDR_No.setBounds(6, 65, 114, 23);
+						panel_resp.add(rbDR_No);
+						
+						cbDRAfter2Min = new JCheckBox("Delivery receipt after 2 min");
+						cbDRAfter2Min.setBounds(6, 99, 364, 23);
+						panel_resp.add(cbDRAfter2Min);
+						
 						JPanel panel_bulk = new JPanel();
 						tabbedPane.addTab("Bulk", null, panel_bulk, null);
 						panel_bulk.setLayout(null);
@@ -520,7 +558,21 @@ public class SmppMessageParamForm extends JDialog {
             this.rbUnicode.setSelected(true);
         else
             this.rbGsm7.setSelected(true);
- 	}
+
+        this.cbRejectIncomingDeliveryMessage.setSelected(this.data.isRejectIncomingDeliveryMessage());
+        this.cbDRAfter2Min.setSelected(this.data.isDeliveryResponseAfter2Min());
+        switch (this.data.getDeliveryResponseGenerating()) {
+            case No:
+                this.rbDR_No.setSelected(true);
+                break;
+            case Success:
+                this.rbDR_Success.setSelected(true);
+                break;
+            case Error8:
+                this.rbDR_Error8.setSelected(true);
+                break;
+        }
+	}
 
 	public SmppSimulatorParameters getData() {
 		return this.data;
@@ -608,6 +660,15 @@ public class SmppMessageParamForm extends JDialog {
             this.data.setSmppEncoding(1);
         else
             this.data.setSmppEncoding(2);
+
+        this.data.setRejectIncomingDeliveryMessage(this.cbRejectIncomingDeliveryMessage.isSelected());
+        this.data.setDeliveryResponseAfter2Min(this.cbDRAfter2Min.isSelected());
+        if (rbDR_No.isSelected())
+            this.data.setDeliveryResponseGenerating(SmppSimulatorParameters.DeliveryResponseGenerating.No);
+        if (rbDR_Success.isSelected())
+            this.data.setDeliveryResponseGenerating(SmppSimulatorParameters.DeliveryResponseGenerating.Success);
+        if (rbDR_Error8.isSelected())
+            this.data.setDeliveryResponseGenerating(SmppSimulatorParameters.DeliveryResponseGenerating.Error8);
 
 		this.dispose();
 	}
