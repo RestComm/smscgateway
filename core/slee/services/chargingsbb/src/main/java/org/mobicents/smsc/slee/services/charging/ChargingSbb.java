@@ -546,7 +546,7 @@ public abstract class ChargingSbb implements Sbb {
 		}
 
 		try {
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
             if (mProcResult.isMessageRejected()) {
                 rejectSmsByMproc(chargingData, true);
                 return;
@@ -662,7 +662,8 @@ public abstract class ChargingSbb implements Sbb {
 
 
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
-                persistence.c2_createRecordArchive(sms);
+                persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),
+                        smscPropertiesManagement.getIncomeReceiptsProcessing());
             }                
 
 //            }
@@ -714,7 +715,8 @@ public abstract class ChargingSbb implements Sbb {
 
 
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
-                persistence.c2_createRecordArchive(sms);
+                persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),
+                        smscPropertiesManagement.getIncomeReceiptsProcessing());
             }                
 
 

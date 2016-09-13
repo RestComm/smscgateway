@@ -42,6 +42,8 @@ public class Schema {
     public static final String COLUMN_ORIG_NETWORK_ID = "ORIG_NETWORK_ID";
     public static final String COLUMN_SENT = "SENT";
     public static final String COLUMN_MESSAGE_ID = "MESSAGE_ID";
+    public static final String COLUMN_REMOTE_MESSAGE_ID = "REMOTE_MESSAGE_ID";
+    public static final String COLUMN_DEST_ID = "DEST_ID";
     public static final String COLUMN_MO_MESSAGE_REF = "MO_MESSAGE_REF";
     public static final String COLUMN_ADDR_SRC_TON = "ADDR_SRC_TON";
     public static final String COLUMN_ADDR_SRC_NPI = "ADDR_SRC_NPI";
@@ -124,11 +126,13 @@ public class Schema {
     public static final String FAMILY_SLOT_MESSAGES_TABLE = "SLOT_MESSAGES_TABLE";
     public static final String FAMILY_MESSAGES = "MESSAGES";
     public static final String FAMILY_MES_ID = "MES_ID";
+    public static final String FAMILY_DLV_MES_ID = "DLV_MES_ID";
 
     public static final List<String> COLUMNS_LIVE;
     public static final List<String> COLUMNS_LIVE_SMS;
     public static final List<String> COLUMNS_ARCHIVE;
     public static final List<String> COLUMNS_MES_ID;
+    public static final List<String> COLUMNS_DLV_MES_ID;
     public static final List<String> COLUMNS_SMPP_SMS_ROUTING_RULE;
     public static final List<String> COLUMNS_SIP_SMS_ROUTING_RULE;
 
@@ -256,6 +260,12 @@ public class Schema {
         tmp.add(COLUMN_ADDR_DST_DIGITS);
         tmp.add(COLUMN_ID);
         COLUMNS_MES_ID = Collections.unmodifiableList(tmp);
+
+        tmp = new ArrayList<String>();
+        tmp.add(COLUMN_REMOTE_MESSAGE_ID);
+        tmp.add(COLUMN_DEST_ID);
+        tmp.add(COLUMN_MESSAGE_ID);
+        COLUMNS_DLV_MES_ID = Collections.unmodifiableList(tmp);
 
         tmp = new ArrayList<String>();
         tmp.add(COLUMN_ADDRESS);

@@ -443,7 +443,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 gotMessageCnt++;
                 Sms sms = smsSet.getSms(currentMsgNum + i1);
                 if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
-                    this.endDeliveryAfterValidityPeriod(sms, processingType);
+                    this.endDeliveryAfterValidityPeriod(sms, processingType, null, null);
                 } else {
                     boolean res1 = applyMProcPreDelivery(sms, processingType);
                     if (res1) {
@@ -493,7 +493,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 gotMessageCnt++;
                 sms = smsSet.getSms(currentMsgNum + i1);
                 if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
-                    this.endDeliveryAfterValidityPeriod(sms, processingType);
+                    this.endDeliveryAfterValidityPeriod(sms, processingType, null, null);
                     sms = null;
                 } else {
                     boolean res1 = applyMProcPreDelivery(sms, processingType);
@@ -580,7 +580,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             this.sendTransactionalResponseFailure(lstPermFailured, null, errorAction, null);
 
             // Processing messages that were temp or permanent failed or rerouted
-            this.postProcessPermFailures(lstPermFailured);
+            this.postProcessPermFailures(lstPermFailured, null, null);
 
             // generating CDRs for permanent failure messages
             this.generateCDRs(lstPermFailured, CdrGenerator.CDR_MPROC_DROP_PRE_DELIVERY, reason);
@@ -799,8 +799,10 @@ public abstract class DeliveryCommonSbb implements Sbb {
      *
      * @param sms
      * @param processingType
+     * @param dlvMessageId
+     * @param dlvDestId
      */
-    protected void endDeliveryAfterValidityPeriod(Sms sms, ProcessingType processingType) {
+    protected void endDeliveryAfterValidityPeriod(Sms sms, ProcessingType processingType, String dlvMessageId, String dlvDestId) {
         // ending of delivery process in this SBB
         ErrorCode smStatus = ErrorCode.VALIDITY_PERIOD_EXPIRED;
         ErrorAction errorAction = ErrorAction.permanentFailure;
@@ -858,7 +860,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         this.sendTransactionalResponseFailure(lstPermFailured, null, errorAction, null);
 
         // Processing messages that were temp or permanent failed or rerouted
-        this.postProcessPermFailures(lstPermFailured);
+        this.postProcessPermFailures(lstPermFailured, dlvMessageId, dlvDestId);
 
         // generating CDRs for permanent failure messages
         this.generateCDRs(lstPermFailured, CdrGenerator.CDR_FAILED, reason);
@@ -874,14 +876,18 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * Processing messages that were succeeded (sms.inSystem=sent in live database, adding of archive record).
      *
      * @param sms
+     * @param dlvMessageId
+     * @param dlvDestId
      */
-    protected void postProcessSucceeded(Sms sms) {
+    protected void postProcessSucceeded(Sms sms, String dlvMessageId, String dlvDestId) {
         try {
             persistence.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT,
                     smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
             sms.setDeliveryDate(new Date());
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
-                persistence.c2_createRecordArchive(sms);
+                persistence.c2_createRecordArchive(sms, dlvMessageId, dlvDestId,
+                        !smscPropertiesManagement.getReceiptsDisabling(),
+                        smscPropertiesManagement.getIncomeReceiptsProcessing());
             }
         } catch (PersistenceException e) {
             this.logger.severe("PersistenceException when DeliveryCommonSbb.postProcessSucceeded()" + e.getMessage(), e);
@@ -892,15 +898,19 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * Processing messages that were failed permanently (sms.inSystem=sent in live database, adding of archive record).
      *
      * @param lstPermFailured
+     * @param dlvMessageId
+     * @param dlvDestId
      */
-    protected void postProcessPermFailures(ArrayList<Sms> lstPermFailured) {
+    protected void postProcessPermFailures(ArrayList<Sms> lstPermFailured, String dlvMessageId, String dlvDestId) {
         try {
             for (Sms sms : lstPermFailured) {
                 persistence.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT,
                         smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
                 sms.setDeliveryDate(new Date());
                 if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
-                    persistence.c2_createRecordArchive(sms);
+                    persistence.c2_createRecordArchive(sms, dlvMessageId, dlvDestId,
+                            !smscPropertiesManagement.getReceiptsDisabling(),
+                            smscPropertiesManagement.getIncomeReceiptsProcessing());
                 }
             }
         } catch (PersistenceException e) {

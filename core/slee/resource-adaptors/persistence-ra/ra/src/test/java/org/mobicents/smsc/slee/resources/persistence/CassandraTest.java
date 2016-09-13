@@ -41,6 +41,7 @@ import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PreparedStatementCollection;
+import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.SmType;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
@@ -315,7 +316,15 @@ public class CassandraTest {
 
         SmsSet smsSet = this.readDueSlotMessage(dueSlot, 1);
 
-        archiveMessage(smsSet);
+        String[] remoteMessageId = new String[3];
+        long l1 = 10000000;
+        for (int i1 = 0; i1 < 3; i1++) {
+            l1++;
+            remoteMessageId[i1] = MessageUtil.createMessageIdString(l1);
+        }
+        String esmeId = "esme_3";
+
+        archiveMessage(smsSet, remoteMessageId, esmeId);
 
         this.addingNewMessages2(dueSlot + 1);
 
@@ -718,7 +727,7 @@ public class CassandraTest {
         }
     }
 
-    public void archiveMessage(SmsSet smsSet) throws Exception {
+    public void archiveMessage(SmsSet smsSet, String[] remoteMessageId, String esmeId) throws Exception {
         for (int i1 = 0; i1 < 3; i1++) {
             Sms sms = smsSet.getSms(i1);
             
@@ -728,8 +737,8 @@ public class CassandraTest {
             LocationInfoWithLMSIImpl locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
 
             sms.getSmsSet().setLocationInfoWithLMSI(locationInfoWithLMSI);
-            
-            sbb.c2_createRecordArchive(sms);
+
+            sbb.c2_createRecordArchive(sms, remoteMessageId[i1], esmeId, true, true);
         }
 
         Sms sms = smsSet.getSms(0);
@@ -740,6 +749,10 @@ public class CassandraTest {
         Sms smsy = sbb.c2_getRecordArchiveForMessageId(sms.getMessageId());
 
         this.checkTestSms(1, smsy, sms.getDbId(), true);
+
+        Long messageId = sbb.c2_getMessageIdByRemoteMessageId(remoteMessageId[0], esmeId);
+        assertNotNull(messageId);
+        assertEquals((long) messageId, sms.getMessageId());
     }
 
     public void archiveMessage2(SmsSet smsSet) throws Exception {
@@ -757,7 +770,7 @@ public class CassandraTest {
 
         sms.getSmsSet().setLocationInfoWithLMSI(locationInfoWithLMSI);
 
-        sbb.c2_createRecordArchive(sms);
+        sbb.c2_createRecordArchive(sms, null, null, true, true);
 
         Sms smsy = sbb.c2_getRecordArchiveForMessageId(sms.getMessageId());
 

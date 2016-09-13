@@ -433,7 +433,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     this.sendTransactionalResponseFailure(lstPermFailured2, lstTempFailured2, errorAction, errMessage);
 
                     // Processing messages that were temp or permanent failed or rerouted
-                    this.postProcessPermFailures(lstPermFailured2);
+                    this.postProcessPermFailures(lstPermFailured2, null, null);
                     this.postProcessTempFailures(smsSet, lstTempFailured2, (errorAction == ErrorAction.subscriberBusy), true);
                     this.postProcessRerouted(lstRerouted, lstNewNetworkId);
 
@@ -505,7 +505,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                 "Sri-ImsiRequest: incoming messages are dropped by mProc rules");
 
         // Processing messages that were temp or permanent failed or rerouted
-        this.postProcessPermFailures(lstPermFailured);
+        this.postProcessPermFailures(lstPermFailured, null, null);
         this.postProcessRerouted(lstRerouted, lstNewNetworkId);
 
         // adding an error receipt if it is needed

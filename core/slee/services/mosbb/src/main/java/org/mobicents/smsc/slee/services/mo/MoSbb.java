@@ -1398,7 +1398,7 @@ public abstract class MoSbb extends MoCommonSbb {
         switch (chargingType) {
             case accept:
                 // applying of MProc
-                MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0);
+                MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
 
                 if (mProcResult.isMessageRejected()) {
                     sms0.setMessageDeliveryResultResponse(null);

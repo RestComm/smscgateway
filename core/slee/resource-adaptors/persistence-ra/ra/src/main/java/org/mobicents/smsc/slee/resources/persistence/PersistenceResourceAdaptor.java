@@ -275,8 +275,10 @@ public class PersistenceResourceAdaptor implements ResourceAdaptor {
             }
 
             @Override
-            public void c2_createRecordArchive(Sms sms) throws PersistenceException {
-                dbOperations_C2.c2_createRecordArchive(sms);
+            public void c2_createRecordArchive(Sms sms, String dlvMessageId, String dlvDestId, boolean deliveryReceipts,
+                    boolean incomingDeliveryReceipts) throws PersistenceException {
+                dbOperations_C2
+                        .c2_createRecordArchive(sms, dlvMessageId, dlvDestId, deliveryReceipts, incomingDeliveryReceipts);
             }
 
             @Override
@@ -333,6 +335,11 @@ public class PersistenceResourceAdaptor implements ResourceAdaptor {
             @Override
             public QuerySmResponse c2_getQuerySmResponse(long messageId) throws PersistenceException {
                 return dbOperations_C2.c2_getQuerySmResponse(messageId);
+            }
+
+            @Override
+            public Long c2_getMessageIdByRemoteMessageId(String remoteMessageId, String destId) throws PersistenceException {
+                return dbOperations_C2.c2_getMessageIdByRemoteMessageId(remoteMessageId, destId);
             }
 
 		};

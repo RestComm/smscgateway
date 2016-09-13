@@ -259,7 +259,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
 
             // Processing succeeded
             sms.getSmsSet().setStatus(ErrorCode.SUCCESS);
-            this.postProcessSucceeded(sms);
+            this.postProcessSucceeded(sms, null, null);
 
             // success CDR generating
             boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
@@ -549,7 +549,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
                     this.sendTransactionalResponseFailure(lstPermFailured2, lstTempFailured2, errorAction, null);
 
                     // Processing messages that were temp or permanent failed or rerouted
-                    this.postProcessPermFailures(lstPermFailured2);
+                    this.postProcessPermFailures(lstPermFailured2, null, null);
                     this.postProcessTempFailures(smsSet, lstTempFailured2, false, false);
                     this.postProcessRerouted(lstRerouted, lstNewNetworkId);
 

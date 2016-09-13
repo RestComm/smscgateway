@@ -25,6 +25,7 @@ package org.mobicents.smsc.mproc.impl;
 import java.util.Date;
 
 import org.mobicents.smsc.library.CorrelationIdValue;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.ProcessingType;
@@ -200,6 +201,30 @@ public class MProcMessageHrImpl implements MProcMessage {
     public int getErrorCode() {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    @Override
+    public boolean isDeliveryReceipt() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public DeliveryReceiptData getDeliveryReceiptData() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public MProcMessage getOriginMessageForDeliveryReceipt(long messageId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Long getReceiptLocalMessageId() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

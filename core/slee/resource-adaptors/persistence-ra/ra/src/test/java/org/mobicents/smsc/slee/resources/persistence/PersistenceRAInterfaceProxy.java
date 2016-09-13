@@ -223,6 +223,16 @@ public class PersistenceRAInterfaceProxy extends DBOperations implements Persist
             int g1 = 0;
             g1++;
         }
+
+        ps = session.prepare("TRUNCATE \"" + Schema.FAMILY_DLV_MES_ID + tName + "\";");
+        boundStatement = new BoundStatement(ps);
+        boundStatement.bind();
+        try {
+            session.execute(boundStatement);
+        } catch (Exception e) {
+            int g1 = 0;
+            g1++;
+        }
     }
 
     public SmsProxy obtainArchiveSms(long dueSlot, String dstDigits, UUID dbId) throws PersistenceException, IOException {

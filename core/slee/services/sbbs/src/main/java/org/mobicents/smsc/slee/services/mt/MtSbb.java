@@ -857,7 +857,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
         // Processing succeeded
         sms.getSmsSet().setStatus(ErrorCode.SUCCESS);
-        this.postProcessSucceeded(sms);
+        this.postProcessSucceeded(sms, null, null);
 
         // success CDR generating
         boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);

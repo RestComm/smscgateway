@@ -47,6 +47,7 @@ import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.library.DbSmsRoutingRule;
 import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageState;
+import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.QuerySmResponse;
 import org.mobicents.smsc.library.SmType;
 import org.mobicents.smsc.library.Sms;
@@ -832,15 +833,14 @@ public class DBOperations {
 		}
 	}
 
-	public void c2_createRecordArchive(Sms sms) throws PersistenceException {
+    public void c2_createRecordArchive(Sms sms, String dlvMessageId, String dlvDestId, boolean deliveryReceipts,
+            boolean incomingDeliveryReceipts) throws PersistenceException {
         if (!this.databaseAvailable)
             return;
 
 		Date deliveryDate = sms.getDeliverDate();
 		if (deliveryDate == null)
 			deliveryDate = new Date();
-
-        SmsSetCache.getInstance().putDeliveredMsgValue(sms, 30);
 
 		long dueSlot = this.c2_getDueSlotForTime(deliveryDate);
 		PreparedStatementCollection psc = getStatementCollection(deliveryDate);
@@ -849,20 +849,34 @@ public class DBOperations {
 		    // we are storing data into MESSAGES_YYYY_MM_DD table
 			PreparedStatement ps = psc.createRecordArchive;
 			BoundStatement boundStatement = new BoundStatement(ps);
-
             setSmsFields(sms, dueSlot, boundStatement, true, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
                     psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
-
 			ResultSet res = session.execute(boundStatement);
 
-            // and created a record in MES_ID_YYYY_MM_DD table
-            ps = psc.createRecordArchiveMesId;
-            boundStatement = new BoundStatement(ps);
-            boundStatement.setLong(Schema.COLUMN_MESSAGE_ID, sms.getMessageId());
-            boundStatement.setString(Schema.COLUMN_ADDR_DST_DIGITS, sms.getSmsSet().getDestAddr());
-            boundStatement.setUUID(Schema.COLUMN_ID, sms.getDbId());
+            if ((deliveryReceipts || incomingDeliveryReceipts) && !MessageUtil.isDeliveryReceipt(sms)) {
+                // and created a record in MES_ID_YYYY_MM_DD table
+                SmsSetCache.getInstance().putDeliveredMsgValue(sms, 30);
 
-            res = session.execute(boundStatement);
+                ps = psc.createRecordArchiveMesId;
+                boundStatement = new BoundStatement(ps);
+                boundStatement.setLong(Schema.COLUMN_MESSAGE_ID, sms.getMessageId());
+                boundStatement.setString(Schema.COLUMN_ADDR_DST_DIGITS, sms.getSmsSet().getDestAddr());
+                boundStatement.setUUID(Schema.COLUMN_ID, sms.getDbId());
+                res = session.execute(boundStatement);
+            }
+
+            if (incomingDeliveryReceipts && dlvMessageId != null && dlvDestId != null
+                    && MessageUtil.isDeliveryReceiptRequest(sms)) {
+                // and created a record in DLV_MES_ID_YYYY_MM_DD table
+//                SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, dlvDestId, sms.getMessageId(), 30);
+
+                ps = psc.createRecordArchiveDlvMesId;
+                boundStatement = new BoundStatement(ps);
+                boundStatement.setString(Schema.COLUMN_REMOTE_MESSAGE_ID, dlvMessageId);
+                boundStatement.setString(Schema.COLUMN_DEST_ID, dlvDestId);
+                boundStatement.setLong(Schema.COLUMN_MESSAGE_ID, sms.getMessageId());
+                res = session.execute(boundStatement);
+            }
 		} catch (Exception e1) {
 			String msg = "Failed createRecordArchive !" + e1.getMessage();
 
@@ -1135,6 +1149,9 @@ public class DBOperations {
 	}
 
     public Sms c2_getRecordArchiveForMessageId(long messageId) throws PersistenceException {
+        Sms sms = SmsSetCache.getInstance().getDeliveredMsgValue(messageId);
+        if (sms != null)
+            return sms;
 
         SmsSet result = null;
         try {
@@ -1189,6 +1206,51 @@ public class DBOperations {
             }
         }
         return result;
+    }
+
+    public Long c2_getMessageIdByRemoteMessageId(String remoteMessageId, String destId) throws PersistenceException {
+        Long result = null;
+        result = SmsSetCache.getInstance().getDeliveredRemoteMsgIdValue(remoteMessageId, destId);
+        if (result != null)
+            return result;
+
+        this.logger.info("**************** 10001: c2_getMessageIdByRemoteMessageId database, remoteMessageId="
+                + remoteMessageId + ", destId=" + destId + ", xxxxxx=" + SmsSetCache.getInstance().getXxxxx());
+
+        try {
+            // first step - today search
+            Date date = new Date();
+            PreparedStatementCollection psc = getStatementCollection(date);
+            result = this.doGetMessageIdByRemoteMessageId(remoteMessageId, destId, psc);
+
+            if (result == null) {
+                // second step - yesterday search
+                Date date2 = new Date(date.getTime() - 1000 * 3600 * 24);
+                psc = getStatementCollection(date2);
+                result = this.doGetMessageIdByRemoteMessageId(remoteMessageId, destId, psc);
+            }
+        } catch (Exception e1) {
+            String msg = "Failed c2_getMessageIdByRemoteMessageId()";
+
+            throw new PersistenceException(msg, e1);
+        }
+
+        return result;
+    }
+
+    private Long doGetMessageIdByRemoteMessageId(String remoteMessageId, String destId, PreparedStatementCollection psc)
+            throws PersistenceException {
+        PreparedStatement ps = psc.getRecordArchiveDlvMesId;
+        BoundStatement boundStatement = new BoundStatement(ps);
+        boundStatement.bind(remoteMessageId, destId);
+        ResultSet res = session.execute(boundStatement);
+
+        Long msgId = null;
+        for (Row row : res) {
+            msgId = row.getLong(Schema.COLUMN_MESSAGE_ID);
+            break;
+        }
+        return msgId;
     }
 
     protected SmsSet createSms(final Row row, SmsSet smsSet, boolean shortMessageNewStringFormat, boolean addedCorrId,
@@ -1660,6 +1722,41 @@ public class DBOperations {
             throw new PersistenceException(msg, e1);
         }
 
+        try {
+            try {
+                // checking if a datatable MES_ID_YYYY_MM_DD exists
+                String s1 = "SELECT * FROM \"" + Schema.FAMILY_DLV_MES_ID + tName + "\";";
+                PreparedStatement ps = session.prepare(s1);
+            } catch (InvalidQueryException e) {
+                // datatable does not exist
+
+                // FAMILY_MES_ID
+                StringBuilder sb = new StringBuilder();
+                sb.append("CREATE TABLE \"" + Schema.FAMILY_DLV_MES_ID);
+                sb.append(tName);
+                sb.append("\" (");
+
+                appendField(sb, Schema.COLUMN_REMOTE_MESSAGE_ID, "ascii");
+                appendField(sb, Schema.COLUMN_DEST_ID, "ascii");
+                appendField(sb, Schema.COLUMN_MESSAGE_ID, "bigint");
+
+                sb.append("PRIMARY KEY (\"");
+                sb.append(Schema.COLUMN_REMOTE_MESSAGE_ID);
+                sb.append("\", \"");
+                sb.append(Schema.COLUMN_DEST_ID);
+                sb.append("\"");
+                sb.append("));");
+
+                String s2 = sb.toString();
+                PreparedStatement ps = session.prepare(s2);
+                BoundStatement boundStatement = new BoundStatement(ps);
+                ResultSet res = session.execute(boundStatement);
+            }
+        } catch (Exception e1) {
+            String msg = "Failed to access or create table " + tName + "!";
+            throw new PersistenceException(msg, e1);
+        }
+
 		psc = new PreparedStatementCollection(this, tName, ttlCurrent, ttlArchive);
 		dataTableRead.putEntry(tName, psc);
 		return psc;
@@ -1851,10 +1948,7 @@ public class DBOperations {
 	}
 
     public QuerySmResponse c2_getQuerySmResponse(long messageId) throws PersistenceException {
-        Sms sms = SmsSetCache.getInstance().getDeliveredMsgValue(messageId);
-        if (sms == null) {
-            sms = c2_getRecordArchiveForMessageId(messageId);
-        }
+        Sms sms = c2_getRecordArchiveForMessageId(messageId);
         if (sms == null) {
             // TODO: we need to check if we have a message in a list of "in progress message"
             // we do not have implemented it now and treated all undelivered messages as "ENROUTE"
@@ -2170,6 +2264,9 @@ public class DBOperations {
         tName = Schema.FAMILY_MES_ID + getTableName(dt);
         this.doDeleteTable(tName);
 
+        tName = Schema.FAMILY_DLV_MES_ID + getTableName(dt);
+        this.doDeleteTable(tName);
+
         String tName2 = this.getTableName(dt);
         dataTableRead.remove(tName2);
 
@@ -2294,6 +2391,18 @@ public class DBOperations {
                 String sYear = s.substring(7, 11);
                 String sMon = s.substring(12, 14);
                 String sDay = s.substring(15, 17);
+                try {
+                    int year = Integer.parseInt(sYear);
+                    int mon = Integer.parseInt(sMon);
+                    int day = Integer.parseInt(sDay);
+                    dt = new Date(year - 1900, mon - 1, day);
+                } catch (Exception e) {
+                }
+            }
+            if (s.startsWith(Schema.FAMILY_DLV_MES_ID) && s.length() == 21) {
+                String sYear = s.substring(11, 15);
+                String sMon = s.substring(16, 18);
+                String sDay = s.substring(19, 21);
                 try {
                     int year = Integer.parseInt(sYear);
                     int mon = Integer.parseInt(sMon);

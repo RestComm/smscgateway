@@ -597,7 +597,7 @@ public class StressTool3 {
                                         sms.setDeliveryDate(new Date());
 
                                         dbOperations.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT, false);
-                                        dbOperations.c2_createRecordArchive(sms);
+                                        dbOperations.c2_createRecordArchive(sms, null, null, false, false);
                                     }
                                 }
 

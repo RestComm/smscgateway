@@ -590,7 +590,7 @@ public abstract class TxSipServerSbb implements Sbb {
 			chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSipOrig, sms0);
 		} else {
             // applying of MProc
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
             if (mProcResult.isMessageRejected()) {
                 SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
                         SmppConstants.STATUS_SUBMITFAIL, 0, null);

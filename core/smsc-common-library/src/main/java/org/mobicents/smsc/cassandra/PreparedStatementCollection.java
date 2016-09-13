@@ -44,6 +44,8 @@ public class PreparedStatementCollection {
     protected PreparedStatement createRecordArchive;
     protected PreparedStatement createRecordArchiveMesId;
     protected PreparedStatement getRecordArchiveMesId;
+    protected PreparedStatement createRecordArchiveDlvMesId;
+    protected PreparedStatement getRecordArchiveDlvMesId;
     protected PreparedStatement getRecordArchive;
 
     public PreparedStatementCollection(DBOperations dbOperation, String tName, int ttlCurrent, int ttlArchive) {
@@ -130,7 +132,6 @@ public class PreparedStatementCollection {
             sa = "UPDATE \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName + "\" " + s3a + " SET \"" + Schema.COLUMN_ALERTING_SUPPORTED + "\"=? where \""
                     + Schema.COLUMN_DUE_SLOT + "\"=? and \"" + Schema.COLUMN_TARGET_ID + "\"=? and \"" + Schema.COLUMN_ID + "\"=?;";
             updateAlertingSupport = dbOperation.session.prepare(sa);
-
             sa = "INSERT INTO \"" + Schema.FAMILY_MESSAGES + tName + "\" (" + s1 + s11 + ") VALUES (" + s2 + s22 + ") " + s3b + ";";
             createRecordArchive = dbOperation.session.prepare(sa);
             sa = "INSERT INTO \"" + Schema.FAMILY_MES_ID + tName + "\" (\"" + Schema.COLUMN_MESSAGE_ID + "\", \""
@@ -139,6 +140,12 @@ public class PreparedStatementCollection {
             sa = "SELECT \"" + Schema.COLUMN_ADDR_DST_DIGITS + "\", \"" + Schema.COLUMN_ID + "\" FROM \""
                     + Schema.FAMILY_MES_ID + tName + "\" where \"" + Schema.COLUMN_MESSAGE_ID + "\"=?;";
             getRecordArchiveMesId = dbOperation.session.prepare(sa);
+            sa = "INSERT INTO \"" + Schema.FAMILY_DLV_MES_ID + tName + "\" (\"" + Schema.COLUMN_REMOTE_MESSAGE_ID + "\", \""
+                    + Schema.COLUMN_DEST_ID + "\", \"" + Schema.COLUMN_MESSAGE_ID + "\") VALUES (?, ?, ?);";
+            createRecordArchiveDlvMesId = dbOperation.session.prepare(sa);
+            sa = "SELECT \"" + Schema.COLUMN_MESSAGE_ID + "\" FROM \"" + Schema.FAMILY_DLV_MES_ID + tName + "\" where \""
+                    + Schema.COLUMN_REMOTE_MESSAGE_ID + "\"=? and \"" + Schema.COLUMN_DEST_ID + "\"=?;";
+            getRecordArchiveDlvMesId = dbOperation.session.prepare(sa);
             sa = "SELECT * FROM \"" + Schema.FAMILY_MESSAGES + tName + "\" where \"" + Schema.COLUMN_ADDR_DST_DIGITS
                     + "\"=? and \"" + Schema.COLUMN_ID + "\"=?;";
             getRecordArchive = dbOperation.session.prepare(sa);

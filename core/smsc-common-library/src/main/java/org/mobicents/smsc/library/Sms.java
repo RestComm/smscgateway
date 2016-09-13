@@ -61,8 +61,11 @@ public class Sms implements Serializable {
 	private long messageId;
 	private int moMessageRef;
 
+    private String receiptOrigMessageId;
+    private Long receiptLocalMessageId;
+
 	private String origSystemId;
-	private String origEsmeName;
+    private String origEsmeName;
 
 	private Date submitDate;
 	private Date deliveryDate;
@@ -252,8 +255,10 @@ public class Sms implements Serializable {
     }
 
     public String getMessageIdText() {
+        return MessageUtil.createMessageIdString(messageId);
+
         // return String.format("%010d", messageId);
-        return String.format("%d", messageId);
+        // return String.format("%d", messageId);
     }
 
 	public void setMessageId(long messageId) {
@@ -650,13 +655,23 @@ public class Sms implements Serializable {
         sb.append(origNetworkId);
 		sb.append(", messageId=");
 		sb.append(messageId);
-		sb.append(", moMessageRef=");
+
+        if (receiptOrigMessageId != null) {
+            sb.append(", receiptOrigMessageId=");
+            sb.append(receiptOrigMessageId);
+        }
+        if (receiptLocalMessageId != null) {
+            sb.append(", receiptLocalMessageId=");
+            sb.append(receiptLocalMessageId);
+        }
+
+        sb.append(", moMessageRef=");
 		sb.append(moMessageRef);
 		sb.append(", origSystemId=");
 		sb.append(origSystemId);
-		sb.append(", origEsmeId=");
-		sb.append(origEsmeName);
-		sb.append(", submitDate=");
+		sb.append(", origEsmeName=");
+        sb.append(origEsmeName);
+        sb.append(", submitDate=");
 		sb.append(submitDate);
 		sb.append(", deliverDate=");
 		sb.append(deliveryDate);
@@ -756,6 +771,26 @@ public class Sms implements Serializable {
             sb.append((b & 0xFF));
         }
         return sb.toString();
+    }
+
+
+    public String getReceiptOrigMessageId() {
+        return receiptOrigMessageId;
+    }
+
+
+    public void setReceiptOrigMessageId(String receiptOrigMessageId) {
+        this.receiptOrigMessageId = receiptOrigMessageId;
+    }
+
+
+    public Long getReceiptLocalMessageId() {
+        return receiptLocalMessageId;
+    }
+
+
+    public void setReceiptLocalMessageId(Long receiptLocalMessageId) {
+        this.receiptLocalMessageId = receiptLocalMessageId;
     }
 
 }

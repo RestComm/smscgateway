@@ -68,6 +68,10 @@ public class SmsSetCache {
     private FastMap<Long, Sms> deliveredMsgCache2 = new FastMap<Long, Sms>();
     private Object deliveredMsgCacheSync = new Object();
 
+    private FastMap<String, Long> deliveredRemoteMsgIdCache1 = new FastMap<String, Long>();
+    private FastMap<String, Long> deliveredRemoteMsgIdCache2 = new FastMap<String, Long>();
+    private Object deliveredRemoteMsgIdCacheSync = new Object();
+
     private ScheduledExecutorService executor;
 
 	private static SmsSetCache singeltone;
@@ -101,6 +105,9 @@ public class SmsSetCache {
 
         CacheManTask_Delivered_Msg t3 = ssc.new CacheManTask_Delivered_Msg();
         ssc.executor.schedule(t3, deliveredMsgLiveTime, TimeUnit.SECONDS);
+
+        CacheManTask_Delivered_RemoteMsgId t4 = ssc.new CacheManTask_Delivered_RemoteMsgId();
+        ssc.executor.schedule(t4, deliveredMsgLiveTime, TimeUnit.SECONDS);
     }
 
     public static void stop() {
@@ -321,6 +328,43 @@ public class SmsSetCache {
         }
     }
 
+    public static String generateRemoteMsgIdKey(String remoteMessageId, String destId) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(remoteMessageId);
+        sb.append("_");
+        sb.append(destId);
+        return sb.toString();
+    }
+
+    public void putDeliveredRemoteMsgIdValue(String remoteMessageId, String destId, Long messageId, int deliveredMsgLiveTime) {
+        this.deliveredMsgLiveTime = deliveredMsgLiveTime;
+        if (deliveredMsgLiveTime > 0) {
+            synchronized (this.deliveredRemoteMsgIdCacheSync) {
+                this.deliveredRemoteMsgIdCache1.put(generateRemoteMsgIdKey(remoteMessageId, destId), messageId);
+            }
+        }
+    }
+
+    
+    // ..................................
+    public int getXxxxx() {
+        return this.deliveredRemoteMsgIdCache1.size();
+    }
+    // ..................................
+    
+    
+    public Long getDeliveredRemoteMsgIdValue(String remoteMessageId, String destId) {
+        if (deliveredMsgLiveTime == 0)
+            return null;
+        String key = generateRemoteMsgIdKey(remoteMessageId, destId);
+        synchronized (this.deliveredRemoteMsgIdCacheSync) {
+            Long res = this.deliveredRemoteMsgIdCache1.get(key);
+            if (res == null)
+                res = this.deliveredRemoteMsgIdCache2.get(key);
+            return res;
+        }
+    }
+
     private class CacheManTask implements Runnable {
         public void run() {
             try {
@@ -362,6 +406,25 @@ public class SmsSetCache {
             } finally {
                 if (isStarted) {
                     CacheManTask_Delivered_Msg t = new CacheManTask_Delivered_Msg();
+                    int time = deliveredMsgLiveTime;
+                    // let's make delay 60 sec for "no caching option"
+                    if (time <= 0)
+                        time = 60;
+                    executor.schedule(t, time, TimeUnit.SECONDS);
+                }
+            }
+        }
+    }
+
+    private class CacheManTask_Delivered_RemoteMsgId implements Runnable {
+        public void run() {
+            try {
+                deliveredRemoteMsgIdCache2 = deliveredRemoteMsgIdCache1;
+                deliveredRemoteMsgIdCache1 = new FastMap<String, Long>();
+
+            } finally {
+                if (isStarted) {
+                    CacheManTask_Delivered_RemoteMsgId t = new CacheManTask_Delivered_RemoteMsgId();
                     int time = deliveredMsgLiveTime;
                     // let's make delay 60 sec for "no caching option"
                     if (time <= 0)

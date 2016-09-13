@@ -61,6 +61,7 @@ import org.mobicents.smsc.mproc.impl.MProcMessageImpl;
 import org.mobicents.smsc.mproc.impl.MProcNewMessageImpl;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.mproc.impl.MProcRuleOamMessages;
+import org.mobicents.smsc.mproc.impl.PersistenseCommonInterface;
 import org.mobicents.smsc.mproc.impl.PostArrivalProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostDeliveryProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostDeliveryTempFailureProcessorImpl;
@@ -232,7 +233,7 @@ public class MProcManagement implements MProcManagementMBean {
         return mProcRule;
     }
 
-    public MProcResult applyMProcArrival(Sms sms) {
+    public MProcResult applyMProcArrival(Sms sms, PersistenseCommonInterface persistence) {
         if (this.mprocs.size() == 0) {
             FastList<Sms> res0 = new FastList<Sms>();
             res0.add(sms);
@@ -245,7 +246,7 @@ public class MProcManagement implements MProcManagementMBean {
         PostArrivalProcessorImpl pap = new PostArrivalProcessorImpl(
                 this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
                 this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger);
-        MProcMessage message = new MProcMessageImpl(sms, null);
+        MProcMessage message = new MProcMessageImpl(sms, null, persistence);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -340,7 +341,7 @@ public class MProcManagement implements MProcManagementMBean {
         FastList<MProcRule> cur = this.mprocs;
         PostPreDeliveryProcessorImpl pap = new PostPreDeliveryProcessorImpl(this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
                 this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger);
-        MProcMessage message = new MProcMessageImpl(sms, processingType);
+        MProcMessage message = new MProcMessageImpl(sms, processingType, null);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -386,7 +387,7 @@ public class MProcManagement implements MProcManagementMBean {
 
         FastList<MProcRule> cur = this.mprocs;
         PostImsiProcessorImpl pap = new PostImsiProcessorImpl(logger);
-        MProcMessage message = new MProcMessageImpl(sms, ProcessingType.SS7_SRI);
+        MProcMessage message = new MProcMessageImpl(sms, ProcessingType.SS7_SRI, null);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -426,7 +427,7 @@ public class MProcManagement implements MProcManagementMBean {
         PostDeliveryProcessorImpl pap = new PostDeliveryProcessorImpl(
                 this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
                 this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger, deliveryFailure);
-        MProcMessage message = new MProcMessageImpl(sms, processingType);
+        MProcMessage message = new MProcMessageImpl(sms, processingType, null);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -471,7 +472,7 @@ public class MProcManagement implements MProcManagementMBean {
         PostDeliveryTempFailureProcessorImpl pap = new PostDeliveryTempFailureProcessorImpl(
                 this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
                 this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger);
-        MProcMessage message = new MProcMessageImpl(sms, processingType);
+        MProcMessage message = new MProcMessageImpl(sms, processingType, null);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {

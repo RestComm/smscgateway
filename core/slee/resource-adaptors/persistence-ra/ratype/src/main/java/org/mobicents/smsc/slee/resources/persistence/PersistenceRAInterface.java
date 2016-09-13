@@ -33,12 +33,14 @@ import org.mobicents.smsc.library.QuerySmResponse;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.impl.PersistenseCommonInterface;
 
 /**
  * @author baranowb
- * 
+ * @author sergey vetyutnev
+ *
  */
-public interface PersistenceRAInterface {
+public interface PersistenceRAInterface extends PersistenseCommonInterface {
 
     boolean isDatabaseAvailable();
 
@@ -321,7 +323,8 @@ public interface PersistenceRAInterface {
 
     void c2_createRecordCurrent(Sms sms) throws PersistenceException;
 
-    void c2_createRecordArchive(Sms sms) throws PersistenceException;
+    void c2_createRecordArchive(Sms sms, String dlvMessageId, String dlvDestId, boolean deliveryReceipts,
+            boolean incomingDeliveryReceipts) throws PersistenceException;
 
     void c2_scheduleMessage_ReschedDueSlot(Sms sms, boolean fastStoreAndForwordMode, boolean removeExpiredValidityPeriod) throws PersistenceException;
 
@@ -340,5 +343,7 @@ public interface PersistenceRAInterface {
     Sms c2_getRecordArchiveForMessageId(long messageId) throws PersistenceException;
 
     QuerySmResponse c2_getQuerySmResponse(long messageId) throws PersistenceException;
+
+    Long c2_getMessageIdByRemoteMessageId(String remoteMessageId, String destId) throws PersistenceException;
 
 }

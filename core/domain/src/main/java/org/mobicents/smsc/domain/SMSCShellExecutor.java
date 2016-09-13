@@ -684,6 +684,10 @@ public class SMSCShellExecutor implements ShellExecutor {
                 smscPropertiesManagement.setReceiptsDisabling(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("enableintermediatereceipts")) {
                 smscPropertiesManagement.setEnableIntermediateReceipts(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("enableintermediatereceipts")) {
+                smscPropertiesManagement.setEnableIntermediateReceipts(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("incomereceiptsprocessing")) {
+                smscPropertiesManagement.setIncomeReceiptsProcessing(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("orignetworkidforreceipts")) {
                 smscPropertiesManagement.setOrigNetworkIdForReceipts(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("generatecdr")) {
@@ -919,6 +923,8 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getEnableIntermediateReceipts());
             } else if (parName.equals("orignetworkidforreceipts")) {
                 sb.append(smscPropertiesManagement.getOrigNetworkIdForReceipts());
+            } else if (parName.equals("incomereceiptsprocessing")) {
+                sb.append(smscPropertiesManagement.getIncomeReceiptsProcessing());
             } else if (parName.equals("generatearchivetable")) {
                 sb.append(smscPropertiesManagement.getGenerateArchiveTable().getValue());
 
@@ -1146,6 +1152,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("enableintermediatereceipts = ");
             sb.append(smscPropertiesManagement.getEnableIntermediateReceipts());
+            sb.append("\n");
+
+            sb.append("incomereceiptsprocessing = ");
+            sb.append(smscPropertiesManagement.getIncomeReceiptsProcessing());
             sb.append("\n");
 
             sb.append("orignetworkidforreceipts = ");

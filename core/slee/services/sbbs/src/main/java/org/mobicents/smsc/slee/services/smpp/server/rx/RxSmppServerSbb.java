@@ -55,6 +55,7 @@ import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
+import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.ProcessingType;
@@ -213,8 +214,6 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
 	public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
 		try {
-			logger.severe(String.format("\nonPduRequestTimeout : PduRequestTimeout=" + event));
-
 			SmsSet smsSet = getSmsSet();
 			if (smsSet == null) {
                 logger.severe("RxSmppServerSbb.onPduRequestTimeout(): CMP smsSet is missed");
@@ -487,6 +486,13 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 return;
             }
 
+            // firstly we store remote messageId if sms has a request to delivery receipt
+            String clusterName = smsSet.getDestClusterName();
+            String dlvMessageId = event.getMessageId();
+            if (MessageUtil.isDeliveryReceiptRequest(sms)) {
+                SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, clusterName, sms.getMessageId(), 30);
+            }
+
             // current message is sent
             // firstly sending of a positive response for transactional mode
             sendTransactionalResponseSuccess(sms);
@@ -496,7 +502,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             // Processing succeeded
             sms.getSmsSet().setStatus(ErrorCode.SUCCESS);
-            this.postProcessSucceeded(sms);
+            this.postProcessSucceeded(sms, dlvMessageId, clusterName);
 
             // success CDR generating
             boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
@@ -539,7 +545,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         } else {
             this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SC_SYSTEM_ERROR, "DeliverSm response has a bad status: " + status);
         }
-    }   
+    }
 
     /**
      * Processing a case when an error in message sending process. This stops of message sending, reschedule or drop messages
@@ -582,7 +588,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     this.sendTransactionalResponseFailure(lstPermFailured, lstTempFailured, errorAction, null);
 
                     // Processing messages that were temp or permanent failed or rerouted
-                    this.postProcessPermFailures(lstPermFailured2);
+                    this.postProcessPermFailures(lstPermFailured2, null, null);
                     this.postProcessTempFailures(smsSet, lstTempFailured2, false, false);
                     this.postProcessRerouted(lstRerouted, lstNewNetworkId);
 

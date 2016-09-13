@@ -30,6 +30,7 @@ import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
 import org.mobicents.smsc.mproc.MProcRuleBaseImpl;
@@ -691,6 +692,26 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 //            return;
 //        }
         // TODO: we need proper implementing
+
+        // ...................................
+        this.logger.info("**************** 200000");                
+        if (message.isDeliveryReceipt()) {
+            Long receiptLocalMessageId = message.getReceiptLocalMessageId();
+            DeliveryReceiptData deliveryReceiptData = message.getDeliveryReceiptData();
+            if (receiptLocalMessageId != null && deliveryReceiptData != null) {
+                MProcMessage sentMsg = message.getOriginMessageForDeliveryReceipt(receiptLocalMessageId);
+                
+                
+                this.logger.info("**************** 200001 sentMsg:" + sentMsg);                
+
+                
+                if (sentMsg != null) {
+                    MProcNewMessage newMsg = factory.createNewCopyMessage(sentMsg);
+                    factory.postNewMessage(newMsg);
+                }
+            }
+        }
+        // ...................................
 
         if (this.makeCopy) {
             MProcNewMessage copy = factory.createNewCopyMessage(message);

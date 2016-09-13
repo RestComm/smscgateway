@@ -49,6 +49,10 @@ public class SmsSetCasheTest {
         SmsSetCache.start(correlationIdLiveTime, sriResponseLiveTime, deliveredMsgLiveTime);
         SmsSetCache ssc = SmsSetCache.getInstance();
 
+        String remoteMessageId = "0000100001";
+        String destId = "esme_33";
+        Long messageId = 3000031L;
+
         String correlationID = "000000000011111";
         ISDNAddressString msisdn = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "11111111");
         AddressString serviceCentreAddress = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "22222222");
@@ -60,6 +64,7 @@ public class SmsSetCasheTest {
         sms.setMessageId(mId);
         sms.setShortMessageText("textxxx");
         ssc.putDeliveredMsgValue(sms, deliveredMsgLiveTime);
+        ssc.putDeliveredRemoteMsgIdValue(remoteMessageId, destId, messageId, deliveredMsgLiveTime);
 
         String targetID = "22222_1_1_2";
         LocationInfoWithLMSI locationInfoWithLMSI = null;
@@ -73,6 +78,8 @@ public class SmsSetCasheTest {
         assertNotNull(vv1);
         Sms sms2 = ssc.getDeliveredMsgValue(mId);
         assertNotNull(sms2);
+        Long msgId2 = ssc.getDeliveredRemoteMsgIdValue(remoteMessageId, destId);
+        assertEquals((long) msgId2, (long) messageId);
 
         Thread.sleep(2500);
         CorrelationIdValue v2 = ssc.getCorrelationIdCacheElement(correlationID);
@@ -81,6 +88,8 @@ public class SmsSetCasheTest {
         assertNotNull(vv2);
         sms2 = ssc.getDeliveredMsgValue(mId);
         assertNotNull(sms2);
+        msgId2 = ssc.getDeliveredRemoteMsgIdValue(remoteMessageId, destId);
+        assertEquals((long) msgId2, (long) messageId);
 
         Thread.sleep(2000);
         CorrelationIdValue v3 = ssc.getCorrelationIdCacheElement(correlationID);
@@ -89,6 +98,8 @@ public class SmsSetCasheTest {
         assertNull(vv3);
         sms2 = ssc.getDeliveredMsgValue(mId);
         assertNull(sms2);
+        msgId2 = ssc.getDeliveredRemoteMsgIdValue(remoteMessageId, destId);
+        assertNull(msgId2);
 
         SmsSetCache.stop();
     }

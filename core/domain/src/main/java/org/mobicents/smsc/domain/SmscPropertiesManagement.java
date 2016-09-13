@@ -86,6 +86,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private static final String PROCESSING_SMS_SET_TIMEOUT = "processingSmsSetTimeout";
     private static final String GENERATE_RECEIPT_CDR = "generateReceiptCdr";
     private static final String RECEIPTS_DISABLING = "receiptsDisabling";
+    private static final String INCOME_RECEIPTS_PROCESSING = "incomeReceiptsProcessing";
     private static final String ENABLE_INTERMEDIATE_RECEIPTS = "enableIntermediateReceipts";
     private static final String ORIG_NETWORK_ID_FOR_RECEIPTS = "origNetworkIdForReceipts";
     private static final String GENERATE_CDR = "generateCdr";
@@ -204,8 +205,11 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	// true: we generate CDR for both receipt and regular messages
 	// false: we generate CDR only for regular messages
     private boolean generateReceiptCdr = false;
-    // true: generating of receipts will be disabled for all messages
+    // true: generating of delivery receipts will be disabled for all messages
     private boolean receiptsDisabling = false;
+    // true: processing of incoming delivery receipts from remote SMSC GW: replacing of messageId in a receipt by a local
+    // messageId
+    private boolean incomeReceiptsProcessing = false;
     // true: allowing of generating of receipts for temporary failures
     private boolean enableIntermediateReceipts = false;
     // true: for receipts the original networkId will be assigned
@@ -688,6 +692,15 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
+    public boolean getIncomeReceiptsProcessing() {
+        return incomeReceiptsProcessing;
+    }
+
+    public void setIncomeReceiptsProcessing(boolean incomeReceiptsProcessing) {
+        this.incomeReceiptsProcessing = incomeReceiptsProcessing;
+        this.store();
+    }
+
     public boolean getOrigNetworkIdForReceipts() {
         return this.origNetworkIdForReceipts;
     }
@@ -1121,6 +1134,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			writer.write(this.processingSmsSetTimeout, PROCESSING_SMS_SET_TIMEOUT, Integer.class);
             writer.write(this.generateReceiptCdr, GENERATE_RECEIPT_CDR, Boolean.class);
             writer.write(this.receiptsDisabling, RECEIPTS_DISABLING, Boolean.class);
+            writer.write(this.incomeReceiptsProcessing, INCOME_RECEIPTS_PROCESSING, Boolean.class);
             writer.write(this.enableIntermediateReceipts, ENABLE_INTERMEDIATE_RECEIPTS, Boolean.class);
             writer.write(this.origNetworkIdForReceipts, ORIG_NETWORK_ID_FOR_RECEIPTS, Boolean.class);
             writer.write(this.generateCdr.getValue(), GENERATE_CDR, Integer.class);
@@ -1305,6 +1319,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             valB = reader.read(RECEIPTS_DISABLING, Boolean.class);
             if (valB != null) {
                 this.receiptsDisabling = valB.booleanValue();
+            }
+            valB = reader.read(INCOME_RECEIPTS_PROCESSING, Boolean.class);
+            if (valB != null) {
+                this.incomeReceiptsProcessing = valB.booleanValue();
             }
             valB = reader.read(ENABLE_INTERMEDIATE_RECEIPTS, Boolean.class);
             if (valB != null) {

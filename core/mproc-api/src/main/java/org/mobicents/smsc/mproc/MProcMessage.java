@@ -91,4 +91,14 @@ public interface MProcMessage {
      */
     int getErrorCode();
 
+    // delivery receipt staff
+
+    boolean isDeliveryReceipt();
+
+    DeliveryReceiptData getDeliveryReceiptData();
+
+    Long getReceiptLocalMessageId();
+
+    MProcMessage getOriginMessageForDeliveryReceipt(long messageId);
+
 }

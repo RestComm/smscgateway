@@ -68,6 +68,7 @@ import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
+import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
 import org.mobicents.smsc.library.SbbStates;
@@ -76,6 +77,7 @@ import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.persistence.SmppExtraConstants;
@@ -258,7 +260,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 		}
 
 		SubmitSmResp response = event.createResponse();
-		response.setMessageId(((Long) sms.getMessageId()).toString());
+		response.setMessageId(sms.getMessageIdText());
 
 		// Lets send the Response with success here
 		try {
@@ -396,7 +398,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 		}
 
 		DataSmResp response = event.createResponse();
-		response.setMessageId(((Long) sms.getMessageId()).toString());
+		response.setMessageId(sms.getMessageIdText());
 
 		// Lets send the Response with success here
 		try {
@@ -519,7 +521,7 @@ public abstract class TxSmppServerSbb implements Sbb {
         if (parseResult.getParsedMessages().size() > 0)
             sms = parseResult.getParsedMessages().get(0);
         if (sms != null)
-            response.setMessageId(((Long) sms.getMessageId()).toString());
+            response.setMessageId(sms.getMessageIdText());
         for (UnsucessfulSME usme : parseResult.getBadAddresses()) {
             try {
                 response.addUnsucessfulSME(usme);
@@ -685,7 +687,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 		}
 
 		DeliverSmResp response = event.createResponse();
-		response.setMessageId(((Long) sms.getMessageId()).toString());
+        response.setMessageId(sms.getMessageIdText());
 
 		// Lets send the Response with success here
 		try {
@@ -1529,12 +1531,55 @@ public abstract class TxSmppServerSbb implements Sbb {
             sms0.setMessageDeliveryResultResponse(messageDeliveryResultResponse);
         }
 
+        // delivery receipt transit - replacing of messageId in delivery receipt with local messageId
+
+        this.logger.info("**************** 00001: smscPropertiesManagement.getIncomeReceiptsProcessing()="
+                + smscPropertiesManagement.getIncomeReceiptsProcessing() + ", MessageUtil.isDeliveryReceipt(sms0)="
+                + MessageUtil.isDeliveryReceipt(sms0));
+
+        if (smscPropertiesManagement.getIncomeReceiptsProcessing() && MessageUtil.isDeliveryReceipt(sms0)) {
+            DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(sms0.getShortMessageText());
+
+            this.logger.info("**************** 00002: deliveryReceiptData=" + deliveryReceiptData);
+
+            if (deliveryReceiptData != null) {
+                String clusterName = esme.getClusterName();
+                String dlvMessageId = deliveryReceiptData.getMessageId();
+                Long messageId = null;
+                try {
+                    messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvMessageId, clusterName);
+                } catch (PersistenceException e) {
+                    logger.severe("Exception when runnung c2_getMessageIdByRemoteMessageId(): " + e.getMessage(), e);
+                }
+
+                this.logger.info("**************** 00003: clusterName=" + clusterName + ", dlvMessageId=" + dlvMessageId
+                        + ", messageId=" + messageId);
+
+                if (messageId != null) {
+                    // we found in local cache / database a reference to an origin
+                    logger.info("Remote delivery receipt: clusterName=" + clusterName + ", dlvMessageId=" + dlvMessageId
+                            + ", receipt=" + sms0.getShortMessageText());
+
+                    sms0.setReceiptOrigMessageId(dlvMessageId);
+                    sms0.setReceiptLocalMessageId(messageId);
+
+                    String messageIdStr = MessageUtil.createMessageIdString(messageId);
+                    String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr,
+                            deliveryReceiptData.getSubmitDate(), deliveryReceiptData.getDoneDate(),
+                            ErrorCode.fromInt(deliveryReceiptData.getError()), deliveryReceiptData.getText(),
+                            deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_DELIVERED), null,
+                            deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_ENROUTE));
+                    sms0.setShortMessageText(updatedReceiptText);
+                }
+            }
+        }
+
         if (withCharging) {
             ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
             chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
         } else {
             // applying of MProc
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
             if (mProcResult.isMessageRejected()) {
                 sms0.setMessageDeliveryResultResponse(null);
                 SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",

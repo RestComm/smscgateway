@@ -19,7 +19,7 @@ public class MProcRuleDefaultTest {
         SmsSet smsSet = new SmsSet();
         sms.setSmsSet(smsSet);
         smsSet.setStatus(ErrorCode.ABSENT_SUBSCRIBER); // code 8
-        MProcMessage message = new MProcMessageImpl(sms, ProcessingType.SMPP);
+        MProcMessage message = new MProcMessageImpl(sms, ProcessingType.SMPP, null);
 
         MProcRuleDefaultImpl pmr = new MProcRuleDefaultImpl();
 

@@ -51,6 +51,8 @@ import org.mobicents.protocols.ss7.map.smstpdu.UserDataImpl;
 import org.mobicents.protocols.ss7.sccp.parameter.GlobalTitle;
 import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
+import org.mobicents.smsc.mproc.impl.DeliveryReceiptDataImpl;
 import org.mobicents.smsc.smpp.GenerateType;
 
 import com.cloudhopper.smpp.SmppConstants;
@@ -475,19 +477,19 @@ public class MessageUtil {
         return null;
     }
 
-    private static final String DELIVERY_ACK_ID = "id:";
-    private static final String DELIVERY_ACK_SUB = " sub:";
-    private static final String DELIVERY_ACK_DLVRD = " dlvrd:";
-    private static final String DELIVERY_ACK_SUBMIT_DATE = " submit date:";
-    private static final String DELIVERY_ACK_DONE_DATE = " done date:";
-    private static final String DELIVERY_ACK_STAT = " stat:";
-    private static final String DELIVERY_ACK_ERR = " err:";
-    private static final String DELIVERY_ACK_TEXT = " text:";
-    private static final String DELIVERY_ACK_STATE_DELIVERED = "DELIVRD";
-    private static final String DELIVERY_ACK_STATE_UNDELIVERABLE = "UNDELIV";
-    private static final String DELIVERY_ACK_STATE_ENROUTE = "ENROUTE";
+    public static final String DELIVERY_ACK_ID = "id:";
+    public static final String DELIVERY_ACK_SUB = " sub:";
+    public static final String DELIVERY_ACK_DLVRD = " dlvrd:";
+    public static final String DELIVERY_ACK_SUBMIT_DATE = " submit date:";
+    public static final String DELIVERY_ACK_DONE_DATE = " done date:";
+    public static final String DELIVERY_ACK_STAT = " stat:";
+    public static final String DELIVERY_ACK_ERR = " err:";
+    public static final String DELIVERY_ACK_TEXT = " text:";
+    public static final String DELIVERY_ACK_STATE_DELIVERED = "DELIVRD";
+    public static final String DELIVERY_ACK_STATE_UNDELIVERABLE = "UNDELIV";
+    public static final String DELIVERY_ACK_STATE_ENROUTE = "ENROUTE";
     public static final byte ESME_DELIVERY_ACK = 0x04;
-    private static final SimpleDateFormat DELIVERY_ACK_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmm");
+    public static final SimpleDateFormat DELIVERY_ACK_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmm");
 
     public static boolean isReceiptOnSuccess(int registeredDelivery) {
         int code = registeredDelivery & 0x03;
@@ -559,19 +561,38 @@ public class MessageUtil {
         Date validityPeriod = MessageUtil.addHours(new Date(), 24);
         receipt.setValidityPeriod(validityPeriod);
 
+        String rcpt = createDeliveryReceiptMessage(sms.getMessageIdText(), sms.getSubmitDate(),
+                new Timestamp(System.currentTimeMillis()), sms.getSmsSet().getStatus(), sms.getShortMessageText(), delivered,
+                extraString, tempFailure);
+
+        // TODO: now we are sending all in GSM7 encoding
+        receipt.setDataCoding(0);
+
+        receipt.setShortMessageText(rcpt);
+
+        receipt.setEsmClass(ESME_DELIVERY_ACK | (sms.getEsmClass() & 0x03));
+
+        return receipt;
+    }
+
+    public static String createDeliveryReceiptMessage(String messageId, Date submitDate, Date deliveryDate,
+            ErrorCode errorCode, String origMsgText, boolean delivered, String extraString, boolean tempFailure) {
         StringBuffer sb = new StringBuffer();
-        DataCodingScheme dcs = new DataCodingSchemeImpl(sms.getDataCoding());
 
         sb.append(DELIVERY_ACK_ID);
-        sb.append(sms.getMessageIdText());
+        sb.append(messageId);
         sb.append(DELIVERY_ACK_SUB);
         sb.append("001");
         sb.append(DELIVERY_ACK_DLVRD);
-        sb.append("001");
+        if (delivered) {
+            sb.append("001");
+        } else {
+            sb.append("000");
+        }
         sb.append(DELIVERY_ACK_SUBMIT_DATE);
-        sb.append(DELIVERY_ACK_DATE_FORMAT.format(sms.getSubmitDate()));
+        sb.append(DELIVERY_ACK_DATE_FORMAT.format(submitDate));
         sb.append(DELIVERY_ACK_DONE_DATE);
-        sb.append(DELIVERY_ACK_DATE_FORMAT.format(new Timestamp(System.currentTimeMillis())));
+        sb.append(DELIVERY_ACK_DATE_FORMAT.format(deliveryDate)); // new Timestamp(System.currentTimeMillis())
         sb.append(DELIVERY_ACK_STAT);
         if (delivered) {
             sb.append(DELIVERY_ACK_STATE_DELIVERED);
@@ -584,26 +605,20 @@ public class MessageUtil {
                 sb.append(DELIVERY_ACK_STATE_ENROUTE);
             }
             sb.append(DELIVERY_ACK_ERR);
-            ErrorCode errorCode = sms.getSmsSet().getStatus();
             sb.append(errorCode != null ? errorCode.getCodeText() : "null");
         }
         sb.append(DELIVERY_ACK_TEXT);
-        sb.append(getFirst20CharOfSMS(sms.getShortMessageText()));
+        sb.append(getFirst20CharOfSMS(origMsgText));
         if (extraString != null) {
             sb.append(extraString);
-        }        
-
-        // TODO: now we are sending all in GSM7 encoding
-        receipt.setDataCoding(0);
-
-        receipt.setShortMessageText(sb.toString());
-
-        receipt.setEsmClass(ESME_DELIVERY_ACK | (sms.getEsmClass() & 0x03));
-
-        return receipt;
+        }
+        return sb.toString();
     }
 
-//    private static String getFirst20CharOfSMS(byte[] rawSms, DataCodingScheme dcs) {
+    public static String createMessageIdString(long messageId) {
+        return String.format("%010d", messageId);
+    }
+
     private static String getFirst20CharOfSMS(String first20CharOfSms) {
         if (first20CharOfSms == null)
             return "";
@@ -611,6 +626,108 @@ public class MessageUtil {
             first20CharOfSms = first20CharOfSms.substring(0, 20);
         }
         return first20CharOfSms;
+    }
+
+    public static boolean isDeliveryReceipt(Sms sms) {
+        int esmeClass = sms.getEsmClass();
+        int messageType = esmeClass & 0x3C;
+        if (messageType == MessageUtil.ESME_DELIVERY_ACK)
+            return true;
+        else
+            return false;
+    }
+
+    public static boolean isDeliveryReceiptRequest(Sms sms) {
+        int registeredDelivery = sms.getRegisteredDelivery();
+        int receiptRequest = registeredDelivery & 0x13;
+        if (receiptRequest != 0)
+            return true;
+        else
+            return false;
+    }
+
+    public static DeliveryReceiptData parseDeliveryReceipt(String msg) {
+        if (msg == null || msg.length() < 102)
+            return null;
+
+        DeliveryReceiptDataImpl deliveryReceiptData = new DeliveryReceiptDataImpl();
+        String idKey = msg.substring(0, 3);
+        String idVal = msg.substring(3, 13);
+        String submittedKey = msg.substring(13, 18);
+        String submittedVal = msg.substring(18, 21);
+        String deliveredKey = msg.substring(21, 28);
+        String deliveredVal = msg.substring(28, 31);
+        String submitDateKey = msg.substring(31, 44);
+        String submitDateVal = msg.substring(44, 54);
+        String doneDateKey = msg.substring(54, 65);
+        String doneDateVal = msg.substring(65, 75);
+        String statusKey = msg.substring(75, 81);
+        String statusVal = msg.substring(81, 88);
+        String errorKey = msg.substring(88, 93);
+        String errorVal = msg.substring(93, 96);
+        String textKey = msg.substring(96, 102);
+        String textVal = msg.substring(102);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmm");
+
+        if (idKey.equals(DELIVERY_ACK_ID)) {
+            try {
+                // long messageId = Long.parseLong(idVal);
+                // deliveryReceiptData.setMessageId(messageId);
+                deliveryReceiptData.setMessageId(idVal);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        if (submittedKey.equals(DELIVERY_ACK_SUB)) {
+            try {
+                int msgSubmitted = Integer.parseInt(submittedVal);
+                deliveryReceiptData.setMsgSubmitted(msgSubmitted);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        if (deliveredKey.equals(DELIVERY_ACK_DLVRD)) {
+            try {
+                int msgDelivered = Integer.parseInt(deliveredVal);
+                deliveryReceiptData.setMsgDelivered(msgDelivered);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        if (submitDateKey.equals(DELIVERY_ACK_SUBMIT_DATE)) {
+            try {
+                Date submitDate = sdf.parse(submitDateVal);
+                deliveryReceiptData.setSubmitDate(submitDate);
+            } catch (ParseException e) {
+            }
+        }
+
+        if (doneDateKey.equals(DELIVERY_ACK_DONE_DATE)) {
+            try {
+                Date doneDate = sdf.parse(doneDateVal);
+                deliveryReceiptData.setDoneDate(doneDate);
+            } catch (ParseException e) {
+            }
+        }
+
+        if (statusKey.equals(DELIVERY_ACK_STAT)) {
+            deliveryReceiptData.setStatus(statusVal);
+        }
+
+        if (errorKey.equals(DELIVERY_ACK_ERR)) {
+            try {
+                int error = Integer.parseInt(errorVal);
+                deliveryReceiptData.setError(error);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        if (textKey.toLowerCase().equals(DELIVERY_ACK_TEXT)) {
+            deliveryReceiptData.setText(textVal);
+        }
+
+        return deliveryReceiptData;
     }
 
     /**

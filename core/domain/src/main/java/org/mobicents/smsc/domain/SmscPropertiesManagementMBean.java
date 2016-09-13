@@ -247,6 +247,10 @@ public interface SmscPropertiesManagementMBean {
 
     public void setEnableIntermediateReceipts(boolean enableIntermediateReceipts);
 
+    public boolean getIncomeReceiptsProcessing();
+
+    public void setIncomeReceiptsProcessing(boolean incomeReceiptsProcessing);
+
     public boolean getOrigNetworkIdForReceipts();
 
     public void setOrigNetworkIdForReceipts(boolean origNetworkIdForReceipts);
