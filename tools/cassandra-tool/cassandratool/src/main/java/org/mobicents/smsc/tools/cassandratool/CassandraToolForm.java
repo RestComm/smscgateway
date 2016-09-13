@@ -139,32 +139,33 @@ public class CassandraToolForm {
         
         JScrollPane scrollPane = new JScrollPane();
         panel_1.add(scrollPane);
-        
+
         tResult = new JTable();
-        tResult.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "TargetId", "DueSLot", "MessageId",
+        tResult.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "TargetId", "Id", "DueSLot", "MessageId",
                 "InSystem", "DeliveryCount", "SmStatus", "ValidityPeriod", "SchedulerDeliveryTime", "Text", }) {
-            Class[] columnTypes = new Class[] { String.class, String.class, String.class, String.class, String.class,
+            Class[] columnTypes = new Class[] { String.class, String.class, String.class, String.class, String.class, String.class,
                     String.class, String.class, String.class, String.class };
 
             public Class getColumnClass(int columnIndex) {
                 return columnTypes[columnIndex];
             }
 
-            boolean[] columnEditables = new boolean[] { false, false, false, false, false, false, false, false, false };
+            boolean[] columnEditables = new boolean[] { false, false, false, false, false, false, false, false, false, false };
 
             public boolean isCellEditable(int row, int column) {
                 return columnEditables[column];
             }
         });
         tResult.getColumnModel().getColumn(0).setPreferredWidth(80);
-        tResult.getColumnModel().getColumn(1).setPreferredWidth(140);
-        tResult.getColumnModel().getColumn(2).setPreferredWidth(20);
+        tResult.getColumnModel().getColumn(1).setPreferredWidth(20);
+        tResult.getColumnModel().getColumn(2).setPreferredWidth(140);
         tResult.getColumnModel().getColumn(3).setPreferredWidth(20);
         tResult.getColumnModel().getColumn(4).setPreferredWidth(20);
-        tResult.getColumnModel().getColumn(5).setPreferredWidth(80);
+        tResult.getColumnModel().getColumn(5).setPreferredWidth(20);
         tResult.getColumnModel().getColumn(6).setPreferredWidth(80);
         tResult.getColumnModel().getColumn(7).setPreferredWidth(80);
-        tResult.getColumnModel().getColumn(8).setPreferredWidth(120);
+        tResult.getColumnModel().getColumn(8).setPreferredWidth(80);
+        tResult.getColumnModel().getColumn(9).setPreferredWidth(120);
 
         tResult.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tResult.setFillsViewportHeight(true);
@@ -348,6 +349,7 @@ public class CassandraToolForm {
 
                         Vector newRow = new Vector();
                         newRow.add(smsSet.getTargetId());
+                        newRow.add(smsSet.getSms(0).getDbId());
                         String reportDate = df.format(this.dbOperations.c2_getTimeForDueSlot(smsSet.getSms(0).getDueSlot()));
                         newRow.add(smsSet.getSms(0).getDueSlot() + " - " + reportDate);
                         newRow.add(smsSet.getSms(0).getMessageId());
@@ -378,6 +380,7 @@ public class CassandraToolForm {
                     Vector newRow = new Vector();
                     newRow.add(row.getString(Schema.COLUMN_ADDR_DST_DIGITS));
                     newRow.add(row.getUUID(Schema.COLUMN_ID));
+                    newRow.add("");
                     newRow.add(row.getLong(Schema.COLUMN_MESSAGE_ID));
                     newRow.add("");
                     newRow.add("");
@@ -394,6 +397,7 @@ public class CassandraToolForm {
 
                     Vector newRow = new Vector();
                     newRow.add(row.getString(Schema.COLUMN_REMOTE_MESSAGE_ID));
+                    newRow.add("");
                     newRow.add(row.getString(Schema.COLUMN_DEST_ID));
                     newRow.add(row.getLong(Schema.COLUMN_MESSAGE_ID));
                     newRow.add("");
