@@ -974,7 +974,7 @@
 																			'<thead><tr><th style="width: 40%;">Name</th><th style="width: 55%;">Value</th><th>&nbsp;</th></tr></thead>' +
 																			'<tbody>'+
 																			
-																				'<tr data-toggle="tooltip" title="Rule will be applied only if destination type of number (TON) of target SMS match\'s with this rule\'s desttonmask. Set value to -1 as wild card to match all the TON. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13; Default value is -1">'+
+																				'<tr data-toggle="tooltip" title="Name of a class for a mproc rule">'+
 																					'<td style="font-size: 0.9em;">Class Name</td>'+
 																					'<td style="font-size: 0.9em; padding: 0;">'+
 																						'<span id="' +id + 'classname-text">' + classname + '</span>'+
@@ -983,12 +983,12 @@
 																					'</td>'+
 																				'</tr>'+
 																				
-																				'<tr data-toggle="tooltip" title="Once rule match\'s, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix will be applied to new SMS">'+
+																				'<tr data-toggle="tooltip" title="Parameters list for a mproc rule">'+
 																				'<td style="font-size: 0.9em;">Rule Parameters</td>'+
 																				'<td style="font-size: 0.9em; padding: 0;">'+
 																					'<div id="div-' + id +'RuleParameters-input" class="control-group">'+
 																					'<span id="' + id +'RuleParameters-input" style="display: none;">'+
-																						'<input type="text" class="input-small" value="' + ruleparameters + '" /> ' +
+																						'<input type="text" class="input-mini" style="width: 320px; margin-right: 12px;" value="' + ruleparameters + '" /> ' +
 																						'<i class="icon-ok" style="cursor: pointer;" onclick="onCustomModifyEsmeOk(\'' + id+ '\', \'ruleparameters\', \'' + id+"RuleParameters" + '\', \'true\')"></i> ' +
 																						'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"RuleParameters"+']\').toggle(); $(\'input[id^='+id+"RuleParameters"+']\').focus();"></i>' + 
 																					'</span>'+
@@ -1105,7 +1105,7 @@
 					success: function(value) {
 						updateMProc();
 						logToConsole('INFO', 'MProc rule ' + id + ' created successfuly.');
-						$('#entities-modal').modal('hide');
+						$('#entities-modal-custom').modal('hide');
 					},
 					error: function(value){
 						errorUID = ("st" + new Date().getTime()).hashCode();
@@ -1354,6 +1354,7 @@
 					success: function(value) {
 						updateMProc();
 						logToConsole('INFO', 'Successfully modified rule ' + mbeanName );
+						spanElementTxt.innerHTML= inputTextEle.value;
 					},
 					error: function(value){
 						errorUID = ("st" + new Date().getTime()).hashCode();
