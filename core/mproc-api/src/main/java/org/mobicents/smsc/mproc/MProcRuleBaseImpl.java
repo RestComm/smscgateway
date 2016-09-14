@@ -150,11 +150,12 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
         return args;
     }
 
-    protected void writeParameter(StringBuilder sb, int parNumber, String name, Object value) {
+    protected void writeParameter(StringBuilder sb, int parNumber, String name, Object value, String paramaterSplitter,
+            String valueSplitter) {
         if (parNumber > 0)
-            sb.append(", ");
+            sb.append(paramaterSplitter);
         sb.append(name);
-        sb.append("=");
+        sb.append(valueSplitter);
         sb.append(value);
     }
 

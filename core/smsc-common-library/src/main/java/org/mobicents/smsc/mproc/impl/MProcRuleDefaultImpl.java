@@ -30,7 +30,6 @@ import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
-import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
 import org.mobicents.smsc.mproc.MProcRuleBaseImpl;
@@ -1053,75 +1052,75 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int parNumber = 0;
 
         if (destTonMask != -1) {
-            writeParameter(sb, parNumber++, "destTonMask", destTonMask);
+            writeParameter(sb, parNumber++, "destTonMask", destTonMask, ", ", "=");
         }
         if (destNpiMask != -1) {
-            writeParameter(sb, parNumber++, "destNpiMask", destNpiMask);
+            writeParameter(sb, parNumber++, "destNpiMask", destNpiMask, ", ", "=");
         }
         if (this.destDigMask != null && !this.destDigMask.equals("") && !this.destDigMask.equals("-1")) {
-            writeParameter(sb, parNumber++, "destDigMask", destDigMask);
+            writeParameter(sb, parNumber++, "destDigMask", destDigMask, ", ", "=");
         }
         if (originatingMask != null) {
-            writeParameter(sb, parNumber++, "originatingMask", originatingMask);
+            writeParameter(sb, parNumber++, "originatingMask", originatingMask, ", ", "=");
         }
         if (networkIdMask != -1) {
-            writeParameter(sb, parNumber++, "networkIdMask", networkIdMask);
+            writeParameter(sb, parNumber++, "networkIdMask", networkIdMask, ", ", "=");
         }
         if (originNetworkIdMask != -1) {
-            writeParameter(sb, parNumber++, "originNetworkIdMask", originNetworkIdMask);
+            writeParameter(sb, parNumber++, "originNetworkIdMask", originNetworkIdMask, ", ", "=");
         }
         if (this.origEsmeNameMask != null && !this.origEsmeNameMask.equals("") && !this.origEsmeNameMask.equals("-1")) {
-            writeParameter(sb, parNumber++, "origEsmeNameMask", origEsmeNameMask);
+            writeParameter(sb, parNumber++, "origEsmeNameMask", origEsmeNameMask, ", ", "=");
         }
-        if (this.originatorSccpAddressMask != null && !this.originatorSccpAddressMask.equals("")
+        if (this.originatorSccpAddressMask != null && !this.originatorSccpAddressMask.equals(" ")
                 && !this.originatorSccpAddressMask.equals("-1")) {
-            writeParameter(sb, parNumber++, "originatorSccpAddressMask", originatorSccpAddressMask);
+            writeParameter(sb, parNumber++, "originatorSccpAddressMask", originatorSccpAddressMask, ", ", "=");
         }
         if (this.imsiDigitsMask != null && !this.imsiDigitsMask.equals("") && !this.imsiDigitsMask.equals("-1")) {
-            writeParameter(sb, parNumber++, "imsiDigitsMask", imsiDigitsMask);
+            writeParameter(sb, parNumber++, "imsiDigitsMask", imsiDigitsMask, ", ", "=");
         }
         if (this.nnnDigitsMask != null && !this.nnnDigitsMask.equals("") && !this.nnnDigitsMask.equals("-1")) {
-            writeParameter(sb, parNumber++, "nnnDigitsMask", nnnDigitsMask);
+            writeParameter(sb, parNumber++, "nnnDigitsMask", nnnDigitsMask, ", ", "=");
         }
         if (processingType != null) {
-            writeParameter(sb, parNumber++, "processingType", processingType);
+            writeParameter(sb, parNumber++, "processingType", processingType, ", ", "=");
         }
         if (this.errorCode != null && !this.errorCode.equals("") && !this.errorCode.equals("-1")) {
-            writeParameter(sb, parNumber++, "errorCode", errorCode);
+            writeParameter(sb, parNumber++, "errorCode", errorCode, ", ", "=");
         }
 
         if (newNetworkId != -1) {
-            writeParameter(sb, parNumber++, "newNetworkId", newNetworkId);
+            writeParameter(sb, parNumber++, "newNetworkId", newNetworkId, ", ", "=");
         }
         if (newDestTon != -1) {
-            writeParameter(sb, parNumber++, "newDestTon", newDestTon);
+            writeParameter(sb, parNumber++, "newDestTon", newDestTon, ", ", "=");
         }
         if (newDestNpi != -1) {
-            writeParameter(sb, parNumber++, "newDestNpi", newDestNpi);
+            writeParameter(sb, parNumber++, "newDestNpi", newDestNpi, ", ", "=");
         }
         if (this.addDestDigPrefix != null && !this.addDestDigPrefix.equals("") && !this.addDestDigPrefix.equals("-1")) {
-            writeParameter(sb, parNumber++, "addDestDigPrefix", addDestDigPrefix);
+            writeParameter(sb, parNumber++, "addDestDigPrefix", addDestDigPrefix, ", ", "=");
         }
         if (makeCopy) {
-            writeParameter(sb, parNumber++, "makeCopy", makeCopy);
+            writeParameter(sb, parNumber++, "makeCopy", makeCopy, ", ", "=");
         }
         if (hrByPass) {
-            writeParameter(sb, parNumber++, "hrByPass", hrByPass);
+            writeParameter(sb, parNumber++, "hrByPass", hrByPass, ", ", "=");
         }
         if (dropAfterSri) {
-            writeParameter(sb, parNumber++, "dropAfterSri", dropAfterSri);
+            writeParameter(sb, parNumber++, "dropAfterSri", dropAfterSri, ", ", "=");
         }
         if (dropAfterTempFail) {
-            writeParameter(sb, parNumber++, "dropAfterTempFail", dropAfterTempFail);
+            writeParameter(sb, parNumber++, "dropAfterTempFail", dropAfterTempFail, ", ", "=");
         }
         if (newNetworkIdAfterSri != -1) {
-            writeParameter(sb, parNumber++, "newNetworkIdAfterSri", newNetworkIdAfterSri);
+            writeParameter(sb, parNumber++, "newNetworkIdAfterSri", newNetworkIdAfterSri, ", ", "=");
         }
         if (newNetworkIdAfterPermFail != -1) {
-            writeParameter(sb, parNumber++, "newNetworkIdAfterPermFail", newNetworkIdAfterPermFail);
+            writeParameter(sb, parNumber++, "newNetworkIdAfterPermFail", newNetworkIdAfterPermFail, ", ", "=");
         }
         if (newNetworkIdAfterTempFail != -1) {
-            writeParameter(sb, parNumber++, "newNetworkIdAfterTempFail", newNetworkIdAfterTempFail);
+            writeParameter(sb, parNumber++, "newNetworkIdAfterTempFail", newNetworkIdAfterTempFail, ", ", "=");
         }
 
         return sb.toString();
