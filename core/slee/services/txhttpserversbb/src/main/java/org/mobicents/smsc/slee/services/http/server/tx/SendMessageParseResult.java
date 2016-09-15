@@ -24,29 +24,22 @@ package org.mobicents.smsc.slee.services.http.server.tx;
 
 import org.mobicents.smsc.library.Sms;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
- * @author sergey vetyutnev
+ * @author Tomasz Pa?ucki
  *
  */
-public class SubmitMultiParseResult {
+public class SendMessageParseResult {
 
-    private ArrayList<Sms> parsedMessages;
-//    private ArrayList<UnsucessfulSME> badAddresses;
+    private List<Sms> parsedMessages;
 
-    public SubmitMultiParseResult(ArrayList<Sms> parsedMessages) {
+    public SendMessageParseResult(List<Sms> parsedMessages) {
         this.parsedMessages = parsedMessages;
-//        this.badAddresses = badAddresses;
     }
 
-    public ArrayList<Sms> getParsedMessages() {
+    public List<Sms> getParsedMessages() {
         return parsedMessages;
     }
-
-//    public ArrayList<UnsucessfulSME> getBadAddresses() {
-//        return badAddresses;
-//    }
-
 }

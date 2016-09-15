@@ -1,4 +1,4 @@
-package org.mobicents.smsc.slee.services.http.server.tx;
+package org.mobicents.smsc.slee.services.http.server.tx.exceptions;
 
 /**
  * Created by tpalucki on 08.09.16.

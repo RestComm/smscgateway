@@ -33,4 +33,8 @@ public class MockHttpServletRequestEvent implements HttpServletRequestEvent {
     public void setRequest(HttpServletRequest req){
         this.request = req;
     }
+
+    public void setResponse(HttpServletResponse resp) {
+        this.response = resp;
+    }
 }

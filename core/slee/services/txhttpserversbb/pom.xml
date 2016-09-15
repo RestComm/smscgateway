@@ -55,6 +55,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>persistence-ra</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mobicents.smsc</groupId>
             <artifactId>smpp-server-ra-library</artifactId>
             <version>${project.version}</version>
@@ -137,24 +142,6 @@
         </dependency>
 
         <!--SPRING-->
-
-        <dependency>
-            <groupId>pl.ivmx.ocp</groupId>
-            <artifactId>jslee-mock</artifactId>
-            <version>1.0.8.8-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-test</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-            </exclusions>
-            <scope>runtime</scope>
-        </dependency>
-        <!--<dependency>-->
-        <!--<groupId>junit</groupId>-->
-        <!--<artifactId>junit</artifactId>-->
-        <!--</dependency>-->
-
         <dependency>
             <groupId>org.simpleframework</groupId>
             <artifactId>simple</artifactId>

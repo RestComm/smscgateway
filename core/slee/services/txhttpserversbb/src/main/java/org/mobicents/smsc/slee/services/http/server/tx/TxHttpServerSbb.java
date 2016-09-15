@@ -1,26 +1,9 @@
 package org.mobicents.smsc.slee.services.http.server.tx;
 
-//import com.cloudhopper.smpp.SmppConstants;
-//import com.cloudhopper.smpp.pdu.*;
-//import com.cloudhopper.smpp.tlv.Tlv;
-//import com.cloudhopper.smpp.tlv.TlvConvertException;
-//import com.cloudhopper.smpp.type.RecoverablePduException;
-//import com.cloudhopper.smpp.type.SmppInvalidArgumentException;
-//import com.cloudhopper.smpp.type.UnsucessfulSME;
-//import com.cloudhopper.smpp.util.TlvUtil;
 import javolution.util.FastList;
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
-//import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
-//import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
-//import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-//import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
-import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecoder;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecodingData;
-import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
@@ -29,17 +12,16 @@ import org.mobicents.smsc.domain.*;
 import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
-import org.mobicents.smsc.slee.resources.persistence.SmppExtraConstants;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
-//import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
-//import org.mobicents.smsc.slee.resources.smpp.server.SmppTransaction;
-//import org.mobicents.smsc.slee.resources.smpp.server.SmppTransactionACIFactory;
-//import org.mobicents.smsc.slee.resources.smpp.server.events.PduRequestTimeout;
 import org.mobicents.smsc.slee.services.charging.ChargingMedium;
 import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
-//import org.mobicents.smsc.smpp.CheckMessageLimitResult;
-//import org.mobicents.smsc.smpp.Esme;
-//import org.mobicents.smsc.smpp.SmppEncoding;
+import org.mobicents.smsc.slee.services.http.server.tx.data.HttpGetMessageIdStatusIncomingData;
+import org.mobicents.smsc.slee.services.http.server.tx.data.HttpSendMessageIncomingData;
+import org.mobicents.smsc.slee.services.http.server.tx.data.HttpSendMessageOutgoingData;
+import org.mobicents.smsc.slee.services.http.server.tx.enums.Status;
+import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
+import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpUtils;
+import org.mobicents.smsc.slee.services.http.server.tx.utils.ResponseFormatter;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -51,12 +33,7 @@ import javax.slee.resource.ResourceAdaptorTypeID;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,382 +56,120 @@ public abstract class TxHttpServerSbb implements Sbb {
     protected Tracer logger;
     private SbbContextExt sbbContext;
 
-//    private SmppTransactionACIFactory smppServerTransactionACIFactory = null;
-//    protected SmppSessions smppServerSessions = null;
+    private final String SEND_MESSAGE_URL_SUFFIX = "/sendMessage";
+    private final String GET_STATUS_URL_SUFFIX = "/getMessageIdStatus";
+
     protected PersistenceRAInterface persistence = null;
     protected SchedulerRaSbbInterface scheduler = null;
-    private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
 
-    private static Charset utf8Charset = Charset.forName("UTF-8");
-    private static Charset ucs2Charset = Charset.forName("UTF-16BE");
-    private static Charset isoCharset = Charset.forName("ISO-8859-1");
-    private static Charset gsm7Charset = new GSMCharset("GSM", new String[]{});
+    private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
 
     public PersistenceRAInterface getStore() {
         return this.persistence;
     }
 
-    /**
-     * Event Handlers
-     */
-
-//        private void onSubmitSm(com.cloudhopper.smpp.pdu.SubmitSm event, ActivityContextInterface aci) {
-//            // TODO remove it ...........................
-//            // long l2 = Date.parse(event.getServiceType());
-//            // Date dt0 = new Date(l2);
-//            Date dt0 = new Date();
-//            Date dt1 = new Date();
-//            // TODO remove it ...........................
-//
-//            SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
-//            Esme esme = smppServerTransaction.getEsme();
-//            String esmeName = esme.getName();
-//
-//            if (this.logger.isFineEnabled()) {
-//                this.logger.fine("\nReceived SUBMIT_SM = " + event + " from Esme name=" + esmeName);
-//            }
-//
-//            CheckMessageLimitResult cres = esme.onMessageReceived(1);
-//            if (cres.getResult() != CheckMessageLimitResult.Result.ok) {
-//                if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
-//                    this.updateOverrateCounters(cres);
-//                    this.logger.info(cres.getMessage());
-//                }
-//
-//                SubmitSmResp response = event.createResponse();
-//                response.setCommandStatus(SmppConstants.STATUS_THROTTLED);
-//                String s = cres.getMessage();
-//                if (s.length() > 255)
-//                    s = s.substring(0, 255);
-//                Tlv tlv;
-//                try {
-//                    tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                    response.addOptionalParameter(tlv);
-//                } catch (TlvConvertException e) {
-//                    this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//                }
-//
-//                // Lets send the Response with error here
-//                try {
-//                    this.smppServerSessions.sendResponsePdu(esme, event, response);
-//                } catch (Exception e) {
-//                    this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-//                }
-//                return;
-//            }
-//
-//            Sms sms;
-//            try {
-//                TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
-//                PersistenceRAInterface store = getStore();
-//
-//                sms = this.createSmsEvent(event, esme, ta, store);
-//                this.processSms(sms, store, esme, event, null, null, IncomingMessageType.submit_sm);
-//            } catch (SmscProcessingException e1) {
-//                if (!e1.isSkipErrorLogging()) {
-//                    this.logger.severe(e1.getMessage(), e1);
-//                    smscStatAggregator.updateMsgInFailedAll();
-//                }
-//
-//                SubmitSmResp response = event.createResponse();
-//                response.setCommandStatus(e1.getSmppErrorCode());
-//                String s = e1.getMessage();
-//                if (s != null) {
-//                    if (s.length() > 255)
-//                        s = s.substring(0, 255);
-//                    Tlv tlv;
-//                    try {
-//                        tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                        response.addOptionalParameter(tlv);
-//                    } catch (TlvConvertException e) {
-//                        this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//                    }
-//                }
-//
-//                // Lets send the Response with error here
-//                try {
-//                    this.smppServerSessions.sendResponsePdu(esme, event, response);
-//                } catch (Exception e) {
-//                    this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-//                }
-//
-//                return;
-//            } catch (Throwable e1) {
-//                String s = "Exception when processing SubmitSm message: " + e1.getMessage();
-//                this.logger.severe(s, e1);
-//                smscStatAggregator.updateMsgInFailedAll();
-//
-//                SubmitSmResp response = event.createResponse();
-//                response.setCommandStatus(SmppConstants.STATUS_SYSERR);
-//                if (s.length() > 255)
-//                    s = s.substring(0, 255);
-//                Tlv tlv;
-//                try {
-//                    tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                    response.addOptionalParameter(tlv);
-//                } catch (TlvConvertException e) {
-//                    this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//                }
-//
-//                // Lets send the Response with error here
-//                try {
-//                    this.smppServerSessions.sendResponsePdu(esme, event, response);
-//                } catch (Exception e) {
-//                    this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-//                }
-//
-//                return;
-//            }
-//
-//            SubmitSmResp response = event.createResponse();
-//            response.setMessageId(((Long) sms.getMessageId()).toString());
-//
-//            // Lets send the Response with success here
-//            try {
-//                if (sms.getMessageDeliveryResultResponse() == null) {
-//                    this.smppServerSessions.sendResponsePdu(esme, event, response);
-//                }
-//            } catch (Throwable e) {
-//                this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-//            }
-//
-//            // TODO remove it ...........................
-//            Date dt3 = new Date();
-//            SmscStatProvider.getInstance().setParam1((int) (dt3.getTime() - dt0.getTime()));
-//            SmscStatProvider.getInstance().setParam2((int) (dt3.getTime() - dt1.getTime()));
-//            // TODO remove it ...........................
-//
-//        }
-
-    // TODO what is it? Counters for smsc? Ask Dominik
-//    private void updateOverrateCounters(CheckMessageLimitResult cres) {
-//        switch (cres.getDomain()) {
-//            case perSecond:
-//                smscStatAggregator.updateSmppSecondRateOverlimitFail();
-//                break;
-//            case perMinute:
-//                smscStatAggregator.updateSmppMinuteRateOverlimitFail();
-//                break;
-//            case perHour:
-//                smscStatAggregator.updateSmppHourRateOverlimitFail();
-//                break;
-//            case perDay:
-//                smscStatAggregator.updateSmppDayRateOverlimitFail();
-//                break;
-//        }
-//    }
-
-//        public void onDataSm(com.cloudhopper.smpp.pdu.DataSm event, ActivityContextInterface aci) {
-//            SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
-//            Esme esme = smppServerTransaction.getEsme();
-//            String esmeName = esme.getName();
-//
-//            if (this.logger.isFineEnabled()) {
-//                this.logger.fine("Received DATA_SM = " + event + " from Esme name=" + esmeName);
-//            }
-//
-//            CheckMessageLimitResult cres = esme.onMessageReceived(1);
-//            if (cres.getResult() != CheckMessageLimitResult.Result.ok) {
-//                if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
-//                    this.updateOverrateCounters(cres);
-//                    this.logger.info(cres.getMessage());
-//                }
-//
-//                DataSmResp response = event.createResponse();
-//                response.setCommandStatus(SmppConstants.STATUS_THROTTLED);
-//                String s = cres.getMessage();
-//                if (s.length() > 255)
-//                    s = s.substring(0, 255);
-//                Tlv tlv;
-//                try {
-//                    tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                    response.addOptionalParameter(tlv);
-//                } catch (TlvConvertException e) {
-//                    this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//                }
-//
-//                // Lets send the Response with error here
-//                try {
-//                    this.smppServerSessions.sendResponsePdu(esme, event, response);
-//                } catch (Exception e) {
-//                    this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
-//                }
-//                return;
-//            }
-//
-//            Sms sms;
-//            try {
-//                TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
-//                PersistenceRAInterface store = getStore();
-//
-//                sms = this.createSmsEvent(event, esme, ta, store);
-//                this.processSms(sms, store, esme, null, event, null, IncomingMessageType.data_sm);
-//            } catch (SmscProcessingException e1) {
-//                if (!e1.isSkipErrorLogging()) {
-//                    this.logger.severe(e1.getMessage(), e1);
-//                    smscStatAggregator.updateMsgInFailedAll();
-//                }
-//
-//                DataSmResp response = event.createResponse();
-//                response.setCommandStatus(e1.getSmppErrorCode());
-//                String s = e1.getMessage();
-//                if (s != null) {
-//                    if (s.length() > 255)
-//                        s = s.substring(0, 255);
-//                    Tlv tlv;
-//                    try {
-//                        tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                        response.addOptionalParameter(tlv);
-//                    } catch (TlvConvertException e) {
-//                        this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//                    }
-//                }
-//
-//                // Lets send the Response with error here
-//                try {
-//                    this.smppServerSessions.sendResponsePdu(esme, event, response);
-//                } catch (Exception e) {
-//                    this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
-//                }
-//
-//                return;
-//            } catch (Throwable e1) {
-//                String s = "Exception when processing dataSm message: " + e1.getMessage();
-//                this.logger.severe(s, e1);
-//                smscStatAggregator.updateMsgInFailedAll();
-//
-//                DataSmResp response = event.createResponse();
-//                response.setCommandStatus(SmppConstants.STATUS_SYSERR);
-//                if (s.length() > 255)
-//                    s = s.substring(0, 255);
-//                Tlv tlv;
-//                try {
-//                    tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                    response.addOptionalParameter(tlv);
-//                } catch (TlvConvertException e) {
-//                    this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//                }
-//
-//                // Lets send the Response with error here
-//                try {
-//                    this.smppServerSessions.sendResponsePdu(esme, event, response);
-//                } catch (Exception e) {
-//                    this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-//                }
-//
-//                return;
-//            }
-//
-//            DataSmResp response = event.createResponse();
-//            response.setMessageId(((Long) sms.getMessageId()).toString());
-//
-//            // Lets send the Response with success here
-//            try {
-//                if (sms.getMessageDeliveryResultResponse() == null) {
-//                    this.smppServerSessions.sendResponsePdu(esme, event, response);
-//                }
-//            } catch (Exception e) {
-//                this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
-//            }
-//        }
-
     public void onHttpGet(HttpServletRequestEvent event, ActivityContextInterface aci) {
         this.logger.fine("onHttpGet");
         HttpServletRequest request = event.getRequest();
-        // TODO fill the response with proper message format content
-        HttpServletResponse response = event.getResponse();
-
-
-        HttpIncomingData submitMessage = null;
-        SubmitMultiResponse submitMultiResponse = null;
-        try {
-            submitMessage = createSubmitMulti(request);
-            this.processHttpEvent(event, submitMessage, aci);
-//            response.getWriter().write(ResponseFormatter.format(submitMultiResponse, submitMessage.getFormat()));
-        } catch (HttpApiException e) {
-            e.printStackTrace();
+        // decision if getStatus or sendMessage
+        final String requestURI = request.getRequestURI();
+        if(requestURI != null && requestURI.contains(SEND_MESSAGE_URL_SUFFIX)){
+            processHttpSendMessageEvent(event, aci);
+        } else if(requestURI != null && requestURI.contains(GET_STATUS_URL_SUFFIX)){
+            this.processHttpGetMessageIdStatusEvent(event, aci);
+        } else {
+            try {
+                HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpUtils.STATUS_SERVICE_UNAVAILABLE, "Unknown operation on the HTTP API");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void onHttpPost(HttpServletRequestEvent event, ActivityContextInterface aci) {
         this.logger.fine("onHttpPost");
         HttpServletRequest request = event.getRequest();
-        // TODO fill the response with proper message format content
-        HttpServletResponse response = event.getResponse();
-
-        HttpIncomingData submitMessage = null;
-        SubmitMultiResponse submitMultiResponse = null;
-        try {
-            submitMessage = createSubmitMulti(request);
-            this.processHttpEvent(event, submitMessage, aci);
-//            response.getWriter().write(ResponseFormatter.format(submitMultiResponse, submitMessage.getFormat()));
-        } catch (HttpApiException e) {
-            e.printStackTrace();
+        // decision if getStatus or sendMessage
+        final String requestURI = request.getRequestURI();
+        if(requestURI != null && requestURI.contains(SEND_MESSAGE_URL_SUFFIX)){
+            processHttpSendMessageEvent(event, aci);
+        } else if(requestURI != null && requestURI.contains(GET_STATUS_URL_SUFFIX)){
+            this.processHttpGetMessageIdStatusEvent(event, aci);
+        } else {
+            try {
+                HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpUtils.STATUS_SERVICE_UNAVAILABLE, "Unknown operation on the HTTP API");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    private HttpIncomingData createSubmitMulti(HttpServletRequest request) throws HttpApiException {
+    private void processHttpSendMessageEvent(HttpServletRequestEvent event, ActivityContextInterface aci) {
+        HttpServletRequest request = event.getRequest();
+        HttpSendMessageIncomingData incomingData;
+        try {
+            incomingData = createSendMessageIncomingData(request);
+            this.sendMessage(event, incomingData, aci);
+        } catch (HttpApiException e) {
+            try {
+                HttpUtils.sendErrorResponse(this.logger, event.getResponse(), HttpUtils.STATUS_BAD_REQUEST, e.getMessage());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    private void processHttpGetMessageIdStatusEvent(HttpServletRequestEvent event, ActivityContextInterface aci) {
+        // TODO handle processing of the event
+        HttpServletRequest request = event.getRequest();
+        HttpGetMessageIdStatusIncomingData incomingData;
+        try {
+            incomingData = createGetMessageIdStatusIncomingData(request);
+            this.getMessageIdStatus(event, incomingData, aci);
+        } catch (HttpApiException e) {
+            try {
+                HttpUtils.sendErrorResponse(this.logger, event.getResponse(), HttpUtils.STATUS_BAD_REQUEST, e.getMessage());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request) throws HttpApiException {
         final String userId = request.getParameter("userid");
+        final String password = request.getParameter("password");
         final String msg = request.getParameter("msg");
         final String format = request.getParameter("format");
         final String encoding = request.getParameter("encoding");
         final String senderId = request.getParameter("sender");
         final String[] destAddresses = request.getParameterValues("to");
 
-        HttpIncomingData httpIncomingData = new HttpIncomingData(userId, msg, format, encoding, senderId, destAddresses);
-        return httpIncomingData;
+        return new HttpSendMessageIncomingData(userId, password, msg, format, encoding, senderId, destAddresses);
     }
 
-    public void processHttpEvent(HttpServletRequestEvent event, HttpIncomingData incomingData, ActivityContextInterface aci) {
+    private HttpGetMessageIdStatusIncomingData createGetMessageIdStatusIncomingData(HttpServletRequest request) throws HttpApiException {
+        final String userId = request.getParameter("userid");
+        final String password = request.getParameter("password");
+        final String msgId = request.getParameter("msgid");
 
+        return new HttpGetMessageIdStatusIncomingData(userId, password, msgId);
+    }
+
+    public void sendMessage(HttpServletRequestEvent event, HttpSendMessageIncomingData incomingData, ActivityContextInterface aci) {
         if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived SubmitMessage = " + incomingData);
+            this.logger.fine("\nReceived sendMessage = " + incomingData);
         }
+        HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
+        outgoingData.setStatus(Status.ERROR);
 
-//        List<com.cloudhopper.smpp.type.Address> addrList = event.getDestAddresses();
-        List<String> destinations = incomingData.getDestAddresses();
-//        int msgCnt = 0;
-//        if (addrList != null)
-//            msgCnt = addrList.size();
-//        CheckMessageLimitResult cres = esme.onMessageReceived(msgCnt);
-//        if (cres.getResult() != CheckMessageLimitResult.Result.ok) {
-//            if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
-//                this.updateOverrateCounters(cres);
-//                this.logger.info(cres.getMessage());
-//            }
-//
-//            SubmitMultiResponse response = event.createResponse();
-//            response.setCommandStatus(SmppConstants.STATUS_THROTTLED);
-//            String s = cres.getMessage();
-//            if (s.length() > 255)
-//                s = s.substring(0, 255);
-//            Tlv tlv;
-//            try {
-//                tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                response.addOptionalParameter(tlv);
-//            } catch (TlvConvertException e) {
-//                this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//            }
-//
-//            // Lets send the Response with error here
-//            try {
-//                this.smppServerSessions.sendResponsePdu(esme, event, response);
-//            } catch (Exception e) {
-//                this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
-//            }
-//            return;
-//        }
-
+//        List<String> destinations = incomingData.getDestAddresses();
         PersistenceRAInterface store = getStore();
-//        SubmitMultiParseResult parseResult;
-        SubmitMultiParseResult parseResult;
+        SendMessageParseResult parseResult;
+        //TODO: get value of networkId
+        int networkId = 0;
         try {
-//            parseResult = this.createSmsEventMulti(event, esme, store, esme.getNetworkId());
-            //TODO: get value of networkId
-            int networkId = 0;
-            parseResult = this.createSmsEventMulti(incomingData, store, networkId);
+            parseResult = this.createSmsEventMultiDest(incomingData, store, networkId);
             for (Sms sms : parseResult.getParsedMessages()) {
-//                this.processSms(sms, store, esme, null, null, event, IncomingMessageType.submit_multi);
                 this.processSms(sms, store, incomingData);
             }
         } catch (SmscProcessingException e1) {
@@ -462,323 +177,57 @@ public abstract class TxHttpServerSbb implements Sbb {
                 this.logger.severe(e1.getMessage(), e1);
                 smscStatAggregator.updateMsgInFailedAll();
             }
-
-//            SubmitMultiResponse response = incomingData.createResponse();
-//            response.setCommandStatus(e1.getSmppErrorCode());
-//            String s = e1.getMessage();
-//            if (s != null) {
-//                if (s.length() > 255)
-//                    s = s.substring(0, 255);
-//                Tlv tlv;
-//                try {
-//                    tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                    response.addOptionalParameter(tlv);
-//                } catch (TlvConvertException e) {
-//                    this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//                }
-//            }
-
-            // Lets send the Response with error here
-
-            // TODO build response
             try {
-//                this.smppServerSessions.sendResponsePdu(esme, incomingData, response);
-                //TODO: what error status??
-                HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while trying to send SubmitMultiResponse" );
-            } catch (Exception e) {
-//                this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
+                //TODO: what error status?
+                HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while trying to send send SMS message to multiple destinations.", ResponseFormatter.format(outgoingData, incomingData.getFormat()));
+            } catch (IOException e) {
                 this.logger.severe("Error while trying to send HttpErrorResponse", e);
             }
-            return ;
+            return;
         } catch (Throwable e1) {
             String s = "Exception when processing SubmitMulti message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
-
-//            SubmitMultiResponse response = event.createResponse();
-//            response.setCommandStatus(SmppConstants.STATUS_SYSERR);
-//            if (s.length() > 255)
-//                s = s.substring(0, 255);
-//            Tlv tlv;
-//            try {
-//                tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                response.addOptionalParameter(tlv);
-//            } catch (TlvConvertException e) {
-//                this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//            }
-
             // Lets send the Response with error here
             try {
-//                this.smppServerSessions.sendResponsePdu(esme, event, response);
                 //TODO: what error status??
-                HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while trying to send SubmitMultiResponse" );
-
-            } catch (Exception e) {
+                HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while trying to send SubmitMultiResponse", ResponseFormatter.format(outgoingData, incomingData.getFormat()));
+            } catch (IOException e) {
                 this.logger.severe("Error while trying to send SubmitMultiResponse=", e);
             }
-            // TODO build response
-            return ;
+            return;
         }
-
-//        SubmitMultiResponse response = event.createResponse();
-//        Sms sms = null;
-//        if (parseResult.getParsedMessages().size() > 0)
-            HttpOutgoingData httpOutgoingData = new HttpOutgoingData();
         for (Sms sms : parseResult.getParsedMessages()) {
-            httpOutgoingData.put(sms.getSmsSet().getDestAddr(), sms.getMessageId());
+            outgoingData.put(sms.getSmsSet().getDestAddr(), sms.getMessageId());
         }
-
-//            sms = parseResult.getParsedMessages().get(0);
-//        if (sms != null)
-//            response.setMessageId(((Long) sms.getMessageId()).toString());
-//        for (UnsucessfulSME usme : parseResult.getBadAddresses()) {
-//            try {
-//                response.addUnsucessfulSME(usme);
-//            } catch (SmppInvalidArgumentException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//        }
 
         // Lets send the Response with success here
         try {
-//            if (sms == null || sms.getMessageDeliveryResultResponse() == null) {
-//                this.smppServerSessions.sendResponsePdu(esme, event, response);
-                //TODO: what error status??
-                //TODO: response format
-                HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), httpOutgoingData.toString() );
-
-//            }
+            outgoingData.setStatus(Status.SUCCESS);
+            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()) );
         } catch (Throwable e) {
-            this.logger.severe("Error while trying to send SubmitMultiResponse=" + httpOutgoingData, e);
+            this.logger.severe("Error while trying to send SubmitMultiResponse=" + outgoingData, e);
         }
     }
 
+    private void getMessageIdStatus(HttpServletRequestEvent event, HttpGetMessageIdStatusIncomingData incomingData, ActivityContextInterface aci) {
+        if (this.logger.isFineEnabled()) {
+            this.logger.fine("\nReceived getMessageIdStatus = " + incomingData);
+        }
 
-//    private TargetAddress createDestTargetAddress(com.cloudhopper.smpp.type.Address addr, int networkId) throws SmscProcessingException {
-private TargetAddress createDestTargetAddress(String addr, int networkId) throws SmscProcessingException {
+        // TODO implement
+    }
+
+    private TargetAddress createDestTargetAddress(String addr, int networkId) throws SmscProcessingException {
         if (addr == null || "".equals(addr)) {
-//            throw new SmscProcessingException("DestAddress digits are absent", SmppConstants.STATUS_INVDSTADR, MAPErrorCode.systemFailure, addr);
             throw new SmscProcessingException("DestAddress digits are absent", 0, MAPErrorCode.systemFailure, addr);
         }
-
         int destTon, destNpi;
-//        switch (addr.getTon()) {
-//            case SmppConstants.TON_UNKNOWN:
-//                destTon = smscPropertiesManagement.getDefaultTon();
-//                break;
-//            case SmppConstants.TON_INTERNATIONAL:
-//                destTon = addr.getTon();
-//                break;
-//            case SmppConstants.TON_NATIONAL:
-//                destTon = addr.getTon();
-//                break;
-//            case SmppConstants.TON_ALPHANUMERIC:
-//                destTon = addr.getTon();
-//                break;
-//            default:
-//                throw new SmscProcessingException("DestAddress TON not supported: " + addr.getTon(),
-//                        SmppConstants.STATUS_INVDSTTON, MAPErrorCode.systemFailure, addr);
-//        }
         destTon = smscPropertiesManagement.getDefaultTon();
-
-//        if (addr.getTon() == SmppConstants.TON_ALPHANUMERIC) {
-//            destNpi = addr.getNpi();
-//        } else {
-//            switch (addr.getNpi()) {
-//                case SmppConstants.NPI_UNKNOWN:
-//                    destNpi = smscPropertiesManagement.getDefaultNpi();
-//                    break;
-//                case SmppConstants.NPI_E164:
-//                    destNpi = addr.getNpi();
-//                    break;
-//                default:
-//                    throw new SmscProcessingException("DestAddress NPI not supported: " + addr.getNpi(), SmppConstants.STATUS_INVDSTNPI,
-//                            MAPErrorCode.systemFailure, addr);
-//            }
-//        }
         destNpi = smscPropertiesManagement.getDefaultNpi();
         // TODO set Validity Period somewhere in the code
-
         TargetAddress ta = new TargetAddress(destTon, destNpi, addr, networkId);
         return ta;
-    }
-
-//    public void onDeliverSm(com.cloudhopper.smpp.pdu.DeliverSm event, ActivityContextInterface aci) {
-//        SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
-//        Esme esme = smppServerTransaction.getEsme();
-//        String esmeName = esme.getName();
-//
-//        if (this.logger.isFineEnabled()) {
-//            this.logger.fine("\nReceived DELIVER_SM = " + event + " from Esme name=" + esmeName);
-//        }
-//
-//        CheckMessageLimitResult cres = esme.onMessageReceived(1);
-//        if (cres.getResult() != CheckMessageLimitResult.Result.ok) {
-//            if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
-//                this.updateOverrateCounters(cres);
-//                this.logger.info(cres.getMessage());
-//            }
-//
-//            DeliverSmResp response = event.createResponse();
-//            response.setCommandStatus(SmppConstants.STATUS_THROTTLED);
-//            String s = cres.getMessage();
-//            if (s.length() > 255)
-//                s = s.substring(0, 255);
-//            Tlv tlv;
-//            try {
-//                tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                response.addOptionalParameter(tlv);
-//            } catch (TlvConvertException e) {
-//                this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//            }
-//
-//            // Lets send the Response with error here
-//            try {
-//                this.smppServerSessions.sendResponsePdu(esme, event, response);
-//            } catch (Exception e) {
-//                this.logger.severe("Error while trying to send DeliverSmResponse=" + response, e);
-//            }
-//            return;
-//        }
-//
-//        Sms sms;
-//        try {
-//            TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
-//            PersistenceRAInterface store = getStore();
-//
-//            sms = this.createSmsEvent(event, esme, ta, store);
-//            this.processSms(sms, store, esme, null, null, null, IncomingMessageType.deliver_sm);
-//        } catch (SmscProcessingException e1) {
-//            if (!e1.isSkipErrorLogging()) {
-//                this.logger.severe(e1.getMessage(), e1);
-//                smscStatAggregator.updateMsgInFailedAll();
-//            }
-//
-//            DeliverSmResp response = event.createResponse();
-//            response.setCommandStatus(e1.getSmppErrorCode());
-//            String s = e1.getMessage();
-//            if (s != null) {
-//                if (s.length() > 255)
-//                    s = s.substring(0, 255);
-//                Tlv tlv;
-//                try {
-//                    tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                    response.addOptionalParameter(tlv);
-//                } catch (TlvConvertException e) {
-//                    this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//                }
-//            }
-//
-//            // Lets send the Response with error here
-//            try {
-//                this.smppServerSessions.sendResponsePdu(esme, event, response);
-//            } catch (Exception e) {
-//                this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-//            }
-//
-//            return;
-//        } catch (Throwable e1) {
-//            String s = "Exception when processing SubmitSm message: " + e1.getMessage();
-//            this.logger.severe(s, e1);
-//            smscStatAggregator.updateMsgInFailedAll();
-//
-//            DeliverSmResp response = event.createResponse();
-//            response.setCommandStatus(SmppConstants.STATUS_SYSERR);
-//            if (s.length() > 255)
-//                s = s.substring(0, 255);
-//            Tlv tlv;
-//            try {
-//                tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-//                response.addOptionalParameter(tlv);
-//            } catch (TlvConvertException e) {
-//                this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-//            }
-//
-//            // Lets send the Response with error here
-//            try {
-//                this.smppServerSessions.sendResponsePdu(esme, event, response);
-//            } catch (Exception e) {
-//                this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-//            }
-//
-//            return;
-//        }
-//
-//        DeliverSmResp response = event.createResponse();
-//        response.setMessageId(((Long) sms.getMessageId()).toString());
-//
-//        // Lets send the Response with success here
-//        try {
-//            this.smppServerSessions.sendResponsePdu(esme, event, response);
-//        } catch (Throwable e) {
-//            this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-//        }
-//    }
-
-//    public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
-//        logger.severe(String.format("\nonPduRequestTimeout : PduRequestTimeout=%s", event));
-//        // TODO : Handle this
-//    }
-
-//    public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
-//                                          EventContext eventContext) {
-//        logger.severe(String.format("\nonRecoverablePduException : RecoverablePduException=%s", event));
-//        // TODO : Handle this
-//    }
-
-    @Override
-    public void sbbActivate() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sbbCreate() throws CreateException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sbbExceptionThrown(Exception arg0, Object arg1, ActivityContextInterface arg2) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sbbLoad() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sbbPassivate() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sbbPostCreate() throws CreateException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sbbRemove() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sbbRolledBack(RolledBackContext arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void sbbStore() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -787,13 +236,7 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
 
         try {
             Context ctx = (Context) new InitialContext().lookup("java:comp/env");
-
-//            this.smppServerTransactionACIFactory = (SmppTransactionACIFactory) ctx
-//                    .lookup("slee/resources/smppp/server/1.0/acifactory");
-//            this.smppServerSessions = (SmppSessions) ctx.lookup("slee/resources/smpp/server/1.0/provider");
-
             this.logger = this.sbbContext.getTracer(getClass().getSimpleName());
-
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, PERSISTENCE_LINK);
             this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID, SCHEDULER_LINK);
         } catch (Exception ne) {
@@ -801,16 +244,9 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
         }
     }
 
-    @Override
-    public void unsetSbbContext() {
-        // TODO Auto-generated method stub
-
-    }
-
     public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
         ServiceID serviceID = event.getService();
         this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
-        // TODO add flag for HTTP API service state in SbbStates
         SbbStates.setSmscTxHttpServerServiceState(true);
     }
 
@@ -818,7 +254,6 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
         boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
         if (isServiceActivity) {
             this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
-            // TODO add flag for HTTP API service state in SbbStates
             SbbStates.setSmscTxHttpServerServiceState(false);
         }
     }
@@ -1160,20 +595,11 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
 //        return MessageUtil.getNationalLanguageIdentifierUdh(nationalLanguageLockingShift, nationalLanguageSingleShift);
 //    }
 
-//    protected SubmitMultiParseResult createSmsEventMulti(SubmitMulti event, Esme origEsme, PersistenceRAInterface store, int networkId) throws SmscProcessingException {
-    protected SubmitMultiParseResult createSmsEventMulti(HttpIncomingData incomingData, PersistenceRAInterface store, int networkId) throws SmscProcessingException {
-//        List<com.cloudhopper.smpp.type.Address> addrList = event.getDestAddresses();
-        List<String> addrList = incomingData.getDestAddresses();
-//        if (addrList == null || addrList.size() == 0) {
-//            throw new SmscProcessingException("For received SubmitMulti no DestAddresses found: ", SmppConstants.STATUS_INVDLNAME, MAPErrorCode.systemFailure,
-//                    null);
-//        }
-        if (addrList == null || addrList.size() == 0) {
-//            throw new SmscProcessingException("For received SubmitMessage no DestAddresses found: ", SmppConstants.STATUS_INVDLNAME, MAPErrorCode.systemFailure,
-//                    null);
-            throw new SmscProcessingException();
+    protected SendMessageParseResult createSmsEventMultiDest(HttpSendMessageIncomingData incomingData, PersistenceRAInterface store, int networkId) throws SmscProcessingException {
+        List<String> addressList = incomingData.getDestAddresses();
+        if (addressList == null || addressList.size() == 0) {
+            throw new SmscProcessingException("For received SubmitMessage no DestAddresses found: ", 0, MAPErrorCode.systemFailure, null);
         }
-
 //        if (event.getSourceAddress() == null || event.getSourceAddress().getAddress() == null
 //                || event.getSourceAddress().getAddress().isEmpty()) {
 //            throw new SmscProcessingException("SourceAddress digits are absent", SmppConstants.STATUS_INVSRCADR,
@@ -1407,7 +833,7 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
 //        }
 
         // ScheduleDeliveryTime processing
-        Date scheduleDeliveryTime;
+        Date scheduleDeliveryTime = new Date(System.currentTimeMillis());
 //        try {
 //            scheduleDeliveryTime = MessageUtil.parseSmppDate(event.getScheduleDeliveryTime());
 //            scheduleDeliveryTime = MessageUtil.parseDate(incomingData.getScheduleDeliveryTime());
@@ -1421,11 +847,11 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
         long messageId = store.c2_getNextMessageId();
         SmscStatProvider.getInstance().setCurrentMessageId(messageId);
 
-        ArrayList<Sms> msgList = new ArrayList<Sms>(addrList.size());
+        ArrayList<Sms> msgList = new ArrayList<Sms>(addressList.size());
 //        ArrayList<UnsucessfulSME> badAddresses = new ArrayList<UnsucessfulSME>(addrList.size());
 
 //        for (com.cloudhopper.smpp.type.Address address : addrList) {
-        for (String address : addrList) {
+        for (String address : addressList) {
             boolean succAddr = false;
             TargetAddress ta = null;
             try {
@@ -1516,12 +942,10 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
         // TODO: process case when event.getReplaceIfPresent()==true: we need
         // remove old message with same MessageId ?
 
-        return new SubmitMultiParseResult(msgList);
+        return new SendMessageParseResult(msgList);
     }
 
-//    private void processSms(Sms sms0, PersistenceRAInterface store, Esme esme, SubmitSm eventSubmit, DataSm eventData,
-//                            SubmitMulti eventSubmitMulti, IncomingMessageType incomingMessageType) throws SmscProcessingException {
-    private void processSms(Sms sms0, PersistenceRAInterface store, HttpIncomingData eventSubmitMulti) throws SmscProcessingException {
+    private void processSms(Sms sms0, PersistenceRAInterface store, HttpSendMessageIncomingData eventSubmitMulti) throws SmscProcessingException {
         if (logger.isInfoEnabled()) {
             logger.info(String.format("\nReceived sms=%s", sms0.toString()));
         }
@@ -1592,8 +1016,6 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
             MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0);
             if (mProcResult.isMessageRejected()) {
                 sms0.setMessageDeliveryResultResponse(null);
-//                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-//                        SmppConstants.STATUS_SUBMITFAIL, 0, null);
                 SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
                         0, 0, null);
                 e.setSkipErrorLogging(true);
@@ -1612,7 +1034,6 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
             }
 
             smscStatAggregator.updateMsgInReceivedAll();
-//            smscStatAggregator.updateMsgInReceivedSmpp();
 
             FastList<Sms> smss = mProcResult.getMessageList();
             for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end; ) {
@@ -1627,8 +1048,6 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
                             try {
                                 this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                             } catch (Exception e) {
-//                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(), SmppConstants.STATUS_SYSERR,
-//                                        MAPErrorCode.systemFailure, null, e);
                                 throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
                                         0, MAPErrorCode.systemFailure, null, e);
                             }
@@ -1639,30 +1058,17 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
                                     sms.setStoringAfterFailure(true);
                                     this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                                 } catch (Exception e) {
-//                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-//                                            SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
                                     throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
                                             0, MAPErrorCode.systemFailure, null, e);
                                 }
                             } else {
                                 try {
                                     sms.setStored(true);
-//                                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                                        store.createLiveSms(sms);
-//                                        if (sms.getScheduleDeliveryTime() == null)
-//                                            store.setNewMessageScheduled(sms.getSmsSet(),
-//                                                    MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-//                                        else
-//                                            store.setNewMessageScheduled(sms.getSmsSet(), sms.getScheduleDeliveryTime());
-//                                    } else {
                                     this.scheduler.setDestCluster(sms.getSmsSet());
                                     store.c2_scheduleMessage_ReschedDueSlot(sms,
                                             smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
                                             false);
-//                                    }
                                 } catch (PersistenceException e) {
-//                                    throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
-//                                            SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
                                     throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
                                             0, MAPErrorCode.systemFailure, null, e);
                                 }
@@ -1698,10 +1104,6 @@ private TargetAddress createDestTargetAddress(String addr, int networkId) throws
         }
         return ret;
     }
-
-//    public enum IncomingMessageType {
-//        submit_sm, data_sm, deliver_sm, submit_multi,
-//    }
 }
 
 
