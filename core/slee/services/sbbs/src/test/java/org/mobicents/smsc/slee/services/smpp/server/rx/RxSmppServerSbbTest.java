@@ -44,6 +44,7 @@ import javax.slee.UnrecognizedEventException;
 import javax.slee.facilities.ActivityContextNamingFacility;
 import javax.slee.facilities.AlarmFacility;
 import javax.slee.facilities.TimerFacility;
+import javax.slee.facilities.TimerID;
 import javax.slee.facilities.Tracer;
 import javax.slee.nullactivity.NullActivityContextInterfaceFactory;
 import javax.slee.nullactivity.NullActivityFactory;
@@ -518,6 +519,18 @@ public class RxSmppServerSbbTest {
         public boolean getDlvIsEnded() {
             // TODO Auto-generated method stub
             return false;
+        }
+
+        @Override
+        public TimerID getDeliveryTimerID() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void setDeliveryTimerID(TimerID val) {
+            // TODO Auto-generated method stub
+            
         }
     }
 

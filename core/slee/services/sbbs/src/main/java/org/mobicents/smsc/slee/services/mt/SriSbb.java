@@ -168,6 +168,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             event.setInformServiceCenterContainer(this.getInformServiceCenterContainer());
             event.setSriMapVersion(this.getSriMapVersion());
             event.setCurrentMsgNum(this.getCurrentMsgNumValue());
+            event.setTimerID(this.getDeliveryTimerID());
 //            event.setSendingPoolMsgCount(this.getSendingPoolMsgCountValue());
 
             this.fireSendMtEvent(event, schedulerActivityContextInterface, null);

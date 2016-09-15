@@ -27,9 +27,14 @@ import java.util.Date;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.CreateException;
+import javax.slee.EventContext;
 import javax.slee.RolledBackContext;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
+import javax.slee.facilities.TimerEvent;
+import javax.slee.facilities.TimerFacility;
+import javax.slee.facilities.TimerID;
+import javax.slee.facilities.TimerOptions;
 import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 
@@ -64,6 +69,9 @@ import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
  *
  */
 public abstract class DeliveryCommonSbb implements Sbb {
+
+    private int DELIVERY_TIMEOUT = 2 * 60;
+
     public static SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
 
     private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID("PersistenceResourceAdaptorType",
@@ -80,6 +88,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     protected PersistenceRAInterface persistence;
     protected SchedulerRaSbbInterface scheduler;
+    protected TimerFacility timerFacility;
 
     private final String className;
 
@@ -143,6 +152,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
     public void setSbbContext(SbbContext sbbContext) {
         this.sbbContext = (SbbContextExt) sbbContext;
         this.logger = this.sbbContext.getTracer(this.className); // getClass().getSimpleName()
+        this.timerFacility = this.sbbContext.getTimerFacility();
 
         try {
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID,
@@ -287,7 +297,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
         dlvIsEnded = true;
         this.setDlvIsEnded(dlvIsEnded);
 
-        endScheduleActivity();
+        this.cancelDeliveryTimer();
+        this.endScheduleActivity();
     }
 
     /**
@@ -312,9 +323,25 @@ public abstract class DeliveryCommonSbb implements Sbb {
         return null;
     }
 
+    protected ActivityContextInterface getSchedulerActivityContextInterface() {
+        ActivityContextInterface[] acis = this.sbbContext.getActivities();
+        for (int count = 0; count < acis.length; count++) {
+            ActivityContextInterface aci = acis[count];
+            Object activity = aci.getActivity();
+            if (activity instanceof SchedulerActivity) {
+                return aci;
+            }
+        }
+
+        return null;
+    }
+
     private void endScheduleActivity() {
         try {
-            this.getSchedulerActivity().endActivity();
+            SchedulerActivity schedulerActivity = this.getSchedulerActivity();
+            if (schedulerActivity != null) {
+                schedulerActivity.endActivity();
+            }
         } catch (Exception e) {
             if (this.logger != null)
                 this.logger.severe("Error while decrementing endScheduleActivity()", e);
@@ -462,6 +489,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 this.setCurrentMsgNum(currentMsgNum);
             }
 
+            this.rescheduleDeliveryTimer();
+            
             return addedMessageCnt;
         } else
             return 0;
@@ -514,6 +543,9 @@ public abstract class DeliveryCommonSbb implements Sbb {
             }
 
             sequenceNumbers = null;
+
+            this.rescheduleDeliveryTimer();
+
             return sms;
         } else
             return null;
@@ -574,7 +606,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             ErrorAction errorAction = ErrorAction.permanentFailure;
             String reason = "Message drop in PreDelivery";
 
-            smsSet.setStatus(smStatus);
+            sms.getSmsSet().setStatus(smStatus);
 
             // sending of a failure response for transactional mode
             this.sendTransactionalResponseFailure(lstPermFailured, null, errorAction, null);
@@ -586,7 +618,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             this.generateCDRs(lstPermFailured, CdrGenerator.CDR_MPROC_DROP_PRE_DELIVERY, reason);
 
             // sending of failure delivery receipts
-            this.generateFailureReceipts(smsSet, lstPermFailured, null);
+            this.generateFailureReceipts(sms.getSmsSet(), lstPermFailured, null);
 
             return false;
         }
@@ -687,6 +719,43 @@ public abstract class DeliveryCommonSbb implements Sbb {
         } else
             return false;
     }
+
+    // *********
+    // Methods for managing of delivery timeout
+
+    protected void rescheduleDeliveryTimer() {
+        this.cancelDeliveryTimer();
+
+        if (this.timerFacility != null) {
+            long startTime = System.currentTimeMillis() + 1000 * DELIVERY_TIMEOUT;
+            TimerOptions options = new TimerOptions();
+
+            ActivityContextInterface activity = getSchedulerActivityContextInterface();
+            TimerID timer = this.timerFacility.setTimer(activity, null, startTime, options);
+            setDeliveryTimerID(timer);
+        }
+    }
+
+    protected void cancelDeliveryTimer() {
+        TimerID timer = this.getDeliveryTimerID();
+        setDeliveryTimerID(null);
+        if (this.timerFacility != null && timer != null)
+            this.timerFacility.cancelTimer(timer);
+    }
+
+    public void onTimerEvent(TimerEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        SmsSet smsSet = getSmsSet();
+        if (smsSet != null) {
+            // deliver timer is triggered
+            String reason = "Delivery timeout error: sendingPoolMessageCount=" + this.getSendingPoolMessageCount()
+                    + ", smsSet=" + smsSet;
+            this.logger.severe(reason);
+
+            onDeliveryTimeout(smsSet, reason);
+        }
+    }
+
+    protected abstract void onDeliveryTimeout(SmsSet smsSet, String reason);
 
     // *********
     // sending of responses to a message sender for the transactional messaging mode
@@ -1434,5 +1503,9 @@ public abstract class DeliveryCommonSbb implements Sbb {
     public abstract void setPendingRequestsList(PendingRequestsList pendingRequestsList);
 
     public abstract PendingRequestsList getPendingRequestsList();
+
+    public abstract TimerID getDeliveryTimerID();
+
+    public abstract void setDeliveryTimerID(TimerID val);
 
 }

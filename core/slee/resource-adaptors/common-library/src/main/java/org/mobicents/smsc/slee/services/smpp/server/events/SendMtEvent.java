@@ -24,6 +24,8 @@ package org.mobicents.smsc.slee.services.smpp.server.events;
 
 import java.io.Serializable;
 
+import javax.slee.facilities.TimerID;
+
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.LMSI;
 import org.mobicents.smsc.library.SmsSet;
@@ -44,7 +46,7 @@ public class SendMtEvent implements Serializable {
     private InformServiceCenterContainer informServiceCenterContainer;
     private int sriMapVersion;
     private long currentMsgNum;
-//    private int sendingPoolMsgCount;
+    private TimerID timerID;
 
     public ISDNAddressString getNetworkNode() {
         return networkNode;
@@ -102,13 +104,13 @@ public class SendMtEvent implements Serializable {
         this.currentMsgNum = currentMsgNum;
     }
 
-//    public int getSendingPoolMsgCount() {
-//        return sendingPoolMsgCount;
-//    }
-//
-//    public void setSendingPoolMsgCount(int sendingPoolMsgCount) {
-//        this.sendingPoolMsgCount = sendingPoolMsgCount;
-//    }
+    public TimerID getTimerID() {
+        return timerID;
+    }
+
+    public void setTimerID(TimerID timerID) {
+        this.timerID = timerID;
+    }
 
     @Override
     public String toString() {
@@ -139,14 +141,15 @@ public class SendMtEvent implements Serializable {
         sb.append(this.sriMapVersion);
         sb.append("currentMsgNum=");
         sb.append(this.currentMsgNum);
-//        sb.append("sendingPoolMsgCount=");
-//        sb.append(this.sendingPoolMsgCount);
         sb.append(", ");
         if (this.smsSet != null) {
             sb.append("smsSet=");
             sb.append(this.smsSet);
             sb.append(", ");
         }
+        sb.append("timerID=");
+        sb.append(this.timerID);
+        sb.append(", ");
 
         sb.append("]");
         return sb.toString();

@@ -33,6 +33,7 @@ import javax.slee.SLEEException;
 import javax.slee.SbbLocalObject;
 import javax.slee.TransactionRequiredLocalException;
 import javax.slee.TransactionRolledbackLocalException;
+import javax.slee.facilities.TimerID;
 
 import org.mobicents.protocols.ss7.map.MAPParameterFactoryImpl;
 import org.mobicents.protocols.ss7.map.MAPSmsTpduParameterFactoryImpl;
@@ -469,5 +470,17 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
     @Override
     public PendingRequestsList getPendingRequestsList() {
         return pendingRequestsList;
+    }
+
+    @Override
+    public TimerID getDeliveryTimerID() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setDeliveryTimerID(TimerID val) {
+        // TODO Auto-generated method stub
+        
     }
 }

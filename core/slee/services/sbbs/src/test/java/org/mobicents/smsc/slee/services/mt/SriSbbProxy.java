@@ -34,6 +34,7 @@ import javax.slee.SLEEException;
 import javax.slee.SbbLocalObject;
 import javax.slee.TransactionRequiredLocalException;
 import javax.slee.TransactionRolledbackLocalException;
+import javax.slee.facilities.TimerID;
 
 import org.mobicents.protocols.ss7.map.MAPParameterFactoryImpl;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
@@ -361,5 +362,17 @@ public class SriSbbProxy extends SriSbb implements ChildRelation, SbbLocalObject
     public PendingRequestsList getPendingRequestsList() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public TimerID getDeliveryTimerID() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setDeliveryTimerID(TimerID val) {
+        // TODO Auto-generated method stub
+        
     }
 }

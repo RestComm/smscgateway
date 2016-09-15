@@ -75,7 +75,6 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.ProcessingType;
-import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
 import org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
 
@@ -141,22 +140,6 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
     public abstract void setSriMapVersion(int sriMapVersion);
 
     public abstract int getSriMapVersion();
-
-    // *********
-    // Get the Scheduler Activity
-
-    protected ActivityContextInterface getSchedulerActivityContextInterface() {
-        ActivityContextInterface[] acis = this.sbbContext.getActivities();
-        for (int count = 0; count < acis.length; count++) {
-            ActivityContextInterface aci = acis[count];
-            Object activity = aci.getActivity();
-            if (activity instanceof SchedulerActivity) {
-                return aci;
-            }
-        }
-
-        return null;
-    }
 
     // *********
     // Get Rsds child SBB
@@ -372,6 +355,12 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 
     // *********
     // Main service methods
+
+	@Override
+    protected void onDeliveryTimeout(SmsSet smsSet, String reason) {
+        this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason, true, null, false,
+                ProcessingType.SS7_MT);
+    }
 
     /**
      * Processing a case when an error in message sending process. This stops of message sending, reschedule or drop messages

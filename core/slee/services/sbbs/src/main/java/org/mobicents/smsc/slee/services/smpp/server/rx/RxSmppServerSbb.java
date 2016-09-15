@@ -87,10 +87,6 @@ import com.cloudhopper.smpp.type.RecoverablePduException;
  * @author sergey vetyutnev
  *
  */
-/**
- * @author bss
- *
- */
 public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private static final String className = RxSmppServerSbb.class.getSimpleName();
 
@@ -454,6 +450,14 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         }
 	}
 
+    /* (non-Javadoc)
+     * @see org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb#onDeliveryTimeout(org.mobicents.smsc.library.SmsSet, java.lang.String)
+     */
+    @Override
+    protected void onDeliveryTimeout(SmsSet smsSet, String reason) {
+        this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason);
+    }
+
     /**
      * Processing of a positive delivery response to smpp destination.
      *
@@ -543,7 +547,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 }
             }
         } else {
-            this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SC_SYSTEM_ERROR, "DeliverSm response has a bad status: " + status);
+            this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SC_SYSTEM_ERROR,
+                    "DeliverSm response has a bad status: " + status);
         }
     }
 

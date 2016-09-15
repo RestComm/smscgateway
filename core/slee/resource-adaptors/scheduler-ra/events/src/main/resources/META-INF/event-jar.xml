@@ -42,4 +42,14 @@
 		<event-type-version>1.0</event-type-version>
 		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent</event-class-name>
 	</event-definition>
+
+<!--
+	<event-definition>
+		<description>Delivery TimeOut Event</description>
+		<event-type-name>javax.slee.facilities.TimerEvent</event-type-name>
+		<event-type-vendor>javax.slee</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>javax.slee.facilities.TimerEvent</event-class-name>
+	</event-definition>
+-->
 </event-jar>

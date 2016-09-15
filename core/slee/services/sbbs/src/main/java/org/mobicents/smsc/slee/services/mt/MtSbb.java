@@ -201,6 +201,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
         this.setInformServiceCenterContainer(event.getInformServiceCenterContainer());
         this.setSriMapVersion(event.getSriMapVersion());
+        this.setDeliveryTimerID(event.getTimerID());
 
         setupMtForwardShortMessageRequest(event.getNetworkNode(), event.getImsiData(), event.getLmsi(), smsSet.getNetworkId());
     }

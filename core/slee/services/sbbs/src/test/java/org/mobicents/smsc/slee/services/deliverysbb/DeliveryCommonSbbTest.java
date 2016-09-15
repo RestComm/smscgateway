@@ -36,6 +36,7 @@ import javax.slee.CreateException;
 import javax.slee.RolledBackContext;
 import javax.slee.SbbContext;
 import javax.slee.facilities.FacilityException;
+import javax.slee.facilities.TimerID;
 import javax.slee.facilities.TraceLevel;
 import javax.slee.facilities.Tracer;
 
@@ -589,6 +590,24 @@ public class DeliveryCommonSbbTest {
 
         @Override
         public void unsetSbbContext() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public TimerID getDeliveryTimerID() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void setDeliveryTimerID(TimerID val) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        protected void onDeliveryTimeout(SmsSet smsSet, String reason) {
             // TODO Auto-generated method stub
             
         }
