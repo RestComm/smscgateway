@@ -38,7 +38,7 @@ public class SbbStates {
     private static boolean mtServiceState;
     private static boolean alertServiceState;
     private static boolean chargingServiceState;
-
+    private static boolean smscTxHttpServerServiceState;
 
     public static boolean isSmscTxSmppServerServiceState() {
         return smscTxSmppServerServiceState;
@@ -112,6 +112,14 @@ public class SbbStates {
         SbbStates.chargingServiceState = chargingServiceState;
     }
 
+    public static boolean isSmscTxHttpServerServiceState() {
+        return smscTxHttpServerServiceState;
+    }
+
+    public static void setSmscTxHttpServerServiceState(boolean smscTxHttpServerServiceState) {
+        SbbStates.smscTxHttpServerServiceState = smscTxHttpServerServiceState;
+    }
+
     public static boolean isAllServicesUp() {
         return smscTxSmppServerServiceState && smscRxSmppServerServiceState && smscTxSipServerServiceState
                 && smscRxSipServerServiceState && moServiceState && homeRoutingServiceState && mtServiceState
@@ -142,6 +150,8 @@ public class SbbStates {
             sb.append("alertServiceState, ");
         if (!chargingServiceState)
             sb.append("chargingServiceState, ");
+        if (!smscTxHttpServerServiceState)
+            sb.append("smscTxHttpServerServiceState, ");
 
         sb.append("]");
 
