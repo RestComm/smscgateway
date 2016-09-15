@@ -590,7 +590,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             lstRerouted, lstNewNetworkId, ProcessingType.SMPP);
 
                     // sending of a failure response for transactional mode
-                    this.sendTransactionalResponseFailure(lstPermFailured, lstTempFailured, errorAction, null);
+                    this.sendTransactionalResponseFailure(lstPermFailured2, lstTempFailured2, errorAction, null);
 
                     // Processing messages that were temp or permanent failed or rerouted
                     this.postProcessPermFailures(lstPermFailured2, null, null);
