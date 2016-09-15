@@ -1013,7 +1013,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
         } else {
             // applying of MProc
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
             if (mProcResult.isMessageRejected()) {
                 sms0.setMessageDeliveryResultResponse(null);
                 SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
