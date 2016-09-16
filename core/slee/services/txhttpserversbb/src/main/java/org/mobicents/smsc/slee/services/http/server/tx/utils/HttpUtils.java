@@ -11,12 +11,6 @@ import java.io.PrintWriter;
  */
 public class HttpUtils {
 
-    public static final int STATUS_BAD_REQUEST = 400;
-
-    public static final int STATUS_INTERNAL_ERROR = 500;
-    public static final int STATUS_SERVICE_UNAVAILABLE = 503;
-
-
     public static void sendOkResponseWithContent(Tracer tracer, HttpServletResponse response, String content) throws IOException {
         tracer.info("Sending 200 OK");
 //        response.setStatus(HttpServletResponse.SC_OK, "OK");

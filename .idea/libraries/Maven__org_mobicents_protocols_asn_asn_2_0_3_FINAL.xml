@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.mobicents.protocols.asn:asn:2.0.3.FINAL">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/protocols/asn/asn/2.0.3.FINAL/asn-2.0.3.FINAL.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/protocols/asn/asn/2.0.3.FINAL/asn-2.0.3.FINAL-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/protocols/asn/asn/2.0.3.FINAL/asn-2.0.3.FINAL-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

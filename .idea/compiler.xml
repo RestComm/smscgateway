@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <resourceExtensions />
+    <wildcardResourcePatterns>
+      <entry name="!?*.java" />
+      <entry name="!?*.form" />
+      <entry name="!?*.class" />
+      <entry name="!?*.groovy" />
+      <entry name="!?*.scala" />
+      <entry name="!?*.flex" />
+      <entry name="!?*.kt" />
+      <entry name="!?*.clj" />
+      <entry name="!?*.aj" />
+    </wildcardResourcePatterns>
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+      <profile default="false" name="Annotation profile for smsc-library" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smsc-library" />
+      </profile>
+      <profile default="false" name="Annotation profile for smpp-load" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smpp-load" />
+      </profile>
+      <profile default="false" name="Annotation profile for simulator-bootstrap" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="simulator-bootstrap" />
+      </profile>
+      <profile default="false" name="Annotation profile for mt-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="mt-sbb" />
+      </profile>
+      <profile default="false" name="Annotation profile for alert-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="alert-sbb" />
+      </profile>
+      <profile default="false" name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="hector-client-ra-du" />
+        <module name="restcomm-smsc-adminguide-jdocbook-mobicents" />
+        <module name="restcomm-smsc-adminguide-sources" />
+        <module name="restcomm-smsc-adminguide-sources-restcomm" />
+        <module name="restcomm-smsc-installguide-jdocbook-restcomm" />
+        <module name="restcomm-smsc-installguide-sources" />
+        <module name="restcomm-smsc-installguide-sources-restcomm" />
+        <module name="restcomm-smsc-releasenotes-jdocbook-restcomm" />
+        <module name="restcomm-smsc-releasenotes-sources" />
+        <module name="restcomm-smsc-releasenotes-sources-restcomm" />
+        <module name="scheduler-ra-du" />
+        <module name="smpp-server-ra-du" />
+      </profile>
+      <profile default="false" name="Annotation profile for smsc-resource-adaptors-du" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smsc-resource-adaptors-du" />
+      </profile>
+      <profile default="false" name="Annotation profile for mproc-api" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="mproc-api" />
+      </profile>
+      <profile default="false" name="Annotation profile for persistence-ratype" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="persistence-ratype" />
+      </profile>
+      <profile default="false" name="Annotation profile for persistence-ra-library" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="persistence-ra-library" />
+      </profile>
+      <profile default="false" name="Annotation profile for smsc-services-du" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smsc-services-du" />
+      </profile>
+      <profile default="false" name="Annotation profile for domain" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="domain" />
+      </profile>
+      <profile default="false" name="Annotation profile for test-bootstrap" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="test-bootstrap" />
+      </profile>
+      <profile default="false" name="Annotation profile for smsc-cli" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smsc-cli" />
+      </profile>
+      <profile default="false" name="Annotation profile for smpp-simulator" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smpp-simulator" />
+      </profile>
+      <profile default="false" name="Annotation profile for charging-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="charging-sbb" />
+      </profile>
+      <profile default="false" name="Annotation profile for smpp-server-ra-ra" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smpp-server-ra-ra" />
+      </profile>
+      <profile default="false" name="Annotation profile for smsc-common-library" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smsc-common-library" />
+      </profile>
+      <profile default="false" name="Annotation profile for scheduler-ra" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="scheduler-ra" />
+      </profile>
+      <profile default="false" name="Annotation profile for sbbs" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="sbbs" />
+      </profile>
+      <profile default="false" name="Annotation profile for homerouting-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="homerouting-sbb" />
+      </profile>
+      <profile default="false" name="Annotation profile for ui-management" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="ui-management" />
+      </profile>
+      <profile default="false" name="Annotation profile for scheduler-ratype" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="scheduler-ratype" />
+      </profile>
+      <profile default="false" name="Annotation profile for scheduler-ra-events" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="scheduler-ra-events" />
+      </profile>
+      <profile default="false" name="Annotation profile for rx-sipserver-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="rx-sipserver-sbb" />
+      </profile>
+      <profile default="false" name="Annotation profile for smpp-server-ra-events" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smpp-server-ra-events" />
+      </profile>
+      <profile default="false" name="Annotation profile for test-mapmodule" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="test-mapmodule" />
+      </profile>
+      <profile default="false" name="Annotation profile for restcomm-smsc-adminguide-sources-asciidoc" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="restcomm-smsc-adminguide-sources-asciidoc" />
+      </profile>
+      <profile default="false" name="Annotation profile for tx-sipserver-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="tx-sipserver-sbb" />
+      </profile>
+      <profile default="false" name="Annotation profile for scheduler-ra-library" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="scheduler-ra-library" />
+      </profile>
+      <profile default="false" name="Annotation profile for smpp-cli" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smpp-cli" />
+      </profile>
+      <profile default="false" name="Annotation profile for cdr-parser" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="cdr-parser" />
+      </profile>
+      <profile default="false" name="Annotation profile for smpp-server-ra-ratype" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smpp-server-ra-ratype" />
+      </profile>
+      <profile default="false" name="Annotation profile for common-library" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="common-library" />
+      </profile>
+      <profile default="false" name="Annotation profile for restcomm-smsc-installguide-sources-asciidoc" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="restcomm-smsc-installguide-sources-asciidoc" />
+      </profile>
+      <profile default="false" name="Annotation profile for bootstrap" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="bootstrap" />
+      </profile>
+      <profile default="false" name="Annotation profile for mo-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="mo-sbb" />
+      </profile>
+      <profile default="false" name="Annotation profile for stresstool" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="stresstool" />
+      </profile>
+      <profile default="false" name="Annotation profile for smpp-server-ra-library" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smpp-server-ra-library" />
+      </profile>
+      <profile default="false" name="Annotation profile for smpp" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="smpp" />
+      </profile>
+      <profile default="false" name="Annotation profile for persistence-ra" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="persistence-ra" />
+      </profile>
+      <profile default="false" name="Annotation profile for rx-smppserver-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="rx-smppserver-sbb" />
+      </profile>
+      <profile default="false" name="Annotation profile for cassandra-tool" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="cassandra-tool" />
+      </profile>
+      <profile default="false" name="Annotation profile for tx-smppserver-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="tx-smppserver-sbb" />
+      </profile>
+      <profile default="false" name="Annotation profile for restcomm-smsc-commons-sources" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="restcomm-smsc-commons-sources" />
+      </profile>
+      <profile default="false" name="Annotation profile for tx-httpserver-sbb" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="tx-httpserver-sbb" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="alert-sbb" target="1.7" />
+      <module name="bootstrap" target="1.7" />
+      <module name="cassandra-tool" target="1.7" />
+      <module name="cassandra-tool-parent" target="1.7" />
+      <module name="cdr-parser" target="1.7" />
+      <module name="cdr-parser-parent" target="1.7" />
+      <module name="charging-sbb" target="1.7" />
+      <module name="common-library" target="1.7" />
+      <module name="core" target="1.7" />
+      <module name="domain" target="1.7" />
+      <module name="hector-client-ra-du" target="1.5" />
+      <module name="homerouting-sbb" target="1.7" />
+      <module name="mo-sbb" target="1.7" />
+      <module name="mproc-api" target="1.7" />
+      <module name="mt-sbb" target="1.7" />
+      <module name="persistence-ra" target="1.7" />
+      <module name="persistence-ra-library" target="1.7" />
+      <module name="persistence-ra-parent" target="1.7" />
+      <module name="persistence-ratype" target="1.7" />
+      <module name="resource-adaptors-parent" target="1.7" />
+      <module name="restcomm-smsc-adminguide" target="1.7" />
+      <module name="restcomm-smsc-adminguide-jdocbook-mobicents" target="1.5" />
+      <module name="restcomm-smsc-adminguide-sources" target="1.5" />
+      <module name="restcomm-smsc-adminguide-sources-asciidoc" target="1.7" />
+      <module name="restcomm-smsc-adminguide-sources-restcomm" target="1.5" />
+      <module name="restcomm-smsc-commons-sources" target="1.7" />
+      <module name="restcomm-smsc-docs" target="1.7" />
+      <module name="restcomm-smsc-installguide" target="1.7" />
+      <module name="restcomm-smsc-installguide-jdocbook-restcomm" target="1.5" />
+      <module name="restcomm-smsc-installguide-sources" target="1.5" />
+      <module name="restcomm-smsc-installguide-sources-asciidoc" target="1.7" />
+      <module name="restcomm-smsc-installguide-sources-restcomm" target="1.5" />
+      <module name="restcomm-smsc-parent" target="1.7" />
+      <module name="restcomm-smsc-releasenotes" target="1.5" />
+      <module name="restcomm-smsc-releasenotes-jdocbook-restcomm" target="1.5" />
+      <module name="restcomm-smsc-releasenotes-sources" target="1.5" />
+      <module name="restcomm-smsc-releasenotes-sources-restcomm" target="1.5" />
+      <module name="rx-sipserver-sbb" target="1.7" />
+      <module name="rx-smppserver-sbb" target="1.7" />
+      <module name="sbbs" target="1.7" />
+      <module name="scheduler-ra" target="1.7" />
+      <module name="scheduler-ra-du" target="1.5" />
+      <module name="scheduler-ra-events" target="1.7" />
+      <module name="scheduler-ra-library" target="1.7" />
+      <module name="scheduler-ra-parent" target="1.7" />
+      <module name="scheduler-ratype" target="1.7" />
+      <module name="services-parent" target="1.7" />
+      <module name="simulator-bootstrap" target="1.7" />
+      <module name="slee" target="1.7" />
+      <module name="smpp" target="1.7" />
+      <module name="smpp-cli" target="1.7" />
+      <module name="smpp-load" target="1.7" />
+      <module name="smpp-server-ra" target="1.7" />
+      <module name="smpp-server-ra-du" target="1.5" />
+      <module name="smpp-server-ra-events" target="1.7" />
+      <module name="smpp-server-ra-library" target="1.7" />
+      <module name="smpp-server-ra-ra" target="1.7" />
+      <module name="smpp-server-ra-ratype" target="1.7" />
+      <module name="smpp-simulator" target="1.7" />
+      <module name="smpp-simulator-parent" target="1.7" />
+      <module name="smsc-cli" target="1.7" />
+      <module name="smsc-common-library" target="1.7" />
+      <module name="smsc-library" target="1.7" />
+      <module name="smsc-resource-adaptors-du" target="1.7" />
+      <module name="smsc-services-du" target="1.7" />
+      <module name="stresstool" target="1.7" />
+      <module name="stresstool-parent" target="1.7" />
+      <module name="test" target="1.7" />
+      <module name="test-bootstrap" target="1.7" />
+      <module name="test-mapmodule" target="1.7" />
+      <module name="tools" target="1.7" />
+      <module name="tx-httpserver-sbb" target="1.7" />
+      <module name="tx-sipserver-sbb" target="1.7" />
+      <module name="tx-smppserver-sbb" target="1.7" />
+      <module name="ui-management" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

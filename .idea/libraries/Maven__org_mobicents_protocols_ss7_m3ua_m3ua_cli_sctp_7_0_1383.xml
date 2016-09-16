@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.mobicents.protocols.ss7.m3ua:m3ua-cli-sctp:7.0.1383">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/protocols/ss7/m3ua/m3ua-cli-sctp/7.0.1383/m3ua-cli-sctp-7.0.1383.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/protocols/ss7/m3ua/m3ua-cli-sctp/7.0.1383/m3ua-cli-sctp-7.0.1383-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/protocols/ss7/m3ua/m3ua-cli-sctp/7.0.1383/m3ua-cli-sctp-7.0.1383-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

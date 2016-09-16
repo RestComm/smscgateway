@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.mobicents.resources:sip11-ratype:2.8.20">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/resources/sip11-ratype/2.8.20/sip11-ratype-2.8.20.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/resources/sip11-ratype/2.8.20/sip11-ratype-2.8.20-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/resources/sip11-ratype/2.8.20/sip11-ratype-2.8.20-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jboss:jboss-mdr:2.0.1.GA">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/jboss-mdr/2.0.1.GA/jboss-mdr-2.0.1.GA.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/jboss-mdr/2.0.1.GA/jboss-mdr-2.0.1.GA-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/jboss-mdr/2.0.1.GA/jboss-mdr-2.0.1.GA-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

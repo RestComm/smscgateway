@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: jboss.jbossts:jbossjts:4.6.1.GA">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/jbossts/jbossjts/4.6.1.GA/jbossjts-4.6.1.GA.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/jbossts/jbossjts/4.6.1.GA/jbossjts-4.6.1.GA-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/jbossts/jbossjts/4.6.1.GA/jbossjts-4.6.1.GA-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

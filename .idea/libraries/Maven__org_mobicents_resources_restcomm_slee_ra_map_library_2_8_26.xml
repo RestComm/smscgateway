@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.mobicents.resources:restcomm-slee-ra-map-library:2.8.26">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/resources/restcomm-slee-ra-map-library/2.8.26/restcomm-slee-ra-map-library-2.8.26.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/resources/restcomm-slee-ra-map-library/2.8.26/restcomm-slee-ra-map-library-2.8.26-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/resources/restcomm-slee-ra-map-library/2.8.26/restcomm-slee-ra-map-library-2.8.26-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

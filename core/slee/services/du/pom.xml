@@ -52,8 +52,12 @@
 			<artifactId>homerouting-sbb</artifactId>
 			<groupId>${project.groupId}</groupId>
 			<version>${project.version}</version>
-		</dependency>						
-
+		</dependency>
+		<dependency>
+			<artifactId>tx-httpserver-sbb</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
+		</dependency>
 <!--
 		<dependency>
 			<artifactId>mt-sbb</artifactId>

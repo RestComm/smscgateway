@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: jboss.profiler.jvmti:jboss-profiler-jvmti:1.0.0.CR5">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/profiler/jvmti/jboss-profiler-jvmti/1.0.0.CR5/jboss-profiler-jvmti-1.0.0.CR5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/profiler/jvmti/jboss-profiler-jvmti/1.0.0.CR5/jboss-profiler-jvmti-1.0.0.CR5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/profiler/jvmti/jboss-profiler-jvmti/1.0.0.CR5/jboss-profiler-jvmti-1.0.0.CR5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

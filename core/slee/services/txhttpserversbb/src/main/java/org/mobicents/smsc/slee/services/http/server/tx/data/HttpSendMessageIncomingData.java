@@ -4,6 +4,7 @@ import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestMessageBodyE
 import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -128,5 +129,10 @@ public class HttpSendMessageIncomingData {
                 ", destAddresses=" + destAddresses +
                 ", scheduleDeliveryTime='" + scheduleDeliveryTime + '\'' +
                 '}';
+    }
+
+    public static ResponseFormat getFormat(HttpServletRequest request){
+        String param = request.getParameter("format");
+        return ResponseFormat.fromString(param);
     }
 }

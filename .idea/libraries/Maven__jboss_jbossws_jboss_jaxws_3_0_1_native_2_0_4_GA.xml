@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: jboss.jbossws:jboss-jaxws:3.0.1-native-2.0.4.GA">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/jbossws/jboss-jaxws/3.0.1-native-2.0.4.GA/jboss-jaxws-3.0.1-native-2.0.4.GA.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/jbossws/jboss-jaxws/3.0.1-native-2.0.4.GA/jboss-jaxws-3.0.1-native-2.0.4.GA-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/jbossws/jboss-jaxws/3.0.1-native-2.0.4.GA/jboss-jaxws-3.0.1-native-2.0.4.GA-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

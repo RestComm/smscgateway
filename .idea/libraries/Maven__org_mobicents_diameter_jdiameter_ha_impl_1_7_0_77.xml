@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.mobicents.diameter:jdiameter-ha-impl:1.7.0.77">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/diameter/jdiameter-ha-impl/1.7.0.77/jdiameter-ha-impl-1.7.0.77.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/diameter/jdiameter-ha-impl/1.7.0.77/jdiameter-ha-impl-1.7.0.77-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/diameter/jdiameter-ha-impl/1.7.0.77/jdiameter-ha-impl-1.7.0.77-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

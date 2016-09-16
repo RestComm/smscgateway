@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jboss.test:jboss-test:1.1.4.GA">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/test/jboss-test/1.1.4.GA/jboss-test-1.1.4.GA.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/test/jboss-test/1.1.4.GA/jboss-test-1.1.4.GA-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/test/jboss-test/1.1.4.GA/jboss-test-1.1.4.GA-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

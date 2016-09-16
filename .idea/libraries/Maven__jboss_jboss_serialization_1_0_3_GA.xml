@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: jboss:jboss-serialization:1.0.3.GA">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/jboss-serialization/1.0.3.GA/jboss-serialization-1.0.3.GA.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/jboss-serialization/1.0.3.GA/jboss-serialization-1.0.3.GA-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/jboss/jboss-serialization/1.0.3.GA/jboss-serialization-1.0.3.GA-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

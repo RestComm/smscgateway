@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.mobicents.protocols.ss7.statistics:statistics-api:3.0.1314">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/protocols/ss7/statistics/statistics-api/3.0.1314/statistics-api-3.0.1314.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/protocols/ss7/statistics/statistics-api/3.0.1314/statistics-api-3.0.1314-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/protocols/ss7/statistics/statistics-api/3.0.1314/statistics-api-3.0.1314-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

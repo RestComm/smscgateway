@@ -30,7 +30,7 @@ import org.mobicents.smsc.mproc.OrigType;
  *
  */
 public enum OriginationType {
-    SMPP, SS7_MO, SS7_HR, SIP;
+    SMPP, SS7_MO, SS7_HR, SIP, HTTP;
 
     public static OriginationType toOriginationType(OrigType origType) {
         if (origType == null)
@@ -44,6 +44,8 @@ public enum OriginationType {
                 return OriginationType.SS7_HR;
             case SIP:
                 return OriginationType.SIP;
+            case HTTP:
+                return OriginationType.HTTP;
         }
         return null;
     }
@@ -60,6 +62,8 @@ public enum OriginationType {
                 return OrigType.SS7_HR;
             case SIP:
                 return OrigType.SIP;
+            case HTTP:
+                return OrigType.HTTP;
         }
         return null;
     }

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jboss.aop:jboss-aop:2.1.1.GA">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/aop/jboss-aop/2.1.1.GA/jboss-aop-2.1.1.GA.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/aop/jboss-aop/2.1.1.GA/jboss-aop-2.1.1.GA-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/aop/jboss-aop/2.1.1.GA/jboss-aop-2.1.1.GA-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

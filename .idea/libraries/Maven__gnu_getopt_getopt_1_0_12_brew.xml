@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: gnu-getopt:getopt:1.0.12-brew">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/gnu-getopt/getopt/1.0.12-brew/getopt-1.0.12-brew.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/gnu-getopt/getopt/1.0.12-brew/getopt-1.0.12-brew-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/gnu-getopt/getopt/1.0.12-brew/getopt-1.0.12-brew-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

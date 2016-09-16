@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.picocontainer:picocontainer:2.13.5">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/picocontainer/picocontainer/2.13.5/picocontainer-2.13.5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/picocontainer/picocontainer/2.13.5/picocontainer-2.13.5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/picocontainer/picocontainer/2.13.5/picocontainer-2.13.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

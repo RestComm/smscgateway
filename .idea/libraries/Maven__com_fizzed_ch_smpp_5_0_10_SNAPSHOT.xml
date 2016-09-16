@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.fizzed:ch-smpp:5.0.10-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/fizzed/ch-smpp/5.0.10-SNAPSHOT/ch-smpp-5.0.10-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/fizzed/ch-smpp/5.0.10-SNAPSHOT/ch-smpp-5.0.10-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/fizzed/ch-smpp/5.0.10-SNAPSHOT/ch-smpp-5.0.10-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

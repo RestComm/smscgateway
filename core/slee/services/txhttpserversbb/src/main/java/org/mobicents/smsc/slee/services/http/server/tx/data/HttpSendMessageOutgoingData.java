@@ -53,4 +53,8 @@ public class HttpSendMessageOutgoingData {
     public String getMessage(){
         return message;
     }
+
+    public void setMessage(String newMessage){
+        this.message = newMessage;
+    }
 }

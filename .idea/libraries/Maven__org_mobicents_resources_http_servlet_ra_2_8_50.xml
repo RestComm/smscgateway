@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.mobicents.resources:http-servlet-ra:2.8.50">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/resources/http-servlet-ra/2.8.50/http-servlet-ra-2.8.50.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/resources/http-servlet-ra/2.8.50/http-servlet-ra-2.8.50-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/resources/http-servlet-ra/2.8.50/http-servlet-ra-2.8.50-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

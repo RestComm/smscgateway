@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.mobicents.smsc:persistence-ra:test-jar:tests:7.0.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/smsc/persistence-ra/7.0.0-SNAPSHOT/persistence-ra-7.0.0-SNAPSHOT-tests.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/smsc/persistence-ra/7.0.0-SNAPSHOT/persistence-ra-7.0.0-SNAPSHOT-test-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mobicents/smsc/persistence-ra/7.0.0-SNAPSHOT/persistence-ra-7.0.0-SNAPSHOT-test-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

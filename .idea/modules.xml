@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/alertsbb/alert-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/alertsbb/alert-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/bootstrap/bootstrap.iml" filepath="$PROJECT_DIR$/core/bootstrap/bootstrap.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/cassandra-tool/cassandratool/cassandra-tool.iml" filepath="$PROJECT_DIR$/tools/cassandra-tool/cassandratool/cassandra-tool.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/cassandra-tool/cassandra-tool-parent.iml" filepath="$PROJECT_DIR$/tools/cassandra-tool/cassandra-tool-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/cdr-parser/cdr-parser/cdr-parser.iml" filepath="$PROJECT_DIR$/tools/cdr-parser/cdr-parser/cdr-parser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/cdr-parser/cdr-parser-parent.iml" filepath="$PROJECT_DIR$/tools/cdr-parser/cdr-parser-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/chargingsbb/charging-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/chargingsbb/charging-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/common-library/common-library.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/common-library/common-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/domain/domain.iml" filepath="$PROJECT_DIR$/core/domain/domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/du/hector-client-ra-du.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/du/hector-client-ra-du.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/homeroutingsbb/homerouting-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/homeroutingsbb/homerouting-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/mosbb/mo-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/mosbb/mo-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/mproc-api/mproc-api.iml" filepath="$PROJECT_DIR$/core/mproc-api/mproc-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/mtsbb/mt-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/mtsbb/mt-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/ra/persistence-ra.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/ra/persistence-ra.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/library/persistence-ra-library.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/library/persistence-ra-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/persistence-ra-parent.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/persistence-ra-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/ratype/persistence-ratype.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/persistence-ra/ratype/persistence-ratype.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/resource-adaptors-parent.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/resource-adaptors-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/adminguide/restcomm-smsc-adminguide.iml" filepath="$PROJECT_DIR$/docs/adminguide/restcomm-smsc-adminguide.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/adminguide/jdocbook-restcomm/restcomm-smsc-adminguide-jdocbook-mobicents.iml" filepath="$PROJECT_DIR$/docs/adminguide/jdocbook-restcomm/restcomm-smsc-adminguide-jdocbook-mobicents.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/adminguide/sources/restcomm-smsc-adminguide-sources.iml" filepath="$PROJECT_DIR$/docs/adminguide/sources/restcomm-smsc-adminguide-sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/adminguide/sources-asciidoc/restcomm-smsc-adminguide-sources-asciidoc.iml" filepath="$PROJECT_DIR$/docs/adminguide/sources-asciidoc/restcomm-smsc-adminguide-sources-asciidoc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/adminguide/sources-restcomm/restcomm-smsc-adminguide-sources-restcomm.iml" filepath="$PROJECT_DIR$/docs/adminguide/sources-restcomm/restcomm-smsc-adminguide-sources-restcomm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/commons/restcomm-smsc-commons-sources.iml" filepath="$PROJECT_DIR$/docs/commons/restcomm-smsc-commons-sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/restcomm-smsc-docs.iml" filepath="$PROJECT_DIR$/docs/restcomm-smsc-docs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/installationguide/restcomm-smsc-installguide.iml" filepath="$PROJECT_DIR$/docs/installationguide/restcomm-smsc-installguide.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/installationguide/jdocbook-restcomm/restcomm-smsc-installguide-jdocbook-restcomm.iml" filepath="$PROJECT_DIR$/docs/installationguide/jdocbook-restcomm/restcomm-smsc-installguide-jdocbook-restcomm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/installationguide/sources/restcomm-smsc-installguide-sources.iml" filepath="$PROJECT_DIR$/docs/installationguide/sources/restcomm-smsc-installguide-sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/installationguide/sources-asciidoc/restcomm-smsc-installguide-sources-asciidoc.iml" filepath="$PROJECT_DIR$/docs/installationguide/sources-asciidoc/restcomm-smsc-installguide-sources-asciidoc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/installationguide/sources-restcomm/restcomm-smsc-installguide-sources-restcomm.iml" filepath="$PROJECT_DIR$/docs/installationguide/sources-restcomm/restcomm-smsc-installguide-sources-restcomm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/restcomm-smsc-parent.iml" filepath="$PROJECT_DIR$/restcomm-smsc-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/releasenotes/restcomm-smsc-releasenotes.iml" filepath="$PROJECT_DIR$/docs/releasenotes/restcomm-smsc-releasenotes.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/releasenotes/jdocbook-restcomm/restcomm-smsc-releasenotes-jdocbook-restcomm.iml" filepath="$PROJECT_DIR$/docs/releasenotes/jdocbook-restcomm/restcomm-smsc-releasenotes-jdocbook-restcomm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/releasenotes/sources/restcomm-smsc-releasenotes-sources.iml" filepath="$PROJECT_DIR$/docs/releasenotes/sources/restcomm-smsc-releasenotes-sources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/releasenotes/sources-restcomm/restcomm-smsc-releasenotes-sources-restcomm.iml" filepath="$PROJECT_DIR$/docs/releasenotes/sources-restcomm/restcomm-smsc-releasenotes-sources-restcomm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/rxsipserversbb/rx-sipserver-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/rxsipserversbb/rx-sipserver-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/rxsmppserversbb/rx-smppserver-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/rxsmppserversbb/rx-smppserver-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/sbbs/sbbs.iml" filepath="$PROJECT_DIR$/core/slee/services/sbbs/sbbs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/ra/scheduler-ra.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/ra/scheduler-ra.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/du/scheduler-ra-du.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/du/scheduler-ra-du.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/events/scheduler-ra-events.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/events/scheduler-ra-events.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/library/scheduler-ra-library.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/library/scheduler-ra-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/scheduler-ra-parent.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/scheduler-ra-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/ratype/scheduler-ratype.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/scheduler-ra/ratype/scheduler-ratype.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/services-parent.iml" filepath="$PROJECT_DIR$/core/slee/services/services-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/smpp-simulator/bootstrap/simulator-bootstrap.iml" filepath="$PROJECT_DIR$/tools/smpp-simulator/bootstrap/simulator-bootstrap.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/slee.iml" filepath="$PROJECT_DIR$/core/slee/slee.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/smpp/smpp.iml" filepath="$PROJECT_DIR$/core/smpp/smpp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/oam/clismpp/smpp-cli.iml" filepath="$PROJECT_DIR$/core/oam/clismpp/smpp-cli.iml" />
+      <module fileurl="file://$PROJECT_DIR$/test/smpp-load/smpp-load.iml" filepath="$PROJECT_DIR$/test/smpp-load/smpp-load.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/smpp-server-ra.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/smpp-server-ra.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/du/smpp-server-ra-du.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/du/smpp-server-ra-du.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/events/smpp-server-ra-events.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/events/smpp-server-ra-events.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/library/smpp-server-ra-library.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/library/smpp-server-ra-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/ra/smpp-server-ra-ra.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/ra/smpp-server-ra-ra.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/ratype/smpp-server-ra-ratype.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/smpp-server-ra/ratype/smpp-server-ra-ratype.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/smpp-simulator/simulator/smpp-simulator.iml" filepath="$PROJECT_DIR$/tools/smpp-simulator/simulator/smpp-simulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/smpp-simulator/smpp-simulator-parent.iml" filepath="$PROJECT_DIR$/tools/smpp-simulator/smpp-simulator-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/oam/cli/smsc-cli.iml" filepath="$PROJECT_DIR$/core/oam/cli/smsc-cli.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/smsc-common-library/smsc-common-library.iml" filepath="$PROJECT_DIR$/core/smsc-common-library/smsc-common-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/library/smsc-library.iml" filepath="$PROJECT_DIR$/core/slee/services/library/smsc-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/resource-adaptors/du/smsc-resource-adaptors-du.iml" filepath="$PROJECT_DIR$/core/slee/resource-adaptors/du/smsc-resource-adaptors-du.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/du/smsc-services-du.iml" filepath="$PROJECT_DIR$/core/slee/services/du/smsc-services-du.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/stresstool/stresstool/stresstool.iml" filepath="$PROJECT_DIR$/tools/stresstool/stresstool/stresstool.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/stresstool/stresstool-parent.iml" filepath="$PROJECT_DIR$/tools/stresstool/stresstool-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/test/hlr-simulator/test.iml" filepath="$PROJECT_DIR$/test/hlr-simulator/test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/test/hlr-simulator/bootstrap/test-bootstrap.iml" filepath="$PROJECT_DIR$/test/hlr-simulator/bootstrap/test-bootstrap.iml" />
+      <module fileurl="file://$PROJECT_DIR$/test/hlr-simulator/mapmodule/test-mapmodule.iml" filepath="$PROJECT_DIR$/test/hlr-simulator/mapmodule/test-mapmodule.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/tools.iml" filepath="$PROJECT_DIR$/tools/tools.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/txhttpserversbb/tx-httpserver-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/txhttpserversbb/tx-httpserver-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/txsipserversbb/tx-sipserver-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/txsipserversbb/tx-sipserver-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/slee/services/txsmppserversbb/tx-smppserver-sbb.iml" filepath="$PROJECT_DIR$/core/slee/services/txsmppserversbb/tx-smppserver-sbb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/management/ui-management/ui-management.iml" filepath="$PROJECT_DIR$/management/ui-management/ui-management.iml" />
+    </modules>
+  </component>
+</project>
