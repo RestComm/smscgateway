@@ -223,7 +223,7 @@
 				</div>	
 				
 				<div id="div-errorcode" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if a delivery error code value match's with this rule's errorcode. Value 0 means a sucessful delivery, non null value means some delivery error. You can specify several values via comma (example: &#34;6,7,8&#34;). Value -1 will match error codes. Default value is -1.">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if an internal SMSC GW's delivery error code value match's with this rule's errorcode. Value 0 means a successful delivery, non 0 value means some delivery error. You can specify several values via comma (example: &#34;6,7,8&#34;). Value -1 will match any error code. Default value is -1.">
 						<span class="add-on">Delivery error code value</span>
 						<input id="errorcode" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Delivery error code value" />
 					</span>				
@@ -298,7 +298,7 @@
 				</div>	
 
 				<div id="div-hrbypass" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's inside Home Routing procedure after SMSC GW receives a response from a local HLR then SMSC GW will bypass HR procedure by sending back to an original SMSC GW origin orininal IMSI and NNN. ">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's inside Home Routing procedure after SMSC GW receives a response from a local HLR then SMSC GW will bypass HR procedure by sending back to an original SMSC GW origin original IMSI and NNN. ">
 						<span class="add-on">ByPass HR procedure after SRI to a local HLR</span>
 						<select id="hrbypass" >
 							<option value="false">False</option>
@@ -333,7 +333,7 @@
 				</div>	
 							
 				<div id="div-dropaftertempfail" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's and if a message delivery has failed temporary, message will be dropped without delivery attempt.">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's and if a message delivery has failed temporary, message will be dropped without any new delivery attempts.">
 						<span class="add-on">Drop after temporary failure</span>
 						<select id="dropaftertempfail" >
 							<option value="false">False</option>
@@ -738,7 +738,7 @@
 																		'</td>'+
 																		'</tr>'+																		
 																		
-																		'<tr data-toggle="tooltip" title="Rule will be applied only if a Delivery error code value match\'s with this rule\'s errorcode. Value 0 means a sucessful delivery, non null value means some delivery error. You can specify several values via comma (example: &#34;6,7,8&#34;). Value -1 will match error codes. Default value is -1.">'+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if an internal SMSC GW delivery error code value match\'s with this rule\'s errorcode. Value 0 means a successful delivery, non 0 value means some delivery error. You can specify several values via comma (example: &#34;6,7,8&#34;). Value -1 will match any error code. Default value is -1.">'+
 																		'<td style="font-size: 0.9em;">Delivery error code value</td>'+
 																		'<td style="font-size: 0.9em; padding: 0;">'+
 																			'<div id="div-' + id +'ErrorCode-input" class="control-group">'+
@@ -838,7 +838,7 @@
 																			'</td>'+
 																		'</tr>'+
 																		
-																		'<tr data-toggle="tooltip" title="Once rule match\'s inside Home Routing procedure after SMSC GW receives a response from a local HLR then SMSC GW will bypass HR procedure by sending back to an original SMSC GW origin orininal IMSI and NNN.">'+
+																		'<tr data-toggle="tooltip" title="Once rule match\'s inside Home Routing procedure after SMSC GW receives a response from a local HLR then SMSC GW will bypass HR procedure by sending back to an original SMSC GW origin original IMSI and NNN.">'+
 																			'<td style="font-size: 0.9em;">ByPass HR procedure after SRI to a local HLR</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
 																				'<div id="div-' + id +'HrByPass-input" class="control-group">'+
@@ -902,7 +902,7 @@
 																			'</td>'+
 																		'</tr>'+																		
 																		
-																		'<tr data-toggle="tooltip" title="Once rule match\'s and if a message delivery has failed temporary, message will be dropped without delivery attempt.">'+
+																		'<tr data-toggle="tooltip" title="Once rule match\'s and if a message delivery has failed temporary, message will be dropped without any new delivery attempts.">'+
 																			'<td style="font-size: 0.9em;">Drop after temporary failure</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
 																				'<div id="div-' + id +'DropAfterTempFail-input" class="control-group">'+

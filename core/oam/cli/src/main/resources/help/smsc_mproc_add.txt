@@ -1,28 +1,45 @@
 Name
 
 SYNOPSIS
-	smsc mproc add <class name> <id> desttonmask <destination type of number>
-	destnpimask	<destination numbering plan indicator> destdigmask <regular
-	expression - destination number digits mask> originatingmask <SS7_MO |
-	SS7_HR | SMPP | SIP> originatorsccpaddressmask <originator SCCP
-	CallingPartyAddress mask> networkidmask <networkId value> origesmenamemask
-	<regualr expression - origination ESME name mask> newnetworkid
-	<new networkId value> newdestton<new destination type of number> newdestnpi
-	<new destination numbering plan indicator> adddestdigprefix <prefix>
-	makecopy <false | true> dropaftersri <false | true>
+	- General case (for customized mproc rules):
+	smsc mproc add <class name> <id> <parameters list>
+
+	- Default mproc rules implementation (<class name> is "mproc"):
+	smsc mproc add mproc <id> networkidmask <networkId value> originnetworkidmask <networkId value>
+	desttonmask <destination type of number> destnpimask <destination numbering plan indicator>
+	destdigmask <regular expression - destination number digits mask> imsidigitsmask <regular
+	expression - imsi digits mask> nnndigitsmask <regular expression - NetworkNodeNumber digits
+	mask> originatingmask <SS7_MO |	SS7_HR | SMPP | SIP | HTTP | -1> origesmenamemask <regualar
+	expression - origination ESME name mask> originatorsccpaddressmask <originator SCCP
+	CallingPartyAddress mask> processingtype <delivery processing type: SS7_SRI | SS7_MT | SMPP |
+	SIP | -1> errorcode <internal SMSC GW delivery error code value> newnetworkid <new networkId
+	value> newdestton <new destination type of number> newdestnpi <new destination numbering plan
+	indicator> adddestdigprefix <prefix value> hrbypass <false | true> dropaftersri <false | true>
+	newnetworkidaftersri <networkId value> newnetworkidafterpermfail <networkId value>
+	dropaftertempfail <false | true> newnetworkidaftertempfail <networkId value>
 
 DESCRIPTION
 	This command is used to configure a new Message Processing Rule. If several mproc 
-	rules match's with a message then all of them will be applied in ascending order of id field. 
-	Mproc rules are processed one time per a message just after a message has come to SMSC before 
-	invoking of Diameter interface and storing to database / delivering. If routing is to be based
-	only on mproc rules, its mandatory to specify for each ESME, SIP and SS7 GT its own networkId 
-	(all networkId are different) and specify a full set of mproc rules for changing of networkId. 
-	After the networkId has changed the message will be routed to the ESME / SIP / SS7 that belongs 
-	to the networkId. SMPP / SIP should be configured in this case so that they accepts all message 
-	that has been routed to their networkId. It is possible also to have several ESME / SIP in one 
-	networkId subnetwork. Then inside the subnetwork all message will be routed based on ESME / SIP 
-	routingAddressRange value.
+	rules match's with a message then all of them will be applied in ascending order of id field.
+
+	There are several mproc rules triggers at which different actions may be applied.
+	Here a trigger list in the orders rules are usually applied during of a SMS life cycle:
+	- HrSri - in HR procedure after SRI response from a local HLR has been received
+	- Arrival - after a message has arrived before invoking of Diameter interface and storing
+	            to database / delivering
+	- PreDelivery - when SMSC GW is going to route a message to some destination just before
+	                a delivery attempt 
+	- ImsiRequest - in MT procedure after SRI response from a subscriber's HLR has been received
+	- DeliveryTempFailure - just after a message delivery failure with a temporary reason
+	- Delivery - just after a message delivery success or failure with a permanent reason
+
+	If routing is to be based only on mproc rules, its mandatory to specify for each ESME, SIP and
+	SS7 GT its own networkId (all networkId are different) and specify a full set of mproc rules
+	for changing of networkId. After the networkId has changed the message will be routed to the
+	ESME / SIP / SS7 that belongs to the networkId. SMPP / SIP should be configured in this case
+	so that they accepts all message that has been routed to their networkId. It is possible also]
+	to have several ESME / SIP in one networkId subnetwork. Then inside the subnetwork all message
+	will be routed based on ESME / SIP routingAddressRange value.
 
 PARAMETERS
 
@@ -35,7 +52,17 @@ PARAMETERS
 					rules are applied.
 
 	Optional Parameters
-	
+
+	- conditions
+
+	networkidmask	- Rule will be applied only if a target SMS is in processing now in a networkId
+					area that is equal to networkidmask (messages's networkId value is networkidmask).
+					Set value to -1 as wild card to match all the network id's. Default value is -1.  	
+
+	originnetworkidmask - Rule will be applied only if a target SMS has come to SMSC GW via networkId
+					area with this rule's originnetworkidmask. Set value to -1 as wild card to match all 
+					the network id's. Default value is -1.
+
 	desttonmask		- Rule will be applied only if destination type of number (TON) 
 					of target SMS match's with this rule's desttonmask. Set value 
 					to -1 as wild card to match all the TON. Valid values of TON are
@@ -47,7 +74,7 @@ PARAMETERS
 						5 : Alphanumeric
 						6 : Abbreviated
 						7 : Reserved
-					Default value is -1
+					Default value is -1.
 
 	destnpimask		- Rule will be applied only if destination number plan indicator 
 					(NPI) of target SMS match's with this rule's destnpimask. Set value 
@@ -62,48 +89,118 @@ PARAMETERS
 						10 : ERMES
 						14 : Internet
 						18 : WAP Client Id
-					Default value is -1 
+					Default value is -1.
 
 	destdigmask 	- Rule will be applied only if destination number of target SMS match's 
 					with this rule's destdigmask. destdigmask is java regular expression. Set
 					value to null or -1 as wild card to match all the digits of target SMS 
-					destination. Default value is -1
+					destination. Default value is -1.
+
+	imsidigitsmask  - Rule will be applied only if IMSI value was obtained after SRI request
+					(during MT or HR procedure) and it match's with this rule's imsidigitsmask.
+					imsidigitsmask is java regular expression. Set value to null or -1 as
+					wild card to match all the digits of IMSIs. Default value is -1.
+
+	nnndigitsmask   - Rule will be applied only if NNN (NetworkNodeNumber of VLR to where a
+					subscriber is registered) value was obtained after SRI request
+					(during MT or HR procedure) and it match's with this rule's nnndigitsmask.
+					nnndigitsmask is java regular expression. Set value to null or -1 as
+					wild card to match all the digits of IMSIs. Default value is -1.
 
 	originatingmask	- Rule will be applied only if target SMS is originated from channel 
-					as specified by originatingmask. Set value to null as wild card to match all 
+					as specified by originatingmask. Set value to -1 as wild card to match all 
 					the origination type. Valid values are 
 						SMPP
 						SS7_MO
 						SS7_HR
-						SIP	
-					Default value is null
+						SIP
+						HTTP
+					Default value is -1.
 
-	originatorsccpaddressmask - Rule will be applied only if CallingPartyAddress digits match's 
+	origesmenamemask - Rule will be applied only if target SMS is originated from SMPP channel
+					(ESME) and who's name match's with originating ESME name mask (Java Regular
+					Expression). Set -1 as wild card to match all the ESME. Default value is -1.
+
+	originatorsccpaddressmask - Rule will be applied only if target SMS is originated from SS7
+					channel (MO or HR procedures) and CallingPartyAddress digits match's 
 					with this rule's originatorsccpaddressmask. originatorsccpaddressmask is java
 					regular expression. Set value to null or -1 as wild card to match all the digits
-					of CallingPartyAddress digits. Default value is -1
+					of CallingPartyAddress digits. Default value is -1.
 
-	networkidmask	- Rule will be applied only if target SMS is origination networkid with 
-					this rule's networkidmask. Set value to -1 as wild card to match all 
-					the network id's. Default value is -1  	
+	processingtype   - Rule will be applied only if a Delivery step match's with this rule's
+					processingtype value. Value -1 will match all steps. Default value is -1.
+					Possible values are:
+						SMPP    - delivery via SMPP channel
+						SS7_SRI - sending of SRI request to HLR
+						SS7_MT  - MT delivery to SS7 network
+						SIP     - delivery via SIP channel
+
+	errorcode        - Rule will be applied only if an internal SMSC GW's delivery error code value
+					match's with this rule's errorcode. Value 0 means a successful delivery,
+					non 0 value means some delivery error. You can specify several values via comma
+					(example: "6,7,8"). Value -1 will match any error code. Default value is -1.
+					A list of error code values can be found here:
+					https://github.com/RestComm/smscgateway/blob/master/core/smsc-common-library/src/main/java/org/mobicents/smsc/library/ErrorCode.java
+
+	- actions
 
 	newnetworkid	- Once rule match's, the target SMS's network id will be change to one set here. 
 					This will allow to received SMS from different network and terminate on different
 					network. Set this to -1 to keep original network id. Default value is -1.
+					This action is for Arrival trigger.
 
 	newdestton		- Once rule match's, the target SMS's destination type of number(TON) will be 
 					changed to one set here. Set this to -1 to keep original TON. Default value is -1.
+					This action is for Arrival trigger.
 					
 	newdestnpi		- Once rule match's, the target SMS's destination number plan indicator (NPI) will 
 					be changed to one set here. Set this to -1 to keep original NPI. Default value is -1.
+					This action is for Arrival trigger.
 					
 	adddestdigprefix- Once rule match's, the target SMS's destination number will be prefixed with 
 					adddestdigprefix set here. Set this to -1 or null to keep original destination number. 
 					Default value is -1.
+					This action is for Arrival trigger.
 					
 	makecopy		- Once rule match's, and makecopy is set to true, a new copy of SMS is created. If new 
 					SMS is created all above parameters like networkidmask, newnetworkid, newdestton, 
-					newdestnpi, adddestdigprefix will be applied to new SMS copy.																		  
+					newdestnpi, adddestdigprefix will be applied to the new SMS copy.																		  
+					Default value is false.
+					This action is for Arrival trigger.
+
+	hrbypass        - Once rule match's inside Home Routing procedure after SMSC GW receives a response
+					from a local HLR then SMSC GW will bypass HR procedure by sending back to an original
+					SMSC GW origin original IMSI and NNN. 
+					Default value is false.
+					This action is for HrSri trigger.
+
+	dropaftersri    - Once rule match's and if a MAP SRI success response is received, message will be
+					dropped without delivery attempt. A delivery response in this case will contain extra
+					fields (IMSI and NetworkNodeNumber values). This action is applied only for SMS that
+					are attempted to be delivered to SS7 network. 
+					Default value is false.
+					This action is for ImsiRequest trigger.
+
+	newnetworkidaftersri - Once rule match's and if a MAP SRI success response is received, message will
+					be rerouted for delivery to another networkId. This action is applied only for SMS
+					that are attempted to be delivered to SS7 network. Set this to -1 to to avoid of
+					message rerouting in this step. Default value is -1.
+					This action is for ImsiRequest trigger.
+
+	newnetworkidafterpermfail - Once rule match's and if a message delivery has failed permanently,
+					message will be rerouted for delivery to another networkId. Set this to -1 to to avoid
+					of message rerouting in this step. Default value is -1.
+					This action is for Delivery trigger.
+
+	dropaftertempfail - Once rule match's and if a message delivery has failed temporary, message will be
+					dropped without new delivery attempts.
+					Default value is false.
+					This action is for DeliveryTempFailure trigger.
+
+	newnetworkidaftertempfail - Once rule match's and if a message delivery has failed temporary, message
+					will be rerouted for delivery to another networkId. Set this to -1 to to avoid
+					of message rerouting in this step. Default value is -1.
+					This action is for DeliveryTempFailure trigger.
 	
 SEE ALSO
 	smsc mproc modify, smsc mproc remove, smsc mproc show

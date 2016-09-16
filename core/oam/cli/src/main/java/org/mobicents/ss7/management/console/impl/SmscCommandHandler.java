@@ -37,7 +37,7 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
 	static final Tree commandTree = new Tree("smsc");
 	static {
 		Node parent = commandTree.getTopNode();
-		
+
 		Node sip = parent.addChild("sip");
 		sip.addChild("modify");
 		sip.addChild("show");
@@ -127,6 +127,7 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         set.addChild("esmedefaultcluster");
         set.addChild("deliverypause");
         set.addChild("receiptsdisabling");
+        set.addChild("incomereceiptsprocessing");
         set.addChild("orignetworkidforreceipts");
 
 		Node get = parent.addChild("get");
@@ -184,6 +185,7 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         get.addChild("esmedefaultcluster");
         get.addChild("deliverypause");
         get.addChild("receiptsdisabling");
+        get.addChild("incomereceiptsprocessing");
         get.addChild("orignetworkidforreceipts");
 
         Node remove = parent.addChild("remove");

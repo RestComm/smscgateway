@@ -1,0 +1,22 @@
+Name
+	smsc set incomereceiptsprocessing
+
+SYNOPSIS
+	smsc set incomereceiptsprocessing <true | false>
+
+DESCRIPTION
+	Enabling of processing of incoming delivery receipts from remote SMSC GW.
+	When a delivery receipt comes from a remote SMSC GW, then
+	SMSC GW will replace messageId in the receipt by a local messageId.
+	This action is needed for a possibility of delivery receipts processing
+	in mproc rules staff and delivery receipts transit to message originators.
+	Default value: false (no remote delivery receipts processing).
+
+EXAMPLES
+	smsc set incomereceiptsprocessing true
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv, smsc get incomereceiptsprocessing,
+	smsc set enableintermediatereceipts, smsc set receiptsdisabling
