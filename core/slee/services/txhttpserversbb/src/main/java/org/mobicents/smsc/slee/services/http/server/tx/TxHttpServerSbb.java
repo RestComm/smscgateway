@@ -2,6 +2,7 @@ package org.mobicents.smsc.slee.services.http.server.tx;
 
 import javolution.util.FastList;
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
+
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
@@ -34,6 +35,7 @@ import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
+
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -723,6 +725,70 @@ public abstract class TxHttpServerSbb implements Sbb {
         }
         return ret;
     }
+
+
+
+
+    @Override
+    public void sbbActivate() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sbbCreate() throws CreateException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sbbExceptionThrown(Exception arg0, Object arg1, ActivityContextInterface arg2) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sbbLoad() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sbbPassivate() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sbbPostCreate() throws CreateException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sbbRemove() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sbbRolledBack(RolledBackContext arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sbbStore() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void unsetSbbContext() {
+        // TODO Auto-generated method stub
+
+    }
+
 }
 
 

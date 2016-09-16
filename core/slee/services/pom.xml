@@ -14,23 +14,18 @@
 
 	<modules>
 		<module>library</module>
+
 		<module>alertsbb</module>
 		<module>chargingsbb</module>
 		<module>txsmppserversbb</module>
-<!--
-		<module>rxsmppserversbb</module>
-		<module>mtsbb</module>
--->
-		<module>mosbb</module>
 		<module>txsipserversbb</module>
-<!--
-		<module>rxsipserversbb</module>
--->
-		<module>homeroutingsbb</module>
-		<module>sbbs</module>
-		<module>du</module>
-
 		<module>txhttpserversbb</module>
+		<module>mosbb</module>
+		<module>homeroutingsbb</module>
+
+		<module>sbbs</module>
+
+		<module>du</module>
 	</modules>
 
 	<dependencyManagement>

@@ -122,8 +122,8 @@ public class SbbStates {
 
     public static boolean isAllServicesUp() {
         return smscTxSmppServerServiceState && smscRxSmppServerServiceState && smscTxSipServerServiceState
-                && smscRxSipServerServiceState && moServiceState && homeRoutingServiceState && mtServiceState
-                && alertServiceState && chargingServiceState;
+                && smscRxSipServerServiceState && smscTxHttpServerServiceState && moServiceState && homeRoutingServiceState
+                && mtServiceState && alertServiceState && chargingServiceState;
     }
 
     public static String getServicesDownList() {
@@ -139,6 +139,8 @@ public class SbbStates {
             sb.append("smscTxSipServerServiceState, ");
         if (!smscRxSipServerServiceState)
             sb.append("smscRxSipServerServiceState, ");
+        if (!smscTxHttpServerServiceState)
+            sb.append("smscTxHttpServerServiceState, ");
 
         if (!moServiceState)
             sb.append("moServiceState, ");
@@ -150,8 +152,6 @@ public class SbbStates {
             sb.append("alertServiceState, ");
         if (!chargingServiceState)
             sb.append("chargingServiceState, ");
-        if (!smscTxHttpServerServiceState)
-            sb.append("smscTxHttpServerServiceState, ");
 
         sb.append("]");
 
