@@ -183,7 +183,7 @@
 				</div>	
 				
 				<div id="div-originatingmask" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if target SMS is originated from channel as specified by originatingmask. Select All as wild card to match all the origination type. Valid values are &#13; SMPP &#13; SS7_MO &#13; SS7_HR &#13; SIP &#13; Default value is All (null)">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if target SMS is originated from channel as specified by originatingmask. Select All as wild card to match all the origination type. Valid values are &#13; SMPP &#13; SS7_MO &#13; SS7_HR &#13; SIP &#13; HTTP &#13; Default value is All (null)">
 						<span class="add-on">Originating Channel</span>
 						<select id="originatingmask" >
 							<option value="All">All</option>
@@ -191,6 +191,7 @@
 							<option value="SS7_HR">SS7 Home Routing</option>
 							<option value="SMPP">SMPP</option>
 							<option value="SIP">SIP</option>
+							<option value="HTTP">HTTP</option>
 						</select>
 					</span>	
 				</div>	
@@ -674,7 +675,7 @@
 																		'</td>'+
 																		'</tr>'+																		
 
-																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS is originated from channel as specified by originatingmask. Leave blank as wild card to match all the origination type. Valid values are &#13; SMPP &#13; SS7_MO &#13; SS7_HR &#13; SIP &#13; Default is blank">'+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if target SMS is originated from channel as specified by originatingmask. Leave blank as wild card to match all the origination type. Valid values are &#13; SMPP &#13; SS7_MO &#13; SS7_HR &#13; SIP &#13; HTTP &#13; Default is blank">'+
 																			'<td style="font-size: 0.9em;">Originating Channel</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
 																				'<div id="div-' + id +'OriginatingMask-input" class="control-group">'+
