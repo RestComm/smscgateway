@@ -1,21 +1,22 @@
 Name
-	smsc mproc add
+	smsc mproc modify
 
 SYNOPSIS
 	- General case (for customized mproc rules):
-	smsc mproc modify <class name> <id> <parameters list>
+	smsc mproc modify <id> <parameters list>
 
-	- Default mproc rules implementation (<class name> is "mproc"):
-	smsc mproc modify mproc <id> networkidmask <networkId value> originnetworkidmask <networkId value>
-	desttonmask <destination type of number> destnpimask <destination numbering plan indicator>
-	destdigmask <regular expression - destination number digits mask> imsidigitsmask <regular
-	expression - imsi digits mask> nnndigitsmask <regular expression - NetworkNodeNumber digits
-	mask> originatingmask <SS7_MO |	SS7_HR | SMPP | SIP | HTTP | -1> origesmenamemask <regualar
-	expression - origination ESME name mask> originatorsccpaddressmask <originator SCCP
-	CallingPartyAddress mask> processingtype <delivery processing type: SS7_SRI | SS7_MT | SMPP |
-	SIP | -1> errorcode <internal SMSC GW delivery error code value> newnetworkid <new networkId
-	value> newdestton <new destination type of number> newdestnpi <new destination numbering plan
-	indicator> adddestdigprefix <prefix value> hrbypass <false | true> dropaftersri <false | true>
+	- Default mproc rules implementation:
+	smsc mproc modify <id> networkidmask <networkId value> originnetworkidmask <networkId
+	value> desttonmask <destination type of number> destnpimask <destination numbering plan
+	indicator> destdigmask <regular expression - destination number digits mask>
+	imsidigitsmask <regular expression - imsi digits mask> nnndigitsmask <regular expression
+	- NetworkNodeNumber digits mask> originatingmask <SS7_MO | SS7_HR | SMPP | SIP | HTTP |
+	-1> origesmenamemask <regualar expression - origination ESME name mask>
+	originatorsccpaddressmask <originator SCCP CallingPartyAddress mask> processingtype
+	<delivery processing type: SS7_SRI | SS7_MT | SMPP | SIP | -1> errorcode <internal SMSC
+	GW delivery error code value> newnetworkid <new networkId value> newdestton <new
+	destination type of number> newdestnpi <new destination numbering plan indicator>
+	adddestdigprefix <prefix value> hrbypass <false | true> dropaftersri <false | true>
 	newnetworkidaftersri <networkId value> newnetworkidafterpermfail <networkId value>
 	dropaftertempfail <false | true> newnetworkidaftertempfail <networkId value>
 

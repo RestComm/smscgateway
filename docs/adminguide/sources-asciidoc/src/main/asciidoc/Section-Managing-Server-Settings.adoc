@@ -2399,14 +2399,43 @@ DESCRIPTION
 
 ----
 
-[[_enableintermediatereceipts_gui]]
+
+[[_incomereceiptsprocessing]]
+=== Income receipts processing
+
+[[_incomereceiptsprocessing_cli]]
+==== Using CLI
+
+SMCS can processing of incoming delivery receipts from remote SMSC GW (replacing of messageId in the receipt by a local messageId). You can set the 'incomereceiptsprocessing' value to true/false by issuing the command `smsc set incomereceiptsprocessing` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get incomereceiptsprocessing` which will display the value set for this property. 
+
+----
+
+Name
+    smsc set incomereceiptsprocessing
+
+SYNOPSIS
+    smsc set incomereceiptsprocessing <true | false>
+
+DESCRIPTION
+	Enabling of processing of incoming delivery receipts from remote SMSC GW.
+	When a delivery receipt comes from a remote SMSC GW, then
+	SMSC GW will replace messageId in the receipt by a local messageId.
+	This action is needed for a possibility of delivery receipts processing
+	in mproc rules staff and delivery receipts transit to message originators.
+	Default value: false (no remote delivery receipts processing).
+
+----
+
+
+[[_incomereceiptsprocessing_gui]]
 ==== Using GUI
 
 .Procedure: Allowing of generating of intermediate receipts using the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'Processing' tab in the GUI. 
-. You can specify if the SMSC should disable of receipt generating by setting the value for the field 'Enable intermediate receipts' to true or false accordingly.
+. You can specify of processing of incoming delivery receipts by setting the value for the field 'Income receipts processing' to true or false accordingly.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 

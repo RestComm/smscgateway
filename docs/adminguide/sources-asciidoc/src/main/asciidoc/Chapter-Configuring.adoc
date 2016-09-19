@@ -216,19 +216,18 @@ If a message fits to all conditions then the rule will be applied to the message
 [cols="1,1,1,1", frame="all", options="header"]
 |===
 | Parameter name | Value | Description | Default value
+| networkidmask | <networkId value> | mproc rule will be applied only if a message is processing now in a networkId area that is equal to networkidmask (messages's networkId value is networkidmask). | "-1" : acts as wild card and hence messages in any network area will match.
+| originnetworkidmask | <networkId value> | mproc rule will be applied only if a message has come to SMSC GW via networkId area with this rule's originnetworkidmask. | "-1" : acts as wild card and hence messages from any network area will match.
 | desttonmask | <destination type of number> | mproc rule will be applied only if message destination Type of Number is equal to this value "desttonmask" | "-1" : acts as wild card and hence messages with any TON will match.
 | destnpimask | <destination numbering plan indicator> | mproc rule will be applied only if message destination Numbering Plan Indicator is equal to this value "destnpimask". | "-1" : acts as wild card and hence messages with any NPI will match.
-| destdigmask | <java regular expression - destination number digits mask> | mproc rule will be applied only if message destination address digits match's with "destdigmask" java regular expression. | "-1" : acts as wild card and hence messages with any destination number will match.
-| originatingmask | <SS7_MO \| SS7_HR \| SMPP \| SIP> | mproc rule will be applied only if message arrived in SMSC GW via a defined "originatingmask" connector. 
-
-. SS7_MO: SMS Originated from Mobile - SS7 connection
-. SS7_HR: SMS Originated from Home Routing configuartion - SS7 connection
-. SMPP: SMS Originated from SMPP connector and SIP connector.
-. SIP: SMS Originated from SIP connector.
- | "-1" : acts as wild card and hence messages originated from any channel will match.
-| originatorsccpaddress- mask | <java regular expression - originator CallingPartyAddress digits mask> | mproc rule will be applied only if CallingPartyAddress digits match's with "originatorsccpaddress mask" java regular expression. | "-1" : acts as wild card and hence messages with any CallingPartyAddress digits or without it will match.
-| networkidmask | <networkId value> | mproc rule will be applied only if message has come to SMSC GW via a subnetwork with networkId which is equal to this value "networkidmask". | "-1" : acts as wild card and hence messages from any network will match.
+| destdigmask | <java regular expression - destination number digits mask> | mproc rule will be applied only if message destination address digits matches with "destdigmask" java regular expression. | "-1" : acts as wild card and hence messages with any destination number will match.
+| imsidigitsmask | <java regular expression - IMSI mask> | mproc rule will be applied only if IMSI value was obtained after SRI request (during MT or HR procedure) and it matches with this rule's imsidigitsmask. imsidigitsmask is java regular expression. | "-1" : acts as wild card and hence messages with any IMSI value or with no IMSI value obtained will match.
+| nnndigitsmask | <java regular expression - NetworkNodeNumber of VLR to where a subscriber is registered mask> | mproc rule will be applied only if NNN (NetworkNodeNumber of VLR to where a subscriber is registered) value was obtained after SRI request (during MT or HR procedure) and it matches with this rule's nnndigitsmask. nnndigitsmask is java regular expression. | "-1" : acts as wild card and hence messages with any IMSI value or with no IMSI value obtained will match.
+| originatingmask | <SS7_MO \| SS7_HR \| SMPP \| SIP \| HTTP> | mproc rule will be applied only if message arrived in SMSC GW via a defined "originatingmask" connector. | "-1" : acts as wild card and hence messages originated from any channel will match.
 | origesmenamemask | <java regualar expression - origination ESME name mask> | mproc rule will be applied only if message has come to SMSC GW from SMPP connector from ESME with a name that fits "origesmenamemask". | "-1" : acts as wild card and hence any message will match (never mind if it came from SS7 or SIP).
+| originatorsccpaddressmask | <java regular expression - originator CallingPartyAddress digits mask> | mproc rule will be applied only if CallingPartyAddress digits match's with "originatorsccpaddress mask" java regular expression. | "-1" : acts as wild card and hence messages with any CallingPartyAddress digits or without it will match.
+| processingtype | <SMPP \| SS7_SRI \| SS7_MT \| SIP> | mproc rule will be applied only if a Delivery step match's with this rule's processingtype value. | "-1" : acts as wild card and hence messages with any delivery step will match.
+| errorcode | <digital value of SMSC GW's internal error code> | mproc rule will be applied only if an internal SMSC GW's delivery error code value matches with this rule's errorcode. Value 0 means a successful delivery, non 0 value means some delivery error. You can specify several values via comma (example: "6,7,8"). Error code values list can be found in org.mobicents.smsc.library.ErrorCode enum. | "-1" : acts as wild card and hence messages with any delivery result will match.
 |===
 
 b) Actions, which will be applied to messages. 
