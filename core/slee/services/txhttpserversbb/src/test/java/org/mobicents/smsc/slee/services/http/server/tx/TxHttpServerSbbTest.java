@@ -16,14 +16,15 @@ import javax.slee.ActivityContextInterface;
 import javax.slee.SLEEException;
 import javax.slee.SbbLocalObject;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
-
 
 /**
  * Created by tpalucki on 05.09.16.
  * @author Tomasz Pałucki
  */
 public class TxHttpServerSbbTest {
+
     private TxHttpServerSbbProxy sbb;
     private PersistenceRAInterfaceProxy pers;
     private boolean cassandraDbInited;
@@ -60,11 +61,13 @@ public class TxHttpServerSbbTest {
     private static final String[] TO_MULTIPLE = {"123456789", "111222333", "123123123"};
     private static final String[] TO_ONE = {"123456789"};
 
-    private static final String URL_SEND_MESSAGE = "http://test.pl/sendMessage";
+    private static final String URL_SEND_MESSAGE = "http://test.pl/restcomm";
     private static final String URL_SEND_MESSAGE_FAKE = "http://test.pl/sendMessageFake";
     private static final String URL_GET_MESSAGE_ID_STATUS = "http://test.pl/getStatus";
 
     private static final String MESSAGE_ID = "123456789";
+
+    private static final String MSG_ARABIC = "الأَبْجَدِيَّة العَرَبِيَّة";
 
     @BeforeMethod
     public void setUpClass() throws Exception {
@@ -106,7 +109,7 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"), FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -114,16 +117,13 @@ public class TxHttpServerSbbTest {
 
         // perform the action
         this.sbb.onHttpGet(event, aci);
-
         MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
-
         printResponseData(resp);
-
         Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
     }
 
     @Test
-    public void sendMessageGETStringErrorTest(){
+    public void sendMessageGETStringErrorTest() throws UnsupportedEncodingException {
         System.out.println("sendMessageGETStringErrorTest");
         if (!this.cassandraDbInited) {
             Assert.fail("Cassandra DB is not inited");
@@ -133,7 +133,7 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"), FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -336,6 +336,98 @@ public class TxHttpServerSbbTest {
         printResponseData(resp);
 
         Assert.assertTrue(isValid(resp, FORMAT_JSON, false), "Response is not valid");
+    }
+
+    @Test
+    public void sendArabicMessageGETJsonSuccessTest() throws UnsupportedEncodingException {
+        System.out.println("sendArabicMessageGETJsonSuccessTest");
+        if (!this.cassandraDbInited) {
+            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        String urlEncoded = null;
+        urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_JSON, ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE);
+//        request.setContentType("application/x-www-form-urlencoded");
+//        request.setCharacterEncoding("UTF-8");
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true), "Response is not valid");
+    }
+
+    @Test
+    public void sendArabicMessageGETStringSuccessTest() throws UnsupportedEncodingException {
+        System.out.println("sendArabicMessageGETStringSuccessTest");
+        if (!this.cassandraDbInited) {
+            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        String urlEncoded = null;
+        urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+
+        Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
+    }
+
+    @Test
+    public void sendArabicMessagePOSTSuccessTest() throws UnsupportedEncodingException {
+            System.out.println("sendArabicMessagePOSTSuccessTest");
+            if (!this.cassandraDbInited) {
+                Assert.fail("Cassandra DB is not inited");
+                return;
+            }
+            //  prepare
+            ActivityContextInterface aci = new HttpActivityContextInterface();
+            MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+            String urlEncoded = null;
+            urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
+
+            MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE);
+            event.setRequest(request);
+
+            MockHttpServletResponse response = new MockHttpServletResponse();
+            event.setResponse(response);
+
+            // perform the action
+            this.sbb.onHttpPost(event, aci);
+
+            MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+            printResponseData(resp);
+
+            Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
     }
 
     //------------------------------------------------------------------------------------------------------------------

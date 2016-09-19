@@ -12,10 +12,10 @@ import java.io.PrintWriter;
 public class HttpUtils {
 
     public static void sendOkResponseWithContent(Tracer tracer, HttpServletResponse response, String content) throws IOException {
-        tracer.info("Sending 200 OK");
-//        response.setStatus(HttpServletResponse.SC_OK, "OK");
+        if (tracer.isFineEnabled()) {
+            tracer.info("Sending 200 OK");
+        }
         response.setStatus(HttpServletResponse.SC_OK);
-
         if (content != null) {
             if (tracer.isFineEnabled()) {
                 tracer.fine("Sending 200 OK: content:" + content);
@@ -24,6 +24,8 @@ public class HttpUtils {
             PrintWriter writer = response.getWriter();
             writer.write(content);
             writer.flush();
+        } else {
+            tracer.severe("Content is empty");
         }
         response.flushBuffer();
     }
@@ -39,9 +41,10 @@ public class HttpUtils {
 
     public static void sendErrorResponseWithContent(Tracer tracer, HttpServletResponse response, int status, String message, String content) throws IOException {
         if (tracer.isFineEnabled()) {
-            tracer.fine("Sending sendError: status:" + status + " message:" + message + " content:" + content);
+            tracer.fine("Sending sendErrorWithContent: status: " + status + " message: " + message + " content: " + content);
         }
-        response.sendError(status, message);
+        response.setStatus(status);
+        response.setContentType("application/soap+xml; charset=UTF-8");
         PrintWriter writer = response.getWriter();
         writer.write(content);
         writer.flush();

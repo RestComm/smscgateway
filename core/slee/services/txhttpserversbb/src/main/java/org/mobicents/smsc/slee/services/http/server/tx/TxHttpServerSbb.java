@@ -4,8 +4,6 @@ import javolution.util.FastList;
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
 
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
@@ -37,9 +35,9 @@ import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,6 +63,9 @@ public abstract class TxHttpServerSbb implements Sbb {
 
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
 
+    private static Charset utf8Charset = Charset.forName("UTF-8");
+    private static Charset ucs2Charset = Charset.forName("UTF-16BE");
+
     public PersistenceRAInterface getStore() {
         return this.persistence;
     }
@@ -74,9 +75,9 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpServletRequest request = event.getRequest();
         // decision if getStatus or sendMessage
         try {
-            if (HttpRequestUtils.isSendMessageRequest(request)) {
+            if (HttpRequestUtils.isSendMessageRequest(logger, request)) {
                 this.processHttpSendMessageEvent(event, aci);
-            } else if (HttpRequestUtils.isGetMessageIdStatusService(request)) {
+            } else if (HttpRequestUtils.isGetMessageIdStatusService(logger, request)) {
                 this.processHttpGetMessageIdStatusEvent(event, aci);
             } else {
                 throw new HttpApiException("Unknown operation on the HTTP API");
@@ -88,7 +89,6 @@ public abstract class TxHttpServerSbb implements Sbb {
                 outgoingData.setMessage(e.getMessage());
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
-//                        HttpUtils.STATUS_SERVICE_UNAVAILABLE,
                         HttpServletResponse.SC_OK,
                         outgoingData.getMessage(),
                         ResponseFormatter.format(outgoingData, HttpSendMessageIncomingData.getFormat(request)));
@@ -96,27 +96,6 @@ public abstract class TxHttpServerSbb implements Sbb {
                 ex.printStackTrace();
             }
         }
-
-//        if(requestURI != null && requestURI.trim().endsWith(SEND_MESSAGE_URL_SUFFIX)){
-//            this.processHttpSendMessageEvent(event, aci);
-//        } else if(requestURI != null && requestURI.trim().endsWith(GET_STATUS_URL_SUFFIX)){
-//            this.processHttpGetMessageIdStatusEvent(event, aci);
-//        } else {
-//            try {
-//                final String message = "Unknown operation on the HTTP API";
-//                HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
-//                outgoingData.setStatus(Status.ERROR);
-//                outgoingData.setMessage(message);
-//                HttpUtils.sendErrorResponseWithContent(logger,
-//                        event.getResponse(),
-////                        HttpUtils.STATUS_SERVICE_UNAVAILABLE,
-//                        HttpServletResponse.SC_OK,
-//                        message,
-//                        ResponseFormatter.format(outgoingData, HttpSendMessageIncomingData.getFormat(request)));
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 
     public void onHttpPost(HttpServletRequestEvent event, ActivityContextInterface aci) {
@@ -124,9 +103,9 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpServletRequest request = event.getRequest();
         // decision if getStatus or sendMessage
         try {
-            if (HttpRequestUtils.isSendMessageRequest(request)) {
+            if (HttpRequestUtils.isSendMessageRequest(logger, request)) {
                 this.processHttpSendMessageEvent(event, aci);
-            } else if (HttpRequestUtils.isGetMessageIdStatusService(request)) {
+            } else if (HttpRequestUtils.isGetMessageIdStatusService(logger, request)) {
                 this.processHttpGetMessageIdStatusEvent(event, aci);
             } else {
                 throw new HttpApiException("Unknown operation on the HTTP API. Parameter set from the request does not match any of the HTTP API services.");
@@ -138,7 +117,6 @@ public abstract class TxHttpServerSbb implements Sbb {
                 outgoingData.setMessage(e.getMessage());
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
-//                        HttpUtils.STATUS_SERVICE_UNAVAILABLE,
                         HttpServletResponse.SC_OK,
                         outgoingData.getMessage(),
                         ResponseFormatter.format(outgoingData, HttpSendMessageIncomingData.getFormat(request)));
@@ -149,61 +127,38 @@ public abstract class TxHttpServerSbb implements Sbb {
     }
 
     private void processHttpSendMessageEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException {
+        logger.fine("processHttpSendMEssageEvent");
         HttpServletRequest request = event.getRequest();
         HttpSendMessageIncomingData incomingData = null;
-//        try {
-            incomingData = createSendMessageIncomingData(request);
-            this.sendMessage(event, incomingData, aci);
-//        } catch (HttpApiException e) {
-//            try {
-//                HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
-//                outgoingData.setStatus(Status.ERROR);
-//                HttpUtils.sendErrorResponseWithContent(this.logger, event.getResponse(),
-////                        HttpUtils.STATUS_OK,
-//                        HttpServletResponse.SC_OK,
-//                        e.getMessage(),
-//                        ResponseFormatter.format(outgoingData, HttpSendMessageIncomingData.getFormat(request)));
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-//        }
+
+        incomingData = createSendMessageIncomingData(request);
+        this.sendMessage(event, incomingData, aci);
     }
 
     private void processHttpGetMessageIdStatusEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException {
+        logger.fine("processHttpGetMessageIdStatusEvent");
         HttpServletRequest request = event.getRequest();
         HttpGetMessageIdStatusIncomingData incomingData;
-//        try {
-            incomingData = createGetMessageIdStatusIncomingData(request);
-            this.getMessageIdStatus(event, incomingData, aci);
-//        } catch (HttpApiException e) {
-//            try {
-//                HttpGetMessageIdStatusOutgoingData outgoingData = new HttpGetMessageIdStatusOutgoingData();
-//                outgoingData.setStatus(Status.ERROR);
-//                outgoingData.setStatusMessage(e.getMessage());
-//                HttpUtils.sendErrorResponseWithContent(this.logger, event.getResponse(),
-////                        HttpUtils.STATUS_OK,
-//                        HttpServletResponse.SC_OK,
-//                        e.getMessage(),
-//                        ResponseFormatter.format(outgoingData, HttpSendMessageIncomingData.getFormat(request)));
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-//        }
+
+        incomingData = createGetMessageIdStatusIncomingData(request);
+        this.getMessageIdStatus(event, incomingData, aci);
     }
 
     private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request) throws HttpApiException {
+        logger.fine("createSendMessageIncomingData");
         final String userId = request.getParameter("userid");
         final String password = request.getParameter("password");
-        final String msg = request.getParameter("msg");
+        final String encodedMsg = request.getParameter("msg");
         final String format = request.getParameter("format");
         final String encoding = request.getParameter("encoding");
         final String senderId = request.getParameter("sender");
         final String[] destAddresses = request.getParameterValues("to");
 
-        return new HttpSendMessageIncomingData(userId, password, msg, format, encoding, senderId, destAddresses);
+        return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
     }
 
     private HttpGetMessageIdStatusIncomingData createGetMessageIdStatusIncomingData(HttpServletRequest request) throws HttpApiException {
+        logger.fine("createGetMessageIdStatusIncomingData");
         final String userId = request.getParameter("userid");
         final String password = request.getParameter("password");
         final String msgId = request.getParameter("msgid");
@@ -213,16 +168,15 @@ public abstract class TxHttpServerSbb implements Sbb {
     }
 
     public void sendMessage(HttpServletRequestEvent event, HttpSendMessageIncomingData incomingData, ActivityContextInterface aci) {
+        logger.fine("sendMessage");
         if (this.logger.isFineEnabled()) {
             this.logger.fine("\nReceived sendMessage = " + incomingData);
         }
         HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
         outgoingData.setStatus(Status.ERROR);
 
-//        List<String> destinations = incomingData.getDestAddresses();
         PersistenceRAInterface store = getStore();
         SendMessageParseResult parseResult;
-        //TODO: get value of networkId
         int networkId = 0;
         try {
             parseResult = this.createSmsEventMultiDest(incomingData, store, networkId);
@@ -240,7 +194,6 @@ public abstract class TxHttpServerSbb implements Sbb {
                 outgoingData.setMessage(message);
                 //TODO: what error status?
                 HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(),
-//                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                         HttpServletResponse.SC_OK,
                         message,
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()));
@@ -257,10 +210,8 @@ public abstract class TxHttpServerSbb implements Sbb {
                 final String message = "Error while trying to send SubmitMultiResponse";
                 outgoingData.setStatus(Status.ERROR);
                 outgoingData.setMessage(message);
-                //TODO: what error status??
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
-//                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                         HttpServletResponse.SC_OK,
                         message, ResponseFormatter.format(outgoingData, incomingData.getFormat()));
             } catch (IOException e) {
@@ -271,7 +222,6 @@ public abstract class TxHttpServerSbb implements Sbb {
         for (Sms sms : parseResult.getParsedMessages()) {
             outgoingData.put(sms.getSmsSet().getDestAddr(), sms.getMessageId());
         }
-
         // Lets send the Response with success here
         try {
             outgoingData.setStatus(Status.SUCCESS);
@@ -319,7 +269,6 @@ public abstract class TxHttpServerSbb implements Sbb {
         int destTon, destNpi;
         destTon = smscPropertiesManagement.getDefaultTon();
         destNpi = smscPropertiesManagement.getDefaultNpi();
-        // TODO set Validity Period somewhere in the code
         TargetAddress ta = new TargetAddress(destTon, destNpi, addr, networkId);
         return ta;
     }
@@ -366,144 +315,40 @@ public abstract class TxHttpServerSbb implements Sbb {
                     0, MAPErrorCode.systemFailure, null);
         }
 
-        DataCodingScheme dataCodingScheme = new DataCodingSchemeImpl(dcs);
-
         // short message data
         byte[] data = incomingData.getShortMessage();
 
         if (data == null) {
             data = new byte[0];
         }
-
-//        byte[] udhData;
-//        byte[] textPart;
         String msg = null;
-        // TODO msg should be filled and decoded somehow below
         switch(incomingData.getEncoding()){
             case UTF8:
+                msg = new String(data, utf8Charset);
                 break;
-            default: // this is UCS2 case - the default one
+            default: // UCS2
+                msg = new String(data, ucs2Charset);
                 break;
         }
-//        udhData = null;
-//        textPart = data;
-//        if (udhPresent && data.length > 2) {
-//            // UDH exists
-//            int udhLen = (textPart[0] & 0xFF) + 1;
-//            if (udhLen <= textPart.length) {
-//                textPart = new byte[textPart.length - udhLen];
-//                udhData = new byte[udhLen];
-//                System.arraycopy(data, udhLen, textPart, 0, textPart.length);
-//                System.arraycopy(data, 0, udhData, 0, udhLen);
-//            }
-//        }
-
-//        if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM8) {
-//            msg = new String(textPart, isoCharset);
-//        } else {
-//            SmppEncoding enc;
-//            if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7) {
-//                enc = smscPropertiesManagement.getSmppEncodingForGsm7();
-//            } else {
-//                enc = smscPropertiesManagement.getSmppEncodingForUCS2();
-//            }
-//            switch (enc) {
-//                case Utf8:
-//                default:
-//                    msg = new String(textPart, utf8Charset);
-//                    break;
-//                case Unicode:
-//                    msg = new String(textPart, ucs2Charset);
-//                    break;
-//                case Gsm7:
-//                    GSMCharsetDecoder decoder = (GSMCharsetDecoder) gsm7Charset.newDecoder();
-//                    decoder.setGSMCharsetDecodingData(new GSMCharsetDecodingData(Gsm7EncodingStyle.bit8_smpp_style,
-//                            Integer.MAX_VALUE, 0));
-//                    ByteBuffer bb = ByteBuffer.wrap(textPart);
-//                    CharBuffer bf = null;
-//                    try {
-//                        bf = decoder.decode(bb);
-//                    } catch (CharacterCodingException e) {
-//                        // this can not be
-//                    }
-//                    msg = bf.toString();
-//                    break;
-//            }
-//        }
 
         // checking max message length
         int nationalLanguageLockingShift = 0;
         int nationalLanguageSingleShift = 0;
-//        if (udhPresent || segmentTlvFlag) {
-//            // here splitting by SMSC is not supported
-//            UserDataHeader udh = null;
-//            int lenSolid = MessageUtil.getMaxSolidMessageBytesLength();
-//            if (udhPresent)
-//                udh = new UserDataHeaderImpl(udhData);
-//            else {
-//                udh = createNationalLanguageUdh(origEsme, dataCodingScheme);
-//                if (udh.getNationalLanguageLockingShift() != null) {
-//                    lenSolid -= 3;
-//                    nationalLanguageLockingShift = udh.getNationalLanguageLockingShift().getNationalLanguageIdentifier()
-//                            .getCode();
-//                }
-//                if (udh.getNationalLanguageSingleShift() != null) {
-//                    lenSolid -= 3;
-//                    nationalLanguageSingleShift = udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier()
-//                            .getCode();
-//                }
-//            }
-//            int messageLen = MessageUtil.getMessageLengthInBytes(dataCodingScheme, msg, udh);
-//            if (udhData != null)
-//                messageLen += udhData.length;
-//
-//            if (messageLen > lenSolid) {
-//                throw new SmscProcessingException("Message length in bytes is too big for solid message: "
-//                        + messageLen + ">" + lenSolid, SmppConstants.STATUS_INVPARLEN,
-//                        MAPErrorCode.systemFailure, null);
-//            }
-//        } else {
-//            // here splitting by SMSC is supported
-//            int lenSegmented = MessageUtil.getMaxSegmentedMessageBytesLength();
-//            if (msg.length() * 2 > (lenSegmented - 6) * 255) { // firstly draft length check
-//                UserDataHeader udh = createNationalLanguageUdh(origEsme, dataCodingScheme);
-//                int messageLen = MessageUtil.getMessageLengthInBytes(dataCodingScheme, msg, udh);
-//                if (udh.getNationalLanguageLockingShift() != null) {
-//                    lenSegmented -= 3;
-//                    nationalLanguageLockingShift = udh.getNationalLanguageLockingShift().getNationalLanguageIdentifier()
-//                            .getCode();
-//                }
-//                if (udh.getNationalLanguageSingleShift() != null) {
-//                    lenSegmented -= 3;
-//                    nationalLanguageSingleShift = udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier()
-//                            .getCode();
-//                }
-//                if (messageLen > lenSegmented * 255) {
-//                    throw new SmscProcessingException("Message length in bytes is too big for segmented message: " + messageLen
-//                            + ">" + lenSegmented, SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure, null);
-//                }
-//            }
-//        }
-
-//        TODO use message util
-//        MessageUtil.getMaxSegmentedMessageBytesLength();
-
-        // ScheduleDeliveryTime processing
-        Date scheduleDeliveryTime = new Date(System.currentTimeMillis());
-
-        long messageId = store.c2_getNextMessageId();
-        SmscStatProvider.getInstance().setCurrentMessageId(messageId);
 
         ArrayList<Sms> msgList = new ArrayList<Sms>(addressList.size());
 
         for (String address : addressList) {
+            // generating message id for each message.
+            long messageId = store.c2_getNextMessageId();
+            SmscStatProvider.getInstance().setCurrentMessageId(messageId);
+
             boolean succAddr = false;
             TargetAddress ta = null;
             try {
                 ta = createDestTargetAddress(address, networkId);
                 succAddr = true;
             } catch (SmscProcessingException e) {
-                // TODO implement handling of the exception
+                logger.severe("SmscProcessingException while processing message to destination: "+address);
             }
 
             if (succAddr) {
@@ -511,36 +356,16 @@ public abstract class TxHttpServerSbb implements Sbb {
                 sms.setDbId(UUID.randomUUID());
                 sms.setOriginationType(OriginationType.HTTP);
 
-//                sms.setSourceAddr(sourceAddr);
-//                sms.setSourceAddrTon(sourceAddrTon);
-//                sms.setSourceAddrNpi(sourceAddrNpi);
-//                sms.setOrigNetworkId(networkId);
-
                 sms.setDataCoding(dcs);
                 sms.setNationalLanguageLockingShift(nationalLanguageLockingShift);
                 sms.setNationalLanguageSingleShift(nationalLanguageSingleShift);
 
-//                sms.setOrigSystemId(origEsme.getSystemId());
-//                sms.setOrigEsmeName(origEsme.getName());
-
                 sms.setSubmitDate(new Timestamp(System.currentTimeMillis()));
 
-//                sms.setServiceType(event.getServiceType());
-//                sms.setEsmClass(event.getEsmClass());
-//                sms.setProtocolId(event.getProtocolId());
-//                sms.setPriority(event.getPriority());
-//                sms.setRegisteredDelivery(event.getRegisteredDelivery());
-//                sms.setReplaceIfPresent(event.getReplaceIfPresent());
                 sms.setDefaultMsgId(incomingData.getDefaultMsgId());
 
+                logger.finest("### Msg is: "+msg);
                 sms.setShortMessageText(msg);
-//                sms.setShortMessageBin(udhData);
-                //TODO: validityPeriod
-                Date validityPeriod = new Date();
-                MessageUtil.applyValidityPeriod(sms, validityPeriod, true, smscPropertiesManagement.getMaxValidityPeriodHours(),
-                        smscPropertiesManagement.getDefaultValidityPeriodHours());
-                //TODO: set schedule Delivery Time
-                MessageUtil.applyScheduleDeliveryTime(sms, scheduleDeliveryTime);
 
                 SmsSet smsSet;
 
@@ -549,18 +374,15 @@ public abstract class TxHttpServerSbb implements Sbb {
                 smsSet.setDestAddrNpi(ta.getAddrNpi());
                 smsSet.setDestAddrTon(ta.getAddrTon());
 
-                //TODO how to obtain networkId
-//                smsSet.setNetworkId(origEsme.getNetworkId());
                 smsSet.setNetworkId(0);
                 smsSet.addSms(sms);
-//                }
+                
                 sms.setSmsSet(smsSet);
                 sms.setMessageId(messageId);
 
                 msgList.add(sms);
             }
         }
-
         // TODO: process case when event.getReplaceIfPresent()==true: we need
         // remove old message with same MessageId ?
         return new SendMessageParseResult(msgList);
@@ -588,8 +410,6 @@ public abstract class TxHttpServerSbb implements Sbb {
         }
         // checking if cassandra database is available
         if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
-//            SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR, 0,
-//                    null);
             SmscProcessingException e = new SmscProcessingException("Database is unavailable", 0, 0,
                     null);
             e.setSkipErrorLogging(true);
@@ -601,8 +421,6 @@ public abstract class TxHttpServerSbb implements Sbb {
             int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
             int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
             if (activityCount >= fetchMaxRows) {
-//                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
-//                        0, null);
                 SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", 0,
                         0, null);
                 e.setSkipErrorLogging(true);
@@ -611,24 +429,6 @@ public abstract class TxHttpServerSbb implements Sbb {
         }
         // TODO how to check if charging is used for http request? Is it turned on for all requests?
         boolean withCharging = false;
-//        switch (smscPropertiesManagement.getTxSmppChargingType()) {
-//        switch (smscPropertiesManagement.getTxSmppChargingType()) {
-//            case Selected:
-//                withCharging = esme.isChargingEnabled();
-//                break;
-//            case All:
-//                withCharging = true;
-//                break;
-//        }
-
-        // transactional mode / or charging request
-//        boolean isTransactional = (eventSubmit != null || eventData != null) && MessageUtil.isTransactional(sms0);
-//        if (isTransactional || withCharging) {
-//            MessageDeliveryResultResponseHttp messageDeliveryResultResponse = new MessageDeliveryResultResponseHttp(
-//                    !isTransactional, this.smppServerSessions, esme, eventSubmit, eventData, sms0.getMessageId());
-//            sms0.setMessageDeliveryResultResponse(messageDeliveryResultResponse);
-//        }
-
         if (withCharging) {
             ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
             chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
@@ -725,9 +525,6 @@ public abstract class TxHttpServerSbb implements Sbb {
         }
         return ret;
     }
-
-
-
 
     @Override
     public void sbbActivate() {

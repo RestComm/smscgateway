@@ -113,11 +113,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.mobicents.resources</groupId>-->
-        <!--<artifactId>http-servlet-ra-du</artifactId>-->
-        <!--<version>${org.mobicents.http.ra.version}</version>-->
-        <!--</dependency>-->
+
         <!--END OF HTTP SERVLET RA-->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -139,6 +135,20 @@
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
             <!--<scope>test</scope>-->
+        </dependency>
+
+        <!--SLEE MOCK-->
+        <dependency>
+            <groupId>pl.ivmx.ocp</groupId>
+            <artifactId>jslee-mock</artifactId>
+            <version>1.0.8.8-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-test</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+            <scope>runtime</scope>
         </dependency>
 
         <!--SPRING-->

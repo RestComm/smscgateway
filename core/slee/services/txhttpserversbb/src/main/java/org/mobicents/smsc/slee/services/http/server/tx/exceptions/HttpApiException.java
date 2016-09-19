@@ -10,4 +10,9 @@ public class HttpApiException extends Exception {
     public HttpApiException(String s) {
         this.msg = s;
     }
+
+    @Override
+    public String getMessage(){
+        return msg;
+    }
 }

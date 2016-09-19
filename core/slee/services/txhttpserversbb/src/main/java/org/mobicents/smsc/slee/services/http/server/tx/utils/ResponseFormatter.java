@@ -34,6 +34,9 @@ public class ResponseFormatter {
     private static String formatString(HttpSendMessageOutgoingData response){
         StringBuilder builder = new StringBuilder();
         builder.append(response.getStatusString()).append(" : ").append(response.getStatus()).append("\n");
+        if(!EMPTY_STRING.equals(response.getMessage())){
+            builder.append(response.getMessage()).append("\n");
+        }
         return builder.toString();
     }
 

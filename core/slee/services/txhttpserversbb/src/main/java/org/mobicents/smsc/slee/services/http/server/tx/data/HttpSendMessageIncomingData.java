@@ -5,6 +5,8 @@ import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +61,11 @@ public class HttpSendMessageIncomingData {
         }
         this.userId = userId;
         this.password = password;
-        this.msg = msg;
+        try {
+            this.msg = URLDecoder.decode(msg, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new HttpApiException("Unsupported exception while decoding message.");
+        }
         this.senderId = senderId;
         this.destAddresses.addAll(Arrays.asList(to));
 

@@ -19,7 +19,6 @@
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.http.server.tx.TxHttpServerSbb</sbb-abstract-class-name>
-
                 <get-child-relation-method>
                     <sbb-alias-ref>
                         ChargingSbb
@@ -41,9 +40,6 @@
                 <event-type-version>1.0</event-type-version>
             </event-type-ref>
             <initial-event-select variable="ActivityContext"/>
-            <!--<initial-event-selector-method-name>-->
-                <!--isInitialHttpRequestEvent-->
-            <!--</initial-event-selector-method-name>-->
         </event>
 
         <event event-direction="Receive" initial-event="True">
@@ -54,9 +50,6 @@
                 <event-type-version>1.0</event-type-version>
             </event-type-ref>
             <initial-event-select variable="ActivityContext"/>
-            <!--<initial-event-selector-method-name>-->
-                <!--isInitialHttpRequestEvent-->
-            <!--</initial-event-selector-method-name>-->
         </event>
 
 		<event event-direction="Receive" initial-event="True">
@@ -77,7 +70,6 @@
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
 		</event>
-
 
 		<resource-adaptor-type-binding>
 			<resource-adaptor-type-ref>
