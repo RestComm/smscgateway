@@ -17,7 +17,6 @@ import javax.slee.SLEEException;
 import javax.slee.SbbLocalObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Date;
 
 /**
  * Created by tpalucki on 05.09.16.
@@ -28,19 +27,6 @@ public class TxHttpServerSbbTest {
     private TxHttpServerSbbProxy sbb;
     private PersistenceRAInterfaceProxy pers;
     private boolean cassandraDbInited;
-
-    private static String sMsg = "??????Hel";
-    private static String sMsg_2 = "Msg 2";
-    private static String sMsg_3 = "Msg 3";
-    private static String sMsg_4 = "Msg 4 []";
-    private static byte[] msgUtf8, msgUtf8_2, msgUtf8_3;
-    private static byte[] msgUcs2;
-    private static byte[] msgGsm7;
-    private static byte[] udhCode;
-    private byte[] msg_ref_num = { 0, 10 };
-    private Date scheduleDeliveryTime;
-
-    private static final int WAITING_TIME = 1000;
 
     // test constants
     private static final String ENCODING_UCS2 = "UCS-2";
@@ -63,7 +49,7 @@ public class TxHttpServerSbbTest {
 
     private static final String URL_SEND_MESSAGE = "http://test.pl/restcomm";
     private static final String URL_SEND_MESSAGE_FAKE = "http://test.pl/sendMessageFake";
-    private static final String URL_GET_MESSAGE_ID_STATUS = "http://test.pl/getStatus";
+    private static final String URL_GET_MESSAGE_ID_STATUS = "http://test.pl/restcomm";
 
     private static final String MESSAGE_ID = "123456789";
 
@@ -243,7 +229,7 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -270,7 +256,7 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -314,6 +300,33 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
+    public void sendMessagePOSTJsonToMultipleSuccessTest(){
+        System.out.println("sendMessagePOSTJsonSuccessTest");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpPost(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true), "Response is not valid");
+    }
+
+    @Test
     public void sendMessagePOSTJsonErrorTest(){
         System.out.println("sendMessagePOSTJsonErrorTest");
         if (!this.cassandraDbInited) {
@@ -324,7 +337,7 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, null, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -403,7 +416,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void sendArabicMessagePOSTSuccessTest() throws UnsupportedEncodingException {
+    public void sendArabicMessagePOSTSuccessStringTest() throws UnsupportedEncodingException {
             System.out.println("sendArabicMessagePOSTSuccessTest");
             if (!this.cassandraDbInited) {
 //                Assert.fail("Cassandra DB is not inited");
@@ -462,20 +475,15 @@ public class TxHttpServerSbbTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         event.setResponse(response);
 
-        //TODO set the persistence
-
         // perform the action
         this.sbb.onHttpGet(event, aci);
-
         MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
-
         printResponseData(resp);
-
         Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
     }
 
     @Test
-    public void getStatusGETErrorTest(){
+    public void getStatusGETPasswordNullErrorTest(){
         System.out.println("getStatusGETErrorTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -485,7 +493,7 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildGetMessageIdStatusRequest(METHOD_GET, URL_GET_MESSAGE_ID_STATUS, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_ID, FORMAT_STRING);
+        MockHttpServletRequest request = buildGetMessageIdStatusRequest(METHOD_GET, URL_GET_MESSAGE_ID_STATUS, USER_DEFAULT, null, MESSAGE_ID, FORMAT_STRING);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -501,12 +509,6 @@ public class TxHttpServerSbbTest {
         Assert.assertTrue(isValid(resp, FORMAT_STRING, false), "Response is not valid");
     }
 
-    @Ignore
-    @Test
-    public void getStatusPOSTTest(){
-//        Assert.fail("Test not yet implemented");
-    }
-
     @Test
     public void getStatusPOSTStringErrorTest(){
         System.out.println("getStatusPOSTStringErrorTest");
@@ -518,7 +520,7 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildGetMessageIdStatusRequest(METHOD_GET, URL_GET_MESSAGE_ID_STATUS, USER_DEFAULT, PASSWORD_DEFAULT, null, FORMAT_STRING);
+        MockHttpServletRequest request = buildGetMessageIdStatusRequest(METHOD_POST, URL_GET_MESSAGE_ID_STATUS, USER_DEFAULT, PASSWORD_DEFAULT, null, FORMAT_STRING);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();

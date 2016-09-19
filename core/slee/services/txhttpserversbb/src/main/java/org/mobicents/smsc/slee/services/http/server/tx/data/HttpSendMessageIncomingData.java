@@ -1,8 +1,8 @@
 package org.mobicents.smsc.slee.services.http.server.tx.data;
 
+import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestMessageBodyEncoding;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
-import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;

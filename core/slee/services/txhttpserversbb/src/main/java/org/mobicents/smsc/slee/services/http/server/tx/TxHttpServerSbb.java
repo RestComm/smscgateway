@@ -2,8 +2,8 @@ package org.mobicents.smsc.slee.services.http.server.tx;
 
 import javolution.util.FastList;
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
-
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
+import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
@@ -33,12 +33,12 @@ import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -65,6 +65,9 @@ public abstract class TxHttpServerSbb implements Sbb {
 
     private static Charset utf8Charset = Charset.forName("UTF-8");
     private static Charset ucs2Charset = Charset.forName("UTF-16BE");
+
+    private final String GET = "GET";
+    private final String POST = "POST";
 
     public PersistenceRAInterface getStore() {
         return this.persistence;
@@ -146,25 +149,89 @@ public abstract class TxHttpServerSbb implements Sbb {
 
     private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request) throws HttpApiException {
         logger.fine("createSendMessageIncomingData");
-        final String userId = request.getParameter("userid");
-        final String password = request.getParameter("password");
-        final String encodedMsg = request.getParameter("msg");
-        final String format = request.getParameter("format");
-        final String encoding = request.getParameter("encoding");
-        final String senderId = request.getParameter("sender");
-        final String[] destAddresses = request.getParameterValues("to");
+        if(GET.equals(request.getMethod())) {
+            final String userId = request.getParameter("userid");
+            final String password = request.getParameter("password");
+            final String encodedMsg = request.getParameter("msg");
+            final String format = request.getParameter("format");
+            final String encoding = request.getParameter("encoding");
+            final String senderId = request.getParameter("sender");
+            final String[] destAddresses = request.getParameterValues("to");
 
-        return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
+            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
+        } else if(POST.equals(request.getMethod())) {
+            String userId = request.getParameter("userid");
+            String password = request.getParameter("password");
+            String encodedMsg = request.getParameter("msg");
+            String format = request.getParameter("format");
+            String encoding = request.getParameter("encoding");
+            String senderId = request.getParameter("sender");
+            String[] destAddresses = request.getParameterValues("to");
+
+            if(userId == null && password == null && encodedMsg == null && senderId == null && destAddresses == null) {
+                Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
+//                userId = map.getOrDefault("userid", new String[]{""})[0];
+                String[] tmp = map.get("userid");
+                userId = (tmp == null ? new String[]{""} : tmp)[0];
+
+                tmp = map.get("password");
+                password = (tmp == null ? new String[]{""} : tmp)[0];
+//                password = map.getOrDefault("password", new String[]{""})[0];
+
+                tmp = map.get("msg");
+                encodedMsg = (tmp == null ? new String[]{""} : tmp)[0];
+//                encodedMsg = map.getOrDefault("msg", new String[]{""})[0];
+
+                tmp = map.get("format");
+                format = (tmp == null ? new String[]{""} : tmp)[0];
+//                format = map.getOrDefault("format", new String[]{""})[0];
+
+                tmp = map.get("encoding");
+                encoding = (tmp == null ? new String[]{""} : tmp)[0];
+//                encoding = map.getOrDefault("encoding", new String[]{""})[0];
+
+                tmp = map.get("sender");
+                senderId = (tmp == null ? new String[]{""} : tmp)[0];
+//                senderId = map.getOrDefault("sender", new String[]{""})[0];
+
+                tmp = map.get("to");
+                destAddresses = (tmp == null ? new String[]{""} : tmp);
+//                destAddresses = map.getOrDefault("to", new String[]{});
+            }
+            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
+            return incomingData;
+        } else {
+            throw new HttpApiException("Unsupported method of the Http Request. Method is: "+request.getMethod());
+        }
     }
 
     private HttpGetMessageIdStatusIncomingData createGetMessageIdStatusIncomingData(HttpServletRequest request) throws HttpApiException {
         logger.fine("createGetMessageIdStatusIncomingData");
-        final String userId = request.getParameter("userid");
-        final String password = request.getParameter("password");
-        final String msgId = request.getParameter("msgid");
-        final String format = request.getParameter("format");
+        String userId = request.getParameter("userid");
+        String password = request.getParameter("password");
+        String msgId = request.getParameter("msgid");
+        String format = request.getParameter("format");
 
-        return new HttpGetMessageIdStatusIncomingData(userId, password, msgId, format);
+        if(userId == null && password == null && msgId == null ) {
+            Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
+//            userId = map.getOrDefault("userid", new String[]{""})[0];
+            String[] tmp = map.get("userid");
+            userId = (tmp == null ? new String[]{""} : tmp)[0];
+
+//            password = map.getOrDefault("password", new String[]{""})[0];
+            tmp = map.get("password");
+            password = (tmp == null ? new String[]{""} : tmp)[0];
+
+//            msgId = map.getOrDefault("msgid", new String[]{""})[0];
+            tmp = map.get("msgid");
+            msgId = (tmp == null ? new String[]{""} : tmp)[0];
+
+//            format = map.getOrDefault("format", new String[]{""})[0];
+            tmp = map.get("format");
+            format = (tmp == null ? new String[]{""} : tmp)[0];
+        }
+        HttpGetMessageIdStatusIncomingData incomingData = new HttpGetMessageIdStatusIncomingData(userId, password, msgId, format);
+        return incomingData;
     }
 
     public void sendMessage(HttpServletRequestEvent event, HttpSendMessageIncomingData incomingData, ActivityContextInterface aci) {
@@ -192,7 +259,6 @@ public abstract class TxHttpServerSbb implements Sbb {
                 final String message = "Error while trying to send send SMS message to multiple destinations.";
                 outgoingData.setStatus(Status.ERROR);
                 outgoingData.setMessage(message);
-                //TODO: what error status?
                 HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(),
                         HttpServletResponse.SC_OK,
                         message,
@@ -235,14 +301,15 @@ public abstract class TxHttpServerSbb implements Sbb {
         if (this.logger.isFineEnabled()) {
             this.logger.fine("\nReceived getMessageIdStatus = " + incomingData);
         }
-        // TODO implement
+        PersistenceRAInterface store = getStore();
         final Long messageId = incomingData.getMsgId();
         QuerySmResponse querySmResponse = null;
         MessageState messageState = null;
 
         HttpGetMessageIdStatusOutgoingData outgoingData;
         try {
-            querySmResponse = persistence.c2_getQuerySmResponse(messageId.longValue());
+            final long msgId = messageId.longValue();
+            querySmResponse = store.c2_getQuerySmResponse(msgId);
             if(querySmResponse == null){
                 throw new HttpApiException("Cannot retrieve QuerySmResponse from database. Returned object is null.");
             }
@@ -276,7 +343,6 @@ public abstract class TxHttpServerSbb implements Sbb {
     @Override
     public void setSbbContext(SbbContext sbbContext) {
         this.sbbContext = (SbbContextExt) sbbContext;
-
         try {
             Context ctx = (Context) new InitialContext().lookup("java:comp/env");
             this.logger = this.sbbContext.getTracer(getClass().getSimpleName());
@@ -307,14 +373,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             throw new SmscProcessingException("For received SubmitMessage no DestAddresses found: ", 0, MAPErrorCode.systemFailure, null);
         }
 
-//        int dcs = event.getDataCoding();
-        int dcs = 1;
-        String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
-        if (err != null) {
-            throw new SmscProcessingException("TxHttp DataCoding scheme does not supported: " + dcs + " - " + err,
-                    0, MAPErrorCode.systemFailure, null);
-        }
-
+        int dcs;
         // short message data
         byte[] data = incomingData.getShortMessage();
 
@@ -324,11 +383,18 @@ public abstract class TxHttpServerSbb implements Sbb {
         String msg = null;
         switch(incomingData.getEncoding()){
             case UTF8:
+                dcs = CharacterSet.GSM7.getCode();
                 msg = new String(data, utf8Charset);
                 break;
             default: // UCS2
+                dcs = CharacterSet.UCS2.getCode();
                 msg = new String(data, ucs2Charset);
                 break;
+        }
+        String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
+        if (err != null) {
+            throw new SmscProcessingException("TxHttp DataCoding scheme does not supported: " + dcs + " - " + err,
+                    0, MAPErrorCode.systemFailure, null);
         }
 
         // checking max message length
@@ -434,7 +500,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
         } else {
             // applying of MProc
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, store);
             if (mProcResult.isMessageRejected()) {
                 sms0.setMessageDeliveryResultResponse(null);
                 SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
@@ -529,55 +595,46 @@ public abstract class TxHttpServerSbb implements Sbb {
     @Override
     public void sbbActivate() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void sbbCreate() throws CreateException {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void sbbExceptionThrown(Exception arg0, Object arg1, ActivityContextInterface arg2) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void sbbLoad() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void sbbPassivate() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void sbbPostCreate() throws CreateException {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void sbbRemove() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void sbbRolledBack(RolledBackContext arg0) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void sbbStore() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -585,7 +642,6 @@ public abstract class TxHttpServerSbb implements Sbb {
         // TODO Auto-generated method stub
 
     }
-
 }
 
 

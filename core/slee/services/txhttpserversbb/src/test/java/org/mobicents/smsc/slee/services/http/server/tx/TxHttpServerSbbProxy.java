@@ -28,15 +28,6 @@ public class TxHttpServerSbbProxy extends TxHttpServerSbb {
         return cassandraSbb;
     }
 
-//        public void setSmppServerSessions(SmppSessions smppServerSessions) {
-//            this.smppServerSessions = smppServerSessions;
-//        }
-//
-//        protected Sms createSmsEvent(BaseSm event, Esme origEsme, TargetAddress ta, PersistenceRAInterface store)
-//                throws SmscProcessingException {
-//            return super.createSmsEvent(event, origEsme, ta, store);
-//        }
-
     //        @Override
     public ChildRelationExt getChargingSbb() {
         // TODO Auto-generated method stub
