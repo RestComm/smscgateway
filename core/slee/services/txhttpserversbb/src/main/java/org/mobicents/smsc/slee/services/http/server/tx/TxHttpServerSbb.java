@@ -170,33 +170,27 @@ public abstract class TxHttpServerSbb implements Sbb {
 
             if(userId == null && password == null && encodedMsg == null && senderId == null && destAddresses == null) {
                 Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
-//                userId = map.getOrDefault("userid", new String[]{""})[0];
+
                 String[] tmp = map.get("userid");
                 userId = (tmp == null ? new String[]{""} : tmp)[0];
 
                 tmp = map.get("password");
                 password = (tmp == null ? new String[]{""} : tmp)[0];
-//                password = map.getOrDefault("password", new String[]{""})[0];
 
                 tmp = map.get("msg");
                 encodedMsg = (tmp == null ? new String[]{""} : tmp)[0];
-//                encodedMsg = map.getOrDefault("msg", new String[]{""})[0];
 
                 tmp = map.get("format");
                 format = (tmp == null ? new String[]{""} : tmp)[0];
-//                format = map.getOrDefault("format", new String[]{""})[0];
 
                 tmp = map.get("encoding");
                 encoding = (tmp == null ? new String[]{""} : tmp)[0];
-//                encoding = map.getOrDefault("encoding", new String[]{""})[0];
 
                 tmp = map.get("sender");
                 senderId = (tmp == null ? new String[]{""} : tmp)[0];
-//                senderId = map.getOrDefault("sender", new String[]{""})[0];
 
                 tmp = map.get("to");
                 destAddresses = (tmp == null ? new String[]{""} : tmp);
-//                destAddresses = map.getOrDefault("to", new String[]{});
             }
             HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
             return incomingData;
@@ -214,19 +208,16 @@ public abstract class TxHttpServerSbb implements Sbb {
 
         if(userId == null && password == null && msgId == null ) {
             Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
-//            userId = map.getOrDefault("userid", new String[]{""})[0];
+
             String[] tmp = map.get("userid");
             userId = (tmp == null ? new String[]{""} : tmp)[0];
 
-//            password = map.getOrDefault("password", new String[]{""})[0];
             tmp = map.get("password");
             password = (tmp == null ? new String[]{""} : tmp)[0];
 
-//            msgId = map.getOrDefault("msgid", new String[]{""})[0];
             tmp = map.get("msgid");
             msgId = (tmp == null ? new String[]{""} : tmp)[0];
 
-//            format = map.getOrDefault("format", new String[]{""})[0];
             tmp = map.get("format");
             format = (tmp == null ? new String[]{""} : tmp)[0];
         }
@@ -422,7 +413,18 @@ public abstract class TxHttpServerSbb implements Sbb {
                 sms.setDbId(UUID.randomUUID());
                 sms.setOriginationType(OriginationType.HTTP);
 
+                // TODO: Setting the Source address, Ton, Npi
+                sms.setSourceAddr(incomingData.getSenderId());
+                sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
+                sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
+                // TODO: setting dcs
                 sms.setDataCoding(dcs);
+                // TODO: esmCls - read from smpp documentation
+                sms.setEsmClass(0);
+                // TODO: regDlvry - read from smpp documentation
+                sms.setRegisteredDelivery(0);
+
+
                 sms.setNationalLanguageLockingShift(nationalLanguageLockingShift);
                 sms.setNationalLanguageSingleShift(nationalLanguageSingleShift);
 
@@ -439,7 +441,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                 smsSet.setDestAddr(ta.getAddr());
                 smsSet.setDestAddrNpi(ta.getAddrNpi());
                 smsSet.setDestAddrTon(ta.getAddrTon());
-
+                // TODO: set network Id - we need configuration for this
                 smsSet.setNetworkId(0);
                 smsSet.addSms(sms);
                 
