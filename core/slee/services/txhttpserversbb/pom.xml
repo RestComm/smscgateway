@@ -137,20 +137,6 @@
             <!--<scope>test</scope>-->
         </dependency>
 
-        <!--SLEE MOCK-->
-        <dependency>
-            <groupId>pl.ivmx.ocp</groupId>
-            <artifactId>jslee-mock</artifactId>
-            <version>1.0.8.8-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-test</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-            </exclusions>
-            <scope>runtime</scope>
-        </dependency>
-
         <!--SPRING-->
         <dependency>
             <groupId>org.simpleframework</groupId>
