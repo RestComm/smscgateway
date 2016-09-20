@@ -113,6 +113,15 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String HR_SRI_BYPASS_LIST = "hrSriBypassList";
     private static final String NATIONAL_LANGUAGE_SINGLE_SHIFT = "nationalLanguageSingleShift";
     private static final String NATIONAL_LANGUAGE_LOCKING_SHIFT = "nationalLanguageLockingShift";
+    private static final String HTTP_DEFAULT_SOURCE_TON = "httpDefaultSourceTon";
+    private static final String HTTP_DEFAULT_SOURCE_NPI = "httpDefaultSourceNpi";
+    private static final String HTTP_DEFAULT_DEST_TON = "httpDefaultDestTon";
+    private static final String HTTP_DEFAULT_DEST_NPI = "httpDefaultDestNpi";
+    private static final String HTTP_DEFAULT_NETWORK_ID = "httpDefaultNetworkId";
+    private static final String HTTP_DEFAULT_MESSAGING_MODE = "httpDefaultMessagingMode";
+    private static final String HTTP_DEFAULT_RD_DELIVERY_RECEIPT = "httpDefaultRDDeliveryReceipt";
+    private static final String HTTP_DEFAULT_RD_INTERMEDIATE_NOTIFICATION = "httpDefaultRDIntermediateNotification";
+    private static final String HTTP_DEFAULT_DATA_CODING = "httpDefaultDataCoding";
 
     private static final String DELIVERY_PAUSE = "deliveryPause";
 
@@ -291,6 +300,25 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // national single and locking shift tables for the case when a message is SMPP originated and does not have included UDH
     private int nationalLanguageSingleShift = 0;
     private int nationalLanguageLockingShift = 0;
+
+    // TxHttp: default TON value for source addresses
+    private int httpDefaultSourceTon = 1;
+    // TxHttp: default NPI value for source addresses
+    private int httpDefaultSourceNpi = 1;
+    // TxHttp: default TON value for destination addresses
+    private int httpDefaultDestTon = 1;
+    // TxHttp: default NPI value for destination addresses
+    private int httpDefaultDestNpi = 1;
+    // TxHttp: default networkId area
+    private int httpDefaultNetworkId = 0;
+    // TxHttp: default messaging mode (0-default SMSC mode, 1-datagram, 2-transaction, 3-storeAndForward)
+    private int httpDefaultMessagingMode = 3;
+    // TxHttp: default delivery receipt requests (0-no, 1-on success or failure, 2-on failure, 3-on success)
+    private int httpDefaultRDDeliveryReceipt = 0;
+    // TxHttp: default intermediate delivery notification requests (0-no, 1-yes)
+    private int httpDefaultRDIntermediateNotification = 0;
+    // TxHttp: default data coding schema that will be used in delivery (common values: 0-GSM7, 8-UCS2)
+    private int httpDefaultDataCoding = 0;
 
     // if set to true:
     // SMSC does not try to deliver any messages from cassandra database to SS7
@@ -970,51 +998,161 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.smscStopped = smscStopped;
     }
 
+    @Override
     public int getSkipUnsentMessages() {
         return skipUnsentMessages;
     }
 
+    @Override
     public void setSkipUnsentMessages(int skipUnsentMessages) {
         this.skipUnsentMessages = skipUnsentMessages;
     }
 
+    @Override
     public GenerateType getGenerateCdr() {
         return generateCdr;
     }
 
+    @Override
     public void setGenerateCdr(GenerateType generateCdr) {
         this.generateCdr = generateCdr;
         this.store();
     }
     
+    @Override
     public int getGenerateCdrInt() {
         return this.generateCdr.getValue();
     }    
     
+    @Override
     public void setGenerateCdrInt(int generateCdr) {
         this.generateCdr = new GenerateType(generateCdr);
         this.store();
     }
 
+    @Override
     public GenerateType getGenerateArchiveTable() {
         return generateArchiveTable;
     }
 
+    @Override
     public void setGenerateArchiveTable(GenerateType generateArchiveTable) {
         this.generateArchiveTable = generateArchiveTable;
         this.store();
     }
     
+    @Override
     public int getGenerateArchiveTableInt() {
         return generateArchiveTable.getValue();
     }    
     
+    @Override
     public void setGenerateArchiveTableInt(int generateArchiveTable) {
     	this.generateArchiveTable = new GenerateType(generateArchiveTable);
     	this.store();
     }
 
-	public void start() throws Exception {
+    @Override
+    public int getHttpDefaultSourceTon() {
+        return httpDefaultSourceTon;
+    }
+
+    @Override
+    public void setHttpDefaultSourceTon(int httpDefaultSourceTon) {
+        this.httpDefaultSourceTon = httpDefaultSourceTon;
+        this.store();
+    }
+
+    @Override
+    public int getHttpDefaultSourceNpi() {
+        return httpDefaultSourceNpi;
+    }
+
+    @Override
+    public void setHttpDefaultSourceNpi(int httpDefaultSourceNpi) {
+        this.httpDefaultSourceNpi = httpDefaultSourceNpi;
+        this.store();
+    }
+
+    @Override
+    public int getHttpDefaultDestTon() {
+        return httpDefaultDestTon;
+    }
+
+    @Override
+    public void setHttpDefaultDestTon(int httpDefaultDestTon) {
+        this.httpDefaultDestTon = httpDefaultDestTon;
+        this.store();
+    }
+
+    @Override
+    public int getHttpDefaultDestNpi() {
+        return httpDefaultDestNpi;
+    }
+
+    @Override
+    public void setHttpDefaultDestNpi(int httpDefaultDestNpi) {
+        this.httpDefaultDestNpi = httpDefaultDestNpi;
+        this.store();
+    }
+
+    @Override
+    public int getHttpDefaultNetworkId() {
+        return httpDefaultNetworkId;
+    }
+
+    @Override
+    public void setHttpDefaultNetworkId(int httpDefaultNetworkId) {
+        this.httpDefaultNetworkId = httpDefaultNetworkId;
+        this.store();
+    }
+
+    @Override
+    public int getHttpDefaultMessagingMode() {
+        return httpDefaultMessagingMode;
+    }
+
+    @Override
+    public void setHttpDefaultMessagingMode(int httpDefaultMessagingMode) {
+        this.httpDefaultMessagingMode = httpDefaultMessagingMode;
+        this.store();
+    }
+
+    @Override
+    public int getHttpDefaultRDDeliveryReceipt() {
+        return httpDefaultRDDeliveryReceipt;
+    }
+
+    @Override
+    public void setHttpDefaultRDDeliveryReceipt(int httpDefaultRDDeliveryReceipt) {
+        this.httpDefaultRDDeliveryReceipt = httpDefaultRDDeliveryReceipt;
+        this.store();
+    }
+
+    @Override
+    public int getHttpDefaultRDIntermediateNotification() {
+        return httpDefaultRDIntermediateNotification;
+    }
+
+    @Override
+    public void setHttpDefaultRDIntermediateNotification(int httpDefaultRDIntermediateNotification) {
+        this.httpDefaultRDIntermediateNotification = httpDefaultRDIntermediateNotification;
+        this.store();
+    }
+
+    @Override
+    public int getHttpDefaultDataCoding() {
+        return httpDefaultDataCoding;
+    }
+
+    @Override
+    public void setHttpDefaultDataCoding(int httpDefaultDataCoding) {
+        this.httpDefaultDataCoding = httpDefaultDataCoding;
+        this.store();
+    }
+
+
+    public void start() throws Exception {
 
 		this.persistFile.clear();
 
@@ -1149,6 +1287,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.translationType, TRANSLATION_TYPE, Integer.class);
             writer.write(this.correlationIdLiveTime, CORRELATION_ID_LIVE_TIME, Integer.class);
             writer.write(this.sriResponseLiveTime, SRI_RESPONSE_LIVE_TIME, Integer.class);
+
+            writer.write(this.httpDefaultSourceTon, HTTP_DEFAULT_SOURCE_TON, Integer.class);
+            writer.write(this.httpDefaultSourceNpi, HTTP_DEFAULT_SOURCE_NPI, Integer.class);
+            writer.write(this.httpDefaultDestTon, HTTP_DEFAULT_DEST_TON, Integer.class);
+            writer.write(this.httpDefaultDestNpi, HTTP_DEFAULT_DEST_NPI, Integer.class);
+            writer.write(this.httpDefaultNetworkId, HTTP_DEFAULT_NETWORK_ID, Integer.class);
+            writer.write(this.httpDefaultMessagingMode, HTTP_DEFAULT_MESSAGING_MODE, Integer.class);
+            writer.write(this.httpDefaultRDDeliveryReceipt, HTTP_DEFAULT_RD_DELIVERY_RECEIPT, Integer.class);
+            writer.write(this.httpDefaultRDIntermediateNotification, HTTP_DEFAULT_RD_INTERMEDIATE_NOTIFICATION, Integer.class);
+            writer.write(this.httpDefaultDataCoding, HTTP_DEFAULT_DATA_CODING, Integer.class);
+
             writer.write(this.diameterDestRealm, DIAMETER_DEST_REALM, String.class);
 			writer.write(this.diameterDestHost, DIAMETER_DEST_HOST, String.class);
 			writer.write(this.diameterDestPort, DIAMETER_DEST_PORT, Integer.class);
@@ -1385,7 +1534,35 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             if (val != null)
                 this.sriResponseLiveTime = val;
 
-			this.diameterDestRealm = reader.read(DIAMETER_DEST_REALM, String.class);
+            val = reader.read(HTTP_DEFAULT_SOURCE_TON, Integer.class);
+            if (val != null)
+                this.httpDefaultSourceTon = val;
+            val = reader.read(HTTP_DEFAULT_SOURCE_NPI, Integer.class);
+            if (val != null)
+                this.httpDefaultSourceNpi = val;
+            val = reader.read(HTTP_DEFAULT_DEST_TON, Integer.class);
+            if (val != null)
+                this.httpDefaultDestTon = val;
+            val = reader.read(HTTP_DEFAULT_DEST_NPI, Integer.class);
+            if (val != null)
+                this.httpDefaultDestNpi = val;
+            val = reader.read(HTTP_DEFAULT_NETWORK_ID, Integer.class);
+            if (val != null)
+                this.httpDefaultNetworkId = val;
+            val = reader.read(HTTP_DEFAULT_MESSAGING_MODE, Integer.class);
+            if (val != null)
+                this.httpDefaultMessagingMode = val;
+            val = reader.read(HTTP_DEFAULT_RD_DELIVERY_RECEIPT, Integer.class);
+            if (val != null)
+                this.httpDefaultRDDeliveryReceipt = val;
+            val = reader.read(HTTP_DEFAULT_RD_INTERMEDIATE_NOTIFICATION, Integer.class);
+            if (val != null)
+                this.httpDefaultRDIntermediateNotification = val;
+            val = reader.read(HTTP_DEFAULT_DATA_CODING, Integer.class);
+            if (val != null)
+                this.httpDefaultDataCoding = val;
+
+            this.diameterDestRealm = reader.read(DIAMETER_DEST_REALM, String.class);
 
 			this.diameterDestHost = reader.read(DIAMETER_DEST_HOST, String.class);
 

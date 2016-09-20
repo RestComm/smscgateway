@@ -757,6 +757,43 @@ public class SMSCShellExecutor implements ShellExecutor {
                     return SMSCOAMMessages.NATIONAL_LANGUAGE_SHIFT_BAD_VALUE;
                 smscPropertiesManagement.setNationalLanguageLockingShift(val);
 
+            } else if (parName.equals("httpdefaultsourceton")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultSourceTon(val);
+            } else if (parName.equals("httpDefaultSourceNpi")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultSourceNpi(val);
+            } else if (parName.equals("httpdefaultdestton")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultDestTon(val);
+            } else if (parName.equals("httpdefaultdestnpi")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultDestNpi(val);
+            } else if (parName.equals("httpdefaultnetworkid")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultNetworkId(val);
+
+            } else if (parName.equals("httpdefaultmessagingmode")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 3)
+                    return SMSCOAMMessages.MESSAGING_MODE_BAD_VALUES;
+                smscPropertiesManagement.setHttpDefaultMessagingMode(val);
+            } else if (parName.equals("httpdefaultrddeliveryreceipt")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 3)
+                    return SMSCOAMMessages.DELIVERY_RECEIPT_BAD_VALUES;
+                smscPropertiesManagement.setHttpDefaultRDDeliveryReceipt(val);
+            } else if (parName.equals("httpdefaultrdintermediatenotification")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 1)
+                    return SMSCOAMMessages.INTERMEDIATE_RECEIPT_BAD_VALUES;
+                smscPropertiesManagement.setHttpDefaultRDIntermediateNotification(val);
+            } else if (parName.equals("httpdefaultdatacoding")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 255)
+                    return SMSCOAMMessages.DATA_CODING_BAD_VALUES;
+                smscPropertiesManagement.setHttpDefaultDataCoding(val);
+
             } else if (parName.equals("deliverypause")) {
                 boolean val = Boolean.parseBoolean(options[3]);
                 smscPropertiesManagement.setDeliveryPause(val);
@@ -974,6 +1011,25 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getNationalLanguageSingleShift());
             } else if (parName.equals("nationallanguagelockingshift")) {
                 sb.append(smscPropertiesManagement.getNationalLanguageLockingShift());
+
+            } else if (parName.equals("httpdefaultsourceton")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultSourceTon());
+            } else if (parName.equals("httpdefaultsourcenpi")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultSourceNpi());
+            } else if (parName.equals("httpdefaultdestton")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultDestTon());
+            } else if (parName.equals("httpdefaultdestnpi")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultDestNpi());
+            } else if (parName.equals("httpdefaultnetworkid")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultNetworkId());
+            } else if (parName.equals("httpdefaultmessagingmode")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultMessagingMode());
+            } else if (parName.equals("httpdefaultrddeliveryreceipt")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt());
+            } else if (parName.equals("httpdefaultrdintermediatenotification")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification());
+            } else if (parName.equals("httpdefaultdatacoding")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultDataCoding());
 
             } else if (parName.equals("deliverypause")) {
                 sb.append(smscPropertiesManagement.isDeliveryPause());
@@ -1246,6 +1302,42 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("nationallanguagelockingshift = ");
             sb.append(smscPropertiesManagement.getNationalLanguageLockingShift());
+            sb.append("\n");
+
+            sb.append("httpdefaultsourceton = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultSourceTon());
+            sb.append("\n");
+
+            sb.append("httpdefaultsourcenpi = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultSourceNpi());
+            sb.append("\n");
+
+            sb.append("httpdefaultdestton = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultDestTon());
+            sb.append("\n");
+
+            sb.append("httpdefaultdestnpi = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultDestNpi());
+            sb.append("\n");
+
+            sb.append("httpdefaultnetworkid = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultNetworkId());
+            sb.append("\n");
+
+            sb.append("httpdefaultmessagingmode = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultMessagingMode());
+            sb.append("\n");
+
+            sb.append("httpdefaultrddeliveryreceipt = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt());
+            sb.append("\n");
+
+            sb.append("httpdefaultrdintermediatenotification = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification());
+            sb.append("\n");
+
+            sb.append("httpdefaultdatacoding = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultDataCoding());
             sb.append("\n");
 
             sb.append("deliverypause = ");

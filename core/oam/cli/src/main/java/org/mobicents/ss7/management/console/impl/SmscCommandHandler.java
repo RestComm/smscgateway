@@ -83,6 +83,15 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         set.addChild("sriresponselivetime");
         set.addChild("nationallanguagesingleshift");
         set.addChild("nationallanguagelockingshift");
+        set.addChild("httpdefaultsourceton");
+        set.addChild("httpdefaultsourcenpi");
+        set.addChild("httpdefaultdestton");
+        set.addChild("httpdefaultdestnpi");
+        set.addChild("httpdefaultnetworkid");
+        set.addChild("httpdefaultmessagingmode");
+        set.addChild("httpdefaultrddeliveryreceipt");
+        set.addChild("httpdefaultrdintermediatenotification");
+        set.addChild("httpdefaultdatacoding");
 
         txsmppcharging.addChild("None");
         txsmppcharging.addChild("Selected");
@@ -171,6 +180,15 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         get.addChild("sriresponselivetime");
         get.addChild("nationallanguagesingleshift");
         get.addChild("nationallanguagelockingshift");
+        get.addChild("httpdefaultsourceton");
+        get.addChild("httpdefaultsourcenpi");
+        get.addChild("httpdefaultdestton");
+        get.addChild("httpdefaultdestnpi");
+        get.addChild("httpdefaultnetworkid");
+        get.addChild("httpdefaultmessagingmode");
+        get.addChild("httpdefaultrddeliveryreceipt");
+        get.addChild("httpdefaultrdintermediatenotification");
+        get.addChild("httpdefaultdatacoding");
 
         Node smppencodingforgsm72 = get.addChild("smppencodingforgsm7");
         Node smppencodingforucs22 = get.addChild("smppencodingforucs2");

@@ -289,4 +289,40 @@ public interface SmscPropertiesManagementMBean {
     
     public void setSriResponseLiveTime(int sriresponselivetime);
 
+    public int getHttpDefaultSourceTon();
+
+    public void setHttpDefaultSourceTon(int httpDefaultSourceTon);
+
+    public int getHttpDefaultSourceNpi();
+
+    public void setHttpDefaultSourceNpi(int httpDefaultSourceNpi);
+
+    public int getHttpDefaultDestTon();
+
+    public void setHttpDefaultDestTon(int httpDefaultDestTon);
+
+    public int getHttpDefaultDestNpi();
+
+    public void setHttpDefaultDestNpi(int httpDefaultDestNpi);
+
+    public int getHttpDefaultNetworkId();
+
+    public void setHttpDefaultNetworkId(int httpDefaultNetworkId);
+
+    public int getHttpDefaultMessagingMode();
+
+    public void setHttpDefaultMessagingMode(int httpDefaultMessagingMode);
+
+    public int getHttpDefaultRDDeliveryReceipt();
+
+    public void setHttpDefaultRDDeliveryReceipt(int httpDefaultRDDeliveryReceipt);
+
+    public int getHttpDefaultRDIntermediateNotification();
+
+    public void setHttpDefaultRDIntermediateNotification(int httpDefaultRDIntermediateNotification);
+
+    public int getHttpDefaultDataCoding();
+
+    public void setHttpDefaultDataCoding(int httpDefaultDataCoding);
+
 }
