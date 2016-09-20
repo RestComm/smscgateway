@@ -1201,7 +1201,7 @@ public class DBOperations {
 
             for (Row row : res) {
                 result = this.createSms(row, null, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
-                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1(), false);
+                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1(), true);
                 break;
             }
         }
