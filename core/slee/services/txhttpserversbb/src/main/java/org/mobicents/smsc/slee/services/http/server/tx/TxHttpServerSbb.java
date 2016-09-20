@@ -176,7 +176,8 @@ public abstract class TxHttpServerSbb implements Sbb {
             final String format = request.getParameter("format");
             final String encoding = request.getParameter("encoding");
             final String senderId = request.getParameter("sender");
-            final String[] destAddresses = request.getParameterValues("to");
+            String destAddressParam = request.getParameter("to");
+            final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
 
             return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
         } else if(POST.equals(request.getMethod())) {
@@ -186,7 +187,8 @@ public abstract class TxHttpServerSbb implements Sbb {
             String format = request.getParameter("format");
             String encoding = request.getParameter("encoding");
             String senderId = request.getParameter("sender");
-            String[] destAddresses = request.getParameterValues("to");
+            String destAddressParam = request.getParameter("to");
+            String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
 
             if(userId == null && password == null && encodedMsg == null && senderId == null && destAddresses == null) {
                 Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
@@ -434,7 +436,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                 sms.setEsmClass(smscPropertiesManagement.getHttpDefaultMessagingMode());
                 // TODO: regDlvry - read from smpp documentation
                 final int registeredDelivery = smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt()
-                            | smscPropertiesManagement.getHttpDefaultRDIntermediateNotification();
+                        | smscPropertiesManagement.getHttpDefaultRDIntermediateNotification();
                 sms.setRegisteredDelivery(registeredDelivery);
 
                 sms.setNationalLanguageLockingShift(nationalLanguageLockingShift);
@@ -451,7 +453,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                 // TODO: set network Id - we need configuration for this
                 smsSet.setNetworkId(smscPropertiesManagement.getHttpDefaultNetworkId());
                 smsSet.addSms(sms);
-                
+
                 sms.setSmsSet(smsSet);
                 sms.setMessageId(messageId);
 
