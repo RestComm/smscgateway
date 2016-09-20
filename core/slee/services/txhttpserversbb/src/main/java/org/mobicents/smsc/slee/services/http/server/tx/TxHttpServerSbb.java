@@ -7,8 +7,21 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
-import org.mobicents.smsc.domain.*;
-import org.mobicents.smsc.library.*;
+import org.mobicents.smsc.domain.MProcManagement;
+import org.mobicents.smsc.domain.SmscPropertiesManagement;
+import org.mobicents.smsc.domain.SmscStatAggregator;
+import org.mobicents.smsc.domain.SmscStatProvider;
+import org.mobicents.smsc.domain.StoreAndForwordMode;
+import org.mobicents.smsc.library.MessageState;
+import org.mobicents.smsc.library.MessageUtil;
+import org.mobicents.smsc.library.OriginationType;
+import org.mobicents.smsc.library.QuerySmResponse;
+import org.mobicents.smsc.library.SbbStates;
+import org.mobicents.smsc.library.Sms;
+import org.mobicents.smsc.library.SmsSet;
+import org.mobicents.smsc.library.SmsSetCache;
+import org.mobicents.smsc.library.SmscProcessingException;
+import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
@@ -28,7 +41,14 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.slee.*;
+import javax.slee.ActivityContextInterface;
+import javax.slee.ActivityEndEvent;
+import javax.slee.CreateException;
+import javax.slee.EventContext;
+import javax.slee.RolledBackContext;
+import javax.slee.Sbb;
+import javax.slee.SbbContext;
+import javax.slee.ServiceID;
 import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 import javax.slee.serviceactivity.ServiceActivity;
@@ -235,9 +255,8 @@ public abstract class TxHttpServerSbb implements Sbb {
 
         PersistenceRAInterface store = getStore();
         SendMessageParseResult parseResult;
-        int networkId = 0;
         try {
-            parseResult = this.createSmsEventMultiDest(incomingData, store, networkId);
+            parseResult = this.createSmsEventMultiDest(incomingData, store);
             for (Sms sms : parseResult.getParsedMessages()) {
                 this.processSms(sms, store, incomingData);
             }
@@ -320,13 +339,14 @@ public abstract class TxHttpServerSbb implements Sbb {
         }
     }
 
-    private TargetAddress createDestTargetAddress(String addr, int networkId) throws SmscProcessingException {
+    private TargetAddress createDestTargetAddress(String addr) throws SmscProcessingException {
         if (addr == null || "".equals(addr)) {
             throw new SmscProcessingException("DestAddress digits are absent", 0, MAPErrorCode.systemFailure, addr);
         }
-        int destTon, destNpi;
-        destTon = smscPropertiesManagement.getDefaultTon();
-        destNpi = smscPropertiesManagement.getDefaultNpi();
+        int destTon, destNpi, networkId;
+        destTon = smscPropertiesManagement.getHttpDefaultDestTon();
+        destNpi = smscPropertiesManagement.getHttpDefaultDestNpi();
+        networkId = smscPropertiesManagement.getHttpDefaultNetworkId();
         TargetAddress ta = new TargetAddress(destTon, destNpi, addr, networkId);
         return ta;
     }
@@ -358,28 +378,20 @@ public abstract class TxHttpServerSbb implements Sbb {
         }
     }
 
-    protected SendMessageParseResult createSmsEventMultiDest(HttpSendMessageIncomingData incomingData, PersistenceRAInterface store, int networkId) throws SmscProcessingException {
+    protected SendMessageParseResult createSmsEventMultiDest(HttpSendMessageIncomingData incomingData, PersistenceRAInterface store) throws SmscProcessingException {
         List<String> addressList = incomingData.getDestAddresses();
         if (addressList == null || addressList.size() == 0) {
             throw new SmscProcessingException("For received SubmitMessage no DestAddresses found: ", 0, MAPErrorCode.systemFailure, null);
         }
 
-        int dcs;
-        // short message data
-        byte[] data = incomingData.getShortMessage();
-
-        if (data == null) {
-            data = new byte[0];
-        }
-        String msg = null;
+        String msg = incomingData.getShortMessage();
+        final int dcs ;
         switch(incomingData.getEncoding()){
             case UTF8:
                 dcs = CharacterSet.GSM7.getCode();
-                msg = new String(data, utf8Charset);
                 break;
             default: // UCS2
-                dcs = CharacterSet.UCS2.getCode();
-                msg = new String(data, ucs2Charset);
+                dcs = smscPropertiesManagement.getHttpDefaultDataCoding();
                 break;
         }
         String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
@@ -402,7 +414,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             boolean succAddr = false;
             TargetAddress ta = null;
             try {
-                ta = createDestTargetAddress(address, networkId);
+                ta = createDestTargetAddress(address);
                 succAddr = true;
             } catch (SmscProcessingException e) {
                 logger.severe("SmscProcessingException while processing message to destination: "+address);
@@ -412,37 +424,32 @@ public abstract class TxHttpServerSbb implements Sbb {
                 Sms sms = new Sms();
                 sms.setDbId(UUID.randomUUID());
                 sms.setOriginationType(OriginationType.HTTP);
-
                 // TODO: Setting the Source address, Ton, Npi
                 sms.setSourceAddr(incomingData.getSenderId());
-                sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
-                sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
+                sms.setSourceAddrNpi(smscPropertiesManagement.getHttpDefaultSourceNpi());
+                sms.setSourceAddrTon(smscPropertiesManagement.getHttpDefaultSourceTon());
                 // TODO: setting dcs
                 sms.setDataCoding(dcs);
                 // TODO: esmCls - read from smpp documentation
-                sms.setEsmClass(0);
+                sms.setEsmClass(smscPropertiesManagement.getHttpDefaultMessagingMode());
                 // TODO: regDlvry - read from smpp documentation
-                sms.setRegisteredDelivery(0);
-
+                final int registeredDelivery = smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt()
+                            | smscPropertiesManagement.getHttpDefaultRDIntermediateNotification();
+                sms.setRegisteredDelivery(registeredDelivery);
 
                 sms.setNationalLanguageLockingShift(nationalLanguageLockingShift);
                 sms.setNationalLanguageSingleShift(nationalLanguageSingleShift);
-
                 sms.setSubmitDate(new Timestamp(System.currentTimeMillis()));
-
                 sms.setDefaultMsgId(incomingData.getDefaultMsgId());
-
                 logger.finest("### Msg is: "+msg);
                 sms.setShortMessageText(msg);
-
                 SmsSet smsSet;
-
                 smsSet = new SmsSet();
                 smsSet.setDestAddr(ta.getAddr());
                 smsSet.setDestAddrNpi(ta.getAddrNpi());
                 smsSet.setDestAddrTon(ta.getAddrTon());
                 // TODO: set network Id - we need configuration for this
-                smsSet.setNetworkId(0);
+                smsSet.setNetworkId(smscPropertiesManagement.getHttpDefaultNetworkId());
                 smsSet.addSms(sms);
                 
                 sms.setSmsSet(smsSet);
@@ -452,7 +459,6 @@ public abstract class TxHttpServerSbb implements Sbb {
             }
         }
         // TODO: process case when event.getReplaceIfPresent()==true: we need
-        // remove old message with same MessageId ?
         return new SendMessageParseResult(msgList);
     }
 
@@ -463,7 +469,6 @@ public abstract class TxHttpServerSbb implements Sbb {
 
         // checking if SMSC is stopped
         if (smscPropertiesManagement.isSmscStopped()) {
-//            SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR, 0, null);
             SmscProcessingException e = new SmscProcessingException("SMSC is stopped", 0, 0, null);
             e.setSkipErrorLogging(true);
             throw e;
@@ -471,7 +476,6 @@ public abstract class TxHttpServerSbb implements Sbb {
         // checking if SMSC is paused
         if (smscPropertiesManagement.isDeliveryPause()
                 && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
-//            SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR, 0, null);
             SmscProcessingException e = new SmscProcessingException("SMSC is paused", 0, 0, null);
             e.setSkipErrorLogging(true);
             throw e;

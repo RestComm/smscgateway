@@ -1,8 +1,8 @@
 package org.mobicents.smsc.slee.services.http.server.tx.data;
 
-import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestMessageBodyEncoding;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
+import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -37,7 +37,6 @@ public class HttpSendMessageIncomingData {
     private RequestMessageBodyEncoding encoding;
     private String senderId;
     private List<String> destAddresses = new ArrayList<String>();
-    private String scheduleDeliveryTime;
 
     public HttpSendMessageIncomingData(String userId, String password, String msg, String formatParam, String encodingStr, String senderId, String[] to) throws HttpApiException {
         // checking if mandatory fields are present
@@ -110,17 +109,11 @@ public class HttpSendMessageIncomingData {
     }
 
     public int getDefaultMsgId() {
-//        return defaultMsgId;
-        // TODO implement defaultMessageId
-        return -1;
+        return 0;
     }
 
-    public String getScheduleDeliveryTime() {
-        return scheduleDeliveryTime;
-    }
-
-    public byte[] getShortMessage() {
-        return this.msg.getBytes();
+    public String getShortMessage() {
+        return this.msg;
     }
 
     @Override
@@ -132,8 +125,7 @@ public class HttpSendMessageIncomingData {
                 ", format='" + format + '\'' +
                 ", encoding=" + encoding +
                 ", senderId='" + senderId + '\'' +
-                ", destAddresses=" + destAddresses +
-                ", scheduleDeliveryTime='" + scheduleDeliveryTime + '\'' +
+                ", destAddresses=" + destAddresses + '\'' +
                 '}';
     }
 
