@@ -78,7 +78,7 @@ public class ResponseFormatter {
         sb.append(response.getStatusString()).append("\"");
         if(response.getStatus().intValue() == 0){
             // in case of success
-            sb.append(",\"").append(response.getStatusMessage()).append("\"}");
+            sb.append(",\"").append(response.getStatusMessage()).append("\"");
         } else{
             // in case of error
             sb.append(":").append(response.getStatus()).append(",\"").append(response.getStatusMessage()).append("\"");

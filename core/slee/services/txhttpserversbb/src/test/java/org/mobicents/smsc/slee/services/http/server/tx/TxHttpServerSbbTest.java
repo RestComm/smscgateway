@@ -483,6 +483,56 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
+    public void getStatusGETJsonSuccessTest(){
+        System.out.println("getStatusGETJsonSuccessTest");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildGetMessageIdStatusRequest(METHOD_GET, URL_GET_MESSAGE_ID_STATUS, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_ID, FORMAT_JSON);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true), "Response is not valid");
+    }
+
+    @Test
+    public void getStatusGETJsonErrorTest(){
+        System.out.println("getStatusGETJsonErrorTest");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildGetMessageIdStatusRequest(METHOD_GET, URL_GET_MESSAGE_ID_STATUS, USER_DEFAULT, PASSWORD_DEFAULT, null, FORMAT_JSON);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, false), "Response is not valid");
+    }
+
+    @Test
     public void getStatusGETPasswordNullErrorTest(){
         System.out.println("getStatusGETErrorTest");
         if (!this.cassandraDbInited) {
