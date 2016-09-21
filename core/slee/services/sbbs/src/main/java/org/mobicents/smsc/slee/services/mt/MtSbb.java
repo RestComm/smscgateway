@@ -1033,7 +1033,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		// TODO : TimeZone should be configurable
         AbsoluteTimeStamp serviceCentreTimeStamp = this.mapSmsTpduParameterFactory.createAbsoluteTimeStamp(
                 (submitDate.getYear() % 100), (submitDate.getMonth() + 1), submitDate.getDate(), submitDate.getHours(),
-                submitDate.getMinutes(), submitDate.getSeconds(), (submitDate.getTimezoneOffset() / 15));
+                submitDate.getMinutes(), submitDate.getSeconds(), -(submitDate.getTimezoneOffset() / 15));
 
         SmsDeliverTpdu smsDeliverTpdu = this.mapSmsTpduParameterFactory.createSmsDeliverTpdu(moreMessagesToSend, false,
                 ((sms.getEsmClass() & SmppConstants.ESM_CLASS_REPLY_PATH_MASK) != 0), false,
