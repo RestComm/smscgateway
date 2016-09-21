@@ -1,0 +1,16 @@
+Name
+	smsc get httpdefaultsourceton
+
+SYNOPSIS
+	smsc get httpdefaultsourceton
+
+DESCRIPTION
+	This command is used to get a value for default TON (Type Of Number) for source
+	addresses for messages from an HTTP connector.
+
+EXAMPLES
+	smsc get httpdefaultsourceton
+
+SEE ALSO
+	smsc set httpdefaultsourceton, smsc get httpdefaultsourcenpi,
+	smsc get httpdefaultdestton, smsc get httpdefaultdestnpi

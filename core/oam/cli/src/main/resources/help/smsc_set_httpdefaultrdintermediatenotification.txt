@@ -1,0 +1,20 @@
+Name
+	smsc set httpdefaultrdintermediatenotification
+
+SYNOPSIS
+	smsc set httpdefaultrdintermediatenotification <intermediate notification request value>
+
+DESCRIPTION
+	This command is used to set a value for default intermediate
+	notification request value for messages from an HTTP connector.
+	Possible values: 0-no, 1-yes
+	Default value is 0.
+
+EXAMPLES
+	smsc set httpdefaultrdintermediatenotification 0
+
+SEE ALSO
+	smsc set httpdefaultsourceton, smsc set httpdefaultsourcenpi,
+	smsc set httpdefaultdestton, smsc set httpdefaultdestnpi,
+	smsc set httpdefaultmessagingmode,
+	smsc set httpdefaultrddeliveryreceipt

@@ -1,0 +1,17 @@
+Name
+	smsc set httpdefaultnetworkid
+
+SYNOPSIS
+	smsc set httpdefaultnetworkid <networkId>
+
+DESCRIPTION
+	This command is used to set a value for default networkId value
+	for messages from an HTTP connector.
+	Default value is 0.
+
+EXAMPLES
+	smsc set httpdefaultnetworkid 0
+
+SEE ALSO
+	smsc set httpdefaultsourceton, smsc set httpdefaultsourcenpi,
+	smsc set httpdefaultdestton, smsc set httpdefaultdestnpi

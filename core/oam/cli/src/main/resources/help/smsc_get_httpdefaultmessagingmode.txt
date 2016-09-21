@@ -1,0 +1,20 @@
+Name
+	smsc get httpdefaultmessagingmode
+
+SYNOPSIS
+	smsc get httpdefaultmessagingmode
+
+DESCRIPTION
+	This command is used to get a value for default messaging mode
+	value for messages from an HTTP connector.
+	Possible values: 0-default SMSC mode, 1-datagram, 2-transaction,
+	3-storeAndForward.
+
+EXAMPLES
+	smsc get httpdefaultmessagingmode
+
+SEE ALSO
+	smsc set httpdefaultmessagingmode
+	smsc get httpdefaultsourceton, smsc get httpdefaultsourcenpi,
+	smsc get httpdefaultdestton, smsc get httpdefaultdestnpi,
+	smsc get httpdefaultnetworkid

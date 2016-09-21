@@ -1,0 +1,21 @@
+Name
+	smsc get httpdefaultrddeliveryreceipt
+
+SYNOPSIS
+	smsc get httpdefaultrddeliveryreceipt
+
+DESCRIPTION
+	This command is used to get a value for default delivery
+	receipt request value for messages from an HTTP connector.
+	Possible values: 0-no, 1-on success or failure,
+	2-on failure only, 3-on success only
+
+EXAMPLES
+	smsc get httpdefaultrddeliveryreceipt
+
+SEE ALSO
+	smsc set httpdefaultrddeliveryreceipt
+	smsc get httpdefaultsourceton, smsc get httpdefaultsourcenpi,
+	smsc get httpdefaultdestton, smsc get httpdefaultdestnpi,
+	smsc get httpdefaultmessagingmode,
+	smsc get httpdefaultrdintermediatenotification

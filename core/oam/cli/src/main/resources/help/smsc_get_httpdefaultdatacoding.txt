@@ -1,0 +1,20 @@
+Name
+	smsc get httpdefaultdatacoding
+
+SYNOPSIS
+	smsc get httpdefaultdatacoding
+
+DESCRIPTION
+	This command is used to get a value for default
+	data coding schema value for messages from an HTTP connector.
+	Most common values: 0:GSM7, 8:UCS-2
+
+EXAMPLES
+	smsc get httpdefaultdatacoding
+
+SEE ALSO
+	smsc set httpdefaultdatacoding
+	smsc get httpdefaultsourceton, smsc get httpdefaultsourcenpi,
+	smsc get httpdefaultdestton, smsc get httpdefaultdestnpi,
+	smsc get httpdefaultmessagingmode,
+	smsc get httpdefaultrddeliveryreceipt

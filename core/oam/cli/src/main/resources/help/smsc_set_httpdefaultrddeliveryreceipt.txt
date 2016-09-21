@@ -1,0 +1,21 @@
+Name
+	smsc set httpdefaultrddeliveryreceipt
+
+SYNOPSIS
+	smsc set httpdefaultrddeliveryreceipt <delivery receipt request value>
+
+DESCRIPTION
+	This command is used to set a value for default delivery
+	receipt request value for messages from an HTTP connector.
+	Possible values: 0-no, 1-on success or failure,
+	2-on failure only, 3-on success only
+	Default value is 0.
+
+EXAMPLES
+	smsc set httpdefaultrddeliveryreceipt 0
+
+SEE ALSO
+	smsc set httpdefaultsourceton, smsc set httpdefaultsourcenpi,
+	smsc set httpdefaultdestton, smsc set httpdefaultdestnpi,
+	smsc set httpdefaultmessagingmode,
+	smsc set httpdefaultrdintermediatenotification
