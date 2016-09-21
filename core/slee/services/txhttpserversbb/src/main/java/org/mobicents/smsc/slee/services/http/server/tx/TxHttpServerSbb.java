@@ -426,8 +426,8 @@ public abstract class TxHttpServerSbb implements Sbb {
             dcs = smscPropertiesManagement.getHttpDefaultDataCoding();
         } else {
             switch(incomingData.getEncoding()){
-                case UTF8:
-                    dcs = CharacterSet.GSM7.getCode();
+                case GSM7:
+                    dcs = 0;
                     break;
                 case UCS2:
                     dcs = 8;
@@ -490,6 +490,10 @@ public abstract class TxHttpServerSbb implements Sbb {
                 sms.setDefaultMsgId(incomingData.getDefaultMsgId());
                 logger.finest("### Msg is: "+msg);
                 sms.setShortMessageText(msg);
+
+                MessageUtil.applyValidityPeriod(sms, null, false, smscPropertiesManagement.getMaxValidityPeriodHours(),
+                        smscPropertiesManagement.getDefaultValidityPeriodHours());
+
                 SmsSet smsSet;
                 smsSet = new SmsSet();
                 smsSet.setDestAddr(ta.getAddr());

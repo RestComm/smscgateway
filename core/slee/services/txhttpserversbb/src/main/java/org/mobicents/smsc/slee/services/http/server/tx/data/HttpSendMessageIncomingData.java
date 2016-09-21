@@ -69,7 +69,7 @@ public class HttpSendMessageIncomingData {
         this.destAddresses.addAll(Arrays.asList(to));
 
         //setting the default
-        if (encodingStr == null) {
+        if (encodingStr != null) {
             this.encoding = RequestMessageBodyEncoding.fromString(encodingStr);
         }
             //setting the default
