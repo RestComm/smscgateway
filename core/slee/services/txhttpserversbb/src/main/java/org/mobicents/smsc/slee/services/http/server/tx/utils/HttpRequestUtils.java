@@ -22,6 +22,7 @@ public class HttpRequestUtils {
     private final static String P_MSGID = "msgid";
 
     public static boolean isSendMessageRequest(Tracer logger, HttpServletRequest request) throws HttpApiException {
+
         Map<String, String[]> params = request.getParameterMap();
         if(!request.getRequestURI().contains("restcomm")){
             logger.finest("URI does not conatin 'restcomm'");
@@ -113,14 +114,15 @@ public class HttpRequestUtils {
             for(String item: splitted){
                 String[] pair = item.split("=");
                 if(pair.length != 2){
-                    logger.severe("#### Length is different than 2.");
-                }
-                String first = pair[0];
-                String second = pair[1];
-                if(second.contains(",")){
-                    map.put(first, second.split(","));
+                    logger.severe("#### Length is different than 2." + item + " will be omitted");
                 } else {
-                    map.put(first, new String[]{second});
+                    String first = pair[0];
+                    String second = pair[1];
+                    if (second.contains(",")) {
+                        map.put(first, second.split(","));
+                    } else {
+                        map.put(first, new String[]{second});
+                    }
                 }
             }
             return map;

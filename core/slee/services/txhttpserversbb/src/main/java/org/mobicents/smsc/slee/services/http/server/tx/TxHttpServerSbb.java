@@ -31,6 +31,7 @@ import org.mobicents.smsc.slee.services.http.server.tx.data.HttpGetMessageIdStat
 import org.mobicents.smsc.slee.services.http.server.tx.data.HttpGetMessageIdStatusOutgoingData;
 import org.mobicents.smsc.slee.services.http.server.tx.data.HttpSendMessageIncomingData;
 import org.mobicents.smsc.slee.services.http.server.tx.data.HttpSendMessageOutgoingData;
+import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.Status;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
@@ -41,14 +42,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.slee.ActivityContextInterface;
-import javax.slee.ActivityEndEvent;
-import javax.slee.CreateException;
-import javax.slee.EventContext;
-import javax.slee.RolledBackContext;
-import javax.slee.Sbb;
-import javax.slee.SbbContext;
-import javax.slee.ServiceID;
+import javax.slee.*;
 import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 import javax.slee.serviceactivity.ServiceActivity;
@@ -89,8 +83,42 @@ public abstract class TxHttpServerSbb implements Sbb {
     private final String GET = "GET";
     private final String POST = "POST";
 
+    private final String SEND_SMS = "sendSms";
+    private final String MSG_QUERY = "msgQuery";
+
     public PersistenceRAInterface getStore() {
         return this.persistence;
+    }
+
+    public InitialEventSelector isInitialHttpRequestEvent(final InitialEventSelector ies) {
+        if (logger.isFinestEnabled()) {
+            logger.finest("incomming http event: " + ies.getEvent());
+        }
+
+        final Object event = ies.getEvent();
+        if (event instanceof HttpServletRequestEvent) {
+            HttpServletRequest request = ((HttpServletRequestEvent) event).getRequest();
+            String requestURL = request.getRequestURL().toString();
+            if(request.getMethod().equals(GET) ){
+                String[] tmp = requestURL.split("\\?");
+                if(tmp[0].endsWith(SEND_SMS) || tmp[0].endsWith(MSG_QUERY)){
+                    ies.setInitialEvent(true);
+                    return ies;
+                }
+            } else if(request.getMethod().equals(POST) && (requestURL.endsWith(SEND_SMS) || requestURL.endsWith(MSG_QUERY))){
+                ies.setInitialEvent(true);
+                return ies;
+            }else{
+                if (logger.isFinestEnabled()) {
+                    logger.finest(request.getMethod() + " this method is not supported!");
+                }
+            }
+        }
+        ies.setInitialEvent(false);
+        if (logger.isFinestEnabled()) {
+            logger.finest("this is not an initial event!");
+        }
+        return ies;
     }
 
     public void onHttpGet(HttpServletRequestEvent event, ActivityContextInterface aci) {
@@ -98,9 +126,11 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpServletRequest request = event.getRequest();
         // decision if getStatus or sendMessage
         try {
-            if (HttpRequestUtils.isSendMessageRequest(logger, request)) {
+            String requestURL = request.getRequestURL().toString();
+            String[] tmp = requestURL.split("\\?");
+            if(tmp[0].endsWith(SEND_SMS)){
                 this.processHttpSendMessageEvent(event, aci);
-            } else if (HttpRequestUtils.isGetMessageIdStatusService(logger, request)) {
+            }else if(tmp[0].endsWith(MSG_QUERY)){
                 this.processHttpGetMessageIdStatusEvent(event, aci);
             } else {
                 throw new HttpApiException("Unknown operation on the HTTP API");
@@ -110,11 +140,12 @@ public abstract class TxHttpServerSbb implements Sbb {
                 HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
                 outgoingData.setStatus(Status.ERROR);
                 outgoingData.setMessage(e.getMessage());
+                ResponseFormat responseFormat = HttpSendMessageIncomingData.getFormat(request);
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
                         HttpServletResponse.SC_OK,
                         outgoingData.getMessage(),
-                        ResponseFormatter.format(outgoingData, HttpSendMessageIncomingData.getFormat(request)));
+                        ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -126,9 +157,11 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpServletRequest request = event.getRequest();
         // decision if getStatus or sendMessage
         try {
-            if (HttpRequestUtils.isSendMessageRequest(logger, request)) {
+            String requestURL = request.getRequestURL().toString();
+            requestURL.endsWith(SEND_SMS);
+            if (requestURL.endsWith(SEND_SMS)) {
                 this.processHttpSendMessageEvent(event, aci);
-            } else if (HttpRequestUtils.isGetMessageIdStatusService(logger, request)) {
+            } else if (requestURL.endsWith(MSG_QUERY)) {
                 this.processHttpGetMessageIdStatusEvent(event, aci);
             } else {
                 throw new HttpApiException("Unknown operation on the HTTP API. Parameter set from the request does not match any of the HTTP API services.");
@@ -138,11 +171,12 @@ public abstract class TxHttpServerSbb implements Sbb {
                 HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
                 outgoingData.setStatus(Status.ERROR);
                 outgoingData.setMessage(e.getMessage());
+                ResponseFormat responseFormat = HttpSendMessageIncomingData.getFormat(request);
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
                         HttpServletResponse.SC_OK,
                         outgoingData.getMessage(),
-                        ResponseFormatter.format(outgoingData, HttpSendMessageIncomingData.getFormat(request)));
+                        ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -274,7 +308,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                 HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(),
                         HttpServletResponse.SC_OK,
                         message,
-                        ResponseFormatter.format(outgoingData, incomingData.getFormat()));
+                        ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
             } catch (IOException e) {
                 this.logger.severe("Error while trying to send HttpErrorResponse", e);
             }
@@ -291,7 +325,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
                         HttpServletResponse.SC_OK,
-                        message, ResponseFormatter.format(outgoingData, incomingData.getFormat()));
+                        message, ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
             } catch (IOException e) {
                 this.logger.severe("Error while trying to send SubmitMultiResponse=", e);
             }
@@ -303,7 +337,7 @@ public abstract class TxHttpServerSbb implements Sbb {
         // Lets send the Response with success here
         try {
             outgoingData.setStatus(Status.SUCCESS);
-            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()) );
+            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat() );
         } catch (Throwable e) {
             this.logger.severe("Error while trying to send SubmitMultiResponse=" + outgoingData, e);
         }
@@ -332,7 +366,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             outgoingData.setStatus(Status.SUCCESS);
             outgoingData.setStatusMessage(messageState.toString());
 
-            HttpUtils.sendOkResponseWithContent(this.logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()));
+            HttpUtils.sendOkResponseWithContent(this.logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
         } catch (PersistenceException e) {
             throw new HttpApiException("PersistenceException while obtaining message status from the database for the " +
                     "message with id: "+incomingData.getMsgId());
@@ -434,6 +468,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                 Sms sms = new Sms();
                 sms.setDbId(UUID.randomUUID());
                 sms.setOriginationType(OriginationType.HTTP);
+                sms.setOrigNetworkId(ta.getNetworkId());
                 // TODO: Setting the Source address, Ton, Npi
                 sms.setSourceAddr(incomingData.getSenderId());
                 sms.setSourceAddrNpi(smscPropertiesManagement.getHttpDefaultSourceNpi());
@@ -443,8 +478,10 @@ public abstract class TxHttpServerSbb implements Sbb {
                 // TODO: esmCls - read from smpp documentation
                 sms.setEsmClass(smscPropertiesManagement.getHttpDefaultMessagingMode());
                 // TODO: regDlvry - read from smpp documentation
-                final int registeredDelivery = smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt()
-                        | smscPropertiesManagement.getHttpDefaultRDIntermediateNotification();
+                int registeredDelivery = smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt();
+                if(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification()!=0) {
+                    registeredDelivery |= 0x10;
+                }
                 sms.setRegisteredDelivery(registeredDelivery);
 
                 sms.setNationalLanguageLockingShift(nationalLanguageLockingShift);
@@ -459,7 +496,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                 smsSet.setDestAddrNpi(ta.getAddrNpi());
                 smsSet.setDestAddrTon(ta.getAddrTon());
                 // TODO: set network Id - we need configuration for this
-                smsSet.setNetworkId(smscPropertiesManagement.getHttpDefaultNetworkId());
+                smsSet.setNetworkId(ta.getNetworkId());
                 smsSet.addSms(sms);
 
                 sms.setSmsSet(smsSet);

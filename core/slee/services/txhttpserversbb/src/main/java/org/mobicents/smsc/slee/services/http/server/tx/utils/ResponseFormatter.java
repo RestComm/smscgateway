@@ -33,10 +33,29 @@ public class ResponseFormatter {
 
     private static String formatString(HttpSendMessageOutgoingData response){
         StringBuilder builder = new StringBuilder();
-        builder.append(response.getStatusString()).append(" : ").append(response.getStatus()).append("\n");
-        if(!EMPTY_STRING.equals(response.getMessage())){
-            builder.append(response.getMessage()).append("\n");
+        builder.append(response.getStatusString());
+
+        if(response.getStatus().intValue() == 0){
+            // in case of success
+            // {"success","77383":962788002265,"77385":962788002265}
+            Map<String, Long> msgIds = response.getMessagesIds();
+            for(Map.Entry<String, Long> entry: msgIds.entrySet()){
+                String destination = entry.getKey();
+                Long id = entry.getValue();
+                builder.append(",").append(destination).append(":").append(id);
+            }
+        } else{
+            // in case of error
+            // example: {"error":6,"request not accepted?}
+            builder.append(":").append(response.getStatus());
+            if(!EMPTY_STRING.equals(response.getMessage())){
+                builder.append(",").append(response.getMessage()).append("\n");
+            }
         }
+        builder.append("\n");
+//        if(!EMPTY_STRING.equals(response.getMessage())){
+//            builder.append(response.getMessage()).append("\n");
+//        }
         return builder.toString();
     }
 

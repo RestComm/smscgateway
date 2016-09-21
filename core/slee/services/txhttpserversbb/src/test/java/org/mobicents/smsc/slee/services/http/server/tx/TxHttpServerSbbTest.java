@@ -47,9 +47,9 @@ public class TxHttpServerSbbTest {
     private static final String[] TO_MULTIPLE = {"123456789", "111222333", "123123123"};
     private static final String[] TO_ONE = {"123456789"};
 
-    private static final String URL_SEND_MESSAGE = "http://test.pl/restcomm";
+    private static final String URL_SEND_MESSAGE = "http://test.pl/restcomm/sendSms";
     private static final String URL_SEND_MESSAGE_FAKE = "http://test.pl/sendMessageFake";
-    private static final String URL_GET_MESSAGE_ID_STATUS = "http://test.pl/restcomm";
+    private static final String URL_GET_MESSAGE_ID_STATUS = "http://test.pl/restcomm/msgQuery";
 
     private static final String MESSAGE_ID = "123456789";
 
