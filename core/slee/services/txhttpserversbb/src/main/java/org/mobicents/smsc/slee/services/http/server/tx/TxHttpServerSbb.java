@@ -388,14 +388,22 @@ public abstract class TxHttpServerSbb implements Sbb {
 
         String msg = incomingData.getShortMessage();
         final int dcs ;
-        switch(incomingData.getEncoding()){
-            case UTF8:
-                dcs = CharacterSet.GSM7.getCode();
-                break;
-            default: // UCS2
-                dcs = smscPropertiesManagement.getHttpDefaultDataCoding();
-                break;
+        if (incomingData.getEncoding() == null) {
+            dcs = smscPropertiesManagement.getHttpDefaultDataCoding();
+        } else {
+            switch(incomingData.getEncoding()){
+                case UTF8:
+                    dcs = CharacterSet.GSM7.getCode();
+                    break;
+                case UCS2:
+                    dcs = 8;
+                    break;
+                default: // UCS2
+                    dcs = smscPropertiesManagement.getHttpDefaultDataCoding();
+                    break;
+            }
         }
+
         String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
         if (err != null) {
             throw new SmscProcessingException("TxHttp DataCoding scheme does not supported: " + dcs + " - " + err,

@@ -21,7 +21,7 @@ public enum RequestMessageBodyEncoding {
      * @return UTF8 or UCS2 encoding. Default is UCS2.
      */
     public static final RequestMessageBodyEncoding fromString(String param) {
-        if (UTF8_STRING.equalsIgnoreCase(param) || ARABIC_STRING.equalsIgnoreCase(param)) {
+        if (UTF8_STRING.equalsIgnoreCase(param) || ENGLISH_STRING.equalsIgnoreCase(param)) {
             return RequestMessageBodyEncoding.UTF8;
         } else {
             return RequestMessageBodyEncoding.UCS2;

@@ -55,7 +55,7 @@ public class HttpSendMessageIncomingData {
         if( to == null || to.length < 1){
             throw new HttpApiException("to parameter is not set properly or not valid in the Http Request.");
         }
-        if(encodingStr == null || !RequestMessageBodyEncoding.isValid(encodingStr)){
+        if(encodingStr != null && !RequestMessageBodyEncoding.isValid(encodingStr)){
             throw new HttpApiException("encoding parameter is not set properly or not valid in the Http Request.");
         }
         this.userId = userId;
@@ -69,8 +69,10 @@ public class HttpSendMessageIncomingData {
         this.destAddresses.addAll(Arrays.asList(to));
 
         //setting the default
-        this.encoding = RequestMessageBodyEncoding.fromString(encodingStr);
-        //setting the default
+        if (encodingStr == null) {
+            this.encoding = RequestMessageBodyEncoding.fromString(encodingStr);
+        }
+            //setting the default
         this.format = ResponseFormat.fromString(formatParam);
     }
 
