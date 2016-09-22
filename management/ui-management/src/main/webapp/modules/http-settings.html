@@ -1,0 +1,262 @@
+					<h3 style="margin: 0px;"><i class="icon-globe"></i> HTTP settings</h3>
+					<hr style="margin: 10 0px;"/>
+					
+					<link href="resources/css/bootstrap-slider.css" rel="stylesheet">
+					<script type="text/javascript" src="resources/js/bootstrap-slider.js"></script>
+					<script type="text/javascript" src="resources/js/jquery-knob.js"></script>
+					
+					
+					<p>
+						<br/>
+					</p> 
+					
+					<div class="alert alert-error" id="login-settings-error" style="display:none;">
+					  <button type="button" class="close">&times;</button>
+					  Some Fields are not correctly filled out, please double check the settings below !
+					</div>
+					
+
+					<h5>Default values for incoming messages</h5>						
+					<div id="dbrr-update-configuration-wrapper">
+						<div class="input-prepend">
+							<div id="div-httpdefaultsourceton" class="control-group">
+							<span id="httpdefaultsourceton-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default TON value for source addresses for messages from HTTP connector">
+								<span class="add-on">Default source addresses TON</span>
+								<input id="httpdefaultsourceton" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+							<div id="div-httpdefaultsourcenpi" class="control-group">
+							<span id="httpdefaultsourcenpi-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default NPI value for source addresses for messages from HTTP connector">
+								<span class="add-on">Default source addresses NPI</span>
+								<input id="httpdefaultsourcenpi" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+							<div id="div-httpdefaultdestton" class="control-group">
+							<span id="httpdefaultdestton-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default TON value for destination addresses for messages from HTTP connector">
+								<span class="add-on">Default destination addresses TON</span>
+								<input id="httpdefaultdestton" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+							<div id="div-httpdefaultdestnpi" class="control-group">
+							<span id="httpdefaultdestnpi-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default NPI value for destination addresses for messages from HTTP connector">
+								<span class="add-on">Default destination addresses NPI</span>
+								<input id="httpdefaultdestnpi" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+
+							<div id="div-httpdefaultnetworkid" class="control-group">
+							<span id="httpdefaultnetworkid-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default networkId area for messages from HTTP connector">
+								<span class="add-on">Default networkId area</span>
+								<input id="httpdefaultnetworkid" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+
+							<div id="div-httpdefaultmessagingmode" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default messaging mode for messages from HTTP connector">
+									<span class="add-on">Default messaging mode</span>
+									<select id="httpdefaultmessagingmode" >
+										<option value="0">Default SMSC mode</option>
+										<option value="1">Datagram</option>
+										<option value="2">Transaction</option>
+										<option value="3">StoreAndForward</option>
+									</select>
+								</span>
+							</div>
+
+							<div id="div-httpdefaultrddeliveryreceipt" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default delivery receipt requests for messages from HTTP connector">
+									<span class="add-on">Default delivery receipt requests</span>
+									<select id="httpdefaultrddeliveryreceipt" >
+										<option value="0">No</option>
+										<option value="1">On success or failure</option>
+										<option value="2">On failure only</option>
+										<option value="3">On success only</option>
+									</select>
+								</span>
+							</div>
+
+							<div id="div-httpdefaultrdintermediatenotification" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default intermediate delivery notification requests for messages from HTTP connector">
+									<span class="add-on">Default messaging mode</span>
+									<select id="httpdefaultrdintermediatenotification" >
+										<option value="0">No</option>
+										<option value="1">Yes</option>
+									</select>
+								</span>
+							</div>
+
+							<div id="div-httpdefaultdatacoding" class="control-group">
+							<span id="httpdefaultdatacoding-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default data coding schema for messages from HTTP connector. Common values: 0-GSM7, 8-UCS2">
+								<span class="add-on">Default data coding schema</span>
+								<input id="httpdefaultdatacoding" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+							</span>
+							</div>
+						</div>
+
+						<div class="control-group">
+							<span class="span12" style="text-align: left;">
+								&nbsp;<button class="btn btn-danger" onclick="updateProperties();"><i class="icon-undo"></i> Revert</button>
+								&nbsp;<button class="btn btn-primary" onclick="applyProperties();"><i class="icon-save"></i> Save</button>
+							</span>
+						</div>								
+					</div>
+					
+
+					
+				<script type="text/javascript">
+					$('#login-settings-error .close').on("click", function(e) {
+					    $(this).parent().hide();
+					});
+
+					function updateProperties(){
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "read", mbean: mbeanSearch },
+								],
+								{ success: [
+									function(response) {
+										$("#httpdefaultsourceton").val(response.value.HttpDefaultSourceTon);
+										$("#httpdefaultsourcenpi").val(response.value.HttpDefaultSourceNpi);
+										$("#httpdefaultdestton").val(response.value.HttpDefaultDestTon);
+										$("#httpdefaultdestnpi").val(response.value.HttpDefaultDestNpi);
+										$("#httpdefaultnetworkid").val(response.value.HttpDefaultNetworkId);
+
+										var httpDefaultMessagingMode = response.value.HttpDefaultMessagingMode;
+										if(httpDefaultMessagingMode == 0){
+											httpdefaultmessagingmode.options[0].selected = true;
+										} else if(httpDefaultMessagingMode == 1){ 
+											httpdefaultmessagingmode.options[1].selected = true;
+										} else if(httpDefaultMessagingMode == 2){ 
+											httpdefaultmessagingmode.options[2].selected = true;
+										} else { 
+											httpdefaultmessagingmode.options[3].selected = true;
+										}										
+
+										var httpDefaultRDDeliveryReceipt = response.value.HttpDefaultRDDeliveryReceipt;
+										if(httpDefaultRDDeliveryReceipt == 0){
+											httpdefaultrddeliveryreceipt.options[0].selected = true;
+										} else if(httpDefaultRDDeliveryReceipt == 1){ 
+											httpdefaultrddeliveryreceipt.options[1].selected = true;
+										} else if(httpDefaultRDDeliveryReceipt == 2){ 
+											httpdefaultrddeliveryreceipt.options[2].selected = true;
+										} else { 
+											httpdefaultrddeliveryreceipt.options[3].selected = true;
+										}										
+
+										var httpDefaultRDIntermediateNotification = response.value.HttpDefaultRDIntermediateNotification;
+										if(httpDefaultRDIntermediateNotification == 0){
+											httpdefaultrdintermediatenotification.options[0].selected = true;
+										} else { 
+											httpdefaultrdintermediatenotification.options[1].selected = true;
+										}										
+
+										$("#httpdefaultdatacoding").val(response.value.HttpDefaultDataCoding);
+									}],
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");										
+									} 
+								}
+							);						
+					}
+
+					function applyProperties() {
+						var formInvalid = false;
+						
+						var httpdefaultsourceton = $("#httpdefaultsourceton").val();
+						if(httpdefaultsourceton.trim() == "") {
+			    			$("#div-httpdefaultsourceton").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-httpdefaultsourceton").hasClass("error")) {
+			    			$("#div-httpdefaultsourceton").removeClass("error");		
+			    		}
+						
+						var httpdefaultsourcenpi = $("#httpdefaultsourcenpi").val();
+						if(httpdefaultsourcenpi.trim() == "") {
+			    			$("#div-httpdefaultsourcenpi").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-httpdefaultsourcenpi").hasClass("error")) {
+			    			$("#div-httpdefaultsourcenpi").removeClass("error");		
+			    		}
+						
+						var httpdefaultdestton = $("#httpdefaultdestton").val();
+						if(httpdefaultdestton.trim() == "") {
+			    			$("#div-httpdefaultdestton").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-httpdefaultdestton").hasClass("error")) {
+			    			$("#div-httpdefaultdestton").removeClass("error");		
+			    		}
+						
+						var httpdefaultdestnpi = $("#httpdefaultdestnpi").val();
+						if(httpdefaultdestnpi.trim() == "") {
+			    			$("#div-httpdefaultdestnpi").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-httpdefaultdestnpi").hasClass("error")) {
+			    			$("#div-httpdefaultdestnpi").removeClass("error");		
+			    		}
+						
+						var httpdefaultnetworkid = $("#httpdefaultnetworkid").val();
+						if(httpdefaultnetworkid.trim() == "") {
+			    			$("#div-httpdefaultnetworkid").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-httpdefaultnetworkid").hasClass("error")) {
+			    			$("#div-httpdefaultnetworkid").removeClass("error");		
+			    		}
+						
+						var httpdefaultdatacoding = $("#httpdefaultdatacoding").val();
+						if(httpdefaultdatacoding.trim() == "") {
+			    			$("#div-httpdefaultdatacoding").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-httpdefaultdatacoding").hasClass("error")) {
+			    			$("#div-httpdefaultdatacoding").removeClass("error");		
+			    		}
+
+
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						} else {
+							$("#login-settings-error").hide();
+						}
+
+						var e = document.getElementById("httpdefaultmessagingmode");
+						var httpDefaultMessagingMode = e.options[e.selectedIndex].value;
+
+						var e = document.getElementById("httpdefaultrddeliveryreceipt");
+						var httpDefaultRDDeliveryReceipt = e.options[e.selectedIndex].value;
+
+						var e = document.getElementById("httpdefaultrdintermediatenotification");
+						var httpDefaultRDIntermediateNotification = e.options[e.selectedIndex].value;
+						
+						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+						jolokia.request(
+								[
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultSourceTon", value: httpdefaultsourceton},
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultSourceNpi", value: httpdefaultsourcenpi },
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultDestTon", value: httpdefaultdestton},
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultDestNpi", value: httpdefaultdestnpi },
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultNetworkId", value: httpdefaultnetworkid },
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultMessagingMode", value: httpDefaultMessagingMode },
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultRDDeliveryReceipt", value: httpDefaultRDDeliveryReceipt },
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultRDIntermediateNotification", value: httpDefaultRDIntermediateNotification },
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultDataCoding", value: httpdefaultdatacoding },
+								],
+								{
+									success: function(response) {
+										logToConsole("INFO", "SMSC Gateway Properties successfully updated.");
+									},
+									error: function(response) {
+										logToConsole("ERROR", "Failure trying to communicate with the RestComm SMSC Gateway. Please try again later.");
+									} 
+								}
+							);
+									
+					}
+
+					$(document).ready(function () {
+						updateProperties();
+					});
+				</script>
