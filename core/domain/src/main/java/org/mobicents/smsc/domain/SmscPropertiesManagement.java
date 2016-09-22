@@ -312,7 +312,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // TxHttp: default networkId area
     private int httpDefaultNetworkId = 0;
     // TxHttp: default messaging mode (0-default SMSC mode, 1-datagram, 2-transaction, 3-storeAndForward)
-    private int httpDefaultMessagingMode = 3;
+    private int httpDefaultMessagingMode = 1;
     // TxHttp: default delivery receipt requests (0-no, 1-on success or failure, 2-on failure, 3-on success)
     private int httpDefaultRDDeliveryReceipt = 0;
     // TxHttp: default intermediate delivery notification requests (0-no, 1-yes)
