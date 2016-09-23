@@ -40,6 +40,12 @@ include::Section-Managing-SIP-Settings.adoc[]
 
 :leveloffset: +1
 
+include::Section-Managing-HTTP-Settings.adoc[]
+
+:leveloffset: -1
+
+:leveloffset: +1
+
 include::Section-Managing-MAP-Version-Cache-Settings.adoc[]
 
 :leveloffset: -1
