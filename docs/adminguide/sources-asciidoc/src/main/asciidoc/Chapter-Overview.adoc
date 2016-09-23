@@ -43,9 +43,10 @@ Easy Configuration and Management:::
 Major Features:::
 {this-platform} {this-application} enables mobile operators to provide core SMSC features like subscriber to subscriber SMS messaging, broadcasting campaigns and group messaging between subscribers. 
 
-* {this-platform} {this-application} can handle mobile originated SMS and deliver them to the intended recipient (mobile, ESME or SIP). It also provides a flexible routing mechanism to route messages to/from ESME over SMPP protocol. {this-platform} {this-application} supports normal style (Server side) SMPP connection.
+* {this-platform} {this-application} can handle mobile originated SMS and deliver them to the intended recipient (mobile, ESME or SIP), it also accepts message uploading from a HTTP connector. It also provides a flexible routing mechanism to route messages to/from ESME over SMPP protocol. {this-platform} {this-application} supports normal style (Server side) SMPP connection.
   It can also act as ESME initiating connection to third party SMSC (Client side). Submit_Sm, Data_Sm, Submit_Multi and Deliver_Sm messages are supported. 
 * {this-platform} {this-application} supports SIP connection through JSLEE SIP RA. 
+* {this-platform} {this-application} supports HTTP connection through GET and POST requests (only message uploading).
 * For incoming from SMPP ESME messages, {this-platform} {this-application} supports StoreAndForward, Datagramm and Transactional modes and a special ForwardAndStore mode for reducing the database load. 
 +
 When a message comes from SMPP, the {this-application} checks the `EsmClass` field in the SMPP message.
@@ -65,7 +66,7 @@ ForwardAndStore (fast) mode::
   In the ForwardAndStore mode, an incoming "StoreAndForward" message will be attempted for delivery immediately, without storing in the database and therefore without any delay.
   If this first delivery attempt fails, the message will be stored in a database for futher scheduling. 					
 
-* Messages that come from SS7 or SIP are processed the same way as "StoreAndForward" messages that come from SMPP ESME. 
+* Messages that come from SS7 or SIP are processed the same way as "StoreAndForward" messages that come from SMPP ESME. It is possible to configure a default way of message processing ("Datagramm" or "StoreAndForward") for messages that come from HTTP connector.
 * {this-platform} {this-application} supports Non Transparent Home Routing as explained in 3GPP Specification version 23.840 5.2.3. 
 * {this-application} has support for SSL for SMPP connection (both client and server side).  
 * {this-platform} {this-application} can be configured for congestion control to reject messages when the number of messages in processing exceeds a configurable limit (`MaxActivityCount`). 
@@ -80,9 +81,9 @@ However StoreAndForward messages and all SS7/SIP originated messages will be sto
   Each ESME can be configured for rate limit per a second, a minute, a hour or a day. 
 * {this-platform} {this-application} supports ReportSMDeliveryStatus and AlertServiceCentre requests after mobile delivery failure.
 * {this-platform} {this-application} supports GSM7, GSM8 and UCS2 message encoding.
-* {this-platform} {this-application} itself splits ESME and SIP originated long length messages before delivering to mobile phones, if a message does not contain User Data headers (UDH).
+* {this-platform} {this-application} itself splits ESME, SIP or HTTP originated long length messages before delivering to mobile phones, if a message does not contain User Data headers (UDH).
 * Multi-tenancy support: {this-platform} {this-application} supports a model of message network as a splitted to several logical subnetworks and SMSC messages will be logically processed only in one of this logical subnetwork.
-  SMPP ESMEs, SCCP SAPs (Service Access Points) and SIP connector will belong to one of such subnetworks (A subnetwork is identified by a digital value - networkId). Any message that has come to SMSC GW from some port (ESME, SS7, SIP) will belong to networkId (subnetwork) from networkId of the port the message has come to SMSC.
+  SMPP ESMEs, SCCP SAPs (Service Access Points) and SIP connector will belong to one of such subnetworks (A subnetwork is identified by a digital value - networkId). Any message that has come to SMSC GW from some port (ESME, SS7, SIP, HTTP) will belong to networkId (subnetwork) from networkId of the port the message has come to SMSC.
   Then the message will be routed into the port (ESME, SS7, SIP) which belongs to the same networkId (subnetwork). 
 * Additionally, when enabled with proper administrator privileges, {this-platform} {this-application} allows convenient group messaging between subscribers (e.g.
   family, friends, colleagues) .

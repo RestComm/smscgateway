@@ -10,6 +10,10 @@ Some error codes are reserved for future use and will be put to use in future ve
 
 ----
 
+package org.mobicents.smsc.library;
+
+public enum ErrorCode {
+
     SUCCESS(0),
 
     UNKNOWN_SUBSCRIBER(1),
@@ -36,6 +40,7 @@ Some error codes are reserved for future use and will be put to use in future ve
     UNKNOWN_SMC(21),
     ILLEGAL_EQUIPMENT(22),
     USER_BUSY(23),
+    // TODO XXX: table is weird 
     //Power off (24вЂ“47: CDMA network reserved). 24-27
     //Reserved.   25-29
     //
@@ -82,7 +87,8 @@ Some error codes are reserved for future use and will be put to use in future ve
     MSC_REFUSES_SM(51),
     HLR_REFUSES_SM(52),
     GIW_REFUSES_SM(53),
-    //No response from the SGSN,
+    //TODO: XXX table is weird here again
+    //No response from the SGSN (54вЂ“63),
     NO_RESPONSE_FROM_SGSN(54),
 
     SGSN_REGUSES_SM(55),
@@ -122,7 +128,7 @@ Some error codes are reserved for future use and will be put to use in future ve
     /**
      * Exceeding maximum of messages in L2CacheDaemon specified by license(70),
      */
-    EXCEEDED_L2CacheDaemon_MAX_MESSAGE(70),
+    EXCEEDED_L2CacheDaemon_MAX_MESSAGE(70), // TODO:XXX ???
     /**
      * Deletion of SMs to be imported to the database because of disconnection between the SMSC and L2CacheDaemon(71),
      */
@@ -130,7 +136,7 @@ Some error codes are reserved for future use and will be put to use in future ve
     /**
      * Exceeding the maximum L2CacheDaemon capacity specified by license(72),
      */
-    EXCEEDED_L2CacheDaemon_CAPACITY(72),
+    EXCEEDED_L2CacheDaemon_CAPACITY(72), // TODO:XXX ??? //TODO: XXX: again ?
     /**
      * Some messages in L2CacheDaemon are the same as the messages in memory(73),
      */
@@ -225,7 +231,7 @@ Some error codes are reserved for future use and will be put to use in future ve
     RESERVED_142(142),
     UNSPECIFIED_TP_PID_ERROR(143),
     DCS_NOT_SUPPORTED(144),
-    SM_TYPE_NOT_SUPPORTED(145),
+    SM_TYPE_NOT_SUPPORTED(145), //TODO: XXX :again? there is SM_TYPE_0_NOT_SUPPORTED />
     //Reserved(146вЂ“158),
     RESERVED_146(146),
     RESERVED_147(147),
@@ -278,7 +284,7 @@ Some error codes are reserved for future use and will be put to use in future ve
     SC_BUSY(192),
     NO_SC_SPECIFIED(193),
     SC_SYSTEM_ERROR(194),
-    INVALID_SME_ADDRESS_2(195),
+    INVALID_SME_ADDRESS_2(195), //TODO: XXX: duplicate!
     DESTINATION_SME_PROHIBITED(196),
     //Reserved(197-207),
     RESERVED_197(197),
@@ -297,7 +303,7 @@ Some error codes are reserved for future use and will be put to use in future ve
      * No SMS storage capability in SIM(209),
      */
     SIM_HAS_NO_SMS_STORAGE(209),
-    ERROR_IN_MS_2(210),
+    ERROR_IN_MS_2(210),  //TODO: XXX: duplicate!
     ESME_MEMORY_OVERFLOW(211),
     /**
      * Reserved(212-223),
@@ -321,8 +327,8 @@ Some error codes are reserved for future use and will be put to use in future ve
     OCS_ACCESS_NOT_GRANTED(224),
     MPROC_ACCESS_NOT_GRANTED(225),
     MPROC_SRI_REQUEST_DROP(226),
-    APP_SPECIFIC_227(227),
-    APP_SPECIFIC_228(228),
+    MPROC_PRE_DELIVERY_DROP(227),
+    VALIDITY_PERIOD_EXPIRED(228),
     APP_SPECIFIC_229(229),
     APP_SPECIFIC_230(230),
     APP_SPECIFIC_231(231),
@@ -350,6 +356,7 @@ Some error codes are reserved for future use and will be put to use in future ve
     APP_SPECIFIC_253(253),
     APP_SPECIFIC_254(254),
     UNSPECIFIED_ERROR_CAUSE(255);
+}
 ----
 
 :sectnums:
