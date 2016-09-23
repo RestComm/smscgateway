@@ -9,6 +9,7 @@ DESCRIPTION
 	value for messages from an HTTP connector.
 	Possible values: 0-default SMSC mode, 1-datagram, 2-transaction,
 	3-storeAndForward.
+	(transaction is not supported now for HTTP originated messages).
 
 EXAMPLES
 	smsc get httpdefaultmessagingmode
