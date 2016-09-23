@@ -30,7 +30,7 @@ We recommend that you set logging threshold to `WARN` and let the CDR appender b
 [[_routing_fundamentals]]
 == SMSC GW routing fundamentals
 
-SMSC GW needs clear info to where it must route messages that have come to SMSC GW from SMPP / SS7 / SIP connectors or created inside SMSC GW receipts.
+SMSC GW needs clear info to where it must route messages that have come to SMSC GW from SMPP / SS7 / SIP / HTTP connectors or created inside SMSC GW receipts.
 Routing procedures gives the answer to this questions, that a user must configure before SMSC GW can properly work. 
 
 
@@ -43,14 +43,14 @@ SMSC GW has two routing procedures:
 [[_routing_fundamentals_1]]
 === The procedure based on dividing of separated routing area into several areas ("subnetworks").
 
-Each area has its unique digital "netwokId" value.
-Each SMPP connection (ESME), SS7 SCCP service access point (SAP), SIP connector and a database routing rule (if you use them instead of default ESME routing rules) belongs to one of network (to each of the a networkId value is assigned). Default netwokId value is "0". If a user does not specify a netwokId value when ESME, SAP, SIP or a database routing rule creation, networkId=0 will be assigned. 
+Each area has its unique digital "networkId" value.
+Each SMPP connection (ESME), SS7 SCCP service access point (SAP), SIP connector and a database routing rule (if you use them instead of default ESME routing rules) belongs to one of network (to each of the a networkId value is assigned). For messages that come via HTTP connector a networkId is assigned depending on a value in HTTP payload or with a default configured value. Default networkId value is "0". If a user does not specify a networkId value when ESME, SAP, SIP or a database routing rule creation, networkId=0 will be assigned. 
 
-When a message has come to SMSC GW a networkId value from ESME, SAP or SIP is assigned for the message.
+When a message has come to SMSC GW a networkId value from ESME, SAP, SIP or HTTP is assigned for the message.
 The message can be routed only inside the area with the same networkId to what the message belongs.
 So this means that by default a message can not leave a "networkId" area via which it has come to SMSC GW. 
 
-If a user needs that a message will be delivered to another "networkId" area, he can configure "message processing" rules ("mproc" rules). There we can configure that a message from a specified networkId1 and which fits some other conditions (like destination address fit to some mask) must be moved to networkId2 (newNetworkId option of a mproc rule). And the message will be delivered via ESME, SAP or SIP that belongs to networkId2. 
+If a user needs that a message will be delivered to another "networkId" area, he can configure "message processing" rules ("mproc" rules). There we can configure that a message from a specified networkId1 and which fits some other conditions (like destination address fit to some mask) must be routed to networkId2 (newNetworkId action of a mproc rule). And the message will be delivered via ESME, SAP or SIP that belongs to networkId2. newNetworkId action in a mproc rule is applied at the step when a message has just come to SMSC GW for processing. There are also other options. A messages can be rerouted to another networkId (or dropped) just before a delivery attempt, after a successfull SRI request to HLR, after temporary or permanent failure.
 
 Multi-tenancy support is also based on this routing procedure.
 For each networkId we can configure a separate SS7 GlobalTitle and for an external peer each networkId can play a role as a separate independed SMSC. 
@@ -117,7 +117,7 @@ If you want to use only the procedure based on subnetworks (networkId) areas you
 
 * configure SMSC GW so that only one SAP / ESME / SIP belongs to each networkId.
 * for every ESME / SIP specify for "Routing Type of number (TON)"=-1, "Routing Number plan indicator (NPI)"=-1, "Routing Range"="^[0-9a-zA-Z]*" (that fits to any message destination address).
-* configure a set of mproc rules that will manage of routing of messages from one subnetwork (networkId) to another.| | 
+* configure a set of mproc rules that will manage of routing of messages from one subnetwork (networkId) to another.
 
 
 
@@ -126,7 +126,7 @@ If you want to use only the procedure based on subnetworks (networkId) areas you
 
 * configured for all SAP / SCCP routing rules / ESME / SIP the same networkId (default networkId=0 is usually used)
 * for every ESME / SIP specify proper values for "Routing Type of number (TON)", "Routing Number plan indicator (NPI)" and "Routing Range" or configure database routing rules
-* you do not need to configure mproc rules for routing| | 
+* you do not need to configure mproc rules for routing
 
 If you want to use both, you need to configure both parts.
 Messages will be routed between subnetworks (networkIds) by mproc rules and inside a subnetwork (networkId) by configuring of ESME / SIP "Routing Type of number (TON)", "Routing Number plan indicator (NPI)" and "Routing Range" (or database routing rules). 
@@ -169,23 +169,41 @@ smsc mproc add mproc 3 networkidmask=3 newnetworkid=0
 == Message processing rules (mproc rules)
 
 Message processing rules (mproc rules) is a tool for processing messages and changing properties of message, for example source/destination TON, NPI, NetworkId etc.
-MProc rules are only applied if pre configured criterian match's. 
+MProc rules are only applied if they match pre configured criterian. 
 
-Following are the states at which mproc rules can be applied to messages: 
+MProc can be applied at several different message processing steps (triggers). Following are the triggers at which mproc rules can be applied to messages: 
 
-. `onPostArrival` : When a message arrives in SMSC GW and has been already processed (accepted) by Diameter server (if Diameter server is configured). `onPostArrival` following actions are possible: 
-+
-* message can be dropped (a success response will be returned to a message originator)
-* message can be rejected (a reject response will be returned to a message originator)
-* most of a message parameters can be updated (for example destination address, networkId  (this is needed for routing such messages to another subnetwork area (networkId)  (see chapter <<_routing_fundamentals>>)) or even a message content) 
-* a new message(es) can be posted for delivering. To post new messages at this step no Diameter server request and  no mproc rules will be applied
+* `HrSri trigger` : triggers inside HomeRouting procedure when a successfull SRI response from a local HLR has received. At this trigger HomeRouting procedure can be bypassed (this means that an original IMSI / NetworkNodeNumber will be returned to a remote SMSC GW and no MT messages will be delivered to a local SMSC GW).
 
-Only after actions applying messages will be stored into a database or/and delivered to a destination. 
+* `Arrival trigger` : triggers when a message arrives in SMSC GW and has been already processed (accepted) by Diameter server (if Diameter server is configured). Following actions are possible: 
 
-* `onPostImsiRequest` : When a successful SRI response has been received from HLR for an SS7 destination message.
-  At this step a message can be dropped (to prevent further delivery). This can be very useful feature to prevent SMS being delivered to off-net or roaming subscribers.
-* `onPostDelivery` : When a message delivery was succeeded or failed.
-  At this step a new message(es) can be posted  for delivering (it can be for example some delivery report). | | 
+** a message can be dropped (a success response will be returned to a message originator)
+** a message can be rejected (a reject response will be returned to a message originator)
+** most of a message parameters can be updated (for example destination address or even a message content).
+** changing of networkId will lead of message routing to another networkId area (see chapter <<_routing_fundamentals>>). It this trigger routing is preformed based on message delivery address or other message attributes.
+** a new message(es) can be posted for delivering. To post new messages at this step no Diameter server request and  no mproc rules will be applied. In case of a message is a delivery receipt it is possible to parse and get receipt content and obtain an original message (that can be resent if needed).
+
+* `PreDelivery trigger` : triggers when a message is going to be delivered as a first or next delivery attempt. This trigger for a message can be in some time after an Arrival trigger and in this trigger we can perform more accurate checking of actual delivery situation of SMSC GW. Following actions are possible:
+
+** a message can be dropped without a delivery attempt
+** a message can be rerouted to another networkId area for delivering
+** a new message(es) can be posted for delivering
+
+* `Imsi trigger` : triggers inside MT procedure after when a successful SRI response has been received from remore HLR for an SS7 destination message.
+** a message can be dropped without a delivery attempt (with reporing by delivery receipts and CDRs)
+** a message can be rerouted to another networkId area for delivering
+
+* `DeliveryTempFailure trigger` : triggers after a message delivery attempts with a temporary failure result. Following actions are possible:
+
+** a message can be dropped without further delivery attempts
+** a message can be rerouted to another networkId area for new delivering attempt right now
+** a new message(es) can be posted for delivering
+
+* `Delivery trigger` : triggers after a message delivery was succeeded or permanently failed. Following actions are possible:
+
+** a message can be rerouted to another networkId area for new delivering attempt right now (this is possible only in delivery failure case)
+** a new message(es) can be posted for delivering (for example a custom delivery receipt)
+
 
 SMSC comes with predifined set of mproc rules (default implementation) (see chapter <<_mproc_rules_default>>). However users can make their own customized implementation of mproc rules by using java programming and implementing provided interfaces  (see chapter <<_mproc_rules_customized>>). All mproc rules implementation has its Class Name.
 The Class Name of a default implementation is "mproc".  This is the name by which users can create new mproc rule instances.
@@ -252,14 +270,14 @@ b) Actions, which will be applied to messages.
 [[_mproc_rules_customized]]
 === Customized message processing rules
 
-Default mproc rules allows to change the properties of a message in pre defined way, however if user wants to achieve more, SMSC allows users to implement their own  custom logic.
+Default mproc rules allows to change the properties of a message in pre defined way, however if a user wants to achieve more, SMSC allows users to implement their own  custom logic.
 Below steps describes how to implement custom mproc rules. 
 
 
 
 .Procedure: Steps for custom mproc rules implementing
 . User should implement the business logic as java code.
-There are couple of interfaces exposed by SMSC, [class]`MProcRuleFactory` and [class]`MProcRule` that must be implemented and add the custom business logic.
+There is a couple of interfaces exposed by SMSC, [class]`MProcRuleFactory` and [class]`MProcRule` that must be implemented and add the custom business logic.
 User needs to cover two parts of rules usage - a rule configuring part and a rule applying part. 
 +
 [IMPORTANT]
@@ -351,21 +369,48 @@ public interface MProcRule extends MProcRuleMBean {
 
     void setId(int val);
 
+    // rule matchers - they specifies if this rule processes a trigger
+
+    /**
+     * @return true if the mproc rule fits to a message for the phase SMSC GW receives SRI
+     * response from a local HLR in HR procedure
+     */
+    boolean matchesPostHrSri(MProcMessage message);
+
     /**
      * @return true if the mproc rule fits to a message when a message has just come to SMSC
      */
     boolean matchesPostArrival(MProcMessage message);
 
     /**
-     * @return true if the mproc rule fits to a message when IMSI / NNN has been received from HLR
+     * @return true if the mproc rule fits to a message before a message delivery will start
+     */
+    boolean matchesPostPreDelivery(MProcMessage message);
+
+    /**
+     * @return true if the mproc rule fits to a message when IMSI / NNN has been received
+     * from HLR (succeeded SRI response)
      */
     boolean matchesPostImsiRequest(MProcMessage message);
 
     /**
-     * @return true if the mproc rule fits to a message when a message has just been delivered
-     * (or delivery failure)
+     * @return true if the mproc rule fits to a message when a message delivery was
+     * ended (success or permanent delivery failure)
      */
     boolean matchesPostDelivery(MProcMessage message);
+
+    /**
+     * @return true if the mproc rule fits to a message when a message has temporary
+     * delivery failure
+     */
+    boolean matchesPostDeliveryTempFailure(MProcMessage message);
+
+    // rule processors - we will put code for processing there
+
+    /**
+     * the event occurs when SMSC GW receives SRI response from a local HLR in HR procedure
+     */
+    void onPostHrSri(PostHrSriProcessor factory, MProcMessage message) throws Exception;
 
     /**
      * the event occurs when a message has just come to SMSC
@@ -373,24 +418,37 @@ public interface MProcRule extends MProcRuleMBean {
     void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception;
 
     /**
-     * the event occurs when IMSI / NNN has been received from HLR
+     * the event occurs before a message delivery will start
+     */
+    void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception;
+
+    /**
+     * the event occurs when IMSI / NNN has been received from HLR (succeeded SRI response)
      */
     void onPostImsiRequest(PostImsiProcessor factory, MProcMessage message) throws Exception;
 
     /**
-     * the event occurs when a message has just been delivered (or delivery failure)
+     * the event occurs when a message delivery was ended (success or permanent delivery
+     * failure)
      */
     void onPostDelivery(PostDeliveryProcessor factory, MProcMessage message) throws Exception;
 
     /**
-     * this method must implement setting of rule parameters as for provided CLI string at
-     * the step of rule creation
+     * the event occurs when a message has temporary delivery failure
+     */
+    void onPostDeliveryTempFailure(PostDeliveryTempFailureProcessor factory, MProcMessage message) throws Exception;
+
+    // applying of rule parameters from CLI / GUI interfaces
+
+    /**
+     * this method must implement setting of rule parameters as for provided CLI string
+     * at the step of rule creation
      */
     void setInitialRuleParameters(String parametersString) throws Exception;
 
     /**
-     * this method must implement setting of rule parameters as for provided CLI string at
-     * the step of rules modifying
+     * this method must implement setting of rule parameters as for provided CLI string
+     * at the step of rules modifying
      */
     void updateRuleParameters(String parametersString) throws Exception;
 
@@ -412,26 +470,46 @@ public interface MProcRuleMBean {
     int getId();
 
     /**
-     * @return Rule class of the mproc rule ("default" or other when a customer implementation)
+     * @return Rule class of the mproc rule ("default" or other when a customer
+     * implementation)
      */
     String getRuleClassName();
 
     /**
-     * @return true if the mproc rule is used for the phase when a message has just come to SMSC
+     * @return true if the mproc rule is used for the phase when a message has just come
+     * to SMSC
      */
     boolean isForPostArrivalState();
 
     /**
-     * @return true if the mproc rule is used for the phase when IMSI / NNN has been received
-     * from HLR
+     * @return true if the mproc rule is used for the phase SMSC GW receives SRI response
+     * from a local HLR in HR procedure 
+     */
+    boolean isForPostHrSriState();
+
+    /**
+     * @return true if the mproc rule is used for the phase before a message delivery
+     * will start
+     */
+    boolean isForPostPreDeliveryState();
+
+    /**
+     * @return true if the mproc rule is used for the phase when IMSI / NNN has been
+     * received from HLR (succeeded SRI response)
      */
     boolean isForPostImsiRequestState();
 
     /**
-     * @return true if the mproc rule is used for the phase when a message has just been
-     * delivered (or delivery failure)
+     * @return true if the mproc rule is used for the phase when a message delivery was ended
+     * (success or permanent delivery failure)
      */
     boolean isForPostDeliveryState();
+
+    /**
+     * @return true if the mproc rule is used for the phase when a message has temporary
+     * delivery failure
+     */
+    boolean isForPostDeliveryTempFailureState();
 
     /**
      * @return rule parameters as CLI return string
@@ -448,14 +526,14 @@ public interface MProcRuleMBean {
 | getId(), setId() | mproc rule id getter and setter. id value is unique for each mproc rule inside SMSC GW.
 | getRuleClassName() | Returns the rule class name ("testrule" in this example)
 | getRuleParameters(), setInitialRuleParameters(), updateRuleParameters() | Getter and setters of configured parameters for a rule instance. Parameters are formed as a plain text string, that can be provided by CLI interface. In this example we need to configure two parameters par1 and par2. Let's specify the parameters strinf as "par1" and "par2" (two values after a space, for example "11 34").
-| isForPostArrivalState(), isForPostImsiRequestState(), isForPostDeliveryState() | Returns true if this rule affects to a message processing step (for onPostArrival, onPostDelivery and onPostImsi requests) and false if not. You have to check configured parameters of a rule and return a proper value
-| matchesPostArrival(MProcMessage message), matchesPostImsiRequest(MProcMessage message), matchesPostDelivery(MProcMessage message)| These methods must return true if rule should be applied false if not (for onPostArrival, onPostImsi and onPostDelivery requests).
-| onPostArrival(), onPostImsiRequest(), onPostDelivery()| These methods are needed for implementing of rule applying actions.
+| isForPostHrSriState(), isForPostArrivalState(), isForPostPreDeliveryState(), isForPostImsiRequestState(), isForPostDeliveryState(), isForPostDeliveryTempFailureState() | Returns true if this rule affects to a message processing trigger (for HrSri, Arrival, PreDelivery, Imsi, Delivery and DeliveryTempFailure triggers) and false if not. You have to check configured parameters of a rule and return a proper value
+| matchesPostHrSri(MProcMessage message), matchesPostArrival(MProcMessage message), matchesPostPreDelivery(MProcMessage message), matchesPostImsiRequest(MProcMessage message), matchesPostDelivery(MProcMessage message), matchesPostDeliveryTempFailure(MProcMessage message) | These methods must return true if rule should be applied or false if not (for HrSri, Arrival, PreDelivery, Imsi, Delivery and DeliveryTempFailure triggers).
+| onPostHrSri(), onPostArrival(), onPostPreDelivery(), onPostImsiRequest(), onPostDelivery(), onPostDeliveryTempFailure() | These methods are needed for implementing of rule applying actions.
 |===
 Id parameter and custom rule parameters ("par1" and "par2" in this example) must be stored into xml config file (it is located in [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/data/SmscManagement_mproc.xml_). For this user needs to implement several extra methods that will be described later. 
 
 . Reusing of base [class]`MProcRuleBaseImpl` class.
-  It is recommended for your custom [class]`MProcRuleTestImpl` to extend  [class]`MProcRuleBaseImpl` provided by SMSC. [class]`MProcRuleBaseImpl` class contains some useful methods that cover getter and setter  and code for persisting of this parameter into xml config file (read() and write() methods), default stubs for `matches()` and `onPost*()` methods and a service method for splitting of a parameters plain text string into subparameters (splitParametersString()).  
+  It is recommended for your custom [class]`MProcRuleTestImpl` to extend  [class]`MProcRuleBaseImpl` provided by SMSC. [class]`MProcRuleBaseImpl` class contains some useful methods that cover code for persisting of its parameters into xml config file (read() and write() methods), default stubs for `matches()` and `onPost*()` methods and a service method for splitting of a parameters plain text string into subparameters (splitParametersString()).  
 +
 Here is the new template of [class]`MProcRuleTestImpl` class implementation that reuses the base class [class]`MProcRuleBaseImpl`: 
 +
@@ -481,7 +559,7 @@ Below is an example:
         return MProcRuleFactoryTestImpl.CLASS_NAME;
     }
 ----
-. Implementing of methods that cover getter / setters for message custom parameters and storing them into xml config file.
+. Implementing of methods that cover getters / setters for message custom parameters and storing them into xml config file.
 +
 In the example setInitialRuleParameters() and updateRuleParameters() methods are implemented in the same way.
 You can implement them in different ways so that updateRuleParameters() method can accept not the whole set of parameters but only that ones that a user wants to change. 
@@ -640,6 +718,51 @@ public interface MProcMessage {
 
     String getOriginatorSccpAddress();
 
+    String getImsiDigits();
+
+    String getNnnDigits();
+
+    /**
+     * @return Procedure that has given an error / success
+     */
+    ProcessingType getProcessingType();
+
+    /**
+     * @return 0 in case of delivery success or error code from ErrorCode in case
+     * of delivery failure
+     */
+    int getErrorCode();
+
+    // delivery receipt staff
+
+    /**
+     * @return true if a message is a SMPP delivery receipt received from remote SMSC GW
+     */
+    boolean isDeliveryReceipt();
+
+    /**
+     * @return if a message is a SMPP delivery receipt received from remote SMSC GW then
+     * this method will parse the delivery receipt and return the parsed content
+     */
+    DeliveryReceiptData getDeliveryReceiptData();
+
+    /**
+     * @return if a message is a SMPP delivery receipt received from remote SMSC GW then
+     * this method will return a local message
+     * id for the original message (for which we have the receipt)
+     */
+    Long getReceiptLocalMessageId();
+
+    /**
+     * Returns a copy of previousely sent to a peer message by there messageId.
+     * This messageId is usually obtained from a
+     * delivery receipt from the peer.
+     *
+     * @param messageId
+     * @return
+     */
+    MProcMessage getOriginMessageForDeliveryReceipt(long messageId);
+
 }
 ---- 
 . Implementing of methods that make some actions: In example above this is `onPostArrival()` and the action is adding "par2" prefix into destination address digits.
@@ -654,7 +777,35 @@ These methods will be invoked for all messages that match rule's conditions.
         factory.updateMessageDestAddr(message, destAddr);
     }
 ----
-In `onPostArrival()`, `onPostImsiRequest()` and `onPostDelivery()` methods user can use provided interfaces  [class]`PostArrivalProcessor`, [class]`PostImsiProcessor` and [class]`PostDeliveryProcessor` that provide methods for message processing / adding / dropping / rejecting. 
+In  `onPostHrSri()`, `onPostArrival()`, `onPostPreDelivery()`, `onPostImsiRequest()` and `onPostDelivery()`, `onPostDeliveryTempFailure()` methods user can use provided interfaces  [class]`PostHrSriProcessor`, [class]`PostArrivalProcessor`, [class]`PostPreDeliveryProcessor`, [class]`PostImsiProcessor` and [class]`PostDeliveryProcessor`, [class]`onPostDeliveryTempFailure` that provide methods for message processing / adding / dropping / rejecting. 
++
+** [class]`PostHrSriProcessor` interface content: 
++
+[source,java]
+----
+
+package org.mobicents.smsc.mproc;
+
+import org.apache.log4j.Logger;
+
+public interface PostHrSriProcessor {
+
+    // access to environmental parameters
+    /**
+     * @return the logger that an application can use for logging info into server.log
+     */
+    Logger getLogger();
+
+    // actions
+    /**
+     * HR procedure will be bypassed (original IMSI and NNN will be sent as SRI response).
+     *
+     * @param newNetworkId
+     */
+    void byPassHr() throws MProcRuleException;
+
+}
+----
 +
 ** [class]`PostArrivalProcessor` interface content: 
 +
@@ -680,19 +831,18 @@ public interface PostArrivalProcessor {
      * Drop the message. Success response (that a message is accepted) will be return to
      * a message originator.
      */
-    void dropMessage();
+    void dropMessage() throws MProcRuleException;
 
     /**
      * Drop the message. A reject will be sent to a message originator.
      */
-    void rejectMessage();
+    void rejectMessage() throws MProcRuleException;
 
     // updating of a message section
     void updateMessageNetworkId(MProcMessage message, int newNetworkId);
 
     /**
-     * Updating of destination address message TON. In case of bad value (<0 or >6)
-     * MProcRuleException will be thrown
+     * Updating of destination address message TON. In case of bad value (<0 or >6) MProcRuleException will be thrown
      * 
      * @param message
      * @param newDestTon
@@ -712,8 +862,9 @@ public interface PostArrivalProcessor {
     void updateMessageDestAddrNpi(MProcMessage message, int newDestNpi) throws MProcRuleException;
 
     /**
-     * Updating of destination address message digits. Value can not be null and must have length
-     * 1-21 characters. In case of bad value MProcRuleException will be thrown
+     * Updating of destination address message digits. Value can not be null and must have
+     * length 1-21 characters. In case of
+     * bad value MProcRuleException will be thrown
      * 
      * @param message
      * @param newDigits
@@ -722,8 +873,7 @@ public interface PostArrivalProcessor {
     void updateMessageDestAddr(MProcMessage message, String newDigits) throws MProcRuleException;
 
     /**
-     * Updating of source address message TON. In case of bad value (<0 or >6)
-     * MProcRuleException will be thrown
+     * Updating of source address message TON. In case of bad value (<0 or >6) MProcRuleException will be thrown
      * 
      * @param message
      * @param newDestTon
@@ -742,8 +892,8 @@ public interface PostArrivalProcessor {
     void updateMessageSourceAddrNpi(MProcMessage message, int newDestNpi) throws MProcRuleException;
 
     /**
-     * Updating of source address message digits. Value can not be null and must have length
-     * 1-21 characters. In case of bad value MProcRuleException will be thrown
+     * Updating of source address message digits. Value can not be null and must have length 1-21 characters. In case of
+     * bad value MProcRuleException will be thrown
      * 
      * @param message
      * @param newDigits
@@ -752,8 +902,9 @@ public interface PostArrivalProcessor {
     void updateMessageSourceAddr(MProcMessage message, String newDigits) throws MProcRuleException;
 
     /**
-     * Updating of message text. Value must not be null and must have length 0-4300. In case
-     * of bad value MProcRuleException will be thrown
+     * Updating of message text. Value must not be null and must have length 0-4300.
+     * In case of bad value MProcRuleException
+     * will be thrown
      * 
      * @param message
      * @param newShortMessageText
@@ -763,7 +914,8 @@ public interface PostArrivalProcessor {
 
     /**
      * Updating of UDH binary content. Value can be null or must have length > 0. In case
-     * of bad value MProcRuleException will be thrown
+     * of bad value MProcRuleException will
+     * be thrown
      * 
      * @param message
      * @param newShortMessageText
@@ -773,12 +925,14 @@ public interface PostArrivalProcessor {
 
     /**
      * Updating of ScheduleDeliveryTime - the time before which a message will not be
-     * delivered. This value can be null, this means that the message will be tried to
-     * delivery immediately. This value must be at least 3 hours before a delivery
+     * delivered. This value can be null, this
+     * means that the message will be tried to delivery immediately. This value must be at
+     * least 3 hours before a delivery
      * period end. If you pass the value that is later then 3 hours before a delivery
-     * period end, then 3 hours before a delivery period end will be set. If you
-     * change both ValidityPeriod and ScheduleDeliveryTime values, then you have to
-     * setup ValidityPeriod value firstly.
+     * period end, then 3 hours before a delivery
+     * period end will be set. If you change both ValidityPeriod and ScheduleDeliveryTime
+     * values, then you have to setup
+     * ValidityPeriod value firstly.
      * 
      * @param message
      * @param newScheduleDeliveryTime
@@ -786,12 +940,13 @@ public interface PostArrivalProcessor {
     void updateScheduleDeliveryTime(MProcMessage message, Date newScheduleDeliveryTime);
 
     /**
-     * Updating delivery period end time. This value can be null, this means that
-     * delivery period will be set to a default delivery period value of SMSC GW.
-     * If the value is more than max validity period that is configured for SMSC GW,
-     * then max validity period will be used instead of a provided value. If you change
-     * both ValidityPeriod and ScheduleDeliveryTime values, then you have to setup
-     * ValidityPeriod value firstly.
+     * Updating delivery period end time. This value can be null, this means that delivery
+     * period will be set to a default
+     * delivery period value of SMSC GW. If the value is more than max validity period that
+     * is configured for SMSC GW, then max
+     * validity period will be used instead of a provided value. If you change both
+     * ValidityPeriod and ScheduleDeliveryTime
+     * values, then you have to setup ValidityPeriod value firstly.
      * 
      * @param message
      * @param newValidityPeriod
@@ -806,11 +961,9 @@ public interface PostArrivalProcessor {
 
     void updateDataCodingUcs2(MProcMessage message);
 
-    void updateNationalLanguageSingleShift(MProcMessage message,
-        int newNationalLanguageSingleShift);
+    void updateNationalLanguageSingleShift(MProcMessage message, int newNationalLanguageSingleShift);
 
-    void updateNationalLanguageLockingShift(MProcMessage message,
-        int newNationalLanguageLockingShift);
+    void updateNationalLanguageLockingShift(MProcMessage message, int newNationalLanguageLockingShift);
 
     void updateEsmClass(MProcMessage message, int newEsmClass);
 
@@ -852,13 +1005,65 @@ public interface PostArrivalProcessor {
 
     /**
      * Posting a new message. To post a new message you need: create a message template
-     * by invoking of createNewMessage(), fill it and post it be invoking of
-     * postNewMessage(). For this new message no mproc rule and diameter request will
-     * be applied.
+     * by invoking of createNewMessage(), fill
+     * it and post it be invoking of postNewMessage(). For this new message no mproc rule
+     * and diameter request will be applied.
      */
-    void postNewMessage(MProcNewMessage message);
+    void postNewMessage(MProcNewMessage message) throws MProcRuleException;
+
 }
 ----
+
+** [class]`PostPreDeliveryProcessor` interface content: 
++
+[source,java]
+----
+
+package org.mobicents.smsc.mproc;
+
+import org.apache.log4j.Logger;
+
+public interface PostPreDeliveryProcessor {
+
+    // access to environmental parameters
+    /**
+     * @return the logger that an application can use for logging info into server.log
+     */
+    Logger getLogger();
+
+    // actions
+    /**
+     * Stopping of message delivery as delivery failure (generating of delivery receipts
+     * and CDRs)
+     */
+    void dropMessage() throws MProcRuleException;
+
+    /**
+     * Stopping of message delivery in this networkID and reschedule of message delivery to
+     * another networkID area
+     * @param newNetworkId
+     */
+    void rerouteMessage(int newNetworkId) throws MProcRuleException;
+
+    /**
+     * Creating a new message template for filling and sending by postNewMessage() method
+     */
+    MProcNewMessage createNewEmptyMessage(OrigType originationType);
+
+    MProcNewMessage createNewCopyMessage(MProcMessage message);
+
+    MProcNewMessage createNewResponseMessage(MProcMessage message);
+
+    /**
+     * Posting a new message. To post a new message you need: create a message template
+     * by invoking of createNewMessage(), fill
+     * it and post it be invoking of postNewMessage(). For this new message no mproc rule
+     * and diameter request will be applied.
+     */
+    void postNewMessage(MProcNewMessage message) throws MProcRuleException;
+}
+----
+
 ** [class]`PostImsiProcessor` interface content: 
 +
 [source,java]
@@ -877,7 +1082,19 @@ public interface PostImsiProcessor {
     Logger getLogger();
 
     // actions
-    void dropMessages();
+    /**
+     * Stopping of message delivery as delivery failure (generating of delivery
+     * receipts and CDRs)
+     */
+    void dropMessage() throws MProcRuleException;
+
+    /**
+     * Stopping of message delivery in this networkID and reschedule of message delivery to
+     * another networkID area
+     * @param newNetworkId
+     */
+    void rerouteMessage(int newNetworkId) throws MProcRuleException;
+
 }
 ----
 ** [class]`PostDeliveryProcessor` interface content: 
@@ -898,8 +1115,18 @@ public interface PostDeliveryProcessor {
     Logger getLogger();
 
     boolean isDeliveryFailure();
-    
+
     // actions
+    /**
+     * Stopping of message delivery in this networkID and reschedule of
+     * message delivery
+     * to another networkID area. Applyable
+     * only for a permanent failure case (will give Exception in Success case)
+     *
+     * @param newNetworkId
+     */
+    void rerouteMessage(int newNetworkId) throws MProcRuleException;
+
     /**
      * Creating a new message template for filling and sending by postNewMessage() method
      */
@@ -911,14 +1138,65 @@ public interface PostDeliveryProcessor {
 
     /**
      * Posting a new message. To post a new message you need: create a message template
-     * by invoking of createNewMessage(), fill it and post it be invoking of
-     * postNewMessage(). For this new message no mproc rule and diameter request will
-     * be applied.
+     * by invoking of createNewMessage(), fill
+     * it and post it be invoking of postNewMessage(). For this new message no mproc rule
+     * and diameter request will be applied.
      */
-    void postNewMessage(MProcNewMessage message);
+    void postNewMessage(MProcNewMessage message) throws MProcRuleException;
 
 }
 ----
+
+** [class]`PostDeliveryTempFailureProcessor` interface content: 
++
+[source,java]
+----
+package org.mobicents.smsc.mproc;
+
+import org.apache.log4j.Logger;
+
+public interface PostDeliveryTempFailureProcessor {
+
+    // access to environmental parameters
+    /**
+     * @return the logger that an application can use for logging info into server.log
+     */
+    Logger getLogger();
+
+    // actions
+    /**
+     * Stopping of message delivery as delivery failure (generating of delivery receipts and CDRs)
+     */
+    void dropMessage() throws MProcRuleException;
+
+    /**
+     * Stopping of message delivery in this networkID and reschedule of message delivery
+     * to another networkID area
+     * @param newNetworkId
+     */
+    void rerouteMessage(int newNetworkId) throws MProcRuleException;
+
+    /**
+     * Creating a new message template for filling and sending by postNewMessage() method
+     */
+    MProcNewMessage createNewEmptyMessage(OrigType originationType);
+
+    MProcNewMessage createNewCopyMessage(MProcMessage message);
+
+    MProcNewMessage createNewResponseMessage(MProcMessage message);
+
+    /**
+     * Posting a new message. To post a new message you need: create a message template
+     * by invoking of createNewMessage(), fill
+     * it and post it be invoking of postNewMessage(). For this new message no mproc rule
+     * and diameter request will be applied.
+     */
+    void postNewMessage(MProcNewMessage message) throws MProcRuleException;
+
+}
+----
+
+
 . Once all the source code is fully implemented, user should deploy it.
  
 

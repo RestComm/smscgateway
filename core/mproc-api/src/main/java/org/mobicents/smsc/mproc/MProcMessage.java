@@ -93,12 +93,30 @@ public interface MProcMessage {
 
     // delivery receipt staff
 
+    /**
+     * @return true if a message is a SMPP delivery receipt received from remote SMSC GW
+     */
     boolean isDeliveryReceipt();
 
+    /**
+     * @return if a message is a SMPP delivery receipt received from remote SMSC GW then this method will parse the delivery
+     *         receipt and return the parsed content
+     */
     DeliveryReceiptData getDeliveryReceiptData();
 
+    /**
+     * @return if a message is a SMPP delivery receipt received from remote SMSC GW then this method will return a local message
+     *         id for the original message (for which we have the receipt)
+     */
     Long getReceiptLocalMessageId();
 
+    /**
+     * Returns a copy of previousely sent to a peer message by there messageId. This messageId is usually obtained from a
+     * delivery receipt from the peer.
+     *
+     * @param messageId
+     * @return
+     */
     MProcMessage getOriginMessageForDeliveryReceipt(long messageId);
 
 }
