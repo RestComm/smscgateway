@@ -1855,6 +1855,53 @@ EXAMPLES
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+[[_dest_txhttpcharging]]
+=== HTTP Charge Settings
+
+[[_dest_txhttpcharging_cli]]
+==== Using CLI
+
+You can set the 'HTTP Originated SMS Charged' value by issuing the command `smsc set txhttpcharging` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get txhttpcharging` which will display the value set for this property. 
+
+----
+
+Name
+	smsc set txhttpcharging
+
+SYNOPSIS
+	smsc set txhttpcharging <accept|reject|diameter>
+
+DESCRIPTION
+	This command is used to set the value of the parameter 'txHttpCharging' to
+	needed values (accepting of messages that come from a HTTP connector).
+	This value is set to accept by default.
+
+	If this is set to 
+	accept - all incoming messages are accepted without charging
+	reject - all incoming messages will be rejected
+	diameter - all incoming messages are checked by Diameter peer before delivering
+	(this option is not supported now)
+
+EXAMPLES
+	smsc set txhttpcharging accept
+----
+
+[[_dest_txhttpcharging_gui]]
+==== Using GUI
+
+.Procedure: Set HTTP originated Charge using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Diameter' tab in the GUI. 
+. You can set 'HTTP originated SMS Charged' value to accept, reject or diameter, in the corresponding list.
+  For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
+
+
 [[_smsc_gateway_server_hr]]
 == Home Routing Settings
 

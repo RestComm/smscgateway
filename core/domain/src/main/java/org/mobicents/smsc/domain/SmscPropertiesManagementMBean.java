@@ -177,6 +177,10 @@ public interface SmscPropertiesManagementMBean {
 
 	public void setTxSipChargingType(ChargingType txSmppCharging);
 
+    public MoChargingType getTxHttpCharging();
+
+    public void setTxHttpCharging(MoChargingType txHttpCharging);
+
     public GlobalTitleIndicator getGlobalTitleIndicator();
 
     public void setGlobalTitleIndicator(GlobalTitleIndicator globalTitleIndicator);

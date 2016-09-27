@@ -96,6 +96,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String HR_CHARGING = "hrCharging";
 	private static final String TX_SMPP_CHARGING = "txSmppCharging";
 	private static final String TX_SIP_CHARGING = "txSipCharging";
+    private static final String TX_HTTP_CHARGING = "txHttpCharging";
     private static final String GLOBAL_TITLE_INDICATOR = "globalTitleIndicator";
     private static final String TRANSLATION_TYPE = "translationType";
     private static final String CORRELATION_ID_LIVE_TIME = "correlationIdLiveTime";
@@ -249,11 +250,18 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	// Defualt is None: none of SMPP originated messages will be charged by OCS
 	// via Diameter before sending
 	private ChargingType txSmppCharging = ChargingType.None;
-	// Defualt is None: none of SIP originated messages will be charged by OCS
-	// via Diameter before sending
-	private ChargingType txSipCharging = ChargingType.None;
-    // Type of SCCP GlobalTytle for outgoing SCCP messages
-    private GlobalTitleIndicator globalTitleIndicator = GlobalTitleIndicator.GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS;
+    // Defualt is None: none of SIP originated messages will be charged by OCS
+    // via Diameter before sending
+    private ChargingType txSipCharging = ChargingType.None;
+    // option for processing of incoming HTTP originated messages
+    // accept - all incoming messages are accepted
+    // reject - all incoming messages will be rejected
+    // diameter - all incoming messages are checked by Diameter peer before
+    // delivering
+    private MoChargingType txHttpCharging = MoChargingType.accept;
+
+	// Type of SCCP GlobalTytle for outgoing SCCP messages
+	private GlobalTitleIndicator globalTitleIndicator = GlobalTitleIndicator.GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS;
     // TranslationType value
     private int translationType = 0;
 
@@ -793,6 +801,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
 	}
 
+    @Override
+    public MoChargingType getTxHttpCharging() {
+        return txHttpCharging;
+    }
+
+    @Override
+    public void setTxHttpCharging(MoChargingType txHttpCharging) {
+        this.txHttpCharging = txHttpCharging;
+        this.store();
+    }
+
     public GlobalTitleIndicator getGlobalTitleIndicator() {
         return globalTitleIndicator;
     }
@@ -1283,6 +1302,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.hrCharging.toString(), HR_CHARGING, String.class);
 			writer.write(this.txSmppCharging.toString(), TX_SMPP_CHARGING, String.class);
             writer.write(this.txSipCharging.toString(), TX_SIP_CHARGING, String.class);
+            writer.write(this.txHttpCharging.toString(), TX_HTTP_CHARGING, String.class);
+
             writer.write(this.globalTitleIndicator.toString(), GLOBAL_TITLE_INDICATOR, String.class);
             writer.write(this.translationType, TRANSLATION_TYPE, Integer.class);
             writer.write(this.correlationIdLiveTime, CORRELATION_ID_LIVE_TIME, Integer.class);
@@ -1520,6 +1541,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             vals = reader.read(TX_SIP_CHARGING, String.class);
             if (vals != null)
                 this.txSipCharging = Enum.valueOf(ChargingType.class, vals);
+
+            vals = reader.read(TX_HTTP_CHARGING, String.class);
+            if (vals != null) {
+                if (vals.toLowerCase().equals("false")) {
+                    this.txHttpCharging = MoChargingType.accept;
+                } else if (vals.toLowerCase().equals("true")) {
+                    this.txHttpCharging = MoChargingType.diameter;
+                } else {
+                    this.txHttpCharging = Enum.valueOf(MoChargingType.class, vals);
+                }
+            }
 
             vals = reader.read(GLOBAL_TITLE_INDICATOR, String.class);
             if (vals != null)

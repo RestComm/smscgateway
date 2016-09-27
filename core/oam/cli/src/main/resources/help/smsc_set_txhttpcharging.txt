@@ -1,0 +1,24 @@
+Name
+	smsc set txhttpcharging
+
+SYNOPSIS
+	smsc set txhttpcharging <accept|reject|diameter>
+
+DESCRIPTION
+	This command is used to set the value of the parameter 'txHttpCharging' to
+	needed values (accepting of messages that come from a HTTP connector).
+	This value is set to accept by default.
+
+	If this is set to 
+	accept - all incoming messages are accepted without charging
+	reject - all incoming messages will be rejected
+	diameter - all incoming messages are checked by Diameter peer before delivering
+	(this option is not supported now)
+
+EXAMPLES
+	smsc set txhttpcharging accept
+
+SEE ALSO
+	smsc set mocharging, smsc set txsmppcharging
+	smsc set hrcharging, smsc set txsipcharging
+	smsc get txhttpcharging

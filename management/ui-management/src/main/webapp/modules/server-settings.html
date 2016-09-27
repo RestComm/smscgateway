@@ -421,12 +421,21 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								</span>  															
 							</div>	
 							<div id="div-charginghr" class="control-group">        						                		
-								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of the parameter 'hrcharging'. If this is accept, all Mobile Originated messages arrived by Home Routing will be accepted for further processin. If set to reject, all Mobile Originated messages arrived by Home Routing will be rejected and proper error message will be sent to peer. If set to diameter, all Mobile Originated messages arrived by Home Routing will be charged by OCS via Diameter, prior to being sent.">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of the parameter 'hrcharging'. If this is accept, all Mobile Originated messages arrived by Home Routing will be accepted for further processing. If set to reject, all Mobile Originated messages arrived by Home Routing will be rejected and proper error message will be sent to peer. If set to diameter, all Mobile Originated messages arrived by Home Routing will be charged by OCS via Diameter, prior to being sent.">
 									<span class="add-on">Home Routed SMS Charged </span>
 									<select id="charginghr" >
 										<option>accept</option>
 										<option>reject</option>
 										<option>diameter</option>
+									</select>
+								</span>  															
+							</div>
+							<div id="div-charginghttp" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of the parameter 'txhttpcharging'. If this is accept, all HTTP Originated messages will be accepted for further processing. If set to reject, all HTTP Originated messages be rejected and proper error message will be sent to peer. If set to diameter, all HTTP Originated messages will be charged by OCS via Diameter, prior to being sent.">
+									<span class="add-on">HTTP originated SMS Charged </span>
+									<select id="charginghttp" >
+										<option>accept</option>
+										<option>reject</option>
 									</select>
 								</span>  															
 							</div>							
@@ -1025,13 +1034,19 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										}
 										
 										var charginghrVar = response.value.HrCharging
-										
 										if(charginghrVar == "accept"){
 											charginghr.options[0].selected = true;
 										} else if(charginghrVar == "reject") {
 											charginghr.options[1].selected = true;
 										} else {
 											charginghr.options[2].selected = true;
+										}
+										
+										var charginghttpVar = response.value.TxHttpCharging
+										if(charginghttpVar == "accept"){
+											charginghttp.options[0].selected = true;
+										} else {
+											charginghttp.options[1].selected = true;
 										}
 									}],
 									error: function(value) {
@@ -1740,10 +1755,13 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						
 						e = document.getElementById("chargingsip");
 						var chargingsip = e.options[e.selectedIndex].text;
-						
+
 						e = document.getElementById("charginghr");
 						var charginghr = e.options[e.selectedIndex].text;
-						
+
+						e = document.getElementById("charginghttp");
+						var charginghttp = e.options[e.selectedIndex].text;
+
 						if(formInvalid) {
 							$("#login-settings-error").show();
 							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
@@ -1764,6 +1782,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "TxSmppChargingType", value: chargingesme },
 									{ type: "write", mbean: mbeanSearch, attribute: "TxSipChargingType", value: chargingsip },
 									{ type: "write", mbean: mbeanSearch, attribute: "HrCharging", value: charginghr },
+									{ type: "write", mbean: mbeanSearch, attribute: "TxHttpCharging", value: charginghttp },
 								],
 								{
 									success: function(response) {

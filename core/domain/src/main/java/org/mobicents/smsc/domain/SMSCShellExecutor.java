@@ -707,6 +707,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 				smscPropertiesManagement.setTxSmppChargingType(Enum.valueOf(ChargingType.class, options[3]));
 			} else if (parName.equals("txsipcharging")) {
 				smscPropertiesManagement.setTxSipChargingType(Enum.valueOf(ChargingType.class, options[3]));
+            } else if (parName.equals("txhttpcharging")) {
+                MoChargingType val = Enum.valueOf(MoChargingType.class, options[3]);
+                if (val != MoChargingType.diameter)
+                    smscPropertiesManagement.setTxHttpCharging(val);
 			} else if (parName.equals("diameterdestrealm")) {
 				String val = options[3];
 				smscPropertiesManagement.setDiameterDestRealm(val);
@@ -975,6 +979,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 				sb.append(smscPropertiesManagement.getTxSmppChargingType());
 			} else if (parName.equals("txsipcharging")) {
 				sb.append(smscPropertiesManagement.getTxSipChargingType());
+            } else if (parName.equals("txhttpcharging")) {
+                sb.append(smscPropertiesManagement.getTxHttpCharging());
 			} else if (parName.equals("diameterdestrealm")) {
 				sb.append(smscPropertiesManagement.getDiameterDestRealm());
 			} else if (parName.equals("diameterdesthost")) {
@@ -1245,6 +1251,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 			sb.append("txsipcharging = ");
 			sb.append(smscPropertiesManagement.getTxSipChargingType());
 			sb.append("\n");
+
+            sb.append("txhttpcharging = ");
+            sb.append(smscPropertiesManagement.getTxHttpCharging());
+            sb.append("\n");
 
 			sb.append("diameterdestrealm = ");
 			sb.append(smscPropertiesManagement.getDiameterDestRealm());
