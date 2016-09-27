@@ -1255,6 +1255,97 @@ Home Routing enables operators to offer a full range of value-added services to 
 You need to configure SMSC GW before you can use SMS Home Routing.
 For more details refer to <<_smsc_gateway_server_hr>>.
 
+[[_http_interface_description]]
+== HTTP interface description
+
+[[_http_interface_description_send_sms]]
+=== Send SMS
+
+Send message API is responsible for sending SMS messages. To send message we should
+create and send HTTP request in proper format. Supported HTTP methods
+are GET and POST. Request URL must have “sendSms” context and contain all of mandatory parameters.
+
+.Mandatory parameters:
+[cols="1,4", frame="all", options="header"]
+|===
+| Parameter name | Meaning
+| userid | Your register email in our platform (not used now)
+| password | Your account password (not used now)
+| msg | Message body (message text)
+| sender | Message source address digits
+| to | Message destination address digits. We can use multiple comma separated destinations. Maximum number of destinations is 50 000 for POST method, in GET it is limited to maximum length of URL. Destinations in international format are without "+" or "00" in beginning, e.g. 962788002265.
+|===
+
+.Optional parameters:
+[cols="1,4", frame="all", options="header"]
+|===
+| Parameter name | Meaning
+| format | Values can be "String" or "json", default is "String"
+| encoding | Values can be "GSM7" (usually used for english letters and digits) or "UCS2" (used for arabic, cyrillic, etc letters), default is "GSM7".
+|===
+
+Format parameter controls the response format to the request. Response contains the status of request, it can be “Success” or “Error”. In case of error it contains an error code and error message. In case of success response contains a list of pairs: “request ID / destination
+ID:destination”.
+
+Request examples:
+[subs="attributes"]
+----
+http://127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user1&password=password&msg=exampleMessage_01&sender=1234&to=1111,2222,3333,4444,6666
+
+http://127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user1&password=password&msg=exampleMessage_02&format=String&encoding=GSM7&sender=1234&to=1111
+
+http://127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user1&password=password&msg=exampleMessage_03&format=json&encoding=UCS2&sender=4321&to=6666,6667
+----
+
+Response examples:
+
+----
+{"Success","444":"2016","222":"2014","111":"2013","333":"2015"}
+
+error:6,request not accepted
+----
+
+[[_http_interface_description_get_message_status]]
+=== Get message status
+
+Get message status API is responsible for checking sent messages status. To check message
+status we should create and send HTTP request in proper format. Supported HTTP methods are GET and POST. Request URL must have "msgQuery" context and contain all of mandatory parameters.
+
+.Mandatory parameters:
+[cols="1,4", frame="all", options="header"]
+|===
+| Parameter name | Meaning
+| userid | Your register email in our platform (not used now)
+| password | Your account password (not used now)
+| msgid | ID of message which will be returned. Only one ID in a parameter is allowed
+|===
+
+.Optional parameters:
+[cols="1,4", frame="all", options="header"]
+|===
+| Parameter name | Meaning
+| format | Values can be "String" or "json", default is "String"
+|===
+
+Response contains the status of request, it can be "Success" or "Error". It contains also a status message.
+
+Request examples:
+
+[subs="attributes"]
+----
+http://127.0.0.1:8080/{this-httpprefix}/msgQuery?userid=100&password=pass&msgid=2005
+
+http://127.0.0.1:8080/{this-httpprefix}/msgQuery?userid=100&password=pass&msgid=534&format=json
+----
+
+Response examples:
+
+----
+{"Success","msg sent"}
+
+error:4,message ID not exists
+----
+
 [[_diameter_ocs_server]]
 == Interworking with Diameter OCS server
 
