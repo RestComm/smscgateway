@@ -28,6 +28,7 @@ import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
+import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
@@ -147,14 +148,23 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpServletRequest request = event.getRequest();
         // decision if getStatus or sendMessage
         try {
-            String requestURL = request.getRequestURL().toString();
-            String[] tmp = requestURL.split("\\?");
-            if(tmp[0].endsWith(SEND_SMS)){
-                this.processHttpSendMessageEvent(event, aci);
-            }else if(tmp[0].endsWith(MSG_QUERY)){
-                this.processHttpGetMessageIdStatusEvent(event, aci);
+            if (checkCharging()) {
+                try {
+                    final String message = "The operation is forbidden";
+                    HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             } else {
-                throw new HttpApiException("Unknown operation on the HTTP API");
+                String requestURL = request.getRequestURL().toString();
+                String[] tmp = requestURL.split("\\?");
+                if (tmp[0].endsWith(SEND_SMS)) {
+                    this.processHttpSendMessageEvent(event, aci);
+                } else if (tmp[0].endsWith(MSG_QUERY)) {
+                    this.processHttpGetMessageIdStatusEvent(event, aci);
+                } else {
+                    throw new HttpApiException("Unknown operation on the HTTP API");
+                }
             }
         } catch (HttpApiException e){
             try {
@@ -178,14 +188,23 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpServletRequest request = event.getRequest();
         // decision if getStatus or sendMessage
         try {
-            String requestURL = request.getRequestURL().toString();
-            requestURL.endsWith(SEND_SMS);
-            if (requestURL.endsWith(SEND_SMS)) {
-                this.processHttpSendMessageEvent(event, aci);
-            } else if (requestURL.endsWith(MSG_QUERY)) {
-                this.processHttpGetMessageIdStatusEvent(event, aci);
+            if (checkCharging()) {
+                try {
+                    final String message = "The operation is forbidden";
+                    HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             } else {
-                throw new HttpApiException("Unknown operation on the HTTP API. Parameter set from the request does not match any of the HTTP API services.");
+                String requestURL = request.getRequestURL().toString();
+                requestURL.endsWith(SEND_SMS);
+                if (requestURL.endsWith(SEND_SMS)) {
+                    this.processHttpSendMessageEvent(event, aci);
+                } else if (requestURL.endsWith(MSG_QUERY)) {
+                    this.processHttpGetMessageIdStatusEvent(event, aci);
+                } else {
+                    throw new HttpApiException("Unknown operation on the HTTP API. Parameter set from the request does not match any of the HTTP API services.");
+                }
             }
         } catch (HttpApiException e) {
             try {
@@ -202,6 +221,10 @@ public abstract class TxHttpServerSbb implements Sbb {
                 ex.printStackTrace();
             }
         }
+    }
+
+    private boolean checkCharging() {
+        return smscPropertiesManagement.getTxHttpCharging() != MoChargingType.accept;
     }
 
     private void processHttpSendMessageEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException {
