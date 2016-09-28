@@ -29,7 +29,7 @@ public class TxHttpServerSbbTest {
     private boolean cassandraDbInited;
 
     // test constants
-    private static final String ENCODING_UCS2 = "UCS-2";
+    private static final String ENCODING_UCS2 = "UCS2";
     private static final String ENCODING_GSM7 = "GSM7";
 
     private static final String FORMAT_STRING = "String";
@@ -393,7 +393,7 @@ public class TxHttpServerSbbTest {
         String urlEncoded = null;
         urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_JSON, ENCODING_GSM7, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_JSON, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_MULTIPLE);
 //        request.setContentType("application/x-www-form-urlencoded");
 //        request.setCharacterEncoding("UTF-8");
         event.setRequest(request);
@@ -425,7 +425,7 @@ public class TxHttpServerSbbTest {
         String urlEncoded = null;
         urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_GSM7, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_MULTIPLE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -455,7 +455,7 @@ public class TxHttpServerSbbTest {
             String urlEncoded = null;
             urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
 
-            MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_GSM7, SENDER_ID_DEFAULT, TO_MULTIPLE);
+            MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_MULTIPLE);
             event.setRequest(request);
 
             MockHttpServletResponse response = new MockHttpServletResponse();
