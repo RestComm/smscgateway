@@ -137,7 +137,7 @@ public class TxHttpServerSbbTest {
         Assert.assertTrue(isValid(resp, FORMAT_STRING, false), "Response is not valid");
     }
 
-    //@Test
+    @Test
     public void sendMessageGETForbiddenTest() throws UnsupportedEncodingException {
         System.out.println("sendMessageGETForbiddenTest");
         if (!this.cassandraDbInited) {
@@ -155,12 +155,13 @@ public class TxHttpServerSbbTest {
         event.setResponse(response);
 
         // perform the action
-        //this.sbb.setForbidden();
+        this.sbb.setForbidden(true);
         this.sbb.onHttpGet(event, aci);
 
         MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
         printResponseData(resp);
         Assert.assertFalse(isValid(resp, FORMAT_STRING, false), "Response is not valid");
+        this.sbb.setForbidden(false);
     }
 
     @Test

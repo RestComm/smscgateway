@@ -35,8 +35,9 @@ public class TxHttpServerSbbProxy extends TxHttpServerSbb {
         return null;
     }
 
-    public void setForbidden() {
-        TxHttpServerSbb.smscPropertiesManagement.setTxHttpCharging(MoChargingType.reject);
+    public void setForbidden(boolean isForbidden) {
+        MoChargingType type = (!isForbidden ? MoChargingType.accept : MoChargingType.reject);
+        TxHttpServerSbb.smscPropertiesManagement.setTxHttpCharging(type);
     }
 
     @Override
