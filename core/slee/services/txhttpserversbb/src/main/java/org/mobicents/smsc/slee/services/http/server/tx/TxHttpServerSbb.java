@@ -149,12 +149,8 @@ public abstract class TxHttpServerSbb implements Sbb {
         // decision if getStatus or sendMessage
         try {
             if (checkCharging()) {
-                try {
-                    final String message = "The operation is forbidden";
-                    HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                final String message = "The operation is forbidden";
+                HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
             } else {
                 String requestURL = request.getRequestURL().toString();
                 String[] tmp = requestURL.split("\\?");
@@ -166,7 +162,8 @@ public abstract class TxHttpServerSbb implements Sbb {
                     throw new HttpApiException("Unknown operation on the HTTP API");
                 }
             }
-        } catch (HttpApiException e){
+        } catch (Exception e){
+            this.logger.severe("Error in onHttpGet", e);
             try {
                 HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
                 outgoingData.setStatus(Status.ERROR);
@@ -178,7 +175,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                         outgoingData.getMessage(),
                         ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                this.logger.severe("Error while sending error response", ex);
             }
         }
     }
@@ -189,12 +186,8 @@ public abstract class TxHttpServerSbb implements Sbb {
         // decision if getStatus or sendMessage
         try {
             if (checkCharging()) {
-                try {
-                    final String message = "The operation is forbidden";
-                    HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                final String message = "The operation is forbidden";
+                HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
             } else {
                 String requestURL = request.getRequestURL().toString();
                 requestURL.endsWith(SEND_SMS);
@@ -206,7 +199,8 @@ public abstract class TxHttpServerSbb implements Sbb {
                     throw new HttpApiException("Unknown operation on the HTTP API. Parameter set from the request does not match any of the HTTP API services.");
                 }
             }
-        } catch (HttpApiException e) {
+        } catch (Exception e) {
+            this.logger.severe("Error in onHttpPost", e);
             try {
                 HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
                 outgoingData.setStatus(Status.ERROR);
@@ -218,7 +212,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                         outgoingData.getMessage(),
                         ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                this.logger.severe("Error while sending error response", ex);
             }
         }
     }
