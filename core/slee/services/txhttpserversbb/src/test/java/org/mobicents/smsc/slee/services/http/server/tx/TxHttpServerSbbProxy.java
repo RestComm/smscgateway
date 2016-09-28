@@ -1,6 +1,7 @@
 package org.mobicents.smsc.slee.services.http.server.tx;
 
 import org.mobicents.slee.ChildRelationExt;
+import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
@@ -32,6 +33,10 @@ public class TxHttpServerSbbProxy extends TxHttpServerSbb {
     public ChildRelationExt getChargingSbb() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void setForbidden() {
+        TxHttpServerSbb.smscPropertiesManagement.setTxHttpCharging(MoChargingType.reject);
     }
 
     @Override
