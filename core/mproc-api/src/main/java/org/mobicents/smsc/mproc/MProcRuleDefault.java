@@ -48,6 +48,24 @@ public interface MProcRuleDefault extends MProcRule {
 
     void setDestDigMask(String destDigMask);
 
+    int getSourceTonMask();
+
+    void setSourceTonMask(int sourceTonMask);
+
+    /**
+     * @return mask for source address numerical type indicator. -1 means any value
+     */
+    int getSourceNpiMask();
+
+    void setSourceNpiMask(int sourceNpiMask);
+
+    /**
+     * @return mask (a regular expression) for source address digits. "-1" means any value (same as "......")
+     */
+    String getSourceDigMask();
+
+    void setSourceDigMask(String sourceDigMask);
+
     /**
      * @return mask for message originatingMask (SMPP, SIP, MO, HR SS7). null (CLI "-1") means any value
      */

@@ -55,6 +55,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String DEST_TON_MASK = "destTonMask";
     private static final String DEST_NPI_MASK = "destNpiMask";
     private static final String DEST_DIG_MASK = "destDigMask";
+    private static final String SOURCE_TON_MASK = "sourceTonMask";
+    private static final String SOURCE_NPI_MASK = "sourceNpiMask";
+    private static final String SOURCE_DIG_MASK = "sourceDigMask";
     private static final String ORIGINATING_MASK = "originatingMask";
     private static final String NETWORK_ID_MASK = "networkIdMask";
     private static final String ORIGIN_NETWORK_ID_MASK = "originNetworkIdMask";
@@ -94,6 +97,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private int destTonMask = -1;
     private int destNpiMask = -1;
     private String destDigMask = "-1";
+    private int sourceTonMask = -1;
+    private int sourceNpiMask = -1;
+    private String sourceDigMask = "-1";
     private OrigType originatingMask = null;
     private int networkIdMask = -1;
     private int originNetworkIdMask = -1;
@@ -117,6 +123,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private boolean hrByPass = false;
 
     private Pattern destDigMaskPattern;
+    private Pattern sourceDigMaskPattern;
     private Pattern origEsmeNameMaskPattern;
     private Pattern originatorSccpAddressMaskPattern;
     private Pattern imsiDigitsMaskPattern;
@@ -160,6 +167,41 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
     public void setDestDigMask(String destDigMask) {
         this.destDigMask = destDigMask;
+
+        this.resetPattern();
+    }
+
+    /**
+     * @return mask for source address type of number. -1 means any value
+     */
+    public int getSourceTonMask() {
+        return sourceTonMask;
+    }
+
+    public void setSourceTonMask(int sourceonMask) {
+        this.sourceTonMask = sourceTonMask;
+    }
+
+    /**
+     * @return mask for source address numerical type indicator. -1 means any value
+     */
+    public int getSourceNpiMask() {
+        return sourceNpiMask;
+    }
+
+    public void setSourceNpiMask(int sourceNpiMask) {
+        this.sourceNpiMask = sourceNpiMask;
+    }
+
+    /**
+     * @return mask (a regular expression) for source address digits. "-1" means any value (same as "......")
+     */
+    public String getSourceDigMask() {
+        return sourceDigMask;
+    }
+
+    public void setSourceDigMask(String sourceDigMask) {
+        this.sourceDigMask = sourceDigMask;
 
         this.resetPattern();
     }
@@ -436,6 +478,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             this.destDigMaskPattern = null;
         }
 
+        if (this.sourceDigMask != null && !this.sourceDigMask.equals("") && !this.sourceDigMask.equals("-1")) {
+            this.sourceDigMaskPattern = Pattern.compile(this.sourceDigMask);
+        } else {
+            this.sourceDigMaskPattern = null;
+        }
+
         if (this.origEsmeNameMask != null && !this.origEsmeNameMask.equals("") && !this.origEsmeNameMask.equals("-1")) {
             this.origEsmeNameMaskPattern = Pattern.compile(this.origEsmeNameMask);
         } else {
@@ -476,7 +524,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         }
     }
 
-    protected void setRuleParameters(int destTonMask, int destNpiMask, String destDigMask, OrigType originatingMask,
+    protected void setRuleParameters(int destTonMask, int destNpiMask, String destDigMask,int sourceTonMask, int sourceNpiMask, String sourceDigMask, OrigType originatingMask,
             int networkIdMask, int originNetworkIdMask, String origEsmeNameMask, String originatorSccpAddressMask,
             String imsiDigitsMask, String nnnDigitsMask, ProcessingType processingType, String errorCode, int newNetworkId,
             int newDestTon, int newDestNpi, String addDestDigPrefix, boolean makeCopy, boolean hrByPass, boolean dropAfterSri,
@@ -484,6 +532,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.destTonMask = destTonMask;
         this.destNpiMask = destNpiMask;
         this.destDigMask = destDigMask;
+        this.sourceTonMask = sourceTonMask;
+        this.sourceNpiMask = sourceNpiMask;
+        this.sourceDigMask = sourceDigMask;
         this.originatingMask = originatingMask;
         this.networkIdMask = networkIdMask;
         this.originNetworkIdMask = originNetworkIdMask;
@@ -571,6 +622,17 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             if (message.getDestAddr() == null)
                 return false;
             Matcher m = this.destDigMaskPattern.matcher(message.getDestAddr());
+            if (!m.matches())
+                return false;
+        }
+        if (sourceTonMask != -1 && sourceTonMask != message.getSourceAddrTon())
+            return false;
+        if (sourceNpiMask != -1 && sourceNpiMask != message.getSourceAddrNpi())
+            return false;
+        if (sourceDigMaskPattern != null) {
+            if (message.getSourceAddr() == null)
+                return false;
+            Matcher m = this.sourceDigMaskPattern.matcher(message.getSourceAddr());
             if (!m.matches())
                 return false;
         }
@@ -810,6 +872,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int destTonMask = -1;
         int destNpiMask = -1;
         String destDigMask = "-1";
+        int sourceTonMask = -1;
+        int sourceNpiMask = -1;
+        String sourceDigMask = "-1";
         String originatingMask = "-1";
         int networkIdMask = -1;
         int originNetworkIdMask = -1;
@@ -842,6 +907,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     destNpiMask = Integer.parseInt(value);
                 } else if (command.equals("destdigmask")) {
                     destDigMask = value;
+                } else if (command.equals("sourcetonmask")) {
+                    sourceTonMask = Integer.parseInt(value);
+                } else if (command.equals("sourcenpimask")) {
+                    sourceNpiMask = Integer.parseInt(value);
+                } else if (command.equals("sourcedigmask")) {
+                    sourceDigMask = value;
                 } else if (command.equals("originatingmask")) {
                     originatingMask = value;
                 } else if (command.equals("networkidmask")) {
@@ -913,7 +984,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         } catch (Exception e) {
         }
 
-        this.setRuleParameters(destTonMask, destNpiMask, destDigMask, originatingMaskVal, networkIdMask, originNetworkIdMask,
+        this.setRuleParameters(destTonMask, destNpiMask, destDigMask, sourceTonMask, sourceNpiMask, sourceDigMask, originatingMaskVal, networkIdMask, originNetworkIdMask,
                 origEsmeNameMask, originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode,
                 newNetworkId, newDestTon, newDestNpi, addDestDigPrefix, makeCopy, hrByPass, dropAfterSri, dropAfterTempFail,
                 newNetworkIdAfterSri, newNetworkIdAfterPermFail, newNetworkIdAfterTempFail);
@@ -941,6 +1012,17 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     success = true;
                 } else if (command.equals("destdigmask")) {
                     this.setDestDigMask(value);
+                    success = true;
+                } else if (command.equals("sourcetonmask")) {
+                    int val = Integer.parseInt(value);
+                    this.setSourceTonMask(val);
+                    success = true;
+                } else if (command.equals("sourcenpimask")) {
+                    int val = Integer.parseInt(value);
+                    this.setSourceNpiMask(val);
+                    success = true;
+                } else if (command.equals("sourcedigmask")) {
+                    this.setSourceDigMask(value);
                     success = true;
                 } else if (command.equals("originatingmask")) {
                     if (value != null && value.equals("-1")) {
@@ -1060,6 +1142,15 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (this.destDigMask != null && !this.destDigMask.equals("") && !this.destDigMask.equals("-1")) {
             writeParameter(sb, parNumber++, "destDigMask", destDigMask, ", ", "=");
         }
+        if (sourceTonMask != -1) {
+            writeParameter(sb, parNumber++, "sourceTonMask", sourceTonMask, ", ", "=");
+        }
+        if (sourceNpiMask != -1) {
+            writeParameter(sb, parNumber++, "sourceNpiMask", sourceNpiMask, ", ", "=");
+        }
+        if (this.sourceDigMask != null && !this.sourceDigMask.equals("") && !this.sourceDigMask.equals("-1")) {
+            writeParameter(sb, parNumber++, "sourceDigMask", sourceDigMask, ", ", "=");
+        }
         if (originatingMask != null) {
             writeParameter(sb, parNumber++, "originatingMask", originatingMask, ", ", "=");
         }
@@ -1139,6 +1230,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.destNpiMask = xml.getAttribute(DEST_NPI_MASK, -1);
             mProcRule.destDigMask = xml.getAttribute(DEST_DIG_MASK, "-1");
 
+            mProcRule.sourceTonMask = xml.getAttribute(SOURCE_TON_MASK, -1);
+            mProcRule.sourceNpiMask = xml.getAttribute(SOURCE_NPI_MASK, -1);
+            mProcRule.sourceDigMask = xml.getAttribute(SOURCE_DIG_MASK, "-1");
+
             String val = xml.getAttribute(ORIGINATING_MASK, "");
             if (val != null) {
                 try {
@@ -1190,6 +1285,15 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
             if (mProcRule.destDigMask != null && !mProcRule.destDigMask.equals("") && !mProcRule.destDigMask.equals("-1"))
                 xml.setAttribute(DEST_DIG_MASK, mProcRule.destDigMask);
+
+            if (mProcRule.sourceTonMask != -1)
+                xml.setAttribute(SOURCE_TON_MASK, mProcRule.sourceTonMask);
+            if (mProcRule.sourceNpiMask != -1)
+                xml.setAttribute(SOURCE_NPI_MASK, mProcRule.sourceNpiMask);
+
+            if (mProcRule.sourceDigMask != null && !mProcRule.sourceDigMask.equals("") && !mProcRule.sourceDigMask.equals("-1"))
+                xml.setAttribute(SOURCE_DIG_MASK, mProcRule.sourceDigMask);
+
             if (mProcRule.originatingMask != null)
                 xml.setAttribute(ORIGINATING_MASK, mProcRule.originatingMask.toString());
 

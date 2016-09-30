@@ -166,6 +166,49 @@
 						<span class="add-on">Destination Digit Mask</span>
 						<input id="destdigmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
 					</span>				
+				</div>
+
+				<div id="div-sourcetonmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if source type of number (TON) of target SMS match's with this rule's sourcetonmask. Set value to -1 as wild card to match all the TON. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13; Default value is -1">
+						<span class="add-on">Source Type of Number (TON)</span>
+						<select id="sourcetonmask" >
+							<option value="-1">-1: Null</option>
+							<option value="0">0 : Unknown</option>
+							<option value="1">1 : International</option>
+							<option value="2">2 : National</option>
+							<option value="3">3 : Network Specific</option>
+							<option value="4">4 : Subscriber Number</option>
+							<option value="5">5 : Alphanumeric</option>
+							<option value="6">6 : Abbreviated</option>
+							<option value="7">7 : Reserved</option>
+						</select>
+					</span>	
+				</div>
+								
+				<div id="div-sourcenpimask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if source number plan indicator (NPI) of target SMS match's with this rule's sourcenpimask. Set value to -1 as wild card to match all the NPI. Valid values of TON are &#13; 0  : Unknown &#13; 1  : ISDN (E163/E164) &#13; 3  : Data (X.121) &#13; 4  : Telex (F.69) &#13; 6  : Land Mobile (E.212) &#13; 8  : National &#13; 9  : Private &#13; 10 : ERMES &#13; 14 : Internet &#13; 18 : WAP Client Id &#13; Default value is -1 ">
+						<span class="add-on">Source Number Plan Indicator (NPI)</span>
+						<select id="sourcenpimask" >
+							<option value="-1">-1 : Null</option>
+							<option value="0">0 : Unknown</option>
+							<option value="1">1 : ISDN (E163/E164)</option>
+							<option value="3">3 : Data (X.121)</option>
+							<option value="4">4 : Telex (F.69)</option>
+							<option value="6">6 : Land Mobile (E.212)</option>
+							<option value="8">8: National</option>
+							<option value="9">9 : Private</option>
+							<option value="10">10 : ERMES</option>
+							<option value="14">14 : Internet (IP)</option>
+							<option value="18">18 : WAP Client Id</option>
+						</select>
+					</span>	
+				</div>
+				
+				<div id="div-sourcedigmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if source number of target SMS match's with this rule's sourcedigmask. sourcedigmask is java regular expression. Set value to -1 or leave blank as wild card to match all the digits of target SMS source. Default value is -1">
+						<span class="add-on">Source Digit Mask</span>
+						<input id="sourcedigmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Source digits mask" />
+					</span>				
 				</div>	
 
 				<div id="div-imsidigitsmask" class="control-group">
@@ -510,6 +553,9 @@
 										var desttonmask = processRuleParameters(ruleparameters, "desttonmask");
 										var destnpimask = processRuleParameters(ruleparameters, "destnpimask");
 										var destdigmask = processRuleParameters(ruleparameters, "destdigmask");
+										var sourcetonmask = processRuleParameters(ruleparameters, "sourcetonmask");
+										var sourcenpimask = processRuleParameters(ruleparameters, "sourcenpimask");
+										var sourcedigmask = processRuleParameters(ruleparameters, "sourcedigmask");
 										var originatingmask = processRuleParameters(ruleparameters, "originatingmask");
 										originatingmask = originatingmask.toUpperCase();
 										var networkidmask = processRuleParameters(ruleparameters, "networkidmask");
@@ -641,8 +687,56 @@
 																			'</td>'+
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DestDigMask"+']\').toggle(); $(\'input[id^='+id+"DestDigMask"+']\').focus();"></i>' +
 																			'</td>'+
-																		'</tr>'+	
-																		
+																		'</tr>'+																		
+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if source type of number (TON) of target SMS match\'s with this rule\'s sourcetonmask. Set value to -1 as wild card to match all the TON. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13; Default value is -1">'+
+																				'<td style="font-size: 0.9em;">Source Type Of Number (TON)</td>'+
+																				'<td style="font-size: 0.9em; padding: 0;">'+
+																					'<div id="div-' + id +'Sourcetonmask-input" class="control-group">'+
+																					'<span id="' + id +'Sourcetonmask-input" style="display: none;">'+
+																						'<input type="text" class="input-small" value="' + sourcetonmask + '" /> ' +
+																						'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'sourcetonmask\', \'' + id+"Sourcetonmask" + '\', \'true\')"></i> ' +
+																						'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"Sourcetonmask"+']\').toggle(); $(\'input[id^='+id+"Sourcetonmask"+']\').focus();"></i>' + 
+																					'</span>'+
+																					'</div>' +
+																					'<span id="' +id + 'Sourcetonmask-text">' + sourcetonmask + '</span>'+
+																				'</td>'+
+																				'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"Sourcetonmask"+']\').toggle(); $(\'input[id^='+id+"Sourcetonmask"+']\').focus();"></i>' +
+																				'</td>'+
+																			'</tr>'+
+																			
+																			'<tr data-toggle="tooltip" title="Rule will be applied only if source number plan indicator (NPI) of target SMS match\'s with this rule\'s sourcenpimask. Set value to -1 as wild card to match all the NPI. Valid values of NPI are &#13; 0  : Unknown &#13; 1  : ISDN (E163/E164) &#13; 3  : Data (X.121) &#13; 4  : Telex (F.69) &#13; 6  : Land Mobile (E.212) &#13; 8  : National &#13; 9  : Private &#13; 10 : ERMES &#13; 14 : Internet &#13; 18 : WAP Client Id &#13; Default value is -1">'+
+																			'<td style="font-size: 0.9em;">Source Number Plan Indicator (NPI)</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'SourceNpiMask-input" class="control-group">'+
+																				'<span id="' + id +'SourceNpiMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + sourcenpimask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'sourcenpimask\', \'' + id+"SourceNpiMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"SourceNpiMask"+']\').toggle(); $(\'input[id^='+id+"SourceNpiMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'SourceNpiMask-text">' + sourcenpimask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"SourceNpiMask"+']\').toggle(); $(\'input[id^='+id+"SourceNpiMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if source number of target SMS match\'s with this rule\'s sourcedigmask. sourcedigmask is java regular expression. Set value to -1 or leave blank as wild card to match all the digits of target SMS source. Default value is -1">'+
+																			'<td style="font-size: 0.9em;">Source Digits Mask</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'SourceDigMask-input" class="control-group">'+
+																				'<span id="' + id +'SourceDigMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + sourcedigmask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'sourcedigmask\', \'' + id+"SourceDigMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"SourceDigMask"+']\').toggle(); $(\'input[id^='+id+"SourceDigMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'SourceDigMask-text">' + sourcedigmask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"SourceDigMask"+']\').toggle(); $(\'input[id^='+id+"SourceDigMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+
 																		'<tr data-toggle="tooltip" title="Rule will be applied only if IMSI digits after a successfull SRI request match\'s with this rule\'s imsidigitsmask. imsidigitsmask is java regular expression. This condition never fits if a message is not delivering to SS7 or IMSI is not obtained. Set value to null or -1 as wild card to match all the digits of IMSI. Default value is -1.">'+
 																		'<td style="font-size: 0.9em;">IMSI Digits Mask</td>'+
 																		'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1154,6 +1248,25 @@
 			parametersstring = parametersstring + " destdigmask "+destdigmask;
 		}
 		
+		var e = document.getElementById("sourcetonmask");
+		if(e.selectedIndex != -1){
+			var sourcetonmask = e.options[e.selectedIndex].value;
+			parametersstring = parametersstring + " sourcetonmask "+sourcetonmask;
+		}
+		
+		e = document.getElementById("sourcenpimask");
+		if(e.selectedIndex != -1){
+			var sourcenpimask = e.options[e.selectedIndex].value;
+			parametersstring = parametersstring + " sourcenpimask "+sourcenpimask;
+		}
+		
+		var sourcedigmask = $("#sourcedigmask").val();
+		if(sourcedigmask.trim() == "") {
+			sourcedigmask = null;		
+		} else {
+			parametersstring = parametersstring + " sourcedigmask "+sourcedigmask;
+		}
+
 		e = document.getElementById("originatingmask");
 		var originatingmask = e.options[e.selectedIndex].value;
 		if(originatingmask == "All") {

@@ -25,7 +25,9 @@ SYNOPSIS
 	- Default mproc rules implementation (<class name> is "mproc"):
 	smsc mproc add mproc <id> networkidmask <networkId value> originnetworkidmask <networkId
 	value> desttonmask <destination type of number> destnpimask <destination numbering plan
-	indicator> destdigmask <regular expression - destination number digits mask>
+	indicator> destdigmask <regular expression - destination number digits mask> sourcetonmask 
+	<source type of number> sourcenpimask <source numbering plan indicator> 
+	sourcedigmask <regular expression - source number digits mask>
 	imsidigitsmask <regular expression - imsi digits mask> nnndigitsmask <regular expression
 	- NetworkNodeNumber digits mask> originatingmask <SS7_MO | SS7_HR | SMPP | SIP | HTTP |
 	-1> origesmenamemask <regualar expression - origination ESME name mask>
@@ -53,6 +55,9 @@ PARAMETERS
 	desttonmask - an optional parameter.
 	destnpimask - an optional parameter.
 	destdigmask - an optional parameter.
+	sourcetonmask - an optional parameter.
+	sourcenpimask - an optional parameter.
+	sourcedigmask - an optional parameter.
 	imsidigitsmask - an optional parameter.
 	nnndigitsmask - an optional parameter.
 	originatingmask - an optional parameter.
@@ -112,7 +117,9 @@ SYNOPSIS
 	- Default mproc rules implementation:
 	smsc mproc modify <id> networkidmask <networkId value> originnetworkidmask <networkId
 	value> desttonmask <destination type of number> destnpimask <destination numbering plan
-	indicator> destdigmask <regular expression - destination number digits mask>
+	indicator> destdigmask <regular expression - destination number digits mask> sourcetonmask 
+	<source type of number> sourcenpimask <source numbering plan indicator> 
+	sourcedigmask <regular expression - source number digits mask>
 	imsidigitsmask <regular expression - imsi digits mask> nnndigitsmask <regular expression
 	- NetworkNodeNumber digits mask> originatingmask <SS7_MO | SS7_HR | SMPP | SIP | HTTP |
 	-1> origesmenamemask <regualar expression - origination ESME name mask>
@@ -138,6 +145,9 @@ PARAMETERS
 	desttonmask - an optional parameter.
 	destnpimask - an optional parameter.
 	destdigmask - an optional parameter.
+	sourcetonmask - an optional parameter.
+	sourcenpimask - an optional parameter.
+	sourcedigmask - an optional parameter.
 	imsidigitsmask - an optional parameter.
 	nnndigitsmask - an optional parameter.
 	originatingmask - an optional parameter.

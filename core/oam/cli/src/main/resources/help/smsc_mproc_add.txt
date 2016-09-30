@@ -8,7 +8,9 @@ SYNOPSIS
 	- Default mproc rules implementation (<class name> is "mproc"):
 	smsc mproc add mproc <id> networkidmask <networkId value> originnetworkidmask <networkId
 	value> desttonmask <destination type of number> destnpimask <destination numbering plan
-	indicator> destdigmask <regular expression - destination number digits mask>
+	indicator> destdigmask <regular expression - destination number digits mask> sourcetonmask 
+	<source type of number> sourcenpimask <source numbering plan indicator> 
+	sourcedigmask <regular expression - source number digits mask>
 	imsidigitsmask <regular expression - imsi digits mask> nnndigitsmask <regular expression
 	- NetworkNodeNumber digits mask> originatingmask <SS7_MO | SS7_HR | SMPP | SIP | HTTP |
 	-1> origesmenamemask <regualar expression - origination ESME name mask>
@@ -97,6 +99,39 @@ PARAMETERS
 					with this rule's destdigmask. destdigmask is java regular expression. Set
 					value to null or -1 as wild card to match all the digits of target SMS 
 					destination. Default value is -1.
+
+	sourcetonmask		- Rule will be applied only if source type of number (TON) 
+					of target SMS match's with this rule's sourcetonmask. Set value 
+					to -1 as wild card to match all the TON. Valid values of TON are
+						0 : Unknown
+						1 : International
+						2 : National
+						3 : Network Specific
+						4 : Subscriber
+						5 : Alphanumeric
+						6 : Abbreviated
+						7 : Reserved
+					Default value is -1.
+
+	sourcenpimask		- Rule will be applied only if source number plan indicator 
+					(NPI) of target SMS match's with this rule's sourcenpimask. Set value 
+					to -1 as wild card to match all the NPI. Valid values of TON are
+						0  : Unknown
+						1  : ISDN (E163/E164)
+						3  : Data (X.121)
+						4  : Telex (F.69)
+						6  : Land Mobile (E.212)
+						8  : National
+						9  : Private
+						10 : ERMES
+						14 : Internet
+						18 : WAP Client Id
+					Default value is -1.
+
+	sourcedigmask 	- Rule will be applied only if source number of target SMS match's 
+					with this rule's sourcedigmask. sourcedigmask is java regular expression. Set
+					value to null or -1 as wild card to match all the digits of target SMS 
+					source. Default value is -1.
 
 	imsidigitsmask  - Rule will be applied only if IMSI value was obtained after SRI request
 					(during MT or HR procedure) and it match's with this rule's imsidigitsmask.
