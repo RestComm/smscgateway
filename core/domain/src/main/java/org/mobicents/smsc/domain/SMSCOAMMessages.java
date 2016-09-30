@@ -111,6 +111,14 @@ public interface SMSCOAMMessages {
 
     public static final String SKIP_UNSENT_MESSAGES_ACCEPTED_VALUE = "skip-unsent-messages command has been accepted to skip unsent messages till time %s";
 
+    public static final String MESSAGING_MODE_BAD_VALUES = "Value of messaging mode is bad (possible values: 0-default SMSC mode, 1-datagram, 2-transaction, 3-storeAndForward)";
+
+    public static final String DELIVERY_RECEIPT_BAD_VALUES = "Value of delivery receipt request is bad (possible values: 0-no, 1-on success or failure, 2-on failure, 3-on success)";
+
+    public static final String INTERMEDIATE_RECEIPT_BAD_VALUES = "Value of intermediate delivery notification request is bad (possible values: 0-no, 1-yes)";
+
+    public static final String DATA_CODING_BAD_VALUES = "Value of data coding schema is bad (possible values: 0-255)";
+
 	/**
 	 * Generic constants
 	 */

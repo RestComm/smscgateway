@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>restcomm-smsc-parent</artifactId>
 		<groupId>org.mobicents.smsc</groupId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>7.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>tools</artifactId>
@@ -14,6 +14,7 @@
 		<module>smpp-simulator</module>
 		<module>stresstool</module>
 		<module>cdr-parser</module>
+		<module>cassandra-tool</module>
 	</modules>
 
 	<build>

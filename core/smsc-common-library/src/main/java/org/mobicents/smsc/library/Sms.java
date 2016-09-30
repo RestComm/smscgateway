@@ -48,6 +48,8 @@ public class Sms implements Serializable {
     private boolean stored;
     private boolean storingAfterFailure;
     private boolean invokedByAlert;
+    // targetId of a delivery start (for case when we do rerouting)
+    private String targetIdOnDeliveryStart;
 
 	private int sourceAddrTon;
 	private int sourceAddrNpi;
@@ -59,8 +61,11 @@ public class Sms implements Serializable {
 	private long messageId;
 	private int moMessageRef;
 
+    private String receiptOrigMessageId;
+    private Long receiptLocalMessageId;
+
 	private String origSystemId;
-	private String origEsmeName;
+    private String origEsmeName;
 
 	private Date submitDate;
 	private Date deliveryDate;
@@ -90,10 +95,19 @@ public class Sms implements Serializable {
     private String origMoServiceCentreAddressDA;
 
     private int deliveryCount;
+    private int reroutingCount;
 
     private OriginationType originationType;
 
 	private TlvSet tlvSet = new TlvSet();
+
+    private boolean statusReportRequest;
+    private int deliveryAttempt;
+    private String userData;
+    private String extraData;
+    private String extraData_2;
+    private String extraData_3;
+    private String extraData_4;
 
     private MessageDeliveryResultResponseInterface messageDeliveryResultResponse;
 
@@ -154,6 +168,17 @@ public class Sms implements Serializable {
 
     public void setInvokedByAlert(boolean invokedByAlert) {
         this.invokedByAlert = invokedByAlert;
+    }
+
+    /**
+     * targetId of a delivery start (for case when we do rerouting)
+     */
+    public String getTargetIdOnDeliveryStart() {
+        return targetIdOnDeliveryStart;
+    }
+
+    public void setTargetIdOnDeliveryStart(String targetIdOnDeliveryStart) {
+        this.targetIdOnDeliveryStart = targetIdOnDeliveryStart;
     }
 
 	/**
@@ -230,8 +255,10 @@ public class Sms implements Serializable {
     }
 
     public String getMessageIdText() {
+        return MessageUtil.createMessageIdString(messageId);
+
         // return String.format("%010d", messageId);
-        return String.format("%d", messageId);
+        // return String.format("%d", messageId);
     }
 
 	public void setMessageId(long messageId) {
@@ -483,6 +510,14 @@ public class Sms implements Serializable {
 		this.deliveryCount = deliveryCount;
 	}
 
+    public int getReroutingCount() {
+        return reroutingCount;
+    }
+
+    public void setReroutingCount(int reroutingCount) {
+        this.reroutingCount = reroutingCount;
+    }
+
 	// Optional parameters
 
 	/**
@@ -525,6 +560,75 @@ public class Sms implements Serializable {
             return false;
     }
 
+    public boolean isStatusReportRequest() {
+        return statusReportRequest;
+    }
+
+
+    public void setStatusReportRequest(boolean statusReportRequest) {
+        this.statusReportRequest = statusReportRequest;
+    }
+
+
+    public int getDeliveryAttempt() {
+        return deliveryAttempt;
+    }
+
+
+    public void setDeliveryAttempt(int deliveryAttempt) {
+        this.deliveryAttempt = deliveryAttempt;
+    }
+
+
+    public String getUserData() {
+        return userData;
+    }
+
+
+    public void setUserData(String userData) {
+        this.userData = userData;
+    }
+
+
+    public String getExtraData() {
+        return extraData;
+    }
+
+
+    public void setExtraData(String extraData) {
+        this.extraData = extraData;
+    }
+
+
+    public String getExtraData_2() {
+        return extraData_2;
+    }
+
+
+    public void setExtraData_2(String extraData_2) {
+        this.extraData_2 = extraData_2;
+    }
+
+
+    public String getExtraData_3() {
+        return extraData_3;
+    }
+
+
+    public void setExtraData_3(String extraData_3) {
+        this.extraData_3 = extraData_3;
+    }
+
+
+    public String getExtraData_4() {
+        return extraData_4;
+    }
+
+
+    public void setExtraData_4(String extraData_4) {
+        this.extraData_4 = extraData_4;
+    }
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -551,13 +655,23 @@ public class Sms implements Serializable {
         sb.append(origNetworkId);
 		sb.append(", messageId=");
 		sb.append(messageId);
-		sb.append(", moMessageRef=");
+
+        if (receiptOrigMessageId != null) {
+            sb.append(", receiptOrigMessageId=");
+            sb.append(receiptOrigMessageId);
+        }
+        if (receiptLocalMessageId != null) {
+            sb.append(", receiptLocalMessageId=");
+            sb.append(receiptLocalMessageId);
+        }
+
+        sb.append(", moMessageRef=");
 		sb.append(moMessageRef);
 		sb.append(", origSystemId=");
 		sb.append(origSystemId);
-		sb.append(", origEsmeId=");
-		sb.append(origEsmeName);
-		sb.append(", submitDate=");
+		sb.append(", origEsmeName=");
+        sb.append(origEsmeName);
+        sb.append(", submitDate=");
 		sb.append(submitDate);
 		sb.append(", deliverDate=");
 		sb.append(deliveryDate);
@@ -589,8 +703,12 @@ public class Sms implements Serializable {
         sb.append(origMoServiceCentreAddressDA);
         sb.append(", deliveryCount=");
         sb.append(deliveryCount);
+        sb.append(", reroutingCount=");
+        sb.append(reroutingCount);
         sb.append(", originationType=");
         sb.append(originationType);
+        sb.append(", originatorSccpAddress=");
+        sb.append(originatorSccpAddress);
         sb.append(", shortMessageText=");
         sb.append(shortMessageText);
         if (shortMessageBin != null) {
@@ -655,7 +773,24 @@ public class Sms implements Serializable {
         return sb.toString();
     }
 
-//    public enum OriginationType {
-//        SMPP, SS7_MO, SS7_HR, SIP
-//    }
+
+    public String getReceiptOrigMessageId() {
+        return receiptOrigMessageId;
+    }
+
+
+    public void setReceiptOrigMessageId(String receiptOrigMessageId) {
+        this.receiptOrigMessageId = receiptOrigMessageId;
+    }
+
+
+    public Long getReceiptLocalMessageId() {
+        return receiptLocalMessageId;
+    }
+
+
+    public void setReceiptLocalMessageId(Long receiptLocalMessageId) {
+        this.receiptLocalMessageId = receiptLocalMessageId;
+    }
+
 }

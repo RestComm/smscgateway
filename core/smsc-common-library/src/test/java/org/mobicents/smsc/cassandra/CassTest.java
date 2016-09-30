@@ -1,7 +1,5 @@
 package org.mobicents.smsc.cassandra;
 
-import org.testng.annotations.Test;
-
 import com.datastax.driver.core.Session;
 
 public class CassTest {
@@ -34,7 +32,7 @@ public class CassTest {
         i1++;
     }
 
-    public class DBOperations_C2_Proxy extends DBOperations_C2 {
+    public class DBOperations_C2_Proxy extends DBOperations {
         public Session getSession() {
             return super.session;
         }

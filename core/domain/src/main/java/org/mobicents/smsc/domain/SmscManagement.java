@@ -39,8 +39,7 @@ import javolution.util.FastList;
 
 import org.apache.log4j.Logger;
 import org.jboss.mx.util.MBeanServerLocator;
-import org.mobicents.smsc.cassandra.DBOperations_C1;
-import org.mobicents.smsc.cassandra.DBOperations_C2;
+import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.mproc.MProcRuleFactory;
 import org.mobicents.smsc.smpp.SmppManagement;
@@ -243,12 +242,12 @@ public class SmscManagement implements SmscManagementMBean {
 
         String hosts = smscPropertiesManagement.getDbHosts();
         int port = smscPropertiesManagement.getDbPort();
-        DBOperations_C2.getInstance().start(hosts, port, this.smscPropertiesManagement.getKeyspaceName(), this.smscPropertiesManagement.getFirstDueDelay(),
+        DBOperations.getInstance().start(hosts, port, this.smscPropertiesManagement.getKeyspaceName(), this.smscPropertiesManagement.getFirstDueDelay(),
                 this.smscPropertiesManagement.getReviseSecondsOnSmscStart(), this.smscPropertiesManagement.getProcessingSmsSetTimeout());
 
         // Step 3 SmsSetCashe.start()
         SmsSetCache.start(this.smscPropertiesManagement.getCorrelationIdLiveTime(),
-                this.smscPropertiesManagement.getSriResponseLiveTime());
+                this.smscPropertiesManagement.getSriResponseLiveTime(), 30);
 
 		// Step 4 Setup ArchiveSms
 		this.archiveSms = ArchiveSms.getInstance(this.name);
@@ -349,8 +348,8 @@ public class SmscManagement implements SmscManagementMBean {
         ObjectName hrObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":layer=" + JMX_LAYER_HOME_ROUTING_MANAGEMENT + ",name=" + this.getName());
         this.unregisterMbean(hrObjNname);
 
-		DBOperations_C1.getInstance().stop();
-		DBOperations_C2.getInstance().stop();
+//		DBOperations_C1.getInstance().stop();
+		DBOperations.getInstance().stop();
 
 		this.archiveSms.stop();
 		ObjectName arhiveObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":layer=" + JMX_LAYER_ARCHIVE_SMS

@@ -67,7 +67,6 @@ import net.java.slee.resource.diameter.ro.events.avp.ServiceInformation;
 
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.SbbContextExt;
-import org.mobicents.smsc.cassandra.DatabaseType;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
@@ -547,7 +546,54 @@ public abstract class ChargingSbb implements Sbb {
 		}
 
 		try {
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+
+            FastList<Sms> smss = mProcResult.getMessageList();
+            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
+                Sms sms = n.getValue();
+                TargetAddress ta = new TargetAddress(sms.getSmsSet());
+                TargetAddress lock = persistence.obtainSynchroObject(ta);
+
+                try {
+                    synchronized (lock) {
+                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+                        if (!storeAndForwMode) {
+                            try {
+                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+                            } catch (Exception e) {
+                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+                                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+                            }
+                        } else {
+                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+                                try {
+                                    sms.setStoringAfterFailure(true);
+                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+                                } catch (Exception e) {
+                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
+                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+                                }
+                            } else {
+                                sms.setStored(true);
+                                // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+                                // persistence.createLiveSms(sms);
+                                // persistence.setNewMessageScheduled(sms.getSmsSet(),
+                                // MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+                                // } else {
+
+                                this.scheduler.setDestCluster(sms.getSmsSet());
+                                persistence.c2_scheduleMessage_ReschedDueSlot(sms,
+                                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, false);
+
+                                // }
+                            }
+                        }
+                    }
+                } finally {
+                    persistence.releaseSynchroObject(lock);
+                }
+            }
+
             if (mProcResult.isMessageRejected()) {
                 rejectSmsByMproc(chargingData, true);
                 return;
@@ -581,50 +627,7 @@ public abstract class ChargingSbb implements Sbb {
                 smscStatAggregator.updateMsgInReceivedSip();
                 break;
             }
-
-            FastList<Sms> smss = mProcResult.getMessageList();
-            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
-                Sms sms = n.getValue();
-                TargetAddress ta = new TargetAddress(sms.getSmsSet());
-                TargetAddress lock = persistence.obtainSynchroObject(ta);
-
-                try {
-                    synchronized (lock) {
-                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-                        if (!storeAndForwMode) {
-                            try {
-                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                            } catch (Exception e) {
-                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(), SmppConstants.STATUS_SYSERR,
-                                        MAPErrorCode.systemFailure, null, e);
-                            }
-                        } else {
-                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-                                try {
-                                    sms.setStoringAfterFailure(true);
-                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                                } catch (Exception e) {
-                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-                                            SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
-                                }
-                            } else {
-                                sms.setStored(true);
-                                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                                    persistence.createLiveSms(sms);
-                                    persistence.setNewMessageScheduled(sms.getSmsSet(),
-                                            MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-                                } else {
-                                    this.scheduler.setDestCluster(sms.getSmsSet());
-                                    persistence.c2_scheduleMessage_ReschedDueSlot(sms,
-                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, false);
-                                }
-                            }
-                        }
-                    }
-                } finally {
-                    persistence.releaseSynchroObject(lock);
-                }
-            }
+            
 		} catch (PersistenceException e) {
 			throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
 					SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
@@ -654,13 +657,17 @@ public abstract class ChargingSbb implements Sbb {
                 sms.setStored(true);
             }
 
-            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                persistence.archiveFailuredSms(sms);
-            } else {
-                if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
-                    persistence.c2_createRecordArchive(sms);
-                }
-            }
+//            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                persistence.archiveFailuredSms(sms);
+//            } else {
+
+
+            if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
+                persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),
+                        smscPropertiesManagement.getIncomeReceiptsProcessing());
+            }                
+
+//            }
 
             smscStatAggregator.updateMsgInRejectedAll();
 
@@ -703,13 +710,18 @@ public abstract class ChargingSbb implements Sbb {
                 sms.setStored(true);
             }
 
-            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                persistence.archiveFailuredSms(sms);
-            } else {
-                if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
-                    persistence.c2_createRecordArchive(sms);
-                }
-            }
+//            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                persistence.archiveFailuredSms(sms);
+//            } else {
+
+
+            if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
+                persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),
+                        smscPropertiesManagement.getIncomeReceiptsProcessing());
+            }                
+
+
+//            }
 
             smscStatAggregator.updateMsgInRejectedAll();
 

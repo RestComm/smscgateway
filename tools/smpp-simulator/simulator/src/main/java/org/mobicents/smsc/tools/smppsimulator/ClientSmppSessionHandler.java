@@ -27,6 +27,8 @@ import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
@@ -34,14 +36,21 @@ import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecoder;
 import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecodingData;
 import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.mobicents.smsc.library.ErrorCode;
+import org.mobicents.smsc.library.MessageUtil;
+import org.mobicents.smsc.tools.smppsimulator.SmppSimulatorParameters.DeliveryResponseGenerating;
 
+import com.cloudhopper.commons.util.windowing.WindowFuture;
 import com.cloudhopper.smpp.PduAsyncResponse;
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.impl.DefaultSmppSessionHandler;
 import com.cloudhopper.smpp.pdu.BaseSm;
+import com.cloudhopper.smpp.pdu.BaseSmResp;
+import com.cloudhopper.smpp.pdu.DeliverSm;
 import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;
 import com.cloudhopper.smpp.tlv.Tlv;
+import com.cloudhopper.smpp.type.Address;
 import com.cloudhopper.smpp.type.RecoverablePduException;
 import com.cloudhopper.smpp.type.UnrecoverablePduException;
 
@@ -184,6 +193,21 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                 resp.setCommandStatus(1);
             }
 
+            long mId = this.testingForm.getMsgIdGenerator().incrementAndGet();
+            String msgId = MessageUtil.createMessageIdString(mId);
+            ((BaseSmResp) resp).setMessageId(msgId);
+
+            // scheduling of delivery receipt if needed
+            if (this.testingForm.getSmppSimulatorParameters().getDeliveryResponseGenerating() != DeliveryResponseGenerating.No) {
+                int delay = 100;
+                if (this.testingForm.getSmppSimulatorParameters().isDeliveryResponseAfter2Min())
+                    delay = 2 * 60 * 1000;
+                this.testingForm.getExecutor().schedule(
+                        new DeliveryReceiptSender(
+                                this.testingForm.getSmppSimulatorParameters().getDeliveryResponseGenerating(), new Date(),
+                                msgId), delay, TimeUnit.MILLISECONDS);
+            }
+
             testingForm.addMessage("PduResponseSent: " + resp.getName(), resp.toString());
         }
 
@@ -243,5 +267,80 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
     // public String lookupTlvTagName(short tag) {
     // return null;
     // }
+
+    public class DeliveryReceiptSender implements Runnable {
+
+        private DeliveryResponseGenerating deliveryResponseGenerating;
+        private Date submitDate;
+        private String messageId;
+
+        public DeliveryReceiptSender(DeliveryResponseGenerating deliveryResponseGenerating, Date submitDate, String messageId) {
+            this.deliveryResponseGenerating = deliveryResponseGenerating;
+            this.submitDate = submitDate;
+            this.messageId = messageId;
+        }
+
+        @Override
+        public void run() {
+            SmppSimulatorParameters param = testingForm.getSmppSimulatorParameters();
+
+            BaseSm pdu;
+//            switch(param.getSendingMessageType()){
+//            case SubmitSm:
+//                SubmitSm submitPdu = new SubmitSm();
+//                pdu = submitPdu;
+//                break;
+//            case DataSm:
+//                DataSm dataPdu = new DataSm();
+//                pdu = dataPdu;
+//                break;
+//            case DeliverSm:
+//                DeliverSm deliverPdu = new DeliverSm();
+//                pdu = deliverPdu;
+//                break;
+//            case SubmitMulti:
+//                SubmitMulti submitMulti = new SubmitMulti();
+//                pdu = submitMulti;
+//                break;
+//            default:
+//                return;
+//            }
+            DeliverSm deliverPdu = new DeliverSm();
+            pdu = deliverPdu;
+
+            pdu.setSourceAddress(new Address((byte) param.getSourceTON().getCode(), (byte) param.getSourceNPI().getCode(),
+                    param.getSourceAddress()));
+
+            pdu.setDestAddress(new Address(pdu.getSourceAddress().getTon(), pdu.getSourceAddress().getNpi(), pdu
+                    .getSourceAddress().getAddress()));
+
+            pdu.setEsmClass((byte) 0x04);
+
+            pdu.setDataCoding((byte) 0);
+            pdu.setRegisteredDelivery((byte) 0);
+
+            boolean tempFailure = false;
+            boolean delivered = true;
+            ErrorCode errorCode = ErrorCode.SUCCESS;
+            if (deliveryResponseGenerating == DeliveryResponseGenerating.Error8) {
+                delivered = false;
+                errorCode = ErrorCode.ABSENT_SUBSCRIBER;
+            }
+
+            String rcpt = MessageUtil.createDeliveryReceiptMessage(messageId, submitDate, new Date(), errorCode, "origMsgText",
+                    delivered, null, tempFailure);
+            byte[] buf = rcpt.getBytes(utf8Charset);
+
+            try {
+                pdu.setShortMessage(buf);
+
+                testingForm.addMessage("Adding receipt=" + pdu.getName(), pdu.toString() + " Text:" + rcpt);
+
+                WindowFuture<Integer, PduRequest, PduResponse> future0 = testingForm.getSession().sendRequestPdu(pdu, 10000,
+                        false);
+            } catch (Exception e) {
+            }
+        }
+    }
 
 }

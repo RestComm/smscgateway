@@ -1,0 +1,20 @@
+Name
+	smsc set httpdefaultdatacoding
+
+SYNOPSIS
+	smsc set httpdefaultdatacoding <delivery receipt request value>
+
+DESCRIPTION
+	This command is used to set a value for default
+	data coding schema value for messages from an HTTP connector.
+	Most common values: 0:GSM7, 8:UCS-2
+	Default value is 0.
+
+EXAMPLES
+	smsc set httpdefaultdatacoding 0
+
+SEE ALSO
+	smsc set httpdefaultsourceton, smsc set httpdefaultsourcenpi,
+	smsc set httpdefaultdestton, smsc set httpdefaultdestnpi,
+	smsc set httpdefaultmessagingmode,
+	smsc set httpdefaultrddeliveryreceipt

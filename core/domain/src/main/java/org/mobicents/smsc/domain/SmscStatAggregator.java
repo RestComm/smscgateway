@@ -210,6 +210,14 @@ public class SmscStatAggregator implements UpdateMessagesInProcessListener {
         statCollector.msgInHrSriPosReq.addAndGet(1);
     }
 
+    public long getMsgInHrSriHrByPass() {
+        return statCollector.msgInHrSriHrByPass.get();
+    }
+
+    public void updateMsgInHrSriHrByPass() {
+        statCollector.msgInHrSriHrByPass.addAndGet(1);
+    }
+
     public long getMsgInHrSriNegReq() {
         return statCollector.msgInHrSriNegReq.get();
     }
@@ -331,6 +339,7 @@ public class SmscStatAggregator implements UpdateMessagesInProcessListener {
 
         private AtomicLong msgInHrSriReq = new AtomicLong();
         private AtomicLong msgInHrSriPosReq = new AtomicLong();
+        private AtomicLong msgInHrSriHrByPass = new AtomicLong();
         private AtomicLong msgInHrSriNegReq = new AtomicLong();
 
         private AtomicLong msgOutTryAll = new AtomicLong();

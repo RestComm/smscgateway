@@ -1,0 +1,17 @@
+Name
+	smsc get txhttpcharging
+
+SYNOPSIS
+	smsc get txhttpcharging
+
+DESCRIPTION
+	This command is used to get the value of the parameter 'txHttpCharging'
+	(accepting of messages that come from a HTTP connector).
+
+EXAMPLES
+	smsc get txhttpcharging
+
+SEE ALSO
+	smsc get mocharging, smsc get txsmppcharging
+	smsc get hrcharging, smsc get txsipcharging
+	smsc set txhttpcharging

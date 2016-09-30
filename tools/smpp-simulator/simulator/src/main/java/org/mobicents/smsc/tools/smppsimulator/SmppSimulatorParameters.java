@@ -43,6 +43,8 @@ public class SmppSimulatorParameters {
 	private long windowMonitorInterval = 15000;
 	
 	private boolean rejectIncomingDeliveryMessage = false;
+    private DeliveryResponseGenerating deliveryResponseGenerating = DeliveryResponseGenerating.No;
+    private boolean deliveryResponseAfter2Min = false;
 
 	private TON sourceTon = TON.International;
 	private NPI sourceNpi = NPI.ISDN;
@@ -347,6 +349,22 @@ public class SmppSimulatorParameters {
         this.specifiedSegmentLength = specifiedSegmentLength;
     }
 
+    public DeliveryResponseGenerating getDeliveryResponseGenerating() {
+        return deliveryResponseGenerating;
+    }
+
+    public void setDeliveryResponseGenerating(DeliveryResponseGenerating deliveryResponseGenerating) {
+        this.deliveryResponseGenerating = deliveryResponseGenerating;
+    }
+
+    public boolean isDeliveryResponseAfter2Min() {
+        return deliveryResponseAfter2Min;
+    }
+
+    public void setDeliveryResponseAfter2Min(boolean deliveryResponseAfter2Min) {
+        this.deliveryResponseAfter2Min = deliveryResponseAfter2Min;
+    }
+
     public enum EncodingType {
     	GSM7_DCS_0, GSM8_DCS_4, UCS2_DCS_8,
     }
@@ -417,6 +435,10 @@ public class SmppSimulatorParameters {
         public int getCode() {
             return this.code;
         }
+    }
+
+    public enum DeliveryResponseGenerating {
+        No, Success, Error8;
     }
 }
 

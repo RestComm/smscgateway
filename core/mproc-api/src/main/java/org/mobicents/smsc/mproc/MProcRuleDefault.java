@@ -56,11 +56,18 @@ public interface MProcRuleDefault extends MProcRule {
     void setOriginatingMask(OrigType originatingMask);
 
     /**
-     * @return mask for message original NetworkId. "-1" means any value.
+     * @return mask for message current NetworkId. "-1" means any value.
      */
     int getNetworkIdMask();
 
     void setNetworkIdMask(int networkIdMask);
+
+    /**
+     * @return mask for message original NetworkId. "-1" means any value.
+     */
+    int getOriginNetworkIdMask();
+
+    void setOriginNetworkIdMask(int originNetworkIdMask);
 
     /**
      * @return mask for message original ESME name. This condition never fits if a message comes not from SMPP. "-1" means any
@@ -78,7 +85,43 @@ public interface MProcRuleDefault extends MProcRule {
 
     void setOriginatorSccpAddressMask(String originatorSccpAddressMask);
 
+    /**
+     * @return mask for IMSI for a subscriber. This condition never fits if a message is not delivering to SS7 or IMSI is not
+     *         obtained. "-1" means any value.
+     */
+    String getImsiDigitsMask();
+
+    void setImsiDigitsMask(String imsiDigitsMask);
+
+    /**
+     * @return mask for NetworkNodeNumber for a subscriber (== VLR address where subscriber is). This condition never fits if a
+     *         message is not delivering to SS7. "-1" means any value.
+     */
+    String getNnnDigitsMask();
+
+    void setNnnDigitsMask(String nnnDigitsMask);
+
+    /**
+     * @return Value for a delivering step. Possible values: SRI_REQ | SS7_DEL | SMPP_DEL | SIP_DEL or null.
+     */
+    ProcessingType getProcessingType();
+
+    void setProcessingType(ProcessingType processingType);
+
+    /**
+     * @Value A set of values of ErrorCode of processing results. "0" ErrorCode means a success delivery. ">0" ErrorCode means
+     *        one of error code. "-1" means any value of success / error code. It is possible to configure several values with
+     *        comma: example "1,2,3" means "UNKNOWN_SUBSCRIBER(1) or UNDEFINED_SUBSCRIBER(2) or ILLEGAL_SUBSCRIBER(3)".
+     */
+    String getErrorCode();
+
+    void setErrorCode(String errorCode);
+
+
     // *** actions ***
+    
+    // *** PostArrivalProcessor ***
+    
     /**
      * @return if !=-1: the new networkId will be assigned to a message
      */
@@ -114,11 +157,55 @@ public interface MProcRuleDefault extends MProcRule {
 
     void setMakeCopy(boolean makeCopy);
 
+
+    // *** PostImsiProcessor ***
+
     /**
      * @return if true - drops a message after succeeded SRI response
      */
     boolean isDropAfterSri();
 
     void setDropAfterSri(boolean dropAfterSri);
+
+    /**
+     * @return if !=-1: reroute a message to this networkId a message after succeeded SRI response
+     */
+    int getNewNetworkIdAfterSri();
+
+    void setNewNetworkIdAfterSri(int newNetworkIdAfterSri);
+
+
+    // *** PostDeliveryProcessor ***
+
+    /**
+     * @return if !=-1: reroute a message to this networkId a message after permanent failure
+     */
+    int getNewNetworkIdAfterPermFail();
+
+    void setNewNetworkIdAfterPermFail(int newNetworkIdAfterPermFail);
+
+
+    // *** PostDeliveryTempFailureProcessor ***
+
+    /**
+     * @return if true - drops a message after temporary failure
+     */
+    boolean isDropAfterTempFail();
+
+    void setDropAfterTempFail(boolean dropAfterTempFail);
+
+    /**
+     * @return if !=-1: reroute a message to this networkId a message after temporary failure
+     */
+    int getNewNetworkIdAfterTempFail();
+
+    void setNewNetworkIdAfterTempFail(int newNetworkIdAfterTempFail);
+
+    /**
+     * @return if true - HR procedure will be bypassed (original IMSI and NNN will be sent as SRI response).
+     */
+    boolean isHrByPass();
+
+    void setHrByPass(boolean hrByPass);
 
 }

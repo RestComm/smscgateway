@@ -1,0 +1,17 @@
+Name
+	smsc set httpdefaultdestnpi
+
+SYNOPSIS
+	smsc set httpdefaultdestnpi <npi value>
+
+DESCRIPTION
+	This command is used to set a value for default NPI (Number Plan Indicator) for
+	destination addresses for messages from an HTTP connector.
+	Default value is 1 (ISDN).
+
+EXAMPLES
+	smsc set httpdefaultdestnpi 1
+
+SEE ALSO
+	smsc set httpdefaultsourceton, smsc set httpdefaultsourcenpi,
+	smsc set httpdefaultdestton, smsc get httpdefaultdestnpi

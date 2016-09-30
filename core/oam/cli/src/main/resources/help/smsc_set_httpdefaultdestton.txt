@@ -1,0 +1,17 @@
+Name
+	smsc set httpdefaultdestton
+
+SYNOPSIS
+	smsc set httpdefaultdestton <ton value>
+
+DESCRIPTION
+	This command is used to set a value for default TON (Type Of Number) for destination
+	addresses for messages from an HTTP connector.
+	Default value is 1 (International).
+
+EXAMPLES
+	smsc set httpdefaultdestton 1
+
+SEE ALSO
+	smsc set httpdefaultsourceton, smsc set httpdefaultsourcenpi,
+	smsc get httpdefaultdestton, smsc set httpdefaultdestnpi

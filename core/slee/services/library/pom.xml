@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.mobicents.smsc</groupId>
 		<artifactId>services-parent</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>7.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>smsc-library</artifactId>
@@ -46,8 +46,8 @@
 				</executions>
 				<!-- TODO: XXX: we need resource filtering, its a bit broken right now -->
 				<configuration>
-					<library-name>org.mobicents.smsc</library-name>
-					<library-vendor>smsc-library</library-vendor>
+					<library-vendor>org.mobicents.smsc</library-vendor>
+					<library-name>smsc-library</library-name>
 					<library-version>1.0</library-version>
 					<library-ref>
 						<library-name>library-map</library-name>

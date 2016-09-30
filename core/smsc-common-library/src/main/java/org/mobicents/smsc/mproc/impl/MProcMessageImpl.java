@@ -24,10 +24,17 @@ package org.mobicents.smsc.mproc.impl;
 
 import java.util.Date;
 
+import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
+import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
+import org.mobicents.smsc.cassandra.PersistenceException;
+import org.mobicents.smsc.library.ErrorCode;
+import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
 import org.mobicents.smsc.library.Sms;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.OrigType;
+import org.mobicents.smsc.mproc.ProcessingType;
 
 /**
 *
@@ -37,9 +44,13 @@ import org.mobicents.smsc.mproc.OrigType;
 public class MProcMessageImpl implements MProcMessage {
 
     private Sms sms;
+    private ProcessingType processingType;
+    private PersistenseCommonInterface persistence;
 
-    public MProcMessageImpl(Sms sms) {
+    public MProcMessageImpl(Sms sms, ProcessingType processingType, PersistenseCommonInterface persistence) {
         this.sms = sms;
+        this.processingType = processingType;
+        this.persistence = persistence;
     }
 
     protected Sms getSmsContent() {
@@ -152,8 +163,79 @@ public class MProcMessageImpl implements MProcMessage {
     }
 
     @Override
+    public String getImsiDigits() {
+        return sms.getSmsSet().getImsi();
+    }
+
+    @Override
+    public String getNnnDigits() {
+        LocationInfoWithLMSI locationInfoWithLMSI = sms.getSmsSet().getLocationInfoWithLMSI();
+        if (locationInfoWithLMSI != null) {
+            ISDNAddressString networkNodeNumber = locationInfoWithLMSI.getNetworkNodeNumber();
+            if (networkNodeNumber != null) {
+                return networkNodeNumber.getAddress();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getErrorCode() {
+        ErrorCode errorCode = sms.getSmsSet().getStatus();
+        if (errorCode != null)
+            return errorCode.getCode();
+        else
+            return 0;
+    }
+
+    @Override
+    public ProcessingType getProcessingType() {
+        return processingType;
+    }
+
+    @Override
     public String toString() {
         return "MProcMessage: " + sms;
+    }
+
+    @Override
+    public boolean isDeliveryReceipt() {
+        return MessageUtil.isDeliveryReceipt(sms);
+    }
+
+    @Override
+    public DeliveryReceiptData getDeliveryReceiptData() {
+        if (isDeliveryReceipt()) {
+            String msg = sms.getShortMessageText();
+            DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg);
+            return deliveryReceiptData;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Long getReceiptLocalMessageId() {
+        return sms.getReceiptLocalMessageId();
+    }
+
+    @Override
+    public MProcMessage getOriginMessageForDeliveryReceipt(long messageId) {
+        if (persistence == null)
+            return null;
+
+        try {
+            Sms sms = persistence.c2_getRecordArchiveForMessageId(messageId);
+            if (sms != null) {
+                MProcMessage msg = new MProcMessageImpl(sms, processingType, null);
+                return msg;
+            } else {
+                return null;
+            }
+        } catch (PersistenceException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

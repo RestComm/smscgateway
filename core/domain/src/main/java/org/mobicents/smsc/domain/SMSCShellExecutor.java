@@ -682,6 +682,12 @@ public class SMSCShellExecutor implements ShellExecutor {
                 smscPropertiesManagement.setGenerateReceiptCdr(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("receiptsdisabling")) {
                 smscPropertiesManagement.setReceiptsDisabling(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("enableintermediatereceipts")) {
+                smscPropertiesManagement.setEnableIntermediateReceipts(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("enableintermediatereceipts")) {
+                smscPropertiesManagement.setEnableIntermediateReceipts(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("incomereceiptsprocessing")) {
+                smscPropertiesManagement.setIncomeReceiptsProcessing(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("orignetworkidforreceipts")) {
                 smscPropertiesManagement.setOrigNetworkIdForReceipts(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("generatecdr")) {
@@ -701,6 +707,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 				smscPropertiesManagement.setTxSmppChargingType(Enum.valueOf(ChargingType.class, options[3]));
 			} else if (parName.equals("txsipcharging")) {
 				smscPropertiesManagement.setTxSipChargingType(Enum.valueOf(ChargingType.class, options[3]));
+            } else if (parName.equals("txhttpcharging")) {
+                MoChargingType val = Enum.valueOf(MoChargingType.class, options[3]);
+                if (val != MoChargingType.diameter)
+                    smscPropertiesManagement.setTxHttpCharging(val);
 			} else if (parName.equals("diameterdestrealm")) {
 				String val = options[3];
 				smscPropertiesManagement.setDiameterDestRealm(val);
@@ -750,6 +760,43 @@ public class SMSCShellExecutor implements ShellExecutor {
                 if (val < 0 || val > 13)
                     return SMSCOAMMessages.NATIONAL_LANGUAGE_SHIFT_BAD_VALUE;
                 smscPropertiesManagement.setNationalLanguageLockingShift(val);
+
+            } else if (parName.equals("httpdefaultsourceton")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultSourceTon(val);
+            } else if (parName.equals("httpDefaultSourceNpi")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultSourceNpi(val);
+            } else if (parName.equals("httpdefaultdestton")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultDestTon(val);
+            } else if (parName.equals("httpdefaultdestnpi")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultDestNpi(val);
+            } else if (parName.equals("httpdefaultnetworkid")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setHttpDefaultNetworkId(val);
+
+            } else if (parName.equals("httpdefaultmessagingmode")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 3)
+                    return SMSCOAMMessages.MESSAGING_MODE_BAD_VALUES;
+                smscPropertiesManagement.setHttpDefaultMessagingMode(val);
+            } else if (parName.equals("httpdefaultrddeliveryreceipt")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 3)
+                    return SMSCOAMMessages.DELIVERY_RECEIPT_BAD_VALUES;
+                smscPropertiesManagement.setHttpDefaultRDDeliveryReceipt(val);
+            } else if (parName.equals("httpdefaultrdintermediatenotification")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 1)
+                    return SMSCOAMMessages.INTERMEDIATE_RECEIPT_BAD_VALUES;
+                smscPropertiesManagement.setHttpDefaultRDIntermediateNotification(val);
+            } else if (parName.equals("httpdefaultdatacoding")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 255)
+                    return SMSCOAMMessages.DATA_CODING_BAD_VALUES;
+                smscPropertiesManagement.setHttpDefaultDataCoding(val);
 
             } else if (parName.equals("deliverypause")) {
                 boolean val = Boolean.parseBoolean(options[3]);
@@ -913,10 +960,12 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getGenerateReceiptCdr());
             } else if (parName.equals("receiptsdisabling")) {
                 sb.append(smscPropertiesManagement.getReceiptsDisabling());
-            } else if (parName.equals("receiptsdisabling")) {
-                sb.append(smscPropertiesManagement.getReceiptsDisabling());
+            } else if (parName.equals("enableintermediatereceipts")) {
+                sb.append(smscPropertiesManagement.getEnableIntermediateReceipts());
             } else if (parName.equals("orignetworkidforreceipts")) {
                 sb.append(smscPropertiesManagement.getOrigNetworkIdForReceipts());
+            } else if (parName.equals("incomereceiptsprocessing")) {
+                sb.append(smscPropertiesManagement.getIncomeReceiptsProcessing());
             } else if (parName.equals("generatearchivetable")) {
                 sb.append(smscPropertiesManagement.getGenerateArchiveTable().getValue());
 
@@ -930,6 +979,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 				sb.append(smscPropertiesManagement.getTxSmppChargingType());
 			} else if (parName.equals("txsipcharging")) {
 				sb.append(smscPropertiesManagement.getTxSipChargingType());
+            } else if (parName.equals("txhttpcharging")) {
+                sb.append(smscPropertiesManagement.getTxHttpCharging());
 			} else if (parName.equals("diameterdestrealm")) {
 				sb.append(smscPropertiesManagement.getDiameterDestRealm());
 			} else if (parName.equals("diameterdesthost")) {
@@ -966,6 +1017,25 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getNationalLanguageSingleShift());
             } else if (parName.equals("nationallanguagelockingshift")) {
                 sb.append(smscPropertiesManagement.getNationalLanguageLockingShift());
+
+            } else if (parName.equals("httpdefaultsourceton")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultSourceTon());
+            } else if (parName.equals("httpdefaultsourcenpi")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultSourceNpi());
+            } else if (parName.equals("httpdefaultdestton")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultDestTon());
+            } else if (parName.equals("httpdefaultdestnpi")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultDestNpi());
+            } else if (parName.equals("httpdefaultnetworkid")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultNetworkId());
+            } else if (parName.equals("httpdefaultmessagingmode")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultMessagingMode());
+            } else if (parName.equals("httpdefaultrddeliveryreceipt")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt());
+            } else if (parName.equals("httpdefaultrdintermediatenotification")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification());
+            } else if (parName.equals("httpdefaultdatacoding")) {
+                sb.append(smscPropertiesManagement.getHttpDefaultDataCoding());
 
             } else if (parName.equals("deliverypause")) {
                 sb.append(smscPropertiesManagement.isDeliveryPause());
@@ -1142,6 +1212,14 @@ public class SMSCShellExecutor implements ShellExecutor {
             sb.append(smscPropertiesManagement.getReceiptsDisabling());
             sb.append("\n");
 
+            sb.append("enableintermediatereceipts = ");
+            sb.append(smscPropertiesManagement.getEnableIntermediateReceipts());
+            sb.append("\n");
+
+            sb.append("incomereceiptsprocessing = ");
+            sb.append(smscPropertiesManagement.getIncomeReceiptsProcessing());
+            sb.append("\n");
+
             sb.append("orignetworkidforreceipts = ");
             sb.append(smscPropertiesManagement.getOrigNetworkIdForReceipts());
             sb.append("\n");
@@ -1174,6 +1252,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 			sb.append(smscPropertiesManagement.getTxSipChargingType());
 			sb.append("\n");
 
+            sb.append("txhttpcharging = ");
+            sb.append(smscPropertiesManagement.getTxHttpCharging());
+            sb.append("\n");
+
 			sb.append("diameterdestrealm = ");
 			sb.append(smscPropertiesManagement.getDiameterDestRealm());
 			sb.append("\n");
@@ -1192,6 +1274,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("removinglivetablesdays = ");
             sb.append(smscPropertiesManagement.getRemovingLiveTablesDays());
+            sb.append("\n");
+
+            sb.append("removingarchivetablesdays = ");
+            sb.append(smscPropertiesManagement.getRemovingArchiveTablesDays());
             sb.append("\n");
 
             sb.append("hrhlrnumber : ");
@@ -1226,6 +1312,42 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("nationallanguagelockingshift = ");
             sb.append(smscPropertiesManagement.getNationalLanguageLockingShift());
+            sb.append("\n");
+
+            sb.append("httpdefaultsourceton = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultSourceTon());
+            sb.append("\n");
+
+            sb.append("httpdefaultsourcenpi = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultSourceNpi());
+            sb.append("\n");
+
+            sb.append("httpdefaultdestton = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultDestTon());
+            sb.append("\n");
+
+            sb.append("httpdefaultdestnpi = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultDestNpi());
+            sb.append("\n");
+
+            sb.append("httpdefaultnetworkid = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultNetworkId());
+            sb.append("\n");
+
+            sb.append("httpdefaultmessagingmode = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultMessagingMode());
+            sb.append("\n");
+
+            sb.append("httpdefaultrddeliveryreceipt = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt());
+            sb.append("\n");
+
+            sb.append("httpdefaultrdintermediatenotification = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification());
+            sb.append("\n");
+
+            sb.append("httpdefaultdatacoding = ");
+            sb.append(smscPropertiesManagement.getHttpDefaultDataCoding());
             sb.append("\n");
 
             sb.append("deliverypause = ");

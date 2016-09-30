@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>core</artifactId>
 		<groupId>org.mobicents.smsc</groupId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>7.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bootstrap</artifactId>
@@ -163,12 +163,20 @@
 			<artifactId>restcomm-dialogic</artifactId>
 			<groupId>org.mobicents.protocols.ss7.hardware</groupId>
 			<version>${jss7.restcomm.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.vendor.dialogic</groupId>
+					<artifactId>gctapi</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>com.vendor.dialogic</groupId>
 			<artifactId>gctapi</artifactId>
 			<version>${dialogic.version}</version>
 		</dependency>		
+-->
 
 		<!-- MTP -->
 		<dependency>

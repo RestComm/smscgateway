@@ -6,7 +6,7 @@ SYNOPSIS
 
 DESCRIPTION
 	This command is used to determine if the value of the parameter 'txsipcharging' 
-	is set to 'none', 'selected' or 'all'. This option defines if SIP originated 
+	is set to 'None', 'Selected' or 'All'. This option defines if SIP originated 
 	messages will be charged by OCS via Diameter before delivery. 
 
 SEE ALSO

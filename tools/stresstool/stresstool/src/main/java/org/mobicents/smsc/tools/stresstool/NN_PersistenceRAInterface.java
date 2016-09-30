@@ -25,7 +25,7 @@ package org.mobicents.smsc.tools.stresstool;
 import java.util.ArrayList;
 import java.util.Date;
 import org.mobicents.smsc.cassandra.PersistenceException;
-import org.mobicents.smsc.cassandra.PreparedStatementCollection_C3;
+import org.mobicents.smsc.cassandra.PreparedStatementCollection;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.TargetAddress;
@@ -94,7 +94,7 @@ public interface NN_PersistenceRAInterface {
     void releaseSynchroObject(TargetAddress ta);
 
 
-    long c2_getDueSlotForTargetId(PreparedStatementCollection_C3 psc, String targetId) throws PersistenceException;
+    long c2_getDueSlotForTargetId(PreparedStatementCollection psc, String targetId) throws PersistenceException;
 
     void c2_updateDueSlotForTargetId(String targetId, long newDueSlot) throws PersistenceException;
 

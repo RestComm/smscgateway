@@ -1,0 +1,15 @@
+Name
+	smsc get enableintermediatereceipts
+
+SYNOPSIS
+	smsc get enableintermediatereceipts <true | false>
+
+DESCRIPTION
+	The SMSC can be configured to generate or not delivery intermediate receipts
+	(these are receipts for temporary delivery failures).
+	This command is used to retrieve the current settings.
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

@@ -17,7 +17,7 @@ The destined number of SMS is checked with address range. {this-platform} {this-
 
 The above methodology can work if the routing rule is based on MSISDN range, however if the range is not fixed (like in case of Number Portability) the above process will break.
 In such cases you can define a Database routing rule.
-You must change the value of the property `smsRoutingRuleClass` in the file [path]_RestComm-smscgateway-<version>/jboss-5.1.0.GA/server/default/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_ to look like below and un-comment if its commented out: 
+You must change the value of the property `smsRoutingRuleClass` in the file [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/default/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_ to look like below and un-comment if its commented out: 
 ----
 
 <property name="smsRoutingRuleClass">org.mobicents.smsc.smpp.DatabaseSmsRoutingRule</property>

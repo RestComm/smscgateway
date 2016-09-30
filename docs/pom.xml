@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.mobicents.smsc</groupId>
 		<artifactId>restcomm-smsc-parent</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>7.1.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.mobicents.smsc.docs</groupId>
@@ -14,11 +14,24 @@
 	<packaging>pom</packaging>
 
 	<properties>
+		<docs.this.platform>Restcomm</docs.this.platform>
+		<docs.this.folder>restcomm</docs.this.folder>
+		<docs.this.httpprefix>restcomm</docs.this.httpprefix>
+		<docs.this.application>SMSC</docs.this.application>
+		<docs.project.version>${project.version}</docs.project.version>
+		<docs.this.issue.tracker.url>https://github.com/Restcomm/smscgateway/issues</docs.this.issue.tracker.url>
+		<docs.this.release.source.code.url>https://github.com/Restcomm/smscgateway</docs.this.release.source.code.url>
+		<docs.this.trunk.source.code.url>https://github.com/Restcomm/smscgateway</docs.this.trunk.source.code.url>
+		<docs.this.release.binary.url>https://github.com/RestComm/smscgateway/releases/latest</docs.this.release.binary.url>
+		<docs.slee.binary.url>https://github.com/RestComm/jain-slee/releases/latest</docs.slee.binary.url>
+		<docs.jee.platform>JBoss Application Server</docs.jee.platform>
 	</properties>
 
 	<modules>
 		<module>commons</module>
+<!--
 		<module>releasenotes</module>
+-->
 		<module>adminguide</module>
 		<module>installationguide</module>
 	</modules>

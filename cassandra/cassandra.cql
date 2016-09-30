@@ -2,11 +2,6 @@ CREATE KEYSPACE "RestCommSMSC" WITH REPLICATION = {'class' : 'SimpleStrategy', '
          
 USE "RestCommSMSC";         
 
-CREATE KEYSPACE "RestCommSMSC"
-         WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor': 1};
-         
-USE "RestCommSMSC";         
-
 CREATE TABLE "CURRENT_SLOT_TABLE" (
 	"ID" int,
 	"NEXT_SLOT" bigint,
@@ -23,6 +18,7 @@ CREATE TABLE "SLOT_MESSAGES_TABLE_YYYY_MM_DD" (
 	"ID" uuid, 
 	"TARGET_ID" ascii,
 	"NETWORK_ID" int,
+	"ORIG_NETWORK_ID" int,
 	"DUE_SLOT" bigint,
 	"IN_SYSTEM" int,
 	"SMSC_UUID" uuid,
@@ -71,9 +67,17 @@ CREATE TABLE "SLOT_MESSAGES_TABLE_YYYY_MM_DD" (
 	"NNN_DIGITS" ascii,
 	"NNN_AN" int,
 	"NNN_NP" int,
-	"SM_STATUS" int,
 	"SM_TYPE" int, 
 	"DELIVERY_COUNT" int, 
+
+	"ORIGINATOR_SCCP_ADDRESS" ascii,
+	"DELIVERY_ATTEMPT" int,
+	"STATUS_REPORT_REQUEST" boolean,
+	"USER_DATA" text,
+	"EXTRA_DATA" text,
+	"EXTRA_DATA_2" text,
+	"EXTRA_DATA_3" text,
+	"EXTRA_DATA_4" text,
 
 	PRIMARY KEY (("DUE_SLOT"), "TARGET_ID", "ID") 
 );
@@ -83,6 +87,7 @@ CREATE TABLE "MESSAGES_YYYY_MM_DD" (
 	"ID" uuid, 
 	"TARGET_ID" ascii,
 	"NETWORK_ID" int,
+	"ORIG_NETWORK_ID" int,
 	"DUE_SLOT" bigint,
 	"IN_SYSTEM" int,
 	"SMSC_UUID" uuid,
@@ -131,11 +136,35 @@ CREATE TABLE "MESSAGES_YYYY_MM_DD" (
 	"NNN_DIGITS" ascii,
 	"NNN_AN" int,
 	"NNN_NP" int,
-	"SM_STATUS" int,
 	"SM_TYPE" int, 
 	"DELIVERY_COUNT" int, 
 
-	PRIMARY KEY (("ADDR_DST_DIGITS"), ID);
+	"ORIGINATOR_SCCP_ADDRESS" ascii,
+	"STATUS_REPORT_REQUEST" boolean,
+	"DELIVERY_ATTEMPT" int,
+	"USER_DATA" text,
+	"EXTRA_DATA" text,
+	"EXTRA_DATA_2" text,
+	"EXTRA_DATA_3" text,
+	"EXTRA_DATA_4" text,
+
+	PRIMARY KEY (("ADDR_DST_DIGITS"), "ID")
+);
+
+CREATE TABLE "MES_ID_YYYY_MM_DD" (
+	"MESSAGE_ID" bigint,
+	"ADDR_DST_DIGITS" ascii,
+	"ID" uuid, 
+
+	PRIMARY KEY ("MESSAGE_ID")
+);
+
+CREATE TABLE "DLV_MES_ID_YYYY_MM_DD" (
+	"REMOTE_MESSAGE_ID" ascii,
+	"DEST_ID" ascii,
+	"MESSAGE_ID" bigint,
+
+	PRIMARY KEY ("REMOTE_MESSAGE_ID", "DEST_ID")
 );
 
 
@@ -144,7 +173,7 @@ CREATE TABLE "SMPP_SMS_ROUTING_RULE_2" (
 	"NETWORK_ID" int,
 	"CLUSTER_NAME" text, 
 
-	PRIMARY KEY ("ADDRESS", "NETWORK_ID");
+	PRIMARY KEY ("ADDRESS", "NETWORK_ID")
 );
 
 CREATE TABLE "SIP_SMS_ROUTING_RULE_2" (
@@ -152,6 +181,6 @@ CREATE TABLE "SIP_SMS_ROUTING_RULE_2" (
 	"NETWORK_ID" int,
 	"CLUSTER_NAME" text, 
 
-	PRIMARY KEY ("ADDRESS", "NETWORK_ID");
+	PRIMARY KEY ("ADDRESS", "NETWORK_ID")
 );
 

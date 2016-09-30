@@ -3,6 +3,8 @@ package org.mobicents.smsc.library;
 import static org.testng.Assert.*;
 
 import java.nio.charset.Charset;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -220,5 +222,14 @@ public class RETest {
         
         int ggg=0;
         ggg++;
+    }
+
+    @Test(groups = { "TimeZone" })
+    public void testTimeZone() {
+        Date submitDate = new Timestamp(System.currentTimeMillis());
+        int timeZone = submitDate.getTimezoneOffset();
+
+        submitDate = new Date();
+        timeZone = submitDate.getTimezoneOffset();
     }
 }

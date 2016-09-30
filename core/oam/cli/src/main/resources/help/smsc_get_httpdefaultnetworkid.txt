@@ -1,0 +1,17 @@
+Name
+	smsc get httpdefaultnetworkid
+
+SYNOPSIS
+	smsc get httpdefaultnetworkid
+
+DESCRIPTION
+	This command is used to get a value for default networkId value
+	for messages from an HTTP connector.
+
+EXAMPLES
+	smsc get httpdefaultnetworkid
+
+SEE ALSO
+	smsc set httpdefaultnetworkid
+	smsc get httpdefaultsourceton, smsc get httpdefaultsourcenpi,
+	smsc get httpdefaultdestton, smsc get httpdefaultdestnpi

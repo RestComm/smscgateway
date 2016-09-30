@@ -1,0 +1,16 @@
+Name
+	smsc get httpdefaultsourcenpi
+
+SYNOPSIS
+	smsc get httpdefaultsourcenpi
+
+DESCRIPTION
+	This command is used to get a value for default NPI (Number Plan Indicator) for
+	source addresses for messages from an HTTP connector.
+
+EXAMPLES
+	smsc get httpdefaultsourcenpi
+
+SEE ALSO
+	smsc get httpdefaultsourceton, smsc set httpdefaultsourcenpi,
+	smsc get httpdefaultdestton, smsc get httpdefaultdestnpi

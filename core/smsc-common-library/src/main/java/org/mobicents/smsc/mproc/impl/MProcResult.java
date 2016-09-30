@@ -36,6 +36,9 @@ public class MProcResult {
     private FastList<Sms> messageList;
     private boolean messageIsRejected;
     private boolean messageIsDropped;
+    private boolean messageIsRerouted;
+    private boolean hrIsByPassed;
+    private int newNetworkId;
 
     public MProcResult() {
     }
@@ -62,6 +65,30 @@ public class MProcResult {
 
     public void setMessageDropped(boolean val) {
         messageIsDropped = val;
+    }
+
+    public boolean isMessageIsRerouted() {
+        return messageIsRerouted;
+    }
+
+    public boolean isHrIsByPassed() {
+        return hrIsByPassed;
+    }
+
+    public void setHrIsByPassed(boolean hrIsByPassed) {
+        this.hrIsByPassed = hrIsByPassed;
+    }
+
+    public void setMessageIsRerouted(boolean messageIsRerouted) {
+        this.messageIsRerouted = messageIsRerouted;
+    }
+
+    public int getNewNetworkId() {
+        return newNetworkId;
+    }
+
+    public void setNewNetworkId(int newNetworkId) {
+        this.newNetworkId = newNetworkId;
     }
 
 }

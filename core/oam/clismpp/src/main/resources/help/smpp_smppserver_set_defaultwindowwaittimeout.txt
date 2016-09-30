@@ -1,0 +1,20 @@
+Name
+	smpp smppserver set defaultwindowwaittimeout
+
+SYNOPSIS
+	smpp smppserver set defaultwindowwaittimeout <default-window-wait-timeout>
+
+DESCRIPTION
+	This command is used to specify the default-window-wait-timeout for this Server
+	in milli-seconds. 
+	The window wait timeout is the time within which the connection to remote SMSC
+	Server should be established.
+
+	The default value is 30000 milli seconds.
+
+	You must restart the SMPP Server for the new value to take effect.
+
+SEE ALSO
+	smpp esme create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

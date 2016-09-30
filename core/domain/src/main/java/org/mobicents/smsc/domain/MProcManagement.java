@@ -48,19 +48,26 @@ import javolution.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
 import org.jboss.mx.util.MBeanServerLocator;
 import org.mobicents.smsc.domain.SmscManagement;
+import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
 import org.mobicents.smsc.mproc.MProcRuleFactory;
 import org.mobicents.smsc.mproc.MProcRule;
 import org.mobicents.smsc.mproc.MProcRuleMBean;
+import org.mobicents.smsc.mproc.ProcessingType;
+import org.mobicents.smsc.mproc.impl.MProcMessageHrImpl;
 import org.mobicents.smsc.mproc.impl.MProcMessageImpl;
 import org.mobicents.smsc.mproc.impl.MProcNewMessageImpl;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.mproc.impl.MProcRuleOamMessages;
+import org.mobicents.smsc.mproc.impl.PersistenseCommonInterface;
 import org.mobicents.smsc.mproc.impl.PostArrivalProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostDeliveryProcessorImpl;
+import org.mobicents.smsc.mproc.impl.PostDeliveryTempFailureProcessorImpl;
+import org.mobicents.smsc.mproc.impl.PostHrSriProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostImsiProcessorImpl;
+import org.mobicents.smsc.mproc.impl.PostPreDeliveryProcessorImpl;
 
 /**
 *
@@ -159,6 +166,9 @@ public class MProcManagement implements MProcManagementMBean {
 
     @Override
     public MProcRule createMProcRule(int id, String ruleFactoryName, String parametersString) throws Exception {
+        logger.info("createMProcRule: id=" + id + ", ruleFactoryName=" + ruleFactoryName + ", parametersString="
+                + parametersString);
+
         if (ruleFactoryName == null) {
             throw new Exception(String.format(MProcRuleOamMessages.CREATE_MPROC_RULE_FAIL_RULE_CLASS_NAME_NULL_VALUE));
         }
@@ -191,6 +201,8 @@ public class MProcManagement implements MProcManagementMBean {
 
     @Override
     public MProcRule modifyMProcRule(int mProcRuleId, String parametersString) throws Exception {
+        logger.info("modifyMProcRule: id=" + mProcRuleId + ", parametersString=" + parametersString);
+
         MProcRule mProcRule = this.getMProcRuleById(mProcRuleId);
         if (mProcRule == null) {
             throw new Exception(String.format(MProcRuleOamMessages.MODIFY_MPROC_RULE_FAIL_NOT_EXIST, mProcRuleId));
@@ -204,6 +216,8 @@ public class MProcManagement implements MProcManagementMBean {
 
     @Override
     public MProcRule destroyMProcRule(int mProcRuleId) throws Exception {
+        logger.info("destroyMProcRule: id=" + mProcRuleId);
+
         MProcRule mProcRule = this.getMProcRuleById(mProcRuleId);
         if (mProcRule == null) {
             throw new Exception(String.format(MProcRuleOamMessages.DESTROY_MPROC_RULE_FAIL_NOT_EXIST, mProcRuleId));
@@ -219,7 +233,7 @@ public class MProcManagement implements MProcManagementMBean {
         return mProcRule;
     }
 
-    public MProcResult applyMProcArrival(Sms sms) {
+    public MProcResult applyMProcArrival(Sms sms, PersistenseCommonInterface persistence) {
         if (this.mprocs.size() == 0) {
             FastList<Sms> res0 = new FastList<Sms>();
             res0.add(sms);
@@ -232,7 +246,7 @@ public class MProcManagement implements MProcManagementMBean {
         PostArrivalProcessorImpl pap = new PostArrivalProcessorImpl(
                 this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
                 this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger);
-        MProcMessage message = new MProcMessageImpl(sms);
+        MProcMessage message = new MProcMessageImpl(sms, null, persistence);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -252,35 +266,105 @@ public class MProcManagement implements MProcManagementMBean {
             return res;
         }
 
-        if (pap.isNeedDropMessage()) {
-            MProcResult res = new MProcResult();
-            res.setMessageDropped(true);
-            return res;
-        }
-
-        if (pap.isNeedRejectMessage()) {
-            MProcResult res = new MProcResult();
-            res.setMessageRejected(true);
-            return res;
-        }
-
-        FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
-        if (newMsgs == null || newMsgs.size() == 0) {
-            FastList<Sms> res0 = new FastList<Sms>();
-            res0.add(sms);
-            MProcResult res = new MProcResult();
-            res.setMessageList(res0);
-            return res;
-        }
-
+        MProcResult res = new MProcResult();;
         FastList<Sms> res0 = new FastList<Sms>();
-        res0.add(sms);
+        res.setMessageList(res0);
+        FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
+        if (pap.isNeedDropMessage()) {
+            res.setMessageDropped(true);
+        } else if (pap.isNeedRejectMessage()) {
+            res.setMessageRejected(true);
+        } else {
+            res0.add(sms);
+        }
+
         for (FastList.Node<MProcNewMessage> n = newMsgs.head(), end = newMsgs.tail(); (n = n.getNext()) != end;) {
             MProcNewMessageImpl newMsg = (MProcNewMessageImpl) n.getValue();
             res0.add(newMsg.getSmsContent());
         }
+
+        return res;
+    }
+
+    public MProcResult applyMProcHrSri(CorrelationIdValue correlationIdValue) {
+        if (this.mprocs.size() == 0) {
+            return new MProcResult();
+        }
+
+        FastList<MProcRule> cur = this.mprocs;
+        PostHrSriProcessorImpl pap = new PostHrSriProcessorImpl(logger);
+        MProcMessage message = new MProcMessageHrImpl(correlationIdValue);
+
+        try {
+            for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
+                MProcRule rule = n.getValue();
+                if (rule.isForPostHrSriState() && rule.matchesPostHrSri(message)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("MRule matches at HrSri phase to a message:\nrule: " + rule + "\ncorrelationIdValue: "
+                                + correlationIdValue);
+                    }
+
+                    rule.onPostHrSri(pap, message);
+                }
+            }
+        } catch (Throwable e) {
+            logger.error("Exception when invoking rule.matches(message) or onPostHrSri(): " + e.getMessage(), e);
+            return new MProcResult();
+        }
+
         MProcResult res = new MProcResult();
+
+        if (pap.isHrByPassed()) {
+            res.setHrIsByPassed(true);
+        }
+
+        return res;
+    }
+
+    public MProcResult applyMProcPreDelivery(Sms sms, ProcessingType processingType) {
+        if (this.mprocs.size() == 0) {
+            return new MProcResult();
+        }
+
+        FastList<MProcRule> cur = this.mprocs;
+        PostPreDeliveryProcessorImpl pap = new PostPreDeliveryProcessorImpl(this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
+                this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger);
+        MProcMessage message = new MProcMessageImpl(sms, processingType, null);
+
+        try {
+            for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
+                MProcRule rule = n.getValue();
+                if (rule.isForPostPreDeliveryState() && rule.matchesPostPreDelivery(message)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("MRule matches at PreDelivery phase to a message:\nrule: " + rule + "\nmessage: " + sms);
+                    }
+                    rule.onPostPreDelivery(pap, message);
+                }
+            }
+        } catch (Throwable e) {
+            logger.error(
+                    "Exception when invoking rule.matches(message) or onPostPreDelivery(): " + e.getMessage(), e);
+            return new MProcResult();
+        }
+
+        FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
+        MProcResult res = new MProcResult();
+
+        FastList<Sms> res0 = new FastList<Sms>();
+        for (FastList.Node<MProcNewMessage> n = newMsgs.head(), end = newMsgs.tail(); (n = n.getNext()) != end;) {
+            MProcNewMessageImpl newMsg = (MProcNewMessageImpl) n.getValue();
+            res0.add(newMsg.getSmsContent());
+        }
         res.setMessageList(res0);
+
+        if (pap.isNeedDropMessages()) {
+            res.setMessageDropped(true);
+        }
+        if (pap.isNeedRerouteMessages()) {
+            res.setMessageIsRerouted(true);
+            res.setNewNetworkId(pap.getNewNetworkId());
+        }
+
         return res;
     }
 
@@ -291,7 +375,7 @@ public class MProcManagement implements MProcManagementMBean {
 
         FastList<MProcRule> cur = this.mprocs;
         PostImsiProcessorImpl pap = new PostImsiProcessorImpl(logger);
-        MProcMessage message = new MProcMessageImpl(sms);
+        MProcMessage message = new MProcMessageImpl(sms, ProcessingType.SS7_SRI, null);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -313,10 +397,16 @@ public class MProcManagement implements MProcManagementMBean {
             res.setMessageDropped(true);
             return res;
         }
+        if (pap.isNeedRerouteMessages()) {
+            MProcResult res = new MProcResult();
+            res.setMessageIsRerouted(true);
+            res.setNewNetworkId(pap.getNewNetworkId());
+            return res;
+        }
         return new MProcResult();
     }
 
-    public MProcResult applyMProcDelivery(Sms sms, boolean deliveryFailure) {
+    public MProcResult applyMProcDelivery(Sms sms, boolean deliveryFailure, ProcessingType processingType) {
         if (this.mprocs.size() == 0) {
             return new MProcResult();
         }
@@ -325,7 +415,7 @@ public class MProcManagement implements MProcManagementMBean {
         PostDeliveryProcessorImpl pap = new PostDeliveryProcessorImpl(
                 this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
                 this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger, deliveryFailure);
-        MProcMessage message = new MProcMessageImpl(sms);
+        MProcMessage message = new MProcMessageImpl(sms, processingType, null);
 
         try {
             for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -344,17 +434,68 @@ public class MProcManagement implements MProcManagementMBean {
         }
 
         FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
-        if (newMsgs == null || newMsgs.size() == 0) {
-            return new MProcResult();
-        }
+        MProcResult res = new MProcResult();
 
         FastList<Sms> res0 = new FastList<Sms>();
         for (FastList.Node<MProcNewMessage> n = newMsgs.head(), end = newMsgs.tail(); (n = n.getNext()) != end;) {
             MProcNewMessageImpl newMsg = (MProcNewMessageImpl) n.getValue();
             res0.add(newMsg.getSmsContent());
         }
-        MProcResult res = new MProcResult();
         res.setMessageList(res0);
+
+        if (pap.isNeedRerouteMessages()) {
+            res.setMessageIsRerouted(true);
+            res.setNewNetworkId(pap.getNewNetworkId());
+        }
+
+        return res;
+    }
+
+    public MProcResult applyMProcDeliveryTempFailure(Sms sms, ProcessingType processingType) {
+        if (this.mprocs.size() == 0) {
+            return new MProcResult();
+        }
+
+        FastList<MProcRule> cur = this.mprocs;
+        PostDeliveryTempFailureProcessorImpl pap = new PostDeliveryTempFailureProcessorImpl(
+                this.smscPropertiesManagement.getDefaultValidityPeriodHours(),
+                this.smscPropertiesManagement.getMaxValidityPeriodHours(), logger);
+        MProcMessage message = new MProcMessageImpl(sms, processingType, null);
+
+        try {
+            for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
+                MProcRule rule = n.getValue();
+                if (rule.isForPostDeliveryTempFailureState() && rule.matchesPostDeliveryTempFailure(message)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("MRule matches at DeliveryTempFailure phase to a message:\nrule: " + rule + "\nmessage: " + sms);
+                    }
+                    rule.onPostDeliveryTempFailure(pap, message);
+                }
+            }
+        } catch (Throwable e) {
+            logger.error(
+                    "Exception when invoking rule.matches(message) or onPostDeliveryTempFailure(): " + e.getMessage(), e);
+            return new MProcResult();
+        }
+
+        FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
+        MProcResult res = new MProcResult();
+
+        FastList<Sms> res0 = new FastList<Sms>();
+        for (FastList.Node<MProcNewMessage> n = newMsgs.head(), end = newMsgs.tail(); (n = n.getNext()) != end;) {
+            MProcNewMessageImpl newMsg = (MProcNewMessageImpl) n.getValue();
+            res0.add(newMsg.getSmsContent());
+        }
+        res.setMessageList(res0);
+
+        if (pap.isNeedDropMessages()) {
+            res.setMessageDropped(true);
+        }
+        if (pap.isNeedRerouteMessages()) {
+            res.setMessageIsRerouted(true);
+            res.setNewNetworkId(pap.getNewNetworkId());
+        }
+
         return res;
     }
 

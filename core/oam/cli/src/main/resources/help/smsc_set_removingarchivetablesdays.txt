@@ -1,8 +1,8 @@
 Name
-	smsc set removingarchivetabledays
+	smsc set removingarchivetablesdays
 
 SYNOPSIS
-	smsc set removingarchivetabledays <value>
+	smsc set removingarchivetablesdays <value>
 
 DESCRIPTION
 	This command is used to configure the SMSC to automatically drop ARCHIVE tables 
@@ -10,7 +10,7 @@ DESCRIPTION
 	midnight and after every SMSC restart.
 
 PARAMETERS
-	removingarchivetabledays	- This parameter is used to specify the number
+	removingarchivetablesdays	- This parameter is used to specify the number
 					  of days the ARCHIVE tables should be kept before 
 					  attempting to drop them automatically.
 
@@ -29,5 +29,5 @@ PARAMETERS
 					  these manually.
 
 SEE ALSO
-	smsc set removinglivetabledays, smsc get removinglivetablesdays, 
-	smsc get removingarchivetabledays
+	smsc set removinglivetablesdays, smsc get removinglivetablesdays, 
+	smsc get removingarchivetablesdays

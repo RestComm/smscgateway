@@ -23,6 +23,7 @@
 package org.mobicents.smsc.mproc.impl;
 
 import org.apache.log4j.Logger;
+import org.mobicents.smsc.mproc.MProcRuleException;
 import org.mobicents.smsc.mproc.PostImsiProcessor;
 
 /**
@@ -32,8 +33,10 @@ import org.mobicents.smsc.mproc.PostImsiProcessor;
 */
 public class PostImsiProcessorImpl implements PostImsiProcessor {
 
-    private boolean needDropMessages = false;
     private Logger logger;
+    private boolean actionAdded = false;
+    private boolean needDropMessage = false;
+    private int rerouteMessage = -1;
 
     public PostImsiProcessorImpl(Logger logger) {
         this.logger = logger;
@@ -45,13 +48,35 @@ public class PostImsiProcessorImpl implements PostImsiProcessor {
     }
 
     // results of message processing
+
     public boolean isNeedDropMessages() {
-        return needDropMessages;
+        return needDropMessage;
+    }
+
+    public boolean isNeedRerouteMessages() {
+        return rerouteMessage != -1;
+    }
+
+    public int getNewNetworkId() {
+        return rerouteMessage;
     }
 
     @Override
-    public void dropMessages() {
-        needDropMessages = true;
+    public void dropMessage() throws MProcRuleException {
+        if (actionAdded)
+            throw new MProcRuleException("Another action already added");
+
+        actionAdded = true;
+        needDropMessage = true;
+    }
+
+    @Override
+    public void rerouteMessage(int newNetworkId) throws MProcRuleException {
+        if (actionAdded)
+            throw new MProcRuleException("Another action already added");
+
+        actionAdded = true;
+        rerouteMessage = newNetworkId;
     }
 
 }

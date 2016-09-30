@@ -34,6 +34,8 @@ public interface HrSriResultInterface {
 
     public void onSriSuccess(CorrelationIdValue correlationIdValue, boolean sriBypass);
 
+    public void onSriHrByPass(CorrelationIdValue correlationIdValue);
+
     public void onSriFailure(CorrelationIdValue correlationIdValue, MAPErrorMessage errorResponse, String cause);
 
 }

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.mobicents.smsc</groupId>
 		<artifactId>services-parent</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>rx-sipserver-sbb</artifactId>
@@ -34,6 +34,12 @@
 			<groupId>org.mobicents.resources</groupId>
 			<artifactId>sip11-ratype</artifactId>
 			<version>${restcomm.resources.sip.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<artifactId>scheduler-ratype</artifactId>
@@ -45,6 +51,11 @@
 			<artifactId>jain-slee-11-ext</artifactId>
 			<version>${jslee.ext.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<artifactId>smsc-library</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

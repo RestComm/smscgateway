@@ -37,8 +37,6 @@ import javax.swing.JComboBox;
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppSession;
 
-import javax.swing.JCheckBox;
-
 /**
  * 
  * @author sergey vetyutnev
@@ -59,7 +57,6 @@ public class SmppParametersForm extends JDialog {
 	private JTextField tbPassword;
 	private JTextField tbRequestExpiryTimeout;
 	private JTextField tbWindowMonitorInterval;
-	private JCheckBox cbRejectIncomingDeliveryMessage;
 	private JTextField tbAddressRange;
 
 	public SmppParametersForm(JFrame owner) {
@@ -172,10 +169,6 @@ public class SmppParametersForm extends JDialog {
 		tbWindowMonitorInterval.setBounds(424, 318, 86, 20);
 		panel.add(tbWindowMonitorInterval);
 		
-		cbRejectIncomingDeliveryMessage = new JCheckBox("Rejecting of incoming SMPP delivery messages");
-		cbRejectIncomingDeliveryMessage.setBounds(10, 344, 524, 25);
-		panel.add(cbRejectIncomingDeliveryMessage);
-		
 		JLabel lblSmppRole = new JLabel("Smpp session type");
 		lblSmppRole.setBounds(10, 155, 401, 14);
 		panel.add(lblSmppRole);
@@ -229,8 +222,6 @@ public class SmppParametersForm extends JDialog {
         }
         if (dv2 != null)
             this.cbSmppSessionType.setSelectedItem(dv2);
-		
-		this.cbRejectIncomingDeliveryMessage.setSelected(this.data.isRejectIncomingDeliveryMessage());
 	}
 
 	public SmppSimulatorParameters getData() {
@@ -285,8 +276,6 @@ public class SmppParametersForm extends JDialog {
 
         this.data.setBindType((SmppBindType) cbBindType.getSelectedItem());
         this.data.setSmppSessionType((SmppSession.Type) cbSmppSessionType.getSelectedItem());
-
-		this.data.setRejectIncomingDeliveryMessage(this.cbRejectIncomingDeliveryMessage.isSelected());
 
 		this.data.setAddressRange(tbAddressRange.getText());
 		

@@ -165,8 +165,8 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Cluster Name' value by issuing the command `smsc set esmedefaultcluster` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get esmedefaultcluster` which will display the value set for this property. 
-
+You can verify this by issuing the command `smsc get esmedefaultcluster` which will display the value set for this property.
+This parameter affects only for DatabaseSmsRoutingRule - see <<_db_routing_rule_settings>>.
 ----
 
 Name
@@ -179,6 +179,8 @@ DESCRIPTION
 	This command is used to set a value for ESME default cluster. If the 
 	destination-address does not match to any ESME (any Cluster Name) the message will
 	be routed to the cluster with the name specified here for esme-default-cluster.
+	This parameter affects only for DatabaseSmsRoutingRule (not used for default
+	routing). 
 ----
 
 You can remove an ESME default cluster by issuing a command in the below format:
@@ -194,6 +196,8 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to remove the value configured for ESME default cluster. If 
 	this value is removed, all unrouted messages will be routed into the GSM network.
+	This parameter affects only for DatabaseSmsRoutingRule (not used for default
+	routing). 
 ----
 
 [[_esmedefaultcluster_gui]]
@@ -616,12 +620,12 @@ EXAMPLES
 == SS7 Settings
 
 [[_set_scgt]]
-=== SMSC Global Title
+=== SMSC Gateway Global Title
 
 [[_set_scgt_cli]]
 ==== Using CLI
 
-You can set the 'SMSC Gobal Title' by issuing the command `smsc set scgt` with appropriate parameters as described below.
+You can set the 'SMSC Gateway Global Title' by issuing the command `smsc set scgt` with appropriate parameters as described below.
 You can verify this by issuing the command `smsc get scgt` which will display the value set for this property. 
 
 ----
@@ -662,12 +666,12 @@ DESCRIPTION
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 [[_set_gti]]
-=== SCCP Global Title type
+=== SMSC Gateway Global Title Indicator
 
 [[_set_gti_cli]]
 ==== Using CLI
 
-You can set the 'SCCP Global Title type' by issuing the command `smsc set gti` with appropriate parameters as described below.
+You can set the 'SMSC Gateway Global Title Indicator' by issuing the command `smsc set gti` with appropriate parameters as described below.
 You can verify this by issuing the command `smsc get gti` which will display the value set for this property. 
 
 ----
@@ -679,8 +683,9 @@ SYNOPSIS
         smsc set gti 0001|0010|0011|0100
 
 DESCRIPTION
-        This command is used to set the value of SCCP Global Title type.
-        This Global Title type will be used for SCCP outgoing messages.
+        This command is used to set the value of SMSC Gateway Global Title 
+        Indicator.
+        This Global Title Indicator will be used for SCCP outgoing messages.
         Default value for ITU-T is 0100.
         Global title 0001 - Nature of address indicator included
         Global title 0010 - Translation type included
@@ -697,17 +702,17 @@ DESCRIPTION
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'SS7 Settings' tab in the GUI. 
-. You can specify the SCCP Global Title type by entering the value in the text field 'SCCP Global Title'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You can specify the SCCP Global Title type by entering the value in the text field 'SMSC Gateway Global Title Indicator'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 [[_set_tt]]
-=== SCCP translation type value
+=== SMSC Gateway Global Title - Translation Type
 
 [[_set_tt_cli]]
 ==== Using CLI
 
-You can set the 'SCCP translation type value' by issuing the command `smsc set tt` with appropriate parameters as described below.
+You can set the 'SMSC Gateway Global Title - Translation Type' by issuing the command `smsc set tt` with appropriate parameters as described below.
 You can verify this by issuing the command `smsc get tt` which will display the value set for this property. 
 
 ----
@@ -731,7 +736,7 @@ DESCRIPTION
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'SS7 Settings' tab in the GUI. 
-. You can specify the SCCP translation type value by entering the value in the text field 'SCCP translation type'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You can specify the SCCP translation type value by entering the value in the text field 'SMSC Gateway Global Title - Translation Type'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
@@ -926,12 +931,12 @@ EXAMPLES
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 [[_hrhlrnumber_sri]]
-=== Pre-configured HLR address for SRI messages
+=== Pre-configured HLR address for SRI requests
 
 [[_set_hrhlrnumber_sri_cli]]
 ==== Using CLI
 
-You can set a pre-configured HLR address for SRI messages by issuing the command `smsc set hrhlrnumber` with appropriate parameters as described below.
+You can set a pre-configured HLR address for SRI requests by issuing the command `smsc set hrhlrnumber` with appropriate parameters as described below.
 You can remove this pre-configured address by issuing the command `smsc remove hrhlrnumber`.
 You can verify this by issuing the command `smsc get hrhlrnumber` which will display the value set for this property. 
 
@@ -946,7 +951,7 @@ SYNOPSIS
 	smsc remove hrhlrnumber networkid <networkId>
 
 DESCRIPTION
-	This command is used to set a pre-configured HLR address for SRI messages.
+	This command is used to set a pre-configured HLR address for SRI requests.
 
 	In some scenarios it may be required to set a HLR address instead of a
 	MSISDN address into the SCCP 'CalledPartyAddress' of 'SendRoutingInfo'
@@ -968,11 +973,11 @@ DESCRIPTION
 [[_set_hrhlrnumber_sri_gui]]
 ==== Using GUI
 
-.Procedure: Set Pre-configured HLR address for SRI messages using the GUI
+.Procedure: Set Pre-configured HLR address for SRI requests using the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'SS7 Settings' tab in the GUI. 
-. You can specify (set or remove) the Pre-configured HLR address for SRI messages by entering appropriate values for a specified networkID.
+. You can specify (set or remove) the "Pre-configured HLR address for SRI requests" by entering appropriate values for a specified networkID. Select needed "Pre-configured HLR address for SRI requests Network Id" field value or type a new networkId value if no such value already specifyied. Then type needed HLR address into below field.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
@@ -1180,8 +1185,8 @@ EXAMPLES
 [[_db_removinglivetablesdays_cli]]
 ==== Using CLI
 
-You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removinglivetabledays` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get removinglivetabledays` which will display the value set for this property. 
+You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removinglivetablesdays` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get removinglivetablesdays` which will display the value set for this property. 
 
 ----
 
@@ -1227,22 +1232,22 @@ PARAMETERS
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
-[[_db_removingarchivetabledays]]
+[[_db_removingarchivetablesdays]]
 === Cassandra Configuration - Removing Live Tables Days
 
-[[_db_removingarchivetabledays_cli]]
+[[_db_removingarchivetablesdays_cli]]
 ==== Using CLI
 
-You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removingarchivetabledays` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get removingarchivetabledays` which will display the value set for this property. 
+You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removingarchivetablesdays` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get removingarchivetablesdays` which will display the value set for this property. 
 
 ----
 
 Name
-	smsc set removingarchivetabledays
+	smsc set removingarchivetablesdays
 
 SYNOPSIS
-	smsc set removingarchivetabledays <value>
+	smsc set removingarchivetablesdays <value>
 
 DESCRIPTION
 	This command is used to configure the SMSC to automatically drop ARCHIVE tables 
@@ -1250,7 +1255,7 @@ DESCRIPTION
 	midnight and after every SMSC restart.
 
 PARAMETERS
-	removingarchivetabledays	- This parameter is used to specify the number
+	removingarchivetablesdays	- This parameter is used to specify the number
 					  of days the ARCHIVE tables should be kept before 
 					  attempting to drop them automatically.
 
@@ -1269,7 +1274,7 @@ PARAMETERS
 					  these manually.
 ----
 
-[[_db_removingarchivetabledays_gui]]
+[[_db_removingarchivetablesdays_gui]]
 ==== Using GUI
 
 .Procedure: Set Cassandra Configuration - Removing Archive Tables Days
@@ -1728,26 +1733,26 @@ Name
 	smsc set txsmppcharging
 
 SYNOPSIS
-	smsc set txsmppcharging <none|selected|all>
+	smsc set txsmppcharging <None|Selected|All>
 
 DESCRIPTION
-	This command is used to set the value of the parameter 'txsmppcharging' to none,
-	selected or all. 
+	This command is used to set the value of the parameter 'txsmppcharging' to None,
+	Selected or All. 
 
-	If this is set to 'all', all ESME Originated messages will be charged by OCS via
+	If this is set to 'Aall', all ESME Originated messages will be charged by OCS via
 	Diameter, prior to being sent.
 
-	If this is set to 'selected', only those messages originating from ESMEs marked 
+	If this is set to 'Selected', only those messages originating from ESMEs marked 
 	with the parameter 'charging-enabled'=true at the time of ESME creation  will be 
 	charged by OCS via Diameter, prior to being sent.
 
-	If this is set to 'none', none of the ESME Originated messages will be charged by 
+	If this is set to 'None', none of the ESME Originated messages will be charged by 
 	OCS via Diameter, prior to being sent. 
 
-	The parameter 'txsmppcharging' is set to 'none' by default.
+	The parameter 'txsmppcharging' is set to 'None' by default.
 
 EXAMPLES
-	smsc set txsmppcharging selected
+	smsc set txsmppcharging Selected
 ----
 
 [[_dest_txsmppcharging_gui]]
@@ -1777,26 +1782,21 @@ Name
     smsc set txsipcharging
 
 SYNOPSIS
-    smsc set txsipcharging <none|selected|all>
+    smsc set txsipcharging <None|Selected|All>
 
 DESCRIPTION
-    This command is used to set the value of the parameter 'txsipcharging' to none,
-    selected or all. 
+	This command is used to set the value of the parameter 'txsipcharging' 
 
-    If this is set to 'all', all SIP Originated messages will be charged by OCS via
-    Diameter, prior to being sent.
+	If this is set to 'All', all SIP Originated messages will be charged by OCS via
+	Diameter, prior to being sent.
 
-    If this is set to 'selected', only those messages originating from SIPs marked 
-    with the parameter 'charging-enabled'=true at the time of SIP creation  will be 
-    charged by OCS via Diameter, prior to being sent.
+	If this is set to 'None' or 'Selected', none of the SIP Originated messages will
+	be charged by OCS via Diameter, prior to being sent. 
 
-    If this is set to 'none', none of the SIP Originated messages will be charged by 
-    OCS via Diameter, prior to being sent. 
-
-    The parameter 'txsipcharging' is set to 'none' by default.
+    The parameter 'txsipcharging' is set to 'None' by default.
 
 EXAMPLES
-    smsc set txsipcharging selected
+    smsc set txsipcharging Selected
 ----
 
 [[_dest_txsipcharging_gui]]
@@ -1855,10 +1855,57 @@ EXAMPLES
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+[[_dest_txhttpcharging]]
+=== HTTP Charge Settings
+
+[[_dest_txhttpcharging_cli]]
+==== Using CLI
+
+You can set the 'HTTP Originated SMS Charged' value by issuing the command `smsc set txhttpcharging` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get txhttpcharging` which will display the value set for this property. 
+
+----
+
+Name
+	smsc set txhttpcharging
+
+SYNOPSIS
+	smsc set txhttpcharging <accept|reject|diameter>
+
+DESCRIPTION
+	This command is used to set the value of the parameter 'txHttpCharging' to
+	needed values (accepting of messages that come from a HTTP connector).
+	This value is set to accept by default.
+
+	If this is set to 
+	accept - all incoming messages are accepted without charging
+	reject - all incoming messages will be rejected
+	diameter - all incoming messages are checked by Diameter peer before delivering
+	(this option is not supported now)
+
+EXAMPLES
+	smsc set txhttpcharging accept
+----
+
+[[_dest_txhttpcharging_gui]]
+==== Using GUI
+
+.Procedure: Set HTTP originated Charge using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Diameter' tab in the GUI. 
+. You can set 'HTTP originated SMS Charged' value to accept, reject or diameter, in the corresponding list.
+  For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
+
+
 [[_smsc_gateway_server_hr]]
 == Home Routing Settings
 
-RestComm SMSC Gateway supports Non Transparent Home Routing as explained in 3GPP 23.840 5.2.3.
+{this-platform} SMSC Gateway supports Non Transparent Home Routing as explained in 3GPP 23.840 5.2.3.
 This option can be disabled by setting "hrcharging" option to "reject" (see <<_dest_hrcharging>>). SMSC GW will accept SendRoutinInfo requests from a remote SMSC, then create a unique "correlationId" value for a requested MSISDN, then send SendRoutinInfo request to HLR, store received by HLR info into a cache and sends back to the remote SMSC SendRoutinInfo response with "correlationId" value in IMSI field and SMSC GlobalTytle (or another special configured GlobalTytle value) in LocationInfo field.
 Then SMSC GW will accept MtForwardSM messages from the remote SMSC, seaches in the cache for "correlationId" and HLR subscriber's and use this data for processing a message further. 
 
@@ -2013,7 +2060,7 @@ DESCRIPTION
 
 EXAMPLES
     smsc set hrsribypass true
-    smsc set hrsribypass false networkid <networkId>
+    smsc set hrsribypass false networkid 2
 ----
 
 [[_hrsribypass_gui]]
@@ -2023,7 +2070,7 @@ EXAMPLES
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'Home Routing' tab in the GUI. 
-. You can specify hrsribypass option by selecting an appropriate value in the field "Bypassing of SRI request to a local HLR" for a specified networkId.
+. You can specify hrsribypass option by selecting an appropriate value in the field "Bypassing of SRI request to a local HLR" for a specified networkId. Select needed "Bypassing of SRI request to a local HLR Network Id" field value or type a new networkId value if no such value already specifyied. Then select needed value into below field ("Removing value from networkId" means just remove "Bypassing of SRI request" for a selected networkId).
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section. 
 . You must click on the button 'Save' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
@@ -2373,6 +2420,73 @@ DESCRIPTION
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
+[[_enableintermediatereceipts]]
+=== Allowing of generating of intermediate receipts
+
+[[_enableintermediatereceipts_cli]]
+==== Using CLI
+
+SMCS can generate intermediate receipts (for temporary failures). You can set the 'enableintermediatereceipts' value to true/false by issuing the command `smsc set enableintermediatereceipts` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get enableintermediatereceipts` which will display the value set for this property. 
+
+----
+
+Name
+    smsc set enableintermediatereceipts
+
+SYNOPSIS
+    smsc set enableintermediatereceipts <true | false>
+
+DESCRIPTION
+    The SMSC can be configured to generate or not delivery intermediate receipts
+	(these are receipts for temporary delivery failures).
+	Default value: false (intermediate receipts will not be generated).
+
+----
+
+
+[[_incomereceiptsprocessing]]
+=== Income receipts processing
+
+[[_incomereceiptsprocessing_cli]]
+==== Using CLI
+
+SMCS can processing of incoming delivery receipts from remote SMSC GW (replacing of messageId in the receipt by a local messageId). You can set the 'incomereceiptsprocessing' value to true/false by issuing the command `smsc set incomereceiptsprocessing` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get incomereceiptsprocessing` which will display the value set for this property. 
+
+----
+
+Name
+    smsc set incomereceiptsprocessing
+
+SYNOPSIS
+    smsc set incomereceiptsprocessing <true | false>
+
+DESCRIPTION
+	Enabling of processing of incoming delivery receipts from remote SMSC GW.
+	When a delivery receipt comes from a remote SMSC GW, then
+	SMSC GW will replace messageId in the receipt by a local messageId.
+	This action is needed for a possibility of delivery receipts processing
+	in mproc rules staff and delivery receipts transit to message originators.
+	Default value: false (no remote delivery receipts processing).
+
+----
+
+
+[[_incomereceiptsprocessing_gui]]
+==== Using GUI
+
+.Procedure: Allowing of generating of intermediate receipts using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Processing' tab in the GUI. 
+. You can specify of processing of incoming delivery receipts by setting the value for the field 'Income receipts processing' to true or false accordingly.
+  For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
 
 [[_smsc_gateway_server_routing_dlv]]
 === Routing of delivery receipts

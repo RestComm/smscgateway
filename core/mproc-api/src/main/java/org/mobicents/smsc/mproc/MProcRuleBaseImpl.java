@@ -48,7 +48,17 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     }
 
     @Override
+    public boolean isForPostHrSriState() {
+        return false;
+    }
+
+    @Override
     public boolean isForPostArrivalState() {
+        return false;
+    }
+
+    @Override
+    public boolean isForPostPreDeliveryState() {
         return false;
     }
 
@@ -63,7 +73,22 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     }
 
     @Override
+    public boolean isForPostDeliveryTempFailureState() {
+        return false;
+    }
+
+    @Override
+    public boolean matchesPostHrSri(MProcMessage messageDest) {
+        return false;
+    }
+
+    @Override
     public boolean matchesPostArrival(MProcMessage messageDest) {
+        return false;
+    }
+
+    @Override
+    public boolean matchesPostPreDelivery(MProcMessage messageDest) {
         return false;
     }
 
@@ -78,7 +103,20 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     }
 
     @Override
+    public boolean matchesPostDeliveryTempFailure(MProcMessage message) {
+        return false;
+    }
+
+    @Override
+    public void onPostHrSri(PostHrSriProcessor factory, MProcMessage message) throws Exception {
+    }
+
+    @Override
     public void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception {
+    }
+
+    @Override
+    public void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception {
     }
 
     @Override
@@ -87,6 +125,10 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
 
     @Override
     public void onPostDelivery(PostDeliveryProcessor factory, MProcMessage message) throws Exception {
+    }
+
+    @Override
+    public void onPostDeliveryTempFailure(PostDeliveryTempFailureProcessor factory, MProcMessage message) throws Exception {
     }
 
     /**
@@ -108,11 +150,12 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
         return args;
     }
 
-    protected void writeParameter(StringBuilder sb, int parNumber, String name, Object value) {
+    protected void writeParameter(StringBuilder sb, int parNumber, String name, Object value, String paramaterSplitter,
+            String valueSplitter) {
         if (parNumber > 0)
-            sb.append(", ");
+            sb.append(paramaterSplitter);
         sb.append(name);
-        sb.append("=");
+        sb.append(valueSplitter);
         sb.append(value);
     }
 

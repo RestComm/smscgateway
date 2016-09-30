@@ -23,10 +23,10 @@
 package org.mobicents.smsc.mproc;
 
 /**
-*
-* @author sergey vetyutnev
-*
-*/
+ *
+ * @author sergey vetyutnev
+ *
+ */
 public enum OrigType {
-    SMPP, SS7_MO, SS7_HR, SIP
+    SMPP, SS7_MO, SS7_HR, SIP, HTTP
 }

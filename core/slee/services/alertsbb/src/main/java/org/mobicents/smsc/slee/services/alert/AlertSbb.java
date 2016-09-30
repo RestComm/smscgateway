@@ -23,7 +23,6 @@
 package org.mobicents.smsc.slee.services.alert;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -66,10 +65,8 @@ import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
-import org.mobicents.smsc.cassandra.DatabaseType;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
-import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
@@ -228,106 +225,75 @@ public abstract class AlertSbb implements Sbb {
 			synchronized (lock) {
 
 				try {
-			        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                        boolean b1 = pers.checkSmsSetExists(lock);
-                        if (!b1) {
-                            if (this.logger.isInfoEnabled()) {
-                                this.logger
-                                        .info("AlertServiceCentre received but no SmsSet is present: addr=" + addr + ", ton=" + addrTon + ", npi=" + addrNpi);
-                            }
-                            return;
+                    long dueSlot = 0;
+                    SmsSet smsSet0 = new SmsSet();
+                    smsSet0.setDestAddr(addr);
+                    smsSet0.setDestAddrNpi(addrNpi);
+                    smsSet0.setDestAddrTon(addrTon);
+                    smsSet0.setNetworkId(networkId);
+
+                    SmsSet smsSet1 = SmsSetCache.getInstance().getProcessingSmsSet(smsSet0.getTargetId());
+                    if (smsSet1 != null) {
+                        // message is already in process
+                        if (logger.isInfoEnabled()) {
+                            logger.info(String
+                                    .format("\nReceived AlertServiceCentre for MSISDN=%s but the delivering for this dest is already in progress",
+                                            addr));
                         }
+                        return;
+                    }
 
-                        SmsSet smsSet = pers.obtainSmsSet(lock);
-                        if (smsSet.getInSystem() == 2) {
-                            if (this.logger.isInfoEnabled()) {
-                                this.logger.info("AlertServiceCentre received but no SmsSet is already in active state (InSystem==2): addr=" + addr + ", ton="
-                                        + addrTon + ", npi=" + addrNpi);
-                            }
-                            return;
-                        }
-                        if (smsSet.getInSystem() == 0) {
-                            if (this.logger.isInfoEnabled()) {
-                                this.logger.info("AlertServiceCentre received but no SmsSet is already in passive state (InSystem==0): addr=" + addr + ", ton="
-                                        + addrTon + ", npi=" + addrNpi);
-                            }
-                            return;
-                        }
+                    dueSlot = pers.c2_getDueSlotForTargetId(smsSet0.getTargetId());
 
-                        pers.fetchSchedulableSms(smsSet, true);
-                        Date newDueDate = new Date();
-                        newDueDate = MessageUtil.checkScheduleDeliveryTime(smsSet, newDueDate);
-                        pers.setDeliveringProcessScheduled(smsSet, newDueDate, 0);
-                    } else {
-                        long dueSlot = 0;
-                        SmsSet smsSet0 = new SmsSet();
-                        smsSet0.setDestAddr(addr);
-                        smsSet0.setDestAddrNpi(addrNpi);
-                        smsSet0.setDestAddrTon(addrTon);
-                        smsSet0.setNetworkId(networkId);
+                    if (dueSlot != 0 && dueSlot > pers.c2_getCurrentDueSlot()
+                            && pers.c2_checkDueSlotWritingPossibility(dueSlot) == dueSlot) {
+                        pers.c2_registerDueSlotWriting(dueSlot);
+                        try {
+                            if (dueSlot != 0 && dueSlot > pers.c2_getCurrentDueSlot()) {
+                                SmsSet smsSet = pers.c2_getRecordListForTargeId(dueSlot, smsSet0.getTargetId());
+                                if (smsSet != null) {
+                                    if (logger.isInfoEnabled()) {
+                                        logger.info(String
+                                                .format("\nReceived AlertServiceCentre for MSISDN=%s, SmsSet was loaded with %d messages",
+                                                        addr, smsSet.getSmsCount()));
+                                    }
 
-                        SmsSet smsSet1 = SmsSetCache.getInstance().getProcessingSmsSet(smsSet0.getTargetId());
-                        if (smsSet1 != null) {
-                            // message is already in process
-                            if (logger.isInfoEnabled()) {
-                                logger.info(String
-                                        .format("\nReceived AlertServiceCentre for MSISDN=%s but the delivering for this dest is already in progress",
-                                                addr));
-                            }
-                            return;
-                        }
+                                    for (int i1 = 0; i1 < smsSet.getSmsCount(); i1++) {
+                                        Sms sms = smsSet.getSms(i1);
+                                        sms.setInvokedByAlert(true);
+                                    }
 
-                        dueSlot = pers.c2_getDueSlotForTargetId(smsSet0.getTargetId());
+                                    ArrayList<SmsSet> lstS = new ArrayList<SmsSet>();
+                                    lstS.add(smsSet);
+                                    ArrayList<SmsSet> lst = pers.c2_sortRecordList(lstS);
+                                    if (lst.size() > 0) {
+                                        smsSet = lst.get(0);
 
-                        if (dueSlot != 0 && dueSlot > pers.c2_getCurrentDueSlot() && pers.c2_checkDueSlotWritingPossibility(dueSlot) == dueSlot) {
-                            pers.c2_registerDueSlotWriting(dueSlot);
-                            try {
-                                if (dueSlot != 0 && dueSlot > pers.c2_getCurrentDueSlot()) {
-                                    SmsSet smsSet = pers.c2_getRecordListForTargeId(dueSlot, smsSet0.getTargetId());
-                                    if (smsSet != null) {
-                                        if (logger.isInfoEnabled()) {
-                                            logger.info(String
-                                                    .format("\nReceived AlertServiceCentre for MSISDN=%s, SmsSet was loaded with %d messages",
-                                                            addr, smsSet.getSmsCount()));
-                                        }
-
-                                        for (int i1 = 0; i1 < smsSet.getSmsCount(); i1++) {
-                                            Sms sms = smsSet.getSms(i1);
-                                            sms.setInvokedByAlert(true);
-                                        }
-
-                                        ArrayList<SmsSet> lstS = new ArrayList<SmsSet>();
-                                        lstS.add(smsSet);
-                                        ArrayList<SmsSet> lst = pers.c2_sortRecordList(lstS);
-                                        if (lst.size() > 0) {
-                                            smsSet = lst.get(0);
-
-                                            smsSet.setProcessingStarted();
-                                            this.scheduler.injectSmsDatabase(smsSet);                                            
-                                        }
-                                    } else {
-                                        if (logger.isInfoEnabled()) {
-                                            logger.info(String
-                                                    .format("\nReceived AlertServiceCentre for MSISDN=%s, dueSlot was scheduled but no SmsSet was loaded",
-                                                            addr));
-                                        }
+                                        smsSet.setProcessingStarted();
+                                        this.scheduler.injectSmsDatabase(smsSet);
                                     }
                                 } else {
                                     if (logger.isInfoEnabled()) {
                                         logger.info(String
-                                                .format("\nReceived AlertServiceCentre for MSISDN=%s but no dueSlot was scheduled or the scheduled dueSlot will come soon - 2",
+                                                .format("\nReceived AlertServiceCentre for MSISDN=%s, dueSlot was scheduled but no SmsSet was loaded",
                                                         addr));
                                     }
                                 }
-                            } finally {
-                                pers.c2_unregisterDueSlotWriting(dueSlot);
+                            } else {
+                                if (logger.isInfoEnabled()) {
+                                    logger.info(String
+                                            .format("\nReceived AlertServiceCentre for MSISDN=%s but no dueSlot was scheduled or the scheduled dueSlot will come soon - 2",
+                                                    addr));
+                                }
                             }
-                        } else {
-                            if (logger.isInfoEnabled()) {
-                                logger.info(String
-                                        .format("\nReceived AlertServiceCentre for MSISDN=%s but no dueSlot was scheduled or the scheduled dueSlot will come soon - 1",
-                                                addr));
-                            }
+                        } finally {
+                            pers.c2_unregisterDueSlotWriting(dueSlot);
+                        }
+                    } else {
+                        if (logger.isInfoEnabled()) {
+                            logger.info(String
+                                    .format("\nReceived AlertServiceCentre for MSISDN=%s but no dueSlot was scheduled or the scheduled dueSlot will come soon - 1",
+                                            addr));
                         }
                     }
                 } catch (PersistenceException e) {

@@ -62,13 +62,13 @@ import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
-import org.mobicents.smsc.cassandra.DatabaseType;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
+import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
 import org.mobicents.smsc.library.SbbStates;
@@ -77,6 +77,7 @@ import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.persistence.SmppExtraConstants;
@@ -259,7 +260,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 		}
 
 		SubmitSmResp response = event.createResponse();
-		response.setMessageId(((Long) sms.getMessageId()).toString());
+		response.setMessageId(sms.getMessageIdText());
 
 		// Lets send the Response with success here
 		try {
@@ -397,7 +398,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 		}
 
 		DataSmResp response = event.createResponse();
-		response.setMessageId(((Long) sms.getMessageId()).toString());
+		response.setMessageId(sms.getMessageIdText());
 
 		// Lets send the Response with success here
 		try {
@@ -520,7 +521,7 @@ public abstract class TxSmppServerSbb implements Sbb {
         if (parseResult.getParsedMessages().size() > 0)
             sms = parseResult.getParsedMessages().get(0);
         if (sms != null)
-            response.setMessageId(((Long) sms.getMessageId()).toString());
+            response.setMessageId(sms.getMessageIdText());
         for (UnsucessfulSME usme : parseResult.getBadAddresses()) {
             try {
                 response.addUnsucessfulSME(usme);
@@ -686,7 +687,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 		}
 
 		DeliverSmResp response = event.createResponse();
-		response.setMessageId(((Long) sms.getMessageId()).toString());
+        response.setMessageId(sms.getMessageIdText());
 
 		// Lets send the Response with success here
 		try {
@@ -1085,22 +1086,29 @@ public abstract class TxSmppServerSbb implements Sbb {
 		MessageUtil.applyScheduleDeliveryTime(sms, scheduleDeliveryTime);
 
 		SmsSet smsSet;
-		if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-			try {
-				smsSet = store.obtainSmsSet(ta);
-			} catch (PersistenceException e1) {
-				throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: "
-						+ ta.toString() + "\n" + e1.getMessage(), SmppConstants.STATUS_SUBMITFAIL,
-						MAPErrorCode.systemFailure, null, e1);
-			}
-		} else {
-			smsSet = new SmsSet();
-			smsSet.setDestAddr(ta.getAddr());
-			smsSet.setDestAddrNpi(ta.getAddrNpi());
-			smsSet.setDestAddrTon(ta.getAddrTon());
-            smsSet.setNetworkId(origEsme.getNetworkId());
-			smsSet.addSms(sms);
-		}
+
+
+//		if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//			try {
+//				smsSet = store.obtainSmsSet(ta);
+//			} catch (PersistenceException e1) {
+//				throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: "
+//						+ ta.toString() + "\n" + e1.getMessage(), SmppConstants.STATUS_SUBMITFAIL,
+//						MAPErrorCode.systemFailure, null, e1);
+//			}
+//		} else {
+
+
+        smsSet = new SmsSet();
+        smsSet.setDestAddr(ta.getAddr());
+        smsSet.setDestAddrNpi(ta.getAddrNpi());
+        smsSet.setDestAddrTon(ta.getAddrTon());
+        smsSet.setNetworkId(origEsme.getNetworkId());
+        smsSet.addSms(sms);			
+
+//		}
+
+
 		sms.setSmsSet(smsSet);
 
 		// long messageId = this.smppServerSessions.getNextMessageId();
@@ -1428,22 +1436,29 @@ public abstract class TxSmppServerSbb implements Sbb {
                 }
 
                 SmsSet smsSet;
-                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                    try {
-                        smsSet = store.obtainSmsSet(ta);
-                    } catch (PersistenceException e1) {
-                        throw new SmscProcessingException(
-                                "PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
-                                SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e1);
-                    }
-                } else {
-                    smsSet = new SmsSet();
-                    smsSet.setDestAddr(ta.getAddr());
-                    smsSet.setDestAddrNpi(ta.getAddrNpi());
-                    smsSet.setDestAddrTon(ta.getAddrTon());
-                    smsSet.setNetworkId(origEsme.getNetworkId());
-                    smsSet.addSms(sms);
-                }
+
+
+//                if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                    try {
+//                        smsSet = store.obtainSmsSet(ta);
+//                    } catch (PersistenceException e1) {
+//                        throw new SmscProcessingException(
+//                                "PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
+//                                SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e1);
+//                    }
+//                } else {
+
+
+                smsSet = new SmsSet();
+                smsSet.setDestAddr(ta.getAddr());
+                smsSet.setDestAddrNpi(ta.getAddrNpi());
+                smsSet.setDestAddrTon(ta.getAddrTon());
+                smsSet.setNetworkId(origEsme.getNetworkId());
+                smsSet.addSms(sms);                    
+
+//                }
+
+
                 sms.setSmsSet(smsSet);
 
                 sms.setMessageId(messageId);
@@ -1516,33 +1531,45 @@ public abstract class TxSmppServerSbb implements Sbb {
             sms0.setMessageDeliveryResultResponse(messageDeliveryResultResponse);
         }
 
+        // delivery receipt transit - replacing of messageId in delivery receipt with local messageId
+        if (smscPropertiesManagement.getIncomeReceiptsProcessing() && MessageUtil.isDeliveryReceipt(sms0)) {
+            DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(sms0.getShortMessageText());
+
+            if (deliveryReceiptData != null) {
+                String clusterName = esme.getClusterName();
+                String dlvMessageId = deliveryReceiptData.getMessageId();
+                Long messageId = null;
+                try {
+                    messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvMessageId, clusterName);
+                } catch (PersistenceException e) {
+                    logger.severe("Exception when runnung c2_getMessageIdByRemoteMessageId(): " + e.getMessage(), e);
+                }
+
+                if (messageId != null) {
+                    // we found in local cache / database a reference to an origin
+                    logger.info("Remote delivery receipt: clusterName=" + clusterName + ", dlvMessageId=" + dlvMessageId
+                            + ", receipt=" + sms0.getShortMessageText());
+
+                    sms0.setReceiptOrigMessageId(dlvMessageId);
+                    sms0.setReceiptLocalMessageId(messageId);
+
+                    String messageIdStr = MessageUtil.createMessageIdString(messageId);
+                    String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr,
+                            deliveryReceiptData.getSubmitDate(), deliveryReceiptData.getDoneDate(),
+                            ErrorCode.fromInt(deliveryReceiptData.getError()), deliveryReceiptData.getText(),
+                            deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_DELIVERED), null,
+                            deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_ENROUTE));
+                    sms0.setShortMessageText(updatedReceiptText);
+                }
+            }
+        }
+
         if (withCharging) {
             ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
             chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
         } else {
             // applying of MProc
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0);
-            if (mProcResult.isMessageRejected()) {
-                sms0.setMessageDeliveryResultResponse(null);
-                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-                        SmppConstants.STATUS_SUBMITFAIL, 0, null);
-                e.setSkipErrorLogging(true);
-                if (logger.isInfoEnabled()) {
-                    logger.info("TxSmpp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
-                }
-                throw e;
-            }
-            if (mProcResult.isMessageDropped()) {
-                sms0.setMessageDeliveryResultResponse(null);
-                smscStatAggregator.updateMsgInFailedAll();
-                if (logger.isInfoEnabled()) {
-                    logger.info("TxSmpp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
-                }
-                return;
-            }
-
-            smscStatAggregator.updateMsgInReceivedAll();
-            smscStatAggregator.updateMsgInReceivedSmpp();
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
 
             FastList<Sms> smss = mProcResult.getMessageList();
             for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
@@ -1573,18 +1600,27 @@ public abstract class TxSmppServerSbb implements Sbb {
                             } else {
                                 try {
                                     sms.setStored(true);
-                                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                                        store.createLiveSms(sms);
-                                        if (sms.getScheduleDeliveryTime() == null)
-                                            store.setNewMessageScheduled(sms.getSmsSet(),
-                                                    MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-                                        else
-                                            store.setNewMessageScheduled(sms.getSmsSet(), sms.getScheduleDeliveryTime());
-                                    } else {
-                                        this.scheduler.setDestCluster(sms.getSmsSet());
-                                        store.c2_scheduleMessage_ReschedDueSlot(sms,
-                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, false);
-                                    }
+
+
+
+//                                    if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+//                                        store.createLiveSms(sms);
+//                                        if (sms.getScheduleDeliveryTime() == null)
+//                                            store.setNewMessageScheduled(sms.getSmsSet(),
+//                                                    MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
+//                                        else
+//                                            store.setNewMessageScheduled(sms.getSmsSet(), sms.getScheduleDeliveryTime());
+//                                    } else {
+
+
+                                    this.scheduler.setDestCluster(sms.getSmsSet());
+                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
+                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+                                            false);                                        
+
+//                                    }
+
+
                                 } catch (PersistenceException e) {
                                     throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
                                             SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
@@ -1596,6 +1632,28 @@ public abstract class TxSmppServerSbb implements Sbb {
                     store.releaseSynchroObject(lock);
                 }
             }
+            
+            if (mProcResult.isMessageRejected()) {
+                sms0.setMessageDeliveryResultResponse(null);
+                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
+                        SmppConstants.STATUS_SUBMITFAIL, 0, null);
+                e.setSkipErrorLogging(true);
+                if (logger.isInfoEnabled()) {
+                    logger.info("TxSmpp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
+                }
+                throw e;
+            }
+            if (mProcResult.isMessageDropped()) {
+                sms0.setMessageDeliveryResultResponse(null);
+                smscStatAggregator.updateMsgInFailedAll();
+                if (logger.isInfoEnabled()) {
+                    logger.info("TxSmpp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+                }
+                return;
+            }
+
+            smscStatAggregator.updateMsgInReceivedAll();
+            smscStatAggregator.updateMsgInReceivedSmpp();
         }
 	}
 

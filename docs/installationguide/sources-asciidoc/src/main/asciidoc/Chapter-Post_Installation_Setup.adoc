@@ -53,9 +53,9 @@ DROP KEYSPACE "RestCommSMSC";
 == Configuring the Gateway
 
 Now that you have installed {this-platform} {this-application} to suit your needs, you can go ahead and configure the SS7 Stack and the SMSC Gateway to meet your requirements.
-The {this-platform} jSS7 Stack Admin Guide in the [path]_restcomm-smscgateway-<version>/docs/ss7/_ folder will assist you in configuring and managing the SS7 Stack.
+The {this-platform} jSS7 Stack Admin Guide in the [path]_{this-folder}-smscgateway-<version>/docs/ss7/_ folder will assist you in configuring and managing the SS7 Stack.
 Only when you have completely configured the SS7 Stack to meet your requirements, you must go ahead with configuring the SMSC Gateway.
  
 
-The {this-platform} {this-application} Admin Guide in the [path]_restcomm-smscgateway-<version>/docs/smsc/_ folder will assist you in configuring and managing the SMSC Gateway.
+The {this-platform} {this-application} Admin Guide in the [path]_{this-folder}-smscgateway-<version>/docs/smsc/_ folder will assist you in configuring and managing the SMSC Gateway.
 To configure and manage both the Stack and the Gateway you can use the Command Line Interface (CLI) tool or the GUI Management Console that comes with the platform. 

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.mobicents.smsc</groupId>
 		<artifactId>services-parent</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>7.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>tx-sipserver-sbb</artifactId>
@@ -41,6 +41,12 @@
 			<groupId>org.mobicents.resources</groupId>
 			<artifactId>sip11-ratype</artifactId>
 			<version>${restcomm.resources.sip.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>		
 		<dependency>
 			<groupId>${project.groupId}</groupId>

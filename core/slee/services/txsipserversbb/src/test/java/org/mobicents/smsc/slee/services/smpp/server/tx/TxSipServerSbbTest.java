@@ -24,10 +24,6 @@ package org.mobicents.smsc.slee.services.smpp.server.tx;
 
 import java.nio.charset.Charset;
 
-import org.mobicents.smsc.domain.SmscPropertiesManagement;
-import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
-import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.testng.annotations.Test;
 
 /**
@@ -58,20 +54,20 @@ public class TxSipServerSbbTest {
     private byte[] data4 = new byte[] { (byte) 0xD0, (byte) 0x9F, (byte) 0xD1, (byte) 0x80, (byte) 0xD0, (byte) 0xB8, (byte) 0xD0, (byte) 0xB2, (byte) 0xD0,
             (byte) 0xB5, (byte) 0xD1, (byte) 0x82  , (byte) 0x20, (byte) 0x30, (byte) 0x30, (byte) 0x31 };
 
-    @Test(groups = { "Base" })
-    public void testA1() throws Exception {
-        SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance("Test");
-
-        TxSipServerSbbProxy sbb = new TxSipServerSbbProxy();
-
-        String fromUser = "abcdefghijklmnoprst";
-        String toUser = "000001";
-        String msg = "Hello 0001";
-        TargetAddress ta = new TargetAddress(1, 1, toUser, 0);
-        PersistenceRAInterface store = new PersistenceRAInterfaceProxy();
-
-        sbb.createSmsEvent(fromUser, msg.getBytes(Charset.forName("UTF-8")), ta, store);
-    }
+//    @Test(groups = { "Base" })
+//    public void testA1() throws Exception {
+//        SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance("Test");
+//
+//        TxSipServerSbbProxy sbb = new TxSipServerSbbProxy();
+//
+//        String fromUser = "abcdefghijklmnoprst";
+//        String toUser = "000001";
+//        String msg = "Hello 0001";
+//        TargetAddress ta = new TargetAddress(1, 1, toUser, 0);
+//        PersistenceRAInterface store = new PersistenceRAInterfaceProxy();
+//
+//        sbb.createSmsEvent(fromUser, msg.getBytes(Charset.forName("UTF-8")), ta, store);
+//    }
 
     @Test(groups = { "Base" })
     public void testA2() throws Exception {

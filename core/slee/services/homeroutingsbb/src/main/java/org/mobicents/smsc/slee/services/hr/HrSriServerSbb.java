@@ -190,7 +190,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
             }
         }
 
-        setupSriRequest(evt.getMsisdn(), evt.getServiceCentreAddress(), dialog.getNetworkId());
+        setupSriRequest(evt.getMsisdn(), evt.getServiceCentreAddress(), dialog.getNetworkId(), dialog.getRemoteAddress());
     }
 
     /**
@@ -203,7 +203,8 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
         this.logger.severe("Received SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt);
     }
 
-    private void setupSriRequest(ISDNAddressString msisdn, AddressString serviceCentreAddress, int networkId) {
+    private void setupSriRequest(ISDNAddressString msisdn, AddressString serviceCentreAddress, int networkId,
+            SccpAddress originatorSccpAddress) {
         smscStatAggregator.updateMsgInHrSriReq();
 
         HrSriClientSbbLocalObject hrSriClientSbbLocalObject = this.getHrSriClientSbbLocalObject();
@@ -213,7 +214,8 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
             if (correlationIDRes.getSmscAddress() != null && !correlationIDRes.getSmscAddress().equals(""))
                 this.setSmscAddressForCountryCode(correlationIDRes.getSmscAddress());
             String correlationID = correlationIDRes.getCorrelationId();
-            CorrelationIdValue correlationIdValue = new CorrelationIdValue(correlationID, msisdn, serviceCentreAddress, networkId);
+            CorrelationIdValue correlationIdValue = new CorrelationIdValue(correlationID, msisdn, serviceCentreAddress,
+                    networkId, originatorSccpAddress);
 
             boolean sriBypass = smscPropertiesManagement.getHrSriBypass(networkId);
             if (sriBypass) {
@@ -232,7 +234,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 sb.append(sca);
                 sb.append(" sriBypass: ");
                 sb.append(sriBypass);
-                this.logger.severe(sb.toString());
+                this.logger.fine(sb.toString());
             }
         }
     }
@@ -323,10 +325,6 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
 
         // sending positive SRI response
         try {
-            long invokeId = this.getInvokeId();
-            IMSI imsi = this.mapParameterFactory.createIMSI(correlationIdValue.getCorrelationID());
-            MWStatus mwStatus = correlationIdValue.getMwStatus();
-            Boolean mwdSet = null;
             String smscAddressForCountryCode = this.getSmscAddressForCountryCode();
             ISDNAddressString networkNodeNumber;
             if (smscAddressForCountryCode != null) {
@@ -335,31 +333,72 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
             } else {
                 networkNodeNumber = getNetworkNodeNumber(correlationIdValue.getNetworkId());
             }
-
             LocationInfoWithLMSI li = this.mapParameterFactory.createLocationInfoWithLMSI(networkNodeNumber, null, null, false, null);
-            if (dlg.getApplicationContext().getApplicationContextVersion() == MAPApplicationContextVersion.version1) {
-                if (mwStatus != null) {
-                    if (mwStatus.getMnrfSet())
-                        mwdSet = true;
-                    mwStatus = null;
-                }
-            }
 
-            dlg.addSendRoutingInfoForSMResponse(invokeId, imsi, li, null, mwdSet);
-
-            InformServiceCentreRequest isc = correlationIdValue.getInformServiceCentreRequest();
-            if (mwStatus != null && isc != null) {
-                dlg.addInformServiceCentreRequest(isc.getStoredMSISDN(), isc.getMwStatus(), null, isc.getAbsentSubscriberDiagnosticSM(),
-                        isc.getAdditionalAbsentSubscriberDiagnosticSM());
-            }
-
-            dlg.close(false);
+            this.doSendResponse(correlationIdValue, dlg, correlationIdValue.getCorrelationID(), li);
         } catch (MAPException e) {
             if (dlg != null) {
                 dlg.release();
             }
 
             String reason = "MAPException when sending SRI positive Response (home routing): " + e.toString();
+            this.logger.severe(reason, e);
+        }
+    }
+
+    private void doSendResponse(CorrelationIdValue correlationIdValue, MAPDialogSms dlg, String imsiValue,
+            LocationInfoWithLMSI li) throws MAPException {
+        long invokeId = this.getInvokeId();
+        IMSI imsi = this.mapParameterFactory.createIMSI(imsiValue);
+        MWStatus mwStatus = correlationIdValue.getMwStatus();
+        Boolean mwdSet = null;
+
+        if (dlg.getApplicationContext().getApplicationContextVersion() == MAPApplicationContextVersion.version1) {
+            if (mwStatus != null) {
+                if (mwStatus.getMnrfSet())
+                    mwdSet = true;
+                mwStatus = null;
+            }
+        }
+
+        dlg.addSendRoutingInfoForSMResponse(invokeId, imsi, li, null, mwdSet);
+
+        InformServiceCentreRequest isc = correlationIdValue.getInformServiceCentreRequest();
+        if (mwStatus != null && isc != null) {
+            dlg.addInformServiceCentreRequest(isc.getStoredMSISDN(), isc.getMwStatus(), null, isc.getAbsentSubscriberDiagnosticSM(),
+                    isc.getAdditionalAbsentSubscriberDiagnosticSM());
+        }
+
+        dlg.close(false);
+    }
+
+    @Override
+    public void onSriHrByPass(CorrelationIdValue correlationIdValue) {
+        MAPDialogSms dlg = this.getActivity();
+        if (dlg == null) {
+            this.logger.severe("Home routing: can not get MAPDialog for sending SRI hrByPass Response");
+            return;
+        }
+
+        smscStatAggregator.updateMsgInHrSriHrByPass();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Home routing: bypassing of HR procedure: transaction: ");
+        sb.append(correlationIdValue);
+        if (this.logger.isInfoEnabled())
+            this.logger.info(sb.toString());
+
+        // sending original SRI response
+        try {
+            SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse = correlationIdValue.getSendRoutingInfoForSMResponse();
+            this.doSendResponse(correlationIdValue, dlg, sendRoutingInfoForSMResponse.getIMSI().getData(),
+                    sendRoutingInfoForSMResponse.getLocationInfoWithLMSI());
+        } catch (MAPException e) {
+            if (dlg != null) {
+                dlg.release();
+            }
+
+            String reason = "MAPException when sending SRI bypassing of HR procedure (home routing): " + e.toString();
             this.logger.severe(reason, e);
         }
     }

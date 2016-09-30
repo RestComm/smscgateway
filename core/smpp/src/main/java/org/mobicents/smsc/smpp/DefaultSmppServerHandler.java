@@ -184,8 +184,12 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 
 			// set esme server bound
 			esme.setServerBound(true);
+
+			// set link start flag
+			esme.setLinkStartFirstTime(true);
+
 			// start enquire message imedialtely
-			this.smppServerOpsThread.scheduleEnquireList(esme.getName(), 0L);
+			this.smppServerOpsThread.scheduleList(esme.getName(), 0L);
 		}
 	}
 

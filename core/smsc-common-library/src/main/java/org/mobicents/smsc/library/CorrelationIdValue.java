@@ -29,6 +29,8 @@ import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.service.sms.InformServiceCentreRequest;
 import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
 import org.mobicents.protocols.ss7.map.api.service.sms.MWStatus;
+import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
+import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
 
 /**
  *
@@ -42,6 +44,7 @@ public class CorrelationIdValue implements Serializable {
     private ISDNAddressString msisdn;
     private AddressString serviceCentreAddress;
     private int networkId;
+    private SccpAddress originatorSccpAddress;
     
     private LocationInfoWithLMSI locationInfoWithLMSI;
     private String imsi;
@@ -49,11 +52,15 @@ public class CorrelationIdValue implements Serializable {
     private InformServiceCentreRequest informServiceCentreRequest;
     private int sriMapVersion = 3;
 
-    public CorrelationIdValue(String correlationID, ISDNAddressString msisdn, AddressString serviceCentreAddress, int networkId) {
+    private SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse;
+
+    public CorrelationIdValue(String correlationID, ISDNAddressString msisdn, AddressString serviceCentreAddress,
+            int networkId, SccpAddress originatorSccpAddress) {
         this.correlationID = correlationID;
         this.msisdn = msisdn;
         this.serviceCentreAddress = serviceCentreAddress;
         this.networkId = networkId;
+        this.originatorSccpAddress = originatorSccpAddress;
     }
 
     public String getCorrelationID() {
@@ -70,6 +77,10 @@ public class CorrelationIdValue implements Serializable {
 
     public int getNetworkId() {
         return networkId;
+    }
+
+    public SccpAddress getOriginatorSccpAddress() {
+        return originatorSccpAddress;
     }
 
 
@@ -113,6 +124,14 @@ public class CorrelationIdValue implements Serializable {
         this.sriMapVersion = sriMapVersion;
     }
 
+    public SendRoutingInfoForSMResponse getSendRoutingInfoForSMResponse() {
+        return sendRoutingInfoForSMResponse;
+    }
+
+    public void setSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse sendRoutingInfoForSMResponse) {
+        this.sendRoutingInfoForSMResponse = sendRoutingInfoForSMResponse;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -126,6 +145,8 @@ public class CorrelationIdValue implements Serializable {
         sb.append(serviceCentreAddress);
         sb.append(", networkId=");
         sb.append(networkId);
+        sb.append(", originatorSccpAddress=");
+        sb.append(originatorSccpAddress);
         sb.append(", locationInfoWithLMSI=");
         sb.append(locationInfoWithLMSI);
         sb.append(", imsi=");

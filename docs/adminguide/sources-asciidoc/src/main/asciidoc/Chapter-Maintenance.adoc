@@ -8,7 +8,7 @@ These tables need to be dropped periodically else the tables may end up occupyin
  
 
 You can choose to drop these tables manually or configure the Gateway to drop the tables periodically.
-To configure these settings, you can make use of the parameters `removinglivetablesdays` and `removingarchivetabledays`.
+To configure these settings, you can make use of the parameters `removinglivetablesdays` and `removingarchivetablesdays`.
  
 
 NOTE: By default, Cassandra Database creates snapshots of tables prior to dropping them.
@@ -21,8 +21,8 @@ To overcome this, you must update the [path]_cassandra.yaml_ configuration file 
 [[_auto_delete_cli]]
 ==== Using CLI
 
-You can configure the auto-drop settings by issuing the command `smsc set removinglivetablesdays` for LIVE tables and the command `smsc set removingarchivetabledays`, with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get removinglivetablesdays` and `smsc get removingarchivetabledays` which will display the values set for these properties. 
+You can configure the auto-drop settings by issuing the command `smsc set removinglivetablesdays` for LIVE tables and the command `smsc set removingarchivetablesdays`, with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get removinglivetablesdays` and `smsc get removingarchivetablesdays` which will display the values set for these properties. 
 
 ----
 
@@ -60,10 +60,10 @@ PARAMETERS
 ----
 
 Name
-	smsc set removingarchivetabledays
+	smsc set removingarchivetablesdays
 
 SYNOPSIS
-	smsc set removingarchivetabledays <value>
+	smsc set removingarchivetablesdays <value>
 
 DESCRIPTION
 	This command is used to configure the SMSC to automatically drop ARCHIVE tables 
@@ -71,7 +71,7 @@ DESCRIPTION
 	midnight and after every SMSC restart.
 
 PARAMETERS
-	removingarchivetabledays	- This parameter is used to specify the number
+	removingarchivetablesdays	- This parameter is used to specify the number
 					  of days the ARCHIVE tables should be kept before 
 					  attempting to drop them automatically.
 
@@ -93,7 +93,7 @@ PARAMETERS
 [[_manual_delete]]
 === Manually drop tables
 
-If you do not want the SMSC Gateway to automatically drop tables you must set the value of the parameters `removinglivetablesdays` and `removingarchivetabledays` to zero and disable this feature as explained in the preceding section.
+If you do not want the SMSC Gateway to automatically drop tables you must set the value of the parameters `removinglivetablesdays` and `removingarchivetablesdays` to zero and disable this feature as explained in the preceding section.
 
 You must decide on how much data you would like to retain in the Database and accordingly delete the tables.
 However you must take precaution to not delete the tables for today or a future date.

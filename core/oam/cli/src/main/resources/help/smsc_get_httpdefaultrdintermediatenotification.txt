@@ -1,0 +1,20 @@
+Name
+	smsc get httpdefaultrdintermediatenotification
+
+SYNOPSIS
+	smsc get httpdefaultrdintermediatenotification
+
+DESCRIPTION
+	This command is used to get a value for default intermediate
+	notification request value for messages from an HTTP connector.
+	Possible values: 0-no, 1-yes
+
+EXAMPLES
+	smsc get httpdefaultrdintermediatenotification
+
+SEE ALSO
+	smsc set httpdefaultrdintermediatenotification
+	smsc get httpdefaultsourceton, smsc get httpdefaultsourcenpi,
+	smsc get httpdefaultdestton, smsc get httpdefaultdestnpi,
+	smsc get httpdefaultmessagingmode,
+	smsc get httpdefaultrddeliveryreceipt

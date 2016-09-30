@@ -1,0 +1,16 @@
+Name
+	smsc set receiptsdisabling
+
+SYNOPSIS
+	smsc set receiptsdisabling <true | false>
+
+DESCRIPTION
+	The SMSC can be configured to generate or not delivery receipts.
+	Setting of receiptsdisabling to false enables of receipts generation.
+	Setting of receiptsdisabling to true disables of receipts generation.
+	Default value: false (receipts will be generated).
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

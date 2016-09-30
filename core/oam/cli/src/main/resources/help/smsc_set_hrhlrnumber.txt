@@ -5,7 +5,7 @@ SYNOPSIS
 	smsc set hrhlrnumber <hlr GT digits> networkid <networkId>
 
 DESCRIPTION
-	This command is used to set a pre-configured HLR address for SRI messages.
+	This command is used to set a pre-configured HLR address for SRI requests.
 	
 	In some scenarios it may be required to set a HLR address instead of a
 	MSISDN address into the SCCP 'CalledPartyAddress' of 'SendRoutingInfo'

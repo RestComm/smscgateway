@@ -6,7 +6,7 @@ SYNOPSIS
 
 DESCRIPTION
 	This command is used to determine if the value of the parameter 'txsmppcharging' 
-	is set to 'none', 'selected' or 'all'. 
+	is set to 'None', 'Selected' or 'All'. 
 
 SEE ALSO
 	smsc set diameterdestrealm, smsc set diameterdesthost, smsc set diameterdestport,

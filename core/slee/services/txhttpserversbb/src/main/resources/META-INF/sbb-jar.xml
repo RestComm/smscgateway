@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE sbb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE SBB 1.1//EN"
+                         "http://java.sun.com/dtd/slee-sbb-jar_1_1.dtd">
+<sbb-jar>
+	<sbb id="TxHttpServerSbb">
+		<description>SBB listening for Http Requests</description>
+		<sbb-name>TxHttpServerSbb</sbb-name>
+		<sbb-vendor>org.mobicents</sbb-vendor>
+		<sbb-version>1.0</sbb-version>
+		<sbb-alias>TxHttpServerSbb</sbb-alias>
+
+        <sbb-ref>
+            <sbb-name>ChargingSbb</sbb-name>
+            <sbb-vendor>org.mobicents</sbb-vendor>
+            <sbb-version>1.0</sbb-version>
+            <sbb-alias>ChargingSbb</sbb-alias>
+        </sbb-ref>
+
+		<sbb-classes>
+			<sbb-abstract-class>
+				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.http.server.tx.TxHttpServerSbb</sbb-abstract-class-name>
+                <get-child-relation-method>
+                    <sbb-alias-ref>
+                        ChargingSbb
+                    </sbb-alias-ref>
+                    <get-child-relation-method-name>
+                        getChargingSbb
+                    </get-child-relation-method-name>
+                    <default-priority>0</default-priority>
+                </get-child-relation-method>
+			</sbb-abstract-class>
+		</sbb-classes>
+
+        <!--HTTP MOBICENTS-->
+        <event event-direction="Receive" initial-event="True">
+            <event-name>HttpGet</event-name>
+            <event-type-ref>
+                <event-type-name>net.java.slee.resource.http.events.incoming.request.GET</event-type-name>
+                <event-type-vendor>net.java.slee</event-type-vendor>
+                <event-type-version>1.0</event-type-version>
+            </event-type-ref>
+            <initial-event-select variable="ActivityContext"/>
+            <initial-event-selector-method-name>isInitialHttpRequestEvent</initial-event-selector-method-name>
+        </event>
+
+        <event event-direction="Receive" initial-event="True">
+            <event-name>HttpPost</event-name>
+            <event-type-ref>
+                <event-type-name>net.java.slee.resource.http.events.incoming.request.POST</event-type-name>
+                <event-type-vendor>net.java.slee</event-type-vendor>
+                <event-type-version>1.0</event-type-version>
+            </event-type-ref>
+            <initial-event-select variable="ActivityContext"/>
+            <initial-event-selector-method-name>isInitialHttpRequestEvent</initial-event-selector-method-name>
+        </event>
+
+		<event event-direction="Receive" initial-event="True">
+			<event-name>ServiceStartedEvent</event-name>
+			<event-type-ref>
+				<event-type-name>javax.slee.serviceactivity.ServiceStartedEvent</event-type-name>
+				<event-type-vendor>javax.slee</event-type-vendor>
+				<event-type-version>1.1</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>ActivityEndEvent</event-name>
+			<event-type-ref>
+				<event-type-name>javax.slee.ActivityEndEvent</event-type-name>
+				<event-type-vendor>javax.slee</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>PersistenceResourceAdaptorType</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>slee/resources/persistence/1.0/provider</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>PersistenceResourceAdaptor</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>
+
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>SchedulerResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/scheduler/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
+
+        <!--HTTP RESOURCE ADAPTOR-->
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>HttpServletResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <activity-context-interface-factory-name>${mobicents.http.ra.acifactory}</activity-context-interface-factory-name>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>${mobicents.http.ra.name}</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>${mobicents.http.ra.link}</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
+	</sbb>
+</sbb-jar>

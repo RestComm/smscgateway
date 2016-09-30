@@ -55,7 +55,7 @@
 								</span>
 							</div>
 							<div id="div-esmedefaultclustername" class="control-group">
-								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for ESME default cluster. If the destination-address does not match to any ESME (any Cluster Name) the message will be routed to the cluster with the name specified here for esme-default- cluster.">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a value for ESME default cluster. If the destination-address does not match to any ESME (any Cluster Name) the message will be routed to the cluster with the name specified here for esme default cluster. This parameter affects only for DatabaseSmsRoutingRule.">
 									<span class="add-on">Default Cluster Name</span>
 									<input id="esmedefaultclustername" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
 								</span>                         
@@ -150,14 +150,14 @@ Delay after every consecutive delivery failure = prev-due-delay * due-delay-mult
 							</div>								
                         </div>  				 	
                         <div class="tab-pane" id="ss7settings">
-                        	<h5 style="border-bottom: 1px solid #DDD;">Global Title Configuration</h5>
+                        	<h5 style="border-bottom: 1px solid #DDD;">SMSC Global Title Configuration</h5>
                         	
 							<div id="div-gtinitext" class="control-group">
-								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC Gateway Global Title Indicator Network Id. Double click on select box to add new values. networkId specifies Global Title for a virtual SS7 subnetwork (this is for Multi-tenancy support). You can define different networkIds as unique subnetworks and assign Global Titles for each of the subnetworks. networkId 0 is for default SS7 network.">
-								  <span class="add-on">SMSC Gateway Global Title Indicator Network Id</span>				
-								  <select id="gtinisel" style="width: 200px;" onchange="gtInSelChange()">
-								  </select>
-							 	 <input id="gtinitext" type="text" name="format" class="input-mini" value="0" style="width: 165px; margin-left: -199px; margin-top: 1px; border: none;" />
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC Gateway Global Title Network Id. Double click on select box to add new values. networkId specifies Global Title for a virtual SS7 subnetwork (this is for Multi-tenancy support). You can define different networkIds as unique subnetworks and assign Global Titles for each of the subnetworks. networkId 0 is for default SS7 network.">
+									<span class="add-on">SMSC Gateway Global Title Indicator Network Id</span>				
+									<select id="gtinisel" style="width: 200px;" onchange="gtInSelChange()">
+									</select>
+							 		<input id="gtinitext" type="text" name="format" class="input-mini" value="0" style="width: 165px; margin-left: -199px; margin-top: 1px; border: none;" />
 							 	</span>
 							</div>	                        	
                         	
@@ -185,6 +185,25 @@ Delay after every consecutive delivery failure = prev-due-delay * due-delay-mult
 									<input id="tt" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
 								</span>
 							</div>													
+
+							&nbsp;
+							<h5 style="border-bottom: 1px solid #DDD;">SRI requests configuration</h5>
+							<div id="div-hrnitext" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="HR Global Title Indicator Network Id. Double click on select box to add new values. networkId specifies virtual SS7 subnetwork (this is for Multi-tenancy support). You can define different networkIds as unique subnetworks and assign HR Global Title Indicator for each of the subnetworks. networkId 0 is for default SS7 network.">
+								  <span class="add-on">Pre-configured HLR address for SRI requests Network Id</span>				
+								  <select id="hrnisel" style="width: 200px;" onchange="hrInSelChange()">
+								  </select>
+							 	 <input id="hrnitext" type="text" name="format" class="input-mini" value="0" style="width: 165px; margin-left: -199px; margin-top: 1px; border: none;" />
+							 	</span>
+							</div>							 
+							 
+                        	<div id="div-hrHlrNumber" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a pre-configured HLR address for SRI messages. In some scenarios it may be required to set a HLR address instead of a MSISDN address into the SCCP CalledPartyAddress of SendRoutingInfo requests issued by the SMSC GW in both mobile terminated and home routing modes. In such cases, you must set this parameter hrhlrnumber to a pre-configured HLR address. For all other scenarios where this is not required, you may leave this parameter empty. When this is empty, the SCCP CalledPartyAddress of SendRoutingInfo request will be set to the destination MSISDN of a subscriber. With different networkIds, hrhlrnumber for several subnetworks can be set.">
+									<span class="add-on">Pre-configured HLR address for SRI requests</span>
+									<input id="hrHlrNumber" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="" />
+								</span>
+							</div>		
+
 							&nbsp;
 							<h5 style="border-bottom: 1px solid #DDD;">Sub System Number Configuration</h5>
 							<div id="div-ussdssn" class="control-group">        
@@ -402,12 +421,21 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								</span>  															
 							</div>	
 							<div id="div-charginghr" class="control-group">        						                		
-								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of the parameter 'hrcharging'. If this is accept, all Mobile Originated messages arrived by Home Routing will be accepted for further processin. If set to reject, all Mobile Originated messages arrived by Home Routing will be rejected and proper error message will be sent to peer. If set to diameter, all Mobile Originated messages arrived by Home Routing will be charged by OCS via Diameter, prior to being sent.">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of the parameter 'hrcharging'. If this is accept, all Mobile Originated messages arrived by Home Routing will be accepted for further processing. If set to reject, all Mobile Originated messages arrived by Home Routing will be rejected and proper error message will be sent to peer. If set to diameter, all Mobile Originated messages arrived by Home Routing will be charged by OCS via Diameter, prior to being sent.">
 									<span class="add-on">Home Routed SMS Charged </span>
 									<select id="charginghr" >
 										<option>accept</option>
 										<option>reject</option>
 										<option>diameter</option>
+									</select>
+								</span>  															
+							</div>
+							<div id="div-charginghttp" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the value of the parameter 'txhttpcharging'. If this is accept, all HTTP Originated messages will be accepted for further processing. If set to reject, all HTTP Originated messages be rejected and proper error message will be sent to peer. If set to diameter, all HTTP Originated messages will be charged by OCS via Diameter, prior to being sent.">
+									<span class="add-on">HTTP originated SMS Charged </span>
+									<select id="charginghttp" >
+										<option>accept</option>
+										<option>reject</option>
 									</select>
 								</span>  															
 							</div>							
@@ -430,7 +458,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									</select>
 								</span> 								
 							</div>
-							
+
 							<div id="div-receiptsdisabling" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set to true to disable SMS receipt. Even if SMS carries header for delivery receipt, SMSC will not generate one">
 									<span class="add-on">Disable Delivery Receipt</span>
@@ -440,7 +468,27 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									</select>
 								</span> 								
 							</div>
-							
+
+							<div id="div-enableintermediatereceipts" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set to true to enable intermediate SMS receipt (for temporary failures). When set to false even if SMS carries header for intermediate delivery receipt, SMSC will not generate one">
+									<span class="add-on">Enable intermediate receipts</span>
+									<select id="enableintermediatereceipts" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span> 								
+							</div>
+
+							<div id="div-incomereceiptsprocessing" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set to true to enable of processing of incoming delivery receipts from remote SMSC GW: replacing of messageId in a receipt by a local messageId">
+									<span class="add-on">Income receipts processing</span>
+									<select id="incomereceiptsprocessing" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span> 								
+							</div>
+
 							<div id="div-origNetworkIdForReceipts" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if this option is turned on (true), for each generated delivery receipts networkId will be set to the value of networkId of an ESME from which the original message has come to SMSC. This can help for routing of receipts back to the originated ESME. If this option is turned off (false) then the networkId of receipts will be taken from networkId of ESME / SS7 / SIP via which the original message has left SMSC GW. ">
 									<span class="add-on">Original NetworkId For Receipts</span>
@@ -522,26 +570,24 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								</span>                         
 							</div>
 							 -->
-							<div id="div-hrnitext" class="control-group">
-								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="HR Global Title Indicator and HR SRI Bypass Network Id. Double click on select box to add new values. networkId specifies virtual SS7 subnetwork (this is for Multi-tenancy support). You can define different networkIds as unique subnetworks and assign HR Global Title Indicator and HR SRI Bypass for each of the subnetworks. networkId 0 is for default SS7 network.">
-								  <span class="add-on">HR Global Title Indicator and HR SRI Bypass Network Id</span>				
-								  <select id="hrnisel" style="width: 200px;" onchange="hrInSelChange()">
+
+							<div id="div-sbnitext" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="HR SRI Bypass Network Id. Double click on select box to add new values. networkId specifies virtual SS7 subnetwork (this is for Multi-tenancy support). You can define different networkIds as unique subnetworks and assign HR SRI Bypass for each of the subnetworks. networkId 0 is for default SS7 network.">
+								  <span class="add-on">Bypassing of SRI request to a local HLR Network Id</span>				
+								  <select id="sbnisel" style="width: 200px;" onchange="sbInSelChange()">
 								  </select>
-							 	 <input id="hrnitext" type="text" name="format" class="input-mini" value="0" style="width: 165px; margin-left: -199px; margin-top: 1px; border: none;" />
+							 	 <input id="sbnitext" type="text" name="format" class="input-mini" value="0" style="width: 165px; margin-left: -199px; margin-top: 1px; border: none;" />
 							 	</span>
 							</div>							 
-							 
-                        	<div id="div-hrHlrNumber" class="control-group">
-								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a pre-configured HLR address for SRI messages. In some scenarios it may be required to set a HLR address instead of a MSISDN address into the SCCP CalledPartyAddress of SendRoutingInfo requests issued by the SMSC GW in both mobile terminated and home routing modes. In such cases, you must set this parameter hrhlrnumber to a pre-configured HLR address. For all other scenarios where this is not required, you may leave this parameter empty. When this is empty, the SCCP CalledPartyAddress of SendRoutingInfo request will be set to the destination MSISDN of a subscriber. With different networkIds, hrhlrnumber for several subnetworks can be set.">
-									<span class="add-on">Home Routing HLR Global Title</span>
-									<input id="hrHlrNumber" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="" />
-								</span>
-							</div>		
 							
                         	<div id="div-hrSriBypass" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set if SMSC GW will bypass a SRI to a local HLR. By default is false means SRI will not be by-passed. NetworkId specifies a virtual SS7 subnetwork (this is for Multi-tenancy support). If you have not specified hrsribypass parameter for a networkId then a master hrsribypass will be used (that was specified for networkId 0).">
-									<span class="add-on">Home Routing SRI Bypass</span>
-									<input id="hrSriBypass" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="" />
+									<span class="add-on">Bypassing of SRI request to a local HLR</span>
+									<select id="hrSriBypass" style="width: 300px;">
+										<option>false</option>
+										<option>true</option>
+										<option>Remove the value for networkId</option>
+									</select>
 								</span>
 							</div>	
 																			 
@@ -593,12 +639,23 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						var hrnisel = document.getElementById("hrnisel");
 						var hrnitext = document.getElementById("hrnitext");
 						var hrHlrNumber = document.getElementById("hrHlrNumber");
-						var hrSriBypass = document.getElementById("hrSriBypass");
-						
+
 						hrnitext.value = hrnisel.options[hrnisel.selectedIndex].text;
-						var strArr = hrnisel.options[hrnisel.selectedIndex].value.split(":");
-						hrHlrNumber.value = strArr[0];
-						hrSriBypass.value = strArr[1];
+						hrHlrNumber.value = hrnisel.options[hrnisel.selectedIndex].value;
+					}					
+					
+					function sbInSelChange(){
+						var sbnisel = document.getElementById("sbnisel");
+						var sbnitext = document.getElementById("sbnitext");
+						sbnitext.value = sbnisel.options[sbnisel.selectedIndex].text;
+
+						var hrSriBypass = document.getElementById("hrSriBypass");
+						var hrSriBypassVar = sbnisel.options[sbnisel.selectedIndex].value;
+						if(hrSriBypassVar == "false"){
+							hrSriBypass.options[0].selected = true;
+						} else {
+							hrSriBypass.options[1].selected = true;
+						}
 					}					
 					
 					function generateCdrCheckBox(){
@@ -706,6 +763,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										$("#mscssn").val(response.value.MscSsn);
 										$("#maxmapv").val(response.value.MaxMapVersion);
 										$("#maxmessagelengthreducer").val(response.value.MaxMessageLengthReducer);
+										$("#hrHlrNumber").val(response.value.HrHlrNumber);
 										
 										$("#sriResponseLiveTime").val(response.value.SriResponseLiveTime);
 																				
@@ -722,12 +780,19 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										
 										$("#tt").val(response.value.TranslationType);
 										
+										$("#gtinisel").empty();
 										$("#gtinisel").append(new Option("0", response.value.ServiceCenterGt));
-										
 										jQuery.each(response.value.NetworkIdVsServiceCenterGt, function(key, val) {
 											$("#gtinisel").append(new Option(key, val));
-											
 										});
+										gtinitext.value = gtinisel.options[gtinisel.selectedIndex].text;
+
+										$("#hrnisel").empty();
+										$("#hrnisel").append(new Option("0", response.value.HrHlrNumber));
+										jQuery.each(response.value.NetworkIdVsHrHlrNumber, function(key, val) {
+											$("#hrnisel").append(new Option(key, val));
+										});
+										hrnitext.value = hrnisel.options[hrnisel.selectedIndex].text;
 									}],
 									error: function(value) {
 										errorUID = ("st" + new Date().getTime()).hashCode();
@@ -815,6 +880,22 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 											receiptsdisabling.options[1].selected = true;
 										}
 										
+										var enableintermediatereceiptsVar = response.value.EnableIntermediateReceipts;
+										
+										if(enableintermediatereceiptsVar){
+											enableintermediatereceipts.options[0].selected = true;
+										} else {
+											enableintermediatereceipts.options[1].selected = true;
+										}
+
+										var incomereceiptsprocessingVar = response.value.IncomeReceiptsProcessing;
+										
+										if(incomereceiptsprocessingVar){
+											incomereceiptsprocessing.options[0].selected = true;
+										} else {
+											incomereceiptsprocessing.options[1].selected = true;
+										}
+
 										var origNetworkIdForReceiptsVar = response.value.OrigNetworkIdForReceipts;
 										
 										if(origNetworkIdForReceiptsVar){
@@ -953,13 +1034,19 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										}
 										
 										var charginghrVar = response.value.HrCharging
-										
 										if(charginghrVar == "accept"){
 											charginghr.options[0].selected = true;
 										} else if(charginghrVar == "reject") {
 											charginghr.options[1].selected = true;
 										} else {
 											charginghr.options[2].selected = true;
+										}
+										
+										var charginghttpVar = response.value.TxHttpCharging
+										if(charginghttpVar == "accept"){
+											charginghttp.options[0].selected = true;
+										} else {
+											charginghttp.options[1].selected = true;
 										}
 									}],
 									error: function(value) {
@@ -979,36 +1066,21 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								],
 								{ success: [
 									function(response) {
-										//var smsHomeRoutingTmp = response.value.SMSHomeRouting
-										//if(smsHomeRoutingTmp){
-										//	smsHomeRouting.options[0].selected = true;
-										//} else {
-										//	smsHomeRouting.options[1].selected = true;
-										//}
-										$("#hrHlrNumber").val(response.value.HrHlrNumber);
-										$("#hrSriBypass").val(response.value.HrSriBypass);
+										if(response.value.HrSriBypass == "false"){
+											hrSriBypass.options[0].selected = true;
+										} else {
+											hrSriBypass.options[1].selected = true;
+										}
+
 										$("#smsHomeRoutingCorrIdLivTme").val(response.value.CorrelationIdLiveTime);
-										
-										
-										$("#hrnisel").append(new Option("0", response.value.HrHlrNumber+":"+response.value.HrSriBypass));
-										
-										var count = 0;
-										jQuery.each(response.value.NetworkIdVsHrHlrNumber, function(key, val) {
-											var optionValue = val+":";
-											var tmpHrSriBypass = "false";
-											
-											tmpHrSriBypass = response.value.NetworkIdVsHrSriBypass[key];
-											if(typeof tmpHrSriBypass == "undefined") {
-												tmpHrSriBypass = "false";    
-											}
-											
-											optionValue = optionValue+tmpHrSriBypass;
-											
-											//alert(optionValue);
-											
-											$("#hrnisel").append(new Option(key, optionValue));
-											
+
+										$("#sbnisel").empty();
+										$("#sbnisel").append(new Option("0", response.value.HrSriBypass));
+										jQuery.each(response.value.NetworkIdVsHrSriBypass, function(key, val) {
+											$("#sbnisel").append(new Option(key, val));
 										});
+										sbnitext.value = sbnisel.options[sbnisel.selectedIndex].text;
+
 									}],
 									error: function(value) {
 										errorUID = ("st" + new Date().getTime()).hashCode();
@@ -1021,30 +1093,18 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 					
 					function applyHomeRouting() {
 						var formInvalid = false;
-						//var e2 = document.getElementById("smsHomeRouting");
-						//var smsHomeRouting = e2.options[e2.selectedIndex].text;
-						var hrnitext = $("#hrnitext").val();
-						hrnitext = hrnitext.trim();
-						if(hrnitext == "") {
-			    			$("#div-hrnitext").addClass("error");					    			
+
+						var sbnitext = $("#sbnitext").val();
+						sbnitext = sbnitext.trim();
+						if(sbnitext == "") {
+			    			$("#div-sbnitext").addClass("error");					    			
 			    			formInvalid = true;
 			    		} else if($("#div-hrnitext").hasClass("error")) {
 			    			$("#div-hrnitext").removeClass("error");		
-			    		}	
+			    		}
 						
-						var hrhlrnumber = $("#hrHlrNumber").val();
-						if(hrhlrnumber.trim() == ""){
-							hrhlrnumber = null;
-						}	
-						
-						var hrsribypass = $("#hrSriBypass").val();
-						hrsribypass = hrsribypass.trim();
-						if(hrsribypass != "true" && hrsribypass != "false"){
-							$("#div-hrSriBypass").addClass("error");					    			
-			    			formInvalid = true;
-			    		} else if($("#div-hrSriBypass").hasClass("error")) {
-			    			$("#div-hrSriBypass").removeClass("error");		
-			    		}	 	
+						var hrSriBypass = document.getElementById("hrSriBypass");
+						var hrsribypassVal = hrSriBypass.selectedIndex;
 						
 						var smsHomeRoutingCorrIdLivTme = $("#smsHomeRoutingCorrIdLivTme").val();
 						if(smsHomeRoutingCorrIdLivTme.trim() == "") {
@@ -1062,7 +1122,6 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 							$("#login-settings-error").hide();
 						}
 						
-						
 						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
 						jolokia.request(
 								[
@@ -1078,28 +1137,14 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									} 
 								}
 							);
-						
-						//alert(hrnitext+" "+hrhlrnumber);
-						
-						if(hrnitext != "0"){
-							jolokia.execute(mbeanSearch,"setHrHlrNumber", hrnitext,hrhlrnumber, 
+
+						if(sbnitext != "0") {
+							if(hrsribypassVal==0) {
+								jolokia.execute(mbeanSearch,"setHrSriBypass", sbnitext, "false", 
 									{
 										success: function(value) {
-											
-											jolokia.execute(mbeanSearch,"setHrSriBypass", hrnitext,hrsribypass, 
-													{
-														success: function(value) {
-															$("#hrnisel").empty();
-															updateHomeRouting();
-															logToConsole("INFO", "SMSC Gateway Home Routing successfully updated.");
-														},
-														error: function(value){
-															errorUID = ("st" + new Date().getTime()).hashCode();
-															createStackTrace(errorUID, value.stacktrace);
-															logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
-														}					
-													});												
-											
+											logToConsole("INFO", "SMSC Gateway Home Routing successfully updated.");
+											updateHomeRouting();
 										},
 										error: function(value){
 											errorUID = ("st" + new Date().getTime()).hashCode();
@@ -1107,14 +1152,53 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 											logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
 										}					
 									});
-							
+							} else if(hrsribypassVal==1) {
+								jolokia.execute(mbeanSearch,"setHrSriBypass", sbnitext, "true", 
+									{
+										success: function(value) {
+											logToConsole("INFO", "SMSC Gateway Home Routing successfully updated.");
+											updateHomeRouting();
+										},
+										error: function(value){
+											errorUID = ("st" + new Date().getTime()).hashCode();
+											createStackTrace(errorUID, value.stacktrace);
+											logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+										}					
+									});
 							} else {
-								
-								mbeanSearch="com.telscale.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
+								jolokia.execute(mbeanSearch,"removeHrSriBypassForNetworkId", sbnitext, 
+									{
+										success: function(value) {
+											logToConsole("INFO", "SMSC Gateway Home Routing successfully updated.");
+											updateHomeRouting();
+										},
+										error: function(value){
+											errorUID = ("st" + new Date().getTime()).hashCode();
+											createStackTrace(errorUID, value.stacktrace);
+											logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+										}					
+									});
+							}
+							
+						} else {
+							if(hrsribypassVal==0) {
 								jolokia.request(
 										[							
-											{ type: "write", mbean: mbeanSearch, attribute: "HrHlrNumber", value: hrhlrnumber },
-											{ type: "write", mbean: mbeanSearch, attribute: "HrSriBypass", value: hrsribypass },
+											{ type: "write", mbean: mbeanSearch, attribute: "HrSriBypass", value: "false" },
+										],
+										{
+											success: function(response) {
+												logToConsole("INFO", "SMSC Gateway properties successfully updated.");
+											},
+											error: function(response) {
+												logToConsole("ERROR", "Failure trying to communicate with the Telscale SMSC Gateway. Please try again later.");
+											} 
+										}
+								);
+							} else {
+								jolokia.request(
+										[							
+											{ type: "write", mbean: mbeanSearch, attribute: "HrSriBypass", value: "true" },
 										],
 										{
 											success: function(response) {
@@ -1126,6 +1210,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										}
 								);
 							}
+						}
 					}					
 
 					
@@ -1337,6 +1422,20 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						if(sriresponselivetime.trim() == ""){
 							sriresponselivetime = "0";
 						}
+
+						var hrnitext = $("#hrnitext").val();
+						hrnitext = hrnitext.trim();
+						if(hrnitext == "") {
+			    			$("#div-hrnitext").addClass("error");					    			
+			    			formInvalid = true;
+						} else if($("#div-hrnitext").hasClass("error")) {
+							$("#div-hrnitext").removeClass("error");		
+						}
+						
+						var hrhlrnumber = $("#hrHlrNumber").val();
+						if(hrhlrnumber.trim() == ""){
+							hrhlrnumber = null;
+						}
 						
 						if(formInvalid) {
 							$("#login-settings-error").show();
@@ -1401,6 +1500,38 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									}
 							);
 						}
+
+						if(hrnitext != "0"){
+							jolokia.execute(mbeanSearch,"setHrHlrNumber", hrnitext,hrhlrnumber, 
+									{
+										success: function(value) {
+											logToConsole("INFO", "SMSC Gateway Home Routing successfully updated.");
+											updateSs7Properties();
+											
+										},
+										error: function(value){
+											errorUID = ("st" + new Date().getTime()).hashCode();
+											createStackTrace(errorUID, value.stacktrace);
+											logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+										}					
+									});
+							
+							} else {
+								
+								jolokia.request(
+										[							
+											{ type: "write", mbean: mbeanSearch, attribute: "HrHlrNumber", value: hrhlrnumber },
+										],
+										{
+											success: function(response) {
+												logToConsole("INFO", "SMSC Gateway properties successfully updated.");
+											},
+											error: function(response) {
+												logToConsole("ERROR", "Failure trying to communicate with the Telscale SMSC Gateway. Please try again later.");
+											} 
+										}
+								);
+							}
 									
 					}
 					
@@ -1624,10 +1755,13 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						
 						e = document.getElementById("chargingsip");
 						var chargingsip = e.options[e.selectedIndex].text;
-						
+
 						e = document.getElementById("charginghr");
 						var charginghr = e.options[e.selectedIndex].text;
-						
+
+						e = document.getElementById("charginghttp");
+						var charginghttp = e.options[e.selectedIndex].text;
+
 						if(formInvalid) {
 							$("#login-settings-error").show();
 							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
@@ -1648,6 +1782,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "TxSmppChargingType", value: chargingesme },
 									{ type: "write", mbean: mbeanSearch, attribute: "TxSipChargingType", value: chargingsip },
 									{ type: "write", mbean: mbeanSearch, attribute: "HrCharging", value: charginghr },
+									{ type: "write", mbean: mbeanSearch, attribute: "TxHttpCharging", value: charginghttp },
 								],
 								{
 									success: function(response) {
@@ -1669,6 +1804,12 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						e = document.getElementById("receiptsdisabling");
 						var receiptsdisabling = e.options[e.selectedIndex].text;
 						
+						e = document.getElementById("enableintermediatereceipts");
+						var enableintermediatereceipts = e.options[e.selectedIndex].text;
+						
+						e = document.getElementById("incomereceiptsprocessing");
+						var incomereceiptsprocessing = e.options[e.selectedIndex].text;
+						
 						e = document.getElementById("origNetworkIdForReceipts");
 						var origNetworkIdForReceipts = e.options[e.selectedIndex].text;
 						
@@ -1679,6 +1820,8 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								[
 									{ type: "write", mbean: mbeanSearch, attribute: "DeliveryPause", value: deliverypauseVar },
 									{ type: "write", mbean: mbeanSearch, attribute: "ReceiptsDisabling", value: receiptsdisabling },
+									{ type: "write", mbean: mbeanSearch, attribute: "EnableIntermediateReceipts", value: enableintermediatereceipts },
+									{ type: "write", mbean: mbeanSearch, attribute: "IncomeReceiptsProcessing", value: incomereceiptsprocessing },
 									{ type: "write", mbean: mbeanSearch, attribute: "OrigNetworkIdForReceipts", value: origNetworkIdForReceipts },
 								],
 								{

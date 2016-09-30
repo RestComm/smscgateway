@@ -1,0 +1,20 @@
+Name
+	smpp smppserver set bindtimeout
+
+SYNOPSIS
+	smpp smppserver set bindtimeout <bind-timeout>
+
+DESCRIPTION
+	This command is used to set a value for bind-timeout in milli-seconds. 
+	Once the TCP socket is established, the SMSC server will wait for the time period 
+	specified by the parameter bind-timeout in milli-seconds, for the peer to send a 
+	bind request, after which it will kill the TCP socket.
+
+	If unspecified, the default value is 5000 milli-seconds.
+
+	You must restart the SMPP Server for the new value to take effect.
+
+SEE ALSO
+	smpp esme create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

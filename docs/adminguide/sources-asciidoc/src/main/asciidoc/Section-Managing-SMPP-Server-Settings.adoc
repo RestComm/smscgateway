@@ -9,7 +9,7 @@
 
 .Procedure: View SMPP Server Details using the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can view the current Session details of the SMPP Server by clicking on the row corresponding to the name of the SMPP Server (`SmscManagement` in this case). 
 
 [[_smpp_server_settings_edit]]
@@ -23,10 +23,10 @@ You can edit the properties of the SMPP Server by issuing appropriate commands f
 ----
 
 Name
-	smppserver set port
+	smpp smppserver set port
 
 SYNOPSIS
-	smppserver set port <port>
+	smpp smppserver set port <port>
 
 DESCRIPTION
 	This command is used to set the port that the SMSC server is listening to for 
@@ -40,10 +40,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set bindtimeout
+	smpp smppserver set bindtimeout
 
 SYNOPSIS
-	smppserver set bindtimeout <bind-timeout>
+	smpp smppserver set bindtimeout <bind-timeout>
 
 DESCRIPTION
 	This command is used to set a value for bind-timeout in milli-seconds. 
@@ -59,10 +59,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set systemid
+	smpp smppserver set systemid
 
 SYNOPSIS
-	smppserver set systemid <system-id>
+	smpp smppserver set systemid <system-id>
 
 DESCRIPTION
 	This command is used to set the value for system-id. This is the 'system-id' 
@@ -74,10 +74,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set autonegotiateversion
+	smpp smppserver set autonegotiateversion
 
 SYNOPSIS
-	smppserver set autonegotiateversion <true/false>
+	smpp smppserver set autonegotiateversion <true/false>
 
 DESCRIPTION
 	This command is used to specify if auto-negotiate-version is enabled or not.
@@ -93,10 +93,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set interfaceversion
+	smpp smppserver set interfaceversion
 
 SYNOPSIS
-	smppserver set interfaceversion <interface-version>
+	smpp smppserver set interfaceversion <interface-version>
 
 DESCRIPTION
 	This command is used to specify the SMPP version that the Server supports. 
@@ -107,10 +107,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set maxconnectionsize
+	smpp smppserver set maxconnectionsize
 
 SYNOPSIS
-	smppserver set maxconnectionsize <max-connection-size>
+	smpp smppserver set maxconnectionsize <max-connection-size>
 
 DESCRIPTION
 	This command is used to specify the maximum number of connections/sessions this 
@@ -122,10 +122,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultwindowsize
+	smpp smppserver set defaultwindowsize
 
 SYNOPSIS
-	smppserver set defaultwindowsize <defaultwindowsize>
+	smpp smppserver set defaultwindowsize <defaultwindowsize>
 
 DESCRIPTION
 	This command is used to specify the default window size for this Server. 
@@ -141,10 +141,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultwindowwaittimeout
+	smpp smppserver set defaultwindowwaittimeout
 
 SYNOPSIS
-	smppserver set defaultwindowwaittimeout <default-window-wait-timeout>
+	smpp smppserver set defaultwindowwaittimeout <default-window-wait-timeout>
 
 DESCRIPTION
 	This command is used to specify the default-window-wait-timeout for this Server
@@ -160,10 +160,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultrequestexpirytimeout
+	smpp smppserver set defaultrequestexpirytimeout
 
 SYNOPSIS
-	smppserver set defaultrequestexpirytimeout <default-request-expiry-timeout>
+	smpp smppserver set defaultrequestexpirytimeout <default-request-expiry-timeout>
 
 DESCRIPTION
 	This command is used to specify the default-request-expiry-timeout for the Server 
@@ -178,10 +178,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultwindowmonitorinterval
+	smpp smppserver set defaultwindowmonitorinterval
 
 SYNOPSIS
-	smppserver set defaultwindowmonitorinterval <default-window-monitor-interval>
+	smpp smppserver set defaultwindowmonitorinterval <default-window-monitor-interval>
 
 DESCRIPTION
 	This command is used to specify the default-window-monitor-interval for the Server 
@@ -199,10 +199,10 @@ DESCRIPTION
 ----
 
 Name
-	smppserver set defaultsessioncountersenabled
+	smpp smppserver set defaultsessioncountersenabled
 
 SYNOPSIS
-	smppserver set defaultsessioncountersenabled <true/false>
+	smpp smppserver set defaultsessioncountersenabled <true/false>
 
 DESCRIPTION
 	This command is used to set the parameter 'defaultsessioncountersenabled' value 
@@ -219,7 +219,7 @@ DESCRIPTION
 
 .Procedure: Edit SMPP Server Properties using GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can edit the properties of the SMPP Server by launching the edit window.
 You can achieve this by clicking on the blue coloured 'edit' button at the end of the row.
 The edit window will display all SMPP properies as shown in the figure below.
@@ -247,7 +247,7 @@ Settingup SSL is only possible from GUI.
 
 .Procedure: Start SMPP Server using GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can start the SMPP Server by clicking on the 'Start' icon lit green in the row corresponding to the SmscManagement unit.
   This icon will be enabled only if the SMPP server is currently stopped. 
 . This action will start the SMPP Server. 
@@ -261,7 +261,7 @@ Settingup SSL is only possible from GUI.
 
 .Procedure: Stop SMPP Server using GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can stop the SMPP Server by clicking on the 'Stop' icon lit red in the row corresponding to the SmscManagement unit.
   This icon will be enabled only if the SMPP server is currently running. 
 . This action will stop the SMPP Server. 
@@ -275,7 +275,7 @@ Settingup SSL is only possible from GUI.
 
 .Procedure: Reset Counters for SMPP Server using GUI
 . In the GUI Management Console for SMSC Gateway, click on 'SMPP Server' in the left panel. 
-. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_restcomm-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/restcomm-smsc-server/META-INF/jboss-beans.xml_. 
+. The main panel will display the existing SMPP Server details as configured in the section `SmscManagement` in the xml descriptor file [path]_{this-folder}-smsc-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_. 
 . You can view the current Session details of the SMPP Server by clicking on the row corresponding to the name of the SMPP Server (`SmscManagement` in this case). 
 . This action will display the current session details of the SMPP Server.
   If you scroll to the bottom, you will find a button named 'Reset Counters'. Click on it if you wish to reset all counters for SMPP Server. 

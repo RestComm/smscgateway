@@ -1,0 +1,16 @@
+Name
+	smpp smppserver set maxconnectionsize
+
+SYNOPSIS
+	smpp smppserver set maxconnectionsize <max-connection-size>
+
+DESCRIPTION
+	This command is used to specify the maximum number of connections/sessions this 
+	Server is expected to handle.
+
+	You must restart the SMPP Server for the new value to take effect.
+
+SEE ALSO
+	smpp esme create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

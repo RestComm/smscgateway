@@ -6,7 +6,7 @@ SYNOPSIS
 
 DESCRIPTION
 	This command is used to get the value of the parameter hrhlrnumber which
-	holds the pre-configured HLR address for SRI messages.
+	holds the pre-configured HLR address for SRI requests.
 	
 	In some scenarios it may be required to set a HLR address instead of a
 	MSISDN address into the SCCP 'CalledPartyAddress' of 'SendRoutingInfo'

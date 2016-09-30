@@ -84,9 +84,11 @@
 				<include>org.mobicents.protocols.ss7.oam.common:linkset-oam</include>
 				<include>org.mobicents.protocols.ss7.oam.common:sccp-oam</include>
 				<include>org.mobicents.protocols.ss7.oam.common:tcap-oam</include>
-				
+
 				<!-- Dialogic -->
+<!--
 			    <include>com.vendor.dialogic:gctapi</include>
+-->
 
 			</includes>
 		</dependencySet>

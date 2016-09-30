@@ -1,0 +1,20 @@
+Name
+	smpp smppserver set defaultwindowsize
+
+SYNOPSIS
+	smpp smppserver set defaultwindowsize <defaultwindowsize>
+
+DESCRIPTION
+	This command is used to specify the default window size for this Server. 
+	The window size is the amount of unacknowledged requests that are permitted to be 
+	outstanding/unacknowledged at any given time. If more requests are added, the 
+	underlying stack will throw an exception.
+
+	The default value is 100.
+
+	You must restart the SMPP Server for the new value to take effect.
+
+SEE ALSO
+	smpp esme create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

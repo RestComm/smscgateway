@@ -25,7 +25,7 @@ package org.mobicents.smsc.domain;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.mobicents.smsc.cassandra.DBOperations_C2;
+import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.library.SmsSetCache;
 
 /**
@@ -45,7 +45,7 @@ public class SmscStatProvider implements SmscStatProviderMBean {
 	private static SmscStatProvider instance = new SmscStatProvider();
 
 	private static final SmsSetCache smsSetCashe = SmsSetCache.getInstance();
-	private static final DBOperations_C2 dbOperations_C2 = DBOperations_C2.getInstance();
+	private static final DBOperations dbOperations_C2 = DBOperations.getInstance();
 
 	public static SmscStatProvider getInstance() {
 		return instance;

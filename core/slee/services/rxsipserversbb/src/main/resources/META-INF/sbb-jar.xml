@@ -2,20 +2,23 @@
 <!DOCTYPE sbb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE SBB 1.1//EN"
                          "http://java.sun.com/dtd/slee-sbb-jar_1_1.dtd">
 <sbb-jar>
-	<sbb id="rxSmppServerSbb">
+	<sbb id="rxSipServerSbb">
 		<description>SBB listening for SMS from Mo, Mt, ESME and routing to SIP</description>
 		<sbb-name>RxSipServerSbb</sbb-name>
 		<sbb-vendor>org.mobicents</sbb-vendor>
 		<sbb-version>1.0</sbb-version>
 		<sbb-alias>RxSipServerSbb</sbb-alias>
 
-
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.sip.server.rx.RxSipServerSbb</sbb-abstract-class-name>
 
-                <cmp-field><cmp-field-name>targetId</cmp-field-name></cmp-field>
-				<cmp-field><cmp-field-name>currentMsgNum</cmp-field-name></cmp-field>
+				<cmp-field><cmp-field-name>targetId</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>currentMsgNum</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>pendingRequestsList</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
 			</sbb-abstract-class>
 		</sbb-classes>
 

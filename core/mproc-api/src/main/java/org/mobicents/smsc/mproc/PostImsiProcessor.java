@@ -38,6 +38,15 @@ public interface PostImsiProcessor {
     Logger getLogger();
 
     // actions
-    void dropMessages();
+    /**
+     * Stopping of message delivery as delivery failure (generating of delivery receipts and CDRs)
+     */
+    void dropMessage() throws MProcRuleException;
+
+    /**
+     * Stopping of message delivery in this networkID and reschedule of message delivery to another networkID area
+     * @param newNetworkId
+     */
+    void rerouteMessage(int newNetworkId) throws MProcRuleException;
 
 }

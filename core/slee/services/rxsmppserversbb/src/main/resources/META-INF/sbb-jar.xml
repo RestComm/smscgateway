@@ -9,7 +9,6 @@
 		<sbb-version>1.0</sbb-version>
 		<sbb-alias>RxSmppServerSbb</sbb-alias>
 
-
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.smpp.server.rx.RxSmppServerSbb</sbb-abstract-class-name>
@@ -17,6 +16,9 @@
 				<cmp-field><cmp-field-name>targetId</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>currentMsgNum</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>pendingRequestsList</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
 			</sbb-abstract-class>
 		</sbb-classes>
 

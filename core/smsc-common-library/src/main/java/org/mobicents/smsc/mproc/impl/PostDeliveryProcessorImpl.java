@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.mobicents.smsc.library.OriginationType;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
+import org.mobicents.smsc.mproc.MProcRuleException;
 import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.PostDeliveryProcessor;
 
@@ -38,10 +39,13 @@ import org.mobicents.smsc.mproc.PostDeliveryProcessor;
 */
 public class PostDeliveryProcessorImpl implements PostDeliveryProcessor {
 
+    private Logger logger;
     private int defaultValidityPeriodHours;
     private int maxValidityPeriodHours;
-    private Logger logger;
     private boolean deliveryFailure;
+
+    private boolean actionAdded = false;
+    private int rerouteMessage = -1;
 
     private FastList<MProcNewMessage> postedMessages = new FastList<MProcNewMessage>();
 
@@ -53,14 +57,22 @@ public class PostDeliveryProcessorImpl implements PostDeliveryProcessor {
         this.deliveryFailure = deliveryFailure;
     }
 
-    // results of message processing
     @Override
     public Logger getLogger() {
         return logger;
     }
 
+    // results of message processing
     public FastList<MProcNewMessage> getPostedMessages() {
         return postedMessages;
+    }
+
+    public boolean isNeedRerouteMessages() {
+        return rerouteMessage != -1;
+    }
+
+    public int getNewNetworkId() {
+        return rerouteMessage;
     }
 
     @Override
@@ -80,8 +92,17 @@ public class PostDeliveryProcessorImpl implements PostDeliveryProcessor {
     }
 
     @Override
-    public void postNewMessage(MProcNewMessage message) {
+    public void postNewMessage(MProcNewMessage message) throws MProcRuleException {
         postedMessages.add(message);
+    }
+
+    @Override
+    public void rerouteMessage(int newNetworkId) throws MProcRuleException {
+        if (actionAdded)
+            throw new MProcRuleException("Another action already added");
+
+        actionAdded = true;
+        rerouteMessage = newNetworkId;
     }
 
     @Override

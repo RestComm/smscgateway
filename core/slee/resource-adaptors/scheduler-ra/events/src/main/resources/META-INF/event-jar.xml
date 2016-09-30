@@ -27,5 +27,29 @@
 		<event-type-vendor>org.mobicents</event-type-vendor>
 		<event-type-version>1.0</event-type-version>
 		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent</event-class-name>
-	</event-definition>	
+	</event-definition>
+	<event-definition>	
+		<description>SMS event fired to MtSbb to initiate sending of MtForwardSm</description>
+		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SS7_SEND_MT</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent</event-class-name>
+	</event-definition>
+	<event-definition>	
+		<description>SMS event fired to MtSbb to initiate sending of ReportSMDeliveryStatusRequest</description>
+		<event-type-name>org.mobicents.smsc.slee.services.smpp.server.events.SS7_SEND_RSDS</event-type-name>
+		<event-type-vendor>org.mobicents</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent</event-class-name>
+	</event-definition>
+
+<!--
+	<event-definition>
+		<description>Delivery TimeOut Event</description>
+		<event-type-name>javax.slee.facilities.TimerEvent</event-type-name>
+		<event-type-vendor>javax.slee</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>javax.slee.facilities.TimerEvent</event-class-name>
+	</event-definition>
+-->
 </event-jar>

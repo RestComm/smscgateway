@@ -103,6 +103,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
@@ -149,6 +150,8 @@ public class SmppTestingForm extends JDialog implements SmppAccepter {
     private static Charset ucs2Charset = Charset.forName("UTF-16BE");
     private static Charset isoCharset = Charset.forName("ISO-8859-1");
     private static Charset gsm7Charset = new GSMCharset("GSM", new String[] {});
+
+    private AtomicLong msgIdGenerator;
 
 	public SmppTestingForm(JFrame owner) {
 		super(owner, true);
@@ -399,8 +402,22 @@ public class SmppTestingForm extends JDialog implements SmppAccepter {
 			}
 		});
 		this.tm.start();
-		
+
+        Random rn = new Random();
+        msgIdGenerator = new AtomicLong(rn.nextInt(100000000));
 	}
+
+    public ScheduledThreadPoolExecutor getExecutor() {
+        return this.monitorExecutor;
+    }
+
+    public SmppSession getSession() {
+        return session0;
+    }
+
+    public AtomicLong getMsgIdGenerator() {
+        return msgIdGenerator;
+    }
 
     private void doSendBadPacket() {
         // TODO: ..............................
@@ -1064,4 +1081,5 @@ public class SmppTestingForm extends JDialog implements SmppAccepter {
 
 		model.newRowsAdded(new TableModelEvent(model));
 	}
+
 }

@@ -43,7 +43,7 @@ Therefore if you need to compile SMSC GW locally, you need to compile the update
 You can use these commands:
 ```
 git clone https://github.com/RestComm/cloudhopper-smpp
-git checkout master\submit\multi-2
+git checkout master_submit_multi-2
 mvn clean install
 ```
 Then you can download and compile SMSC GW code locally.
