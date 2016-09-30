@@ -71,9 +71,11 @@ public class HttpUtils {
         }
         response.setStatus(status);
         response.setContentType(getContentTypeFromFormat(responseFormat).toString());
-        PrintWriter writer = response.getWriter();
-        writer.write(content);
-        writer.flush();
+        if(content != null) {
+            PrintWriter writer = response.getWriter();
+            writer.write(content);
+            writer.flush();
+        }
         response.flushBuffer();
     }
 

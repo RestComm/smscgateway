@@ -74,7 +74,7 @@ public class HttpSendMessageIncomingData {
         if(isEmptyOrNull(senderId)){
             throw new HttpApiException("sender parameter is not set properly or not valid in the Http Request.");
         }
-        if( to == null || to.length < 1){
+        if(to == null || to.length < 1 || !validateDestNumbers(to)){
             throw new HttpApiException("to parameter is not set properly or not valid in the Http Request.");
         }
         if(encodingStr != null && !RequestMessageBodyEncoding.isValid(encodingStr)){
@@ -106,6 +106,17 @@ public class HttpSendMessageIncomingData {
             return true;
         }
         return false;
+    }
+
+    private boolean validateDestNumbers(String[] toCheck) {
+        try {
+            for(String number: toCheck) {
+                Long.parseLong(number);
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public List<String> getDestAddresses() {

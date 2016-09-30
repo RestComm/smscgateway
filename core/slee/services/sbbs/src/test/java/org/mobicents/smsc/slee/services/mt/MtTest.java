@@ -397,6 +397,166 @@ public class MtTest {
     }
 
     /**
+     * MAP V3, 1 message, 1 segment, USim message
+     */
+    @Test(groups = { "Mt" })
+    public void SuccessDeliveryUsimTest() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        MAPServiceSmsProxy serviceSri = (MAPServiceSmsProxy)this.sriSbb.mapProvider.getMAPServiceSms();
+        MAPServiceSmsProxy serviceMt = (MAPServiceSmsProxy)this.mtSbb.mapProvider.getMAPServiceSms();
+        MAPServiceSmsProxy serviceRsds = (MAPServiceSmsProxy)this.rsdsSbb.mapProvider.getMAPServiceSms();
+        SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+        MProcManagement.getInstance("Test");
+
+        ArrayList<SmsDef> lst = new ArrayList<SmsDef>();
+        SmsDef sd1 = new SmsDef();
+        sd1.dataCodingScheme = 246;
+        sd1.esmClass = 0x43;
+        sd1.msg = "012345012345";
+        sd1.msgUdh = new byte[] { 2, 112, 0 };
+        lst.add(sd1);
+        SmsSet smsSet = prepareDatabase(lst);
+//        SmsSet smsSetX = SmsSetCache.getInstance().getProcessingSmsSet(smsSet.getTargetId());
+//        assertNotNull(smsSetX);
+//        Sms smsX = this.pers.obtainLiveSms(procDueSlot, procTargetId, procId[0]);
+//        assertEquals(smsX.getSmsSet().getInSystem(), 0);
+
+        // initial onSms message
+        SmsSetEvent event = new SmsSetEvent();
+        event.setSmsSet(smsSet);
+        this.sriSbb.onSms(event, null, null);
+
+        MAPDialogSmsProxy dlg = serviceSri.getLastMAPDialogSms();
+//        MAPApplicationContextVersion acv =  dlg.getApplicationContext().getApplicationContextVersion();
+//        assertEquals(acv, MAPApplicationContextVersion.version3);
+
+//        assertNull(serviceMt.getLastMAPDialogSms());
+//        ArrayList<MAPTestEvent> lstEvt = dlg.getEventList();
+//        assertEquals(lstEvt.size(), 2);
+//        assertEquals(dlg.getLocalAddress().getGlobalTitle().getDigits(), smscPropertiesManagement.getServiceCenterGt());
+//        assertEquals(((GlobalTitle0100) dlg.getLocalAddress().getGlobalTitle()).getNumberingPlan(), org.mobicents.protocols.ss7.indicator.NumberingPlan.ISDN_TELEPHONY);
+//        assertEquals(((GlobalTitle0100) dlg.getLocalAddress().getGlobalTitle()).getNatureOfAddress(), NatureOfAddress.INTERNATIONAL);
+//        assertEquals(dlg.getRemoteAddress().getGlobalTitle().getDigits(), msdnDig);
+//        assertEquals(((GlobalTitle0100) dlg.getRemoteAddress().getGlobalTitle()).getNumberingPlan(), org.mobicents.protocols.ss7.indicator.NumberingPlan.ISDN_TELEPHONY);
+//        assertEquals(((GlobalTitle0100) dlg.getRemoteAddress().getGlobalTitle()).getNatureOfAddress(), NatureOfAddress.INTERNATIONAL);
+//
+//        MAPTestEvent evt = lstEvt.get(0);
+//        assertEquals(evt.testEventType, MAPTestEventType.componentAdded);
+//        SendRoutingInfoForSMRequest sriReq = (SendRoutingInfoForSMRequest) evt.event;
+//        assertEquals(sriReq.getMsisdn().getAddress(), msdnDig);
+//        assertEquals(sriReq.getMsisdn().getAddressNature(), AddressNature.international_number);
+//        assertEquals(sriReq.getMsisdn().getNumberingPlan(), org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN);
+//        assertEquals(sriReq.getServiceCentreAddress().getAddress(), smscPropertiesManagement.getServiceCenterGt());
+//        assertEquals(sriReq.getServiceCentreAddress().getAddressNature(), AddressNature.international_number);
+//        assertEquals(sriReq.getServiceCentreAddress().getNumberingPlan(), org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN);
+//        assertTrue(sriReq.getSm_RP_PRI());
+
+//        evt = lstEvt.get(1);
+//        assertEquals(evt.testEventType, MAPTestEventType.send);
+//        smsSetX = SmsSetCache.getInstance().getProcessingSmsSet(smsSet.getTargetId());
+//        assertNotNull(smsSetX);
+//        smsX = this.pers.obtainLiveSms(procDueSlot, procTargetId, procId[0]);
+//        assertEquals(smsX.getSmsSet().getInSystem(), 0);
+
+        // SRI response
+        IMSI imsi = new IMSIImpl(imsiDig);
+        ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
+                org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
+        LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        evt1.setMAPDialog(dlg);
+        this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
+        this.sriSbb.onDialogDelimiter(null, null);
+
+        dlg = serviceMt.getLastMAPDialogSms();
+//        acv =  dlg.getApplicationContext().getApplicationContextVersion();
+//        assertEquals(acv, MAPApplicationContextVersion.version3);
+//
+//        lstEvt = dlg.getEventList();
+//        assertEquals(lstEvt.size(), 2);
+
+        dlg = serviceMt.getLastMAPDialogSms();
+        ArrayList<MAPTestEvent> lstEvt = dlg.getEventList();
+        assertEquals(lstEvt.size(), 2);
+        MAPTestEvent evt = lstEvt.get(0);
+        assertEquals(evt.testEventType, MAPTestEventType.componentAdded);
+        MtForwardShortMessageRequestImpl mtFsmReq = (MtForwardShortMessageRequestImpl) evt.event;
+        assertFalse(mtFsmReq.getMoreMessagesToSend());
+        SM_RP_DA sm_RP_DA = mtFsmReq.getSM_RP_DA();
+        IMSI daImsi = sm_RP_DA.getIMSI();
+        assertEquals(daImsi.getData(), imsiDig);
+        SM_RP_OA sm_RP_OA = mtFsmReq.getSM_RP_OA();
+        AddressString scas = sm_RP_OA.getServiceCentreAddressOA();
+        assertEquals(scas.getAddress(), smscPropertiesManagement.getServiceCenterGt());
+        assertEquals(scas.getAddressNature(), AddressNature.international_number);
+        assertEquals(scas.getNumberingPlan(), org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN);
+        SmsSignalInfo ssi = mtFsmReq.getSM_RP_UI();
+        SmsDeliverTpdu tpdu = (SmsDeliverTpdu) ssi.decodeTpdu(false);
+        assertEquals(tpdu.getDataCodingScheme().getCode(), 16);
+        assertFalse(tpdu.getForwardedOrSpawned());
+        assertFalse(tpdu.getMoreMessagesToSend());
+        assertEquals(tpdu.getOriginatingAddress().getAddressValue(), origDig);
+        assertEquals(tpdu.getOriginatingAddress().getNumberingPlanIdentification(), NumberingPlanIdentification.ISDNTelephoneNumberingPlan);
+        assertEquals(tpdu.getOriginatingAddress().getTypeOfNumber(), TypeOfNumber.InternationalNumber);
+        assertEquals(tpdu.getProtocolIdentifier().getCode(), 7);
+        assertFalse(tpdu.getReplyPathExists());
+        assertEquals(tpdu.getServiceCentreTimeStamp().getDay(), curDate.getDate());
+        int mon1 = tpdu.getServiceCentreTimeStamp().getMonth();
+        int mon2 = curDate.getMonth() + 1;
+        assertEquals(mon1, mon2);
+        assertEquals(tpdu.getSmsTpduType(), SmsTpduType.SMS_DELIVER);
+        assertFalse(tpdu.getStatusReportIndication());
+        assertFalse(tpdu.getUserDataHeaderIndicator());
+        UserData ud = tpdu.getUserData();
+        ud.decode();
+        assertNull(ud.getDecodedUserDataHeader());
+        String msg1 = ud.getDecodedMessage();
+        assertEquals(msg1, msgShort);
+
+//        evt = lstEvt.get(1);
+//        assertEquals(evt.testEventType, MAPTestEventType.send);
+//        smsSetX = SmsSetCache.getInstance().getProcessingSmsSet(smsSet.getTargetId());
+//        assertNotNull(smsSetX);
+//        smsX = this.pers.obtainLiveSms(procDueSlot, procTargetId, procId[0]);
+//        assertEquals(smsX.getSmsSet().getInSystem(), 0);
+//
+//        UUID smsId = smsSet.getSms(0).getDbId();
+//        SmsProxy smsx2 = this.pers.obtainArchiveSms(procDueSlot, smsSet.getDestAddr(), smsId);
+//        assertNull(smsx2);
+
+        // Mt response
+        MtForwardShortMessageResponseImpl evt2 = new MtForwardShortMessageResponseImpl(null, null);
+        evt2.setMAPDialog(dlg);
+        DialogAccept daevt = new DialogAccept(dlg, null);
+        this.mtSbb.onDialogAccept(daevt, null);
+        this.mtSbb.onMtForwardShortMessageResponse(evt2, null);
+        DialogClose dcl = new DialogClose(dlg);
+        this.mtSbb.onDialogClose(dcl, null);
+//        smsSetX = SmsSetCache.getInstance().getProcessingSmsSet(smsSet.getTargetId());
+//        assertNull(smsSetX);
+//        smsX = this.pers.obtainLiveSms(procDueSlot, procTargetId, procId[0]);
+//        assertNull(smsX);
+
+//        dlg = serviceSri.getLastMAPDialogSms();
+//        lstEvt = dlg.getEventList();
+//        assertEquals(lstEvt.size(), 2);
+//
+//        dlg = serviceMt.getLastMAPDialogSms();
+//        lstEvt = dlg.getEventList();
+//        assertEquals(lstEvt.size(), 2);
+//
+//        int b1 = this.pers.checkSmsExists(procDueSlot, smsSet.getTargetId());
+//        smsx2 = this.pers.obtainArchiveSms(procDueSlot, smsSet.getDestAddr(), smsId);
+//        assertNotNull(smsx2);
+//
+//        dlg = serviceRsds.getLastMAPDialogSms();
+//        assertNull(dlg);
+    }
+
+    /**
      * MAP V3, 1 message, 1 segment, GSM7
      * 160 chars including [] -> 2 segments
      */
