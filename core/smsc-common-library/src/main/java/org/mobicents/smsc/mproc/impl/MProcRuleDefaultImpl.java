@@ -616,11 +616,11 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         }
 
         if (this.originatorSccpAddressMask != null && this.originatorSccpAddressMask.length() > 0
-                && !this.originatorSccpAddressMask.equals("-1") && message.getShortMessageText() != null
-                && message.getShortMessageText().length() > 0
-                && this.originatorSccpAddressMask.charAt(0) != message.getShortMessageText().charAt(0))
+                && !this.originatorSccpAddressMask.equals("-1") && message.getOriginatorSccpAddress() != null
+                && message.getOriginatorSccpAddress().length() > 0
+                && this.originatorSccpAddressMask.charAt(0) != message.getOriginatorSccpAddress().charAt(0))
             return false;
-        
+
         return true;
     }
 
