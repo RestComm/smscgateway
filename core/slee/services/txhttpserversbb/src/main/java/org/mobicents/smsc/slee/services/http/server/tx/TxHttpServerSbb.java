@@ -499,7 +499,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                 ta = createDestTargetAddress(address);
                 succAddr = true;
             } catch (SmscProcessingException e) {
-                logger.severe("SmscProcessingException while processing message to destination: "+address);
+                logger.severe("SmscProcessingException while processing message to destination: "+address, e);
             }
 
             if (succAddr) {
