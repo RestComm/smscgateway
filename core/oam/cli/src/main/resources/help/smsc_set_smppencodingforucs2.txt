@@ -2,7 +2,7 @@ Name
     smsc set smppencodingforucs2
 
 SYNOPSIS
-    smsc set smppencodingforucs2 <UTF8|UNICODE|GSM7>
+    smsc set smppencodingforucs2 <Utf8|Unicode|Gsm7>
 
 DESCRIPTION
     This command is used to set the Encoding Scheme at SMPP side for

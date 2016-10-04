@@ -2,11 +2,11 @@ Name
     smsc set smppencodingforgsm7
 
 SYNOPSIS
-    smsc set smppencodingforgsm7 <UTF8|UNICODE|GSM7>
+    smsc set smppencodingforgsm7 <Utf8|Unicode|Gsm7>
 
 DESCRIPTION
     This command is used to set the Encoding Scheme at SMPP side for
-    GSM7 encoding (DCS =0).
+    GSM7 encoding (DCS=0).
 
     At the SMPP side, messages accept 3 different encoding schemes namely UTF8,
     UNICODE and GSM7 (8-bit), for both sending and receiving messages. The SMSC

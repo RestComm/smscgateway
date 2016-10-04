@@ -1,0 +1,16 @@
+Name
+    smsc set httpencodingforgsm7
+
+SYNOPSIS
+    smsc set httpencodingforgsm7 <Utf8|Unicode>
+
+DESCRIPTION
+    This command is used to set the Encoding Scheme at HTTP side for
+    GSM7 encoding (DCS=0).
+
+    At the HTTP side, messages accept 2 different encoding schemes namely UTF8,
+    UNICODE, for receiving messages. This value may be overridden by a
+    parameter in HTTP request. 
+
+EXAMPLES
+	smsc set httpencodingforgsm7 utf8 

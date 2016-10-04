@@ -92,6 +92,29 @@
 							</span>
 							</div>
 						</div>
+					</div>
+					
+					<h5>Default values for incoming messages from HTTP connector</h5>						
+					<div id="dbrr-update-configuration-wrapper-2">
+							<div id="div-httpencodingforgsm7" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the HTTP message content encoding for data coding schema [0] (GSM7).">
+									<span class="add-on">HTTP Encoding for GSM7</span>
+									<select id="httpencodingforgsm7" >
+										<option>Utf8</option>
+										<option>Unicode</option>
+									</select>
+								</span>
+							</div>
+
+							<div id="div-httpencodingforucs2" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the HTTP message content encoding for data coding schema [8] (UCS2).">
+									<span class="add-on">HTTP Encoding for UCS2</span>
+									<select id="httpencodingforucs2" >
+										<option>Utf8</option>
+										<option>Unicode</option>
+									</select>
+								</span>
+							</div>
 
 						<div class="control-group">
 							<span class="span12" style="text-align: left;">
@@ -100,7 +123,7 @@
 							</span>
 						</div>								
 					</div>
-					
+
 
 					
 				<script type="text/javascript">
@@ -121,6 +144,7 @@
 										$("#httpdefaultdestton").val(response.value.HttpDefaultDestTon);
 										$("#httpdefaultdestnpi").val(response.value.HttpDefaultDestNpi);
 										$("#httpdefaultnetworkid").val(response.value.HttpDefaultNetworkId);
+										$("#httpdefaultdatacoding").val(response.value.HttpDefaultDataCoding);
 
 										var httpDefaultMessagingMode = response.value.HttpDefaultMessagingMode;
 										if(httpDefaultMessagingMode == 0){
@@ -151,7 +175,19 @@
 											httpdefaultrdintermediatenotification.options[1].selected = true;
 										}										
 
-										$("#httpdefaultdatacoding").val(response.value.HttpDefaultDataCoding);
+										var httpEncodingForGsm7 = response.value.HttpEncodingForGsm7;
+										if(httpEncodingForGsm7 == "Utf8"){
+											httpencodingforgsm7.options[0].selected = true;
+										} else { 
+											httpencodingforgsm7.options[1].selected = true;
+										}										
+
+										var httpEncodingForUCS2 = response.value.HttpEncodingForUCS2;
+										if(httpEncodingForUCS2 == "Utf8"){
+											httpencodingforucs2.options[0].selected = true;
+										} else { 
+											httpencodingforucs2.options[1].selected = true;
+										}										
 									}],
 									error: function(value) {
 										errorUID = ("st" + new Date().getTime()).hashCode();
@@ -212,6 +248,22 @@
 			    		} else if($("#div-httpdefaultdatacoding").hasClass("error")) {
 			    			$("#div-httpdefaultdatacoding").removeClass("error");		
 			    		}
+						
+						var httpencodingforgsm7 = $("#httpencodingforgsm7").val();
+						if(httpencodingforgsm7.trim() == "") {
+			    			$("#div-httpencodingforgsm7").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-httpencodingforgsm7").hasClass("error")) {
+			    			$("#div-httpencodingforgsm7").removeClass("error");		
+			    		}
+
+						var httpencodingforucs2 = $("#httpencodingforucs2").val();
+						if(httpencodingforucs2.trim() == "") {
+			    			$("#div-httpencodingforucs2").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-httpencodingforucs2").hasClass("error")) {
+			    			$("#div-httpencodingforucs2").removeClass("error");		
+			    		}
 
 
 						if(formInvalid) {
@@ -243,6 +295,8 @@
 									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultRDDeliveryReceipt", value: httpDefaultRDDeliveryReceipt },
 									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultRDIntermediateNotification", value: httpDefaultRDIntermediateNotification },
 									{ type: "write", mbean: mbeanSearch, attribute: "HttpDefaultDataCoding", value: httpdefaultdatacoding },
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpEncodingForGsm7", value: httpencodingforgsm7 },
+									{ type: "write", mbean: mbeanSearch, attribute: "HttpEncodingForUCS2", value: httpencodingforucs2 },
 								],
 								{
 									success: function(response) {

@@ -640,9 +640,7 @@ public class SMSCShellExecutor implements ShellExecutor {
                     return String.format(SMSCOAMMessages.ILLEGAL_ARGUMENT, "SmppEncodingForUCS2 value",
                             "UTF8 or UNICODE or GSM7 are possible");
                 }
-//            } else if (parName.equals("hosts")) {
-//                String val = options[3];
-//                smscPropertiesManagement.setHosts(val);
+
             } else if (parName.equals("dbhosts")) {
                 String val = options[3];
                 smscPropertiesManagement.setDbHosts(val);
@@ -797,6 +795,26 @@ public class SMSCShellExecutor implements ShellExecutor {
                 if (val < 0 || val > 255)
                     return SMSCOAMMessages.DATA_CODING_BAD_VALUES;
                 smscPropertiesManagement.setHttpDefaultDataCoding(val);
+            } else if (parName.equals("httpencodingforgsm7")) {
+                String s1 = options[3].toLowerCase();
+                if (s1.equals("utf8")) {
+                    smscPropertiesManagement.setHttpEncodingForGsm7(HttpEncoding.Utf8);
+                } else if (s1.equals("unicode")) {
+                    smscPropertiesManagement.setHttpEncodingForGsm7(HttpEncoding.Unicode);
+                } else {
+                    return String.format(SMSCOAMMessages.ILLEGAL_ARGUMENT, "HttpEncodingForGsm7 value",
+                            "UTF8 or UNICODE are possible");
+                }
+            } else if (parName.equals("httpencodingforucs2")) {
+                String s1 = options[3].toLowerCase();
+                if (s1.equals("utf8")) {
+                    smscPropertiesManagement.setHttpEncodingForUCS2(HttpEncoding.Utf8);
+                } else if (s1.equals("unicode")) {
+                    smscPropertiesManagement.setHttpEncodingForUCS2(HttpEncoding.Unicode);
+                } else {
+                    return String.format(SMSCOAMMessages.ILLEGAL_ARGUMENT, "HttpEncodingForUCS2 value",
+                            "UTF8 or UNICODE are possible");
+                }
 
             } else if (parName.equals("deliverypause")) {
                 boolean val = Boolean.parseBoolean(options[3]);
@@ -1036,6 +1054,10 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification());
             } else if (parName.equals("httpdefaultdatacoding")) {
                 sb.append(smscPropertiesManagement.getHttpDefaultDataCoding());
+            } else if (parName.equals("httpencodingforgsm7")) {
+                sb.append(smscPropertiesManagement.getHttpEncodingForGsm7());
+            } else if (parName.equals("httpencodingforucs2")) {
+                sb.append(smscPropertiesManagement.getHttpEncodingForUCS2());
 
             } else if (parName.equals("deliverypause")) {
                 sb.append(smscPropertiesManagement.isDeliveryPause());
@@ -1348,6 +1370,14 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("httpdefaultdatacoding = ");
             sb.append(smscPropertiesManagement.getHttpDefaultDataCoding());
+            sb.append("\n");
+
+            sb.append("httpencodingforgsm7 = ");
+            sb.append(smscPropertiesManagement.getHttpEncodingForGsm7());
+            sb.append("\n");
+
+            sb.append("httpencodingforucs2 = ");
+            sb.append(smscPropertiesManagement.getHttpEncodingForUCS2());
             sb.append("\n");
 
             sb.append("deliverypause = ");

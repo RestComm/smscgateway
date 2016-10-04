@@ -1,0 +1,16 @@
+Name
+    smsc get httpencodingforucs2
+
+SYNOPSIS
+    smsc get httpencodingforucs2
+
+DESCRIPTION
+    This command is used to set the Encoding Scheme at HTTP side for
+    UCS2 encoding (DCS=8).
+
+    At the HTTP side, messages accept 2 different encoding schemes namely UTF8,
+    UNICODE, for receiving messages. This value may be overridden by a
+    parameter in HTTP request. 
+
+EXAMPLES
+	smsc get httpencodingforucs2

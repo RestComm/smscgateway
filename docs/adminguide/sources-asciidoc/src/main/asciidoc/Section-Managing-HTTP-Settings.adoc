@@ -342,4 +342,52 @@ EXAMPLES
 . You must click on the button 'Save' at the bottom of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+[[_http_encoding_for_ucs2]]
+=== HTTP Encoding for GSM7/UCS2
+
+[[_http_encoding_for_ucs2_cli]]
+==== Using CLI
+
+You can set the 'HTTP Encoding for GSM7 (DCS=0)' and 'HTTP Encoding for UCS2 (DCS=8)' value by issuing the commands `smsc set httpencodingforgsm7` / `smsc set httpencodingforucs2` with appropriate parameters as described below.
+You can verify this by issuing the commands `smsc get httpencodingforgsm7` / `smsc get httpencodingforucs2` which will display the value set for these property.
+
+
+----
+
+Name
+    smsc set httpencodingforgsm7
+    smsc set httpencodingforucs2
+
+SYNOPSIS
+    smsc set httpencodingforgsm7 <Utf8|Unicode>
+	smsc set httpencodingforucs2 <Utf8|Unicode>
+
+DESCRIPTION
+    These commands are used to set the Encoding Scheme at HTTP side for
+    different GSM data coding schemas (DCS). 
+    
+    For GSM7 encoding (DCS = 0) you must use the command 
+    smsc set smppencodingforgsm7, in order to set text encoding style. 
+    
+    For UCS2 encoding (DCS = 8), you must use the command
+    smsc set smppencodingforucs2, in order to set text encoding style.
+    
+    At the HTTP side, messages accept 2 different encoding schemes namely UTF8,
+    UNICODE, for receiving messages. This value may be overridden by a
+    parameter in HTTP request. 
+
+EXAMPLES
+	smsc set httpencodingforgsm7 utf8 
+	or
+	smsc set httpencodingforucs2 unicode
+----
+
+[[_http_encoding_for_ucs2_gui]]
+==== Using GUI
+. In the GUI Management Console for SMSC Gateway, click on 'HTTP Settings' in the left panel. 
+. The main panel will display the existing Settings.
+. You can specify the encoding scheme by choosing from the values (Utf8 | Unicode) in the list for 'HTTP Encoding for GSM7' (DCS=0) or 'HTTP Encoding for UCS2' (DCS=8). For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
 

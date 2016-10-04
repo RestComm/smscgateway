@@ -123,6 +123,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String HTTP_DEFAULT_RD_DELIVERY_RECEIPT = "httpDefaultRDDeliveryReceipt";
     private static final String HTTP_DEFAULT_RD_INTERMEDIATE_NOTIFICATION = "httpDefaultRDIntermediateNotification";
     private static final String HTTP_DEFAULT_DATA_CODING = "httpDefaultDataCoding";
+    private static final String HTTP_ENCODING_FOR_UCS2 = "httpEncodingForUCS2";
+    private static final String HTTP_ENCODING_FOR_GSM7 = "httpEncodingForGsm7";
 
     private static final String DELIVERY_PAUSE = "deliveryPause";
 
@@ -327,6 +329,13 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private int httpDefaultRDIntermediateNotification = 0;
     // TxHttp: default data coding schema that will be used in delivery (common values: 0-GSM7, 8-UCS2)
     private int httpDefaultDataCoding = 0;
+
+    // Encoding type at HTTP part for data coding schema==0 (GSM7)
+    // 0-UTF8, 1-UNICODE
+    private HttpEncoding httpEncodingForGsm7 = HttpEncoding.Utf8;
+    // Encoding type at HTTP part for data coding schema==8 (UCS2)
+    // 0-UTF8, 1-UNICODE
+    private HttpEncoding httpEncodingForUCS2 = HttpEncoding.Utf8;
 
     // if set to true:
     // SMSC does not try to deliver any messages from cassandra database to SS7
@@ -558,6 +567,28 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setSmppEncodingForUCS2(SmppEncoding smppEncodingForUCS2) {
         this.smppEncodingForUCS2 = smppEncodingForUCS2;
+        this.store();
+    }
+
+    @Override
+    public HttpEncoding getHttpEncodingForGsm7() {
+        return httpEncodingForGsm7;
+    }
+
+    @Override
+    public void setHttpEncodingForGsm7(HttpEncoding httpEncodingForGsm7) {
+        this.httpEncodingForGsm7 = httpEncodingForGsm7;
+        this.store();
+    }
+
+    @Override
+    public HttpEncoding getHttpEncodingForUCS2() {
+        return httpEncodingForUCS2;
+    }
+
+    @Override
+    public void setHttpEncodingForUCS2(HttpEncoding httpEncodingForUCS2) {
+        this.httpEncodingForUCS2 = httpEncodingForUCS2;
         this.store();
     }
 
@@ -1286,6 +1317,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 //			writer.write(this.isSMSHomeRouting, SMS_HOME_ROUTING, Boolean.class);
             writer.write(this.smppEncodingForGsm7.toString(), SMPP_ENCODING_FOR_GSM7, String.class);
             writer.write(this.smppEncodingForUCS2.toString(), SMPP_ENCODING_FOR_UCS2, String.class);
+            writer.write(this.httpEncodingForGsm7.toString(), HTTP_ENCODING_FOR_GSM7, String.class);
+            writer.write(this.httpEncodingForUCS2.toString(), HTTP_ENCODING_FOR_UCS2, String.class);
 
 			writer.write(this.reviseSecondsOnSmscStart, REVISE_SECONDS_ON_SMSC_START, Integer.class);
 			writer.write(this.processingSmsSetTimeout, PROCESSING_SMS_SET_TIMEOUT, Integer.class);
@@ -1472,6 +1505,14 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
                 this.smppEncodingForGsm7 = Enum.valueOf(SmppEncoding.class, vals);
 
             vals = reader.read(SMPP_ENCODING_FOR_UCS2, String.class);
+            if (vals != null)
+                this.httpEncodingForUCS2 = Enum.valueOf(HttpEncoding.class, vals);
+
+            vals = reader.read(HTTP_ENCODING_FOR_GSM7, String.class);
+            if (vals != null)
+                this.httpEncodingForGsm7 = Enum.valueOf(HttpEncoding.class, vals);
+
+            vals = reader.read(HTTP_ENCODING_FOR_UCS2, String.class);
             if (vals != null)
                 this.smppEncodingForUCS2 = Enum.valueOf(SmppEncoding.class, vals);
 

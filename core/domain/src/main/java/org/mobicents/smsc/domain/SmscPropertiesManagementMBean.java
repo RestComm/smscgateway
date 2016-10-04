@@ -329,4 +329,12 @@ public interface SmscPropertiesManagementMBean {
 
     public void setHttpDefaultDataCoding(int httpDefaultDataCoding);
 
+    public HttpEncoding getHttpEncodingForGsm7();
+
+    public void setHttpEncodingForGsm7(HttpEncoding httpEncodingForGsm7);
+
+    public HttpEncoding getHttpEncodingForUCS2();
+
+    public void setHttpEncodingForUCS2(HttpEncoding httpEncodingForUCS2);
+
 }
