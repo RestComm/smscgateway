@@ -25,16 +25,20 @@ package org.mobicents.smsc.slee.services.http.server.tx.data;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestMessageBodyEncoding;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
+import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.slee.facilities.Tracer;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tpalucki on 08.09.16.
+ *
  * @author Tomasz Pa?ucki
  */
 public class HttpSendMessageIncomingData {
@@ -55,68 +59,97 @@ public class HttpSendMessageIncomingData {
      * possible: english, arabic
      * values: UCS-2, UTF-8
      * Default is english
-     * */
+     */
     private RequestMessageBodyEncoding encoding;
     private String senderId;
     private List<String> destAddresses = new ArrayList<String>();
 
     public HttpSendMessageIncomingData(String userId, String password, String msg, String formatParam, String encodingStr, String senderId, String[] to) throws HttpApiException {
+        //setting the default
+        this.format = ResponseFormat.fromString(formatParam);
         // checking if mandatory fields are present
-        if(isEmptyOrNull(userId)){
-            throw new HttpApiException("userid parameter is not set properly or not valid in the Http Request.");
+        if (isEmptyOrNull(userId)) {
+            throw new HttpApiException("'userid' parameter is not set properly or not valid in the Http Request.");
         }
-        if(isEmptyOrNull(password)){
-            throw new HttpApiException("password parameter is not set properly or not valid in the Http Request.");
+        if (isEmptyOrNull(password)) {
+            throw new HttpApiException("'password' parameter is not set properly or not valid in the Http Request.");
         }
-        if(isEmptyOrNull(msg)){
-            throw new HttpApiException("msg parameter is not set properly or not valid in the Http Request.");
+        if (isEmptyOrNull(msg)) {
+            throw new HttpApiException("'msg' parameter is not set properly or not valid in the Http Request.");
         }
-        if(isEmptyOrNull(senderId)){
-            throw new HttpApiException("sender parameter is not set properly or not valid in the Http Request.");
+        if (isEmptyOrNull(senderId)) {
+            throw new HttpApiException("'sender' parameter is not set properly or not valid in the Http Request.");
         }
-        if(to == null || to.length < 1 || !validateDestNumbers(to)){
-            throw new HttpApiException("to parameter is not set properly or not valid in the Http Request.");
+        //check only digits
+        try {
+            Long.parseLong(senderId);
+        } catch (NumberFormatException e) {
+            throw new HttpApiException("'sender' parameter is not valid in the Http Request. sender:" + senderId);
         }
-        if(encodingStr != null && !RequestMessageBodyEncoding.isValid(encodingStr)){
-            throw new HttpApiException("encoding parameter is not set properly or not valid in the Http Request.");
+
+        if (to == null || to.length < 1) {
+//             !validateDestNumbersAndRemoveEmpty(to)){
+            throw new HttpApiException("'to' parameter is not set in the Http Request.");
+        }
+
+        this.destAddresses = new ArrayList<String>(Arrays.asList(to));
+        //check only digits
+        List<String> notValidNumbers = validateDestNumbersAndRemoveEmpty(this.destAddresses);
+        if(!notValidNumbers.isEmpty()){
+            throw new HttpApiException("'to' parameter contains not valid value. Wrong format of numbers:" + Arrays.toString(notValidNumbers.toArray()));
+        }
+
+        if (encodingStr != null && !RequestMessageBodyEncoding.isValid(encodingStr)) {
+            throw new HttpApiException("'encoding' parameter is not set properly or not valid in the Http Request.");
         }
         this.userId = userId;
         this.password = password;
-        try {
-            this.msg = URLDecoder.decode(msg, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new HttpApiException("Unsupported exception while decoding message.");
-        }
+        this.msg = decodeMassage(msg);
         this.senderId = senderId;
-        this.destAddresses.addAll(Arrays.asList(to));
 
         //setting the default
         if (encodingStr != null) {
             this.encoding = RequestMessageBodyEncoding.fromString(encodingStr);
         }
-            //setting the default
-        this.format = ResponseFormat.fromString(formatParam);
+
+    }
+
+    private String decodeMassage(String msgParameter) throws HttpApiException {
+        try {
+            String encodedMsg = new String(msgParameter.getBytes("iso-8859-1"), "UTF-8");
+            return   encodedMsg;
+        } catch (UnsupportedEncodingException e) {
+            throw new HttpApiException(e.getMessage(),e);
+        }
     }
 
     private boolean isEmptyOrNull(String toCheck) {
-        if(toCheck == null) {
+        if (toCheck == null) {
             return true;
         }
-        if("".equals(toCheck)){
+        if ("".equals(toCheck)) {
             return true;
         }
         return false;
     }
 
-    private boolean validateDestNumbers(String[] toCheck) {
-        try {
-            for(String number: toCheck) {
-                Long.parseLong(number);
+    private List<String> validateDestNumbersAndRemoveEmpty(List<String> toCheck) {
+        List<String> notValidDestinationNumbers = new ArrayList<>();
+        Iterator<String> iterator = toCheck.iterator();
+        while(iterator.hasNext()){
+            String number = iterator.next().trim();
+            if(number.isEmpty()){
+                //remove empty strings
+                iterator.remove();
+            }else {
+                try {
+                    Long.parseLong(number);
+                } catch (NumberFormatException e) {
+                    notValidDestinationNumbers.add(number);
+                }
             }
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
         }
+        return notValidDestinationNumbers;
     }
 
     public List<String> getDestAddresses() {
@@ -164,8 +197,19 @@ public class HttpSendMessageIncomingData {
                 '}';
     }
 
-    public static ResponseFormat getFormat(HttpServletRequest request){
-        String param = request.getParameter("format");
-        return ResponseFormat.fromString(param);
+    public static ResponseFormat getFormat(Tracer tracer, HttpServletRequest request) throws HttpApiException {
+        String formatParameter = request.getParameter("format");
+        if(formatParameter!= null) {
+            return ResponseFormat.fromString(formatParameter);
+        } else {
+            try {
+                Map<String, String[]> stringMap = HttpRequestUtils.extractParametersFromPost(tracer, request);
+                String[] format = stringMap.get(HttpRequestUtils.P_FORMAT);
+                return ResponseFormat.fromString(format != null && format.length > 0 ? format[0] : null);
+            }catch (Exception e){
+                return ResponseFormat.STRING;
+            }
+        }
+
     }
 }

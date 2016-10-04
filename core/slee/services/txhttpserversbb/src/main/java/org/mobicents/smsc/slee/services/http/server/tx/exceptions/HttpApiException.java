@@ -27,14 +27,15 @@ package org.mobicents.smsc.slee.services.http.server.tx.exceptions;
  */
 public class HttpApiException extends Exception {
 
-    final String msg;
-
-    public HttpApiException(String s) {
-        this.msg = s;
+    public HttpApiException(String message) {
+        super(message);
     }
 
-    @Override
-    public String getMessage(){
-        return msg;
+    public HttpApiException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public HttpApiException(Throwable cause) {
+        super(cause);
     }
 }

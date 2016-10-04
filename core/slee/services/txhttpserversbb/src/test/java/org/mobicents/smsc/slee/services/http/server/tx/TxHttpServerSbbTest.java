@@ -17,9 +17,11 @@ import javax.slee.SLEEException;
 import javax.slee.SbbLocalObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 
 /**
  * Created by tpalucki on 05.09.16.
+ *
  * @author Tomasz Pałucki
  */
 public class TxHttpServerSbbTest {
@@ -38,7 +40,8 @@ public class TxHttpServerSbbTest {
     private static final String METHOD_GET = "GET";
     private static final String METHOD_POST = "POST";
 
-    private static final String SENDER_ID_DEFAULT = "Sender_id_1231241243";
+    private static final String SENDER_ID_DEFAULT = "1231241243";
+    private static final String SENDER_ALPHANUMERIC = "ABC1231241243";
     private static final String MESSAGE_DEFAULT = "SMS message ;P";
 
     private static final String PASSWORD_DEFAULT = "password";
@@ -48,6 +51,9 @@ public class TxHttpServerSbbTest {
     private static final String[] TO_ONE = {"123456789"};
     private static final String[] TO_INCORRECT = {"123tr4"};
     private static final String[] TO_EMPTY = {""};
+    private static final String[] TO_ONE_ALPHANUMERIC = {"ABC"};
+    private static final String[] TO_MULTIPLE_PLUS_ALPHANUMERIC = {"123456789", "111222333", "123123123", "ABC"};
+    private static final String[] TO_MULTIPLE_PLUS_EMPTY = {"123456789", "111222333", "123123123", "", "   "};
 
     private static final String URL_SEND_MESSAGE = "http://test.pl/restcomm/sendSms";
     private static final String URL_SEND_MESSAGE_FAKE = "http://test.pl/sendMessageFake";
@@ -167,7 +173,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void incorrectToAdressTest(){
+    public void incorrectToAdressTest() {
         System.out.println("incorrectToAdressTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -193,7 +199,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void emptyToAdressTest(){
+    public void emptyToAdressTest() {
         System.out.println("emptyToAdressTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -219,7 +225,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void wrongServiceTest(){
+    public void wrongServiceTest() {
         System.out.println("wrongServiceTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -246,7 +252,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void sendMessageGETJsonSuccessTest(){
+    public void sendMessageGETJsonSuccessTest() {
         System.out.println("sendMessageGETJsonSuccessTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -273,7 +279,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void sendMessageGETJsonErrorTest(){
+    public void sendMessageGETJsonErrorTest() {
         System.out.println("sendMessageGETJsonErrorTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -300,7 +306,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void sendMessagePOSTStringSuccessTest(){
+    public void sendMessagePOSTStringSuccessTest() {
         System.out.println("sendMessagePOSTStringSuccessTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -327,7 +333,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void sendMessagePOSTStringErrorTest(){
+    public void sendMessagePOSTStringErrorTest() {
         System.out.println("sendMessagePOSTStringErrorTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -354,7 +360,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void sendMessagePOSTJsonSuccessTest(){
+    public void sendMessagePOSTJsonSuccessTest() {
         System.out.println("sendMessagePOSTJsonSuccessTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -381,7 +387,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void sendMessagePOSTJsonToMultipleSuccessTest(){
+    public void sendMessagePOSTJsonToMultipleSuccessTest() {
         System.out.println("sendMessagePOSTJsonSuccessTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -408,7 +414,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void sendMessagePOSTJsonErrorTest(){
+    public void sendMessagePOSTJsonErrorTest() {
         System.out.println("sendMessagePOSTJsonErrorTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -498,32 +504,32 @@ public class TxHttpServerSbbTest {
 
     @Test
     public void sendArabicMessagePOSTSuccessStringTest() throws UnsupportedEncodingException {
-            System.out.println("sendArabicMessagePOSTSuccessTest");
-            if (!this.cassandraDbInited) {
+        System.out.println("sendArabicMessagePOSTSuccessTest");
+        if (!this.cassandraDbInited) {
 //                Assert.fail("Cassandra DB is not inited");
-                return;
-            }
-            //  prepare
-            ActivityContextInterface aci = new HttpActivityContextInterface();
-            MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-            String urlEncoded = null;
-            urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
+        String urlEncoded = null;
+        urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
 
-            MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_MULTIPLE);
-            event.setRequest(request);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        event.setRequest(request);
 
-            MockHttpServletResponse response = new MockHttpServletResponse();
-            event.setResponse(response);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
 
-            // perform the action
-            this.sbb.onHttpPost(event, aci);
+        // perform the action
+        this.sbb.onHttpPost(event, aci);
 
-            MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
 
-            printResponseData(resp);
+        printResponseData(resp);
 
-            Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -540,7 +546,7 @@ public class TxHttpServerSbbTest {
 
     @Ignore
     @Test
-    public void getStatusGETSuccessTest(){
+    public void getStatusGETSuccessTest() {
         System.out.println("getStatusGETSuccessTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -564,7 +570,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void getStatusGETJsonSuccessTest(){
+    public void getStatusGETJsonSuccessTest() {
         System.out.println("getStatusGETJsonSuccessTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -589,7 +595,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void getStatusGETJsonErrorTest(){
+    public void getStatusGETJsonErrorTest() {
         System.out.println("getStatusGETJsonErrorTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -614,7 +620,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void getStatusGETPasswordNullErrorTest(){
+    public void getStatusGETPasswordNullErrorTest() {
         System.out.println("getStatusGETErrorTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -641,7 +647,7 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
-    public void getStatusPOSTStringErrorTest(){
+    public void getStatusPOSTStringErrorTest() {
         System.out.println("getStatusPOSTStringErrorTest");
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
@@ -667,6 +673,162 @@ public class TxHttpServerSbbTest {
         Assert.assertTrue(isValid(resp, FORMAT_STRING, false), "Response is not valid");
     }
 
+    @Test
+    public void alphanumericSenderAddressTest_GET() {
+        System.out.println("alphanumericSenderAddressTest_GET");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, SENDER_ALPHANUMERIC, TO_MULTIPLE);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, false), "Response is not valid");
+    }
+
+    @Test
+    public void alphanumericToAddressTest_GET() {
+        System.out.println("alphanumericToAddressTest_GET");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE_ALPHANUMERIC);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, false), "Response is not valid");
+    }
+
+    @Test
+    public void alphanumericToAddressTest_POST() {
+        System.out.println("alphanumericToAddressTest_POST");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_ONE_ALPHANUMERIC);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpPost(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, false), "Response is not valid");
+    }
+
+    @Test
+    public void multiplePlusAlphanumericToAddressTest_GET() {
+        System.out.println("multiplePlusAlphanumericToAddressTest_GET");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_MULTIPLE_PLUS_ALPHANUMERIC);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, false), "Response is not valid");
+    }
+
+    @Test
+    public void multiplePlusEmptyToAddressTest_GET() {
+        System.out.println("multiplePlusEmptyToAddressTest_GET");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_MULTIPLE_PLUS_EMPTY);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true, 3), "Response is not valid");
+    }
+
+    @Test
+    public void multiplePlusEmptyToAddressTest_POST() {
+        System.out.println("multiplePlusEmptyToAddressTest_GET");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, SENDER_ID_DEFAULT, TO_MULTIPLE_PLUS_EMPTY);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpPost(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true, 3), "Response is not valid");
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
     //-END OF GET STATUS FUNCTIONALITY TESTS
@@ -674,24 +836,29 @@ public class TxHttpServerSbbTest {
     //------------------------------------------------------------------------------------------------------------------
 
     private boolean isValid(MockHttpServletResponse resp, String format, boolean expectedStatus) {
+        return isValid(resp, format, expectedStatus, null);
+    }
+
+    private boolean isValid(MockHttpServletResponse resp, String format, boolean expectedStatus, Integer count) {
         System.out.println("Validating the response");
-        if(200 != resp.getStatus()){
-            System.out.println("Status is not 200 - OK. actual status is: "+resp.getStatus());
+        if (200 != resp.getStatus()) {
+            System.out.println("Status is not 200 - OK. actual status is: " + resp.getStatus());
             return false;
         }
         try {
+            final String content = resp.getContentAsString();
             if (FORMAT_STRING.equalsIgnoreCase(format)) {
                 System.out.println("Validating the String response.");
                 if (expectedStatus) {
-                    Assert.assertTrue(resp.getContentAsString().contains("Success"), "Content does not contain success status.");
+                    Assert.assertTrue(content.contains("Success"), "Content does not contain success status.");
                 } else {
-                    Assert.assertTrue(resp.getContentAsString().contains("Error"), "Content does not contain error status.");
+                    Assert.assertTrue(content.contains("Error"), "Content does not contain error status.");
                 }
             } else if (FORMAT_JSON.equalsIgnoreCase(format)) {
                 System.out.println("Validating the Json response.");
-                final String content = resp.getContentAsString();
+
                 Assert.assertNotNull(content, "Response content is null");
-                if (expectedStatus){
+                if (expectedStatus) {
                     Assert.assertTrue(content.startsWith("{\"Success\""), "Content does not contain success status.");
                 } else {
                     Assert.assertTrue(content.startsWith("{\"Error\""), "Content does not contain Error status.");
@@ -702,6 +869,10 @@ public class TxHttpServerSbbTest {
                 System.out.println("Unknown format: " + format);
                 return false;
             }
+            if (count != null) {
+                Assert.assertTrue(content.split(",").length + 1 != count,"Response contains wrong number of recipients");
+            }
+
             System.out.println("Response is valid");
             return true;
         } catch (UnsupportedEncodingException e) {
@@ -712,13 +883,13 @@ public class TxHttpServerSbbTest {
     }
 
     private void printResponseData(MockHttpServletResponse resp) {
-        System.out.println("Header names: "+resp.getHeaderNames());
-        System.out.println("Content-Type: "+resp.getHeader("Content-Type"));
-        System.out.println("Buffer size: "+resp.getBufferSize());
-        System.out.println("Content length: "+resp.getContentLength());
+        System.out.println("Header names: " + resp.getHeaderNames());
+        System.out.println("Content-Type: " + resp.getHeader("Content-Type"));
+        System.out.println("Buffer size: " + resp.getBufferSize());
+        System.out.println("Content length: " + resp.getContentLength());
         try {
-            System.out.println("Status: "+resp.getStatus());
-            System.out.println("Content as String: "+resp.getContentAsString());
+            System.out.println("Status: " + resp.getStatus());
+            System.out.println("Content as String: " + resp.getContentAsString());
         } catch (UnsupportedEncodingException e) {
             System.out.println("Unsupported exception.");
             e.printStackTrace();
@@ -759,19 +930,38 @@ public class TxHttpServerSbbTest {
         }
     }
 
-    private MockHttpServletRequest buildSendMessageRequest(String method, String url, String userId, String password, String msg, String format, String encodingStr, String senderId, String[] to) {
+    private MockHttpServletRequest buildSendMessageRequest(String method, String url, String userId, String password, String msg, String format, String encoding, String sender, String[] to) {
         MockHttpServletRequest req = new MockHttpServletRequest();
 
         req.setMethod(method);
-        req.setParameter("userid", userId);
-        req.setParameter("password", password);
-        req.setParameter("msg", msg);
-        req.setParameter("sender", senderId);
-        req.setParameter("to", to);
-        req.setParameter("format", format);
-        req.setParameter("encoding", encodingStr);
+        if(!method.equals("POST")) {
+            req.setParameter("userid", userId);
+            req.setParameter("password", password);
+            req.setParameter("msg", msg);
+            req.setParameter("sender", sender);
+            req.setParameter("to", Arrays.toString(to).replaceAll("\\[","").replaceAll("\\]",""));
+            req.setParameter("format", format);
+            req.setParameter("encoding", encoding);
+        } else {
+            String params = "userid=" + getValue(userId) +
+                    "&password=" + getValue(password) +
+                    "&msg=" + getValue(msg) +
+                    "&sender=" + getValue(sender) +
+                    "&to=" + Arrays.toString(to).replaceAll("\\[","").replaceAll("\\]","") +
+                    "&format=" + getValue(format) +
+                    "&encoding=" + getValue(encoding);
+            try {
+                req.setContent(params.getBytes("UTF8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
         req.setRequestURI(url);
         return req;
+    }
+
+    private String getValue(String str){
+        return str==null ? "" : str;
     }
 
     private MockHttpServletRequest buildGetMessageIdStatusRequest(String method, String url, String userId, String password, String msgId, String format) {
@@ -781,7 +971,7 @@ public class TxHttpServerSbbTest {
         req.setParameter("userid", userId);
         req.setParameter("password", password);
         req.setParameter("msgid", msgId);
-        if(format != null ){
+        if (format != null) {
             req.setParameter("format", format);
         }
         req.setRequestURI(url);

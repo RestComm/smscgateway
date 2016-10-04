@@ -168,13 +168,13 @@ public abstract class TxHttpServerSbb implements Sbb {
                 HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
                 outgoingData.setStatus(Status.ERROR);
                 outgoingData.setMessage(e.getMessage());
-                ResponseFormat responseFormat = HttpSendMessageIncomingData.getFormat(request);
+                ResponseFormat responseFormat = HttpSendMessageIncomingData.getFormat(logger, request);
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
                         HttpServletResponse.SC_OK,
                         outgoingData.getMessage(),
                         ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 this.logger.severe("Error while sending error response", ex);
             }
         }
@@ -205,13 +205,13 @@ public abstract class TxHttpServerSbb implements Sbb {
                 HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
                 outgoingData.setStatus(Status.ERROR);
                 outgoingData.setMessage(e.getMessage());
-                ResponseFormat responseFormat = HttpSendMessageIncomingData.getFormat(request);
+                ResponseFormat responseFormat = HttpSendMessageIncomingData.getFormat(logger, request);
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
                         HttpServletResponse.SC_OK,
                         outgoingData.getMessage(),
                         ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 this.logger.severe("Error while sending error response", ex);
             }
         }
@@ -248,10 +248,10 @@ public abstract class TxHttpServerSbb implements Sbb {
             final String format = request.getParameter("format");
             final String encoding = request.getParameter("encoding");
             final String senderId = request.getParameter("sender");
-            String destAddressParam = request.getParameter("to");
+            final String destAddressParam = request.getParameter("to");
             final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
-
             return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
+
         } else if(POST.equals(request.getMethod())) {
             String userId = request.getParameter("userid");
             String password = request.getParameter("password");
@@ -262,35 +262,41 @@ public abstract class TxHttpServerSbb implements Sbb {
             String destAddressParam = request.getParameter("to");
             String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
 
-            if(userId == null && password == null && encodedMsg == null && senderId == null && destAddresses == null) {
-                Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
+            Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
 
-                String[] tmp = map.get("userid");
-                userId = (tmp == null ? new String[]{""} : tmp)[0];
-
-                tmp = map.get("password");
-                password = (tmp == null ? new String[]{""} : tmp)[0];
-
-                tmp = map.get("msg");
-                encodedMsg = (tmp == null ? new String[]{""} : tmp)[0];
-
-                tmp = map.get("format");
-                format = (tmp == null ? new String[]{""} : tmp)[0];
-
-                tmp = map.get("encoding");
-                encoding = (tmp == null ? new String[]{""} : tmp)[0];
-
-                tmp = map.get("sender");
-                senderId = (tmp == null ? new String[]{""} : tmp)[0];
-
-                tmp = map.get("to");
+            if(userId == null || userId.isEmpty()) {
+                userId = getValueFromMap(map, "userid");
+            }
+            if(password == null || password.isEmpty()) {
+                password = getValueFromMap(map, "password");
+            }
+            if(encodedMsg == null || encodedMsg.isEmpty()) {
+                encodedMsg = getValueFromMap(map, "msg");
+            }
+            if(format == null || format.isEmpty()) {
+                format = getValueFromMap(map, "format");
+            }
+            if(encoding == null || encoding.isEmpty()) {
+                encoding = getValueFromMap(map, "encoding");
+            }
+            if(senderId == null || senderId.isEmpty()) {
+                senderId = getValueFromMap(map, "sender");
+            }
+            if(destAddresses == null || destAddresses.length < 1) {
+                String[] tmp = map.get("to");
                 destAddresses = (tmp == null ? new String[]{""} : tmp);
             }
             HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
             return incomingData;
         } else {
-            throw new HttpApiException("Unsupported method of the Http Request. Method is: "+request.getMethod());
+            throw new HttpApiException("Unsupported method of the Http Request. Method is: " + request.getMethod());
         }
+    }
+
+    private String getValueFromMap(Map<String, String[]> map, String key){
+        String[] tmp = map.get(key);
+        String terValue = (tmp == null || tmp.length < 1 ? null : tmp[0]);
+        return terValue;
     }
 
     private HttpGetMessageIdStatusIncomingData createGetMessageIdStatusIncomingData(HttpServletRequest request) throws HttpApiException {
@@ -302,7 +308,6 @@ public abstract class TxHttpServerSbb implements Sbb {
 
         if(userId == null && password == null && msgId == null ) {
             Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
-
             String[] tmp = map.get("userid");
             userId = (tmp == null ? new String[]{""} : tmp)[0];
 
@@ -342,7 +347,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             try {
                 final String message = "Error while trying to send send SMS message to multiple destinations.";
                 outgoingData.setStatus(Status.ERROR);
-                outgoingData.setMessage(message);
+                outgoingData.setMessage(message  + " " + e1.getMessage());
                 HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(),
                         HttpServletResponse.SC_OK,
                         message,
@@ -363,7 +368,8 @@ public abstract class TxHttpServerSbb implements Sbb {
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
                         HttpServletResponse.SC_OK,
-                        message, ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
+                        message  + " " + e1.getMessage(),
+                        ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
             } catch (IOException e) {
                 this.logger.severe("Error while trying to send SubmitMultiResponse=", e);
             }
