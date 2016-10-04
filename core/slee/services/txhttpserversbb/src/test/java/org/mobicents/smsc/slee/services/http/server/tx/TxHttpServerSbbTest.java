@@ -115,7 +115,7 @@ public class TxHttpServerSbbTest {
         this.sbb.onHttpGet(event, aci);
         MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
         printResponseData(resp);
-        Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_STRING, true, 1), "Response is not valid");
     }
 
     @Test
@@ -275,7 +275,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_JSON, true), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true, 1), "Response is not valid");
     }
 
     @Test
@@ -329,7 +329,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_STRING, true, 1), "Response is not valid");
     }
 
     @Test
@@ -383,7 +383,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_JSON, true), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true, 1), "Response is not valid");
     }
 
     @Test
@@ -410,7 +410,34 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_JSON, true), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true, 3), "Response is not valid");
+    }
+
+    @Test
+    public void sendMessagePOSTJsonWrongRecipientsAmountErrorTest() {
+        System.out.println("sendMessagePOSTJsonWrongRecipientsAmountErrorTest");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_GSM7, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpPost(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+
+        Assert.assertFalse(isValid(resp, FORMAT_JSON, true, 4), "Response is not valid");
     }
 
     @Test
@@ -469,7 +496,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_JSON, true), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true, 3), "Response is not valid");
     }
 
     @Test
@@ -499,7 +526,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_STRING, true, 3), "Response is not valid");
     }
 
     @Test
@@ -529,7 +556,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_STRING, true), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_STRING, true, 3), "Response is not valid");
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -869,8 +896,9 @@ public class TxHttpServerSbbTest {
                 System.out.println("Unknown format: " + format);
                 return false;
             }
-            if (count != null) {
-                Assert.assertTrue(content.split(",").length + 1 != count,"Response contains wrong number of recipients");
+            if (count != null && content.split(",").length - 1 != count) {
+                System.out.println("Response contains wrong number of recipients");
+                return false;
             }
 
             System.out.println("Response is valid");
