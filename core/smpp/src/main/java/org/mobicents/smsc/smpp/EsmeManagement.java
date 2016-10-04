@@ -31,6 +31,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,8 +55,13 @@ import javolution.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
 import org.jboss.mx.util.MBeanServerLocator;
 
+import com.cloudhopper.commons.util.windowing.Window;
+import com.cloudhopper.commons.util.windowing.WindowFuture;
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppSession;
+import com.cloudhopper.smpp.impl.DefaultSmppSession;
+import com.cloudhopper.smpp.pdu.PduRequest;
+import com.cloudhopper.smpp.pdu.PduResponse;
 
 /**
  *
@@ -372,7 +378,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 	private void stopWrappedSession(Esme esme) {
 		if (esme.getSmppSessionType().equals(SmppSession.Type.SERVER)) {
-			SmppSession smppSession = esme.getSmppSession();
+			DefaultSmppSession smppSession = esme.getSmppSession();
 
 			if (smppSession != null) {
 				// TODO can server side send UNBIND?
@@ -383,7 +389,17 @@ public class EsmeManagement implements EsmeManagementMBean {
 					logger.error(String.format("Failed to close smpp session for %s.",
 							smppSession.getConfiguration().getName()));
 				}
-				smppSession.destroy();
+
+                // firing of onPduRequestTimeout() for sent messages for which we do not have responses
+                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+                    this.logger.warn("Firing of onPduRequestTimeout from EsmeManagement.stopWrappedSession() - 1: "
+                            + future.getRequest().toString());
+                    smppSession.expired(future);
+                }
+
+                smppSession.destroy();
 			}
 		} else {
 			if (this.smppClient != null) {

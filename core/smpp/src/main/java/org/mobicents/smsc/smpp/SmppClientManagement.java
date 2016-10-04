@@ -21,17 +21,24 @@
  */
 package org.mobicents.smsc.smpp;
 
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.log4j.Logger;
 
 import javolution.util.FastList;
 
+import com.cloudhopper.commons.util.windowing.Window;
+import com.cloudhopper.commons.util.windowing.WindowFuture;
 import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
+import com.cloudhopper.smpp.impl.DefaultSmppSession;
+import com.cloudhopper.smpp.pdu.PduRequest;
+import com.cloudhopper.smpp.pdu.PduResponse;
 
 /**
  * @author Amit Bhayani
@@ -133,7 +140,7 @@ public class SmppClientManagement implements SmppClientManagementMBean {
 	}
 
 	protected void stopSmppClientSession(Esme esme) {
-		SmppSession smppSession = esme.getSmppSession();
+		DefaultSmppSession smppSession = esme.getSmppSession();
 		if (smppSession != null) {
 			if (smppSession.isBound()) {
 				try {
@@ -150,7 +157,17 @@ public class SmppClientManagement implements SmppClientManagementMBean {
 				logger.error(String.format("Failed to close smpp client session for %s.",
 						smppSession.getConfiguration().getName()));
 			}
-			smppSession.destroy();
+
+            // firing of onPduRequestTimeout() for sent messages for which we do not have responses
+            Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+            Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+            for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+                this.logger.warn("Firing of onPduRequestTimeout from SmppClientManagement.stopSmppClientSession() - 1: "
+                        + future.getRequest().toString());
+                smppSession.expired(future);
+            }
+
+            smppSession.destroy();
 		}
 	}
 

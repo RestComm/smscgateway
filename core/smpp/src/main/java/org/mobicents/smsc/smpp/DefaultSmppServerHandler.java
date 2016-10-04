@@ -21,8 +21,12 @@
  */
 package org.mobicents.smsc.smpp;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
+import com.cloudhopper.commons.util.windowing.Window;
+import com.cloudhopper.commons.util.windowing.WindowFuture;
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.SmppServerHandler;
@@ -33,6 +37,8 @@ import com.cloudhopper.smpp.SmppSessionHandler;
 import com.cloudhopper.smpp.impl.DefaultSmppSession;
 import com.cloudhopper.smpp.pdu.BaseBind;
 import com.cloudhopper.smpp.pdu.BaseBindResp;
+import com.cloudhopper.smpp.pdu.PduRequest;
+import com.cloudhopper.smpp.pdu.PduResponse;
 import com.cloudhopper.smpp.type.Address;
 import com.cloudhopper.smpp.type.SmppProcessingException;
 
@@ -216,6 +222,17 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 			esmeServer.setServerBound(false);
 			esmeServer.resetEnquireLinkFail();
 			this.smppServerOpsThread.removeEnquireList(esmeName);
+
+            DefaultSmppSession defaultSession = (DefaultSmppSession) session;
+
+            // firing of onPduRequestTimeout() for sent messages for which we do not have responses
+            Window<Integer, PduRequest, PduResponse> wind = defaultSession.getSendWindow();
+            Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+            for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+                this.logger.warn("Firing of onPduRequestTimeout from DefaultSmppServerHandler.sessionDestroyed(): "
+                        + future.getRequest().toString());
+                defaultSession.expired(future);
+            }
 
 			// make sure it's really shutdown
 			session.destroy();

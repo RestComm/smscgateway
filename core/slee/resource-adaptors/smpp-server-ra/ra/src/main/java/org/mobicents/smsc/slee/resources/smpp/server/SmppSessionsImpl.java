@@ -408,8 +408,9 @@ public class SmppSessionsImpl implements SmppSessions {
 						pduRequest), e);
 			} finally {
 				if (smppServerTransaction != null) {
-					smppServerResourceAdaptor.endActivity(smppServerTransaction);
-				}
+                    smppServerResourceAdaptor.endActivity(smppServerTransaction);
+                    pduRequest.setReferenceObject(null);
+                }
 			}
 		}
 
