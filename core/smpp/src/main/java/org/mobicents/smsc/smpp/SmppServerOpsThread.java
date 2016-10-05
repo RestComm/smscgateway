@@ -21,12 +21,8 @@
  */
 package org.mobicents.smsc.smpp;
 
-import com.cloudhopper.commons.util.windowing.Window;
-import com.cloudhopper.commons.util.windowing.WindowFuture;
 import com.cloudhopper.smpp.impl.DefaultSmppSession;
 import com.cloudhopper.smpp.pdu.EnquireLink;
-import com.cloudhopper.smpp.pdu.PduRequest;
-import com.cloudhopper.smpp.pdu.PduResponse;
 
 import javolution.util.FastList;
 import javolution.util.FastMap;
@@ -34,7 +30,6 @@ import javolution.util.FastMap;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author nhanth87
@@ -185,14 +180,14 @@ public class SmppServerOpsThread implements Runnable {
 							smppSession.getConfiguration().getName()));
 				}
 
-				// firing of onPduRequestTimeout() for sent messages for which we do not have responses
-                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
-                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
-                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
-                    this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.enquireLink() - 1: "
-                            + future.getRequest().toString());
-                    smppSession.expired(future);
-                }
+//				// firing of onPduRequestTimeout() for sent messages for which we do not have responses
+//                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+//                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+//                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+//                    this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.enquireLink() - 1: "
+//                            + future.getRequest().toString());
+//                    smppSession.expired(future);
+//                }
 
 				smppSession.destroy();
 				return;
@@ -209,13 +204,13 @@ public class SmppServerOpsThread implements Runnable {
 			}
 
             // firing of onPduRequestTimeout() for sent messages for which we do not have responses
-            Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
-            Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
-            for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
-                this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.enquireLink() - 2: "
-                        + future.getRequest().toString());
-                smppSession.expired(future);
-            }
+//            Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+//            Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+//            for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+//                this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.enquireLink() - 2: "
+//                        + future.getRequest().toString());
+//                smppSession.expired(future);
+//            }
 
             smppSession.destroy();
 		}
@@ -235,13 +230,13 @@ public class SmppServerOpsThread implements Runnable {
 				}
 
                 // firing of onPduRequestTimeout() for sent messages for which we do not have responses
-                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
-                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
-                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
-                    this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.serverLinkDown() - 1: "
-                            + future.getRequest().toString());
-                    smppSession.expired(future);
-                }
+//                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+//                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+//                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+//                    this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.serverLinkDown() - 1: "
+//                            + future.getRequest().toString());
+//                    smppSession.expired(future);
+//                }
 
                 smppSession.destroy();
 

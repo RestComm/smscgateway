@@ -31,7 +31,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -55,13 +54,9 @@ import javolution.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
 import org.jboss.mx.util.MBeanServerLocator;
 
-import com.cloudhopper.commons.util.windowing.Window;
-import com.cloudhopper.commons.util.windowing.WindowFuture;
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.impl.DefaultSmppSession;
-import com.cloudhopper.smpp.pdu.PduRequest;
-import com.cloudhopper.smpp.pdu.PduResponse;
 
 /**
  *
@@ -390,14 +385,14 @@ public class EsmeManagement implements EsmeManagementMBean {
 							smppSession.getConfiguration().getName()));
 				}
 
-                // firing of onPduRequestTimeout() for sent messages for which we do not have responses
-                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
-                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
-                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
-                    this.logger.warn("Firing of onPduRequestTimeout from EsmeManagement.stopWrappedSession() - 1: "
-                            + future.getRequest().toString());
-                    smppSession.expired(future);
-                }
+//                // firing of onPduRequestTimeout() for sent messages for which we do not have responses
+//                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+//                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+//                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+//                    this.logger.warn("Firing of onPduRequestTimeout from EsmeManagement.stopWrappedSession() - 1: "
+//                            + future.getRequest().toString());
+//                    smppSession.expired(future);
+//                }
 
                 smppSession.destroy();
 			}
