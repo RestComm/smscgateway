@@ -22,7 +22,11 @@
 
 package org.mobicents.smsc.slee.services.http.server.tx.data;
 
-import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestMessageBodyEncoding;
+import org.mobicents.smsc.domain.HttpEncoding;
+import org.mobicents.smsc.domain.SmscPropertiesManagement;
+import org.mobicents.smsc.slee.services.http.server.tx.enums.MessageBodyEncoding;
+import org.mobicents.smsc.slee.services.http.server.tx.enums.SmscMessageEncoding;
+import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestParameter;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
@@ -30,6 +34,7 @@ import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.slee.facilities.Tracer;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -60,64 +65,107 @@ public class HttpSendMessageIncomingData {
      * values: UCS-2, UTF-8
      * Default is english
      */
-    private RequestMessageBodyEncoding encoding;
+    private SmscMessageEncoding smscEncoding;
+
+    /**
+     * Optional parameter
+     * Possible values: UTF-8, UTF-16
+     * Default is UTF-8
+     */
+    private MessageBodyEncoding messageBodyEncoding;
     private String senderId;
     private List<String> destAddresses = new ArrayList<String>();
+    private HttpEncoding httpEncoding;
 
-    public HttpSendMessageIncomingData(String userId, String password, String msg, String formatParam, String encodingStr, String senderId, String[] to) throws HttpApiException {
+    public HttpSendMessageIncomingData(String userId, String password, String msg, String formatParam, String smscEncodingStr, String messageBodyEncodingStr, String senderId, String[] to, SmscPropertiesManagement smscPropertiesManagement) throws HttpApiException {
         //setting the default
         this.format = ResponseFormat.fromString(formatParam);
         // checking if mandatory fields are present
         if (isEmptyOrNull(userId)) {
-            throw new HttpApiException("'userid' parameter is not set properly or not valid in the Http Request.");
+            throw new HttpApiException("'" + RequestParameter.USER_ID.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
         if (isEmptyOrNull(password)) {
-            throw new HttpApiException("'password' parameter is not set properly or not valid in the Http Request.");
+            throw new HttpApiException("'" + RequestParameter.PASSWORD.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
         if (isEmptyOrNull(msg)) {
-            throw new HttpApiException("'msg' parameter is not set properly or not valid in the Http Request.");
+            throw new HttpApiException("'" + RequestParameter.MESSAGE_BODY.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
         if (isEmptyOrNull(senderId)) {
-            throw new HttpApiException("'sender' parameter is not set properly or not valid in the Http Request.");
+            throw new HttpApiException("'" + RequestParameter.SENDER.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
         //check only digits
         try {
             Long.parseLong(senderId);
         } catch (NumberFormatException e) {
-            throw new HttpApiException("'sender' parameter is not valid in the Http Request. sender:" + senderId);
+            throw new HttpApiException("'" + RequestParameter.SENDER.getName() + "' parameter is not valid in the Http Request. sender:" + senderId);
         }
 
         if (to == null || to.length < 1) {
 //             !validateDestNumbersAndRemoveEmpty(to)){
-            throw new HttpApiException("'to' parameter is not set in the Http Request.");
+            throw new HttpApiException("'" + RequestParameter.TO.getName() + "' parameter is not set in the Http Request.");
         }
 
         this.destAddresses = new ArrayList<String>(Arrays.asList(to));
         //check only digits
         List<String> notValidNumbers = validateDestNumbersAndRemoveEmpty(this.destAddresses);
-        if(!notValidNumbers.isEmpty()){
-            throw new HttpApiException("'to' parameter contains not valid value. Wrong format of numbers:" + Arrays.toString(notValidNumbers.toArray()));
+        if (!notValidNumbers.isEmpty()) {
+            throw new HttpApiException("'" + RequestParameter.TO.getName() + "' parameter contains not valid value. Wrong format of numbers:" + Arrays.toString(notValidNumbers.toArray()));
         }
 
-        if (encodingStr != null && !RequestMessageBodyEncoding.isValid(encodingStr)) {
-            throw new HttpApiException("'encoding' parameter is not set properly or not valid in the Http Request.");
+        if (smscEncodingStr != null && !SmscMessageEncoding.isValid(smscEncodingStr)) {
+            throw new HttpApiException("'" + RequestParameter.SMSC_ENCODING.getName() + "' parameter is not set properly or not valid in the Http Request.");
+        }
+
+        if (messageBodyEncodingStr != null && !MessageBodyEncoding.isValid(messageBodyEncodingStr)) {
+            throw new HttpApiException("'" + RequestParameter.MESSAGE_BODY_ENCODING.getName() + "' parameter is not set properly or not valid in the Http Request.");
+        }
+
+        //setting the defaults
+        if (smscEncodingStr != null) {
+            this.smscEncoding = SmscMessageEncoding.fromString(smscEncodingStr);
+        }
+
+        if (messageBodyEncodingStr != null) {
+            this.messageBodyEncoding = MessageBodyEncoding.fromString(messageBodyEncodingStr);
+        } else {
+            if (SmscMessageEncoding.GSM7.equals(getSmscEncoding())) {
+                httpEncoding = smscPropertiesManagement.getHttpEncodingForGsm7();
+            } else {
+                httpEncoding = smscPropertiesManagement.getHttpEncodingForUCS2();
+            }
+            switch (httpEncoding) {
+                case Utf8:
+                    this.messageBodyEncoding = MessageBodyEncoding.UTF8;
+                    break;
+                case Unicode:
+                    this.messageBodyEncoding = MessageBodyEncoding.UTF16;
+                    break;
+                default:
+                    this.messageBodyEncoding = MessageBodyEncoding.UTF8;
+                    break;
+            }
         }
         this.userId = userId;
         this.password = password;
-        this.msg = decodeMassage(msg);
+        this.msg = decodeMessage(msg, getMessageBodyEncoding());
         this.senderId = senderId;
-
-        //setting the default
-        if (encodingStr != null) {
-            this.encoding = RequestMessageBodyEncoding.fromString(encodingStr);
-        }
-
     }
 
-    private String decodeMassage(String msgParameter) throws HttpApiException {
+    private String decodeMessage(String msgParameter, MessageBodyEncoding messageBodyEncoding) throws HttpApiException {
+        String encoding;
+        switch (messageBodyEncoding) {
+            case UTF8:
+                encoding = "UTF-8";
+                break;
+            case UTF16:
+                encoding = "UTF-16";
+                break;
+            default:
+                encoding = "UTF-8";
+                break;
+        }
         try {
-            String encodedMsg = new String(msgParameter.getBytes("iso-8859-1"), "UTF-8");
-            return   encodedMsg;
+            return new String(msgParameter.getBytes("iso-8859-1"), Charset.forName(encoding));
         } catch (UnsupportedEncodingException e) {
             throw new HttpApiException(e.getMessage(),e);
         }
@@ -168,8 +216,12 @@ public class HttpSendMessageIncomingData {
         return format;
     }
 
-    public RequestMessageBodyEncoding getEncoding() {
-        return encoding;
+    public SmscMessageEncoding getSmscEncoding() {
+        return smscEncoding;
+    }
+
+    public MessageBodyEncoding getMessageBodyEncoding() {
+        return messageBodyEncoding;
     }
 
     public String getSenderId() {
@@ -191,7 +243,8 @@ public class HttpSendMessageIncomingData {
                 ", password='" + password + '\'' +
                 ", msg='" + msg + '\'' +
                 ", format='" + format + '\'' +
-                ", encoding=" + encoding +
+                ", smscEncoding=" + smscEncoding +
+                ", messageBodyEncoding=" + messageBodyEncoding +
                 ", senderId='" + senderId + '\'' +
                 ", destAddresses=" + destAddresses + '\'' +
                 '}';

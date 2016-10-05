@@ -43,6 +43,8 @@ public class HttpRequestUtils {
     public final static String P_PASSWORD = "password";
     public final static String P_MSGID = "msgid";
     public final static String P_FORMAT = "format";
+    public final static String P_SMSC_ENCODING = "smscEncoding";
+    public final static String P_MESSAGE_BODY_ENCODING = "messageBodyEncoding";
 
     public static Map<String,String[]> extractParametersFromPost(Tracer logger, HttpServletRequest request) throws HttpApiException {
         try {

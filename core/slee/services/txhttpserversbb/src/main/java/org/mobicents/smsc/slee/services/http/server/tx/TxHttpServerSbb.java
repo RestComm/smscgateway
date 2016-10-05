@@ -53,6 +53,7 @@ import org.mobicents.smsc.slee.services.http.server.tx.data.HttpGetMessageIdStat
 import org.mobicents.smsc.slee.services.http.server.tx.data.HttpGetMessageIdStatusOutgoingData;
 import org.mobicents.smsc.slee.services.http.server.tx.data.HttpSendMessageIncomingData;
 import org.mobicents.smsc.slee.services.http.server.tx.data.HttpSendMessageOutgoingData;
+import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestParameter;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.Status;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
@@ -242,51 +243,56 @@ public abstract class TxHttpServerSbb implements Sbb {
     private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request) throws HttpApiException {
         logger.fine("createSendMessageIncomingData");
         if(GET.equals(request.getMethod())) {
-            final String userId = request.getParameter("userid");
-            final String password = request.getParameter("password");
-            final String encodedMsg = request.getParameter("msg");
-            final String format = request.getParameter("format");
-            final String encoding = request.getParameter("encoding");
-            final String senderId = request.getParameter("sender");
-            final String destAddressParam = request.getParameter("to");
+            final String userId = request.getParameter(RequestParameter.USER_ID.getName());
+            final String password = request.getParameter(RequestParameter.PASSWORD.getName());
+            final String encodedMsg = request.getParameter(RequestParameter.MESSAGE_BODY.getName());
+            final String format = request.getParameter(RequestParameter.FORMAT.getName());
+            final String msgEncoding = request.getParameter(RequestParameter.SMSC_ENCODING.getName());
+            final String bodyEncoding = request.getParameter(RequestParameter.MESSAGE_BODY_ENCODING.getName());
+            final String senderId = request.getParameter(RequestParameter.SENDER.getName());
+            final String destAddressParam = request.getParameter(RequestParameter.TO.getName());
             final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
-            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
+            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, destAddresses, smscPropertiesManagement);
 
         } else if(POST.equals(request.getMethod())) {
-            String userId = request.getParameter("userid");
-            String password = request.getParameter("password");
-            String encodedMsg = request.getParameter("msg");
-            String format = request.getParameter("format");
-            String encoding = request.getParameter("encoding");
-            String senderId = request.getParameter("sender");
-            String destAddressParam = request.getParameter("to");
+            String userId = request.getParameter(RequestParameter.USER_ID.getName());
+            String password = request.getParameter(RequestParameter.PASSWORD.getName());
+            String encodedMsg = request.getParameter(RequestParameter.MESSAGE_BODY.getName());
+            String format = request.getParameter(RequestParameter.FORMAT.getName());
+            String msgEncoding = request.getParameter(RequestParameter.SMSC_ENCODING.getName());
+            String bodyEncoding = request.getParameter(RequestParameter.MESSAGE_BODY_ENCODING.getName());
+            String senderId = request.getParameter(RequestParameter.SENDER.getName());
+            String destAddressParam = request.getParameter(RequestParameter.TO.getName());
             String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
 
             Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
 
             if(userId == null || userId.isEmpty()) {
-                userId = getValueFromMap(map, "userid");
+                userId = getValueFromMap(map, RequestParameter.USER_ID.getName());
             }
             if(password == null || password.isEmpty()) {
-                password = getValueFromMap(map, "password");
+                password = getValueFromMap(map, RequestParameter.PASSWORD.getName());
             }
             if(encodedMsg == null || encodedMsg.isEmpty()) {
-                encodedMsg = getValueFromMap(map, "msg");
+                encodedMsg = getValueFromMap(map, RequestParameter.MESSAGE_BODY.getName());
             }
             if(format == null || format.isEmpty()) {
-                format = getValueFromMap(map, "format");
+                format = getValueFromMap(map, RequestParameter.FORMAT.getName());
             }
-            if(encoding == null || encoding.isEmpty()) {
-                encoding = getValueFromMap(map, "encoding");
+            if(msgEncoding == null || msgEncoding.isEmpty()) {
+                msgEncoding = getValueFromMap(map, RequestParameter.SMSC_ENCODING.getName());
+            }
+            if(bodyEncoding == null || bodyEncoding.isEmpty()) {
+                bodyEncoding = getValueFromMap(map, RequestParameter.MESSAGE_BODY_ENCODING.getName());
             }
             if(senderId == null || senderId.isEmpty()) {
-                senderId = getValueFromMap(map, "sender");
+                senderId = getValueFromMap(map, RequestParameter.SENDER.getName());
             }
             if(destAddresses == null || destAddresses.length < 1) {
-                String[] tmp = map.get("to");
+                String[] tmp = map.get(RequestParameter.TO.getName());
                 destAddresses = (tmp == null ? new String[]{""} : tmp);
             }
-            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, encoding, senderId, destAddresses);
+            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, destAddresses, smscPropertiesManagement);
             return incomingData;
         } else {
             throw new HttpApiException("Unsupported method of the Http Request. Method is: " + request.getMethod());
@@ -301,23 +307,23 @@ public abstract class TxHttpServerSbb implements Sbb {
 
     private HttpGetMessageIdStatusIncomingData createGetMessageIdStatusIncomingData(HttpServletRequest request) throws HttpApiException {
         logger.fine("createGetMessageIdStatusIncomingData");
-        String userId = request.getParameter("userid");
-        String password = request.getParameter("password");
-        String msgId = request.getParameter("msgid");
-        String format = request.getParameter("format");
+        String userId = request.getParameter(RequestParameter.USER_ID.getName());
+        String password = request.getParameter(RequestParameter.PASSWORD.getName());
+        String msgId = request.getParameter(RequestParameter.MESSAGE_ID.getName());
+        String format = request.getParameter(RequestParameter.FORMAT.getName());
 
         if(userId == null && password == null && msgId == null ) {
             Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
-            String[] tmp = map.get("userid");
+            String[] tmp = map.get(RequestParameter.USER_ID.getName());
             userId = (tmp == null ? new String[]{""} : tmp)[0];
 
-            tmp = map.get("password");
+            tmp = map.get(RequestParameter.PASSWORD.getName());
             password = (tmp == null ? new String[]{""} : tmp)[0];
 
-            tmp = map.get("msgid");
+            tmp = map.get(RequestParameter.MESSAGE_ID.getName());
             msgId = (tmp == null ? new String[]{""} : tmp)[0];
 
-            tmp = map.get("format");
+            tmp = map.get(RequestParameter.FORMAT.getName());
             format = (tmp == null ? new String[]{""} : tmp)[0];
         }
         HttpGetMessageIdStatusIncomingData incomingData = new HttpGetMessageIdStatusIncomingData(userId, password, msgId, format);
@@ -466,10 +472,10 @@ public abstract class TxHttpServerSbb implements Sbb {
 
         String msg = incomingData.getShortMessage();
         final int dcs ;
-        if (incomingData.getEncoding() == null) {
+        if (incomingData.getSmscEncoding() == null) {
             dcs = smscPropertiesManagement.getHttpDefaultDataCoding();
         } else {
-            switch(incomingData.getEncoding()){
+            switch(incomingData.getSmscEncoding()){
                 case GSM7:
                     dcs = 0;
                     break;

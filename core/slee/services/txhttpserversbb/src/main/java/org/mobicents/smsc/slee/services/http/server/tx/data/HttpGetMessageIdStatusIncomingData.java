@@ -22,6 +22,7 @@
 
 package org.mobicents.smsc.slee.services.http.server.tx.data;
 
+import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestParameter;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 
@@ -41,13 +42,13 @@ public class HttpGetMessageIdStatusIncomingData {
     public HttpGetMessageIdStatusIncomingData(String userId, String password, String msgId, String formatParam) throws HttpApiException {
         // checking if mandatory fields are present
         if(isEmptyOrNull(userId)){
-            throw new HttpApiException("userid parameter is not set properly or not valid in the Http Request.");
+            throw new HttpApiException("'" + RequestParameter.USER_ID.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
         if(isEmptyOrNull(password)){
-            throw new HttpApiException("password parameter is not set properly or not valid in the Http Request.");
+            throw new HttpApiException("'" + RequestParameter.PASSWORD.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
         if(isEmptyOrNull(msgId)){
-            throw new HttpApiException("msgid parameter is not set properly or not valid in the Http Request.");
+            throw new HttpApiException("'" + RequestParameter.MESSAGE_ID.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
 
         this.userId = userId;
@@ -56,7 +57,7 @@ public class HttpGetMessageIdStatusIncomingData {
         try {
             this.msgId = Long.parseLong(msgId);
         } catch (NumberFormatException e){
-            throw new HttpApiException("msgid parameter in the Http Request is not valid long type");
+            throw new HttpApiException("'" + RequestParameter.MESSAGE_ID.getName() + "' parameter in the Http Request is not valid long type");
         }
     }
 
