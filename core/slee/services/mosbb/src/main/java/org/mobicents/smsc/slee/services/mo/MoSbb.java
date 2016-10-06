@@ -1380,10 +1380,13 @@ public abstract class MoSbb extends MoCommonSbb {
             int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.4);
             int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
             if (activityCount >= fetchMaxRows) {
+                smscCongestionControl.registerMaxActivityCount1_4Threshold();
                 SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
                         MAPErrorCode.resourceLimitation, null);
                 e.setSkipErrorLogging(true);
                 throw e;
+            } else {
+                smscCongestionControl.registerMaxActivityCount1_4BackToNormal();
             }
         }
 

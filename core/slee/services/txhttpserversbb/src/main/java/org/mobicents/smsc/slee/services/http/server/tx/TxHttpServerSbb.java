@@ -24,12 +24,14 @@ package org.mobicents.smsc.slee.services.http.server.tx;
 
 import javolution.util.FastList;
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
+
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.MProcManagement;
+import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
@@ -70,6 +72,7 @@ import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
@@ -99,6 +102,7 @@ public abstract class TxHttpServerSbb implements Sbb {
     protected SchedulerRaSbbInterface scheduler = null;
 
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
     private static Charset utf8Charset = Charset.forName("UTF-8");
     private static Charset ucs2Charset = Charset.forName("UTF-16BE");
@@ -594,10 +598,13 @@ public abstract class TxHttpServerSbb implements Sbb {
             int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
             int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
             if (activityCount >= fetchMaxRows) {
+                smscCongestionControl.registerMaxActivityCount1_2Threshold();
                 SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", 0,
                         0, null);
                 e.setSkipErrorLogging(true);
                 throw e;
+            } else {
+                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
             }
         }
         // TODO how to check if charging is used for http request? Is it turned on for all requests?

@@ -49,6 +49,7 @@ import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.SmscProcessingException;
@@ -81,6 +82,7 @@ public abstract class MoCommonSbb implements Sbb {
 	protected MAPProvider mapProvider;
 	protected MAPParameterFactory mapParameterFactory;
     protected SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    protected SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
     protected SchedulerRaSbbInterface scheduler = null;
 
 	protected SmppSessions smppServerSessions = null;

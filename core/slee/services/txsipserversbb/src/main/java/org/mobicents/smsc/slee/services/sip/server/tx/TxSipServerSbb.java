@@ -65,6 +65,7 @@ import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.Sip;
 import org.mobicents.smsc.domain.SipManagement;
 import org.mobicents.smsc.domain.SipXHeaders;
+import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
@@ -117,6 +118,7 @@ public abstract class TxSipServerSbb implements Sbb {
 
 	protected PersistenceRAInterface persistence = null;
 	private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
 	private static final SipManagement sipManagement = SipManagement.getInstance();
 
@@ -567,10 +569,13 @@ public abstract class TxSipServerSbb implements Sbb {
             int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
             int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
             if (activityCount >= fetchMaxRows) {
+                smscCongestionControl.registerMaxActivityCount1_2Threshold();
                 SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
                         0, null);
                 e.setSkipErrorLogging(true);
                 throw e;
+            } else {
+                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
             }
         }
 

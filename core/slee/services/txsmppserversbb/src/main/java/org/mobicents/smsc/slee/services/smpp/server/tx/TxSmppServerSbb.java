@@ -64,6 +64,7 @@ import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MProcManagement;
+import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
@@ -133,6 +134,7 @@ public abstract class TxSmppServerSbb implements Sbb {
 	protected PersistenceRAInterface persistence = null;
 	protected SchedulerRaSbbInterface scheduler = null;
 	private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+	private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
 	private static Charset utf8Charset = Charset.forName("UTF-8");
 	private static Charset ucs2Charset = Charset.forName("UTF-16BE");
@@ -1506,10 +1508,13 @@ public abstract class TxSmppServerSbb implements Sbb {
             int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
             int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
             if (activityCount >= fetchMaxRows) {
+                smscCongestionControl.registerMaxActivityCount1_2Threshold();
                 SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
                         0, null);
                 e.setSkipErrorLogging(true);
                 throw e;
+            } else {
+                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
             }
         }
 

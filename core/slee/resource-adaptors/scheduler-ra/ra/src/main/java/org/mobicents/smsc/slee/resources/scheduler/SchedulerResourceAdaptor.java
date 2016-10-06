@@ -54,6 +54,7 @@ import javax.transaction.SystemException;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.SmsRouteManagement;
+import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
@@ -99,6 +100,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 
 	private Date garbageCollectionTime = new Date();
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
 	public SchedulerResourceAdaptor() {
 		this.schedulerRaSbbInterface = new SchedulerRaSbbInterface() {
@@ -427,8 +429,13 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 			int maxCnt;
 			int fetchMaxRows = smscPropertiesManagement.getFetchMaxRows();
 			int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
-			int fetchAvailRows = smscPropertiesManagement.getMaxActivityCount() - activityCount;
-			maxCnt = Math.min(fetchMaxRows, fetchAvailRows);
+            int fetchAvailRows = smscPropertiesManagement.getMaxActivityCount() - activityCount;
+            maxCnt = Math.min(fetchMaxRows, fetchAvailRows);
+            if (fetchAvailRows <= 0) {
+                smscCongestionControl.registerMaxActivityCount1_0Threshold();
+            } else {
+                smscCongestionControl.registerMaxActivityCount1_0BackToNormal();
+            }
 
 			if (savedOneWaySmsSetCollection != null && savedOneWaySmsSetCollection.size() > 0) {
 				schedulableSms = savedOneWaySmsSetCollection;
