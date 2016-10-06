@@ -156,7 +156,7 @@ public class HomeRoutingManagement implements HomeRoutingManagementMBean {
     protected void checkCcMccmncTable() {
 //        if (ccMccmncCollection != null && ccMccmnsTableVersionLoaded == ccMccmnsTableVersionActual)
 //            return;
-        load();
+//        load();
     }
 
     @Override
