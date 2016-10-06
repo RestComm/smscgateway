@@ -157,8 +157,8 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
      * @param aci
      */
     public void onSendRoutingInfoForSMRequest(SendRoutingInfoForSMRequest evt, ActivityContextInterface aci) {
-        if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived SEND_ROUTING_INFO_FOR_SM_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("\nHome routing: HrSriServerSbb: Received SEND_ROUTING_INFO_FOR_SM_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
         }
 
         this.setInvokeId(evt.getInvokeId());
@@ -179,13 +179,13 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 MAPErrorMessage errorMessage = this.mapProvider.getMAPErrorMessageFactory().createMAPErrorMessageFacilityNotSup(null, null, null);
                 dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
                 if (this.logger.isInfoEnabled()) {
-                    this.logger.info("\nSent ErrorComponent = " + errorMessage);
+                    this.logger.info("\nHome routing: Sent ErrorComponent = " + errorMessage);
                 }
 
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
-                logger.severe("Error while sending Error message", e);
+                logger.severe("Home routing: Error while sending Error message", e);
                 return;
             }
         }
@@ -200,7 +200,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
      * @param aci
      */
     public void onSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse evt, ActivityContextInterface aci) {
-        this.logger.severe("Received SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt);
+        this.logger.severe("Home routing: Received SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt);
     }
 
     private void setupSriRequest(ISDNAddressString msisdn, AddressString serviceCentreAddress, int networkId,
@@ -228,7 +228,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
 
             if (this.logger.isFineEnabled()) {
                 StringBuilder sb = new StringBuilder();
-                sb.append("Created correlationId=");
+                sb.append("Home routing: Created correlationId=");
                 sb.append(correlationID);
                 sb.append(" for received ServiceCentedAddress=");
                 sb.append(sca);
@@ -318,7 +318,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 dlg.release();
             }
 
-            String reason = "Exception when ImsiCacheElement (home routing): " + e1.toString();
+            String reason = "Home routing: Exception when ImsiCacheElement : " + e1.toString();
             this.logger.severe(reason, e1);
             return;
         }
@@ -341,7 +341,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 dlg.release();
             }
 
-            String reason = "MAPException when sending SRI positive Response (home routing): " + e.toString();
+            String reason = "Home routing: MAPException when sending SRI positive Response : " + e.toString();
             this.logger.severe(reason, e);
         }
     }
@@ -383,7 +383,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
         smscStatAggregator.updateMsgInHrSriHrByPass();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Home routing: bypassing of HR procedure: transaction: ");
+        sb.append("Home routing: bypassing of Home routing: procedure: transaction: ");
         sb.append(correlationIdValue);
         if (this.logger.isInfoEnabled())
             this.logger.info(sb.toString());
@@ -398,7 +398,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 dlg.release();
             }
 
-            String reason = "MAPException when sending SRI bypassing of HR procedure (home routing): " + e.toString();
+            String reason = "Home routing: MAPException when sending SRI bypassing of Home routing: " + e.toString();
             this.logger.severe(reason, e);
         }
     }
@@ -444,7 +444,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 dlg.release();
             }
 
-            String reason = "MAPException when sending SRI negative Response (home routing): " + e.toString();
+            String reason = "Home routing: MAPException when sending SRI negative Response: " + e.toString();
             this.logger.severe(reason, e);
         }
     }

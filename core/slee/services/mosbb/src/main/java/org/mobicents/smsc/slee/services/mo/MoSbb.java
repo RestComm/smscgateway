@@ -577,7 +577,7 @@ public abstract class MoSbb extends MoCommonSbb {
 
         IMSI destinationImsi = smRPDA.getIMSI();
 		if (destinationImsi == null) {
-			throw new SmscProcessingException("Mt DA IMSI is absent", SmppConstants.STATUS_SYSERR,
+			throw new SmscProcessingException("Home routing: Mt DA IMSI is absent", SmppConstants.STATUS_SYSERR,
 					MAPErrorCode.unexpectedDataValue, null);
 		}
 
@@ -587,12 +587,12 @@ public abstract class MoSbb extends MoCommonSbb {
 		try {
 		    civ = SmsSetCache.getInstance().getCorrelationIdCacheElement(correlationID);
         } catch (Exception e) {
-            throw new SmscProcessingException("Error when getting of CorrelationIdCacheElement", SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null,
+            throw new SmscProcessingException("Home routing: Error when getting of CorrelationIdCacheElement", SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null,
                     e);
         }
         if (civ == null) {
             smscStatAggregator.updateHomeRoutingCorrIdFail();
-            throw new SmscProcessingException("No data is found for: CorrelationId=" + correlationID, SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+            throw new SmscProcessingException("Home routing: No data is found for: CorrelationId=" + correlationID, SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
                     null);
         }
 
@@ -601,23 +601,23 @@ public abstract class MoSbb extends MoCommonSbb {
 		try {
 			smsTpdu = smsSignalInfo.decodeTpdu(false);
 
-			logger.fine("The SmsTpduType is " + smsTpdu.getSmsTpduType());
+			logger.fine("Home routing: The SmsTpduType is " + smsTpdu.getSmsTpduType());
 
 			switch (smsTpdu.getSmsTpduType()) {
 			case SMS_DELIVER:
 				SmsDeliverTpdu smsDeliverTpdu = (SmsDeliverTpdu) smsTpdu;
 				if (this.logger.isInfoEnabled()) {
-					this.logger.info("Received SMS_DELIVER = " + smsDeliverTpdu);
+					this.logger.info("Home routing: Received SMS_DELIVER = " + smsDeliverTpdu);
 				}
 				// AddressField af = smsSubmitTpdu.getDestinationAddress();
 				sms = this.handleSmsDeliverTpdu(smsDeliverTpdu, civ, networkId, originatorSccpAddress, isMoOperation, dialog, evt, invokeId);
 				break;
 			default:
-				this.logger.severe("Received non SMS_DELIVER = " + smsTpdu);
+				this.logger.severe("Home routing: Received non SMS_DELIVER = " + smsTpdu);
 				break;
 			}
 		} catch (MAPException e1) {
-			logger.severe("Error while decoding SmsSignalInfo ", e1);
+			logger.severe("Home routing: Error while decoding SmsSignalInfo ", e1);
 		}
 
         return sms;

@@ -86,7 +86,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
         try {
             this.onSriFullResponse();
         } catch (Throwable e1) {
-            logger.severe("Exception in SriSbb.onDialogDelimiter (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
+            logger.severe("Exception in HrSriClientSbb.onDialogDelimiter (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
 
@@ -96,7 +96,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
             this.onSriFullResponse();
         } catch (Throwable e1) {
-            logger.severe("Exception in SriSbb.onDialogClose (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
+            logger.severe("Exception in HrSriClientSbb.onDialogClose (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
 
@@ -108,7 +108,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
         CorrelationIdValue correlationIdValue = this.getCorrelationIdValue();
         if (correlationIdValue == null) {
-            this.logger.severe("CorrelationIdValue CMP missed");
+            this.logger.severe("HrSriClientSbb.onRejectComponent(): CorrelationIdValue CMP missed");
             return;
         }
         this.returnSriFailure(correlationIdValue, null, "Home routing: onRejectComponent after SRI Request: " + reason != null ? reason.toString() : "");
@@ -121,14 +121,14 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
             MAPRefuseReason mapRefuseReason = evt.getRefuseReason();
             CorrelationIdValue correlationIdValue = this.getCorrelationIdValue();
             if (correlationIdValue == null) {
-                this.logger.severe("CorrelationIdValue CMP missed");
+                this.logger.severe("HrSriClientSbb.onDialogReject(): CorrelationIdValue CMP missed");
                 return;
             }
 
             if (mapRefuseReason == MAPRefuseReason.PotentialVersionIncompatibility
                     && evt.getMAPDialog().getApplicationContext().getApplicationContextVersion() != MAPApplicationContextVersion.version1) {
                 if (logger.isWarningEnabled()) {
-                    this.logger.warning("Rx : Sri (home routing) onDialogReject / PotentialVersionIncompatibility=" + evt);
+                    this.logger.warning("Home routing: Rx : Sri (home routing) onDialogReject / PotentialVersionIncompatibility=" + evt);
                 }
                 // possible a peer supports only MAP V1
                 // Now send new SRI with supported ACN (MAP V1)
@@ -140,7 +140,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
             // If ACN not supported, lets use the new one suggested
             if (mapRefuseReason == MAPRefuseReason.ApplicationContextNotSupported) {
                 if (logger.isWarningEnabled()) {
-                    this.logger.warning("Rx : Sri (home routing) onDialogReject / ApplicationContextNotSupported=" + evt);
+                    this.logger.warning("Home routing: Rx : Sri (home routing) onDialogReject / ApplicationContextNotSupported=" + evt);
                 }
 
                 // Now send new SRI with supported ACN
@@ -169,7 +169,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
             CorrelationIdValue correlationIdValue = this.getCorrelationIdValue();
             if (correlationIdValue == null) {
-                this.logger.severe("CorrelationIdValue CMP missed");
+                this.logger.severe("HrSriClientSbb.onDialogUserAbort(): CorrelationIdValue CMP missed");
                 return;
             }
 
@@ -188,14 +188,14 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
             CorrelationIdValue correlationIdValue = this.getCorrelationIdValue();
             if (correlationIdValue == null) {
-                this.logger.severe("CorrelationIdValue CMP missed");
+                this.logger.severe("HrSriClientSbb.onDialogProviderAbort(): CorrelationIdValue CMP missed");
                 return;
             }
 
             this.returnSriFailure(correlationIdValue, null,
                     "(home routing) onDialogProviderAbort after SRI Request: " + abortProviderReason != null ? abortProviderReason.toString() : "");
         } catch (Throwable e1) {
-            logger.severe("Exception in SriSbb.onDialogProviderAbort() (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
+            logger.severe("Exception in HrSriClientSbb.onDialogProviderAbort() (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
 
@@ -210,13 +210,13 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
             CorrelationIdValue correlationIdValue = this.getCorrelationIdValue();
             if (correlationIdValue == null) {
-                this.logger.severe("CorrelationIdValue CMP missed");
+                this.logger.severe("HrSriClientSbb.onDialogTimeout(): CorrelationIdValue CMP missed");
                 return;
             }
 
             this.returnSriFailure(correlationIdValue, null, "(home routing) onDialogTimeout after SRI Request");
         } catch (Throwable e1) {
-            logger.severe("Exception in SriSbb.onDialogTimeout() (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
+            logger.severe("Exception in HrSriClientSbb.onDialogTimeout() (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
 
@@ -243,7 +243,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
      */
     public void onSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse evt, ActivityContextInterface aci) {
         if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt + " Dialog=" + evt.getMAPDialog());
+            this.logger.fine("\nHome routing: HrSriClientSbb: Received SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt + " Dialog=" + evt.getMAPDialog());
         }
 
         if (evt.getMAPDialog().getApplicationContext().getApplicationContextVersion() == MAPApplicationContextVersion.version1
@@ -263,7 +263,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
     public void onInformServiceCentreRequest(InformServiceCentreRequest evt, ActivityContextInterface aci) {
         if (this.logger.isInfoEnabled()) {
-            this.logger.info("\nReceived INFORM_SERVICE_CENTER_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
+            this.logger.info("\nHome routing: HrSriClientSbb: Received INFORM_SERVICE_CENTER_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
         }
 
         CorrelationIdValue correlationIdValue = this.getCorrelationIdValue();
@@ -296,7 +296,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
                 }
             }
         } catch (Throwable e1) {
-            logger.severe("Exception in SriSbb.onErrorComponent when fetching records and issuing events: " + e1.getMessage(), e1);
+            logger.severe("Exception in HrSriClientSbb.onErrorComponent when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
 
@@ -335,10 +335,11 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
         this.maxMAPApplicationContextVersion = MAPApplicationContextVersion.getInstance(smscPropertiesManagement
                 .getMaxMapVersion());
     }
+
     @Override
     public void setupSriRequest(CorrelationIdValue correlationIdValue) {
         if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived SriRequest: event= " + correlationIdValue);
+            this.logger.fine("\nHome routing: HrSriClientSbb: Received SriRequest: event= " + correlationIdValue);
         }
 
         this.setCorrelationIdValue(correlationIdValue);
@@ -367,7 +368,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
                 mapDialogSms.release();
             }
 
-            String reason = "MAPException when sending SRI from sendSRI() (home routing): " + e.toString();
+            String reason = "Home routing: HrSriClientSbb: MAPException when sending SRI from sendSRI(): " + e.toString();
             this.logger.severe(reason, e);
             this.returnSriFailure(correlationIdValue, null, reason);
         }
@@ -394,7 +395,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
         mapDialogSms.addSendRoutingInfoForSMRequest(isdn, sm_RP_PRI, serviceCenterAddress, null, false, null, null,
                 null);
         if (this.logger.isInfoEnabled())
-            this.logger.info("\nSending: SendRoutingInfoForSMRequest (home routing): isdn=" + isdn + ", serviceCenterAddress="
+            this.logger.info("\nHome routing: HrSriClientSbb: Sending: SendRoutingInfoForSMRequest: isdn=" + isdn + ", serviceCenterAddress="
                     + serviceCenterAddress + ", sm_RP_PRI=" + sm_RP_PRI);
 
         return mapDialogSms;
@@ -406,7 +407,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
         CorrelationIdValue correlationIdValue = this.getCorrelationIdValue();
         if (correlationIdValue == null) {
-            this.logger.severe("CorrelationIdValue CMP missed");
+            this.logger.severe("Home routing HrSriClientSbb.onSriFullResponse(): CorrelationIdValue CMP missed");
             return;
         }
 
@@ -428,10 +429,10 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
         if (errorMessage != null) {
             // we have a negative response
-            this.returnSriFailure(correlationIdValue, errorMessage, "MAP ErrorMessage received: " + errorMessage);
+            this.returnSriFailure(correlationIdValue, errorMessage, "Home routing HrSriClientSbb.onSriFullResponse(): MAP ErrorMessage received: " + errorMessage);
         } else {
             // we have no responses - this is an error behaviour
-            this.returnSriFailure(correlationIdValue, null, "Empty response after SRI Request");
+            this.returnSriFailure(correlationIdValue, null, "Home routing HrSriClientSbb.onSriFullResponse(): Empty response after SRI Request");
         }
     }
 
