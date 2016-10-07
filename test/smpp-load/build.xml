@@ -13,7 +13,7 @@
 
 	<property name="assemble.dir" value="${ant.file.mobicents.release}/../target/load" />
 	<path id="project.class.path">
-		<pathelement location="${assemble.dir}/smpp-load-7.1.0-SNAPSHOT.jar" />
+		<pathelement location="${assemble.dir}/smpp-load-7.1.80.jar" />
 		<pathelement location="${assemble.dir}/ch-smpp-5.0.10-SNAPSHOT.jar" />
 		<pathelement location="${assemble.dir}/netty-3.9.0.Final.jar" />
 		<pathelement location="${assemble.dir}/slf4j-api-1.5.6.jar" />
