@@ -1330,6 +1330,7 @@ EXAMPLES
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+[[_max_rows]]
 === Max Rows
 
 [[_max_rows_cli]]
@@ -1366,6 +1367,7 @@ EXAMPLES
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+[[_max_activity_count]]
 === Max Activity Count
 
 [[_max_activity_count_cli]]

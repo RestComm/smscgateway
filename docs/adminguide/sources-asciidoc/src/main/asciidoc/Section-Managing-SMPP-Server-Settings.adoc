@@ -1,4 +1,5 @@
 
+[[_smpp_server_settings]]
 = SMPP Server Settings
 
 [[_smpp_server_settings_view]]

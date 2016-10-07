@@ -3,9 +3,12 @@
 You must fine-tune Memory and Database settings for better performance before using {this-platform} {this-application} in production.
 Once you complete setting up the Gateway you must configure the SS7 Stack the SMSC Gateway following the instructions specified in this guide. 
 
-== Memory Settings
+[[_fine_tuning]]
+== Memory Settings and fine tuning
 
-You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size.
+=== Memory Settings
+
+You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size. 4 GB is recommended.
 These settings are specified in the file [path]_{this-folder}-smscgateway-version>/jboss-5.1.0.GA/bin/run.conf_. 
 
 -Xms3072m::
@@ -13,6 +16,47 @@ These settings are specified in the file [path]_{this-folder}-smscgateway-versio
 
 -Xmx3072m::
   Maximum heap size, set in megabytes
+
+=== Message flow types
+
+We have two possible message flow type. 
+
+1. When a message is firstly stored into a cassandra database - StoreAndForward mode (StoreAndForward messages when <<_storeandforwardmode>> is set to "normal")
+2. When a first delivery retry is done without storing a message into a cassandra database - datagramm, Transactional, ForwardAndStore (StoreAndForward messages when <<_storeandforwardmode>> is set to "fast").
+
+If you have some high traffic load you can try scenario "1". In this case when a message highload peaks cassandra will store messages before delivering and all incoming messages will be accepted (but this may lead some delay before the first delivery attempt). In scenario "2" if there are many messages in processing then some incoming messages will rejected by SMSC GW with "STATUS_THROTTLED" cause (for SMPP case). And SMPP application must be ready to resend such rejected messages later. If SMPP applications can not do so, then it is better to use "1" scenario.
+
+=== SMSC configuration parameters which influence the traffic throughput
+
+Firstly we need to check <<_fetch_period>>, <<_max_rows>> and <<_max_activity_count>> chapters. "Max Activity Count" parameter specifies how many messages will be processed at the same time. If you have high productivity server then you can try to increase it. But be carefull - if you increase it too high then it leads the productivity reducing because of SMSC GW will not be able to process all together.
+
+For monitoring you can use <<_smsc_stat_get>> chapter. DueSlotProcessingLag output said if SMSC GW is overloaded (you will see that this parameter be encrased permanemtly in this case).
+
+In the configuration of SCTP layer leave the parameter "SingleThread" as "true". The count of threads that will process incoming SS7 messages is specified by a parameter "deliveryMessageThreadCount". We need to do it if we have some bottleneck in SS7 part.
+
+* open file jboss/server/default/deploy/telscale-smsc-server/META-INF/jboss-beans.xml in the text editor
+* find "bean name="Mtp3UserPart"" mbean definition
+* update parameter "deliveryMessageThreadCount" to some value like "processor count * 2"
+
+SMPP side also has important parameters "DefaultWindowSize" and "MaxConnectionSize" for SMPP Server, you can increase it if you see that you have bottleneck at SMPP side but SMSC GW generally is not overloaded. See <<_smpp_server_settings>>.
+
+We need to add info of cassandra database parameters update for high loaded systems (in the file cassandra.yaml):
+
+* tombstone_warn_threshold: 1000 -> 5000 (in case of warning like "Read 386 live and 1496 tombstoned cells in system.schema_columns (see tombstone_warn_threshold).")
+* read_request_timeout_in_ms 5000 -> 25000 (or twice more to prevent timeouts in case when we have very many paending message to one destination)
+* range_request_timeout_in_ms 10000 -> 50000 (same)
+* request_timeout_in_ms 10000 -> 50000 (same)
+
+[[_starting_background]]
+== Starting of the SMSC GW process
+
+We can use "screen" linux command to run jboss processes at background.
+
+As a command how to check if SMSC GW instanse is run we can use:
+ps -ef | grep jboss
+
+If we run several instanses of the same server (by mistake) the second instanse will have records in the logs like "BindException: Address already in use". We need to terminate all such servers and run only one instanse again.
+
 
 [[_logging]]
 == Configuring log4j Logging Service
