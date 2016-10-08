@@ -205,6 +205,23 @@ public class RETest {
         boolean b3 = m.matches();
     }
 
+    @Test(groups = { "RegularExpr" })
+    public void testRegularExpr51() {
+        String expr = "^9370.*";
+        Pattern p = Pattern.compile(expr);
+        Matcher m = p.matcher("9370");
+        boolean b1 = m.matches();
+
+        m = p.matcher("9370111");
+        boolean b2 = m.matches();
+
+        m = p.matcher("8370111");
+        boolean b3 = m.matches();
+
+        m = p.matcher("937");
+        boolean b4 = m.matches();
+    }
+
     @Test(groups = { "UnicodeDecode" })
     public void testUnicodeDecode() {
         Charset ucs2Charset = Charset.forName("UTF-16BE");

@@ -23,6 +23,7 @@
 package org.mobicents.smsc.domain;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -41,6 +42,11 @@ import org.mobicents.protocols.ss7.oam.common.statistics.api.CounterDefSet;
 import org.mobicents.protocols.ss7.oam.common.statistics.api.CounterMediator;
 import org.mobicents.protocols.ss7.oam.common.statistics.api.CounterType;
 import org.mobicents.protocols.ss7.oam.common.statistics.api.SourceValueSet;
+import org.mobicents.smsc.server.bootstrap.Version;
+import org.restcomm.commons.statistics.reporter.RestcommStatsReporter;
+
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 
 /**
 *
@@ -56,6 +62,12 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
 
     private FastMap<String, CounterDefSet> lstCounters = new FastMap<String, CounterDefSet>();
 
+    protected static final String DEFAULT_STATISTICS_SERVER = "https://statistics.restcomm.com/rest/";
+
+    private RestcommStatsReporter statsReporter = RestcommStatsReporter.getRestcommStatsReporter();
+    private MetricRegistry metrics = RestcommStatsReporter.getMetricRegistry();
+    private Counter counterMessages = metrics.counter("messages");
+
     public SmscStatProviderJmx(MBeanHost ss7Management) {
         this.ss7Management = ss7Management;
 
@@ -67,18 +79,40 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
      */
 
     public void start() throws Exception {
-        logger.info("Starting ...");
+        logger.info("SmscStatProviderJmx Starting ...");
 
         setupCounterList();
 
         this.ss7Management.registerMBean(Ss7Layer.SMSC_GW, SmscManagementType.MANAGEMENT, this.getName(), this);
 
-        logger.info("Started ...");
+        String statisticsServer = Version.instance.getStatisticsServer();
+        if (statisticsServer == null || !statisticsServer.contains("http")) {
+            statisticsServer = DEFAULT_STATISTICS_SERVER;
+        }
+        // define remote server address (optionally)
+        statsReporter.setRemoteServer(statisticsServer);
+
+        String projectName = System.getProperty("RestcommProjectName", Version.instance.getProjectName());
+        String projectType = System.getProperty("RestcommProjectType", Version.instance.getProjectType());
+        String projectVersion = System.getProperty("RestcommProjectVersion", Version.instance.getProjectVersion());
+        logger.info("Restcomm Stats starting: " + projectName + " " + projectType + " " + projectVersion + " "
+                + statisticsServer);
+        statsReporter.setProjectName(projectName);
+        statsReporter.setProjectType(projectType);
+        statsReporter.setVersion(projectVersion);
+        statsReporter.start(86400, TimeUnit.SECONDS);
+
+        smscStatAggregator.setCounterMessages(counterMessages);
+
+        logger.info("SmscStatProviderJmx Started ...");
     }
 
     public void stop() {
-        logger.info("Stopping ...");
-        logger.info("Stopped ...");
+        logger.info("SmscStatProviderJmx Stopping ...");
+
+        statsReporter.stop();
+
+        logger.info("SmscStatProviderJmx Stopped ...");
     }
 
     public String getName() {

@@ -81,14 +81,14 @@ public class SS7Service extends ServiceMBeanSupport implements SS7ServiceMBean {
 		}
 	}
 
-	public String getSS7Version() {
-		String version = Version.instance.getProperty("version");
-		if (version != null) {
-			return version;
-		} else {
-			return "2.0";
-		}
-	}
+    public String getSS7Version() {
+        String version = Version.instance.getProperty("version");
+        if (version != null) {
+            return version;
+        } else {
+            return "2.0";
+        }
+    }
 
 	public void setJndiName(String jndiName) {
 		this.jndiName = jndiName;

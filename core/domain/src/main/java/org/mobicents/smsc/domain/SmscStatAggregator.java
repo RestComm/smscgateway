@@ -32,6 +32,8 @@ import org.mobicents.protocols.ss7.statistics.api.StatResult;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.UpdateMessagesInProcessListener;
 
+import com.codahale.metrics.Counter;
+
 /**
 *
 * @author sergey vetyutnev
@@ -47,12 +49,18 @@ public class SmscStatAggregator implements UpdateMessagesInProcessListener {
     private StatCollector statCollector = new StatCollector();
     private UUID sessionId = UUID.randomUUID();
 
+    private Counter counterMessages;
+
     public SmscStatAggregator() {
         SmsSetCache.getInstance().setUpdateMessagesInProcessListener(this);
     }
 
     public static SmscStatAggregator getInstance() {
         return instance;
+    }
+
+    public void setCounterMessages(Counter counterMessages) {
+        this.counterMessages = counterMessages;
     }
 
     public void reset() {
@@ -244,6 +252,9 @@ public class SmscStatAggregator implements UpdateMessagesInProcessListener {
 
     public void updateMsgOutSentAll() {
         statCollector.msgOutSentAll.addAndGet(1);
+
+        if (counterMessages != null)
+            counterMessages.inc();
     }
 
     public long getMsgOutTryAllCumulative() {

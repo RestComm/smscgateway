@@ -35,6 +35,18 @@
 			<groupId>org.mobicents.protocols.ss7.oam.common</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.restcomm.commons</groupId>
+			<artifactId>restcomm-statistics</artifactId>
+			<version>${restcomm.commons.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>${metrics.version}</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -73,4 +85,14 @@
 			</activation>
 		</profile>
 	</profiles>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+
 </project>

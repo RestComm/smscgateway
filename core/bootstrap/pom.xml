@@ -61,7 +61,13 @@
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>		
-		
+
+		<dependency>
+			<groupId>org.restcomm.commons</groupId>
+			<artifactId>restcomm-statistics</artifactId>
+			<version>${restcomm.commons.version}</version>
+		</dependency>
+
 		<!-- SMSC Dependency -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
