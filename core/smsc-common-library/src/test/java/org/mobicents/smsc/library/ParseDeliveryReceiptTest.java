@@ -41,11 +41,14 @@ public class ParseDeliveryReceiptTest {
     public void testParseDeliveryReceipt() {
         String msg = "id:0512249005 sub:001 dlvrd:000 submit date:1609051327 done date:1609051337 stat:ENROUTE err:054 text:xxssxx";
         String msg2 = "id:0512249005 sub:001 dlvrd:000 submit date:1609051327 done date:1609051337 stat:ENROUTE err:054 text:";
-
-        DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg);
+        String msg3 = "id:1010d937-8f43-4754-9dd8-6e987cda32fa sub:001 dlvrd:000 submit date:161008120127 done date:1610081500 stat:UNDELIV err:004 text:exampleMessage02";
 
         Date d1 = new Date(116, 9 - 1, 5, 13, 27, 0);
         Date d2 = new Date(116, 9 - 1, 5, 13, 37, 0);
+        Date d3 = new Date(116, 10 - 1, 8, 12, 1, 27);
+        Date d4 = new Date(116, 10 - 1, 8, 15, 0, 0);
+
+        DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg);
 
         assertEquals(deliveryReceiptData.getMessageId(), "0512249005");
         assertEquals(deliveryReceiptData.getMsgSubmitted(), 1);
@@ -58,6 +61,16 @@ public class ParseDeliveryReceiptTest {
 
         deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg2);
         assertEquals(deliveryReceiptData.getText(), "");
+
+        deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg3);
+        assertEquals(deliveryReceiptData.getMessageId(), "1010d937-8f43-4754-9dd8-6e987cda32fa");
+        assertEquals(deliveryReceiptData.getMsgSubmitted(), 1);
+        assertEquals(deliveryReceiptData.getMsgDelivered(), 0);
+        assertTrue(deliveryReceiptData.getSubmitDate().equals(d3));
+        assertTrue(deliveryReceiptData.getDoneDate().equals(d4));
+        assertEquals(deliveryReceiptData.getStatus(), "UNDELIV");
+        assertEquals(deliveryReceiptData.getError(), 4);
+        assertEquals(deliveryReceiptData.getText(), "exampleMessage02");
     }
 
     @Test(groups = { "ParseDeliveryReceipt" })

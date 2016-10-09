@@ -650,82 +650,84 @@ public class MessageUtil {
         if (msg == null || msg.length() < 102)
             return null;
 
+        String[] namesList = new String[] { DELIVERY_ACK_ID, DELIVERY_ACK_SUB, DELIVERY_ACK_DLVRD, DELIVERY_ACK_SUBMIT_DATE,
+                DELIVERY_ACK_DONE_DATE, DELIVERY_ACK_STAT, DELIVERY_ACK_ERR, DELIVERY_ACK_TEXT, };
+
+        int pos = 0;
+        ArrayList<String> values = new ArrayList<String>(8);
+        for (int i1 = 0; i1 < namesList.length; i1++) {
+            String fieldName = namesList[i1];
+            int newPos = msg.indexOf(fieldName, pos);
+            if (newPos < 0)
+                return null;
+
+            if (i1 == 0) {
+                if (newPos != 0)
+                    return null;
+            } else {
+                values.add(msg.substring(pos, newPos));
+            }
+            pos = newPos + fieldName.length();
+        }
+        values.add(msg.substring(pos));
+
         DeliveryReceiptDataImpl deliveryReceiptData = new DeliveryReceiptDataImpl();
-        String idKey = msg.substring(0, 3);
-        String idVal = msg.substring(3, 13);
-        String submittedKey = msg.substring(13, 18);
-        String submittedVal = msg.substring(18, 21);
-        String deliveredKey = msg.substring(21, 28);
-        String deliveredVal = msg.substring(28, 31);
-        String submitDateKey = msg.substring(31, 44);
-        String submitDateVal = msg.substring(44, 54);
-        String doneDateKey = msg.substring(54, 65);
-        String doneDateVal = msg.substring(65, 75);
-        String statusKey = msg.substring(75, 81);
-        String statusVal = msg.substring(81, 88);
-        String errorKey = msg.substring(88, 93);
-        String errorVal = msg.substring(93, 96);
-        String textKey = msg.substring(96, 102);
-        String textVal = msg.substring(102);
+
+        String idVal = values.get(0);
+        String submittedVal = values.get(1);
+        String deliveredVal = values.get(2);
+        String submitDateVal = values.get(3);
+        String doneDateVal = values.get(4);
+        String statusVal = values.get(5);
+        String errorVal = values.get(6);
+        String textVal = values.get(7);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmm");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMddHHmmss");
 
-        if (idKey.equals(DELIVERY_ACK_ID)) {
-            try {
-                // long messageId = Long.parseLong(idVal);
-                // deliveryReceiptData.setMessageId(messageId);
-                deliveryReceiptData.setMessageId(idVal);
-            } catch (NumberFormatException e) {
-            }
+        deliveryReceiptData.setMessageId(idVal);
+
+        try {
+            int msgSubmitted = Integer.parseInt(submittedVal);
+            deliveryReceiptData.setMsgSubmitted(msgSubmitted);
+        } catch (NumberFormatException e) {
         }
 
-        if (submittedKey.equals(DELIVERY_ACK_SUB)) {
-            try {
-                int msgSubmitted = Integer.parseInt(submittedVal);
-                deliveryReceiptData.setMsgSubmitted(msgSubmitted);
-            } catch (NumberFormatException e) {
-            }
+        try {
+            int msgDelivered = Integer.parseInt(deliveredVal);
+            deliveryReceiptData.setMsgDelivered(msgDelivered);
+        } catch (NumberFormatException e) {
         }
 
-        if (deliveredKey.equals(DELIVERY_ACK_DLVRD)) {
-            try {
-                int msgDelivered = Integer.parseInt(deliveredVal);
-                deliveryReceiptData.setMsgDelivered(msgDelivered);
-            } catch (NumberFormatException e) {
-            }
+        try {
+            Date submitDate;
+            if (submitDateVal.length() == 10)
+                submitDate = sdf.parse(submitDateVal);
+            else
+                submitDate = sdf2.parse(submitDateVal);
+            deliveryReceiptData.setSubmitDate(submitDate);
+        } catch (ParseException e) {
         }
 
-        if (submitDateKey.equals(DELIVERY_ACK_SUBMIT_DATE)) {
-            try {
-                Date submitDate = sdf.parse(submitDateVal);
-                deliveryReceiptData.setSubmitDate(submitDate);
-            } catch (ParseException e) {
-            }
+        try {
+            Date doneDate;
+            if (doneDateVal.length() == 10)
+                doneDate = sdf.parse(doneDateVal);
+            else
+                doneDate = sdf2.parse(doneDateVal);
+            deliveryReceiptData.setDoneDate(doneDate);
+        } catch (ParseException e) {
         }
 
-        if (doneDateKey.equals(DELIVERY_ACK_DONE_DATE)) {
-            try {
-                Date doneDate = sdf.parse(doneDateVal);
-                deliveryReceiptData.setDoneDate(doneDate);
-            } catch (ParseException e) {
-            }
+        deliveryReceiptData.setStatus(statusVal);
+
+        try {
+            int error = Integer.parseInt(errorVal);
+            deliveryReceiptData.setError(error);
+        } catch (NumberFormatException e) {
         }
 
-        if (statusKey.equals(DELIVERY_ACK_STAT)) {
-            deliveryReceiptData.setStatus(statusVal);
-        }
-
-        if (errorKey.equals(DELIVERY_ACK_ERR)) {
-            try {
-                int error = Integer.parseInt(errorVal);
-                deliveryReceiptData.setError(error);
-            } catch (NumberFormatException e) {
-            }
-        }
-
-        if (textKey.toLowerCase().equals(DELIVERY_ACK_TEXT)) {
-            deliveryReceiptData.setText(textVal);
-        }
+        deliveryReceiptData.setText(textVal);
 
         return deliveryReceiptData;
     }
