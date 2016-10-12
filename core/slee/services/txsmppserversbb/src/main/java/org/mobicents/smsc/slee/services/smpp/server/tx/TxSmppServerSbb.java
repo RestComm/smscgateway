@@ -1544,16 +1544,31 @@ public abstract class TxSmppServerSbb implements Sbb {
                 String clusterName = esme.getClusterName();
                 String dlvMessageId = deliveryReceiptData.getMessageId();
                 Long messageId = null;
+                String drFormat = null;
                 try {
                     messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvMessageId, clusterName);
+                    drFormat = "regular";
                 } catch (PersistenceException e) {
-                    logger.severe("Exception when runnung c2_getMessageIdByRemoteMessageId(): " + e.getMessage(), e);
+                    logger.severe("Exception when runnung c2_getMessageIdByRemoteMessageId() - 1: " + e.getMessage(), e);
+                }
+
+                if (messageId == null) {
+                    // trying to parse as a hex format
+                    try {
+                        long mId = Long.parseLong(dlvMessageId);
+                        String digDlvMessageId = String.format("%08X", mId);
+                        messageId = persistence.c2_getMessageIdByRemoteMessageId(digDlvMessageId, clusterName);
+                        drFormat = "hex";
+                    } catch (PersistenceException e) {
+                        logger.severe("Exception when runnung c2_getMessageIdByRemoteMessageId() - 2: " + e.getMessage(), e);
+                    } catch (NumberFormatException e) {
+                    }
                 }
 
                 if (messageId != null) {
                     // we found in local cache / database a reference to an origin
                     logger.info("Remote delivery receipt: clusterName=" + clusterName + ", dlvMessageId=" + dlvMessageId
-                            + ", receipt=" + sms0.getShortMessageText());
+                            + ", receipt=" + sms0.getShortMessageText() + ", drFormat=" + drFormat);
 
                     sms0.setReceiptOrigMessageId(dlvMessageId);
                     sms0.setReceiptLocalMessageId(messageId);

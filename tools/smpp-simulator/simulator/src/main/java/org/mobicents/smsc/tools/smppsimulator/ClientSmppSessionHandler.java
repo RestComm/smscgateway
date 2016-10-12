@@ -194,7 +194,17 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
             }
 
             long mId = this.testingForm.getMsgIdGenerator().incrementAndGet();
-            String msgId = MessageUtil.createMessageIdString(mId);
+
+            String msgId;
+            String msgId2;
+            if (this.testingForm.getSmppSimulatorParameters().isHexMessageIdResponse()) {
+                msgId = String.format("%08X", mId);
+                msgId2 = MessageUtil.createMessageIdString(mId);
+            } else {
+                msgId = MessageUtil.createMessageIdString(mId);
+                msgId2 = MessageUtil.createMessageIdString(mId);
+            }
+
             ((BaseSmResp) resp).setMessageId(msgId);
 
             // scheduling of delivery receipt if needed
@@ -205,7 +215,7 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                 this.testingForm.getExecutor().schedule(
                         new DeliveryReceiptSender(
                                 this.testingForm.getSmppSimulatorParameters().getDeliveryResponseGenerating(), new Date(),
-                                msgId), delay, TimeUnit.MILLISECONDS);
+                                msgId2), delay, TimeUnit.MILLISECONDS);
             }
 
             testingForm.addMessage("PduResponseSent: " + resp.getName(), resp.toString());

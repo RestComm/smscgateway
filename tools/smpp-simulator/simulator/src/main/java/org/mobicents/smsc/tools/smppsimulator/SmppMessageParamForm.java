@@ -93,9 +93,10 @@ public class SmppMessageParamForm extends JDialog {
 	private JCheckBox cbRejectIncomingDeliveryMessage;
 	private JRadioButton rbDR_No;
 	private JRadioButton rbDR_Success;
-	private JRadioButton rbDR_Error8;
-	private JCheckBox cbDRAfter2Min;
-	private final ButtonGroup buttonGroup_2 = new ButtonGroup();
+    private JRadioButton rbDR_Error8;
+    private JCheckBox cbDRAfter2Min;
+    private JCheckBox cbHexMessageIdResponse;
+    private final ButtonGroup buttonGroup_2 = new ButtonGroup();
 
 	public SmppMessageParamForm(JDialog owner) {
 		super(owner, true);
@@ -374,6 +375,10 @@ public class SmppMessageParamForm extends JDialog {
 						cbDRAfter2Min.setBounds(6, 99, 364, 23);
 						panel_resp.add(cbDRAfter2Min);
 						
+						cbHexMessageIdResponse = new JCheckBox("HexMessageIdResponse");
+						cbHexMessageIdResponse.setBounds(6, 125, 364, 23);
+						panel_resp.add(cbHexMessageIdResponse);
+						
 						JPanel panel_bulk = new JPanel();
 						tabbedPane.addTab("Bulk", null, panel_bulk, null);
 						panel_bulk.setLayout(null);
@@ -561,6 +566,7 @@ public class SmppMessageParamForm extends JDialog {
 
         this.cbRejectIncomingDeliveryMessage.setSelected(this.data.isRejectIncomingDeliveryMessage());
         this.cbDRAfter2Min.setSelected(this.data.isDeliveryResponseAfter2Min());
+        this.cbHexMessageIdResponse.setSelected(this.data.isHexMessageIdResponse());
         switch (this.data.getDeliveryResponseGenerating()) {
             case No:
                 this.rbDR_No.setSelected(true);
@@ -663,6 +669,7 @@ public class SmppMessageParamForm extends JDialog {
 
         this.data.setRejectIncomingDeliveryMessage(this.cbRejectIncomingDeliveryMessage.isSelected());
         this.data.setDeliveryResponseAfter2Min(this.cbDRAfter2Min.isSelected());
+        this.data.setHexMessageIdResponse(this.cbHexMessageIdResponse.isSelected());
         if (rbDR_No.isSelected())
             this.data.setDeliveryResponseGenerating(SmppSimulatorParameters.DeliveryResponseGenerating.No);
         if (rbDR_Success.isSelected())
