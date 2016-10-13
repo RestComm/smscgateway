@@ -77,6 +77,15 @@ public final class Version {
         }
     }
 
+    public String getShortName() {
+        String version = instance.getProperty("short.name");
+        if (version != null) {
+            return version;
+        } else {
+            return "???";
+        }
+    }
+
     public String getProjectType() {
         String version = instance.getProperty("version");
         if (version != null) {

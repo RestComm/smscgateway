@@ -92,7 +92,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
         // define remote server address (optionally)
         statsReporter.setRemoteServer(statisticsServer);
 
-        String projectName = System.getProperty("RestcommProjectName", Version.instance.getProjectName());
+        String projectName = System.getProperty("RestcommProjectName", Version.instance.getShortName());
         String projectType = System.getProperty("RestcommProjectType", Version.instance.getProjectType());
         String projectVersion = System.getProperty("RestcommProjectVersion", Version.instance.getProjectVersion());
         logger.info("Restcomm Stats starting: " + projectName + " " + projectType + " " + projectVersion + " "
