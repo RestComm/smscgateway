@@ -1,5 +1,7 @@
 package org.mobicents.smsc.slee.resources.smpp.server;
 
+import java.util.Map;
+
 import javax.slee.SLEEException;
 import javax.slee.facilities.Tracer;
 import javax.slee.resource.ActivityAlreadyExistsException;
@@ -10,6 +12,7 @@ import org.mobicents.smsc.slee.resources.smpp.server.events.PduRequestTimeout;
 import org.mobicents.smsc.smpp.Esme;
 import org.mobicents.smsc.smpp.SmppSessionHandlerInterface;
 
+import com.cloudhopper.commons.util.windowing.Window;
 import com.cloudhopper.commons.util.windowing.WindowFuture;
 import com.cloudhopper.smpp.PduAsyncResponse;
 import com.cloudhopper.smpp.SmppConstants;
@@ -331,9 +334,20 @@ public class SmppSessionsImpl implements SmppSessions {
 
 		@Override
 		public void fireChannelUnexpectedlyClosed() {
-			tracer.severe(String
-					.format("Rx : fireChannelUnexpectedlyClosed for SmppSessionImpl=%s Default handling is to discard an unexpected channel closed",
-							this.esme.getName()));
+            tracer.severe(String
+                    .format("Rx : fireChannelUnexpectedlyClosed for SmppSessionImpl=%s Default handling is to discard an unexpected channel closed",
+                            this.esme.getName()));
+
+            DefaultSmppSession defaultSession = esme.getSmppSession();
+
+            // firing of onPduRequestTimeout() for sent messages for which we do not have responses
+            Window<Integer, PduRequest, PduResponse> wind = defaultSession.getSendWindow();
+            Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+            for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+                tracer.warning("Firing of onPduRequestTimeout from DefaultSmppServerHandler.sessionDestroyed(): "
+                        + future.getRequest().toString());
+                defaultSession.expired(future);
+            }
 		}
 
 		@Override
