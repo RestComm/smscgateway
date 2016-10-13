@@ -333,7 +333,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         }
                     }
 
-                    SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, submitSm, 2000);
+                    SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, submitSm,
+                            esme.getWindowWaitTimeout());
                     if (logger.isInfoEnabled()) {
                         logger.info(String.format("\nSent submitSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                 esme.getName(), i1, sms.toString()));
@@ -380,7 +381,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     // TODO : waiting for 2 secs for window to accept our
                     // request,
                     // is it good? Should time be more here?
-                    SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, deliverSm, 2000);
+                    SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, deliverSm,
+                            esme.getWindowWaitTimeout());
                     if (logger.isInfoEnabled()) {
                         logger.info(String.format("\nSent deliverSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                 esme.getName(), i1, sms.toString()));
