@@ -876,7 +876,8 @@ public class DBOperations {
             }
         }
 
-        if (incomingDeliveryReceipts && dlvMessageId != null && dlvDestId != null && MessageUtil.isDeliveryReceiptRequest(sms)) {
+        if (incomingDeliveryReceipts && dlvMessageId != null && dlvMessageId.length() > 0 && dlvDestId != null
+                && MessageUtil.isDeliveryReceiptRequest(sms)) {
             try {
                 // and created a record in DLV_MES_ID_YYYY_MM_DD table
                 // SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, dlvDestId, sms.getMessageId(), 30);
@@ -888,8 +889,8 @@ public class DBOperations {
                 boundStatement.setLong(Schema.COLUMN_MESSAGE_ID, sms.getMessageId());
                 ResultSet res = session.execute(boundStatement);
             } catch (Exception e1) {
-                String msg = "Failed createRecordArchive - 3 !, dlvMessageId=" + dlvMessageId + ", dlvDestId" + dlvDestId
-                        + ", messageId=" + sms.getMessageId() + e1.getMessage();
+                String msg = "Failed createRecordArchive - 3 !, dlvMessageId=" + dlvMessageId + ", dlvDestId=" + dlvDestId
+                        + ", messageId=" + sms.getMessageId() + " - " + e1.getMessage();
 
                 throw new PersistenceException(msg, e1);
             }
