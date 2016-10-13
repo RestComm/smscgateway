@@ -38,7 +38,7 @@ In the configuration of SCTP layer leave the parameter "SingleThread" as "true".
 * find "bean name="Mtp3UserPart"" mbean definition
 * update parameter "deliveryMessageThreadCount" to some value like "processor count * 2"
 
-SMPP side also has important parameters "DefaultWindowSize" and "MaxConnectionSize" for SMPP Server, you can increase it if you see that you have bottleneck at SMPP side but SMSC GW generally is not overloaded. See <<_smpp_server_settings>>.
+SMPP side also has important parameters "DefaultWindowSize" and "WindowSize" for SMPP Server and ESMEs, you can increase it if you see that you have bottleneck at SMPP side but SMSC GW generally is not overloaded. See <<_smpp_server_settings>>.
 
 We need to add info of cassandra database parameters update for high loaded systems (in the file cassandra.yaml):
 

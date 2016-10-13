@@ -75,7 +75,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private static final String CLUSTER_NAME = "clusterName";
 	private static final String FETCH_PERIOD = "fetchPeriod";
 	private static final String FETCH_MAX_ROWS = "fetchMaxRows";
-	private static final String MAX_ACTIVITY_COUNT = "maxActivityCount";
+    private static final String MAX_ACTIVITY_COUNT = "maxActivityCount";
+    private static final String DELIVERY_TIMEOUT = "deliveryTimeout";
     private static final String SMPP_ENCODING_FOR_UCS2 = "smppEncodingForUCS2";
     private static final String SMPP_ENCODING_FOR_GSM7 = "smppEncodingForGsm7";
 	private static final String SMS_HOME_ROUTING = "smsHomeRouting";
@@ -195,8 +196,11 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private long fetchPeriod = 200;
 	// max message fetching count for one fetching step
 	private int fetchMaxRows = 100;
-	// max count of delivering Activities that are possible at the same time
-	private int maxActivityCount = 500;
+    // max count of delivering Activities that are possible at the same time
+    private int maxActivityCount = 500;
+    // delivery process timeout in seconds (timeout occurs if no actions for delivering (delivery confirmation or deliver a new
+    // item) for long time)
+    private int deliveryTimeout = 120;
 
 	// if destinationAddress does not match to any esme (any ClusterName) or
 	// a message will be routed to defaultClusterName (only for
@@ -672,6 +676,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 		this.maxActivityCount = maxActivityCount;
 		this.store();
 	}
+
+    @Override
+    public int getDeliveryTimeout() {
+        return deliveryTimeout;
+    }
+
+    @Override
+    public void setDeliveryTimeout(int deliveryTimeout) {
+        this.deliveryTimeout = deliveryTimeout;
+        this.store();
+    }
 
 	// @Override
 	// public int getCdrDatabaseExportDuration() {
@@ -1313,7 +1328,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.nationalLanguageLockingShift, NATIONAL_LANGUAGE_LOCKING_SHIFT, Integer.class);
 
 			writer.write(this.esmeDefaultClusterName, ESME_DEFAULT_CLUSTER_NAME, String.class);
-			writer.write(this.maxActivityCount, MAX_ACTIVITY_COUNT, Integer.class);
+            writer.write(this.maxActivityCount, MAX_ACTIVITY_COUNT, Integer.class);
+            writer.write(this.deliveryTimeout, DELIVERY_TIMEOUT, Integer.class);
 //			writer.write(this.isSMSHomeRouting, SMS_HOME_ROUTING, Boolean.class);
             writer.write(this.smppEncodingForGsm7.toString(), SMPP_ENCODING_FOR_GSM7, String.class);
             writer.write(this.smppEncodingForUCS2.toString(), SMPP_ENCODING_FOR_UCS2, String.class);
@@ -1492,6 +1508,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			val = reader.read(MAX_ACTIVITY_COUNT, Integer.class);
 			if (val != null)
 				this.maxActivityCount = val;
+
+            val = reader.read(DELIVERY_TIMEOUT, Integer.class);
+            if (val != null)
+                this.deliveryTimeout = val;
 
 			// this line is for backward compatibility
 			valB = reader.read(SMS_HOME_ROUTING, Boolean.class);

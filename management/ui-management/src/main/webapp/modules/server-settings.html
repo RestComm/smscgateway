@@ -341,6 +341,12 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									<input id="processingSmsSetTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
 								</span> 
 							</div>
+							<div id="div-deliveryTimeout" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set a length of delivery process timeout in seconds. Timeout occurs if no actions for delivering (delivery confirmation or a new item delivery) for long time). If the timeout occurs SMSC GW will terminate delivery process. Default value: 120 seconds.">
+									<span class="add-on">Delivery timeout (sec)</span>
+									<input id="deliveryTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
 							<div class="control-group">
 								<span class="span12" style="text-align: left;">
 									&nbsp;<button class="btn btn-danger" onclick="updateScheduler();"><i class="icon-undo"></i> Revert</button>
@@ -846,6 +852,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										
 										$("#reviseSecondsOnSmscStart").val(response.value.ReviseSecondsOnSmscStart);
 										$("#processingSmsSetTimeout").val(response.value.ProcessingSmsSetTimeout);
+										$("#deliveryTimeout").val(response.value.DeliveryTimeout);
 									}],
 									error: function(value) {
 										errorUID = ("st" + new Date().getTime()).hashCode();
@@ -1682,6 +1689,14 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 			    			$("#div-processingSmsSetTimeout").removeClass("error");		
 			    		}	
 						
+						var deliveryTimeout = $("#deliveryTimeout").val();
+						if(deliveryTimeout.trim() == "") {
+			    			$("#div-deliveryTimeout").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-deliveryTimeout").hasClass("error")) {
+			    			$("#div-deliveryTimeout").removeClass("error");		
+			    		}	
+						
 						if(formInvalid) {
 							$("#login-settings-error").show();
 							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
@@ -1699,6 +1714,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "MaxActivityCount", value: schedulerfetchmaxactivity },
 									{ type: "write", mbean: mbeanSearch, attribute: "ReviseSecondsOnSmscStart", value: reviseSecondsOnSmscStart },
 									{ type: "write", mbean: mbeanSearch, attribute: "ProcessingSmsSetTimeout", value: processingSmsSetTimeout },
+									{ type: "write", mbean: mbeanSearch, attribute: "DeliveryTimeout", value: deliveryTimeout },
 								],
 								{
 									success: function(response) {

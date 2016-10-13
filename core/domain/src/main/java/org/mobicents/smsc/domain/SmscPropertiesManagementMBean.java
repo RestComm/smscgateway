@@ -138,7 +138,11 @@ public interface SmscPropertiesManagementMBean {
 
 	public void setMaxActivityCount(int maxActivityCount);
 
-	public String getEsmeDefaultClusterName();
+    public int getDeliveryTimeout();
+
+    public void setDeliveryTimeout(int deliveryTimeout);
+
+    public String getEsmeDefaultClusterName();
 
 	public void setEsmeDefaultClusterName(String val);
 

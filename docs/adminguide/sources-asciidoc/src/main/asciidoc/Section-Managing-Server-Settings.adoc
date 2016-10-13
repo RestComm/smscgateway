@@ -1485,6 +1485,53 @@ EXAMPLES
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+[[_deliverytimeout]]
+=== Delivery timeout
+
+[[_deliverytimeout_cli]]
+==== Using CLI
+
+You can set the 'Delivery timeout' value by issuing the command `smsc set deliverytimeout` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get deliverytimeout` which will display the value set for this property.
+If unspecified, the default value for this parameter is 600 seconds.
+Generally, you may not have to modify this value. 
+
+----
+
+Name
+	smsc set deliverytimeout
+
+SYNOPSIS
+	smsc set deliverytimeout <delivery-timeout>
+
+DESCRIPTION
+	This command is used to set a length of delivery process timeout
+	in seconds. Timeout occurs if no actions for delivering (delivery confirmation
+	or a new item delivery) for long time). If the timeout occurs SMSC GW will
+	terminate delivery process.
+	Default value: 120 seconds.
+
+EXAMPLES
+	smsc set deliverytimeout 120
+----
+
+[[_deliverytimeout_gui]]
+==== Using GUI
+
+.Procedure: Set Delivery timeout using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Scheduler' tab in the GUI. 
+. You can specify the Delivery timeout in seconds by entering the value in the text field 'Delivery timeout (sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
+
+
+
+
+
 [[_smsc_gateway_server_skip_diue_slot]]
 === Skipping of scheduled for the past and not yet sent messages ("In process" due_slot shifting).
 

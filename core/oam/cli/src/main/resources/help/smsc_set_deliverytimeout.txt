@@ -1,0 +1,18 @@
+Name
+	smsc set deliverytimeout
+
+SYNOPSIS
+	smsc set deliverytimeout <delivery-timeout>
+
+DESCRIPTION
+	This command is used to set a length of delivery process timeout
+	in seconds. Timeout occurs if no actions for delivering (delivery confirmation
+	or a new item delivery) for long time). If the timeout occurs SMSC GW will
+	terminate delivery process.
+	Default value: 120 seconds.
+
+EXAMPLES
+	smsc set deliverytimeout 120
+
+SEE ALSO
+	smsc set maxmapv, smsc get deliverytimeout, smsc set maxactivitycount

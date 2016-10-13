@@ -70,8 +70,6 @@ import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
  */
 public abstract class DeliveryCommonSbb implements Sbb {
 
-    private int DELIVERY_TIMEOUT = 2 * 60;
-
     public static SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
 
     private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID("PersistenceResourceAdaptorType",
@@ -727,7 +725,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         this.cancelDeliveryTimer();
 
         if (this.timerFacility != null) {
-            long startTime = System.currentTimeMillis() + 1000 * DELIVERY_TIMEOUT;
+            long startTime = System.currentTimeMillis() + 1000 * smscPropertiesManagement.getDeliveryTimeout();
             TimerOptions options = new TimerOptions();
 
             ActivityContextInterface activity = getSchedulerActivityContextInterface();

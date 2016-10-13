@@ -661,8 +661,11 @@ public class SMSCShellExecutor implements ShellExecutor {
 				smscPropertiesManagement.setFetchMaxRows(val);
 			} else if (parName.equals("maxactivitycount")) {
 				int val = Integer.parseInt(options[3]);
-				smscPropertiesManagement.setMaxActivityCount(val);
-			} else if (parName.equals("esmedefaultcluster")) {
+                smscPropertiesManagement.setMaxActivityCount(val);
+            } else if (parName.equals("deliverytimeout")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setDeliveryTimeout(val);
+            } else if (parName.equals("esmedefaultcluster")) {
 				smscPropertiesManagement.setEsmeDefaultClusterName(options[3]);
             } else if (parName.equals("correlationidlivetime")) {
                 int val = Integer.parseInt(options[3]);
@@ -964,6 +967,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 				sb.append(smscPropertiesManagement.getFetchMaxRows());
 			} else if (parName.equals("maxactivitycount")) {
 				sb.append(smscPropertiesManagement.getMaxActivityCount());
+            } else if (parName.equals("deliverytimeout")) {
+                sb.append(smscPropertiesManagement.getDeliveryTimeout());
 			} else if (parName.equals("esmedefaultcluster")) {
 				sb.append(smscPropertiesManagement.getEsmeDefaultClusterName());
             } else if (parName.equals("correlationidlivetime")) {
@@ -1182,9 +1187,9 @@ public class SMSCShellExecutor implements ShellExecutor {
 			sb.append(smscPropertiesManagement.getKeyspaceName());
 			sb.append("\n");
 
-			sb.append("maxactivitycount = ");
-			sb.append(smscPropertiesManagement.getMaxActivityCount());
-			sb.append("\n");
+            sb.append("clustername = ");
+            sb.append(smscPropertiesManagement.getClusterName());
+            sb.append("\n");
 
 			sb.append("fetchperiod = ");
 			sb.append(smscPropertiesManagement.getFetchPeriod());
@@ -1194,9 +1199,13 @@ public class SMSCShellExecutor implements ShellExecutor {
 			sb.append(smscPropertiesManagement.getFetchMaxRows());
 			sb.append("\n");
 
-			sb.append("maxactivitycount = ");
-			sb.append(smscPropertiesManagement.getMaxActivityCount());
-			sb.append("\n");
+            sb.append("maxactivitycount = ");
+            sb.append(smscPropertiesManagement.getMaxActivityCount());
+            sb.append("\n");
+
+            sb.append("deliverytimeout = ");
+            sb.append(smscPropertiesManagement.getDeliveryTimeout());
+            sb.append("\n");
 
 			// sb.append("cdrDatabaseExportDuration = ");
 			// sb.append(smscPropertiesManagement.getCdrDatabaseExportDuration());
