@@ -845,43 +845,55 @@ public class DBOperations {
 		long dueSlot = this.c2_getDueSlotForTime(deliveryDate);
 		PreparedStatementCollection psc = getStatementCollection(deliveryDate);
 
-		try {
-		    // we are storing data into MESSAGES_YYYY_MM_DD table
-			PreparedStatement ps = psc.createRecordArchive;
-			BoundStatement boundStatement = new BoundStatement(ps);
+        try {
+            // we are storing data into MESSAGES_YYYY_MM_DD table
+            PreparedStatement ps = psc.createRecordArchive;
+            BoundStatement boundStatement = new BoundStatement(ps);
             setSmsFields(sms, dueSlot, boundStatement, true, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
                     psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
-			ResultSet res = session.execute(boundStatement);
+            ResultSet res = session.execute(boundStatement);
+        } catch (Exception e1) {
+            String msg = "Failed createRecordArchive - 1 !" + e1.getMessage();
 
-            if ((deliveryReceipts || incomingDeliveryReceipts) && !MessageUtil.isDeliveryReceipt(sms)) {
+            throw new PersistenceException(msg, e1);
+        }
+
+        if ((deliveryReceipts || incomingDeliveryReceipts) && !MessageUtil.isDeliveryReceipt(sms)) {
+            try {
                 // and created a record in MES_ID_YYYY_MM_DD table
                 SmsSetCache.getInstance().putDeliveredMsgValue(sms, 30);
 
-                ps = psc.createRecordArchiveMesId;
-                boundStatement = new BoundStatement(ps);
+                PreparedStatement ps = psc.createRecordArchiveMesId;
+                BoundStatement boundStatement = new BoundStatement(ps);
                 boundStatement.setLong(Schema.COLUMN_MESSAGE_ID, sms.getMessageId());
                 boundStatement.setString(Schema.COLUMN_ADDR_DST_DIGITS, sms.getSmsSet().getDestAddr());
                 boundStatement.setUUID(Schema.COLUMN_ID, sms.getDbId());
-                res = session.execute(boundStatement);
+                ResultSet res = session.execute(boundStatement);
+            } catch (Exception e1) {
+                String msg = "Failed createRecordArchive - 2 !" + e1.getMessage();
+
+                throw new PersistenceException(msg, e1);
             }
+        }
 
-            if (incomingDeliveryReceipts && dlvMessageId != null && dlvDestId != null
-                    && MessageUtil.isDeliveryReceiptRequest(sms)) {
+        if (incomingDeliveryReceipts && dlvMessageId != null && dlvDestId != null && MessageUtil.isDeliveryReceiptRequest(sms)) {
+            try {
                 // and created a record in DLV_MES_ID_YYYY_MM_DD table
-//                SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, dlvDestId, sms.getMessageId(), 30);
+                // SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, dlvDestId, sms.getMessageId(), 30);
 
-                ps = psc.createRecordArchiveDlvMesId;
-                boundStatement = new BoundStatement(ps);
+                PreparedStatement ps = psc.createRecordArchiveDlvMesId;
+                BoundStatement boundStatement = new BoundStatement(ps);
                 boundStatement.setString(Schema.COLUMN_REMOTE_MESSAGE_ID, dlvMessageId);
                 boundStatement.setString(Schema.COLUMN_DEST_ID, dlvDestId);
                 boundStatement.setLong(Schema.COLUMN_MESSAGE_ID, sms.getMessageId());
-                res = session.execute(boundStatement);
-            }
-		} catch (Exception e1) {
-			String msg = "Failed createRecordArchive !" + e1.getMessage();
+                ResultSet res = session.execute(boundStatement);
+            } catch (Exception e1) {
+                String msg = "Failed createRecordArchive - 3 !, dlvMessageId=" + dlvMessageId + ", dlvDestId" + dlvDestId
+                        + ", messageId=" + sms.getMessageId() + e1.getMessage();
 
-			throw new PersistenceException(msg, e1);
-		}
+                throw new PersistenceException(msg, e1);
+            }
+        }
 	}
 
     private void setSmsFields(Sms sms, long dueSlot, BoundStatement boundStatement, boolean archive,
