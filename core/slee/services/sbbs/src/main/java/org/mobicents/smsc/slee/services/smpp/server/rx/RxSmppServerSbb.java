@@ -483,8 +483,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             if (sms == null) {
 
                 // !!!! !!!!-
-                this.logger.severe("nul sms =========: UnconfirmedCnt=" + this.getUnconfirmedMessageCountInSendingPool()
-                        + ", sequenceNumber=" + event.getSequenceNumber());
+//                this.logger.severe("nul sms =========: UnconfirmedCnt=" + this.getUnconfirmedMessageCountInSendingPool()
+//                        + ", sequenceNumber=" + event.getSequenceNumber());
                 // !!!! !!!!-
 
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
@@ -495,9 +495,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             // firstly we store remote messageId if sms has a request to delivery receipt
             String clusterName = smsSet.getDestClusterName();
             String dlvMessageId = event.getMessageId();
-            if (MessageUtil.isDeliveryReceiptRequest(sms)) {
-                SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, clusterName, sms.getMessageId(), 30);
-            }
+//            if (MessageUtil.isDeliveryReceiptRequest(sms)) {
+//                SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, clusterName, sms.getMessageId(), 30);
+//            }
 
             // current message is sent
             // firstly sending of a positive response for transactional mode

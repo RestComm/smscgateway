@@ -345,14 +345,6 @@ public class SmsSetCache {
         }
     }
 
-    
-    // ..................................
-    public int getXxxxx() {
-        return this.deliveredRemoteMsgIdCache1.size();
-    }
-    // ..................................
-    
-    
     public Long getDeliveredRemoteMsgIdValue(String remoteMessageId, String destId) {
         if (deliveredMsgLiveTime == 0)
             return null;

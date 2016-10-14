@@ -876,11 +876,11 @@ public class DBOperations {
             }
         }
 
-        if (incomingDeliveryReceipts && dlvMessageId != null && dlvMessageId.length() > 0 && dlvDestId != null
-                && MessageUtil.isDeliveryReceiptRequest(sms)) {
+        if (incomingDeliveryReceipts && !MessageUtil.isDeliveryReceipt(sms) && dlvMessageId != null
+                && dlvMessageId.length() > 0 && dlvDestId != null) {
             try {
                 // and created a record in DLV_MES_ID_YYYY_MM_DD table
-                // SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, dlvDestId, sms.getMessageId(), 30);
+                SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, dlvDestId, sms.getMessageId(), 30);
 
                 PreparedStatement ps = psc.createRecordArchiveDlvMesId;
                 BoundStatement boundStatement = new BoundStatement(ps);
