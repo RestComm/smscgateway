@@ -349,7 +349,7 @@ public class SmppMessageParamForm extends JDialog {
 						panel_resp.setLayout(null);
 						
 						cbRejectIncomingDeliveryMessage = new JCheckBox("Rejecting of incoming SMPP delivery messages");
-						cbRejectIncomingDeliveryMessage.setBounds(6, 7, 247, 23);
+						cbRejectIncomingDeliveryMessage.setBounds(6, 7, 320, 23);
 						panel_resp.add(cbRejectIncomingDeliveryMessage);
 						
 						rbDR_Success = new JRadioButton("Success receipt");

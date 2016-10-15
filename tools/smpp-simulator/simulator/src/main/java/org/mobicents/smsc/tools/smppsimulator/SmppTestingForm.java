@@ -526,6 +526,7 @@ public class SmppTestingForm extends JDialog implements SmppAccepter {
                     byte[] buf1 = encodeSegment(messageText, encodingType);
                     byte[] buf2;
                     if (encodingType == EncodingType.GSM8_DCS_4) {
+                        // 4-bytes length
                         byte[] bf3 = new byte[7];
                         bf3[0] = 6; // total UDH length
                         bf3[1] = 5; // UDH id
@@ -534,6 +535,13 @@ public class SmppTestingForm extends JDialog implements SmppAccepter {
                         bf3[4] = (byte) 0x94;
                         bf3[5] = 0;
                         bf3[6] = 0;
+
+                        // 0-bytes length
+//                        bf3 = new byte[3];
+//                        bf3[0] = 2; // total UDH length
+//                        bf3[1] = 112; // UDH id
+//                        bf3[2] = 0; // UDH length
+                        
                         buf2 = new byte[bf3.length + buf1.length];
                         System.arraycopy(bf3, 0, buf2, 0, bf3.length);
                         System.arraycopy(buf1, 0, buf2, bf3.length, buf1.length);
@@ -590,6 +598,12 @@ public class SmppTestingForm extends JDialog implements SmppAccepter {
                     bf1[4] = (byte) 0x94;
                     bf1[5] = 0;
                     bf1[6] = 0;
+
+                    // 0-bytes length
+//                    bf1 = new byte[3];
+//                    bf1[0] = 2; // total UDH length
+//                    bf1[1] = 112; // UDH id
+//                    bf1[2] = 0; // UDH length
 
                     byte[] bf2 = new byte[bf1.length + buf.length];
                     System.arraycopy(bf1, 0, bf2, 0, bf1.length);
