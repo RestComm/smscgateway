@@ -30,13 +30,13 @@
 	<property name="restcomm-slee.release" value="2.8.0.FINAL" />
 
 	<!-- jss7 stack and MAP RA -->
-	<property name="restcomm-jss7.build-number" value="1383" />
-	<property name="restcomm-jss7.version" value="7.0.${restcomm-jss7.build-number}" />
-	<property name="restcomm-jss7.release" value="7.0.1383" />
+	<property name="restcomm-jss7.build-number" value="1385" />
+	<property name="restcomm-jss7.version" value="7.1.${restcomm-jss7.build-number}" />
+	<property name="restcomm-jss7.release" value="7.1.1385" />
 
-	<property name="restcomm-map-ra.build-number" value="53" />
-	<property name="restcomm-map-ra.version" value="7.0.${restcomm-map-ra.build-number}" />
-	<property name="restcomm-map-ra.release" value="7.0.53" />
+	<property name="restcomm-map-ra.build-number" value="57" />
+	<property name="restcomm-map-ra.version" value="7.1.${restcomm-map-ra.build-number}" />
+	<property name="restcomm-map-ra.release" value="7.1.57" />
 
 	<!-- Diameter mux and RAs -->
 	<property name="restcomm-diam.build-number" value="89" />
@@ -629,6 +629,13 @@
                 	<include name="sctp-impl-*.jar" />
             </fileset>
 		</delete>
+
+		<!-- jDiameter - copying of jdiameter-config.xml into diameter mux (only simulator profile) -->    	
+		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy/restcomm-diameter-mux-${restcomm-diam.version}.sar/config" failonerror="true" overwrite="true">
+			<fileset dir="${release.dir}/resources/ocs/smsc-part">
+				<include name="jdiameter-config.xml" />
+			</fileset>
+		</copy>
 
 
 		<copy todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true">
