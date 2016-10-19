@@ -80,7 +80,7 @@ public class HttpUsersManagement implements HttpUsersManagementMBean {
         binding.setAlias(HttpUser.class, "httpUser");
     }
 
-    protected static HttpUsersManagement getInstance(String name) {
+    public static HttpUsersManagement getInstance(String name) {
         if (instance == null) {
             instance = new HttpUsersManagement(name);
         }

@@ -23,9 +23,11 @@
 package org.mobicents.smsc.slee.services.http.server.tx.data;
 
 import org.mobicents.smsc.domain.HttpEncoding;
+import org.mobicents.smsc.domain.HttpUsersManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.*;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
+import org.mobicents.smsc.slee.services.http.server.tx.exceptions.UnauthorizedException;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,18 +45,9 @@ import java.util.Map;
  *
  * @author Tomasz Pa?ucki
  */
-public class HttpSendMessageIncomingData {
+public class HttpSendMessageIncomingData extends BaseIncomingData {
 
-    private String userId;
-    private String password;
     private String msg;
-
-    /**
-     * Response format for the request
-     * Possible values: String, json
-     * Default is String
-     */
-    private ResponseFormat format;
 
     /**
      * Optional parameter
@@ -77,16 +70,9 @@ public class HttpSendMessageIncomingData {
     private NPI senderNpi;
 
     public HttpSendMessageIncomingData(String userId, String password, String msg, String formatParam, String smscEncodingStr, String messageBodyEncodingStr,
-                                       String sender, String senderTon, String senderNpi, String[] to, SmscPropertiesManagement smscPropertiesManagement) throws HttpApiException {
-        //setting the default
-        this.format = ResponseFormat.fromString(formatParam);
-        // checking if mandatory fields are present
-        if (isEmptyOrNull(userId)) {
-            throw new HttpApiException("'" + RequestParameter.USER_ID.getName() + "' parameter is not set properly or not valid in the Http Request.");
-        }
-        if (isEmptyOrNull(password)) {
-            throw new HttpApiException("'" + RequestParameter.PASSWORD.getName() + "' parameter is not set properly or not valid in the Http Request.");
-        }
+                                       String sender, String senderTon, String senderNpi, String[] to, SmscPropertiesManagement smscPropertiesManagement, HttpUsersManagement httpUsersManagement) throws HttpApiException, UnauthorizedException {
+        super(userId, password, formatParam, httpUsersManagement);
+
         if (isEmptyOrNull(msg)) {
             throw new HttpApiException("'" + RequestParameter.MESSAGE_BODY.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
@@ -162,8 +148,6 @@ public class HttpSendMessageIncomingData {
             this.senderNpi = NPI.fromInt(defaultSourceNpi);
         }
 
-        this.userId = userId;
-        this.password = password;
         this.msg = decodeMessage(msg, getMessageBodyEncoding());
         this.sender = sender;
     }
@@ -186,16 +170,6 @@ public class HttpSendMessageIncomingData {
         } catch (UnsupportedEncodingException e) {
             throw new HttpApiException(e.getMessage(),e);
         }
-    }
-
-    private boolean isEmptyOrNull(String toCheck) {
-        if (toCheck == null) {
-            return true;
-        }
-        if ("".equals(toCheck)) {
-            return true;
-        }
-        return false;
     }
 
     private List<String> validateDestNumbersAndRemoveEmpty(List<String> toCheck) {
@@ -221,16 +195,8 @@ public class HttpSendMessageIncomingData {
         return destAddresses;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
     public String getMsg() {
         return msg;
-    }
-
-    public ResponseFormat getFormat() {
-        return format;
     }
 
     public SmscMessageEncoding getSmscEncoding() {
@@ -271,21 +237,5 @@ public class HttpSendMessageIncomingData {
                 ", senderNpi='" + senderNpi + '\'' +
                 ", destAddresses=" + destAddresses + '\'' +
                 '}';
-    }
-
-    public static ResponseFormat getFormat(Tracer tracer, HttpServletRequest request) throws HttpApiException {
-        String formatParameter = request.getParameter("format");
-        if(formatParameter!= null) {
-            return ResponseFormat.fromString(formatParameter);
-        } else {
-            try {
-                Map<String, String[]> stringMap = HttpRequestUtils.extractParametersFromPost(tracer, request);
-                String[] format = stringMap.get(HttpRequestUtils.P_FORMAT);
-                return ResponseFormat.fromString(format != null && format.length > 0 ? format[0] : null);
-            }catch (Exception e){
-                return ResponseFormat.STRING;
-            }
-        }
-
     }
 }

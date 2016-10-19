@@ -1,6 +1,7 @@
 package org.mobicents.smsc.slee.services.http.server.tx;
 
 import org.junit.Ignore;
+import org.mobicents.smsc.domain.HttpUsersManagement;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
@@ -13,6 +14,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.slee.ActivityContextInterface;
 import javax.slee.SLEEException;
 import javax.slee.SbbLocalObject;
@@ -57,6 +59,9 @@ public class TxHttpServerSbbTest {
     private static final String PASSWORD_DEFAULT = "password";
     private static final String USER_DEFAULT = "user_4321";
 
+    private static final String USER_INCORRECT = "user_6584";
+    private static final String PASSWORD_INCORRECT = "password345";
+
     private static final String[] TO_MULTIPLE = {"123456789", "111222333", "123123123"};
     private static final String[] TO_ONE = {"123456789"};
     private static final String[] TO_INCORRECT = {"123tr4"};
@@ -85,13 +90,20 @@ public class TxHttpServerSbbTest {
 //            Assert.fail("Cassandra DB is not inited");
         this.pers.start();
 
-
-        this.sbb = new TxHttpServerSbbProxy(this.pers);
-
         SmscPropertiesManagement.getInstance("Test");
         SmscPropertiesManagement.getInstance().setSmscStopped(false);
         SmscPropertiesManagement.getInstance().setStoreAndForwordMode(StoreAndForwordMode.normal);
+
         MProcManagement.getInstance("Test");
+
+        HttpUsersManagement usersManagement = HttpUsersManagement.getInstance("Test");
+        if(usersManagement.getHttpUserByName("user_4321") == null) {
+            //add if not exists
+            usersManagement.createHttpUser("user_4321", "password");
+        }
+
+        this.sbb = new TxHttpServerSbbProxy(this.pers);
+
     }
 
     @AfterMethod
@@ -106,7 +118,9 @@ public class TxHttpServerSbbTest {
     //------------------------------------------------------------------------------------------------------------------
     @Test
     public void sendMessageGETStringSuccessTest() throws Exception {
+
         System.out.println("sendMessageGETStringSuccessTest");
+
         if (!this.cassandraDbInited) {
 //            Assert.fail("Cassandra DB is not inited");
             return;
@@ -154,7 +168,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_STRING, false), "Response is not valid");
+        Assert.assertEquals(resp.getStatus(), HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test
@@ -370,7 +384,63 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_JSON, false), "Response is not valid");
+        Assert.assertEquals(resp.getStatus(), HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Test
+    public void sendMessageGETJsonWrongUsernameTest() {
+        System.out.println("sendMessageGETJsonWrongUsernameTest");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_INCORRECT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+
+        Assert.assertEquals(resp.getStatus(), HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Test
+    public void sendMessageGETJsonWrongPasswordTest() {
+        System.out.println("sendMessageGETJsonWrongPasswordTest");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_INCORRECT, PASSWORD_INCORRECT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+
+        Assert.assertEquals(resp.getStatus(), HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test
@@ -426,7 +496,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_STRING, false), "Response is not valid");
+        Assert.assertEquals(resp.getStatus(), HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test
@@ -538,7 +608,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_JSON, false), "Response is not valid");
+        Assert.assertEquals(resp.getStatus(), HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test
@@ -747,7 +817,7 @@ public class TxHttpServerSbbTest {
 
         printResponseData(resp);
 
-        Assert.assertTrue(isValid(resp, FORMAT_STRING, false), "Response is not valid");
+        Assert.assertEquals(resp.getStatus(), HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test

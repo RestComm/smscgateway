@@ -29,13 +29,7 @@ import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
-import org.mobicents.smsc.domain.MoChargingType;
-import org.mobicents.smsc.domain.MProcManagement;
-import org.mobicents.smsc.domain.SmscCongestionControl;
-import org.mobicents.smsc.domain.SmscPropertiesManagement;
-import org.mobicents.smsc.domain.SmscStatAggregator;
-import org.mobicents.smsc.domain.SmscStatProvider;
-import org.mobicents.smsc.domain.StoreAndForwordMode;
+import org.mobicents.smsc.domain.*;
 import org.mobicents.smsc.library.MessageState;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
@@ -51,14 +45,12 @@ import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.services.charging.ChargingMedium;
 import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
-import org.mobicents.smsc.slee.services.http.server.tx.data.HttpGetMessageIdStatusIncomingData;
-import org.mobicents.smsc.slee.services.http.server.tx.data.HttpGetMessageIdStatusOutgoingData;
-import org.mobicents.smsc.slee.services.http.server.tx.data.HttpSendMessageIncomingData;
-import org.mobicents.smsc.slee.services.http.server.tx.data.HttpSendMessageOutgoingData;
+import org.mobicents.smsc.slee.services.http.server.tx.data.*;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestParameter;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.Status;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
+import org.mobicents.smsc.slee.services.http.server.tx.exceptions.UnauthorizedException;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpUtils;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.ResponseFormatter;
@@ -87,6 +79,9 @@ import java.util.UUID;
 public abstract class TxHttpServerSbb implements Sbb {
 
     protected static SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+
+    protected static HttpUsersManagement httpUsersManagement = HttpUsersManagement.getInstance();
+
 
     private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID(
             "PersistenceResourceAdaptorType", "org.mobicents", "1.0");
@@ -167,18 +162,22 @@ public abstract class TxHttpServerSbb implements Sbb {
                     throw new HttpApiException("Unknown operation on the HTTP API");
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             this.logger.severe("Error in onHttpGet", e);
             try {
-                HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
-                outgoingData.setStatus(Status.ERROR);
-                outgoingData.setMessage(e.getMessage());
-                ResponseFormat responseFormat = HttpSendMessageIncomingData.getFormat(logger, request);
-                HttpUtils.sendErrorResponseWithContent(logger,
-                        event.getResponse(),
-                        HttpServletResponse.SC_OK,
-                        outgoingData.getMessage(),
-                        ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
+                if (e instanceof UnauthorizedException) {
+                    HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+                } else {
+                    HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
+                    outgoingData.setStatus(Status.ERROR);
+                    outgoingData.setMessage(e.getMessage());
+                    ResponseFormat responseFormat = BaseIncomingData.getFormat(logger, request);
+                    HttpUtils.sendErrorResponseWithContent(logger,
+                            event.getResponse(),
+                            HttpServletResponse.SC_OK,
+                            outgoingData.getMessage(),
+                            ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
+                }
             } catch (Exception ex) {
                 this.logger.severe("Error while sending error response", ex);
             }
@@ -207,15 +206,19 @@ public abstract class TxHttpServerSbb implements Sbb {
         } catch (Exception e) {
             this.logger.severe("Error in onHttpPost", e);
             try {
-                HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
-                outgoingData.setStatus(Status.ERROR);
-                outgoingData.setMessage(e.getMessage());
-                ResponseFormat responseFormat = HttpSendMessageIncomingData.getFormat(logger, request);
-                HttpUtils.sendErrorResponseWithContent(logger,
-                        event.getResponse(),
-                        HttpServletResponse.SC_OK,
-                        outgoingData.getMessage(),
-                        ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
+                if (e instanceof UnauthorizedException) {
+                    HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+                } else {
+                    HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
+                    outgoingData.setStatus(Status.ERROR);
+                    outgoingData.setMessage(e.getMessage());
+                    ResponseFormat responseFormat = BaseIncomingData.getFormat(logger, request);
+                    HttpUtils.sendErrorResponseWithContent(logger,
+                            event.getResponse(),
+                            HttpServletResponse.SC_OK,
+                            outgoingData.getMessage(),
+                            ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
+                }
             } catch (Exception ex) {
                 this.logger.severe("Error while sending error response", ex);
             }
@@ -226,8 +229,8 @@ public abstract class TxHttpServerSbb implements Sbb {
         return smscPropertiesManagement.getTxHttpCharging() != MoChargingType.accept;
     }
 
-    private void processHttpSendMessageEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException {
-        logger.fine("processHttpSendMEssageEvent");
+    private void processHttpSendMessageEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException, UnauthorizedException {
+        logger.fine("processHttpSendMessageEvent");
         HttpServletRequest request = event.getRequest();
         HttpSendMessageIncomingData incomingData = null;
 
@@ -235,7 +238,7 @@ public abstract class TxHttpServerSbb implements Sbb {
         this.sendMessage(event, incomingData, aci);
     }
 
-    private void processHttpGetMessageIdStatusEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException {
+    private void processHttpGetMessageIdStatusEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException, UnauthorizedException {
         logger.fine("processHttpGetMessageIdStatusEvent");
         HttpServletRequest request = event.getRequest();
         HttpGetMessageIdStatusIncomingData incomingData;
@@ -244,7 +247,7 @@ public abstract class TxHttpServerSbb implements Sbb {
         this.getMessageIdStatus(event, incomingData, aci);
     }
 
-    private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request) throws HttpApiException {
+    private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request) throws HttpApiException, UnauthorizedException {
         logger.fine("createSendMessageIncomingData");
         if(GET.equals(request.getMethod())) {
             final String userId = request.getParameter(RequestParameter.USER_ID.getName());
@@ -258,7 +261,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             final String senderTon = request.getParameter(RequestParameter.SENDER_TON.getName());
             final String senderNpi = request.getParameter(RequestParameter.SENDER_NPI.getName());
             final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
-            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement);
+            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement);
 
         } else if(POST.equals(request.getMethod())) {
             String userId = request.getParameter(RequestParameter.USER_ID.getName());
@@ -306,7 +309,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                 String[] tmp = map.get(RequestParameter.TO.getName());
                 destAddresses = (tmp == null ? new String[]{""} : tmp);
             }
-            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement);
+            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement);
             return incomingData;
         } else {
             throw new HttpApiException("Unsupported method of the Http Request. Method is: " + request.getMethod());
@@ -319,7 +322,7 @@ public abstract class TxHttpServerSbb implements Sbb {
         return terValue;
     }
 
-    private HttpGetMessageIdStatusIncomingData createGetMessageIdStatusIncomingData(HttpServletRequest request) throws HttpApiException {
+    private HttpGetMessageIdStatusIncomingData createGetMessageIdStatusIncomingData(HttpServletRequest request) throws HttpApiException, UnauthorizedException {
         logger.fine("createGetMessageIdStatusIncomingData");
         String userId = request.getParameter(RequestParameter.USER_ID.getName());
         String password = request.getParameter(RequestParameter.PASSWORD.getName());
@@ -340,7 +343,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             tmp = map.get(RequestParameter.FORMAT.getName());
             format = (tmp == null ? new String[]{""} : tmp)[0];
         }
-        HttpGetMessageIdStatusIncomingData incomingData = new HttpGetMessageIdStatusIncomingData(userId, password, msgId, format);
+        HttpGetMessageIdStatusIncomingData incomingData = new HttpGetMessageIdStatusIncomingData(userId, password, msgId, format, httpUsersManagement);
         return incomingData;
     }
 
