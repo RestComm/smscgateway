@@ -241,6 +241,12 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         mproc.addChild("remove");
         mproc.addChild("show");
 
+        Node httpuser = parent.addChild("httpuser");
+        httpuser.addChild("add");
+        httpuser.addChild("modify");
+        httpuser.addChild("remove");
+        httpuser.addChild("show");
+
         Node skipUnsentMessages = parent.addChild("skipunsentmessages");
 
 	};

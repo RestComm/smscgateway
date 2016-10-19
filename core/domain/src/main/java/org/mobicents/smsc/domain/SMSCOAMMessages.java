@@ -173,8 +173,18 @@ public interface SMSCOAMMessages {
 
     public static final String DELETE_HTTPUSER_FAILED_NO_HTTPUSERFOUND = "No HttpUser found with given name %s";
 
-    public static final String SHOW_HTTPUSER_NAME = "HttpUser name=";
+    public static final String SHOW_HTTPUSER_NAME = "HttpUser userName=";
 
     public static final String SHOW_HTTPUSER_PASSWORD = " password=";
+
+    public static final String HTTPUSER_CREATE_SUCCESS = "Successfully created HttpUser userName=%s";
+
+    public static final String HTTPUSER_MODIFY_SUCCESS = "Successfully modified HttpUser userName=%s";
+
+    public static final String HTTPUSER_REMOVE_SUCCESS = "Successfully removed HttpUser userName=%s";
+
+    public static final String HTTPUSER_NO_HTTPUSER = "No HttpUser - userName=%s";
+
+    public static final String NO_HTTPUSER_DEFINED_YET = "No HttpUser is defined yet";
 
 }

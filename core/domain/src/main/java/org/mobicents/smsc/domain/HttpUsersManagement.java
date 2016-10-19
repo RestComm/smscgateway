@@ -124,9 +124,9 @@ public class HttpUsersManagement implements HttpUsersManagementMBean {
         if (userName == null || userName.isEmpty()) {
             throw new Exception("userName must not be null or an empty String");
         }
-        if (password == null || password.isEmpty()) {
-            throw new Exception("password must not be null or an empty String");
-        }
+//        if (password == null || password.isEmpty()) {
+//            throw new Exception("password must not be null or an empty String");
+//        }
 
         for (FastList.Node<HttpUser> n = httpUsers.head(), end = httpUsers.tail(); (n = n.getNext()) != end;) {
             HttpUser httpUser = n.getValue();

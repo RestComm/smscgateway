@@ -308,7 +308,137 @@ public class SMSCShellExecutor implements ShellExecutor {
         }
     }
 
-	private String executeSmsc(String[] args) {
+    private String addHttpUser(String[] args) throws Exception {
+        if (args.length < 4 || args.length > 30) {
+            return SMSCOAMMessages.INVALID_COMMAND;
+        }
+
+        // create new HttpUser
+        HttpUsersManagement httpUsersManagement = HttpUsersManagement.getInstance();
+
+        String userName = args[3];
+        if (userName == null) {
+            return SMSCOAMMessages.INVALID_COMMAND;
+        }
+
+        int count = 4;
+        String password = "";
+
+        while (count < args.length) {
+            // These are all optional parameters for a Tx/Rx/Trx binds
+            String key = args[count++];
+            if (key == null) {
+                return SMSCOAMMessages.INVALID_COMMAND;
+            }
+
+            if (key.equals("password")) {
+                password = args[count++];
+            } else {
+                return SMSCOAMMessages.INVALID_COMMAND;
+            }
+        }
+
+        httpUsersManagement.createHttpUser(userName, password);
+
+        return String.format(SMSCOAMMessages.HTTPUSER_CREATE_SUCCESS, userName);
+    }
+
+    private String modifyHttpUser(String[] args) throws Exception {
+        if (args.length < 4 || args.length > 30) {
+            return SMSCOAMMessages.INVALID_COMMAND;
+        }
+
+        HttpUsersManagement httpUsersManagement = HttpUsersManagement.getInstance();
+
+        String userName = args[3];
+        if (userName == null) {
+            return SMSCOAMMessages.INVALID_COMMAND;
+        }
+
+        HttpUser httpUser = httpUsersManagement.getHttpUserByName(userName);
+
+        if (httpUser == null) {
+            throw new Exception(String.format(SMSCOAMMessages.HTTPUSER_NO_HTTPUSER, userName));
+        }
+
+        int count = 4;
+
+        while (count < args.length) {
+            String key = args[count++];
+            if (key == null) {
+                return SMSCOAMMessages.INVALID_COMMAND;
+            }
+
+            if (key.equals("password")) {
+                httpUser.setPassword(args[count++]);
+            } else {
+                return SMSCOAMMessages.INVALID_COMMAND;
+            }
+
+        }
+
+        return String.format(SMSCOAMMessages.HTTPUSER_MODIFY_SUCCESS, httpUser.getUserName());
+    }
+
+    private String removeHttpUser(String[] args) throws Exception {
+        if (args.length < 4) {
+            return SMSCOAMMessages.INVALID_COMMAND;
+        }
+
+        HttpUsersManagement httpUsersManagement = HttpUsersManagement.getInstance();
+
+        String userName = args[3];
+        if (userName == null) {
+            return SMSCOAMMessages.INVALID_COMMAND;
+        }
+
+        HttpUser httpUser = httpUsersManagement.getHttpUserByName(userName);
+
+        if (httpUser == null) {
+            throw new Exception(String.format(SMSCOAMMessages.HTTPUSER_NO_HTTPUSER, userName));
+        }
+
+        httpUsersManagement.destroyHttpUser(userName);
+
+        return String.format(SMSCOAMMessages.HTTPUSER_REMOVE_SUCCESS, userName);
+    }
+
+    private String showHttpUser(String[] args) {
+        if (args.length < 3) {
+            return SMSCOAMMessages.INVALID_COMMAND;
+        }
+
+        String userName = null;
+        if (args.length > 3) {
+            userName = args[3];
+        }
+
+        HttpUsersManagement httpUsersManagement = HttpUsersManagement.getInstance();
+
+        StringBuffer sb = new StringBuffer();
+        if (userName == null) {
+            // all HttpUsers
+            List<HttpUser> httpUsers = httpUsersManagement.getHttpUsers();
+            if (httpUsers.size() == 0) {
+                return SMSCOAMMessages.NO_HTTPUSER_DEFINED_YET;
+            }
+            for (HttpUser httpUser : httpUsers) {
+                sb.append(SMSCOAMMessages.NEW_LINE);
+                httpUser.show(sb);
+            }
+        } else {
+            // a selected HttpUser
+            HttpUser httpUser = httpUsersManagement.getHttpUserByName(userName);
+            if (httpUser == null) {
+                return String.format(SMSCOAMMessages.HTTPUSER_NO_HTTPUSER, userName);
+            }
+            httpUser.show(sb);
+        }
+
+        return sb.toString();
+    }
+
+    private String executeSmsc(String[] args) {
 		try {
 			if (args.length < 2 || args.length > 50) {
 				// any command will have atleast 3 args
@@ -347,6 +477,24 @@ public class SMSCShellExecutor implements ShellExecutor {
                     return this.removeMProc(args);
                 } else if (rasCmd.equals("show")) {
                     return this.showMProc(args);
+                }
+
+                return SMSCOAMMessages.INVALID_COMMAND;
+
+            } else if (args[1].equals("httpuser")) {
+                String rasCmd = args[2];
+                if (rasCmd == null) {
+                    return SMSCOAMMessages.INVALID_COMMAND;
+                }
+
+                if (rasCmd.equals("add")) {
+                    return this.addHttpUser(args);
+                } else if (rasCmd.equals("modify")) {
+                    return this.modifyHttpUser(args);
+                } else if (rasCmd.equals("remove")) {
+                    return this.removeHttpUser(args);
+                } else if (rasCmd.equals("show")) {
+                    return this.showHttpUser(args);
                 }
 
                 return SMSCOAMMessages.INVALID_COMMAND;

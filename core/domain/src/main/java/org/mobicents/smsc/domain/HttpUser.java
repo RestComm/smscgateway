@@ -43,7 +43,7 @@ public class HttpUser implements HttpUserMBean {
     protected HttpUsersManagement httpUsersManagement;
 
     private String userName;
-    private String password;
+    private String password = "";
 
     public HttpUser() {
     }
