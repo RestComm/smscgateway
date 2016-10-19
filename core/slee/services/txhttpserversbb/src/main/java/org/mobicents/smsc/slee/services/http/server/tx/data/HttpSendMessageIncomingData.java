@@ -24,10 +24,7 @@ package org.mobicents.smsc.slee.services.http.server.tx.data;
 
 import org.mobicents.smsc.domain.HttpEncoding;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
-import org.mobicents.smsc.slee.services.http.server.tx.enums.MessageBodyEncoding;
-import org.mobicents.smsc.slee.services.http.server.tx.enums.SmscMessageEncoding;
-import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestParameter;
-import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
+import org.mobicents.smsc.slee.services.http.server.tx.enums.*;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
 
@@ -73,11 +70,14 @@ public class HttpSendMessageIncomingData {
      * Default is UTF-8
      */
     private MessageBodyEncoding messageBodyEncoding;
-    private String senderId;
+    private String sender;
     private List<String> destAddresses = new ArrayList<String>();
-    private HttpEncoding httpEncoding;
 
-    public HttpSendMessageIncomingData(String userId, String password, String msg, String formatParam, String smscEncodingStr, String messageBodyEncodingStr, String senderId, String[] to, SmscPropertiesManagement smscPropertiesManagement) throws HttpApiException {
+    private TON senderTon;
+    private NPI senderNpi;
+
+    public HttpSendMessageIncomingData(String userId, String password, String msg, String formatParam, String smscEncodingStr, String messageBodyEncodingStr,
+                                       String sender, String senderTon, String senderNpi, String[] to, SmscPropertiesManagement smscPropertiesManagement) throws HttpApiException {
         //setting the default
         this.format = ResponseFormat.fromString(formatParam);
         // checking if mandatory fields are present
@@ -90,16 +90,9 @@ public class HttpSendMessageIncomingData {
         if (isEmptyOrNull(msg)) {
             throw new HttpApiException("'" + RequestParameter.MESSAGE_BODY.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
-        if (isEmptyOrNull(senderId)) {
+        if (isEmptyOrNull(sender)) {
             throw new HttpApiException("'" + RequestParameter.SENDER.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
-        //check only digits
-        try {
-            Long.parseLong(senderId);
-        } catch (NumberFormatException e) {
-            throw new HttpApiException("'" + RequestParameter.SENDER.getName() + "' parameter is not valid in the Http Request. sender:" + senderId);
-        }
-
         if (to == null || to.length < 1) {
 //             !validateDestNumbersAndRemoveEmpty(to)){
             throw new HttpApiException("'" + RequestParameter.TO.getName() + "' parameter is not set in the Http Request.");
@@ -120,6 +113,14 @@ public class HttpSendMessageIncomingData {
             throw new HttpApiException("'" + RequestParameter.MESSAGE_BODY_ENCODING.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
 
+        if (senderTon != null && TON.fromString(senderTon) == null) {
+            throw new HttpApiException("'" + RequestParameter.SENDER_TON.getName() + "' parameter is not set properly or not valid in the Http Request.");
+        }
+
+        if (senderNpi != null && NPI.fromString(senderNpi) == null) {
+            throw new HttpApiException("'" + RequestParameter.SENDER_NPI.getName() + "' parameter is not set properly or not valid in the Http Request.");
+        }
+
         //setting the defaults
         if (smscEncodingStr != null) {
             this.smscEncoding = SmscMessageEncoding.fromString(smscEncodingStr);
@@ -128,6 +129,7 @@ public class HttpSendMessageIncomingData {
         if (messageBodyEncodingStr != null) {
             this.messageBodyEncoding = MessageBodyEncoding.fromString(messageBodyEncodingStr);
         } else {
+            HttpEncoding httpEncoding;
             if (SmscMessageEncoding.GSM7.equals(getSmscEncoding())) {
                 httpEncoding = smscPropertiesManagement.getHttpEncodingForGsm7();
             } else {
@@ -145,10 +147,25 @@ public class HttpSendMessageIncomingData {
                     break;
             }
         }
+
+        if (senderTon != null) {
+            this.senderTon = TON.fromString(senderTon);
+        } else {
+            int defaultSourceTon = smscPropertiesManagement.getHttpDefaultSourceTon();
+            this.senderTon = TON.fromInt(defaultSourceTon);
+        }
+
+        if (senderNpi != null) {
+            this.senderNpi = NPI.fromString(senderNpi);
+        } else {
+            int defaultSourceNpi = smscPropertiesManagement.getHttpDefaultSourceNpi();
+            this.senderNpi = NPI.fromInt(defaultSourceNpi);
+        }
+
         this.userId = userId;
         this.password = password;
         this.msg = decodeMessage(msg, getMessageBodyEncoding());
-        this.senderId = senderId;
+        this.sender = sender;
     }
 
     private String decodeMessage(String msgParameter, MessageBodyEncoding messageBodyEncoding) throws HttpApiException {
@@ -224,9 +241,13 @@ public class HttpSendMessageIncomingData {
         return messageBodyEncoding;
     }
 
-    public String getSenderId() {
-        return senderId;
+    public String getSender() {
+        return sender;
     }
+
+    public TON getSenderTon() { return senderTon; }
+
+    public NPI getSenderNpi() { return senderNpi; }
 
     public int getDefaultMsgId() {
         return 0;
@@ -245,7 +266,9 @@ public class HttpSendMessageIncomingData {
                 ", format='" + format + '\'' +
                 ", smscEncoding=" + smscEncoding +
                 ", messageBodyEncoding=" + messageBodyEncoding +
-                ", senderId='" + senderId + '\'' +
+                ", sender='" + sender + '\'' +
+                ", senderTon='" + senderTon + '\'' +
+                ", senderNpi='" + senderNpi + '\'' +
                 ", destAddresses=" + destAddresses + '\'' +
                 '}';
     }

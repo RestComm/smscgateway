@@ -255,8 +255,10 @@ public abstract class TxHttpServerSbb implements Sbb {
             final String bodyEncoding = request.getParameter(RequestParameter.MESSAGE_BODY_ENCODING.getName());
             final String senderId = request.getParameter(RequestParameter.SENDER.getName());
             final String destAddressParam = request.getParameter(RequestParameter.TO.getName());
+            final String senderTon = request.getParameter(RequestParameter.SENDER_TON.getName());
+            final String senderNpi = request.getParameter(RequestParameter.SENDER_NPI.getName());
             final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
-            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, destAddresses, smscPropertiesManagement);
+            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement);
 
         } else if(POST.equals(request.getMethod())) {
             String userId = request.getParameter(RequestParameter.USER_ID.getName());
@@ -266,6 +268,8 @@ public abstract class TxHttpServerSbb implements Sbb {
             String msgEncoding = request.getParameter(RequestParameter.SMSC_ENCODING.getName());
             String bodyEncoding = request.getParameter(RequestParameter.MESSAGE_BODY_ENCODING.getName());
             String senderId = request.getParameter(RequestParameter.SENDER.getName());
+            String senderTon = request.getParameter(RequestParameter.SENDER_TON.getName());
+            String senderNpi = request.getParameter(RequestParameter.SENDER_NPI.getName());
             String destAddressParam = request.getParameter(RequestParameter.TO.getName());
             String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
 
@@ -292,11 +296,17 @@ public abstract class TxHttpServerSbb implements Sbb {
             if(senderId == null || senderId.isEmpty()) {
                 senderId = getValueFromMap(map, RequestParameter.SENDER.getName());
             }
+            if(senderTon == null || senderTon.isEmpty()) {
+                senderTon = getValueFromMap(map, RequestParameter.SENDER_TON.getName());
+            }
+            if(senderNpi == null || senderNpi.isEmpty()) {
+                senderNpi = getValueFromMap(map, RequestParameter.SENDER_NPI.getName());
+            }
             if(destAddresses == null || destAddresses.length < 1) {
                 String[] tmp = map.get(RequestParameter.TO.getName());
                 destAddresses = (tmp == null ? new String[]{""} : tmp);
             }
-            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, destAddresses, smscPropertiesManagement);
+            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement);
             return incomingData;
         } else {
             throw new HttpApiException("Unsupported method of the Http Request. Method is: " + request.getMethod());
@@ -524,9 +534,9 @@ public abstract class TxHttpServerSbb implements Sbb {
                 sms.setOriginationType(OriginationType.HTTP);
                 sms.setOrigNetworkId(ta.getNetworkId());
                 // TODO: Setting the Source address, Ton, Npi
-                sms.setSourceAddr(incomingData.getSenderId());
-                sms.setSourceAddrNpi(smscPropertiesManagement.getHttpDefaultSourceNpi());
-                sms.setSourceAddrTon(smscPropertiesManagement.getHttpDefaultSourceTon());
+                sms.setSourceAddr(incomingData.getSender());
+                sms.setSourceAddrNpi(incomingData.getSenderNpi().getCode());
+                sms.setSourceAddrTon(incomingData.getSenderTon().getCode());
                 // TODO: setting dcs
                 sms.setDataCoding(dcs);
                 // TODO: esmCls - read from smpp documentation

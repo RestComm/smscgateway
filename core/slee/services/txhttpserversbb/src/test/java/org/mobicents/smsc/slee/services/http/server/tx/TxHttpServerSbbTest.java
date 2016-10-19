@@ -48,6 +48,12 @@ public class TxHttpServerSbbTest {
     private static final String SENDER_ALPHANUMERIC = "ABC1231241243";
     private static final String MESSAGE_DEFAULT = "SMS message ;P";
 
+    private static final String SENDER_TON_DEFAULT = "1";
+    private static final String SENDER_NPI_DEFAULT = "1";
+
+    private static final String SENDER_TON_INCORRECT = "9d";
+    private static final String SENDER_NPI_INCORRECT = "20";
+
     private static final String PASSWORD_DEFAULT = "password";
     private static final String USER_DEFAULT = "user_4321";
 
@@ -109,7 +115,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"), FORMAT_STRING, ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"),
+                FORMAT_STRING, ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -133,7 +140,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"), FORMAT_STRING, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"),
+                FORMAT_STRING, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -160,7 +168,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"), FORMAT_STRING, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"),
+                FORMAT_STRING, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -177,6 +186,56 @@ public class TxHttpServerSbbTest {
     }
 
     @Test
+    public void sendMessageGETStringIncorrectTonTest() throws Exception {
+        System.out.println("sendMessageGETStringIncorrectTonTest");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"),
+                FORMAT_STRING, ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_INCORRECT, SENDER_NPI_DEFAULT, TO_ONE);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_STRING, false, 1), "Response is not valid");
+    }
+
+    @Test
+    public void sendMessageGETStringIncorrectNpiTest() throws Exception {
+        System.out.println("sendMessageGETStringIncorrectNpiTest");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, URLEncoder.encode(MESSAGE_DEFAULT, "UTF-8"),
+                FORMAT_STRING, ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_INCORRECT, TO_ONE);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpGet(event, aci);
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+        printResponseData(resp);
+        Assert.assertTrue(isValid(resp, FORMAT_STRING, false, 1), "Response is not valid");
+    }
+
+    @Test
     public void incorrectToAdressTest() {
         System.out.println("incorrectToAdressTest");
         if (!this.cassandraDbInited) {
@@ -187,7 +246,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_INCORRECT);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_INCORRECT);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -213,7 +273,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_EMPTY);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_EMPTY);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -239,7 +300,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE_FAKE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE_FAKE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -266,7 +328,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -293,7 +356,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -320,7 +384,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING, ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING,
+                ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -347,7 +412,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, null, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -374,7 +440,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -401,7 +468,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_MULTIPLE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -428,7 +496,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_MULTIPLE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -455,7 +524,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, null, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, null, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -485,7 +555,8 @@ public class TxHttpServerSbbTest {
         String urlEncoded = null;
         urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_MULTIPLE);
 //        request.setContentType("application/x-www-form-urlencoded");
 //        request.setCharacterEncoding("UTF-8");
         event.setRequest(request);
@@ -517,7 +588,8 @@ public class TxHttpServerSbbTest {
         String urlEncoded = null;
         urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_MULTIPLE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -547,7 +619,8 @@ public class TxHttpServerSbbTest {
         String urlEncoded = null;
         urlEncoded = URLEncoder.encode(MSG_ARABIC, "UTF-8");
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, urlEncoded, FORMAT_STRING,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_MULTIPLE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -715,7 +788,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ALPHANUMERIC, TO_MULTIPLE);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ALPHANUMERIC, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_MULTIPLE);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -727,7 +801,7 @@ public class TxHttpServerSbbTest {
         MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
 
         printResponseData(resp);
-        Assert.assertTrue(isValid(resp, FORMAT_JSON, false), "Response is not valid");
+        Assert.assertTrue(isValid(resp, FORMAT_JSON, true), "Response is not valid");
     }
 
     @Test
@@ -741,7 +815,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE_ALPHANUMERIC);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE_ALPHANUMERIC);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -767,7 +842,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_ONE_ALPHANUMERIC);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE_ALPHANUMERIC);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -793,7 +869,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE_PLUS_ALPHANUMERIC);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_MULTIPLE_PLUS_ALPHANUMERIC);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -819,7 +896,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE_PLUS_EMPTY);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_GET, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_MULTIPLE_PLUS_EMPTY);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -845,7 +923,8 @@ public class TxHttpServerSbbTest {
         ActivityContextInterface aci = new HttpActivityContextInterface();
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
-        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON, ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, TO_MULTIPLE_PLUS_EMPTY);
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_JSON,
+                ENCODING_UCS2, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_MULTIPLE_PLUS_EMPTY);
         event.setRequest(request);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -962,7 +1041,8 @@ public class TxHttpServerSbbTest {
         }
     }
 
-    private MockHttpServletRequest buildSendMessageRequest(String method, String url, String userId, String password, String msg, String format, String smscEncoding, String messageBodyEncoding, String sender, String[] to) {
+    private MockHttpServletRequest buildSendMessageRequest(String method, String url, String userId, String password, String msg, String format, String smscEncoding,
+                                                           String messageBodyEncoding, String sender, String senderTon, String senderNpi, String[] to) {
         MockHttpServletRequest req = new MockHttpServletRequest();
 
         req.setMethod(method);
@@ -975,6 +1055,8 @@ public class TxHttpServerSbbTest {
             req.setParameter(RequestParameter.FORMAT.getName(), format);
             req.setParameter(RequestParameter.SMSC_ENCODING.getName(), smscEncoding);
             req.setParameter(RequestParameter.MESSAGE_BODY_ENCODING.getName(), messageBodyEncoding);
+            req.setParameter(RequestParameter.SENDER_TON.getName(), senderTon);
+            req.setParameter(RequestParameter.SENDER_NPI.getName(), senderNpi);
         } else {
             String params = RequestParameter.USER_ID.getName() + "=" + getValue(userId) +
                     "&" + RequestParameter.PASSWORD.getName() + "=" + getValue(password) +
@@ -989,6 +1071,12 @@ public class TxHttpServerSbbTest {
             }
             if (messageBodyEncoding != null) {
                 params += "&" + RequestParameter.MESSAGE_BODY_ENCODING.getName() + "=" + getValue(messageBodyEncoding);
+            }
+            if (senderTon != null) {
+                params += "&" + RequestParameter.SENDER_TON.getName() + "=" + getValue(senderTon);
+            }
+            if (senderNpi != null) {
+                params += "&" + RequestParameter.SENDER_NPI.getName() + "=" + getValue(senderNpi);
             }
 
             try {
