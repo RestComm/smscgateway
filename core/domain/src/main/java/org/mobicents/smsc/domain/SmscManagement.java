@@ -62,6 +62,7 @@ public class SmscManagement implements SmscManagementMBean {
 	public static final String JMX_LAYER_SMSC_PROPERTIES_MANAGEMENT = "SmscPropertiesManagement";
     public static final String JMX_LAYER_SMSC_DATABASE_MANAGEMENT = "SmscDatabaseManagement";
     public static final String JMX_LAYER_HOME_ROUTING_MANAGEMENT = "HomeRoutingManagement";
+    public static final String JMX_LAYER_HTTPUSER_MANAGEMENT = "HttpUserManagement";
 
 	public static final String JMX_LAYER_DATABASE_SMS_ROUTING_RULE = "DatabaseSmsRoutingRule";
 
@@ -82,6 +83,7 @@ public class SmscManagement implements SmscManagementMBean {
     private MProcManagement mProcManagement = null;
     private SmscPropertiesManagement smscPropertiesManagement = null;
     private HomeRoutingManagement homeRoutingManagement = null;
+    private HttpUsersManagement httpUsersManagement = null;
 	private SmscDatabaseManagement smscDatabaseManagement = null;
 	private ArchiveSms archiveSms;
 	private MapVersionCache mapVersionCache;
@@ -240,6 +242,14 @@ public class SmscManagement implements SmscManagementMBean {
         ObjectName hrObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":layer=" + JMX_LAYER_HOME_ROUTING_MANAGEMENT + ",name=" + this.getName());
         this.registerMBean(this.homeRoutingManagement, HomeRoutingManagementMBean.class, true, hrObjNname);
 
+        this.httpUsersManagement = HttpUsersManagement.getInstance(this.name);
+        this.httpUsersManagement.setPersistDir(this.persistDir);
+        this.httpUsersManagement.start();
+
+        ObjectName httpUsersObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":layer=" + JMX_LAYER_HTTPUSER_MANAGEMENT
+                + ",name=" + this.getName());
+        this.registerMBean(this.httpUsersManagement, HttpUsersManagementMBean.class, true, httpUsersObjNname);
+
         String hosts = smscPropertiesManagement.getDbHosts();
         int port = smscPropertiesManagement.getDbPort();
         DBOperations.getInstance().start(hosts, port, this.smscPropertiesManagement.getKeyspaceName(), this.smscPropertiesManagement.getFirstDueDelay(),
@@ -347,6 +357,10 @@ public class SmscManagement implements SmscManagementMBean {
         this.homeRoutingManagement.stop();
         ObjectName hrObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":layer=" + JMX_LAYER_HOME_ROUTING_MANAGEMENT + ",name=" + this.getName());
         this.unregisterMbean(hrObjNname);
+
+        this.httpUsersManagement.stop();
+        ObjectName httpUsersObjNname = new ObjectName(SmscManagement.JMX_DOMAIN + ":layer=" + JMX_LAYER_HTTPUSER_MANAGEMENT + ",name=" + this.getName());
+        this.unregisterMbean(httpUsersObjNname);
 
 //		DBOperations_C1.getInstance().stop();
 		DBOperations.getInstance().stop();

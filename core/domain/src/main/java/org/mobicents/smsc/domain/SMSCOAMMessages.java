@@ -168,4 +168,13 @@ public interface SMSCOAMMessages {
 
     public static final String HR_CCMCCMNC_REMOVED = "CcMccmnc ha successfully removed";
 
+
+    public static final String CREATE_HTTPUSER_FAIL_ALREADY_EXIST = "Creation of HttpUser failed. Other HttpUser with name=%s already exist";
+
+    public static final String DELETE_HTTPUSER_FAILED_NO_HTTPUSERFOUND = "No HttpUser found with given name %s";
+
+    public static final String SHOW_HTTPUSER_NAME = "HttpUser name=";
+
+    public static final String SHOW_HTTPUSER_PASSWORD = " password=";
+
 }

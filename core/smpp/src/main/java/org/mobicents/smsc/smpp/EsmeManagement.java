@@ -427,7 +427,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 		try {
 			this.load();
 		} catch (FileNotFoundException e) {
-			logger.warn(String.format("Failed to load the SS7 configuration file. \n%s", e.getMessage()));
+			logger.warn(String.format("Failed to load the ESME configuration file. \n%s", e.getMessage()));
 		}
 
 		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
