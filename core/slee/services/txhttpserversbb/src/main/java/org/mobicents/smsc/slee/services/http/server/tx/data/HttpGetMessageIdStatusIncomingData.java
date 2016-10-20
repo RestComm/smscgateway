@@ -24,11 +24,8 @@ package org.mobicents.smsc.slee.services.http.server.tx.data;
 
 import org.mobicents.smsc.domain.HttpUsersManagement;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestParameter;
-import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.UnauthorizedException;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by tpalucki on 14.09.16.

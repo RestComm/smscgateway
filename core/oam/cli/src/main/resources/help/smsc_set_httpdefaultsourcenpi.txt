@@ -7,10 +7,16 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to set a value for default NPI (Number Plan Indicator) for
 	source addresses for messages from an HTTP connector.
-	Default value is 1 (ISDN).
+	Values -1 and -2 mean autodetection of NPI value from the content of digits
+	-1: international (a string contains only digits with "+" at the begin) / 
+	    national (a string contains only digits without "+" at the begin) / 
+	    alphanumerical (a string does not contain only digits)
+	-2: international (a string contains only digits) / 
+	    alphanumerical (a string does not contain only digits)
+	Default value is -1.
 
 EXAMPLES
-	smsc set httpdefaultsourcenpi 1
+	smsc set httpdefaultsourcenpi -1
 
 SEE ALSO
 	smsc set httpdefaultsourceton, smsc get httpdefaultsourcenpi,

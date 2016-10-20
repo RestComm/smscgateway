@@ -316,9 +316,13 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private int nationalLanguageLockingShift = 0;
 
     // TxHttp: default TON value for source addresses
-    private int httpDefaultSourceTon = 1;
+    // -1: autodetect - international / national / alphanumerical
+    // -2: autodetect - international / alphanumerical
+    private int httpDefaultSourceTon = -2;
     // TxHttp: default NPI value for source addresses
-    private int httpDefaultSourceNpi = 1;
+    // -1: autodetect - international / national / alphanumerical
+    // -2: autodetect - international / alphanumerical
+    private int httpDefaultSourceNpi = -2;
     // TxHttp: default TON value for destination addresses
     private int httpDefaultDestTon = 1;
     // TxHttp: default NPI value for destination addresses

@@ -28,17 +28,15 @@ import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.*;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.HttpApiException;
 import org.mobicents.smsc.slee.services.http.server.tx.exceptions.UnauthorizedException;
-import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.slee.facilities.Tracer;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by tpalucki on 08.09.16.
@@ -133,23 +131,59 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
             }
         }
 
-        if (senderTon != null) {
-            this.senderTon = TON.fromString(senderTon);
-        } else {
-            int defaultSourceTon = smscPropertiesManagement.getHttpDefaultSourceTon();
-            this.senderTon = TON.fromInt(defaultSourceTon);
-        }
+        this.sender = sender;
+        this.msg = decodeMessage(msg, getMessageBodyEncoding());
 
-        if (senderNpi != null) {
+        if (senderTon != null && senderNpi != null) {
+            // senderTon & senderNpi are specified in HTTP request
+            this.senderTon = TON.fromString(senderTon);
             this.senderNpi = NPI.fromString(senderNpi);
         } else {
+            int defaultSourceTon = smscPropertiesManagement.getHttpDefaultSourceTon();
             int defaultSourceNpi = smscPropertiesManagement.getHttpDefaultSourceNpi();
-            this.senderNpi = NPI.fromInt(defaultSourceNpi);
-        }
 
-        this.msg = decodeMessage(msg, getMessageBodyEncoding());
-        this.sender = sender;
+            if (defaultSourceTon < 0 || defaultSourceNpi < 0) {
+                // senderTon & senderNpi auto detection
+                if (defaultSourceTon == -1 || defaultSourceNpi == -1) {
+                    // -1: international (a string contains only digits with "+" at the begin) /
+                    // national (a string contains only digits without "+" at the begin) /
+                    // alphanumerical (a string does not contain only digits)
+                    Matcher m = regExDigitsWithPlus.matcher(this.sender);
+                    if (m.matches()) {
+                        this.senderTon = TON.INTERNATIONAL;
+                        this.senderNpi = NPI.ISDN;
+                        this.sender = this.sender.substring(1);
+                    } else {
+                        m = regExDigits.matcher(this.sender);
+                        if (m.matches()) {
+                            this.senderTon = TON.NATIONAL;
+                            this.senderNpi = NPI.ISDN;
+                        } else {
+                            this.senderTon = TON.ALFANUMERIC;
+                            this.senderNpi = NPI.UNKNOWN;
+                        }
+                    }
+                } else {
+                    // -2: international (a string contains only digits) /
+                    // alphanumerical (a string does not contain only digits)
+                    Matcher m = regExDigits.matcher(this.sender);
+                    if (m.matches()) {
+                        this.senderTon = TON.INTERNATIONAL;
+                        this.senderNpi = NPI.ISDN;
+                    } else {
+                        this.senderTon = TON.ALFANUMERIC;
+                        this.senderNpi = NPI.UNKNOWN;
+                    }
+                }
+            } else {
+                this.senderTon = TON.fromInt(defaultSourceTon);
+                this.senderNpi = NPI.fromInt(defaultSourceNpi);
+            }
+        }
     }
+
+    private Pattern regExDigits = Pattern.compile("^[0-9]+$");
+    private Pattern regExDigitsWithPlus = Pattern.compile("^\\+\\d+$");
 
     private String decodeMessage(String msgParameter, MessageBodyEncoding messageBodyEncoding) throws HttpApiException {
         String encoding;
