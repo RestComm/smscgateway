@@ -79,8 +79,7 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
         if (isEmptyOrNull(sender)) {
             throw new HttpApiException("'" + RequestParameter.SENDER.getName() + "' parameter is not set properly or not valid in the Http Request.");
         }
-        if (to == null || to.length < 1) {
-//             !validateDestNumbersAndRemoveEmpty(to)){
+        if (to == null || to.length < 1 || checkAllElements(to)) {
             throw new HttpApiException("'" + RequestParameter.TO.getName() + "' parameter is not set in the Http Request.");
         }
 
@@ -172,15 +171,24 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
         }
     }
 
+    private boolean checkAllElements(String[] addresses) {
+        for (String e : addresses) {
+            if (e != null && !e.trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private List<String> validateDestNumbersAndRemoveEmpty(List<String> toCheck) {
         List<String> notValidDestinationNumbers = new ArrayList<>();
         Iterator<String> iterator = toCheck.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             String number = iterator.next().trim();
-            if(number.isEmpty()){
+            if (number.isEmpty()) {
                 //remove empty strings
                 iterator.remove();
-            }else {
+            } else {
                 try {
                     Long.parseLong(number);
                 } catch (NumberFormatException e) {

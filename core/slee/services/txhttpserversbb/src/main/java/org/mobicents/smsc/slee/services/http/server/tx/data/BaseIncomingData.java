@@ -26,14 +26,14 @@ public abstract class BaseIncomingData {
         this.format = formatParam == null ? ResponseFormat.STRING : ResponseFormat.fromString(formatParam);
         // checking if mandatory fields are present
         if (isEmptyOrNull(userId)) {
-            throw new UnauthorizedException("Unauthorized: Access is denied due to invalid credentials - " + RequestParameter.USER_ID.getName() + " is null.");
+            throw new UnauthorizedException("Unauthorized: Access is denied due to invalid credentials - " + RequestParameter.USER_ID.getName() + " is null.", userId, password);
         }
         if (isEmptyOrNull(password)) {
-            throw new UnauthorizedException("Unauthorized: Access is denied due to invalid credentials - " + RequestParameter.PASSWORD.getName() + " is null.");
+            throw new UnauthorizedException("Unauthorized: Access is denied due to invalid credentials - " + RequestParameter.PASSWORD.getName() + " is null.", userId, password);
         }
         if (!checkUsernameAndPassword(userId, password, httpUsersManagement)) {
             throw new UnauthorizedException("Unauthorized: Access is denied due to invalid credentials - "
-                    + RequestParameter.USER_ID.getName() + " or " + RequestParameter.PASSWORD.getName() + " is incorrect.");
+                    + RequestParameter.USER_ID.getName() + " or " + RequestParameter.PASSWORD.getName() + " is incorrect.", userId, password);
         }
         this.userId = userId;
         this.password = password;

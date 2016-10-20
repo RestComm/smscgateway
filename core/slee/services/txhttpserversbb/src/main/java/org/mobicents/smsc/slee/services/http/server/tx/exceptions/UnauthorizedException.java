@@ -5,15 +5,21 @@ package org.mobicents.smsc.slee.services.http.server.tx.exceptions;
  */
 public class UnauthorizedException extends Exception {
 
-    public UnauthorizedException(String message) {
+    private String userName;
+
+    private String password;
+
+    public UnauthorizedException(String message, String userName, String password) {
         super(message);
+        this.userName = userName;
+        this.password = password;
     }
 
-    public UnauthorizedException(String message, Throwable cause) {
-        super(message, cause);
+    public String getUserName() {
+        return userName;
     }
 
-    public UnauthorizedException(Throwable cause) {
-        super(cause);
+    public String getPassword() {
+        return password;
     }
 }

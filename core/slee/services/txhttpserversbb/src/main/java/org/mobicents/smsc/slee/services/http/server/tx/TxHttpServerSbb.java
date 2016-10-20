@@ -109,7 +109,7 @@ public abstract class TxHttpServerSbb implements Sbb {
     private final String MSG_QUERY = "msgQuery";
 
     public PersistenceRAInterface getStore() {
-        return this.persistence;
+        return persistence;
     }
 
     public InitialEventSelector isInitialHttpRequestEvent(final InitialEventSelector ies) {
@@ -144,7 +144,7 @@ public abstract class TxHttpServerSbb implements Sbb {
     }
 
     public void onHttpGet(HttpServletRequestEvent event, ActivityContextInterface aci) {
-        this.logger.fine("onHttpGet");
+        logger.fine("onHttpGet");
         HttpServletRequest request = event.getRequest();
         // decision if getStatus or sendMessage
         try {
@@ -155,37 +155,45 @@ public abstract class TxHttpServerSbb implements Sbb {
                 String requestURL = request.getRequestURL().toString();
                 String[] tmp = requestURL.split("\\?");
                 if (tmp[0].endsWith(SEND_SMS)) {
-                    this.processHttpSendMessageEvent(event, aci);
+                    processHttpSendMessageEvent(event, aci);
                 } else if (tmp[0].endsWith(MSG_QUERY)) {
-                    this.processHttpGetMessageIdStatusEvent(event, aci);
+                    processHttpGetMessageIdStatusEvent(event, aci);
                 } else {
                     throw new HttpApiException("Unknown operation on the HTTP API");
                 }
             }
-        } catch (Exception e) {
-            this.logger.severe("Error in onHttpGet", e);
+        } catch (HttpApiException e) {
             try {
-                if (e instanceof UnauthorizedException) {
-                    HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-                } else {
-                    HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
-                    outgoingData.setStatus(Status.ERROR);
-                    outgoingData.setMessage(e.getMessage());
-                    ResponseFormat responseFormat = BaseIncomingData.getFormat(logger, request);
-                    HttpUtils.sendErrorResponseWithContent(logger,
-                            event.getResponse(),
-                            HttpServletResponse.SC_OK,
-                            outgoingData.getMessage(),
-                            ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
+                if (logger.isWarningEnabled()) {
+                    logger.warning(e.getMessage());
                 }
+                sendErrorResponse(event, e);
             } catch (Exception ex) {
-                this.logger.severe("Error while sending error response", ex);
+                logger.severe("Error while sending error response", ex);
+            }
+        } catch (UnauthorizedException e) {
+            try {
+                if (logger.isWarningEnabled()) {
+                    logger.warning(e.getMessage() + " UserName:" + e.getUserName() + " Password:" + e.getPassword());
+                }
+                HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            } catch (Exception ex) {
+                logger.severe("Error while sending error response", ex);
+            }
+        } catch (Exception e) {
+            try {
+                if (logger.isWarningEnabled()) {
+                    logger.warning(e.getMessage());
+                }
+                sendErrorResponse(event, e);
+            } catch (Exception ex) {
+                logger.severe("Error while sending error response", ex);
             }
         }
     }
 
     public void onHttpPost(HttpServletRequestEvent event, ActivityContextInterface aci) {
-        this.logger.fine("onHttpPost");
+        logger.fine("onHttpPost");
         HttpServletRequest request = event.getRequest();
         // decision if getStatus or sendMessage
         try {
@@ -196,33 +204,53 @@ public abstract class TxHttpServerSbb implements Sbb {
                 String requestURL = request.getRequestURL().toString();
                 requestURL.endsWith(SEND_SMS);
                 if (requestURL.endsWith(SEND_SMS)) {
-                    this.processHttpSendMessageEvent(event, aci);
+                    processHttpSendMessageEvent(event, aci);
                 } else if (requestURL.endsWith(MSG_QUERY)) {
-                    this.processHttpGetMessageIdStatusEvent(event, aci);
+                    processHttpGetMessageIdStatusEvent(event, aci);
                 } else {
                     throw new HttpApiException("Unknown operation on the HTTP API. Parameter set from the request does not match any of the HTTP API services.");
                 }
             }
-        } catch (Exception e) {
-            this.logger.severe("Error in onHttpPost", e);
+        } catch (HttpApiException e) {
             try {
-                if (e instanceof UnauthorizedException) {
-                    HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-                } else {
-                    HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
-                    outgoingData.setStatus(Status.ERROR);
-                    outgoingData.setMessage(e.getMessage());
-                    ResponseFormat responseFormat = BaseIncomingData.getFormat(logger, request);
-                    HttpUtils.sendErrorResponseWithContent(logger,
-                            event.getResponse(),
-                            HttpServletResponse.SC_OK,
-                            outgoingData.getMessage(),
-                            ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
+                if (logger.isWarningEnabled()) {
+                    logger.warning(e.getMessage());
                 }
+                sendErrorResponse(event, e);
             } catch (Exception ex) {
-                this.logger.severe("Error while sending error response", ex);
+                logger.severe("Error while sending error response", ex);
+            }
+        } catch (UnauthorizedException e) {
+            try {
+                if (logger.isWarningEnabled()) {
+                    logger.warning(e.getMessage() + " UserName:" + e.getUserName() + " Password:" + e.getPassword());
+                }
+                HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            } catch (Exception ex) {
+                logger.severe("Error while sending error response", ex);
+            }
+        } catch (Exception e) {
+            try {
+                if (logger.isWarningEnabled()) {
+                    logger.warning(e.getMessage());
+                }
+                sendErrorResponse(event, e);
+            } catch (Exception ex) {
+                logger.severe("Error while sending error response", ex);
             }
         }
+    }
+
+    private void sendErrorResponse(HttpServletRequestEvent event, Exception e) throws HttpApiException, IOException {
+        HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
+        outgoingData.setStatus(Status.ERROR);
+        outgoingData.setMessage(e.getMessage());
+        ResponseFormat responseFormat = BaseIncomingData.getFormat(logger, event.getRequest());
+        HttpUtils.sendErrorResponseWithContent(logger,
+                event.getResponse(),
+                HttpServletResponse.SC_OK,
+                outgoingData.getMessage(),
+                ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
     }
 
     private boolean checkCharging() {
@@ -235,7 +263,7 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpSendMessageIncomingData incomingData = null;
 
         incomingData = createSendMessageIncomingData(request);
-        this.sendMessage(event, incomingData, aci);
+        sendMessage(event, incomingData, aci);
     }
 
     private void processHttpGetMessageIdStatusEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException, UnauthorizedException {
@@ -244,7 +272,7 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpGetMessageIdStatusIncomingData incomingData;
 
         incomingData = createGetMessageIdStatusIncomingData(request);
-        this.getMessageIdStatus(event, incomingData, aci);
+        getMessageIdStatus(event, incomingData, aci);
     }
 
     private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request) throws HttpApiException, UnauthorizedException {
@@ -349,8 +377,8 @@ public abstract class TxHttpServerSbb implements Sbb {
 
     public void sendMessage(HttpServletRequestEvent event, HttpSendMessageIncomingData incomingData, ActivityContextInterface aci) {
         logger.fine("sendMessage");
-        if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived sendMessage = " + incomingData);
+        if (logger.isFineEnabled()) {
+            logger.fine("\nReceived sendMessage = " + incomingData);
         }
         HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
         outgoingData.setStatus(Status.ERROR);
@@ -358,13 +386,13 @@ public abstract class TxHttpServerSbb implements Sbb {
         PersistenceRAInterface store = getStore();
         SendMessageParseResult parseResult;
         try {
-            parseResult = this.createSmsEventMultiDest(incomingData, store);
+            parseResult = createSmsEventMultiDest(incomingData, store);
             for (Sms sms : parseResult.getParsedMessages()) {
-                this.processSms(sms, store, incomingData);
+                processSms(sms, store, incomingData);
             }
         } catch (SmscProcessingException e1) {
             if (!e1.isSkipErrorLogging()) {
-                this.logger.severe(e1.getMessage(), e1);
+                logger.severe(e1.getMessage(), e1);
                 smscStatAggregator.updateMsgInFailedAll();
             }
             try {
@@ -376,12 +404,12 @@ public abstract class TxHttpServerSbb implements Sbb {
                         message,
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
             } catch (IOException e) {
-                this.logger.severe("Error while trying to send HttpErrorResponse", e);
+                logger.severe("Error while trying to send HttpErrorResponse", e);
             }
             return;
         } catch (Throwable e1) {
             String s = "Exception when processing SubmitMulti message: " + e1.getMessage();
-            this.logger.severe(s, e1);
+            logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
             // Lets send the Response with error here
             try {
@@ -394,7 +422,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                         message  + " " + e1.getMessage(),
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
             } catch (IOException e) {
-                this.logger.severe("Error while trying to send SubmitMultiResponse=", e);
+                logger.severe("Error while trying to send SubmitMultiResponse=", e);
             }
             return;
         }
@@ -406,13 +434,13 @@ public abstract class TxHttpServerSbb implements Sbb {
             outgoingData.setStatus(Status.SUCCESS);
             HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat() );
         } catch (Throwable e) {
-            this.logger.severe("Error while trying to send SubmitMultiResponse=" + outgoingData, e);
+            logger.severe("Error while trying to send SubmitMultiResponse=" + outgoingData, e);
         }
     }
 
     private void getMessageIdStatus(HttpServletRequestEvent event, HttpGetMessageIdStatusIncomingData incomingData, ActivityContextInterface aci) throws HttpApiException {
-        if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived getMessageIdStatus = " + incomingData);
+        if (logger.isFineEnabled()) {
+            logger.fine("\nReceived getMessageIdStatus = " + incomingData);
         }
         PersistenceRAInterface store = getStore();
         final Long messageId = incomingData.getMsgId();
@@ -433,7 +461,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             outgoingData.setStatus(Status.SUCCESS);
             outgoingData.setStatusMessage(messageState.toString());
 
-            HttpUtils.sendOkResponseWithContent(this.logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
+            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
         } catch (PersistenceException e) {
             throw new HttpApiException("PersistenceException while obtaining message status from the database for the " +
                     "message with id: "+incomingData.getMsgId());
@@ -459,9 +487,9 @@ public abstract class TxHttpServerSbb implements Sbb {
         this.sbbContext = (SbbContextExt) sbbContext;
         try {
             Context ctx = (Context) new InitialContext().lookup("java:comp/env");
-            this.logger = this.sbbContext.getTracer(getClass().getSimpleName());
-            this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, PERSISTENCE_LINK);
-            this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID, SCHEDULER_LINK);
+            logger = this.sbbContext.getTracer(getClass().getSimpleName());
+            persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, PERSISTENCE_LINK);
+            scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID, SCHEDULER_LINK);
         } catch (Exception ne) {
             logger.severe("Could not set SBB context:", ne);
         }
@@ -469,14 +497,14 @@ public abstract class TxHttpServerSbb implements Sbb {
 
     public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
         ServiceID serviceID = event.getService();
-        this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
+        logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
         SbbStates.setSmscTxHttpServerServiceState(true);
     }
 
     public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
         boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
         if (isServiceActivity) {
-            this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
+            logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
             SbbStates.setSmscTxHttpServerServiceState(false);
         }
     }
@@ -660,7 +688,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                         boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
                         if (!storeAndForwMode) {
                             try {
-                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+                                scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                             } catch (Exception e) {
                                 throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
                                         0, MAPErrorCode.systemFailure, null, e);
@@ -670,7 +698,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                             if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast && sms.getScheduleDeliveryTime() == null) {
                                 try {
                                     sms.setStoringAfterFailure(true);
-                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+                                    scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                                 } catch (Exception e) {
                                     throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
                                             0, MAPErrorCode.systemFailure, null, e);
@@ -678,7 +706,7 @@ public abstract class TxHttpServerSbb implements Sbb {
                             } else {
                                 try {
                                     sms.setStored(true);
-                                    this.scheduler.setDestCluster(sms.getSmsSet());
+                                    scheduler.setDestCluster(sms.getSmsSet());
                                     store.c2_scheduleMessage_ReschedDueSlot(sms,
                                             smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
                                             false);
@@ -711,8 +739,8 @@ public abstract class TxHttpServerSbb implements Sbb {
             try {
                 ret = (ChargingSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
             } catch (Exception e) {
-                if (this.logger.isSevereEnabled()) {
-                    this.logger.severe("Exception while trying to creat ChargingSbb child", e);
+                if (logger.isSevereEnabled()) {
+                    logger.severe("Exception while trying to creat ChargingSbb child", e);
                 }
             }
         }
