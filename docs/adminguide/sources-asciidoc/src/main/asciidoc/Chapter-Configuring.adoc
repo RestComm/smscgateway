@@ -1457,6 +1457,9 @@ Here there is a describtion for the case of Telestax OCS server and as an exampl
 
 * from <smsc gw root folder>/resource/ocs/smsc-part to SMSC GW <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config
 * from <smsc gw root folder>/resource/ocs/ocs-part to OCS server <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config
+
+This file is already copied to SMSC GW into Simulator profile.
+
 . Those configs suppose that you use Telestax OCS server and it is on the same host.
 If not you need to make extra configuring.
 In the testing config files SMSC GW plays a role of a diameter client and OCS server - a diameter server.
