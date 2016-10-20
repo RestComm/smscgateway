@@ -125,14 +125,11 @@ For configuring of SMSC Global Titles - see chapters <<_set_scgt>>.
 [[_routing_fundamentals_2]]
 === The procedure of routing messages to destinations inside subnetworks.
 
-
-
-
 Inside each subnetwork there may be several ESME, SAP or SIP configured.
 If we use default routing rules, then for routing SMSC GW makes following steps:
 
-* it checks all ESMEs that belongs to the networkId.
-  It checks if TON, NPI and AddressRange of an ESME Routing Address fit to a message destination TON, NPI and address digits the the message will be routed to this ESME.
+* it checks all ESMEs / ESME clustes that belong to the networkId.
+  It checks if TON, NPI and AddressRange of an ESME / cluster Routing Address fit to a message destination TON, NPI and address digits the the message will be routed to this ESME. Several ESMEs inside a single networkId area can be grouped in a cluster. In this case the load is shared in a round robin fashion between ESME nodes in the cluster.
   There is one exception of this rule.
   A message will not be routed in any case to the ESME from which it has come.
 * if no ESME found for routing SMSC GW then checks SIP connector if it's settings (TON, NPI and routing AddressRange) fits to a message destination TON, NPI and address digits.
@@ -140,9 +137,8 @@ If we use default routing rules, then for routing SMSC GW makes following steps:
 * if SIP also does not fit, a message will be routed to SS7 network.
   Then routing rules at SCCP level will be taken into account for further routing.
 
+
 For configuring of ESME and SIP routing parameters see <<_esme_settings>> and <<_sip>>.
-
-
 
 Instead of default routing rules database routing rules can be used.
 This is a set of stored in the cassandra database rules that describes where SMSC GW will route a message (to some ESME / SIP) depending on a message destination address.

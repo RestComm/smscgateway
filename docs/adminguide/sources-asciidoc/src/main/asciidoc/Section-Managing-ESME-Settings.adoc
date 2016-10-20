@@ -2,12 +2,21 @@
 [[_esme_settings]]
 = External Short Messaging Entities (ESMEs)
 
-&THIS.PLATFORM;&THIS.APPLICATION;can now act as ESME (initiate bind to remote SMSC) or can also act as SMSC (accept bind from remote ESME). While defining an ESME (SMPP connection), you can optionally pass the Cluster name.
+{this-platform} {this-application} can now act as ESME (initiate bind to remote SMSC - Client type ESME) or can also act as SMSC (accept bind from remote ESME - Server type ESME). While defining an ESME (SMPP connection), you can optionally pass the Cluster name.
 If it is not passed, cluster name is same as ESME name.
 As the name suggests, its now possible to group different ESMEs in the same cluster.
-This is useful only when SMS is suppose to be routed out of &THIS.PLATFORM;&THIS.APPLICATION;to ESME.
-If there are multiple ESME's in a cluster, the load is shared in a round robin fashion to send out SMS.
-In case if one of the ESME is in `UNBOUND` state, the next `BOUND` smpp connection (within same cluster) will be used.
+This is useful only when SMS is suppose to be routed out of {this-platform} {this-application} to ESME. If there are multiple ESME's in a cluster, the load is shared in a round robin fashion to send out SMS. In case if one of the ESME is in `UNBOUND` state, the next `BOUND` smpp connection (within same cluster) will be used.
+
+The current algo for routing is the following. We have two steps:
+
+* 1 step - selecting ESME cluster for delivering. Each cluster can contain one or more ESME. The idea of cluster usage is to have load sharing between nodes (ESMEs) inside a cluster and/or if some cluster node is unbound then SMSC GW will send messages to another cluster. SMSC GW selects the first cluster that ESME(s) fits to the conditions:
+**   bindType==transiever or receiver (for SERVER type) or transmitter (for CLIENT type)
+**   the ESME is not the ESME from which the message has come to SMSC GW
+**   networkID of a message == networkID of an ESME
+**   dest address, ton and npi of a message fit to routing address, ton and npi of ESME. The fact if this ESME is bound or not is not taken into account at this step
+* 2 step - selecting of ESME in the cluster:
+**   selecting of ESME in the cluster that is bound (and not stopped) now. If all ESMEs are not bound in the cluster then the message will be dropped (temporary delivery failure)
+
 Below diagram explains the load-balancing between SMPP connections  
 
 .SMPP Load Balancing
@@ -16,7 +25,7 @@ image::images/smsc-SMPP-Loadbalancing.png[]
 You can define multiple ESMEs, each with a unique name but the same `systemId` and declare their `host-ip` and `port` values as -1 (only for SMPP type Server). The SMSC will now accept multiple incoming BIND requests from any `IP` and any `port` as far as the `systemId` and `Password` matches.
  
 
-Alternatively, if you declare a real value for `host-ip`(say for example 10.199.7.23) and `port` as -1, the SMSC will accept as many BINDS as ESMEs defined from the specified IP but any port as far as the `systemId` and `Password` matches.
+Alternatively, if you declare a real value for `host-ip` (say for example 10.199.7.23) and `port` as -1, the SMSC will accept as many BINDS as ESMEs defined from the specified IP but any port as far as the `systemId` and `Password` matches.
  
 
 [[_esme_settings_create]]
