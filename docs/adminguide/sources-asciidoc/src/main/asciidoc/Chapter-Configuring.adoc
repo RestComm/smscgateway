@@ -174,10 +174,14 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 [[_routing_fundamentals_4]]
 === Routing model examples.
 
+==== Routing all messages from one ESME to SS7
+
 If you have one ESME and JSS7 connector, and the only traffic is ESME -> JSS7
 
 * use networkId=0 for all 
 * configure "Routing Range" value of the ESME to a value that fits to no mobile subscriber (for example "0") 
+
+==== All JSS7 originated messages must be routed to ESME and all ESME originated messages must be routed to JSS7
 
 If you use the model "all JSS7 originated messages must be routed to ESME and all ESME originated messages must be routed to JSS7", you can:
 
@@ -189,6 +193,7 @@ smsc mproc add mproc 1 networkidmask=1 newnetworkid=0
 +
 smsc mproc add mproc 2 networkidmask=0 newnetworkid=1
 
+==== Several ESMEs send message to one SS7 connection and delivery receipts come back to an originator ESME
 
 If you have several ESMEs that send message to one SS7 connection and you need that delivery receipts come back to an originator ESME (and no more traffic), you can:
 
@@ -204,6 +209,41 @@ smsc mproc add mproc 2 networkidmask=2 newnetworkid=0
 smsc mproc add mproc 3 networkidmask=3 newnetworkid=0
 
 * set the option "Delivery receipts will be routed to the origination networkId" is set to true 
+
+==== Routing desision based on SRI request results
+
+Sometimes we need to decide where to route messages depending on SendRoutingRequest (SRI) to HLR results. To achieve it we may use two approaches
+
+* dropaftersri - performing of "SRI request only" functionality, get SRI response data and then resend a message again to a proper destination (or avoid of sending if for exammple a subscriber is in roaming).
+* newnetworkidaftersri - rerouting of a message after SRI response (to another networkID area)
+
+.dropaftersri procedure
+
+One of a solution is to use a separate ESME(s) that will send messages only for SRI requests only. We can configure an mproc rule like this:
+
+`smsc mproc add 1 origesmenamemask XXX dropaftersri true`
+
+In this case all messages that fit to the mproc rules conditions (in this example == all messages that have come from ESME with name "XXX") will be dropped after a SRI request without futher message sending ("dropaftersri true" says for it). A condition can be any of possible (not exactly "origesmenamemask XXX"), this condition is good if you want to send all messages for SRI request only via a dedicated for this purpose ESME.
+
+We can then get SRI response results by one of the following ways (pay attention that it may be also a MAP error response from HLR):
+
+*   CDR will contain extra fields for IMSI / VLR (if the response is successfull)
+*   you can request a delivery receipt that will be routed back to your ESME and this receipt will contain also extra fields (IMSI / VLR).
+
+If SRI returns MAP error message (or some other error response) then MProcRule.onPostImsiRequest() and "dropaftersri" action will not be invoked and the behavior is the same for other messages that delivery failed. It may be also several attempts to send SRI requests in case of temporary errors (for StoreAndForward mode only of cause).
+
+Delivery response for such dropped after SRI requests messages will contain in the message text (at the end) extra fields with varaible length: imsi, nnn_digits, nnn_an (address nature), nnn_np (numbering plan) with filled values from a SRI response. The example of this string is: `imsi:00000000000000 nnn_digits:0000000000 nnn_an: nnn_np:11`. SMPP error code for such cases is: 226.
+
+CDR records will contain "failed_imsi" operation result cause and also conatins IMSI and NNN values.
+
+.newnetworkidaftersri procedure
+
+We can add mproc rules like
+
+`smsc mproc add 1 imsidigitsmask <regular expression> newnetworkidaftersri 22`
+
+This rule will reroute a message to networkId==22 area for further delivering if IMSI from a SRI response matches the mask. You can use also other conditions here for proper filtering (networkidmask, destdigmask, nnndigitsmask, etc). If in the new networkId area a message will be delivered again to SS7 network then a new SRI will be performed.
+
 
 [[_mproc_rules_fundamentals]]
 == Message processing rules (mproc rules)
