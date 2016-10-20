@@ -1,0 +1,154 @@
+
+[[_httpuser_settings]]
+= HTTP connector user accounts
+
+[[_httpuser_settings_add]]
+== Create a new HTTP user account
+
+[[_httpuser_settings_add_cli]]
+=== Using CLI
+
+You can configure a new HTTP user account by issuing the command `smsc httpuser add` with appropriate parameters as described below. 
+
+----
+
+Name
+	smsc httpuser add
+
+SYNOPSIS
+	smsc httpuser add <userName> password <password>
+
+DESCRIPTION
+	This command is used to configure a new HTTP User account
+	to access the HTTP connector for submitting messages to SMSC GW.
+
+PARAMETERS
+
+	userName      - A unique user name that identifies  an account.
+
+	Optional Parameters
+
+	password      - Password for accestting of HTTP connector.	
+----
+
+[[_httpuser_settings_add_gui]]
+=== Using GUI
+
+.Procedure: Create new HTTP user account using GUI
+. In the GUI Management Console for SMSC Gateway, click on 'HTTP user accounts' in the left panel. 
+. The main panel will display the existing HTTP user accounts (if any), one each in a row with corresponding actions (remove, update) for each row.
+  Below this you will find the button 'Create HTTP user account'. 
+. You can create a new HTTP user account by launching the 'Create HTTP user account' window by clicking on the blue coloured 'Create HTTP user account' button.
+  The 'Create HTTP user account' window will display all HTTP user account paramters that must be defined by you.
+  For more details of these parameters please refer to the descriptions of the CLI commands for the same in the preceding section.
+. Enter appropriate values for all the parameters and then click on the 'Create' button at the bottom of this 'HTTP user account' window.
+  This action will create a new HTTP user account with parameters as defined by you. 
+. If there is an error in defining the HTTP user account, then you will find the details of the error in the Management Console Log section below. 
+
+[[_httpuser_settings_modify]]
+== Modify HTTP user account
+
+[[_httpuser_settings_modify_cli]]
+=== Using CLI
+
+You can modify an existing HTTP user account by issuing the command `smsc httpuser modify` with appropriate parameters as described below. 
+
+----
+
+Name
+	smsc httpuser modify
+
+SYNOPSIS
+	smsc httpuser modify <userName> password <password>
+
+DESCRIPTION
+	This command is used to modify parameters of a HTTP User account.
+
+PARAMETERS
+
+	userName      - A user name that identifies an account.
+
+	Optional Parameters
+
+	password      - Password for accessing of HTTP connector.	
+----
+
+[[_httpuser_settings_modify_gui]]
+=== Using GUI
+
+.Procedure: Modify an existing HTTP user account using GUI
+. In the GUI Management Console for SMSC Gateway, click on 'HTTP user accounts' in the left panel. 
+. The main panel will display the existing HTTP user accounts (if any), one each in a row with corresponding actions (remove, update) for each row.
+. You can update an existing by launching the 'HTTP user account <name> properties' window by clicking on the blue coloured 'Update HTTP user account' button.
+  The 'HTTP user account <name> properties' window will display all HTTP user account paramters that can be updated by you.
+  For more details of these parameters please refer to the descriptions of the CLI commands  for the same in the preceding section.
+. Update appropriate values for all the parameters and then click on the 'Close' button.
+  This action will modify a new HTTP user account with parameters as defined by you. 
+. If there is an error in defining the HTTP user account, then you will find the details of the error in the Management Console Log section below. 
+
+[[_httpuser_settings_show]]
+== View HTTP user account details
+
+[[_httpuser_settings_show_cli]]
+=== Using CLI
+
+You can view the details of all or concrete configured HTTP user accounts by issuing the command `smsc httpuser show` as described below. 
+
+----
+
+Name
+	smsc httpuser show
+
+SYNOPSIS
+	smsc httpuser show <userName> password <password>
+
+DESCRIPTION
+	This command is used to show HTTP User account(s) details.
+
+PARAMETERS
+
+	userName      - A unique user name that identifies a user.
+	                This parameter is option. If it is omitted all
+	                accounts will be displayed.
+----
+
+[[_httpuser_settings_show_gui]]
+=== Using GUI
+
+.Procedure: View HTTP user account using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'HTTP user accounts' in the left panel. 
+. The main panel will display the existing HTTP user accounts (if any), one each in a row with corresponding actions (remove, update) for each row.
+. You can view the details of an HTTP user account by clicking on the row corresponding to the HTTP user account.
+  All relevant details of the HTTP user account will be displayed in an expanded format. 
+
+[[_httpuser_settings_remove]]
+== Delete an existing HTTP user account
+
+[[_httpuser_settings_remove_cli]]
+=== Using CLI
+
+You can delete any HTTP user account by issuing the command `smsc httpuser remove` with appropriate parameters as described below. 
+
+----
+
+Name
+	smsc httpuser remove
+
+SYNOPSIS
+	smsc httpuser remove <userName>
+
+DESCRIPTION
+	This command is used to remove of a HTTP User account.
+
+PARAMETERS
+
+	userName      - A unique user name that identifies  an account.
+----
+
+[[_httpuser_settings_remove_gui]]
+=== Using GUI
+
+.Procedure: Delete HTTP user account using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'HTTP user accounts' in the left panel. 
+. The main panel will display the existing HTTP user accounts (if any), one each in a row with corresponding actions (remove, update) for each row.
+. To delete an existing HTTP user account click on the delete icon marked 'x' in red, for the row corresponding to the HTTP user account.

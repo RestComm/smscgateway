@@ -1,0 +1,17 @@
+Name
+	smsc httpuser show
+
+SYNOPSIS
+	smsc httpuser show <userName> password <password>
+
+DESCRIPTION
+	This command is used to show HTTP User account(s) details.
+
+PARAMETERS
+
+	userName      - A unique user name that identifies a user.
+	                This parameter is option. If it is omitted all
+	                accounts will be displayed.
+
+SEE ALSO
+	smsc httpuser add, smsc httpuser modify, smsc httpuser remove 

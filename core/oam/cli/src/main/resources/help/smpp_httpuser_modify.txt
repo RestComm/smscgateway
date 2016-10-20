@@ -1,0 +1,19 @@
+Name
+	smsc httpuser modify
+
+SYNOPSIS
+	smsc httpuser modify <userName> password <password>
+
+DESCRIPTION
+	This command is used to modify parameters of a HTTP User account.
+
+PARAMETERS
+
+	userName      - A user name that identifies an account.
+
+	Optional Parameters
+
+	password      - Password for accessing of HTTP connector.	
+
+SEE ALSO
+	smsc httpuser add, smsc httpuser remove, smsc httpuser show 

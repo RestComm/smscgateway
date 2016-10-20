@@ -1,0 +1,15 @@
+Name
+	smsc httpuser remove
+
+SYNOPSIS
+	smsc httpuser remove <userName>
+
+DESCRIPTION
+	This command is used to remove of a HTTP User account.
+
+PARAMETERS
+
+	userName      - A unique user name that identifies  an account.
+
+SEE ALSO
+	smsc httpuser add, smsc httpuser modify, smsc httpuser show 
