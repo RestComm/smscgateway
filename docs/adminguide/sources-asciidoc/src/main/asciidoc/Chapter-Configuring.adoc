@@ -1366,6 +1366,8 @@ are GET and POST. Request URL must have “sendSms” context and contain all of
 | format | Values can be "String" or "json", default is "String"
 | smscEncoding | Values can be "GSM7" (usually used for english letters and digits) or "UCS2" (used for arabic, cyrillic, etc letters), default is "GSM7". This parameter affects Data Coding Schema parameter.
 | messageBodyEncoding | Values can be "UTF8" or "UTF16". If parameter is not provided then value depends on "smscEncoding" parameter and it is taken from SMSC properties . Default value is "UTF8". This parameter affects data encoding of a message body at HTTP interface.
+| senderTon | TON value for a source address (if missed then <<_httpdefaultsourceton>> value will be used)
+| senderNpi | NPI value for a source address (if missed then <<_httpdefaultsourcenpi>> value will be used)
 |===
 
 Format parameter controls the response format to the request. Response contains the status of request, it can be “Success” or “Error”. In case of error it contains an error code and error message. In case of success response contains a list of pairs: “request ID / destination
@@ -1378,7 +1380,7 @@ http://127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user1&password=password&m
 
 http://127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user1&password=password&msg=exampleMessage_02&format=String&smscEncoding=GSM7&messageBodyEncoding=UTF8&sender=1234&to=1111
 
-http://127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user1&password=password&msg=exampleMessage_03&format=json&smscEncoding=UCS2&messageBodyEncoding=UTF16&sender=4321&to=6666,6667
+http://127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user1&password=password&msg=exampleMessage_03&format=json&smscEncoding=UCS2&messageBodyEncoding=UTF16&sender=4321&to=6666,6667&senderTon=5&senderNpi=0
 ----
 
 Response examples:
