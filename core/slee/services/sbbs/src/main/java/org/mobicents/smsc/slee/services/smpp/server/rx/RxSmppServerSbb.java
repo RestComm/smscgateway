@@ -55,7 +55,6 @@ import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.ProcessingType;
@@ -467,6 +466,12 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
      * @throws Exception
      */
     private void handleResponse(BaseSmResp event) throws Exception {
+        if (isDeliveringEnded()) {
+            if (logger.isFineEnabled()) {
+                this.logger.fine("SMPP Response received when DeliveringEnded state: status=" + event.getCommandStatus());
+            }
+        }
+
         SmsSet smsSet = getSmsSet();
         if (smsSet == null) {
             logger.severe("RxSmppServerSbb.handleResponse(): CMP smsSet is missed");
@@ -481,12 +486,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             Sms sms = confirmMessageInSendingPool(event.getSequenceNumber());
             if (sms == null) {
-
-                // !!!! !!!!-
-//                this.logger.severe("nul sms =========: UnconfirmedCnt=" + this.getUnconfirmedMessageCountInSendingPool()
-//                        + ", sequenceNumber=" + event.getSequenceNumber());
-                // !!!! !!!!-
-
+                this.logger.severe("RxSmppServerSbb.handleResponse(): no sms in MessageInSendingPool: UnconfirmedCnt="
+                        + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber());
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
                         "Received undefined SequenceNumber: " + event.getSequenceNumber() + ", SmsSet=" + smsSet);
                 return;
@@ -549,8 +550,14 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 }
             }
         } else {
-            this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SC_SYSTEM_ERROR,
-                    "DeliverSm response has a bad status: " + status);
+            ErrorAction errorAction = ErrorAction.permanentFailure;
+            if (status == SmppConstants.STATUS_THROTTLED || status == SmppConstants.STATUS_X_T_APPN
+                    || status == SmppConstants.STATUS_SYSERR || status == SmppConstants.STATUS_INVBNDSTS)
+                errorAction = ErrorAction.temporaryFailure;
+            logger.warning("RxSmppServerSbb.handleResponse(): error code response received: status=" + status + ", errorAction="
+                    + errorAction + ", smsSet=" + smsSet);
+            this.onDeliveryError(smsSet, errorAction, ErrorCode.SC_SYSTEM_ERROR, "DeliverSm response has a bad status: "
+                    + status);
         }
     }
 
