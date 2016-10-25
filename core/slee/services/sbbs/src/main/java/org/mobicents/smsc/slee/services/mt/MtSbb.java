@@ -242,6 +242,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     this.onDeliveryError(smsSet, ErrorAction.memoryCapacityExceededFlag, ErrorCode.MESSAGE_QUEUE_FULL,
                             "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
                             mapErrorMessage, false, ProcessingType.SS7_MT);
+                } else if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.equipmentProtocolError) {
+                    this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.MS_NOT_EQUIPPED,
+                            "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
+                            mapErrorMessage, false, ProcessingType.SS7_MT);
                 } else {
                     this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SENDING_SM_FAILED,
                             "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
@@ -250,7 +254,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
             } else if (mapErrorMessage.isEmSystemFailure()) {
                 // TODO: may be it is not a permanent case ???
                 MAPErrorMessageSystemFailure systemFailure = mapErrorMessage.getEmSystemFailure();
-                this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SYSTEM_FAILURE,
+                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SYSTEM_FAILURE,
                         "Error systemFailure after MtForwardSM Request: " + systemFailure.toString(), true, mapErrorMessage,
                         false, ProcessingType.SS7_MT);
             } else if (mapErrorMessage.isEmFacilityNotSup()) {

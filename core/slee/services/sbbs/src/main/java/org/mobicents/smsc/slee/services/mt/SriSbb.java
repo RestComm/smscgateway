@@ -600,7 +600,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                         ProcessingType.SS7_SRI);
             } else if (errorMessage.isEmSystemFailure()) {
                 // TODO: may be systemFailure is not a permanent error case ?
-                this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SYSTEM_FAILURE,
+                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SYSTEM_FAILURE,
                         "SystemFailure response from HLR: " + errorMessage.toString(), true, errorMessage, false,
                         ProcessingType.SS7_SRI);
             } else if (errorMessage.isEmUnknownSubscriber()) {
