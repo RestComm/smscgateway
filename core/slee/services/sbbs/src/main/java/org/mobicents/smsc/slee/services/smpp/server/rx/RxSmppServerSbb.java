@@ -572,7 +572,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
      */
     private void onDeliveryError(SmsSet smsSet, ErrorAction errorAction, ErrorCode smStatus, String reason) {
         try {
-            smscStatAggregator.updateMsgInFailedAll();
+            smscStatAggregator.updateMsgOutFailedAll();
 
             // generating of a temporary failure CDR (one record for all unsent messages)
             this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED_ESME, reason);
