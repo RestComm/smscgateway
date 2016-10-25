@@ -1,0 +1,362 @@
+
+<h3 style="margin: 0px;">
+	<i class="icon-group"></i> HTTP user accounts
+</h3>
+<hr style="margin: 10 0px;" />
+<span style="float: right;">
+	<button id="refresh" style="float: right; margin-right: 20px; margin-left: 20px; height: 30px;" class="btn btn-medium btn-success" data-toggle="tooltip" data-placement="left" title="HTTP user accounts List" onclick="updateHttpUsers();">
+		<i class="icon-refresh"></i>
+	</button>
+</span>
+<span id="httpUsers-table-wrapper">
+	<table id="no-httpUsers-table" class="table" style="display: none;">
+		<tr>
+			<td>
+				<div class="alert alert-info fade in">
+					<strong>No HTTP user accounts defined yet!</strong> 
+				</div>
+			</td>
+		</tr>
+	</table>
+
+	<table id="httpUsers-table" class="table table-hover">
+		<thead>
+			<tr>
+				<th style="width: 30px;">&nbsp;</th>
+				<th>User Name</th>
+				<th style="text-align: center; width: 150px;">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	<p>
+		<a href="#entities-modal" role="button" class="btn btn-info btn-small" data-toggle="modal" ><i class="icon-external-link"></i> Create HTTP user account</a>
+	</p>	
+</span>
+
+<div id="entities-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>Create HTTP user account</h3>
+	</div>
+	<div id="entities-modal-body" class="modal-body">
+		<div class="alert alert-error" id="login-settings-error" style="display:none;">
+		  <button type="button" class="close">&times;</button>
+		  Some Fields are not correctly filled out, please double check the settings below !
+		</div>
+		<p>
+			<span>
+				<div id="div-userName" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="unique name for this HTTP user account">
+						<span class="add-on">User Name</span>
+						<input id="userName" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="User Name" />
+					</span>				
+				</div>
+				
+				<div id="div-password" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Password sending messages to HTTP connector">
+						<span class="add-on">Password</span>
+						<input id="password" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Password" />
+					</span>					
+				</div>
+
+				<button id="add-entity-button" class="btn btn btn-primary" onclick="createHttpUser()">Create</button>
+			</span>
+		</p>
+		<p>&nbsp;</p>
+		<div class="accordion" id="entities-accordion">
+		</div>
+	</div>
+	<div class="modal-footer">
+		<a href="#" onclick="$('#entities-modal').modal('hide'); return false;" class="btn">Close</a>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function updateHttpUsers() {
+		mbeanSearch="org.mobicents.smsc:layer=HttpUser,name=*";
+		var mbeanVar;
+		$.ajax({
+			dataType: "json",
+			url: window.jolokiaProtocol + "//" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+		})
+		.done(function(html) {
+			if (html.error) {
+				logToConsole("ERROR", html.error);
+			}
+			else {
+
+				$('.service-row').remove();
+				$('.text-info').remove();
+				var noOfHttpUsers = 0;
+
+				html.value.sort();
+
+				mbeanCount = html.value.length;
+				mbeanRead = 0;
+				httpUserResponses = {};
+				userList = [];
+
+				for(ind=0; ind<html.value.length; ind++) {
+					// alert("###### :"+ind+" value:"+html.value[ind]); 
+				
+				    // jQuery.each(html.value, function() {
+					// mbeanVar = this;
+
+					mbeanVar = html.value[ind];
+					noOfHttpUsers = noOfHttpUsers + 1;
+
+
+					jolokia.request(
+							[
+								{ type: "read", mbean: mbeanVar },
+							],
+							{
+								success: [ onHttpUserResponse ],
+								error: function(value) {
+									errorUID = ("st" + new Date().getTime()).hashCode();
+									createStackTrace(errorUID, value.stacktrace);
+									logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+								}
+							}
+						); 
+
+				// });
+				};
+				
+				if(noOfHttpUsers == 0){
+					$('#no-httpUsers-table').show();
+					$('#httpUsers-table').hide();
+				}else {
+					$('#no-httpUsers-table'+name).hide();
+					$('#httpUsers-table').show();
+				}
+			}
+		})
+		.fail(function() {
+			logToConsole("ERROR", "Failure trying to communicate with the SMSC Gateway. Please try again later.");
+		})
+	}
+
+	var mbeanCount = 0;
+	var mbeanRead = 0;
+	var httpUserResponses = {};
+	var userList = [];
+
+	function onHttpUserResponse(response) {
+		var userName = response.value.UserName;
+
+		userList[mbeanRead] = userName;
+		mbeanRead++;
+		httpUserResponses[userName] = response;
+
+		if(mbeanRead >= mbeanCount) {
+			userList.sort();
+
+			for(ind=0; ind<userList.length; ind++) {
+				userName = userList[ind];
+				response = httpUserResponses[userName];
+
+				var password = response.value.Password;
+
+									$('#httpUsers-table').children('tbody').append('<tr class="service-row"><td style="vertical-align: middle; text-align: center;"><i style="color: ' + '#51A351' + ';" class="' + 'icon-play-circle' + '"></i></td>'+
+											'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + userName + '</td>' +
+											'<td style="font-size: 16px; vertical-align: middle; text-align: center; width: 150px;">' + 
+												'<button class="btn btn-small btn-danger"' + ' data-toggle="tooltip" title="Remove HTTP user account" data-placement="bottom" onclick="httpUserOperation(\'destroyHttpUser\', \'' + userName +  '\')"><i class="icon-remove"> </i></button> ' +
+												'<a href="#entities-modal'+userName+'" role="button" class="btn btn-info btn-small" data-toggle="modal"><i class="icon-external-link"></i></a>' +
+											'</td></tr>'+
+
+											'<tr class="text-info" style="display: none;"><td colspan=6>' +
+											'<div class="bs-docs-example bs-docs-example-submenus"> '+
+									        '    <div id="div-' + userName +'httpUser-props">'+
+									        '      <p class="muted">HTTP user Properties</p>'+
+													'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
+														'<dt>Password</dt> <dd>' + password + ' </dd>' + 
+													'</dl>'+
+									        '    </div>'+
+
+											'</td></tr>'
+									);
+
+									$('#httpUsers-table-wrapper').append('<div id="entities-modal'+userName+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
+											'<div class="modal-header">'+
+												'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+												'<h3>HTTP user '+userName+' properties</h3>'+
+											'</div>'+
+											'<div id="entities-modal-body" class="modal-body">'+
+													'<div class="accordion-group">' +
+														'<div class="accordion-heading">' +userName+ 										
+														'</div>'+
+														'<div id="' + userName + '" class="accordion-body">' +
+															'<div class="accordion-inner">' +
+																'<strong><i class="icon-list"></i> HTTP user account Configuration Properties</strong>' +
+																
+																'<div class="alert alert-error" id="login-settings-error" style="display:none;">'+
+																  '<button type="button" class="close">&times;</button>'+
+																  'Some Fields are not correctly filled out, please double check the settings below !'+
+																'</div>'+																			
+
+																'<table id="'+userName+'-HttpUser" class="table table-condensed table-striped">' + 
+																	'<thead><tr><th style="width: 40%;">Name</th><th style="width: 55%;">Value</th><th>&nbsp;</th></tr></thead>' +
+																	'<tbody>'+
+																	
+																		'<tr data-toggle="tooltip" title="is used by the SMSC to authenticate a HTTP user when he tries to upload a message HTTP connector">'+
+																			'<td style="font-size: 0.9em;">Password</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + userName +'Password-input" class="control-group">'+
+																				'<span id="' + userName +'Password-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + password + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyHttpUserOk(\'' + userName + '\', \'Password\', \'' + userName +"Password" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+userName+"Password"+']\').toggle(); $(\'input[id^='+userName+"Password"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +userName + 'Password-text">' + password + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+userName+"Password"+']\').toggle(); $(\'input[id^='+userName+"Password"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+																	
+																		
+																	'</tbody>' +
+																'</table>' +															
+															'</div>'+
+														'</div>'+
+													'</div>'+
+											'</div>'+
+											'<div class="modal-footer">'+
+												'<a href="#" onclick="$(\'#entities-modal'+userName+'\').modal(\'hide\'); return false;" class="btn">Close</a>'+
+											'</div>'+										
+										'</div>');	
+
+			}
+		}
+	}
+
+	function httpUserOperation(operation, name) {
+		mbeanSearch="org.mobicents.smsc:layer=HttpUserManagement,name=SmscManagement";
+		jolokia.execute(mbeanSearch,operation,name,
+				{
+					success: function(value) {
+						updateHttpUsers();
+						logToConsole('INFO', 'Successfully '+operation+'ed HttpUser ' + name );
+					},
+					error: function(value){
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+					}
+				});	
+		
+	}
+
+	function createHttpUser(){
+		var formInvalid = false;
+		var focusNotSet = true;
+
+		var userName = $("#userName").val();
+		if(userName.trim() == "") {
+			$("#div-userName").addClass("error");
+			if(focusNotSet){
+				$("#userName").focus();
+				focusNotSet = false;
+			}
+			formInvalid = true;
+		} else if($("#div-userName").hasClass("error")) {
+			$("#div-userName").removeClass("error");		
+		}
+
+		var password = $("#password").val();
+		if(password == "") {
+			password = null;
+		}
+		
+		if(formInvalid) {
+			$("#login-settings-error").show();
+			logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+			return false;
+		} else {
+			$("#login-settings-error").hide();
+		}
+		
+		jolokia.execute("org.mobicents.smsc:layer=HttpUserManagement,name=SmscManagement","createHttpUser", userName,password, 
+				{
+					success: function(value) {
+						updateHttpUsers();
+						logToConsole('INFO', 'HTTP user account ' + userName + ' created successfuly.');
+						$('#entities-modal').modal('hide');
+					},
+					error: function(value){
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+					}					
+				});		
+		
+	}
+	
+	function onModifyHttpUserOk(mbeanName, propertyName, spanId){
+		var skipCheck = false;
+		onModifyHttpUserOk(mbeanName, propertyName, spanId, skipCheck)
+	}
+
+	function onModifyHttpUserOk(mbeanName, propertyName, spanId, skipCheck){
+		var formInvalid = false;
+		
+		var spanElement = document.getElementById(spanId + "-input");
+		var eleChild = spanElement.childNodes;
+		var inputTextEle = eleChild[0];
+		var spanElementTxt = document.getElementById(spanId + "-text");
+		
+		var propvalue = inputTextEle.value;
+		
+		if(!skipCheck){
+			if(propvalue.trim() == "") {
+				$("#div-"+spanId + "-input").addClass("error");					    			
+				formInvalid = true;
+			} else if($("#div-"+spanId + "-input").hasClass("error")) {
+				$("#div-"+spanId + "-input").removeClass("error");		
+			}	
+			
+			if(formInvalid) {
+				$("#login-settings-error").show();
+				logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+				return false;
+			} else {
+				$("#login-settings-error").hide();
+			}
+		}
+		
+		var propValue = inputTextEle.value;
+		if(propValue == ""){
+			propValue = null;
+		}
+		
+		var mbeanSearch="org.mobicents.smsc:layer=HttpUser,name="+mbeanName;
+		jolokia.request(
+				[
+					{ type: "write", mbean: mbeanSearch, attribute: propertyName, value: propValue },
+				],
+				{
+					success: function(response) {
+						
+						logToConsole("INFO", "HTTP user account property "+ propertyName +"  successfully updated.");
+						
+						spanElementTxt.innerHTML= inputTextEle.value;
+					},
+					error: function(value) {
+						errorUID = ("st" + new Date().getTime()).hashCode();
+						createStackTrace(errorUID, value.stacktrace);
+						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+					} 
+				}
+			);		
+		
+		spanElement.style.display = 'none';
+		spanElementTxt.style.display = '';
+		
+		
+	}	
+	$(document).ready(function () {
+		updateHttpUsers();
+	});
+</script>

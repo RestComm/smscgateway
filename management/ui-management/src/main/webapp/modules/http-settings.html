@@ -20,27 +20,74 @@
 					<div id="dbrr-update-configuration-wrapper">
 						<div class="input-prepend">
 							<div id="div-httpdefaultsourceton" class="control-group">
-							<span id="httpdefaultsourceton-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default TON value for source addresses for messages from HTTP connector, -1: autodetect (international / national / alphanumerical), -2: autodetect - international / alphanumerical">
+							<span id="httpdefaultsourceton-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default TON value for source addresses for messages from HTTP connector">
 								<span class="add-on">Default source addresses TON</span>
-								<input id="httpdefaultsourceton" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+								<select id="httpdefaultsourceton" style="width: 400px;">
+									<option value="-2">-2 : Autodetect - international / alphanumerical</option>
+									<option value="-1">-1 : Autodetect (international / national / alphanumerical)</option>
+									<option value="0">0 : Unknown</option>
+									<option value="1">1 : International</option>
+									<option value="2">2 : National</option>
+									<option value="3">3 : Network Specific</option>
+									<option value="4">4 : Subscriber Number</option>
+									<option value="5">5 : Alphanumeric</option>
+									<option value="6">6 : Abbreviated</option>
+									<option value="7">7 : Reserved</option>
+								</select>
 							</span>
 							</div>
 							<div id="div-httpdefaultsourcenpi" class="control-group">
 							<span id="httpdefaultsourcenpi-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default NPI value for source addresses for messages from HTTP connector, -1: autodetect (international / national / alphanumerical), -2: autodetect - international / alphanumerical">
 								<span class="add-on">Default source addresses NPI</span>
-								<input id="httpdefaultsourcenpi" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+								<select id="httpdefaultsourcenpi" style="width: 400px;">
+									<option value="-2">-2 : Autodetect - international / alphanumerical</option>
+									<option value="-1">-1 : Autodetect (international / national / alphanumerical)</option>
+									<option value="0">0 : Unknown</option>
+									<option value="1">1 : ISDN (E163/E164)</option>
+									<option value="3">3 : Data (X.121)</option>
+									<option value="4">4 : Telex (F.69)</option>
+									<option value="6">6 : Land Mobile (E.212)</option>
+									<option value="8">8 : National</option>
+									<option value="9">9 : Private</option>
+									<option value="10">10 : ERMES</option>
+									<option value="14">14 : Internet (IP)</option>
+									<option value="18">18 : WAP Client Id</option>
+								</select>
 							</span>
 							</div>
+
+							// ...............................
+
 							<div id="div-httpdefaultdestton" class="control-group">
 							<span id="httpdefaultdestton-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default TON value for destination addresses for messages from HTTP connector">
 								<span class="add-on">Default destination addresses TON</span>
-								<input id="httpdefaultdestton" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+								<select id="httpdefaultdestton" style="width: 400px;">
+									<option value="0">0 : Unknown</option>
+									<option value="1">1 : International</option>
+									<option value="2">2 : National</option>
+									<option value="3">3 : Network Specific</option>
+									<option value="4">4 : Subscriber Number</option>
+									<option value="5">5 : Alphanumeric</option>
+									<option value="6">6 : Abbreviated</option>
+									<option value="7">7 : Reserved</option>
+								</select>
 							</span>
 							</div>
 							<div id="div-httpdefaultdestnpi" class="control-group">
 							<span id="httpdefaultdestnpi-span" class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default NPI value for destination addresses for messages from HTTP connector">
 								<span class="add-on">Default destination addresses NPI</span>
-								<input id="httpdefaultdestnpi" type="text" class="input-mini" style="width: 220px; margin-right: 12px; text-align: center;" value="" />
+								<select id="httpdefaultdestnpi" style="width: 400px;">
+									<option value="0">0 : Unknown</option>
+									<option value="1">1 : ISDN (E163/E164)</option>
+									<option value="3">3 : Data (X.121)</option>
+									<option value="4">4 : Telex (F.69)</option>
+									<option value="6">6 : Land Mobile (E.212)</option>
+									<option value="8">8 : National</option>
+									<option value="9">9 : Private</option>
+									<option value="10">10 : ERMES</option>
+									<option value="14">14 : Internet (IP)</option>
+									<option value="18">18 : WAP Client Id</option>
+								</select>
 							</span>
 							</div>
 
@@ -96,25 +143,25 @@
 					
 					<h5>Default values for incoming messages from HTTP connector</h5>						
 					<div id="dbrr-update-configuration-wrapper-2">
-							<div id="div-httpencodingforgsm7" class="control-group">
-								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the HTTP message content encoding for data coding schema [0] (GSM7).">
-									<span class="add-on">HTTP Encoding for GSM7</span>
-									<select id="httpencodingforgsm7" >
-										<option>Utf8</option>
-										<option>Unicode</option>
-									</select>
-								</span>
-							</div>
+						<div id="div-httpencodingforgsm7" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the HTTP message content encoding for data coding schema [0] (GSM7).">
+								<span class="add-on">HTTP Encoding for GSM7</span>
+								<select id="httpencodingforgsm7" >
+									<option>Utf8</option>
+									<option>Unicode</option>
+								</select>
+							</span>
+						</div>
 
-							<div id="div-httpencodingforucs2" class="control-group">
-								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the HTTP message content encoding for data coding schema [8] (UCS2).">
-									<span class="add-on">HTTP Encoding for UCS2</span>
-									<select id="httpencodingforucs2" >
-										<option>Utf8</option>
-										<option>Unicode</option>
-									</select>
-								</span>
-							</div>
+						<div id="div-httpencodingforucs2" class="control-group">
+							<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the HTTP message content encoding for data coding schema [8] (UCS2).">
+								<span class="add-on">HTTP Encoding for UCS2</span>
+								<select id="httpencodingforucs2" >
+									<option>Utf8</option>
+									<option>Unicode</option>
+								</select>
+							</span>
+						</div>
 
 						<div class="control-group">
 							<span class="span12" style="text-align: left;">
@@ -139,10 +186,102 @@
 								],
 								{ success: [
 									function(response) {
-										$("#httpdefaultsourceton").val(response.value.HttpDefaultSourceTon);
-										$("#httpdefaultsourcenpi").val(response.value.HttpDefaultSourceNpi);
-										$("#httpdefaultdestton").val(response.value.HttpDefaultDestTon);
-										$("#httpdefaultdestnpi").val(response.value.HttpDefaultDestNpi);
+										var httpDefaultSourceTon = response.value.HttpDefaultSourceTon;
+										if(httpDefaultSourceTon == -2){
+											httpdefaultsourceton.options[0].selected = true;
+										} else if(httpDefaultSourceTon == -1){ 
+											httpdefaultsourceton.options[1].selected = true;
+										} else if(httpDefaultSourceTon == 0){ 
+											httpdefaultsourceton.options[2].selected = true;
+										} else if(httpDefaultSourceTon == 1){ 
+											httpdefaultsourceton.options[3].selected = true;
+										} else if(httpDefaultSourceTon == 2){ 
+											httpdefaultsourceton.options[4].selected = true;
+										} else if(httpDefaultSourceTon == 3){ 
+											httpdefaultsourceton.options[5].selected = true;
+										} else if(httpDefaultSourceTon == 4){ 
+											httpdefaultsourceton.options[6].selected = true;
+										} else if(httpDefaultSourceTon == 5){ 
+											httpdefaultsourceton.options[7].selected = true;
+										} else if(httpDefaultSourceTon == 6){ 
+											httpdefaultsourceton.options[8].selected = true;
+										} else {
+											httpdefaultsourceton.options[9].selected = true;
+										}										
+
+										var httpDefaultSourceNpi = response.value.HttpDefaultSourceNpi;
+										if(httpDefaultSourceNpi == -2){
+											httpdefaultsourcenpi.options[0].selected = true;
+										} else if(httpDefaultSourceNpi == -1){ 
+											httpdefaultsourcenpi.options[1].selected = true;
+										} else if(httpDefaultSourceNpi == 0){ 
+											httpdefaultsourcenpi.options[2].selected = true;
+										} else if(httpDefaultSourceNpi == 1){ 
+											httpdefaultsourcenpi.options[3].selected = true;
+										} else if(httpDefaultSourceNpi == 3){ 
+											httpdefaultsourcenpi.options[4].selected = true;
+										} else if(httpDefaultSourceNpi == 4){ 
+											httpdefaultsourcenpi.options[5].selected = true;
+										} else if(httpDefaultSourceNpi == 6){ 
+											httpdefaultsourcenpi.options[6].selected = true;
+										} else if(httpDefaultSourceNpi == 8){ 
+											httpdefaultsourcenpi.options[7].selected = true;
+										} else if(httpDefaultSourceNpi == 9){ 
+											httpdefaultsourcenpi.options[8].selected = true;
+										} else if(httpDefaultSourceNpi == 10){ 
+											httpdefaultsourcenpi.options[9].selected = true;
+										} else if(httpDefaultSourceNpi == 14){ 
+											httpdefaultsourcenpi.options[10].selected = true;
+										} else if(httpDefaultSourceNpi == 18){ 
+											httpdefaultsourcenpi.options[11].selected = true;
+										} else {
+											httpdefaultsourcenpi.options[12].selected = true;
+										}										
+
+										var httpDefaultDestTon = response.value.HttpDefaultDestTon;
+										if(httpDefaultDestTon == 0){ 
+											httpdefaultdestton.options[0].selected = true;
+										} else if(httpDefaultDestTon == 1){ 
+											httpdefaultdestton.options[1].selected = true;
+										} else if(httpDefaultDestTon == 2){ 
+											httpdefaultdestton.options[2].selected = true;
+										} else if(httpDefaultDestTon == 3){ 
+											httpdefaultdestton.options[3].selected = true;
+										} else if(httpDefaultDestTon == 4){ 
+											httpdefaultdestton.options[4].selected = true;
+										} else if(httpDefaultDestTon == 5){ 
+											httpdefaultdestton.options[5].selected = true;
+										} else if(httpDefaultDestTon == 6){ 
+											httpdefaultdestton.options[6].selected = true;
+										} else {
+											httpdefaultdestton.options[7].selected = true;
+										}										
+
+										var httpDefaultDestNpi = response.value.HttpDefaultDestNpi;
+										if(httpDefaultDestNpi == 0){ 
+											httpdefaultdestnpi.options[0].selected = true;
+										} else if(httpDefaultDestNpi == 1){ 
+											httpdefaultdestnpi.options[1].selected = true;
+										} else if(httpDefaultDestNpi == 3){ 
+											httpdefaultdestnpi.options[2].selected = true;
+										} else if(httpDefaultDestNpi == 4){ 
+											httpdefaultdestnpi.options[3].selected = true;
+										} else if(httpDefaultDestNpi == 6){ 
+											httpdefaultdestnpi.options[4].selected = true;
+										} else if(httpDefaultDestNpi == 8){ 
+											httpdefaultdestnpi.options[5].selected = true;
+										} else if(httpDefaultDestNpi == 9){ 
+											httpdefaultdestnpi.options[6].selected = true;
+										} else if(httpDefaultDestNpi == 10){ 
+											httpdefaultdestnpi.options[7].selected = true;
+										} else if(httpDefaultDestNpi == 14){ 
+											httpdefaultdestnpi.options[8].selected = true;
+										} else if(httpDefaultDestNpi == 18){ 
+											httpdefaultdestnpi.options[9].selected = true;
+										} else {
+											httpdefaultdestnpi.options[10].selected = true;
+										}										
+										
 										$("#httpdefaultnetworkid").val(response.value.HttpDefaultNetworkId);
 										$("#httpdefaultdatacoding").val(response.value.HttpDefaultDataCoding);
 
@@ -200,7 +339,7 @@
 
 					function applyProperties() {
 						var formInvalid = false;
-						
+
 						var httpdefaultsourceton = $("#httpdefaultsourceton").val();
 						if(httpdefaultsourceton.trim() == "") {
 			    			$("#div-httpdefaultsourceton").addClass("error");					    			
@@ -248,7 +387,7 @@
 			    		} else if($("#div-httpdefaultdatacoding").hasClass("error")) {
 			    			$("#div-httpdefaultdatacoding").removeClass("error");		
 			    		}
-						
+
 						var httpencodingforgsm7 = $("#httpencodingforgsm7").val();
 						if(httpencodingforgsm7.trim() == "") {
 			    			$("#div-httpencodingforgsm7").addClass("error");					    			
