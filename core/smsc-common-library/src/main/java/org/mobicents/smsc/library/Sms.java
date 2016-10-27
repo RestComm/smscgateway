@@ -277,7 +277,7 @@ public class Sms implements Serializable {
 	}
 
 	/**
-	 * SMPP name of origination esme (�� for MO messages)
+	 * SMPP name of origination esme systemId (SMPP originated) / HttpUser name (HTTP originated)
 	 */
 	public String getOrigSystemId() {
 		return origSystemId;

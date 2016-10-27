@@ -148,8 +148,8 @@ The fields "DUE_SLOT", "TARGET_ID", "ID" together act as the primary key.
 | ALERTING_SUPPORTED | BOOLEAN | The value is 'true' if SMSC was successfully registered at HLR after delivery failure. However this field is currently not being used because this demands extra database access.
 | MESSAGE_ID | BIGINT | A unique message ID assigned by SMSC. Max value is 10 000 000 000 (because of limitation of delivery receipts IDs), so this value may repeats in some big time.
 | MO_MESSAGE_REF | INT | SMS TPDU Message Reference field.
-| ORIG_ESME_ID | TEXT | SMSC internal name of origination ESME (empty for MO messages).
-| ORIG_SYSTEM_ID | TEXT | SMPP name of origination ESME (empty for MO messages).
+| ORIG_ESME_ID | TEXT | SMSC internal name of origination ESME (empty for MO, HR and HTTP messages).
+| ORIG_SYSTEM_ID | TEXT | SMPP systemId of origination ESME for SMPP originated messages, HTTP account name for HTTP messages, empty for MO, HR and SIP messages.
 | DEST_CLUSTER_NAME | TEXT | Name of cluster for destination ESME terminated massages (empty for MT messages).
 | DEST_ESME_ID | TEXT | SMSC internal name of destination ESME (empty for MT messages).
 | DEST_SYSTEM_ID | TEXT | SMPP name of destination ESME (empty for MT messages).
@@ -214,8 +214,8 @@ The fields "ADDR_DST_DIGITS", "ID" together act as the primary key.
 | ALERTING_SUPPORTED | BOOLEAN | The value is 'true' if SMSC was successfully registered at HLR after delivery failure. However this field is currently not being used because this demands extra database access.
 | MESSAGE_ID | BIGINT | A unique message ID assigned by SMSC. Max value is 10 000 000 000 (because of limitation of delivery receipts IDs), so this value may repeats in some big time.
 | MO_MESSAGE_REF | INT | SMS TPDU Message Reference field.
-| ORIG_ESME_ID | TEXT | SMSC internal name of origination ESME (empty for MO messages).
-| ORIG_SYSTEM_ID | TEXT | SMPP name of origination ESME (empty for MO messages).
+| ORIG_ESME_ID | TEXT | SMSC internal name of origination ESME (empty for MO, HR, SIP and HTTP messages).
+| ORIG_SYSTEM_ID | TEXT | SMPP systemId of origination ESME for SMPP originated messages, HTTP account name for HTTP messages, empty for MO, HR and SIP messages.
 | DEST_CLUSTER_NAME | TEXT | Name of cluster for destination ESME terminated massages (empty for MT messages).
 | DEST_ESME_ID | TEXT | SMSC internal name of destination ESME (empty for MT messages).
 | DEST_SYSTEM_ID | TEXT | SMPP name of destination ESME (empty for MT messages).

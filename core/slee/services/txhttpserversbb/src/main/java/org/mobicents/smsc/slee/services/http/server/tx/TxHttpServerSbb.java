@@ -600,6 +600,7 @@ public abstract class TxHttpServerSbb implements Sbb {
 
                 sms.setSmsSet(smsSet);
                 sms.setMessageId(messageId);
+                sms.setOrigSystemId(incomingData.getUserId());
 
                 msgList.add(sms);
             }
