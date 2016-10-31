@@ -331,8 +331,51 @@
 					</span>				
 				</div>																		
 				
+				<div id="div-newsourceton" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's source address type of number(TON) will be changed to one set here. Set this to -1 to keep original TON. Default value is -1.">
+						<span class="add-on">New Type Of Number (TON)</span>
+						<select id="newsourceton" >
+							<option value="-1">-1 : null</option>
+							<option value="0">0 : Unknown</option>
+							<option value="1">1 : International</option>
+							<option value="2">2 : National</option>
+							<option value="3">3 : Network Specific</option>
+							<option value="4">4 : Subscriber Number</option>
+							<option value="5">5 : Alphanumeric</option>
+							<option value="6">6 : Abbreviated</option>
+							<option value="7">7 : Reserved</option>
+						</select>
+					</span>	
+				</div>
+								
+				<div id="div-newsourcenpi" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's source address number plan indicator (NPI) will be changed to one set here. Set this to -1 to keep original NPI. Default value is -1.">
+						<span class="add-on">New Number Plan Indicator (NPI)</span>
+						<select id="newsourcenpi" >
+							<option value="-1">-1 : null</option>
+							<option value="0">0 : Unknown</option>
+							<option value="1">1 : ISDN (E163/E164)</option>
+							<option value="3">3 : Data (X.121)</option>
+							<option value="4">4 : Telex (F.69)</option>
+							<option value="6">6 : Land Mobile (E.212)</option>
+							<option value="8">8 : National</option>
+							<option value="9">9 : Private</option>
+							<option value="10">10 : ERMES</option>
+							<option value="14">14 : Internet (IP)</option>
+							<option value="18">18 : WAP Client Id</option>
+						</select>
+					</span>	
+				</div>	
+				
+				<div id="div-newsourceaddr" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's source address number will be changed to one set here. Set this to -1 or leave empty to keep original source address number. Dfault value is -1.">
+						<span class="add-on">New Source Address</span>
+						<input id="newsourceaddr" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="New Source Address digits" />
+					</span>				
+				</div>
+				
 				<div id="div-makecopy" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix will be applied to new SMS">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix, newsourceton, newsourcenpi, newsourceaddr will be applied to new SMS">
 						<span class="add-on">Make Copy</span>
 						<select id="makecopy" >
 							<option value="false">False</option>
@@ -572,6 +615,9 @@
 										var newdestton = processRuleParameters(ruleparameters, "newdestton");
 										var newdestnpi = processRuleParameters(ruleparameters, "newdestnpi");
 										var addestdigprefix = processRuleParameters(ruleparameters, "adddestdigprefix");
+										var newsourceton = processRuleParameters(ruleparameters, "newsourceton");
+										var newsourcenpi = processRuleParameters(ruleparameters, "newsourcenpi");
+										var newsourceaddr = processRuleParameters(ruleparameters, "newsourceaddr");
 										var makecopy = processRuleParameters(ruleparameters, "makecopy");
 										if(makecopy=="-1") { makecopy = "false"; }
 										var hrbypass = processRuleParameters(ruleparameters, "hrbypass");
@@ -915,9 +961,57 @@
 																			'</td>'+
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"AddDestDigPrefix"+']\').toggle(); $(\'input[id^='+id+"AddDestDigPrefix"+']\').focus();"></i>' +
 																			'</td>'+
+																		'</tr>'+
+
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s source type of number(TON) will be changed to one set here. Set this to -1 to keep original TON. Default value is -1. Valid values of TON are &#13; 0 : Unknown &#13; 1 : International &#13; 2 : National &#13; 3 : Network Specific &#13; 4 : Subscriber &#13; 5 : Alphanumeric &#13; 6 : Abbreviated &#13; 7 : Reserved &#13;">'+
+																			'<td style="font-size: 0.9em;">New Source Ton</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewSourceTon-input" class="control-group">'+
+																				'<span id="' + id +'NewSourceTon-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newsourceton + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newsourceton\', \'' + id+"NewSourceTon" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewSourceTon"+']\').toggle(); $(\'input[id^='+id+"NewSourceTon"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewSourceTon-text">' + newsourceton + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewSourceTon"+']\').toggle(); $(\'input[id^='+id+"NewSourceTon"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s source number plan indicator (NPI) will be changed to one set here. Set this to -1 to keep original NPI. Default value is -1. Valid values of NPI are &#13; 0  : Unknown &#13; 1  : ISDN (E163/E164) &#13; 3  : Data (X.121) &#13; 4  : Telex (F.69) &#13; 6  : Land Mobile (E.212) &#13; 8  : National &#13; 9  : Private &#13; 10 : ERMES &#13; 14 : Internet &#13; 18 : WAP Client Id &#13;">'+
+																			'<td style="font-size: 0.9em;">New Source Npi</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewSourceNpi-input" class="control-group">'+
+																				'<span id="' + id +'NewSourceNpi-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newsourcenpi + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newsourcenpi\', \'' + id+"NewSourceNpi" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewSourceNpi"+']\').toggle(); $(\'input[id^='+id+"NewSourceNpi"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewSourceNpi-text">' + newsourcenpi + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewSourceNpi"+']\').toggle(); $(\'input[id^='+id+"NewSourceNpi"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s source number will be changed to one set here. Set this to -1 or leave blank to keep original source number. Dfault value is -1.">'+
+																			'<td style="font-size: 0.9em;">New Source Address</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewSourceAddr-input" class="control-group">'+
+																				'<span id="' + id +'NewSourceAddr-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newsourceaddr + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newsourceaddr\', \'' + id+"NewSourceAddr" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewSourceAddr"+']\').toggle(); $(\'input[id^='+id+"NewSourceAddr"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewSourceAddr-text">' + newsourceaddr + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewSourceAddr"+']\').toggle(); $(\'input[id^='+id+"NewSourceAddr"+']\').focus();"></i>' +
+																			'</td>'+
 																		'</tr>'+	
 																		
-																		'<tr data-toggle="tooltip" title="Once rule match\'s, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix will be applied to new SMS">'+
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix, newsourceton, newsourcenpi, newsourceaddr will be applied to new SMS">'+
 																			'<td style="font-size: 0.9em;">Make Copy</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
 																				'<div id="div-' + id +'MakeCopy-input" class="control-group">'+
@@ -1360,6 +1454,25 @@
 			parametersstring = parametersstring + " adddestdigprefix "+addestdigprefix;
 		}
 		
+		var nsrc = document.getElementById("newsourceton");
+		if(nsrc.selectedIndex != -1){
+			var newsourceton = nsrc.options[nsrc.selectedIndex].value;
+			parametersstring = parametersstring + " newsourceton "+newsourceton;
+		}
+		
+		nsrc = document.getElementById("newsourcenpi");
+		if(nsrc.selectedIndex != -1){
+			var newsourcenpi = nsrc.options[nsrc.selectedIndex].value;
+			parametersstring = parametersstring + " newsourcenpi "+newsourcenpi;
+		}
+		
+		var newsourceaddr = $("#newsourceaddr").val();
+		if(newsourceaddr == "") {
+			newsourceaddr = null;
+		} else {
+			parametersstring = parametersstring + " newsourceaddr "+newsourceaddr;
+		}
+
 		e = document.getElementById("makecopy");
 		var makecopy = e.options[e.selectedIndex].value;
 		parametersstring = parametersstring + " makecopy "+makecopy;
