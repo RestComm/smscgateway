@@ -72,6 +72,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String NEW_DEST_TON = "newDestTon";
     private static final String NEW_DEST_NPI = "newDestNpi";
     private static final String ADD_DEST_DIG_PREFIX = "addDestDigPrefix";
+    private static final String NEW_SOURCE_TON = "newSourceTon";
+    private static final String NEW_SOURCE_NPI = "newSourceNpi";
+    private static final String NEW_SOURCE_ADDR = "newSourceAddr";
     private static final String MAKE_COPY = "makeCopy";
     private static final String DROP_AFTER_SRI = "dropAfterSri";
     private static final String DROP_AFTER_TEMP_FAIL = "dropAfterTempFail";
@@ -114,6 +117,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private int newDestTon = -1;
     private int newDestNpi = -1;
     private String addDestDigPrefix = "-1";
+    private int newSourceTon = -1;
+    private int newSourceNpi = -1;
+    private String newSourceAddr = "-1";
     private boolean makeCopy = false;
     private boolean dropAfterSri = false;
     private boolean dropAfterTempFail = false;
@@ -381,6 +387,39 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     /**
+     * @return if !=-1: the new source address type of number will be assigned to a message
+     */
+    public int getNewSourceTon() {
+        return newSourceTon;
+    }
+
+    public void setNewSourceTon(int newSourceTon) {
+        this.newSourceTon = newSourceTon;
+    }
+
+    /**
+     * @return if !=-1: the new source address numbering plan indicator will be assigned to a message
+     */
+    public int getNewSourceNpi() {
+        return newSourceNpi;
+    }
+
+    public void setNewSourceNpi(int newSourceNpi) {
+        this.newSourceNpi = newSourceNpi;
+    }
+
+    /**
+     * @return if !="-1" / != null: the new source Address will be assigned to a message
+     */
+    public String getNewSourceAddr() {
+        return newSourceAddr;
+    }
+
+    public void setNewSourceAddr(String newSourceAddr) {
+        this.newSourceAddr = newSourceAddr;
+    }
+
+    /**
      * @return if true - a copy of a message will be created. All other next
      *         rules will be applied only for a copy of a message
      */
@@ -527,7 +566,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     protected void setRuleParameters(int destTonMask, int destNpiMask, String destDigMask,int sourceTonMask, int sourceNpiMask, String sourceDigMask, OrigType originatingMask,
             int networkIdMask, int originNetworkIdMask, String origEsmeNameMask, String originatorSccpAddressMask,
             String imsiDigitsMask, String nnnDigitsMask, ProcessingType processingType, String errorCode, int newNetworkId,
-            int newDestTon, int newDestNpi, String addDestDigPrefix, boolean makeCopy, boolean hrByPass, boolean dropAfterSri,
+            int newDestTon, int newDestNpi, String addDestDigPrefix, int newSourceTon, int newSourceNpi, String newSourceAddr, boolean makeCopy, boolean hrByPass, boolean dropAfterSri,
             boolean dropAfterTempFail, int newNetworkIdAfterSri, int newNetworkIdAfterPermFail, int newNetworkIdAfterTempFail) {
         this.destTonMask = destTonMask;
         this.destNpiMask = destNpiMask;
@@ -549,6 +588,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.newDestTon = newDestTon;
         this.newDestNpi = newDestNpi;
         this.addDestDigPrefix = addDestDigPrefix;
+        this.newSourceTon = newSourceTon;
+        this.newSourceNpi = newSourceNpi;
+        this.newSourceAddr = newSourceAddr;
         this.makeCopy = makeCopy;
         this.hrByPass = hrByPass;
         this.dropAfterSri = dropAfterSri;
@@ -565,7 +607,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     public boolean isForPostArrivalState() {
         if (this.makeCopy || this.newNetworkId != -1
                 || (this.addDestDigPrefix != null && !this.addDestDigPrefix.equals("") && !this.addDestDigPrefix.equals("-1"))
-                || this.newDestNpi != -1 || this.newDestTon != -1) {
+                || (this.newSourceAddr != null && !this.newSourceAddr.equals("") && !this.newSourceAddr.equals("-1"))
+                || this.newDestNpi != -1 || this.newDestTon != -1 || this.newSourceNpi != -1 || this.newSourceTon != -1) {
             return true;
         } else
             return false;
@@ -791,6 +834,19 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (this.newDestTon != -1) {
             factory.updateMessageDestAddrTon(message, this.newDestTon);
         }
+
+        if (this.newSourceAddr != null && !this.newSourceAddr.equals("") && !this.newSourceAddr.equals("-1")) {
+            factory.updateMessageSourceAddr(message, this.newSourceAddr);
+        }
+
+        if (this.newSourceNpi != -1) {
+            factory.updateMessageSourceAddrNpi(message, this.newSourceNpi);
+        }
+
+        if (this.newSourceTon != -1) {
+            factory.updateMessageSourceAddrTon(message, this.newSourceTon);
+        }
+
     }
 
     @Override
@@ -889,6 +945,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int newDestTon = -1;
         int newDestNpi = -1;
         String addDestDigPrefix = "-1";
+        int newSourceTon = -1;
+        int newSourceNpi = -1;
+        String newSourceAddr = "-1";
         boolean makeCopy = false;
         boolean hrByPass = false;
         boolean dropAfterSri = false;
@@ -944,6 +1003,15 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } else if (command.equals("adddestdigprefix")) {
                     addDestDigPrefix = value;
                     success = true;
+                } else if (command.equals("newsourceton")) {
+                    newSourceTon = Integer.parseInt(value);
+                    success = true;
+                } else if (command.equals("newsourcenpi")) {
+                    newSourceNpi = Integer.parseInt(value);
+                    success = true;
+                } else if (command.equals("newsourceaddr")) {
+                    newSourceAddr = value;
+                    success = true;
                 } else if (command.equals("makecopy")) {
                     makeCopy = Boolean.parseBoolean(value);
                     success = true;
@@ -986,7 +1054,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
         this.setRuleParameters(destTonMask, destNpiMask, destDigMask, sourceTonMask, sourceNpiMask, sourceDigMask, originatingMaskVal, networkIdMask, originNetworkIdMask,
                 origEsmeNameMask, originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode,
-                newNetworkId, newDestTon, newDestNpi, addDestDigPrefix, makeCopy, hrByPass, dropAfterSri, dropAfterTempFail,
+                newNetworkId, newDestTon, newDestNpi, addDestDigPrefix, newSourceTon, newSourceNpi, newSourceAddr, makeCopy, hrByPass, dropAfterSri, dropAfterTempFail,
                 newNetworkIdAfterSri, newNetworkIdAfterPermFail, newNetworkIdAfterTempFail);
     }
 
@@ -1078,6 +1146,17 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     success = true;
                 } else if (command.equals("adddestdigprefix")) {
                     this.setAddDestDigPrefix(value);
+                    success = true;
+                } else if (command.equals("newsourceton")) {
+                    int val = Integer.parseInt(value);
+                    this.setNewSourceTon(val);
+                    success = true;
+                } else if (command.equals("newsourcenpi")) {
+                    int val = Integer.parseInt(value);
+                    this.setNewSourceNpi(val);
+                    success = true;
+                } else if (command.equals("newsourceaddr")) {
+                    this.setNewSourceAddr(value);
                     success = true;
                 } else if (command.equals("makecopy")) {
                     boolean val = Boolean.parseBoolean(value);
@@ -1192,6 +1271,15 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (this.addDestDigPrefix != null && !this.addDestDigPrefix.equals("") && !this.addDestDigPrefix.equals("-1")) {
             writeParameter(sb, parNumber++, "addDestDigPrefix", addDestDigPrefix, ", ", "=");
         }
+        if (newSourceTon != -1) {
+            writeParameter(sb, parNumber++, "newSourceTon", newSourceTon, ", ", "=");
+        }
+        if (newSourceNpi != -1) {
+            writeParameter(sb, parNumber++, "newSourceNpi", newSourceNpi, ", ", "=");
+        }
+        if (this.newSourceAddr != null && !this.newSourceAddr.equals("") && !this.newSourceAddr.equals("-1")) {
+            writeParameter(sb, parNumber++, "newSourceAddr", newSourceAddr, ", ", "=");
+        }
         if (makeCopy) {
             writeParameter(sb, parNumber++, "makeCopy", makeCopy, ", ", "=");
         }
@@ -1263,6 +1351,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.newDestTon = xml.getAttribute(NEW_DEST_TON, -1);
             mProcRule.newDestNpi = xml.getAttribute(NEW_DEST_NPI, -1);
             mProcRule.addDestDigPrefix = xml.getAttribute(ADD_DEST_DIG_PREFIX, "-1");
+            mProcRule.newSourceTon = xml.getAttribute(NEW_SOURCE_TON, -1);
+            mProcRule.newSourceNpi = xml.getAttribute(NEW_SOURCE_NPI, -1);
+            mProcRule.newSourceAddr = xml.getAttribute(NEW_SOURCE_ADDR, "-1");
             mProcRule.makeCopy = xml.getAttribute(MAKE_COPY, false);
             mProcRule.hrByPass = xml.getAttribute(HR_BY_PASS, false);
             mProcRule.dropAfterSri = xml.getAttribute(DROP_AFTER_SRI, false);
@@ -1328,6 +1419,15 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             if (mProcRule.addDestDigPrefix != null && !mProcRule.addDestDigPrefix.equals("")
                     && !mProcRule.addDestDigPrefix.equals("-1"))
                 xml.setAttribute(ADD_DEST_DIG_PREFIX, mProcRule.addDestDigPrefix);
+
+           if (mProcRule.newSourceTon != -1)
+                xml.setAttribute(NEW_SOURCE_TON, mProcRule.newSourceTon);
+            if (mProcRule.newSourceNpi != -1)
+                xml.setAttribute(NEW_SOURCE_NPI, mProcRule.newSourceNpi);
+
+            if (mProcRule.newSourceAddr != null && !mProcRule.newSourceAddr.equals("")
+                    && !mProcRule.newSourceAddr.equals("-1"))
+                xml.setAttribute(NEW_SOURCE_ADDR, mProcRule.newSourceAddr);
 
             if (mProcRule.makeCopy)
                 xml.setAttribute(MAKE_COPY, mProcRule.makeCopy);

@@ -86,19 +86,19 @@ public interface PostArrivalProcessor {
      * Updating of source address message TON. In case of bad value (<0 or >6) MProcRuleException will be thrown
      * 
      * @param message
-     * @param newDestTon
+     * @param newSourceTon
      * @throws MProcRuleException
      */
-    void updateMessageSourceAddrTon(MProcMessage message, int newDestTon) throws MProcRuleException;
+    void updateMessageSourceAddrTon(MProcMessage message, int newSourceTon) throws MProcRuleException;
 
     /**
      * Updating of source address message NPI. In case of bad value (<0 or >6) MProcRuleException will be thrown
      * 
      * @param message
-     * @param newDestNpi
+     * @param newSourceNpi
      * @throws MProcRuleException
      */
-    void updateMessageSourceAddrNpi(MProcMessage message, int newDestNpi) throws MProcRuleException;
+    void updateMessageSourceAddrNpi(MProcMessage message, int newSourceNpi) throws MProcRuleException;
 
     /**
      * Updating of source address message digits. Value can not be null and must have length 1-21 characters. In case of

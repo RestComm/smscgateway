@@ -169,6 +169,27 @@ public interface MProcRuleDefault extends MProcRule {
     void setAddDestDigPrefix(String addDestDigPrefix);
 
     /**
+     * @return if !=-1: the new source address type of number will be assigned to a message
+     */
+    int getNewSourceTon();
+
+    void setNewSourceTon(int newSourceTon);
+
+    /**
+     * @return if !=-1: the new source address numbering plan indicator will be assigned to a message
+     */
+    int getNewSourceNpi();
+
+    void setNewSourceNpi(int newSourceNpi);
+
+    /**
+     * @return if !="-1" / != null: the new source address will be assigned to a message
+     */
+    String getNewSourceAddr();
+
+    void setNewSourceAddr(String newSourceAddr);
+
+    /**
      * @return if true - a copy of a message will be created. All other next rules will be applied only for a copy of a message
      */
     boolean isMakeCopy();

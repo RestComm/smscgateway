@@ -130,19 +130,19 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     }
 
     @Override
-    public void updateMessageSourceAddrTon(MProcMessage message, int newDestTon) throws MProcRuleException {
-        MProcUtility.checkSourceAddrTon(newDestTon);
+    public void updateMessageSourceAddrTon(MProcMessage message, int newSourceTon) throws MProcRuleException {
+        MProcUtility.checkSourceAddrTon(newSourceTon);
         MProcMessageImpl msg = (MProcMessageImpl) message;
         Sms sms = msg.getSmsContent();
-        sms.setSourceAddrTon(newDestTon);
+        sms.setSourceAddrTon(newSourceTon);
     }
 
     @Override
-    public void updateMessageSourceAddrNpi(MProcMessage message, int newDestNpi) throws MProcRuleException {
-        MProcUtility.checkSourceAddrNpi(newDestNpi);
+    public void updateMessageSourceAddrNpi(MProcMessage message, int newSourceNpi) throws MProcRuleException {
+        MProcUtility.checkSourceAddrNpi(newSourceNpi);
         MProcMessageImpl msg = (MProcMessageImpl) message;
         Sms sms = msg.getSmsContent();
-        sms.setSourceAddrNpi(newDestNpi);
+        sms.setSourceAddrNpi(newSourceNpi);
     }
 
     @Override
