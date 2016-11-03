@@ -68,6 +68,7 @@ import org.mobicents.smsc.smpp.Esme;
 import org.mobicents.smsc.smpp.EsmeManagement;
 import org.mobicents.smsc.smpp.SmppEncoding;
 import org.mobicents.smsc.smpp.SmppInterfaceVersionType;
+import org.mobicents.smsc.smpp.TlvSet;
 
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.SmppSession.Type;
@@ -332,6 +333,10 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         }
                     }
 
+                    for (Tlv tlv : sms.getTlvSet().getOptionalParameters()) {
+                        submitSm.addOptionalParameter(tlv);
+                    }
+
                     SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, submitSm,
                             esme.getWindowWaitTimeout());
                     if (logger.isInfoEnabled()) {
@@ -375,6 +380,10 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             Tlv tlv = new Tlv(SmppConstants.TAG_MESSAGE_PAYLOAD, msg, null);
                             deliverSm.addOptionalParameter(tlv);
                         }
+                    }
+
+                    for (Tlv tlv : sms.getTlvSet().getOptionalParameters()) {
+                        deliverSm.addOptionalParameter(tlv);
                     }
 
                     // TODO : waiting for 2 secs for window to accept our
