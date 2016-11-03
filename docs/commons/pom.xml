@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.mobicents.smsc.docs</groupId>
 		<artifactId>restcomm-smsc-docs</artifactId>
-		<version>7.2.0-SNAPSHOT</version>
+		<version>7.1.91</version>
 	</parent>
 
 	<artifactId>restcomm-smsc-commons-sources</artifactId>
