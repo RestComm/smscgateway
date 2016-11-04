@@ -207,7 +207,7 @@ public class SmppShellExecutor implements ShellExecutor {
 
         }
 
-        return String.format(SmppOamMessages.MODIFY_ESME_SUCCESSFULL, esme.getSystemId());
+        return String.format(SmppOamMessages.MODIFY_ESME_SUCCESSFULL, esme.getName());
     }
 
     /**
@@ -397,7 +397,7 @@ public class SmppShellExecutor implements ShellExecutor {
                 windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay, enquireLinkDelayServer, linkDropServer,sourceTon, sourceNpi,
                 sourceAddressRange, routinigTon, routingNpi, routingAddressRange, networkId, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
                 rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, minMessageLength, maxMessageLength);
-        return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getSystemId());
+        return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getName());
     }
 
     /**
