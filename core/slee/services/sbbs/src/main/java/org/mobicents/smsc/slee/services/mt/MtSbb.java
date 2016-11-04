@@ -1084,8 +1084,22 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			SmsSignalInfo smsSignalInfo;
 			if (messageProcessingState == MessageProcessingState.firstMessageSending) {
 
-				DataCodingScheme dataCodingScheme = this.mapSmsTpduParameterFactory.createDataCodingScheme(sms.getDataCoding());
-				Tlv sarMsgRefNum = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_MSG_REF_NUM);
+                int dcs = sms.getDataCoding();
+                Tlv dest_addr_subunit = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_DEST_ADDR_SUBUNIT);
+                if (dest_addr_subunit != null) {
+                    try {
+                        int mclass = dest_addr_subunit.getValueAsByte();
+                        if (mclass >= 1 && mclass <= 4) {
+                            dcs |= (0x10 + (mclass - 1));
+                        }
+                    } catch (TlvConvertException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+			    DataCodingScheme dataCodingScheme = this.mapSmsTpduParameterFactory.createDataCodingScheme(dcs);
+
+			    Tlv sarMsgRefNum = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_MSG_REF_NUM);
 				Tlv sarTotalSegments = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_TOTAL_SEGMENTS);
 				Tlv sarSegmentSeqnum = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_SEGMENT_SEQNUM);
 				SmsSignalInfo[] segments;
