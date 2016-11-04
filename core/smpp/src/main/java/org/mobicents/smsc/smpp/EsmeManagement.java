@@ -250,30 +250,6 @@ public class EsmeManagement implements EsmeManagementMBean {
 				throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_ALREADY_EXIST, name));
 			}
 
-			// SystemId:IP:Port:SmppBindType combination should be unique for
-			// CLIENT. For SERVER it accepts multiple incoming binds as far as
-			// host is anonymous (-1) and/or port is -1
-			String primaryKey = systemId + smppBindType;
-			String existingPrimaryKey = esme.getSystemId() + esme.getSmppBindType().name();
-
-			if (smppSessionTypeObj == SmppSession.Type.SERVER) {
-				if (!host.equals("-1") && port != -1) {
-					primaryKey = primaryKey + host + port;
-					existingPrimaryKey = existingPrimaryKey + esme.getHost() + esme.getPort();
-				} else {
-					// Let the ESME be created
-					primaryKey = "X";
-					existingPrimaryKey = "Y";
-				}
-			} else {
-				primaryKey = primaryKey + host + port;
-				existingPrimaryKey = existingPrimaryKey + esme.getHost() + esme.getPort();
-			}
-
-			if (primaryKey.equals(existingPrimaryKey)) {
-				throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_PRIMARY_KEY_ALREADY_EXIST, systemId,
-						host, port, smppBindType));
-			}
 		}// for loop
 
 		EsmeCluster esmeCluster = this.esmeClusters.get(clusterName);
