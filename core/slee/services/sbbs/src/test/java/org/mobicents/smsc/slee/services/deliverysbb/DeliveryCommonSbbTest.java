@@ -23,6 +23,7 @@
 package org.mobicents.smsc.slee.services.deliverysbb;
 
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertEquals;
@@ -148,11 +149,11 @@ public class DeliveryCommonSbbTest {
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 5);
         assertFalse(sbb.isMessageConfirmedInSendingPool(1));
 
-        sbb.registerMessageInSendingPool(0, 100);
-        sbb.registerMessageInSendingPool(1, 101);
-        sbb.registerMessageInSendingPool(2, 102);
-        sbb.registerMessageInSendingPool(3, 103);
-        sbb.registerMessageInSendingPool(4, 104);
+        sbb.registerMessageInSendingPool(0, 100, null);
+        sbb.registerMessageInSendingPool(1, 101, null);
+        sbb.registerMessageInSendingPool(2, 102, null);
+        sbb.registerMessageInSendingPool(3, 103, null);
+        sbb.registerMessageInSendingPool(4, 104, null);
         sbb.endRegisterMessageInSendingPool();
 
         assertFalse(sbb.isDeliveringEnded());
@@ -328,11 +329,11 @@ public class DeliveryCommonSbbTest {
         loadSbb(sbb);
 
         int cnt = sbb.obtainNextMessagesSendingPool(5, ProcessingType.SMPP);
-        sbb.registerMessageInSendingPool(0, 100);
-        sbb.registerMessageInSendingPool(1, 101);
-        sbb.registerMessageInSendingPool(2, 102);
-        sbb.registerMessageInSendingPool(3, 103);
-        sbb.registerMessageInSendingPool(4, 104);
+        sbb.registerMessageInSendingPool(0, 100, null);
+        sbb.registerMessageInSendingPool(1, 101, null);
+        sbb.registerMessageInSendingPool(2, 102, null);
+        sbb.registerMessageInSendingPool(3, 103, null);
+        sbb.registerMessageInSendingPool(4, 104, null);
         sbb.endRegisterMessageInSendingPool();
 
         assertEquals(sbb.getCurrentMsgNumValue(), 6);
@@ -435,6 +436,135 @@ public class DeliveryCommonSbbTest {
         assertEquals(lstTempFailured.get(1).getMessageId(), 4);
 
         assertEquals(lstPermFailured.get(0).getMessageId(), 2);
+    }
+
+    @Test(groups = { "DeliveryCommonSbb" })
+    public void testExtraSequensNumbers() {
+        if (!this.cassandraDbInited)
+            return;
+
+        SmsSetCache.SMSSET_MSG_PRO_SEGMENT_LIMIT = 50;
+
+        // 01
+        DeliveryCommonSbbProxy sbb = initiateSbb(null);
+        loadSbb(sbb);
+
+        SmsSet smsSet = new SmsSet();
+        for (int i1 = 0; i1 < 5; i1++) {
+            Sms sms = createSms(i1);
+            SmsSet smsSet2 = new SmsSet();
+            smsSet2.addSms(sms);
+            smsSet.addSmsSet(smsSet2);
+        }
+
+        sbb.addInitialMessageSet(smsSet);
+        SmsSetCache.getInstance().addProcessingSmsSet(smsSet.getTargetId(), smsSet, 0);
+
+        storeSbb(sbb);
+
+        assertEquals(sbb.getTotalUnsentMessageCount(), 5L);
+        assertNull(sbb.getMessageInSendingPool(0));
+        assertEquals(sbb.getUnsentMessage(0).getMessageId(), 0L);
+        assertEquals(sbb.getSendingPoolMessageCount(), 0);
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
+        assertFalse(sbb.isMessageConfirmedInSendingPool(0));
+
+        storeSbb(sbb);
+
+        // 02
+        sbb = initiateSbb(sbb);
+        loadSbb(sbb);
+
+        int cnt = sbb.obtainNextMessagesSendingPool(5, ProcessingType.SMPP);
+        int[] ext0 = new int[0];
+        int[] ext1 = new int[] { 201, 202 };
+        int[] ext2 = new int[] { 301, 302, 303, 304 };
+        sbb.registerMessageInSendingPool(0, 100, ext0);
+        sbb.registerMessageInSendingPool(1, 101, ext1);
+        sbb.registerMessageInSendingPool(2, 102, null);
+        sbb.registerMessageInSendingPool(3, 103, null);
+        sbb.registerMessageInSendingPool(4, 104, ext2);
+        sbb.endRegisterMessageInSendingPool();
+
+        assertEquals(cnt, 5);
+        assertEquals(sbb.getCurrentMsgNumValue(), 5);
+        assertEquals(sbb.getSendingPoolMessageCount(), 5);
+        assertEquals(sbb.getTotalUnsentMessageCount(), 5);
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 5);
+
+        assertEquals(sbb.getMessageInSendingPool(0).getMessageId(), 0);
+        assertEquals(sbb.getMessageInSendingPool(1).getMessageId(), 1);
+        assertEquals(sbb.getMessageInSendingPool(2).getMessageId(), 2);
+        assertEquals(sbb.getMessageInSendingPool(3).getMessageId(), 3);
+        assertEquals(sbb.getMessageInSendingPool(4).getMessageId(), 4);
+        assertNull(sbb.getMessageInSendingPool(5));
+
+        ConfirmMessageInSendingPool confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(404);
+        assertFalse(confirmMessageInSendingPool.sequenceNumberFound);
+        assertFalse(confirmMessageInSendingPool.confirmed);
+        assertNull(confirmMessageInSendingPool.sms);
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(101);
+        assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
+        assertFalse(confirmMessageInSendingPool.confirmed);
+        assertNull(confirmMessageInSendingPool.sms);
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(302);
+        assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
+        assertFalse(confirmMessageInSendingPool.confirmed);
+        assertNull(confirmMessageInSendingPool.sms);
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(102);
+        assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
+        assertTrue(confirmMessageInSendingPool.confirmed);
+        assertNotNull(confirmMessageInSendingPool.sms);
+
+        assertEquals(sbb.getCurrentMsgNumValue(), 5);
+        assertEquals(sbb.getSendingPoolMessageCount(), 5);
+        assertEquals(sbb.getTotalUnsentMessageCount(), 5);
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 4);
+
+        storeSbb(sbb);
+
+        // 03
+        sbb = initiateSbb(sbb);
+        loadSbb(sbb);
+
+        assertEquals(sbb.getCurrentMsgNumValue(), 5);
+        assertEquals(sbb.getSendingPoolMessageCount(), 5);
+        assertEquals(sbb.getTotalUnsentMessageCount(), 5);
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 4);
+
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(100);
+        assertTrue(confirmMessageInSendingPool.confirmed);
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(201);
+        assertFalse(confirmMessageInSendingPool.confirmed);
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(202);
+        assertTrue(confirmMessageInSendingPool.confirmed);
+
+        assertEquals(sbb.getCurrentMsgNumValue(), 5);
+        assertEquals(sbb.getSendingPoolMessageCount(), 5);
+        assertEquals(sbb.getTotalUnsentMessageCount(), 5);
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 2);
+
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(302);
+        assertFalse(confirmMessageInSendingPool.sequenceNumberFound);
+        assertFalse(confirmMessageInSendingPool.confirmed);
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(301);
+        assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
+        assertFalse(confirmMessageInSendingPool.confirmed);
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(303);
+        assertFalse(confirmMessageInSendingPool.confirmed);
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(304);
+        assertFalse(confirmMessageInSendingPool.confirmed);
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(104);
+        assertTrue(confirmMessageInSendingPool.confirmed);
+
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 1);
+
+        confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(103);
+        assertTrue(confirmMessageInSendingPool.confirmed);
+
+        assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
+
+        sbb.commitSendingPoolMsgCount();
     }
 
     private Sms createSms(int num) {

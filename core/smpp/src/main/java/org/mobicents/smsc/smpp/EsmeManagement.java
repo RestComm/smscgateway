@@ -203,15 +203,15 @@ public class EsmeManagement implements EsmeManagementMBean {
 		return null;
 	}
 
-	public Esme createEsme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
-		String smppBindType, String systemType, String smppIntVersion, byte ton, byte npi, String address,
-		String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long clientBindTimeout,
-		long windowMonitorInterval,	long windowWaitTimeout, String clusterName, boolean countersEnabled, int enquireLinkDelay, int enquireLinkDelayServer,
-		long linkDropServer, int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
-		int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour, long rateLimitPerDay,
-		int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
-		int maxMessageLength)
-		throws Exception {
+    public Esme createEsme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
+            String smppBindType, String systemType, String smppIntVersion, byte ton, byte npi, String address,
+            String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long clientBindTimeout,
+            long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
+            int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon, int sourceNpi,
+            String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, int networkId,
+            boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
+            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
+            int maxMessageLength) throws Exception {
 
 		SmppBindType smppBindTypeOb = SmppBindType.valueOf(smppBindType);
 
@@ -287,12 +287,12 @@ public class EsmeManagement implements EsmeManagementMBean {
 			clusterName = name;
 		}
 
-		Esme esme = new Esme(name, systemId, password, host, port, chargingEnabled, systemType, smppInterfaceVersionTypeObj,
-			ton, npi, address, smppBindTypeOb, smppSessionTypeObj, windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout,
-			windowMonitorInterval, windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay, enquireLinkDelayServer,
-			linkDropServer, sourceTon, sourceNpi, sourceAddressRange, routingTon, routingNpi, routingAddressRange, networkId, rateLimitPerSecond,
-			rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay, nationalLanguageSingleShift,
-			nationalLanguageLockingShift, minMessageLength, maxMessageLength);
+        Esme esme = new Esme(name, systemId, password, host, port, chargingEnabled, systemType, smppInterfaceVersionTypeObj,
+                ton, npi, address, smppBindTypeOb, smppSessionTypeObj, windowSize, connectTimeout, requestExpiryTimeout,
+                clientBindTimeout, windowMonitorInterval, windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay,
+                enquireLinkDelayServer, linkDropServer, sourceTon, sourceNpi, sourceAddressRange, routingTon, routingNpi,
+                routingAddressRange, networkId, splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
+                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, minMessageLength, maxMessageLength);
 
 		esme.esmeManagement = this;
 

@@ -3,8 +3,9 @@ Name
 
 SYNOPSIS
 	smpp esme create name <systemId> <host-ip> <port> <SmppBindType>  
-	<SmppSession.Type> password <password> networkid <networkid> system-type 
-	<sms | vms | ota > interface-version <3.3 | 3.4 | 5.0> esme-ton <esme address ton> 
+	<SmppSession.Type> password <password> networkid <networkid>
+	split-long-messages <true | false> system-type <sms | vms | ota >
+	interface-version <3.3 | 3.4 | 5.0> esme-ton <esme address ton>
 	esme-npi <esme address npi> esme-range <esme address range> 
 	cluster-name <clusterName> window-size <windowSize> 
 	connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> 
@@ -77,13 +78,16 @@ PARAMETERS
 	Password	    - It is used by the SMSC to authenticate the identity of 
 				  the binding ESME. The Service Provider may require 
 				  ESME’s to provide a password when binding to the SMSC.	
-				  
+
 	networkId       - indicates virtual subnetwork that this ESME belongs. SMS 
 	                flows within same netwrokId, unless changed using mproc
 	                (this is for multi-tenancy support). If this parameter is
                     skipped - networkId will be set to "0" when ESME creation.
                     If you do not use multi-tenancy support - set this value
                     to 0 or skip.   			  
+
+	split-long-messages - long messages will be split before sending to this
+				  ESME destination. Default value is false.
 
 	system-type     - Default value is null. 
 				  This is used to categorize the type of ESME that is 
@@ -388,6 +392,9 @@ PARAMETERS
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
+
+EXAMPLES
+	smpp esme create test test 127.0.0.1 -1 TRANSCEIVER SERVER password yyyy esme-range 6667
 
 SEE ALSO
 	smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,

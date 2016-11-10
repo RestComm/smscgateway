@@ -77,6 +77,10 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     int getNetworkId();
 
+    boolean getSplitLongMessages();
+
+    void setSplitLongMessages(boolean splitLongMessages);
+
 	/**
 	 * Sets charging for this ESME. If charging is enabled, SMSC will try to deduct the units from charging server. If charging server returns negative response or error, SMS will be dropped and CDR will be logged
 	 * 

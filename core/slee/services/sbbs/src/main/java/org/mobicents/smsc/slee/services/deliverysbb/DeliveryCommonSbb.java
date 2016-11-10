@@ -81,6 +81,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     private static final int MAX_POSSIBLE_REROUTING = 9;
 
+    private static int messageReferenceNumberAncor = 0;
+
     protected Tracer logger;
     protected SbbContextExt sbbContext;
 
@@ -99,6 +101,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     private PendingRequestsList pendingRequestsList;
     private int[] sequenceNumbers;
+    private int[][] sequenceNumbersExtra;
     private boolean pendingRequestsListIsLoaded;
     private boolean pendingRequestsListIsDirty;
 
@@ -439,6 +442,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             pendingRequestsListIsDirty = true;
             pendingRequestsList = null;
             sequenceNumbers = null;
+            sequenceNumbersExtra = null;
         }
     }
 
@@ -481,6 +485,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             }            
 
             sequenceNumbers = new int[addedMessageCnt];
+            sequenceNumbersExtra = new int[addedMessageCnt][];
 
             if (gotMessageCnt > 0) {
                 currentMsgNum += gotMessageCnt;
@@ -541,6 +546,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             }
 
             sequenceNumbers = null;
+            sequenceNumbersExtra = null;
 
             this.rescheduleDeliveryTimer();
 
@@ -643,6 +649,25 @@ public abstract class DeliveryCommonSbb implements Sbb {
         return true;
     }
 
+    /**
+     * @return return next MessageReferenceNumber for this delivery sequence
+     */
+//    protected int getNextMessageReferenceNumber() {
+//        while (messageReferenceNumberAncor > 30000)
+//            messageReferenceNumberAncor -= 30000;
+//        int res = messageReferenceNumberAncor++;
+//        this.setMessageReferenceNumberAncor(messageReferenceNumberAncor);
+//        return res;
+//    }
+    protected static int getNextMessageReferenceNumber() {
+        int res = messageReferenceNumberAncor + 1;
+        if (res > 60000)
+            res = 0;
+        messageReferenceNumberAncor = res;
+
+        return res;
+    }
+
     // *********
     // Methods for confirming of message delivering in a message sending pool
 
@@ -651,10 +676,14 @@ public abstract class DeliveryCommonSbb implements Sbb {
      *
      * @param numInSendingPool A message number in a message sending pool
      * @param sequenceNumber A sequence number of a message for which we will be able of confirming
+     * @param sequenceNumberExtra Extra sequence numbers of a message (2, 3, ... message parts) for which we will be able of
+     *        confirming
      */
-    protected void registerMessageInSendingPool(int numInSendingPool, int sequenceNumber) {
-        if (sequenceNumbers != null && numInSendingPool >= 0 && numInSendingPool < sequenceNumbers.length) {
+    protected void registerMessageInSendingPool(int numInSendingPool, int sequenceNumber, int[] sequenceNumberExtra) {
+        if (sequenceNumbers != null && sequenceNumbersExtra != null && numInSendingPool >= 0
+                && numInSendingPool < sequenceNumbers.length && numInSendingPool < sequenceNumbersExtra.length) {
             sequenceNumbers[numInSendingPool] = sequenceNumber;
+            sequenceNumbersExtra[numInSendingPool] = sequenceNumberExtra;
         }
     }
 
@@ -664,12 +693,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected void endRegisterMessageInSendingPool() {
         pendingRequestsListIsDirty = true;
-        if (sequenceNumbers != null) {
-            pendingRequestsList = new PendingRequestsList(sequenceNumbers);
+        if (sequenceNumbers != null && sequenceNumbersExtra != null) {
+            pendingRequestsList = new PendingRequestsList(sequenceNumbers, sequenceNumbersExtra);
         } else {
             pendingRequestsList = null;
         }
         sequenceNumbers = null;
+        sequenceNumbersExtra = null;
     }
 
     /**
@@ -679,20 +709,23 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @return Sms message that is in the pendingRequestsList list with sequenceNumber or null if no such message in
      *         pendingRequestsList, it will return null
      */
-    protected Sms confirmMessageInSendingPool(int sequenceNumber) {
+    protected ConfirmMessageInSendingPool confirmMessageInSendingPool(int sequenceNumber) {
         checkPendingRequestsListLoaded();
-        Sms sms;
+
+        ConfirmMessageInSendingPool res;
         if (pendingRequestsList != null) {
             pendingRequestsListIsDirty = true;
-            int i1 = pendingRequestsList.confirm(sequenceNumber);
-            if (i1 < 0) {
-                return null;
-            }
-            sms = getMessageInSendingPool(i1);
+            res = pendingRequestsList.confirm(sequenceNumber);
+            if (res.sequenceNumberFound)
+                res.sms = getMessageInSendingPool(res.msgNum);
         } else {
-            sms = getMessageInSendingPool(0);
+            res = new ConfirmMessageInSendingPool();
+            res.sequenceNumberFound = true;
+            res.confirmed = true;
+            res.sms = getMessageInSendingPool(0);
         }
-        return sms;
+
+        return res;
     }
 
     /**

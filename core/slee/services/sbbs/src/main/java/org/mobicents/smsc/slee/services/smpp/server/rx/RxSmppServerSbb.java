@@ -40,8 +40,11 @@ import javax.slee.ServiceID;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
 
+import org.mobicents.protocols.ss7.map.api.MAPProvider;
+import org.mobicents.protocols.ss7.map.api.MAPSmsTpduParameterFactory;
 import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
 import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
 import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetEncoder;
 import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetEncodingData;
@@ -62,13 +65,13 @@ import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppTransaction;
 import org.mobicents.smsc.slee.resources.smpp.server.SmppTransactionACIFactory;
 import org.mobicents.smsc.slee.resources.smpp.server.events.PduRequestTimeout;
+import org.mobicents.smsc.slee.services.deliverysbb.ConfirmMessageInSendingPool;
 import org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
 import org.mobicents.smsc.smpp.Esme;
 import org.mobicents.smsc.smpp.EsmeManagement;
 import org.mobicents.smsc.smpp.SmppEncoding;
 import org.mobicents.smsc.smpp.SmppInterfaceVersionType;
-import org.mobicents.smsc.smpp.TlvSet;
 
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.SmppSession.Type;
@@ -95,6 +98,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
 	protected SmppTransactionACIFactory smppServerTransactionACIFactory = null;
 	protected SmppSessions smppServerSessions = null;
+    protected MAPSmsTpduParameterFactory mapSmsTpduParameterFactory;
 
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
 
@@ -120,6 +124,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             this.smppServerTransactionACIFactory = (SmppTransactionACIFactory) ctx
                     .lookup("slee/resources/smppp/server/1.0/acifactory");
             this.smppServerSessions = (SmppSessions) ctx.lookup("slee/resources/smpp/server/1.0/provider");
+
+            MAPProvider mapProvider = (MAPProvider) ctx.lookup("slee/resources/map/2.0/provider");
+            this.mapSmsTpduParameterFactory = mapProvider.getMAPSmsTpduParameterFactory();
         } catch (Exception ne) {
             logger.severe("Could not set SBB context:", ne);
         }
@@ -285,124 +292,180 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 			smsSet.setDestSystemId(esme.getSystemId());
             smsSet.setDestEsmeName(esme.getName());
 
-            for (int i1 = 0; i1 < deliveryMsgCnt; i1++) {
+            for (int poolIndex = 0; poolIndex < deliveryMsgCnt; poolIndex++) {
                 smscStatAggregator.updateMsgOutTryAll();
                 smscStatAggregator.updateMsgOutTrySmpp();
 
-                Sms sms = this.getMessageInSendingPool(i1);
+                Sms sms = this.getMessageInSendingPool(poolIndex);
                 if (sms == null) {
                     // this should not be
                     throw new SmscProcessingException(
-                            "sendDeliverSm: getCurrentMessage() returns null sms for msgNum in SendingPool " + i1, 0, 0, null);
+                            "sendDeliverSm: getCurrentMessage() returns null sms for msgNum in SendingPool " + poolIndex, 0, 0, null);
                 }
 
-//                sms.setDeliveryCount(sms.getDeliveryCount() + 1);
-                int sequenceNumber;
+                // message splitting staff
+                boolean esmeAllowSplitting = esme.getSplitLongMessages();
+                int esmClass = sms.getEsmClass();
+                boolean udhPresent = (esmClass & SmppConstants.ESM_CLASS_UDHI_MASK) != 0;
+                Tlv sarMsgRefNum = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_MSG_REF_NUM);
+                Tlv sarTotalSegments = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_TOTAL_SEGMENTS);
+                Tlv sarSegmentSeqnum = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_SEGMENT_SEQNUM);
+                boolean sarTlvPresent = sarMsgRefNum != null && sarTotalSegments != null && sarSegmentSeqnum != null;
 
-                if (esme.getSmppSessionType() == Type.CLIENT) {
-                    SubmitSm submitSm = new SubmitSm();
-                    submitSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(), sms
-                            .getSourceAddr()));
-                    submitSm.setDestAddress(new Address((byte) sms.getSmsSet().getDestAddrTon(), (byte) sms.getSmsSet()
-                            .getDestAddrNpi(), sms.getSmsSet().getDestAddr()));
-                    submitSm.setEsmClass((byte) sms.getEsmClass());
-                    submitSm.setProtocolId((byte) sms.getProtocolId());
-                    submitSm.setPriority((byte) sms.getPriority());
-                    if (sms.getScheduleDeliveryTime() != null) {
-                        submitSm.setScheduleDeliveryTime(MessageUtil.printSmppAbsoluteDate(sms.getScheduleDeliveryTime(),
-                                -(new Date()).getTimezoneOffset()));
+                ArrayList<String> lstStrings = new ArrayList<String>();
+                ArrayList<byte[]> lstUdhs = new ArrayList<byte[]>();
+                lstStrings.add(sms.getShortMessageText());
+                lstUdhs.add(sms.getShortMessageBin());
+                if (esmeAllowSplitting && !udhPresent && !sarTlvPresent) {
+                    DataCodingScheme dataCodingScheme = this.mapSmsTpduParameterFactory.createDataCodingScheme(sms
+                            .getDataCoding());
+                    String[] segmentsStrings = MessageUtil.sliceMessage(sms.getShortMessageText(), dataCodingScheme,
+                            sms.getNationalLanguageLockingShift(), sms.getNationalLanguageSingleShift());
+                    if (segmentsStrings != null && segmentsStrings.length > 1) {
+                        // we need to split a message for segments
+                        lstStrings.clear();
+                        lstUdhs.clear();
+                        int messageReferenceNumber = this.getNextMessageReferenceNumber();
+                        esmClass |= SmppConstants.ESM_CLASS_UDHI_MASK;
+                        int messageSegmentCount = segmentsStrings.length;
+
+                        for (int ii1 = 0; ii1 < messageSegmentCount; ii1++) {
+                            lstStrings.add(segmentsStrings[ii1]);
+
+                            byte[] bf1 = new byte[7];
+                            bf1[0] = 6; // total UDH length
+                            bf1[1] = UserDataHeader._InformationElementIdentifier_ConcatenatedShortMessages16bit; // UDH id
+                            bf1[2] = 4; // UDH length
+                            bf1[3] = (byte) (messageReferenceNumber & 0x00FF);
+                            bf1[4] = (byte) ((messageReferenceNumber & 0xFF00) >> 8);
+                            bf1[5] = (byte) messageSegmentCount; // segmCnt
+                            bf1[6] = (byte) (ii1 + 1); // segmNum
+                            lstUdhs.add(bf1);
+                        }
                     }
-                    if (sms.getValidityPeriod() != null) {
-                        submitSm.setValidityPeriod(MessageUtil.printSmppAbsoluteDate(sms.getValidityPeriod(),
-                                -(new Date()).getTimezoneOffset()));
-                    }
-                    submitSm.setRegisteredDelivery((byte) sms.getRegisteredDelivery());
-                    submitSm.setReplaceIfPresent((byte) sms.getReplaceIfPresent());
-                    submitSm.setDataCoding((byte) sms.getDataCoding());
+                }
 
-                    String msgStr = sms.getShortMessageText();
-                    byte[] msgUdh = sms.getShortMessageBin();
-                    if (msgStr != null || msgUdh != null) {
-                        byte[] msg = recodeShortMessage(sms.getDataCoding(), msgStr, msgUdh);
+                int sequenceNumber = 0;
+                int[] sequenceNumberExt = null;
+                int segmCnt = lstStrings.size();
+                if (segmCnt > 1) {
+                    sequenceNumberExt = new int[segmCnt - 1];
+                }
 
-                        if (msg.length <= 255) {
-                            submitSm.setShortMessage(msg);
-                        } else {
-                            Tlv tlv = new Tlv(SmppConstants.TAG_MESSAGE_PAYLOAD, msg, null);
+                for (int segmentIndex = 0; segmentIndex < segmCnt; segmentIndex++) {
+                    if (esme.getSmppSessionType() == Type.CLIENT) {
+                        SubmitSm submitSm = new SubmitSm();
+                        submitSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(), sms
+                                .getSourceAddr()));
+                        submitSm.setDestAddress(new Address((byte) sms.getSmsSet().getDestAddrTon(), (byte) sms.getSmsSet()
+                                .getDestAddrNpi(), sms.getSmsSet().getDestAddr()));
+                        submitSm.setEsmClass((byte) esmClass);
+                        submitSm.setProtocolId((byte) sms.getProtocolId());
+                        submitSm.setPriority((byte) sms.getPriority());
+                        if (sms.getScheduleDeliveryTime() != null) {
+                            submitSm.setScheduleDeliveryTime(MessageUtil.printSmppAbsoluteDate(sms.getScheduleDeliveryTime(),
+                                    -(new Date()).getTimezoneOffset()));
+                        }
+                        if (sms.getValidityPeriod() != null) {
+                            submitSm.setValidityPeriod(MessageUtil.printSmppAbsoluteDate(sms.getValidityPeriod(),
+                                    -(new Date()).getTimezoneOffset()));
+                        }
+                        submitSm.setRegisteredDelivery((byte) sms.getRegisteredDelivery());
+                        submitSm.setReplaceIfPresent((byte) sms.getReplaceIfPresent());
+                        submitSm.setDataCoding((byte) sms.getDataCoding());
+
+                        String msgStr = lstStrings.get(segmentIndex);
+                        byte[] msgUdh = lstUdhs.get(segmentIndex);
+                        if (msgStr != null || msgUdh != null) {
+                            byte[] msg = recodeShortMessage(sms.getDataCoding(), msgStr, msgUdh);
+
+                            if (msg.length <= 255) {
+                                submitSm.setShortMessage(msg);
+                            } else {
+                                Tlv tlv = new Tlv(SmppConstants.TAG_MESSAGE_PAYLOAD, msg, null);
+                                submitSm.addOptionalParameter(tlv);
+                            }
+                        }
+
+                        for (Tlv tlv : sms.getTlvSet().getOptionalParameters()) {
                             submitSm.addOptionalParameter(tlv);
                         }
-                    }
 
-                    for (Tlv tlv : sms.getTlvSet().getOptionalParameters()) {
-                        submitSm.addOptionalParameter(tlv);
-                    }
-
-                    SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, submitSm,
-                            esme.getWindowWaitTimeout());
-                    if (logger.isInfoEnabled()) {
-                        logger.info(String.format("\nSent submitSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
-                                esme.getName(), i1, sms.toString()));
-                    }
-                    sequenceNumber = submitSm.getSequenceNumber();
-
-                    ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
-                            .getActivityContextInterface(smppServerTransaction);
-                    smppTxaci.attach(this.sbbContext.getSbbLocalObject());
-                } else {
-                    DeliverSm deliverSm = new DeliverSm();
-                    deliverSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(), sms
-                            .getSourceAddr()));
-                    deliverSm.setDestAddress(new Address((byte) sms.getSmsSet().getDestAddrTon(), (byte) sms.getSmsSet()
-                            .getDestAddrNpi(), sms.getSmsSet().getDestAddr()));
-                    deliverSm.setEsmClass((byte) sms.getEsmClass());
-                    deliverSm.setProtocolId((byte) sms.getProtocolId());
-                    deliverSm.setPriority((byte) sms.getPriority());
-                    if (sms.getScheduleDeliveryTime() != null) {
-                        deliverSm.setScheduleDeliveryTime(MessageUtil.printSmppAbsoluteDate(sms.getScheduleDeliveryTime(),
-                                -(new Date()).getTimezoneOffset()));
-                    }
-                    if (sms.getValidityPeriod() != null && esme.getSmppVersion() == SmppInterfaceVersionType.SMPP50) {
-                        deliverSm.setValidityPeriod(MessageUtil.printSmppAbsoluteDate(sms.getValidityPeriod(),
-                                -(new Date()).getTimezoneOffset()));
-                    }
-                    deliverSm.setRegisteredDelivery((byte) sms.getRegisteredDelivery());
-                    deliverSm.setReplaceIfPresent((byte) sms.getReplaceIfPresent());
-                    deliverSm.setDataCoding((byte) sms.getDataCoding());
-
-                    String msgStr = sms.getShortMessageText();
-                    byte[] msgUdh = sms.getShortMessageBin();
-                    if (msgStr != null || msgUdh != null) {
-                        byte[] msg = recodeShortMessage(sms.getDataCoding(), msgStr, msgUdh);
-
-                        if (msg.length <= 255) {
-                            deliverSm.setShortMessage(msg);
+                        SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, submitSm,
+                                esme.getWindowWaitTimeout());
+                        if (logger.isInfoEnabled()) {
+                            logger.info(String.format("\nSent submitSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
+                                    esme.getName(), poolIndex, sms.toString()));
+                        }
+                        if (segmentIndex == 0) {
+                            sequenceNumber = submitSm.getSequenceNumber();
                         } else {
-                            Tlv tlv = new Tlv(SmppConstants.TAG_MESSAGE_PAYLOAD, msg, null);
+                            sequenceNumberExt[segmentIndex - 1] = submitSm.getSequenceNumber();
+                        }
+
+                        ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
+                                .getActivityContextInterface(smppServerTransaction);
+                        smppTxaci.attach(this.sbbContext.getSbbLocalObject());
+                    } else {
+                        DeliverSm deliverSm = new DeliverSm();
+                        deliverSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(),
+                                sms.getSourceAddr()));
+                        deliverSm.setDestAddress(new Address((byte) sms.getSmsSet().getDestAddrTon(), (byte) sms.getSmsSet()
+                                .getDestAddrNpi(), sms.getSmsSet().getDestAddr()));
+                        deliverSm.setEsmClass((byte) esmClass);
+                        deliverSm.setProtocolId((byte) sms.getProtocolId());
+                        deliverSm.setPriority((byte) sms.getPriority());
+                        if (sms.getScheduleDeliveryTime() != null) {
+                            deliverSm.setScheduleDeliveryTime(MessageUtil.printSmppAbsoluteDate(sms.getScheduleDeliveryTime(),
+                                    -(new Date()).getTimezoneOffset()));
+                        }
+                        if (sms.getValidityPeriod() != null && esme.getSmppVersion() == SmppInterfaceVersionType.SMPP50) {
+                            deliverSm.setValidityPeriod(MessageUtil.printSmppAbsoluteDate(sms.getValidityPeriod(),
+                                    -(new Date()).getTimezoneOffset()));
+                        }
+                        deliverSm.setRegisteredDelivery((byte) sms.getRegisteredDelivery());
+                        deliverSm.setReplaceIfPresent((byte) sms.getReplaceIfPresent());
+                        deliverSm.setDataCoding((byte) sms.getDataCoding());
+
+                        String msgStr = lstStrings.get(segmentIndex);
+                        byte[] msgUdh = lstUdhs.get(segmentIndex);
+                        if (msgStr != null || msgUdh != null) {
+                            byte[] msg = recodeShortMessage(sms.getDataCoding(), msgStr, msgUdh);
+
+                            if (msg.length <= 255) {
+                                deliverSm.setShortMessage(msg);
+                            } else {
+                                Tlv tlv = new Tlv(SmppConstants.TAG_MESSAGE_PAYLOAD, msg, null);
+                                deliverSm.addOptionalParameter(tlv);
+                            }
+                        }
+
+                        for (Tlv tlv : sms.getTlvSet().getOptionalParameters()) {
                             deliverSm.addOptionalParameter(tlv);
                         }
-                    }
 
-                    for (Tlv tlv : sms.getTlvSet().getOptionalParameters()) {
-                        deliverSm.addOptionalParameter(tlv);
-                    }
+                        // TODO : waiting for 2 secs for window to accept our
+                        // request,
+                        // is it good? Should time be more here?
+                        SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, deliverSm,
+                                esme.getWindowWaitTimeout());
+                        if (logger.isInfoEnabled()) {
+                            logger.info(String.format("\nSent deliverSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
+                                    esme.getName(), poolIndex, sms.toString()));
+                        }
+                        if (segmentIndex == 0) {
+                            sequenceNumber = deliverSm.getSequenceNumber();
+                        } else {
+                            sequenceNumberExt[segmentIndex - 1] = deliverSm.getSequenceNumber();
+                        }
 
-                    // TODO : waiting for 2 secs for window to accept our
-                    // request,
-                    // is it good? Should time be more here?
-                    SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, deliverSm,
-                            esme.getWindowWaitTimeout());
-                    if (logger.isInfoEnabled()) {
-                        logger.info(String.format("\nSent deliverSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
-                                esme.getName(), i1, sms.toString()));
+                        ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
+                                .getActivityContextInterface(smppServerTransaction);
+                        smppTxaci.attach(this.sbbContext.getSbbLocalObject());
                     }
-                    sequenceNumber = deliverSm.getSequenceNumber();
-
-                    ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
-                            .getActivityContextInterface(smppServerTransaction);
-                    smppTxaci.attach(this.sbbContext.getSbbLocalObject());
                 }
 
-                this.registerMessageInSendingPool(i1, sequenceNumber);
+                this.registerMessageInSendingPool(poolIndex, sequenceNumber, sequenceNumberExt);
             }
             this.endRegisterMessageInSendingPool();
 
@@ -493,12 +556,17 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             smscStatAggregator.updateMsgOutSentAll();
             smscStatAggregator.updateMsgOutSentSmpp();
 
-            Sms sms = confirmMessageInSendingPool(event.getSequenceNumber());
-            if (sms == null) {
+            ConfirmMessageInSendingPool confirmMessageInSendingPool = confirmMessageInSendingPool(event.getSequenceNumber());
+            if (!confirmMessageInSendingPool.sequenceNumberFound) {
                 this.logger.severe("RxSmppServerSbb.handleResponse(): no sms in MessageInSendingPool: UnconfirmedCnt="
                         + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber());
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
                         "Received undefined SequenceNumber: " + event.getSequenceNumber() + ", SmsSet=" + smsSet);
+                return;
+            }
+            Sms sms = confirmMessageInSendingPool.sms;
+            if (!confirmMessageInSendingPool.confirmed) {
+                this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON);
                 return;
             }
 

@@ -70,14 +70,14 @@
 						<input id="password" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Password" />
 					</span>					
 				</div>
-				
+
 				<div id="div-networkId" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="is used by the SMSC to associate this SMPP connection with given network for multi tenancy. SMS can be routed in same network only, default network id is 0.">
 						<span class="add-on">Network Id</span>
 						<input id="networkId" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Network Id" value="0" />
 					</span>					
 				</div>				
-				
+
 				<div id="div-ipAddress" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if SMSC is acting as ESME, the BIND request will be sent to configured ip and port. If SMSC is acting as Server, it will accept incoming BIND request from specified IP and Port. If port is unknown, pass -1 as willd character">
 						<span class="add-on">IP Address</span>
@@ -401,14 +401,24 @@
 						<input id="minMessageLength" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Min Message Length" value="-1"/>
 					</span>	
 				</div>
-				
+
 				<div id="div-maxMessageLength" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="maximum message length (in characters) acceptable to the SMSC GW, for messages coming from this ESME. If an incoming message length is more than the max-message-length it will be rejected by SMSC GW. The default value for this parameter is 1 and it implies no limitations. Any other negative value also implies no limitations.">
 						<span class="add-on">Max Message Length</span>
 						<input id="maxMessageLength" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Max Message Length" value="-1"/>
 					</span>	
 				</div>																															
-																																																																				
+
+				<div id="div-splitLongMessages" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If true long messages will be split before sending to this destination">
+						<span class="add-on">Long message splitting</span>
+						<select id="splitLongMessages" >
+							<option>false</option>
+							<option>true</option>
+						</select>
+					</span>
+				</div>
+
 				<button id="add-entity-button" class="btn btn btn-primary" onclick="createEsme()">Create</button>
 			</span>
 		</p>
@@ -534,12 +544,12 @@
 		// var name = response.value.Name;
 		var host = response.value.Host;
 		var port = response.value.Port;
-		
+
 		var networkId = response.value.NetworkId;
-		
+		var splitLongMessages = response.value.SplitLongMessages;
+
 		var isSmppServerStarted = response.value.Started;
-		
-		var networkId = response.value.NetworkId;
+
 		var clusterName = response.value.ClusterName;
 		
 		var chargingenabled = response.value.ChargingEnabled;
@@ -757,6 +767,7 @@
 						'<dt>NationalLanguageLockingShift</dt> <dd>' + nationalLanguageLockingShift + ' </dd>' +
 						'<dt>MinMessageLength</dt> <dd>' + minMessageLength + ' </dd>' +
 						'<dt>MaxMessageLength</dt> <dd>' + maxMessageLength + ' </dd>' +
+					    '<dt>SplitLongMessages</dt> <dd>' + splitLongMessages + ' </dd>' + 
 						'</dl>'+
 		        '    </div>'+	
 		        '<hr style="margin: 5px 0;"/>' +
@@ -854,7 +865,7 @@
 									'<table id="'+name+'-ESME" class="table table-condensed table-striped">' + 
 										'<thead><tr><th style="width: 40%;">Name</th><th style="width: 55%;">Value</th><th>&nbsp;</th></tr></thead>' +
 										'<tbody>'+
-										
+
 											'<tr data-toggle="tooltip" title="network id to which this SMPP connection belongs to">'+
 												'<td style="font-size: 0.9em;">Network Id</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1334,6 +1345,22 @@
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxMessageLength"+']\').toggle(); $(\'input[id^='+name+"MaxMessageLength"+']\').focus();"></i>' +
 											'</td>'+
 										'</tr>'+																	
+
+											'<tr data-toggle="tooltip" title="If true long messages will be split before sending to this destination">'+
+												'<td style="font-size: 0.9em;">Long message splitting</td>'+
+												'<td style="font-size: 0.9em; padding: 0;">'+
+													'<div id="div-' + name +'SplitLongMessages-input" class="control-group">'+
+													'<span id="' + name +'SplitLongMessages-input" style="display: none;">'+
+														'<input type="text" class="input-small" value="' + splitLongMessages + '" /> ' +
+														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SplitLongMessages\', \'' + name+"SplitLongMessages" + '\', \'true\')"></i> ' +
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' + 
+													'</span>'+
+													'</div>' +
+													'<span id="' +name + 'SplitLongMessages-text">' + splitLongMessages + '</span>'+
+												'</td>'+
+												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' +
+												'</td>'+
+											'</tr>'+																	
 											
 										'</tbody>' +
 									'</table>' +															
@@ -1984,13 +2011,15 @@
 		if(password == "") {
 			password = null;
 		}
-		
+
 		var networkId = $("#networkId").val();
 		if(networkId == "") {
 			networkId = "0";
 		}
-		
-		
+
+		var e = document.getElementById("splitLongMessages");
+		var splitLongMessages = e.options[e.selectedIndex].text;
+
 		var ipAddress = $("#ipAddress").val();
 		if(ipAddress.trim() == "") {
 			$("#div-ipAddress").addClass("error");		
@@ -2159,7 +2188,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
+		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
 				{
 					success: function(value) {
 						updateEsmes();

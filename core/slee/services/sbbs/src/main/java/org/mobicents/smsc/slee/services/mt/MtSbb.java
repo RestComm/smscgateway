@@ -60,7 +60,6 @@ import org.mobicents.protocols.ss7.map.api.service.sms.SM_RP_OA;
 import org.mobicents.protocols.ss7.map.api.service.sms.SmsSignalInfo;
 import org.mobicents.protocols.ss7.map.api.smstpdu.AbsoluteTimeStamp;
 import org.mobicents.protocols.ss7.map.api.smstpdu.AddressField;
-import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverTpdu;
@@ -68,7 +67,6 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.TypeOfNumber;
 import org.mobicents.protocols.ss7.map.api.smstpdu.UserData;
 import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
 import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeaderElement;
-import org.mobicents.protocols.ss7.map.smstpdu.UserDataImpl;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
 import org.mobicents.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.mobicents.slee.resource.map.events.DialogAccept;
@@ -945,55 +943,6 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         }
     }
 
-    private String[] sliceMessage(String msg, DataCodingScheme dataCodingScheme, int nationalLanguageLockingShift,
-            int nationalLanguageSingleShift) {
-        int lenSolid = MessageUtil.getMaxSolidMessageCharsLength(dataCodingScheme);
-        int lenSegmented = MessageUtil.getMaxSegmentedMessageCharsLength(dataCodingScheme);
-
-        UserDataHeader udh = null;
-        if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7
-                && (nationalLanguageLockingShift > 0 || nationalLanguageSingleShift > 0)) {
-            udh = MessageUtil.getNationalLanguageIdentifierUdh(nationalLanguageLockingShift, nationalLanguageSingleShift);
-            if (nationalLanguageLockingShift > 0) {
-                lenSolid -= 3;
-                lenSegmented -= 3;
-            }
-            if (nationalLanguageSingleShift > 0) {
-                lenSolid -= 3;
-                lenSegmented -= 3;
-            }
-        }
-
-		int msgLenInChars = msg.length();
-        if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7 && msgLenInChars * 2 > lenSolid) {
-            // GSM7 data coding. We need to care if some characters occupy two char places
-            msgLenInChars = UserDataImpl.checkEncodedDataLengthInChars(msg, udh);
-        }
-		if (msgLenInChars <= lenSolid) {
-            String[] res = new String[] { msg };
-            return res;
-		} else {
-            if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7) {
-                String[] res = UserDataImpl.sliceString(msg, lenSegmented, udh);
-                return res;
-            } else {
-                ArrayList<String> res = new ArrayList<String>();
-                int segmCnt = (msg.length() - 1) / lenSegmented + 1;
-                for (int i1 = 0; i1 < segmCnt; i1++) {
-                    if (i1 == segmCnt - 1) {
-                        res.add(msg.substring(i1 * lenSegmented, msg.length()));
-                    } else {
-                        res.add(msg.substring(i1 * lenSegmented, (i1 + 1) * lenSegmented));
-                    }
-                }
-
-                String[] ress = new String[res.size()];
-                res.toArray(ress);
-                return ress;
-            }
-        }
-	}
-
     protected SmsSignalInfo createSignalInfo(Sms sms, String msg, byte[] udhData, boolean moreMessagesToSend,
             int messageReferenceNumber, int messageSegmentCount, int messageSegmentNumber, DataCodingScheme dataCodingScheme,
             int nationalLanguageLockingShift, int nationalLanguageSingleShift) throws MAPException {
@@ -1120,7 +1069,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				} else {
 					// possible a big message and segmentation
                     String[] segmentsByte;
-                    segmentsByte = this.sliceMessage(sms.getShortMessageText(), dataCodingScheme,
+                    segmentsByte = MessageUtil.sliceMessage(sms.getShortMessageText(), dataCodingScheme,
                             sms.getNationalLanguageLockingShift(), sms.getNationalLanguageSingleShift());
                     segments = new SmsSignalInfo[segmentsByte.length];
 

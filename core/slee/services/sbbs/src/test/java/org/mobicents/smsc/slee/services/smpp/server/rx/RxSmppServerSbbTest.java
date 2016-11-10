@@ -57,6 +57,7 @@ import javax.slee.serviceactivity.ServiceActivityContextInterfaceFactory;
 import javax.slee.serviceactivity.ServiceActivityFactory;
 
 import org.jboss.netty.channel.Channel;
+import org.mobicents.protocols.ss7.map.MAPSmsTpduParameterFactoryImpl;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.slee.SbbLocalObjectExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
@@ -175,7 +176,7 @@ public class RxSmppServerSbbTest {
 //
         esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null, SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER,
                 SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, 0,
-                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, 0, 0, 0, 0, -1, -1, -1, -1);
+                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
 
         SmsSetCache.getInstance().clearProcessingSmsSet();
 
@@ -323,6 +324,46 @@ public class RxSmppServerSbbTest {
 //        this.sbb.onDeliverSmResp(eventResp, aci, eventContext);
     }
 
+    @Test(groups = { "RxSmppServer" })
+    public void testSubmitSm_test3_3() throws Exception {
+        if (!this.cassandraDbInited)
+            return;
+
+        ArrayList<SmsDef> lst = new ArrayList<SmsDef>();
+        SmsDef sd1 = new SmsDef();
+        String s01 = "1234567890";
+        StringBuilder sb = new StringBuilder();
+        for (int i1 = 0; i1 < 20; i1++) {
+            sb.append(s01);
+        }
+        sd1.msg = sb.toString();
+        sd1.stored = true;
+        lst.add(sd1);
+        SmsDef sd2 = new SmsDef();
+        sd2.msg = "Msg 2";
+        sd2.stored = true;
+        lst.add(sd2);
+        SmsSet smsSet = prepareDatabase(lst);
+        SmsSetEvent event = new SmsSetEvent();
+        event.setSmsSet(smsSet);
+
+        EventContext eventContext = null;
+
+        ActivityContextInterface aci = new SmppTransactionProxy(esme);
+
+        this.sbb.onDeliverSm(event, aci, eventContext);
+
+        DeliverSmResp eventResp = new DeliverSmResp();
+        eventResp.setSequenceNumber(sbb.getNextSentSequenseId());
+        this.sbb.onDeliverSmResp(eventResp, aci, eventContext);
+        eventResp = new DeliverSmResp();
+        eventResp.setSequenceNumber(sbb.getNextSentSequenseId());
+        this.sbb.onDeliverSmResp(eventResp, aci, eventContext);
+        eventResp = new DeliverSmResp();
+        eventResp.setSequenceNumber(sbb.getNextSentSequenseId());
+        this.sbb.onDeliverSmResp(eventResp, aci, eventContext);
+    }
+
     private SmsSet prepareDatabase(ArrayList<SmsDef> lst) throws PersistenceException {
         SmsSet smsSet = createEmptySmsSet(ta1);
 
@@ -451,6 +492,7 @@ public class RxSmppServerSbbTest {
             this.scheduler = new SchedulerResourceAdaptorProxy();
             RxSmppServerSbb.smscPropertiesManagement = SmscPropertiesManagement.getInstance("Test");
             smppServerSessions = new SmppSessionsProxy();
+            mapSmsTpduParameterFactory = new MAPSmsTpduParameterFactoryImpl();
             smppServerTransactionACIFactory = new SmppTransactionACIFactoryProxy();
             sbbContext = new SbbContextExtProxy();
         }

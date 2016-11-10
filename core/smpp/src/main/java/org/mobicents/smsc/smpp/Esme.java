@@ -61,7 +61,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private static final String ESME_PASSWORD = "password";
 	private static final String REMOTE_HOST_IP = "host";
 	private static final String REMOTE_HOST_PORT = "port";
-	private static final String NETWORK_ID = "networkId";
+    private static final String NETWORK_ID = "networkId";
+    private static final String SPLIT_LONG_MESSAGES = "splitLongMessages";
 	private static final String SMPP_BIND_TYPE = "smppBindType";
 
 	private static final String SMPP_SESSION_TYPE = "smppSessionType";
@@ -114,7 +115,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private int port;
 	private String systemType;
 	private SmppInterfaceVersionType smppVersion = null;
-	private int networkId;
+    private int networkId;
+    // long messages will be split before sending to this destination
+    private boolean splitLongMessages;
 
 	// These are configured ESME TON, NPI and Address Range. If ESME is acting
 	// as Server, incoming BIND request should match there TON, NPI and address
@@ -226,27 +229,57 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
 	}
 
-	/**
-	 * @param systemId
-	 * @param password
-	 * @param host
-	 * @param port
-	 * @param systemType
-	 * @param smppVersion
-	 * @param address
-	 * @param smppBindType
-	 * @param smppSessionType
-	 * @param smscManagement
-	 * @param state
-	 */
-	public Esme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
-		String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
-		SmppBindType smppBindType, Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout,
-		long clientBindTimeout, long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
-		int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon,
-		int routingNpi, String routingAddressRange, int networkId, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
-		long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
-		int maxMessageLength
+    /**
+     * @param name
+     * @param systemId
+     * @param password
+     * @param host
+     * @param port
+     * @param chargingEnabled
+     * @param systemType
+     * @param smppVersion
+     * @param esmeTon
+     * @param esmeNpi
+     * @param esmeAddressRange
+     * @param smppBindType
+     * @param smppSessionType
+     * @param windowSize
+     * @param connectTimeout
+     * @param requestExpiryTimeout
+     * @param clientBindTimeout
+     * @param windowMonitorInterval
+     * @param windowWaitTimeout
+     * @param clusterName
+     * @param countersEnabled
+     * @param enquireLinkDelay
+     * @param enquireLinkDelayServer
+     * @param linkDropServer
+     * @param sourceTon
+     * @param sourceNpi
+     * @param sourceAddressRange
+     * @param routingTon
+     * @param routingNpi
+     * @param routingAddressRange
+     * @param networkId
+     * @param splitLongMessages
+     * @param rateLimitPerSecond
+     * @param rateLimitPerMinute
+     * @param rateLimitPerHour
+     * @param rateLimitPerDay
+     * @param nationalLanguageSingleShift
+     * @param nationalLanguageLockingShift
+     * @param minMessageLength
+     * @param maxMessageLength
+     */
+    public Esme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
+            String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
+            SmppBindType smppBindType, Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout,
+            long clientBindTimeout, long windowMonitorInterval, long windowWaitTimeout, String clusterName,
+            boolean countersEnabled, int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon,
+            int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
+            int networkId, boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
+            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
+            int maxMessageLength
 
     ) {
 		this.name = name;
@@ -300,6 +333,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		}
 
         this.networkId = networkId;
+        this.splitLongMessages = splitLongMessages;
 
         this.rateLimitPerSecond = rateLimitPerSecond;
         this.rateLimitPerMinute = rateLimitPerMinute;
@@ -412,6 +446,17 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		this.networkId = networkId;
 		this.store();
 	}
+
+    @Override
+    public boolean getSplitLongMessages() {
+        return splitLongMessages;
+    }
+
+    @Override
+    public void setSplitLongMessages(boolean splitLongMessages) {
+        this.splitLongMessages = splitLongMessages;
+        this.store();
+    }
 
 	public SmppBindType getSmppBindType() {
 		return smppBindType;
@@ -972,7 +1017,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			esme.password = xml.getAttribute(ESME_PASSWORD, null);
 			esme.host = xml.getAttribute(REMOTE_HOST_IP, "");
 			esme.port = xml.getAttribute(REMOTE_HOST_PORT, -1);
-			esme.networkId = xml.getAttribute(NETWORK_ID, 0);
+            esme.networkId = xml.getAttribute(NETWORK_ID, 0);
+            esme.splitLongMessages = xml.getAttribute(SPLIT_LONG_MESSAGES, false);
 
             esme.rateLimitPerSecond = xml.getAttribute(RATE_LIMIT_PER_SECOND, 0L);
             esme.rateLimitPerMinute = xml.getAttribute(RATE_LIMIT_PER_MINUTE, 0L);
@@ -1078,7 +1124,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			xml.setAttribute(ESME_PASSWORD, esme.password);
 			xml.setAttribute(REMOTE_HOST_IP, esme.host);
 			xml.setAttribute(REMOTE_HOST_PORT, esme.port);
-			xml.setAttribute(NETWORK_ID, esme.networkId);
+            xml.setAttribute(NETWORK_ID, esme.networkId);
+            xml.setAttribute(SPLIT_LONG_MESSAGES, esme.splitLongMessages);
 
             xml.setAttribute(RATE_LIMIT_PER_SECOND, esme.rateLimitPerSecond);
             xml.setAttribute(RATE_LIMIT_PER_MINUTE, esme.rateLimitPerMinute);
@@ -1159,24 +1206,23 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	};
 
 	public void show(StringBuffer sb) {
-		sb.append(SmppOamMessages.SHOW_ESME_NAME).append(this.name).append(SmppOamMessages.SHOW_ESME_SYSTEM_ID)
-				.append(this.systemId).append(SmppOamMessages.SHOW_ESME_STATE).append(this.getStateName())
-				.append(SmppOamMessages.SHOW_ESME_PASSWORD).append(this.password)
-				.append(SmppOamMessages.SHOW_ESME_HOST).append(this.host).append(SmppOamMessages.SHOW_ESME_PORT)
-				.append(this.port).append(SmppOamMessages.SHOW_NETWORK_ID).append(this.networkId)
-				.append(SmppOamMessages.CHARGING_ENABLED).append(this.chargingEnabled)
-				.append(SmppOamMessages.SHOW_ESME_BIND_TYPE).append(this.smppBindType)
-				.append(SmppOamMessages.SHOW_ESME_SYSTEM_TYPE).append(this.systemType)
-				.append(SmppOamMessages.SHOW_ESME_INTERFACE_VERSION).append(this.smppVersion)
-				.append(SmppOamMessages.SHOW_ADDRESS_TON).append(this.esmeTon).append(SmppOamMessages.SHOW_ADDRESS_NPI)
-				.append(this.esmeNpi).append(SmppOamMessages.SHOW_ADDRESS).append(this.esmeAddressRange)
-				.append(SmppOamMessages.SHOW_CLUSTER_NAME).append(this.clusterName)
-				.append(SmppOamMessages.SHOW_SOURCE_ADDRESS_TON).append(this.sourceTon)
-				.append(SmppOamMessages.SHOW_SOURCE_ADDRESS_NPI).append(this.sourceNpi)
-				.append(SmppOamMessages.SHOW_SOURCE_ADDRESS).append(this.sourceAddressRange)
-				.append(SmppOamMessages.SHOW_ROUTING_ADDRESS_TON).append(this.routingTon)
-				.append(SmppOamMessages.SHOW_ROUTING_ADDRESS_NPI).append(this.routingNpi)
-				.append(SmppOamMessages.SHOW_ROUTING_ADDRESS).append(this.routingAddressRange)
+        sb.append(SmppOamMessages.SHOW_ESME_NAME).append(this.name).append(SmppOamMessages.SHOW_ESME_SYSTEM_ID)
+                .append(this.systemId).append(SmppOamMessages.SHOW_ESME_STATE).append(this.getStateName())
+                .append(SmppOamMessages.SHOW_ESME_PASSWORD).append(this.password).append(SmppOamMessages.SHOW_ESME_HOST)
+                .append(this.host).append(SmppOamMessages.SHOW_ESME_PORT).append(this.port)
+                .append(SmppOamMessages.SHOW_NETWORK_ID).append(this.networkId).append(SmppOamMessages.CHARGING_ENABLED)
+                .append(this.chargingEnabled).append(SmppOamMessages.SHOW_ESME_BIND_TYPE).append(this.smppBindType)
+                .append(SmppOamMessages.SHOW_ESME_SYSTEM_TYPE).append(this.systemType)
+                .append(SmppOamMessages.SHOW_ESME_INTERFACE_VERSION).append(this.smppVersion)
+                .append(SmppOamMessages.SHOW_ADDRESS_TON).append(this.esmeTon).append(SmppOamMessages.SHOW_ADDRESS_NPI)
+                .append(this.esmeNpi).append(SmppOamMessages.SHOW_ADDRESS).append(this.esmeAddressRange)
+                .append(SmppOamMessages.SHOW_CLUSTER_NAME).append(this.clusterName)
+                .append(SmppOamMessages.SHOW_SOURCE_ADDRESS_TON).append(this.sourceTon)
+                .append(SmppOamMessages.SHOW_SOURCE_ADDRESS_NPI).append(this.sourceNpi)
+                .append(SmppOamMessages.SHOW_SOURCE_ADDRESS).append(this.sourceAddressRange)
+                .append(SmppOamMessages.SHOW_ROUTING_ADDRESS_TON).append(this.routingTon)
+                .append(SmppOamMessages.SHOW_ROUTING_ADDRESS_NPI).append(this.routingNpi)
+                .append(SmppOamMessages.SHOW_ROUTING_ADDRESS).append(this.routingAddressRange)
                 .append(SmppOamMessages.SHOW_RATE_LIMIT_PER_SECOND).append(this.rateLimitPerSecond)
                 .append(SmppOamMessages.SHOW_RATE_LIMIT_PER_MINUTE).append(this.rateLimitPerMinute)
                 .append(SmppOamMessages.SHOW_RATE_LIMIT_PER_HOUR).append(this.rateLimitPerHour)
@@ -1188,9 +1234,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
                 .append(SmppOamMessages.SHOW_NATIONAL_LANGUAGE_SINGLE_SHIFT).append(this.getNationalLanguageSingleShift())
                 .append(SmppOamMessages.SHOW_NATIONAL_LANGUAGE_LOCKING_SHIFT).append(this.getNationalLanguageLockingShift())
                 .append(SmppOamMessages.MIN_MESSAGE_LENGTH).append(this.getMinMessageLength())
-                .append(SmppOamMessages.MAX_MESSAGE_LENGTH).append(this.getMaxMessageLength());
+                .append(SmppOamMessages.MAX_MESSAGE_LENGTH).append(this.getMaxMessageLength())
+                .append(SmppOamMessages.SPLIT_LONG_MESSAGES).append(this.splitLongMessages);
 
-		sb.append(SmppOamMessages.NEW_LINE);
+        sb.append(SmppOamMessages.NEW_LINE);
 	}
 
 	@Override

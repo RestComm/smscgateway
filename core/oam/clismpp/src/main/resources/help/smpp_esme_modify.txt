@@ -2,13 +2,14 @@ Name
 	smpp esme modify
 
 SYNOPSIS
-	smpp esme modify <name> password <Specify new password> networkid <networkid> 
-	esme-ton <esme address ton> esme-npi <esme address npi> 
-	esme-range <esme address range> window-size <windowSize> 
+	smpp esme modify <name> password <Specify new password> networkid <networkid>
+	split-long-messages <true | false> esme-ton <esme address ton>
+	esme-npi <esme address npi> esme-range <esme address range> window-size <windowSize> 
 	connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> 
 	client-bind-timeout <clientBindTimeout> window-monitor-interval <windowMonitorInterval>
 	window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> 
-	enquire-link-delay <30000> enquire-link-delay-server <0> link-drop-server <0> charging-enabled <true | false> 
+	enquire-link-delay <30000> enquire-link-delay-server <0> link-drop-server <0>
+	charging-enabled <true | false> 
 	source-ton <source address ton> source-npi <source address npi>
 	source-range <source address range> routing-ton <routing address ton>
 	routing-npi <routing address npi> routing-range <routing address range>
@@ -36,13 +37,16 @@ PARAMETERS
 				  ESMEs to provide a password when binding to the SMSC.
 
 				  The new value takes effect when SMPP is restarted.
-				  
+
 	networkId       - indicates virtual subnetwork that this ESME belongs. SMS 
 	                flows within same netwrokId, unless changed using mproc
 	                (this is for multi-tenancy support). If this parameter is
                     skipped - networkId will be set to "0" when ESME creation.
                     If you do not use multi-tenancy support - set this value
                     to 0 or skip.
+
+	split-long-messages - long messages will be split before sending to this
+				  ESME destination. Default value is false.
 
 	esme-ton 		- Specify new ESME TON. 
 				  If the SMPP Session Type is CLIENT,
@@ -375,6 +379,9 @@ PARAMETERS
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
+
+EXAMPLES
+	smpp esme modify test password yyyy
 
 SEE ALSO
 	smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,

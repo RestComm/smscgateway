@@ -19,9 +19,6 @@
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>deliveryTimerID</cmp-field-name></cmp-field>
-<!--
-                <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
--->
 			</sbb-abstract-class>
 		</sbb-classes>
 
@@ -102,6 +99,18 @@
 
 		<resource-adaptor-type-binding>
 			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>MAPResourceAdaptorType</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>2.0</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			<activity-context-interface-factory-name>slee/resources/map/2.0/acifactory</activity-context-interface-factory-name>
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>slee/resources/map/2.0/provider</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>MAPRA</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
 				<resource-adaptor-type-name>SMPPServerResourceAdaptorType</resource-adaptor-type-name>
 				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
 				<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
@@ -112,7 +121,6 @@
 				<resource-adaptor-entity-link>SmppServerRA</resource-adaptor-entity-link>
 			</resource-adaptor-entity-binding>
 		</resource-adaptor-type-binding>
-
 		<resource-adaptor-type-binding>
 			<resource-adaptor-type-ref>
 				<resource-adaptor-type-name>PersistenceResourceAdaptorType</resource-adaptor-type-name>
@@ -125,7 +133,6 @@
 				<resource-adaptor-entity-link>PersistenceResourceAdaptor</resource-adaptor-entity-link>
 			</resource-adaptor-entity-binding>
 		</resource-adaptor-type-binding>		
-
 		<resource-adaptor-type-binding>
 			<resource-adaptor-type-ref>
 				<resource-adaptor-type-name>SchedulerResourceAdaptorType</resource-adaptor-type-name>
@@ -170,9 +177,6 @@
                 <cmp-field><cmp-field-name>pendingRequestsList</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
-<!--
-                <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
--->
 
 				<cmp-field><cmp-field-name>informServiceCenterContainer</cmp-field-name></cmp-field>
 				<cmp-field><cmp-field-name>sriMapVersion</cmp-field-name></cmp-field>
@@ -490,9 +494,6 @@
                 <cmp-field><cmp-field-name>pendingRequestsList</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
-<!--
-                <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
--->
 
 				<cmp-field><cmp-field-name>sriMapVersion</cmp-field-name></cmp-field>
 
@@ -970,9 +971,6 @@
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>deliveryTimerID</cmp-field-name></cmp-field>
-<!--
-                <cmp-field><cmp-field-name>sendingPoolMsgCount</cmp-field-name></cmp-field>
--->
 			</sbb-abstract-class>
 		</sbb-classes>
 
