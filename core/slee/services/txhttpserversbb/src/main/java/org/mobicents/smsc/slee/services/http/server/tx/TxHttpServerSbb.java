@@ -22,6 +22,7 @@
 
 package org.mobicents.smsc.slee.services.http.server.tx;
 
+import com.cloudhopper.smpp.SmppConstants;
 import javolution.util.FastList;
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
 
@@ -288,8 +289,10 @@ public abstract class TxHttpServerSbb implements Sbb {
             final String destAddressParam = request.getParameter(RequestParameter.TO.getName());
             final String senderTon = request.getParameter(RequestParameter.SENDER_TON.getName());
             final String senderNpi = request.getParameter(RequestParameter.SENDER_NPI.getName());
+            final String udhStr = request.getParameter(RequestParameter.UDH.getName());
             final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
-            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement);
+            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding,
+                    senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement, udhStr);
 
         } else if(POST.equals(request.getMethod())) {
             String userId = request.getParameter(RequestParameter.USER_ID.getName());
@@ -302,6 +305,7 @@ public abstract class TxHttpServerSbb implements Sbb {
             String senderTon = request.getParameter(RequestParameter.SENDER_TON.getName());
             String senderNpi = request.getParameter(RequestParameter.SENDER_NPI.getName());
             String destAddressParam = request.getParameter(RequestParameter.TO.getName());
+            String udhStr = request.getParameter(RequestParameter.UDH.getName());
             String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
 
             Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
@@ -333,11 +337,15 @@ public abstract class TxHttpServerSbb implements Sbb {
             if(senderNpi == null || senderNpi.isEmpty()) {
                 senderNpi = getValueFromMap(map, RequestParameter.SENDER_NPI.getName());
             }
+            if (udhStr == null || udhStr.isEmpty()){
+                udhStr = getValueFromMap(map, RequestParameter.UDH.getName());
+            }
             if(destAddresses == null || destAddresses.length < 1) {
                 String[] tmp = map.get(RequestParameter.TO.getName());
                 destAddresses = (tmp == null ? new String[]{""} : tmp);
             }
-            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement);
+            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding,
+                    senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement, udhStr);
             return incomingData;
         } else {
             throw new HttpApiException("Unsupported method of the Http Request. Method is: " + request.getMethod());
@@ -570,8 +578,17 @@ public abstract class TxHttpServerSbb implements Sbb {
                 sms.setSourceAddrTon(incomingData.getSenderTon().getCode());
                 // TODO: setting dcs
                 sms.setDataCoding(dcs);
-                // TODO: esmCls - read from smpp documentation
-                sms.setEsmClass(smscPropertiesManagement.getHttpDefaultMessagingMode());
+
+                // Set UDH
+                if (incomingData.getUdh().length != 0)
+                {
+                    sms.setShortMessageBin(incomingData.getUdh());
+                    sms.setEsmClass(SmppConstants.ESM_CLASS_UDHI_MASK);
+
+                } else {
+                    // TODO: esmCls - read from smpp documentation
+                    sms.setEsmClass(smscPropertiesManagement.getHttpDefaultMessagingMode());
+                }
                 // TODO: regDlvry - read from smpp documentation
                 int registeredDelivery = smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt();
                 if(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification()!=0) {

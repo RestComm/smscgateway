@@ -66,9 +66,10 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
 
     private TON senderTon;
     private NPI senderNpi;
+    private byte[] udh;
 
     public HttpSendMessageIncomingData(String userId, String password, String msg, String formatParam, String smscEncodingStr, String messageBodyEncodingStr,
-                                       String sender, String senderTon, String senderNpi, String[] to, SmscPropertiesManagement smscPropertiesManagement, HttpUsersManagement httpUsersManagement) throws HttpApiException, UnauthorizedException {
+                                       String sender, String senderTon, String senderNpi, String[] to, SmscPropertiesManagement smscPropertiesManagement, HttpUsersManagement httpUsersManagement, String udhStr) throws HttpApiException, UnauthorizedException {
         super(userId, password, formatParam, httpUsersManagement);
 
         if (isEmptyOrNull(msg)) {
@@ -130,6 +131,10 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
                     break;
             }
         }
+
+		if (udhStr != null) {
+			this.udh = udhToByte(udhStr);
+		}
 
         this.sender = sender;
         this.msg = decodeMessage(msg, getMessageBodyEncoding());
@@ -233,6 +238,12 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
         return notValidDestinationNumbers;
     }
 
+	private byte[] udhToByte(String udhDecoded) {
+		byte[] udhDec = udhDecoded.getBytes(Charset.forName("UTF-8"));
+
+		return udhDec;
+	}
+
     public List<String> getDestAddresses() {
         return destAddresses;
     }
@@ -265,6 +276,19 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
         return this.msg;
     }
 
+    public byte[] getUdh() {
+        return udh;
+    }
+
+    public String udhToString (byte[] udhs) {
+        StringBuilder udhtoString = new StringBuilder();
+        for (byte b : udhs) {
+            udhtoString.append(b);
+            udhtoString.append(":");
+        }
+        return udhtoString.toString();
+    }
+
     @Override
     public String toString() {
         return "HttpSendMessageIncomingData{" +
@@ -278,6 +302,7 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
                 ", senderTon='" + senderTon + '\'' +
                 ", senderNpi='" + senderNpi + '\'' +
                 ", destAddresses=" + destAddresses + '\'' +
+                ", udh=" + udhToString(udh) + '\'' +
                 '}';
     }
 }

@@ -24,7 +24,7 @@ public class AutodecodingTest {
         httpUsersManagement.createHttpUser("userId", "password");
 
         HttpSendMessageIncomingData idata = new HttpSendMessageIncomingData("userId", "password", "msg", null, null, null,
-                "wwwwww", null, null, new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement);
+                "wwwwww", null, null, new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement,"");
 
         assertEquals(idata.getSender(), "wwwwww");
         assertEquals(idata.getSenderTon(), org.mobicents.smsc.slee.services.http.server.tx.enums.TON.ALFANUMERIC);
@@ -33,7 +33,7 @@ public class AutodecodingTest {
 
         // international
         idata = new HttpSendMessageIncomingData("userId", "password", "msg", null, null, null, "+33334444", null, null,
-                new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement);
+                new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement, "");
 
         assertEquals(idata.getSender(), "33334444");
         assertEquals(idata.getSenderTon(), org.mobicents.smsc.slee.services.http.server.tx.enums.TON.INTERNATIONAL);
@@ -42,7 +42,7 @@ public class AutodecodingTest {
 
         // national
         idata = new HttpSendMessageIncomingData("userId", "password", "www", null, null, null, "33334444", null, null,
-                new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement);
+                new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement, "");
 
         assertEquals(idata.getSender(), "33334444");
         assertEquals(idata.getSenderTon(), org.mobicents.smsc.slee.services.http.server.tx.enums.TON.NATIONAL);
@@ -64,7 +64,7 @@ public class AutodecodingTest {
         httpUsersManagement.createHttpUser("userId", "password");
 
         HttpSendMessageIncomingData idata = new HttpSendMessageIncomingData("userId", "password", "msg", null, null, null,
-                "wwwwww", null, null, new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement);
+                "wwwwww", null, null, new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement,"");
 
         assertEquals(idata.getSender(), "wwwwww");
         assertEquals(idata.getSenderTon(), org.mobicents.smsc.slee.services.http.server.tx.enums.TON.ALFANUMERIC);
@@ -73,7 +73,7 @@ public class AutodecodingTest {
 
         // international
         idata = new HttpSendMessageIncomingData("userId", "password", "msg", null, null, null, "33334444", null, null,
-                new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement);
+                new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement,"");
 
         assertEquals(idata.getSender(), "33334444");
         assertEquals(idata.getSenderTon(), org.mobicents.smsc.slee.services.http.server.tx.enums.TON.INTERNATIONAL);
