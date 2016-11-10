@@ -15,7 +15,8 @@ public enum RequestParameter {
     SMSC_ENCODING("smscEncoding"),
     MESSAGE_BODY_ENCODING("messageBodyEncoding"),
     SENDER_TON("senderTon"),
-    SENDER_NPI("senderNpi");
+    SENDER_NPI("senderNpi"),
+    UDH("udh");
 
     private String name;
 
