@@ -580,10 +580,10 @@ public abstract class TxHttpServerSbb implements Sbb {
                 sms.setDataCoding(dcs);
 
                 // Set UDH
-                if (incomingData.getUdh().length != 0)
+                if (incomingData.getUdh() != null)
                 {
                     sms.setShortMessageBin(incomingData.getUdh());
-                    sms.setEsmClass(SmppConstants.ESM_CLASS_UDHI_MASK);
+                    sms.setEsmClass(smscPropertiesManagement.getHttpDefaultMessagingMode() | SmppConstants.ESM_CLASS_UDHI_MASK);
 
                 } else {
                     // TODO: esmCls - read from smpp documentation

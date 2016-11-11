@@ -132,9 +132,9 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
             }
         }
 
-		if (udhStr != null) {
-			this.udh = udhToByte(udhStr);
-		}
+        if (!isEmptyOrNull(udhStr)) {
+            this.udh = udhToByte(udhStr);
+        }
 
         this.sender = sender;
         this.msg = decodeMessage(msg, getMessageBodyEncoding());
@@ -238,11 +238,14 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
         return notValidDestinationNumbers;
     }
 
-	private byte[] udhToByte(String udhDecoded) {
-		byte[] udhDec = udhDecoded.getBytes(Charset.forName("UTF-8"));
+    private byte[] udhToByte(String udhDecoded) throws HttpApiException {
+        try {
+            return udhDecoded.getBytes("iso-8859-1");
+        } catch (UnsupportedEncodingException e) {
+            throw new HttpApiException(e.getMessage(),e);
+        }
 
-		return udhDec;
-	}
+    }
 
     public List<String> getDestAddresses() {
         return destAddresses;
@@ -281,12 +284,18 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
     }
 
     public String udhToString (byte[] udhs) {
-        StringBuilder udhtoString = new StringBuilder();
-        for (byte b : udhs) {
-            udhtoString.append(b);
-            udhtoString.append(":");
-        }
-        return udhtoString.toString();
+        if (udhs != null) {
+			StringBuilder udhtoString = new StringBuilder();
+			int length = udhs.length;
+
+			for (int i = 0; i < length; i++) {
+				udhtoString.append(String.format("%02X ", udhs[i]));
+			}
+			return udhtoString.toString();
+		} else {
+			return "";
+		}
+
     }
 
     @Override
