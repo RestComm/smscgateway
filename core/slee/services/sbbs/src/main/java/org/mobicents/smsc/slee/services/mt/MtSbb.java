@@ -63,6 +63,8 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.AddressField;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverTpdu;
+import org.mobicents.protocols.ss7.map.api.smstpdu.SmsStatusReportTpdu;
+import org.mobicents.protocols.ss7.map.api.smstpdu.Status;
 import org.mobicents.protocols.ss7.map.api.smstpdu.TypeOfNumber;
 import org.mobicents.protocols.ss7.map.api.smstpdu.UserData;
 import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
@@ -85,6 +87,7 @@ import org.mobicents.smsc.library.ErrorAction;
 import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.Sms;
+import org.mobicents.smsc.library.SmsDeliveryReportData;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
@@ -994,9 +997,31 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                 this.mapSmsTpduParameterFactory.createProtocolIdentifier(sms.getProtocolId()), serviceCentreTimeStamp, ud);
 
         SmsSignalInfo smsSignalInfo = this.mapParameterFactory.createSmsSignalInfo(smsDeliverTpdu, isoCharset);
-
         return smsSignalInfo;
 	}
+
+    private SmsSignalInfo createSignalInfoStatusReport(Sms sms, boolean moreMessagesToSend,
+            SmsDeliveryReportData smsDeliveryReportData) throws MAPException {
+        // TODO : TimeZone should be configurable
+        Date submitDate = sms.getSubmitDate();
+        AbsoluteTimeStamp submitTimeStamp = this.mapSmsTpduParameterFactory.createAbsoluteTimeStamp(
+                (submitDate.getYear() % 100), (submitDate.getMonth() + 1), submitDate.getDate(), submitDate.getHours(),
+                submitDate.getMinutes(), submitDate.getSeconds(), -(submitDate.getTimezoneOffset() / 15));
+        Date deliveryDate = smsDeliveryReportData.getDeliveryDate();
+        AbsoluteTimeStamp deliveryTimeStamp = this.mapSmsTpduParameterFactory.createAbsoluteTimeStamp(
+                (deliveryDate.getYear() % 100), (deliveryDate.getMonth() + 1), deliveryDate.getDate(), deliveryDate.getHours(),
+                deliveryDate.getMinutes(), deliveryDate.getSeconds(), -(deliveryDate.getTimezoneOffset() / 15));
+        Status status = this.mapSmsTpduParameterFactory.createStatus(smsDeliveryReportData.getStatusVal());
+
+        SmsStatusReportTpdu smsStatusReportTpdu = this.mapSmsTpduParameterFactory.createSmsStatusReportTpdu(moreMessagesToSend,
+                false, smsDeliveryReportData.getStatusReportQualifier(), sms.getMoMessageRef(),
+                this.getSmsTpduOriginatingAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr()),
+                submitTimeStamp, deliveryTimeStamp, status,
+                this.mapSmsTpduParameterFactory.createProtocolIdentifier(sms.getProtocolId()), null);
+
+        SmsSignalInfo smsSignalInfo = this.mapParameterFactory.createSmsSignalInfo(smsStatusReportTpdu, isoCharset);
+        return smsSignalInfo;
+    }
 
 	private void sendMtSms(MAPApplicationContext mapApplicationContext, MessageProcessingState messageProcessingState,
 			MAPDialogSms mapDialogSms, int networkId) throws SmscProcessingException {
@@ -1052,7 +1077,14 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				Tlv sarTotalSegments = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_TOTAL_SEGMENTS);
 				Tlv sarSegmentSeqnum = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_SEGMENT_SEQNUM);
 				SmsSignalInfo[] segments;
-                if ((sms.getEsmClass() & SmppConstants.ESM_CLASS_UDHI_MASK) != 0) {
+
+                if (SmsDeliveryReportData.checkMessageIsSmsDeliveryReportData(sms.getShortMessageText())) {
+                    // this is SMS-STATUS-REPORT
+                    segments = new SmsSignalInfo[1];
+                    SmsDeliveryReportData smsDeliveryReportData = SmsDeliveryReportData.decodeFromString(sms
+                            .getShortMessageText());
+                    segments[0] = this.createSignalInfoStatusReport(sms, moreMessagesToSend, smsDeliveryReportData);
+                } else if ((sms.getEsmClass() & SmppConstants.ESM_CLASS_UDHI_MASK) != 0) {
                     // message already contains UDH - we can not slice it
                     segments = new SmsSignalInfo[1];
                     segments[0] = this.createSignalInfo(sms, sms.getShortMessageText(), sms.getShortMessageBin(), moreMessagesToSend, 0, 1, 1,

@@ -1406,6 +1406,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected void generateSuccessReceipt(SmsSet smsSet, Sms sms) {
         if (!smscPropertiesManagement.getReceiptsDisabling()) {
+            // SMPP delivery receipt
             int registeredDelivery = sms.getRegisteredDelivery();
             if (MessageUtil.isReceiptOnSuccess(registeredDelivery)) {
                 TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
@@ -1413,6 +1414,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 Sms receipt = MessageUtil.createReceiptSms(sms, true, ta,
                         smscPropertiesManagement.getOrigNetworkIdForReceipts());
                 this.sendNewGeneratedMessage(receipt, ta);
+            }
+
+            // SMS-STATUS-REPORT
+            if (sms.isStatusReportRequest()) {
+                TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
+                        smsSet.getNetworkId());
+                Sms smsStatusReport = MessageUtil.createSmsStatusReport(sms, true, ta,
+                        smscPropertiesManagement.getOrigNetworkIdForReceipts());
+                this.sendNewGeneratedMessage(smsStatusReport, ta);
             }
         }
     }
@@ -1425,6 +1435,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
     protected void generateIntermediateReceipts(SmsSet smsSet, ArrayList<Sms> lstTempFailured) {
         if (!smscPropertiesManagement.getReceiptsDisabling() && smscPropertiesManagement.getEnableIntermediateReceipts()) {
             for (Sms sms : lstTempFailured) {
+                // SMPP delivery receipt
                 int registeredDelivery = sms.getRegisteredDelivery();
                 if (MessageUtil.isReceiptIntermediate(registeredDelivery)) {
                     TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
@@ -1450,17 +1461,29 @@ public abstract class DeliveryCommonSbb implements Sbb {
     protected void generateFailureReceipts(SmsSet smsSet, ArrayList<Sms> lstPermFailured, String extraString) {
         if (!smscPropertiesManagement.getReceiptsDisabling()) {
             for (Sms sms : lstPermFailured) {
+                // SMPP delivery receipt
                 int registeredDelivery = sms.getRegisteredDelivery();
                 if (MessageUtil.isReceiptOnFailure(registeredDelivery)) {
                     TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
-
-                    smsSet.getNetworkId());
+                            smsSet.getNetworkId());
                     Sms receipt = MessageUtil.createReceiptSms(sms, false, ta,
                             smscPropertiesManagement.getOrigNetworkIdForReceipts(), extraString);
                     this.sendNewGeneratedMessage(receipt, ta);
 
-                    this.logger.info("Adding an faulire receipt: source=" + receipt.getSourceAddr() + ", dest="
+                    this.logger.info("Adding an failire receipt: source=" + receipt.getSourceAddr() + ", dest="
                             + receipt.getSmsSet().getDestAddr());
+                }
+
+                // SMS-STATUS-REPORT
+                if (sms.isStatusReportRequest()) {
+                    TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
+                            smsSet.getNetworkId());
+                    Sms smsStatusReport = MessageUtil.createSmsStatusReport(sms, false, ta,
+                            smscPropertiesManagement.getOrigNetworkIdForReceipts());
+                    this.sendNewGeneratedMessage(smsStatusReport, ta);
+
+                    this.logger.info("Adding an failire SMS-STATUS-REPORT: source=" + smsStatusReport.getSourceAddr()
+                            + ", dest=" + smsStatusReport.getSmsSet().getDestAddr());
                 }
             }
         }

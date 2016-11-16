@@ -41,6 +41,8 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.ConcatenatedShortMessagesIden
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.api.smstpdu.NationalLanguageLockingShiftIdentifier;
 import org.mobicents.protocols.ss7.map.api.smstpdu.NationalLanguageSingleShiftIdentifier;
+import org.mobicents.protocols.ss7.map.api.smstpdu.Status;
+import org.mobicents.protocols.ss7.map.api.smstpdu.StatusReportQualifier;
 import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
 import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
@@ -779,6 +781,57 @@ public class MessageUtil {
         deliveryReceiptData.setText(textVal);
 
         return deliveryReceiptData;
+    }
+
+    public static Sms createSmsStatusReport(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts) {
+        Sms smsStatusReport = new Sms();
+        smsStatusReport.setDbId(UUID.randomUUID());
+        smsStatusReport.setSourceAddr(sms.getSmsSet().getDestAddr());
+        smsStatusReport.setSourceAddrNpi(sms.getSmsSet().getDestAddrNpi());
+        smsStatusReport.setSourceAddrTon(sms.getSmsSet().getDestAddrTon());
+
+        smsStatusReport.setSubmitDate(sms.getSubmitDate());
+
+        smsStatusReport.setMessageId(sms.getMessageId());
+        Date validityPeriod = MessageUtil.addHours(new Date(), 24);
+        smsStatusReport.setValidityPeriod(validityPeriod);
+
+        SmsDeliveryReportData smsDeliveryReportData = new SmsDeliveryReportData();
+        smsDeliveryReportData.setDeliveryDate(new Date());
+        smsDeliveryReportData.setStatusReportQualifier(StatusReportQualifier.SmsSubmitResult);
+        int statusVal;
+        if (delivered)
+            statusVal = Status.SMS_RECEIVED;
+        else {
+            // TODO: fill statusVal with proper values (after experience)
+            if (sms.getSmsSet().getStatus() == ErrorCode.VALIDITY_PERIOD_EXPIRED) {
+                statusVal = Status.SMS_VALIDITY_PERIOD_EXPIRED;
+            } else {
+                statusVal = Status.SMS_VALIDITY_PERIOD_EXPIRED;
+            }
+        }
+        smsDeliveryReportData.setStatusVal(statusVal);
+        String rcpt = smsDeliveryReportData.encodeToString();
+
+        smsStatusReport.setDataCoding(0);
+
+        smsStatusReport.setShortMessageText(rcpt);
+
+        smsStatusReport.setEsmClass(sms.getEsmClass() & 0x03);
+        smsStatusReport.setMoMessageRef(sms.getMoMessageRef());
+        smsStatusReport.setSubmitDate(sms.getSubmitDate());
+
+        SmsSet backSmsSet = new SmsSet();
+        backSmsSet.setDestAddr(ta.getAddr());
+        backSmsSet.setDestAddrNpi(ta.getAddrNpi());
+        backSmsSet.setDestAddrTon(ta.getAddrTon());
+        if (origNetworkIdForReceipts)
+            backSmsSet.setNetworkId(sms.getOrigNetworkId());
+        else
+            backSmsSet.setNetworkId(sms.getSmsSet().getNetworkId());
+        backSmsSet.addSms(smsStatusReport);
+
+        return smsStatusReport;
     }
 
     /**

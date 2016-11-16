@@ -961,8 +961,7 @@ public abstract class MoSbb extends MoCommonSbb {
 		// TODO: do we need somehow care with RegisteredDelivery ?
 		sms.setReplaceIfPresent(smsSubmitTpdu.getRejectDuplicates() ? 2 : 0);
 
-		// TODO: care with smsSubmitTpdu.getStatusReportRequest() parameter
-		// sending back SMS_STATUS_REPORT tpdu ?
+        sms.setStatusReportRequest(smsSubmitTpdu.getStatusReportRequest());
 
 		DataCodingScheme dataCodingScheme = smsSubmitTpdu.getDataCodingScheme();
 		byte[] smsPayload = null;
