@@ -56,6 +56,7 @@ import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.impl.DeliveryReceiptDataImpl;
 import org.mobicents.smsc.smpp.GenerateType;
+import org.mobicents.smsc.smpp.TlvSet;
 
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.tlv.Tlv;
@@ -697,7 +698,7 @@ public class MessageUtil {
             return false;
     }
 
-    public static DeliveryReceiptData parseDeliveryReceipt(String msg) {
+    public static DeliveryReceiptData parseDeliveryReceipt(String msg, TlvSet tlvSet) {
         if (msg == null || msg.length() < 102)
             return null;
 
@@ -779,6 +780,21 @@ public class MessageUtil {
         }
 
         deliveryReceiptData.setText(textVal);
+
+        Tlv tlv = tlvSet.getOptionalParameter(SmppConstants.TAG_RECEIPTED_MSG_ID);
+        if (tlv != null) {
+            byte[] data = tlv.getValue();
+            String val = new String(data);
+            deliveryReceiptData.setTlvReceiptedMessageId(val);
+        }
+        tlv = tlvSet.getOptionalParameter(SmppConstants.TAG_MSG_STATE);
+        if (tlv != null) {
+            byte[] data = tlv.getValue();
+            if (data.length > 0) {
+                int val = data[0] & 0xFF;
+                deliveryReceiptData.setTlvMessageState(val);
+            }
+        }
 
         return deliveryReceiptData;
     }

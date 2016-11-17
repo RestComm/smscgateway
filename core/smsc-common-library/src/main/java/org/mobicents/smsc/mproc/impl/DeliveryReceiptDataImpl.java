@@ -41,6 +41,8 @@ public class DeliveryReceiptDataImpl implements DeliveryReceiptData {
     private String status;
     private int error;
     private String text;
+    private String tlvReceiptedMessageId;
+    private Integer tlvMessageState;
 
     public void setMessageId(String messageId) {
         this.messageId = messageId;
@@ -114,6 +116,24 @@ public class DeliveryReceiptDataImpl implements DeliveryReceiptData {
         return text;
     }
 
+    public void setTlvReceiptedMessageId(String val) {
+        tlvReceiptedMessageId = val;
+    }
+
+    @Override
+    public String getTlvReceiptedMessageId() {
+        return tlvReceiptedMessageId;
+    }
+
+    public void setTlvMessageState(Integer val) {
+        tlvMessageState = val;
+    }
+
+    @Override
+    public Integer getTlvMessageState() {
+        return tlvMessageState;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -134,6 +154,14 @@ public class DeliveryReceiptDataImpl implements DeliveryReceiptData {
         sb.append(error);
         sb.append(", text=");
         sb.append(text);
+        if (tlvReceiptedMessageId != null) {
+            sb.append(", tlvReceiptedMessageId=");
+            sb.append(tlvReceiptedMessageId);
+        }
+        if (tlvMessageState != null) {
+            sb.append(", tlvMessageState=");
+            sb.append(tlvMessageState);
+        }
         sb.append("]");
 
         return sb.toString();

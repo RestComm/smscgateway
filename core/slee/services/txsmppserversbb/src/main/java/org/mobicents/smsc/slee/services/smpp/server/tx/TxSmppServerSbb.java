@@ -1539,37 +1539,60 @@ public abstract class TxSmppServerSbb implements Sbb {
 
         // delivery receipt transit - replacing of messageId in delivery receipt with local messageId
         if (smscPropertiesManagement.getIncomeReceiptsProcessing() && MessageUtil.isDeliveryReceipt(sms0)) {
-            DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(sms0.getShortMessageText());
+            DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(sms0.getShortMessageText(),
+                    sms0.getTlvSet());
 
             if (deliveryReceiptData != null) {
                 String clusterName = esme.getClusterName();
+                String dlvTlvMessageId = deliveryReceiptData.getTlvReceiptedMessageId();
                 String dlvMessageId = deliveryReceiptData.getMessageId();
                 Long messageId = null;
                 String drFormat = null;
-                try {
-                    messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvMessageId, clusterName);
-                    drFormat = "regular";
-                } catch (PersistenceException e) {
-                    logger.severe("Exception when runnung c2_getMessageIdByRemoteMessageId() - 1: " + e.getMessage(), e);
-                }
 
+                if (dlvTlvMessageId != null) {
+                    try {
+                        messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvTlvMessageId, clusterName);
+                        drFormat = "dlvTlvMessageId";
+                    } catch (PersistenceException e) {
+                        logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 1: " + e.getMessage(), e);
+                    }
+                }
                 if (messageId == null) {
                     // trying to parse as a hex format
                     try {
-                        long mId = Long.parseLong(dlvMessageId);
-                        String digDlvMessageId = String.format("%08X", mId);
-                        messageId = persistence.c2_getMessageIdByRemoteMessageId(digDlvMessageId, clusterName);
-                        drFormat = "hex";
+                        messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvMessageId, clusterName);
+                        drFormat = "dlvMessageId";
                     } catch (PersistenceException e) {
-                        logger.severe("Exception when runnung c2_getMessageIdByRemoteMessageId() - 2: " + e.getMessage(), e);
+                        logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 2: " + e.getMessage(), e);
                     } catch (NumberFormatException e) {
                     }
                 }
 
+//                try {
+//                    messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvMessageId, clusterName);
+//                    drFormat = "regular";
+//                } catch (PersistenceException e) {
+//                    logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 1: " + e.getMessage(), e);
+//                }
+//
+//                if (messageId == null) {
+//                    // trying to parse as a hex format
+//                    try {
+//                        long mId = Long.parseLong(dlvMessageId);
+//                        String digDlvMessageId = String.format("%08X", mId);
+//                        messageId = persistence.c2_getMessageIdByRemoteMessageId(digDlvMessageId, clusterName);
+//                        drFormat = "hex";
+//                    } catch (PersistenceException e) {
+//                        logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 2: " + e.getMessage(), e);
+//                    } catch (NumberFormatException e) {
+//                    }
+//                }
+
                 if (messageId != null) {
                     // we found in local cache / database a reference to an origin
                     logger.info("Remote delivery receipt: clusterName=" + clusterName + ", dlvMessageId=" + dlvMessageId
-                            + ", receipt=" + sms0.getShortMessageText() + ", drFormat=" + drFormat);
+                            + ", dlvTlvMessageId=" + dlvTlvMessageId + ", receipt=" + sms0.getShortMessageText()
+                            + ", drFormat=" + drFormat);
 
                     sms0.setReceiptOrigMessageId(dlvMessageId);
                     sms0.setReceiptLocalMessageId(messageId);

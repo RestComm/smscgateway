@@ -207,7 +207,7 @@ public class MProcMessageImpl implements MProcMessage {
     public DeliveryReceiptData getDeliveryReceiptData() {
         if (isDeliveryReceipt()) {
             String msg = sms.getShortMessageText();
-            DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg);
+            DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg, sms.getTlvSet());
             return deliveryReceiptData;
         } else {
             return null;

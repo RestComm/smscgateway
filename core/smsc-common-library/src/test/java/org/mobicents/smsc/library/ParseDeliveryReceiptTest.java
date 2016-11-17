@@ -24,11 +24,16 @@ package org.mobicents.smsc.library;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertNull;
 
 import java.util.Date;
 
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
+import org.mobicents.smsc.smpp.TlvSet;
 import org.testng.annotations.Test;
+
+import com.cloudhopper.smpp.SmppConstants;
+import com.cloudhopper.smpp.tlv.Tlv;
 
 /**
 *
@@ -48,7 +53,9 @@ public class ParseDeliveryReceiptTest {
         Date d3 = new Date(116, 10 - 1, 8, 12, 1, 27);
         Date d4 = new Date(116, 10 - 1, 8, 15, 0, 0);
 
-        DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg);
+        TlvSet tlvSet = new TlvSet();
+
+        DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg, tlvSet);
 
         assertEquals(deliveryReceiptData.getMessageId(), "0512249005");
         assertEquals(deliveryReceiptData.getMsgSubmitted(), 1);
@@ -58,11 +65,23 @@ public class ParseDeliveryReceiptTest {
         assertEquals(deliveryReceiptData.getStatus(), "ENROUTE");
         assertEquals(deliveryReceiptData.getError(), 54);
         assertEquals(deliveryReceiptData.getText(), "xxssxx");
+        assertNull(deliveryReceiptData.getTlvReceiptedMessageId());
+        assertNull(deliveryReceiptData.getTlvMessageState());
 
-        deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg2);
+        deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg2, tlvSet);
         assertEquals(deliveryReceiptData.getText(), "");
 
-        deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg3);
+        String rcptId = "00ffab10";
+        byte[] data = rcptId.getBytes();
+        Tlv tlv = new Tlv(SmppConstants.TAG_RECEIPTED_MSG_ID, data, "rec_msg_id");
+        tlvSet.addOptionalParameter(tlv);
+        byte[] data2 = new byte[] { 2 };
+        Tlv tlv2 = new Tlv(SmppConstants.TAG_MSG_STATE, data2, "msg_state");
+        tlvSet.addOptionalParameter(tlv2);
+        assertNull(deliveryReceiptData.getTlvReceiptedMessageId());
+        assertNull(deliveryReceiptData.getTlvMessageState());
+
+        deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg3, tlvSet);
         assertEquals(deliveryReceiptData.getMessageId(), "1010d937-8f43-4754-9dd8-6e987cda32fa");
         assertEquals(deliveryReceiptData.getMsgSubmitted(), 1);
         assertEquals(deliveryReceiptData.getMsgDelivered(), 0);
@@ -71,6 +90,8 @@ public class ParseDeliveryReceiptTest {
         assertEquals(deliveryReceiptData.getStatus(), "UNDELIV");
         assertEquals(deliveryReceiptData.getError(), 4);
         assertEquals(deliveryReceiptData.getText(), "exampleMessage02");
+        assertEquals(deliveryReceiptData.getTlvReceiptedMessageId(), rcptId);
+        assertEquals((int) deliveryReceiptData.getTlvMessageState(), 2);
     }
 
     @Test(groups = { "ParseDeliveryReceipt" })

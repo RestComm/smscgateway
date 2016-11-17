@@ -47,4 +47,8 @@ public interface DeliveryReceiptData {
 
     public String getText();
 
+    public String getTlvReceiptedMessageId();
+
+    public Integer getTlvMessageState();
+
 }
