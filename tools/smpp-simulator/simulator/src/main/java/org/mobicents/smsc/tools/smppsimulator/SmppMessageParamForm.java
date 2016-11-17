@@ -95,7 +95,7 @@ public class SmppMessageParamForm extends JDialog {
 	private JRadioButton rbDR_Success;
     private JRadioButton rbDR_Error8;
     private JCheckBox cbDRAfter2Min;
-    private JCheckBox cbHexMessageIdResponse;
+    private JCheckBox cbIdResponseTlv;
     private final ButtonGroup buttonGroup_2 = new ButtonGroup();
 
 	public SmppMessageParamForm(JDialog owner) {
@@ -375,9 +375,9 @@ public class SmppMessageParamForm extends JDialog {
 						cbDRAfter2Min.setBounds(6, 99, 364, 23);
 						panel_resp.add(cbDRAfter2Min);
 						
-						cbHexMessageIdResponse = new JCheckBox("HexMessageIdResponse");
-						cbHexMessageIdResponse.setBounds(6, 125, 364, 23);
-						panel_resp.add(cbHexMessageIdResponse);
+						cbIdResponseTlv = new JCheckBox("Tlv fields usage in delivery receipt");
+						cbIdResponseTlv.setBounds(6, 125, 364, 23);
+						panel_resp.add(cbIdResponseTlv);
 						
 						JPanel panel_bulk = new JPanel();
 						tabbedPane.addTab("Bulk", null, panel_bulk, null);
@@ -566,7 +566,7 @@ public class SmppMessageParamForm extends JDialog {
 
         this.cbRejectIncomingDeliveryMessage.setSelected(this.data.isRejectIncomingDeliveryMessage());
         this.cbDRAfter2Min.setSelected(this.data.isDeliveryResponseAfter2Min());
-        this.cbHexMessageIdResponse.setSelected(this.data.isHexMessageIdResponse());
+        this.cbIdResponseTlv.setSelected(this.data.isIdResponseTlv());
         switch (this.data.getDeliveryResponseGenerating()) {
             case No:
                 this.rbDR_No.setSelected(true);
@@ -669,7 +669,7 @@ public class SmppMessageParamForm extends JDialog {
 
         this.data.setRejectIncomingDeliveryMessage(this.cbRejectIncomingDeliveryMessage.isSelected());
         this.data.setDeliveryResponseAfter2Min(this.cbDRAfter2Min.isSelected());
-        this.data.setHexMessageIdResponse(this.cbHexMessageIdResponse.isSelected());
+        this.data.setIdResponseTlv(this.cbIdResponseTlv.isSelected());
         if (rbDR_No.isSelected())
             this.data.setDeliveryResponseGenerating(SmppSimulatorParameters.DeliveryResponseGenerating.No);
         if (rbDR_Success.isSelected())

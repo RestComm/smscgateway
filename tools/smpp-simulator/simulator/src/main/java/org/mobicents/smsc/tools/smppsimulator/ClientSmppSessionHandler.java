@@ -197,12 +197,15 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
 
             String msgId;
             String msgId2;
-            if (this.testingForm.getSmppSimulatorParameters().isHexMessageIdResponse()) {
+            String msgId3;
+            if (this.testingForm.getSmppSimulatorParameters().isIdResponseTlv()) {
                 msgId = String.format("%08X", mId);
                 msgId2 = MessageUtil.createMessageIdString(mId);
+                msgId3 = msgId;
             } else {
                 msgId = MessageUtil.createMessageIdString(mId);
                 msgId2 = MessageUtil.createMessageIdString(mId);
+                msgId3 = null;
             }
 
             ((BaseSmResp) resp).setMessageId(msgId);
@@ -215,7 +218,7 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                 this.testingForm.getExecutor().schedule(
                         new DeliveryReceiptSender(
                                 this.testingForm.getSmppSimulatorParameters().getDeliveryResponseGenerating(), new Date(),
-                                msgId2), delay, TimeUnit.MILLISECONDS);
+                                msgId2, msgId3), delay, TimeUnit.MILLISECONDS);
             }
 
             testingForm.addMessage("PduResponseSent: " + resp.getName(), resp.toString());
@@ -283,11 +286,14 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
         private DeliveryResponseGenerating deliveryResponseGenerating;
         private Date submitDate;
         private String messageId;
+        private String messageIdTlv;
 
-        public DeliveryReceiptSender(DeliveryResponseGenerating deliveryResponseGenerating, Date submitDate, String messageId) {
+        public DeliveryReceiptSender(DeliveryResponseGenerating deliveryResponseGenerating, Date submitDate, String messageId,
+                String messageIdTlv) {
             this.deliveryResponseGenerating = deliveryResponseGenerating;
             this.submitDate = submitDate;
             this.messageId = messageId;
+            this.messageIdTlv = messageIdTlv;
         }
 
         @Override
@@ -340,6 +346,12 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
             String rcpt = MessageUtil.createDeliveryReceiptMessage(messageId, submitDate, new Date(), errorCode, "origMsgText",
                     delivered, null, tempFailure);
             byte[] buf = rcpt.getBytes(utf8Charset);
+
+            if (messageIdTlv != null) {
+                byte[] data = messageIdTlv.getBytes();
+                Tlv tlv = new Tlv(SmppConstants.TAG_RECEIPTED_MSG_ID, data, "rec_msg_id");
+                pdu.addOptionalParameter(tlv);
+            }
 
             try {
                 pdu.setShortMessage(buf);
