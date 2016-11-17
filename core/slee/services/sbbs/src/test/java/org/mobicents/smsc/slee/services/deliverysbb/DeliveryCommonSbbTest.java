@@ -506,11 +506,11 @@ public class DeliveryCommonSbbTest {
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(101);
         assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
         assertFalse(confirmMessageInSendingPool.confirmed);
-        assertNull(confirmMessageInSendingPool.sms);
+        assertNotNull(confirmMessageInSendingPool.sms);
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(302);
         assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
         assertFalse(confirmMessageInSendingPool.confirmed);
-        assertNull(confirmMessageInSendingPool.sms);
+        assertNotNull(confirmMessageInSendingPool.sms);
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(102);
         assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
         assertTrue(confirmMessageInSendingPool.confirmed);
