@@ -1594,7 +1594,12 @@ public abstract class TxSmppServerSbb implements Sbb {
                             + ", dlvTlvMessageId=" + dlvTlvMessageId + ", receipt=" + sms0.getShortMessageText()
                             + ", drFormat=" + drFormat);
 
-                    sms0.setReceiptOrigMessageId(dlvMessageId);
+                    if (dlvTlvMessageId != null) {
+                        sms0.setReceiptOrigMessageId(dlvTlvMessageId);
+                        sms0.getTlvSet().removeOptionalParameter(SmppConstants.TAG_RECEIPTED_MSG_ID);
+                    } else {
+                        sms0.setReceiptOrigMessageId(dlvMessageId);
+                    }
                     sms0.setReceiptLocalMessageId(messageId);
 
                     String messageIdStr = MessageUtil.createMessageIdString(messageId);
