@@ -1000,7 +1000,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         return smsSignalInfo;
 	}
 
-    private SmsSignalInfo createSignalInfoStatusReport(Sms sms, boolean moreMessagesToSend,
+    protected SmsSignalInfo createSignalInfoStatusReport(Sms sms, boolean moreMessagesToSend,
             SmsDeliveryReportData smsDeliveryReportData) throws MAPException {
         // TODO : TimeZone should be configurable
         Date submitDate = sms.getSubmitDate();
@@ -1078,11 +1078,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				Tlv sarSegmentSeqnum = sms.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_SEGMENT_SEQNUM);
 				SmsSignalInfo[] segments;
 
-                if (SmsDeliveryReportData.checkMessageIsSmsDeliveryReportData(sms.getShortMessageText())) {
+                SmsDeliveryReportData smsDeliveryReportData = SmsDeliveryReportData.decodeFromString(sms.getShortMessageText());
+                if (smsDeliveryReportData != null) {
                     // this is SMS-STATUS-REPORT
                     segments = new SmsSignalInfo[1];
-                    SmsDeliveryReportData smsDeliveryReportData = SmsDeliveryReportData.decodeFromString(sms
-                            .getShortMessageText());
                     segments[0] = this.createSignalInfoStatusReport(sms, moreMessagesToSend, smsDeliveryReportData);
                 } else if ((sms.getEsmClass() & SmppConstants.ESM_CLASS_UDHI_MASK) != 0) {
                     // message already contains UDH - we can not slice it

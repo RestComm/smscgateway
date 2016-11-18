@@ -33,6 +33,8 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.StatusReportQualifier;
  */
 public class SmsDeliveryReportData {
 
+    protected static final String prefix = "SMS-STATUS-REPORT[";
+
     private int statusVal;
     private Date deliveryDate;
     private StatusReportQualifier statusReportQualifier;
@@ -61,27 +63,78 @@ public class SmsDeliveryReportData {
         this.statusReportQualifier = statusReportQualifier;
     }
 
-    public static boolean checkMessageIsSmsDeliveryReportData(String msg) {
-        // TODO: delivery report ...................................
-        // StatusReportQualifier: from
-        // SMS STATUS REPORT
-        // TODO: delivery report ...................................
-
-
-        // TODO: implement it .........................................
-        return false;
-    }
-
+    /**
+     * Trying to decode message text in SmsDeliveryReportData format
+     * Returns null if format is not recognized
+     * @param msg
+     * @return
+     */
     public static SmsDeliveryReportData decodeFromString(String msg) {
-        SmsDeliveryReportData res = new SmsDeliveryReportData();
-        // TODO: implement it .........................................
-        return res;
+        if (msg == null || msg.length() < prefix.length() + 16 || !msg.startsWith(prefix))
+            return null;
+
+        String s1 = msg.substring(prefix.length(), msg.length() - 1);
+        String[] ss = s1.split(",");
+        if (ss.length != 8)
+            return null;
+
+        try {
+            int statusVal = Integer.parseInt(ss[0]);
+
+            int year = Integer.parseInt(ss[1]);
+            int month = Integer.parseInt(ss[2]);
+            int date = Integer.parseInt(ss[3]);
+            int hour = Integer.parseInt(ss[4]);
+            int minute = Integer.parseInt(ss[5]);
+            int second = Integer.parseInt(ss[6]);
+
+            int statusReportQualifierVal = Integer.parseInt(ss[7]);
+            StatusReportQualifier statusReportQualifier;
+            if (statusReportQualifierVal == 0)
+                statusReportQualifier = StatusReportQualifier.SmsSubmitResult;
+            else
+                statusReportQualifier = StatusReportQualifier.SmsCommandResult;
+
+            SmsDeliveryReportData res = new SmsDeliveryReportData();
+            Date dateVal = new Date(year, month, date, hour, minute, second);
+            res.setStatusVal(statusVal);
+            res.setDeliveryDate(dateVal);
+            res.setStatusReportQualifier(statusReportQualifier);
+            return res;
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     public String encodeToString() {
         StringBuilder sb = new StringBuilder();
-        // TODO: implement it .........................................
+        sb.append(prefix);
+        sb.append(statusVal);
+        sb.append(",");
+        if (deliveryDate != null) {
+            sb.append(deliveryDate.getYear());
+            sb.append(",");
+            sb.append(deliveryDate.getMonth());
+            sb.append(",");
+            sb.append(deliveryDate.getDate());
+            sb.append(",");
+            sb.append(deliveryDate.getHours());
+            sb.append(",");
+            sb.append(deliveryDate.getMinutes());
+            sb.append(",");
+            sb.append(deliveryDate.getSeconds());
+        } else {
+            sb.append("0,0,0,0,0,0");
+        }
+        sb.append(",");
+        sb.append(statusReportQualifier.getCode());
+        sb.append("]");
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return encodeToString();
     }
 
 }

@@ -823,7 +823,7 @@ public class MessageUtil {
             if (sms.getSmsSet().getStatus() == ErrorCode.VALIDITY_PERIOD_EXPIRED) {
                 statusVal = Status.SMS_VALIDITY_PERIOD_EXPIRED;
             } else {
-                statusVal = Status.SMS_VALIDITY_PERIOD_EXPIRED;
+                statusVal = Status.REMOTE_PROCEDURE_ERROR;
             }
         }
         smsDeliveryReportData.setStatusVal(statusVal);
