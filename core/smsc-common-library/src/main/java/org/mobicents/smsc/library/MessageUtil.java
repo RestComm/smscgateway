@@ -783,9 +783,13 @@ public class MessageUtil {
 
         Tlv tlv = tlvSet.getOptionalParameter(SmppConstants.TAG_RECEIPTED_MSG_ID);
         if (tlv != null) {
-            byte[] data = tlv.getValue();
-            String val = new String(data);
-            deliveryReceiptData.setTlvReceiptedMessageId(val);
+            // byte[] data = tlv.getValue();
+            // String val = new String(data);
+            try {
+                String val = tlv.getValueAsString();
+                deliveryReceiptData.setTlvReceiptedMessageId(val);
+            } catch (TlvConvertException e) {
+            }
         }
         tlv = tlvSet.getOptionalParameter(SmppConstants.TAG_MSG_STATE);
         if (tlv != null) {
