@@ -348,7 +348,9 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
             byte[] buf = rcpt.getBytes(utf8Charset);
 
             if (messageIdTlv != null) {
-                byte[] data = messageIdTlv.getBytes();
+                byte[] data0 = messageIdTlv.getBytes();
+                byte[] data = new byte[data0.length + 1];
+                System.arraycopy(data0, 0, data, 0, data0.length);
                 Tlv tlv = new Tlv(SmppConstants.TAG_RECEIPTED_MSG_ID, data, "rec_msg_id");
                 pdu.addOptionalParameter(tlv);
             }
