@@ -2543,7 +2543,7 @@ DESCRIPTION
 [[_smsc_gateway_server_routing_dlv_cli]]
 ==== Using CLI
 
-If this option is turned on for each generated delivery receipt networkId will be assigned to the value of networkId of an ESME via which the original message has come to SMSC.
+If this option is turned on for each generated delivery receipts and SMS-STATUS-REPORTs networkId will be assigned to the value of networkId of an ESME via which the original message has come to SMSC.
 This can help for routing of receipts back to the originated ESME.
 If this option is turned off then the networkId of receipts will be taken from networkId of ESME / SS7 / SIP via which the original message has left SMSC GW.
 You can configure this option by issuing the command smsc set orignetworkidforreceipts with appropriate parameters as described below. 
