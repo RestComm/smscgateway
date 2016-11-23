@@ -107,6 +107,7 @@ public class TxSmppServerSbbTest {
     private static byte[] msgGsm7;
     private static byte[] udhCode;
     private static byte[] msgUSim;
+    private static byte[] msgUcs2Udh;
 	private byte[] msg_ref_num = { 0, 10 };
 	private Date scheduleDeliveryTime;
 
@@ -147,6 +148,15 @@ public class TxSmppServerSbbTest {
                 (byte) 0xf2, 0x06, (byte) 0x9f, 0x0e, (byte) 0x97, (byte) 0xb8, 0x1b, (byte) 0x97, (byte) 0xc4, (byte) 0xac,
                 (byte) 0xb5, (byte) 0xd6, (byte) 0xff, 0x1d, 0x42, 0x67, 0x7f, (byte) 0xed, 0x06, 0x39, 0x6f, 0x18, 0x4c,
                 (byte) 0xa6, 0x0f, 0x3e, 0x64, (byte) 0xb8, (byte) 0x9e, 0x2f, (byte) 0x9f };
+
+        msgUcs2Udh = new byte[] { 0x05, 0x00, 0x03, 0x00, 0x05, 0x01, 0x00, 0x48, 0x00, 0x69, 0x00, 0x20, 0x00, 0x50, 0x00,
+                0x61, 0x00, 0x6E, 0x00, 0x64, 0x00, 0x61, 0x00, 0x73, 0x00, 0x2C, 0x00, 0x0A, 0x00, 0x0A, 0x00, 0x49, 0x00,
+                0x74, 0x2B, 0x19, 0x00, 0x73, 0x00, 0x20, 0x00, 0x74, 0x00, 0x69, 0x00, 0x6D, 0x00, 0x65, 0x00, 0x20, 0x00,
+                0x61, 0x00, 0x67, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6E, 0x00, 0x20, 0x00, 0x74, 0x00, 0x6F, 0x00, 0x20, 0x00,
+                0x67, 0x00, 0x69, 0x00, 0x76, 0x00, 0x65, 0x00, 0x20, 0x00, 0x75, 0x00, 0x73, 0x00, 0x20, 0x00, 0x79, 0x00,
+                0x6F, 0x00, 0x75, 0x00, 0x72, 0x00, 0x20, 0x00, 0x61, 0x00, 0x76, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6C, 0x00,
+                0x61, 0x00, 0x62, 0x00, 0x69, 0x00, 0x6C, 0x00, 0x69, 0x00, 0x74, 0x00, 0x79, 0x00, 0x20, 0x00, 0x66, 0x00,
+                0x6F, 0x00, 0x72, 0x00, 0x20, 0x00, 0x6E, 0x00, 0x65, 0x00, 0x78, 0x00, 0x74, 0x00, 0x20, 0x00, 0x77 };
 
         MProcManagement.getInstance("TestTxSmpp");
         try {
@@ -807,6 +817,62 @@ public class TxSmppServerSbbTest {
         event.setDataCoding((byte) 246);
         event.setEsmClass((byte) 0x43);
         event.setShortMessage(msgUSim);
+
+        long dueSlot = this.pers.c2_getDueSlotForTime(scheduleDeliveryTime);
+        PreparedStatementCollection psc = this.pers.getStatementCollection(scheduleDeliveryTime);
+        int b1 = this.pers.checkSmsExists(dueSlot, ta1.getTargetId());
+        long b2 = this.pers.c2_getDueSlotForTargetId(psc, ta1.getTargetId());
+        assertEquals(b1, 0);
+        assertEquals(b2, 0L);
+
+        TxSmppServerSbb.smscPropertiesManagement.setSmppEncodingForUCS2(SmppEncoding.Unicode);
+        this.sbb.onSubmitSm(event, aci);
+
+        b1 = this.pers.checkSmsExists(dueSlot, ta1.getTargetId());
+        assertEquals(b1, 1);
+
+//        SmsSet smsSet = this.pers.c2_getRecordListForTargeId(dueSlot, ta1.getTargetId());
+//        this.checkSmsSet(smsSet, curDate, true);
+//        Sms sms = smsSet.getSms(0);
+//        assertEquals(sms.getShortMessageText(), sMsg); // msgUcs2
+//        assertEquals(sms.getShortMessageBin(), udhCode);
+//
+//        assertEquals(this.smppSess.getReqList().size(), 0);
+//        assertEquals(this.smppSess.getRespList().size(), 1);
+//
+//        PduResponse resp = this.smppSess.getRespList().get(0);
+//        assertEquals(resp.getCommandStatus(), 0);
+//        assertEquals(resp.getOptionalParameterCount(), 0);
+    }
+
+    @Test(groups = { "TxSmppServer" })
+    public void testUcs2Udh() throws Exception {
+
+        if (!this.cassandraDbInited)
+            return;
+
+        this.smppSess = new SmppSessionsProxy();
+        this.sbb.setSmppServerSessions(smppSess);
+
+        int windowSize = SmppConstants.DEFAULT_WINDOW_SIZE;
+        long connectTimeout = SmppConstants.DEFAULT_CONNECT_TIMEOUT;
+        long requestExpiryTimeout = SmppConstants.DEFAULT_REQUEST_EXPIRY_TIMEOUT;
+        long clientBindTimeout = SmppConstants.DEFAULT_BIND_TIMEOUT;
+        long windowMonitorInterval = SmppConstants.DEFAULT_WINDOW_MONITOR_INTERVAL;
+        long windowWaitTimeout = SmppConstants.DEFAULT_WINDOW_WAIT_TIMEOUT;
+
+        Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
+                SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
+                windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
+                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+        ActivityContextInterface aci = new SmppTransactionProxy(esme);
+
+        SubmitSm event = new SubmitSm();
+        Date curDate = new Date();
+        this.fillSm(event, curDate, true);
+        event.setDataCoding((byte) 8);
+        event.setEsmClass((byte) 0x40);
+        event.setShortMessage(msgUcs2Udh);
 
         long dueSlot = this.pers.c2_getDueSlotForTime(scheduleDeliveryTime);
         PreparedStatementCollection psc = this.pers.getStatementCollection(scheduleDeliveryTime);
