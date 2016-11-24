@@ -458,7 +458,14 @@
 		if(index == -1){
 			return "-1";
 		}
-		
+
+		if(index!=0 && ruleparameters[index-1]!=" ") {
+			var index = ruleparameters.indexOf(parameter, index+1);
+			if(index == -1){
+				return "-1";
+			}
+		}
+
 		var valueStartIndex = ruleparameters.indexOf("=", index);
 		valueStartIndex = valueStartIndex+1;
 		
