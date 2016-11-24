@@ -88,6 +88,14 @@ public interface MProcRuleDefault extends MProcRule {
     void setOriginNetworkIdMask(int originNetworkIdMask);
 
     /**
+     * @return mask for NetworkId for via which an original message for a delivery receipt has come to SMSC GW. "-1" means any
+     *         value.
+     */
+    int getReceiptNetworkIdMask();
+
+    void setReceiptNetworkIdMask(int receiptNetworkIdMask);
+
+    /**
      * @return mask for message original ESME name. This condition never fits if a message comes not from SMPP. "-1" means any
      *         value.
      */

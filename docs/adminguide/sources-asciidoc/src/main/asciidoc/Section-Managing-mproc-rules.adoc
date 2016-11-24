@@ -24,8 +24,9 @@ SYNOPSIS
 
 	- Default mproc rules implementation (<class name> is "mproc"):
 	smsc mproc add mproc <id> networkidmask <networkId value> originnetworkidmask <networkId
-	value> desttonmask <destination type of number> destnpimask <destination numbering plan
-	indicator> destdigmask <regular expression - destination number digits mask> sourcetonmask 
+	value> receiptnetworkidmask <networkId value> desttonmask <destination type of number>
+	destnpimask <destination numbering plan	indicator>
+	destdigmask <regular expression - destination number digits mask> sourcetonmask
 	<source type of number> sourcenpimask <source numbering plan indicator> 
 	sourcedigmask <regular expression - source number digits mask>
 	imsidigitsmask <regular expression - imsi digits mask> nnndigitsmask <regular expression
@@ -41,6 +42,7 @@ SYNOPSIS
 	newnetworkidafterpermfail <networkId value> dropaftertempfail <false | true> 
 	newnetworkidaftertempfail <networkId value>
 
+
 DESCRIPTION
 
 	This command is used to add a new mproc rule.
@@ -54,6 +56,7 @@ PARAMETERS
 
 	networkidmask - an optional parameter.
 	originnetworkidmask - an optional parameter.
+	receiptnetworkidmask - an optional parameter.
 	desttonmask - an optional parameter.
 	destnpimask - an optional parameter.
 	destdigmask - an optional parameter.
@@ -121,8 +124,9 @@ SYNOPSIS
 
 	- Default mproc rules implementation:
 	smsc mproc modify <id> networkidmask <networkId value> originnetworkidmask <networkId
-	value> desttonmask <destination type of number> destnpimask <destination numbering plan
-	indicator> destdigmask <regular expression - destination number digits mask> sourcetonmask 
+	value> receiptnetworkidmask <networkId value> desttonmask <destination type of number>
+	destnpimask <destination numbering plan indicator>
+	destdigmask <regular expression - destination number digits mask> sourcetonmask 
 	<source type of number> sourcenpimask <source numbering plan indicator> 
 	sourcedigmask <regular expression - source number digits mask>
 	imsidigitsmask <regular expression - imsi digits mask> nnndigitsmask <regular expression
@@ -149,6 +153,7 @@ PARAMETERS
 
 	networkidmask - an optional parameter.
 	originnetworkidmask - an optional parameter.
+	receiptnetworkidmask - an optional parameter.
 	desttonmask - an optional parameter.
 	destnpimask - an optional parameter.
 	destdigmask - an optional parameter.

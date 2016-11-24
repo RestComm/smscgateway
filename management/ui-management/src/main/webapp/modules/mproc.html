@@ -116,11 +116,18 @@
 						<input id="networkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
 					</span>				
 				</div>	
-				
+
 				<div id="div-originnetworkidmask" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if SMS origination networkid match\'s with this rule\'s originnetworkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1.">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if SMS origination networkid match\'s with this rule\'s receiptnetworkidmask. Set value to -1 as wild card to match all the network id\'s. Default value is -1.">
 						<span class="add-on">Originating Network Id Mask</span>
 						<input id="originnetworkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Originating Network Id Mask" />
+					</span>				
+				</div>	
+
+				<div id="div-receiptnetworkidmask" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only Rule will be applied only if\na) a message is a delivery receipt,\nb) the delivery receipt is recognized by SMSC GW\nc) an original message for the delivery receipt is found\nd) networkId of the original message == receiptnetworkidmask.\nSet value to -1 as wild card to match all the network id\'s. Default value is -1.">
+						<span class="add-on">Receipt Network Id Mask</span>
+						<input id="receiptnetworkidmask" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Receipt Network Id Mask" />
 					</span>				
 				</div>	
 
@@ -610,6 +617,7 @@
 										originatingmask = originatingmask.toUpperCase();
 										var networkidmask = processRuleParameters(ruleparameters, "networkidmask");
 										var originnetworkidmask = processRuleParameters(ruleparameters, "originnetworkidmask");
+										var receiptnetworkidmask = processRuleParameters(ruleparameters, "receiptnetworkidmask");
 										var origesmenamemask = processRuleParameters(ruleparameters, "origesmenamemask"); 
 										var originatorsccpaddressmask = processRuleParameters(ruleparameters, "originatorsccpaddressmask"); 
 										var imsidigitsmask = processRuleParameters(ruleparameters, "imsidigitsmask");
@@ -691,6 +699,22 @@
 																				'<span id="' +id + 'OriginNetworkIdMask-text">' + originnetworkidmask + '</span>'+
 																			'</td>'+
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"OriginNetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"OriginNetworkIdMask"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if\na) a message is a delivery receipt,\nb) the delivery receipt is recognized by SMSC GW\nc) an original message for the delivery receipt is found\nd) networkId of the original message == receiptnetworkidmask.\n Set value to -1 as wild card to match all the network id\'s. Default value is -1.">'+
+																			'<td style="font-size: 0.9em;">Receipt Network Id Mask</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'receiptNetworkIdMask-input" class="control-group">'+
+																				'<span id="' + id +'ReceiptNetworkIdMask-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + receiptnetworkidmask + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'receiptnetworkidmask\', \'' + id+"ReceiptNetworkIdMask" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"ReceiptNetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"ReceiptNetworkIdMask"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'ReceiptNetworkIdMask-text">' + receiptnetworkidmask + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"ReceiptNetworkIdMask"+']\').toggle(); $(\'input[id^='+id+"ReceiptNetworkIdMask"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+
 
@@ -1425,6 +1449,13 @@
 			originnetworkidmask = "-1";
 		} else {
 			parametersstring = parametersstring + " originnetworkidmask "+originnetworkidmask;
+		}
+
+		var receiptnetworkidmask = $("#receiptnetworkidmask").val();
+		if(receiptnetworkidmask.trim() == "") {
+			receiptnetworkidmask = "-1";
+		} else {
+			parametersstring = parametersstring + " receiptnetworkidmask "+receiptnetworkidmask;
 		}
 		
 		var errorcode = $("#errorcode").val();

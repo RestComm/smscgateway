@@ -194,11 +194,6 @@ public class MProcMessageImpl implements MProcMessage {
     }
 
     @Override
-    public String toString() {
-        return "MProcMessage: " + sms;
-    }
-
-    @Override
     public boolean isDeliveryReceipt() {
         return MessageUtil.isDeliveryReceipt(sms);
     }
@@ -236,6 +231,11 @@ public class MProcMessageImpl implements MProcMessage {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "MProcMessage: " + sms;
     }
 
 }

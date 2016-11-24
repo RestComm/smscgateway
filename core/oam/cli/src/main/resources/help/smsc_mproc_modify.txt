@@ -7,8 +7,9 @@ SYNOPSIS
 
 	- Default mproc rules implementation:
 	smsc mproc modify <id> networkidmask <networkId value> originnetworkidmask <networkId
-	value> desttonmask <destination type of number> destnpimask <destination numbering plan
-	indicator> destdigmask <regular expression - destination number digits mask> sourcetonmask 
+	value> receiptnetworkidmask <networkId value> desttonmask <destination type of number>
+	destnpimask <destination numbering plan indicator>
+	destdigmask <regular expression - destination number digits mask> sourcetonmask 
 	<source type of number> sourcenpimask <source numbering plan indicator> 
 	sourcedigmask <regular expression - source number digits mask>
 	imsidigitsmask <regular expression - imsi digits mask> nnndigitsmask <regular expression
@@ -48,6 +49,13 @@ PARAMETERS
 	originnetworkidmask - Rule will be applied only if a target SMS has come to SMSC GW via networkId
 					area with this rule's originnetworkidmask. Set value to -1 as wild card to match all 
 					the network id's. Default value is -1.
+
+	receiptnetworkidmask - Rule will be applied only if
+					a) a message is a delivery receipt,
+					b) the delivery receipt is recognized by SMSC GW
+					c) an original message for the delivery receipt is found
+					d) networkId of the original message == receiptnetworkidmask 
+					Set value to -1 as wild card to match all the network id's. Default value is -1.
 
 	desttonmask		- Rule will be applied only if destination type of number (TON) 
 					of target SMS match's with this rule's desttonmask. Set value 

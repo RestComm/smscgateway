@@ -30,6 +30,7 @@ import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
 import org.mobicents.smsc.mproc.MProcRuleBaseImpl;
@@ -61,6 +62,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String ORIGINATING_MASK = "originatingMask";
     private static final String NETWORK_ID_MASK = "networkIdMask";
     private static final String ORIGIN_NETWORK_ID_MASK = "originNetworkIdMask";
+    private static final String RECEIPT_NETWORK_ID_MASK = "receiptNetworkIdMask";
     private static final String ORIG_ESME_NAME_MASK = "origEsmeNameMask";
     private static final String ORIGINATOR_SCCP_ADDRESS_MASK = "originatorSccpAddressMask";
     private static final String IMSI_DIGITS_MASK = "imsiDigitsMask";
@@ -106,6 +108,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private OrigType originatingMask = null;
     private int networkIdMask = -1;
     private int originNetworkIdMask = -1;
+    private int receiptNetworkIdMask = -1;
     private String origEsmeNameMask = "-1";
     private String originatorSccpAddressMask = "-1";
     private String imsiDigitsMask = "-1";
@@ -259,6 +262,20 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     @Override
     public void setOriginNetworkIdMask(int originNetworkIdMask) {
         this.originNetworkIdMask = originNetworkIdMask;
+    }
+
+    /**
+     * @return mask for NetworkId for via which an original message for a delivery receipt has come to SMSC GW. "-1" means any
+     *         value.
+     */
+    @Override
+    public int getReceiptNetworkIdMask() {
+        return receiptNetworkIdMask;
+    }
+
+    @Override
+    public void setReceiptNetworkIdMask(int receiptNetworkIdMask) {
+        this.receiptNetworkIdMask = receiptNetworkIdMask;
     }
 
     /**
@@ -563,11 +580,13 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         }
     }
 
-    protected void setRuleParameters(int destTonMask, int destNpiMask, String destDigMask,int sourceTonMask, int sourceNpiMask, String sourceDigMask, OrigType originatingMask,
-            int networkIdMask, int originNetworkIdMask, String origEsmeNameMask, String originatorSccpAddressMask,
-            String imsiDigitsMask, String nnnDigitsMask, ProcessingType processingType, String errorCode, int newNetworkId,
-            int newDestTon, int newDestNpi, String addDestDigPrefix, int newSourceTon, int newSourceNpi, String newSourceAddr, boolean makeCopy, boolean hrByPass, boolean dropAfterSri,
-            boolean dropAfterTempFail, int newNetworkIdAfterSri, int newNetworkIdAfterPermFail, int newNetworkIdAfterTempFail) {
+    protected void setRuleParameters(int destTonMask, int destNpiMask, String destDigMask, int sourceTonMask,
+            int sourceNpiMask, String sourceDigMask, OrigType originatingMask, int networkIdMask, int originNetworkIdMask,
+            int receiptNetworkIdMask, String origEsmeNameMask, String originatorSccpAddressMask, String imsiDigitsMask,
+            String nnnDigitsMask, ProcessingType processingType, String errorCode, int newNetworkId, int newDestTon,
+            int newDestNpi, String addDestDigPrefix, int newSourceTon, int newSourceNpi, String newSourceAddr,
+            boolean makeCopy, boolean hrByPass, boolean dropAfterSri, boolean dropAfterTempFail, int newNetworkIdAfterSri,
+            int newNetworkIdAfterPermFail, int newNetworkIdAfterTempFail) {
         this.destTonMask = destTonMask;
         this.destNpiMask = destNpiMask;
         this.destDigMask = destDigMask;
@@ -577,6 +596,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.originatingMask = originatingMask;
         this.networkIdMask = networkIdMask;
         this.originNetworkIdMask = originNetworkIdMask;
+        this.receiptNetworkIdMask = receiptNetworkIdMask;
         this.origEsmeNameMask = origEsmeNameMask;
         this.originatorSccpAddressMask = originatorSccpAddressMask;
         this.imsiDigitsMask = imsiDigitsMask;
@@ -685,6 +705,23 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             return false;
         if (originNetworkIdMask != -1 && originNetworkIdMask != message.getOrigNetworkId())
             return false;
+        if (receiptNetworkIdMask != -1) {
+            boolean matched = false;
+            if (message.isDeliveryReceipt()) {
+                Long receiptLocalMessageId = message.getReceiptLocalMessageId();
+                DeliveryReceiptData deliveryReceiptData = message.getDeliveryReceiptData();
+                if (receiptLocalMessageId != null && deliveryReceiptData != null) {
+                    MProcMessage sentMsg = message.getOriginMessageForDeliveryReceipt(receiptLocalMessageId);
+                    if (sentMsg != null) {
+                        if (receiptNetworkIdMask == sentMsg.getOrigNetworkId())
+                            matched = true;
+                    }
+                }
+            }
+            if (!matched)
+                return false;
+        }
+
         if (origEsmeNameMaskPattern != null) {
             if (message.getOrigEsmeName() == null)
                 return false;
@@ -934,6 +971,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         String originatingMask = "-1";
         int networkIdMask = -1;
         int originNetworkIdMask = -1;
+        int receiptNetworkIdMask = -1;
         String origEsmeNameMask = "-1";
         String originatorSccpAddressMask = "-1";
         String imsiDigitsMask = "-1";
@@ -978,6 +1016,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     networkIdMask = Integer.parseInt(value);
                 } else if (command.equals("originnetworkidmask")) {
                     originNetworkIdMask = Integer.parseInt(value);
+                } else if (command.equals("receiptnetworkidmask")) {
+                    receiptNetworkIdMask = Integer.parseInt(value);
                 } else if (command.equals("origesmenamemask")) {
                     origEsmeNameMask = value;
                 } else if (command.equals("originatorsccpaddressmask")) {
@@ -1052,10 +1092,11 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         } catch (Exception e) {
         }
 
-        this.setRuleParameters(destTonMask, destNpiMask, destDigMask, sourceTonMask, sourceNpiMask, sourceDigMask, originatingMaskVal, networkIdMask, originNetworkIdMask,
-                origEsmeNameMask, originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode,
-                newNetworkId, newDestTon, newDestNpi, addDestDigPrefix, newSourceTon, newSourceNpi, newSourceAddr, makeCopy, hrByPass, dropAfterSri, dropAfterTempFail,
-                newNetworkIdAfterSri, newNetworkIdAfterPermFail, newNetworkIdAfterTempFail);
+        this.setRuleParameters(destTonMask, destNpiMask, destDigMask, sourceTonMask, sourceNpiMask, sourceDigMask,
+                originatingMaskVal, networkIdMask, originNetworkIdMask, receiptNetworkIdMask, origEsmeNameMask,
+                originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode, newNetworkId,
+                newDestTon, newDestNpi, addDestDigPrefix, newSourceTon, newSourceNpi, newSourceAddr, makeCopy, hrByPass,
+                dropAfterSri, dropAfterTempFail, newNetworkIdAfterSri, newNetworkIdAfterPermFail, newNetworkIdAfterTempFail);
     }
 
     @Override
@@ -1107,6 +1148,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } else if (command.equals("originnetworkidmask")) {
                     int val = Integer.parseInt(value);
                     this.setOriginNetworkIdMask(val);
+                    success = true;
+                } else if (command.equals("receiptnetworkidmask")) {
+                    int val = Integer.parseInt(value);
+                    this.setReceiptNetworkIdMask(val);
                     success = true;
                 } else if (command.equals("origesmenamemask")) {
                     this.setOrigEsmeNameMask(value);
@@ -1239,6 +1284,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (originNetworkIdMask != -1) {
             writeParameter(sb, parNumber++, "originNetworkIdMask", originNetworkIdMask, ", ", "=");
         }
+        if (receiptNetworkIdMask != -1) {
+            writeParameter(sb, parNumber++, "receiptNetworkIdMask", receiptNetworkIdMask, ", ", "=");
+        }
         if (this.origEsmeNameMask != null && !this.origEsmeNameMask.equals("") && !this.origEsmeNameMask.equals("-1")) {
             writeParameter(sb, parNumber++, "origEsmeNameMask", origEsmeNameMask, ", ", "=");
         }
@@ -1332,6 +1380,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
             mProcRule.networkIdMask = xml.getAttribute(NETWORK_ID_MASK, -1);
             mProcRule.originNetworkIdMask = xml.getAttribute(ORIGIN_NETWORK_ID_MASK, -1);
+            mProcRule.receiptNetworkIdMask = xml.getAttribute(RECEIPT_NETWORK_ID_MASK, -1);
             mProcRule.origEsmeNameMask = xml.getAttribute(ORIG_ESME_NAME_MASK, "-1");
             mProcRule.originatorSccpAddressMask = xml.getAttribute(ORIGINATOR_SCCP_ADDRESS_MASK, "-1");
             mProcRule.imsiDigitsMask = xml.getAttribute(IMSI_DIGITS_MASK, "-1");
@@ -1392,6 +1441,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 xml.setAttribute(NETWORK_ID_MASK, mProcRule.networkIdMask);
             if (mProcRule.originNetworkIdMask != -1)
                 xml.setAttribute(ORIGIN_NETWORK_ID_MASK, mProcRule.originNetworkIdMask);
+            if (mProcRule.receiptNetworkIdMask != -1)
+                xml.setAttribute(RECEIPT_NETWORK_ID_MASK, mProcRule.receiptNetworkIdMask);
             if (mProcRule.origEsmeNameMask != null && !mProcRule.origEsmeNameMask.equals("")
                     && !mProcRule.origEsmeNameMask.equals("-1"))
                 xml.setAttribute(ORIG_ESME_NAME_MASK, mProcRule.origEsmeNameMask);
