@@ -47,11 +47,14 @@ public class ParseDeliveryReceiptTest {
         String msg = "id:0512249005 sub:001 dlvrd:000 submit date:1609051327 done date:1609051337 stat:ENROUTE err:054 text:xxssxx";
         String msg2 = "id:0512249005 sub:001 dlvrd:000 submit date:1609051327 done date:1609051337 stat:ENROUTE err:054 text:";
         String msg3 = "id:1010d937-8f43-4754-9dd8-6e987cda32fa sub:001 dlvrd:000 submit date:161008120127 done date:1610081500 stat:UNDELIV err:004 text:exampleMessage02";
+        String msg4 = "id:1479978899.393701000100 sub:001 dlvrd:001 submit date:161124101732 done date:161124101735 stat:DELIVRD err:000";
 
         Date d1 = new Date(116, 9 - 1, 5, 13, 27, 0);
         Date d2 = new Date(116, 9 - 1, 5, 13, 37, 0);
         Date d3 = new Date(116, 10 - 1, 8, 12, 1, 27);
         Date d4 = new Date(116, 10 - 1, 8, 15, 0, 0);
+        Date d5 = new Date(116, 11 - 1, 24, 10, 17, 32);
+        Date d6 = new Date(116, 11 - 1, 24, 10, 17, 35);
 
         TlvSet tlvSet = new TlvSet();
 
@@ -91,6 +94,27 @@ public class ParseDeliveryReceiptTest {
         assertEquals(deliveryReceiptData.getError(), 4);
         assertEquals(deliveryReceiptData.getText(), "exampleMessage02");
         assertEquals(deliveryReceiptData.getTlvReceiptedMessageId(), rcptId);
+        assertEquals((int) deliveryReceiptData.getTlvMessageState(), 2);
+
+        String rcptId2 = "1479978899.393701000100@1154905154";
+        tlvSet.clearAllOptionalParameter();
+        data = rcptId2.getBytes();
+        tlv = new Tlv(SmppConstants.TAG_RECEIPTED_MSG_ID, data, "rec_msg_id");
+        tlvSet.addOptionalParameter(tlv);
+        data2 = new byte[] { 2 };
+        tlv2 = new Tlv(SmppConstants.TAG_MSG_STATE, data2, "msg_state");
+        tlvSet.addOptionalParameter(tlv2);
+        deliveryReceiptData = MessageUtil.parseDeliveryReceipt(msg4, tlvSet);
+
+        assertEquals(deliveryReceiptData.getMessageId(), "1479978899.393701000100");
+        assertEquals(deliveryReceiptData.getMsgSubmitted(), 1);
+        assertEquals(deliveryReceiptData.getMsgDelivered(), 1);
+        assertTrue(deliveryReceiptData.getSubmitDate().equals(d5));
+        assertTrue(deliveryReceiptData.getDoneDate().equals(d6));
+        assertEquals(deliveryReceiptData.getStatus(), "DELIVRD");
+        assertEquals(deliveryReceiptData.getError(), 0);
+        assertNull(deliveryReceiptData.getText());
+        assertEquals(deliveryReceiptData.getTlvReceiptedMessageId(), rcptId2);
         assertEquals((int) deliveryReceiptData.getTlvMessageState(), 2);
     }
 

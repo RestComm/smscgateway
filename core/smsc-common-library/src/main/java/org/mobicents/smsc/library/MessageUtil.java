@@ -710,14 +710,20 @@ public class MessageUtil {
         for (int i1 = 0; i1 < namesList.length; i1++) {
             String fieldName = namesList[i1];
             int newPos = msg.indexOf(fieldName, pos);
-            if (newPos < 0)
-                return null;
+            if (newPos < 0) {
+                if (fieldName.equals(DELIVERY_ACK_TEXT))
+                    break;
+                else
+                    return null;
+            }
 
             if (i1 == 0) {
                 if (newPos != 0)
                     return null;
             } else {
-                values.add(msg.substring(pos, newPos));
+                if (newPos >= 0) {
+                    values.add(msg.substring(pos, newPos));
+                }
             }
             pos = newPos + fieldName.length();
         }
@@ -732,7 +738,9 @@ public class MessageUtil {
         String doneDateVal = values.get(4);
         String statusVal = values.get(5);
         String errorVal = values.get(6);
-        String textVal = values.get(7);
+        String textVal = null;
+        if (values.size() >= 8)
+            textVal = values.get(7);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmm");
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMddHHmmss");
