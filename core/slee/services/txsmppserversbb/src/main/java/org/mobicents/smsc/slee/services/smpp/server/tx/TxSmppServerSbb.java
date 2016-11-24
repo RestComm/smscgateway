@@ -548,40 +548,45 @@ public abstract class TxSmppServerSbb implements Sbb {
             throw new SmscProcessingException("DestAddress digits are absent", SmppConstants.STATUS_INVDSTADR, MAPErrorCode.systemFailure, addr);
         }
 
-        int destTon, destNpi;
-		switch (addr.getTon()) {
-		case SmppConstants.TON_UNKNOWN:
-			destTon = smscPropertiesManagement.getDefaultTon();
-			break;
-        case SmppConstants.TON_INTERNATIONAL:
-            destTon = addr.getTon();
-            break;
-        case SmppConstants.TON_NATIONAL:
-            destTon = addr.getTon();
-            break;
-        case SmppConstants.TON_ALPHANUMERIC:
-            destTon = addr.getTon();
-            break;
-		default:
-			throw new SmscProcessingException("DestAddress TON not supported: " + addr.getTon(),
-					SmppConstants.STATUS_INVDSTTON, MAPErrorCode.systemFailure, addr);
-		}
+        int destTon = addr.getTon();
+        int destNpi = addr.getNpi();
 
-        if (addr.getTon() == SmppConstants.TON_ALPHANUMERIC) {
-            destNpi = addr.getNpi();
-        } else {
-            switch (addr.getNpi()) {
-            case SmppConstants.NPI_UNKNOWN:
-                destNpi = smscPropertiesManagement.getDefaultNpi();
-                break;
-            case SmppConstants.NPI_E164:
-                destNpi = addr.getNpi();
-                break;
-            default:
-                throw new SmscProcessingException("DestAddress NPI not supported: " + addr.getNpi(), SmppConstants.STATUS_INVDSTNPI,
-                        MAPErrorCode.systemFailure, addr);
-            }
-        }
+
+//        switch (addr.getTon()) {
+//		case SmppConstants.TON_UNKNOWN:
+//			destTon = smscPropertiesManagement.getDefaultTon();
+//			break;
+//        case SmppConstants.TON_INTERNATIONAL:
+//            destTon = addr.getTon();
+//            break;
+//        case SmppConstants.TON_NATIONAL:
+//            destTon = addr.getTon();
+//            break;
+//        case SmppConstants.TON_ALPHANUMERIC:
+//            destTon = addr.getTon();
+//            break;
+//		default:
+//			throw new SmscProcessingException("DestAddress TON not supported: " + addr.getTon(),
+//					SmppConstants.STATUS_INVDSTTON, MAPErrorCode.systemFailure, addr);
+//		}
+//
+//        if (addr.getTon() == SmppConstants.TON_ALPHANUMERIC) {
+//            destNpi = addr.getNpi();
+//        } else {
+//            switch (addr.getNpi()) {
+//            case SmppConstants.NPI_UNKNOWN:
+//                destNpi = smscPropertiesManagement.getDefaultNpi();
+//                break;
+//            case SmppConstants.NPI_E164:
+//                destNpi = addr.getNpi();
+//                break;
+//            default:
+//                throw new SmscProcessingException("DestAddress NPI not supported: " + addr.getNpi(), SmppConstants.STATUS_INVDSTNPI,
+//                        MAPErrorCode.systemFailure, addr);
+//            }
+//        }
+
+
 
 		TargetAddress ta = new TargetAddress(destTon, destNpi, addr.getAddress(), networkId);
 		return ta;
@@ -818,41 +823,48 @@ public abstract class TxSmppServerSbb implements Sbb {
 					MAPErrorCode.systemFailure, null);
 		}
 		sms.setSourceAddr(event.getSourceAddress().getAddress());
-		switch (event.getSourceAddress().getTon()) {
-		case SmppConstants.TON_UNKNOWN:
-			sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
-			break;
-        case SmppConstants.TON_INTERNATIONAL:
-            sms.setSourceAddrTon(event.getSourceAddress().getTon());
-            break;
-        case SmppConstants.TON_NATIONAL:
-            sms.setSourceAddrTon(event.getSourceAddress().getTon());
-            break;
-		case SmppConstants.TON_ALPHANUMERIC:
-			sms.setSourceAddrTon(event.getSourceAddress().getTon());
-			break;
-		default:
-			throw new SmscProcessingException("SourceAddress TON not supported: " + event.getSourceAddress().getTon(),
-					SmppConstants.STATUS_INVSRCTON, MAPErrorCode.systemFailure, null);
-		}
-		if (event.getSourceAddress().getTon() == SmppConstants.TON_ALPHANUMERIC) {
-			// TODO: when alphanumerical orig address (TON_ALPHANUMERIC) - which
-			// should we NPI select
-			// sms.setSourceAddrNpi(SmppConstants.NPI_UNKNOWN);
-		} else {
-			switch (event.getSourceAddress().getNpi()) {
-			case SmppConstants.NPI_UNKNOWN:
-				sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
-				break;
-			case SmppConstants.NPI_E164:
-				sms.setSourceAddrNpi(event.getSourceAddress().getNpi());
-				break;
-			default:
-				throw new SmscProcessingException("SourceAddress NPI not supported: "
-						+ event.getSourceAddress().getNpi(), SmppConstants.STATUS_INVSRCNPI,
-						MAPErrorCode.systemFailure, null);
-			}
-		}
+        sms.setSourceAddrTon(event.getSourceAddress().getTon());
+        sms.setSourceAddrNpi(event.getSourceAddress().getNpi());
+
+		
+		
+//		switch (event.getSourceAddress().getTon()) {
+//		case SmppConstants.TON_UNKNOWN:
+//			sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
+//			break;
+//        case SmppConstants.TON_INTERNATIONAL:
+//            sms.setSourceAddrTon(event.getSourceAddress().getTon());
+//            break;
+//        case SmppConstants.TON_NATIONAL:
+//            sms.setSourceAddrTon(event.getSourceAddress().getTon());
+//            break;
+//		case SmppConstants.TON_ALPHANUMERIC:
+//			sms.setSourceAddrTon(event.getSourceAddress().getTon());
+//			break;
+//		default:
+//			throw new SmscProcessingException("SourceAddress TON not supported: " + event.getSourceAddress().getTon(),
+//					SmppConstants.STATUS_INVSRCTON, MAPErrorCode.systemFailure, null);
+//		}
+//		if (event.getSourceAddress().getTon() == SmppConstants.TON_ALPHANUMERIC) {
+//			// TODO: when alphanumerical orig address (TON_ALPHANUMERIC) - which
+//			// should we NPI select
+//			// sms.setSourceAddrNpi(SmppConstants.NPI_UNKNOWN);
+//		} else {
+//			switch (event.getSourceAddress().getNpi()) {
+//			case SmppConstants.NPI_UNKNOWN:
+//				sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
+//				break;
+//			case SmppConstants.NPI_E164:
+//				sms.setSourceAddrNpi(event.getSourceAddress().getNpi());
+//				break;
+//			default:
+//				throw new SmscProcessingException("SourceAddress NPI not supported: "
+//						+ event.getSourceAddress().getNpi(), SmppConstants.STATUS_INVSRCNPI,
+//						MAPErrorCode.systemFailure, null);
+//			}
+//		}
+
+
 
         sms.setOrigNetworkId(origEsme.getNetworkId());
 
@@ -1155,42 +1167,49 @@ public abstract class TxSmppServerSbb implements Sbb {
 
         // checking parameters first
         String sourceAddr = event.getSourceAddress().getAddress();
-        int sourceAddrTon;
-        int sourceAddrNpi = 0;
-        switch (event.getSourceAddress().getTon()) {
-        case SmppConstants.TON_UNKNOWN:
-            sourceAddrTon = smscPropertiesManagement.getDefaultTon();
-            break;
-        case SmppConstants.TON_INTERNATIONAL:
-            sourceAddrTon = event.getSourceAddress().getTon();
-            break;
-        case SmppConstants.TON_NATIONAL:
-            sourceAddrTon = event.getSourceAddress().getTon();
-            break;
-        case SmppConstants.TON_ALPHANUMERIC:
-            sourceAddrTon = event.getSourceAddress().getTon();
-            break;
-        default:
-            throw new SmscProcessingException("SourceAddress TON not supported: " + event.getSourceAddress().getTon(),
-                    SmppConstants.STATUS_INVSRCTON, MAPErrorCode.systemFailure, null);
-        }
-        if (event.getSourceAddress().getTon() == SmppConstants.TON_ALPHANUMERIC) {
-            // TODO: when alphanumerical orig address (TON_ALPHANUMERIC) - which
-            // should we NPI select
-            // sms.setSourceAddrNpi(SmppConstants.NPI_UNKNOWN);
-        } else {
-            switch (event.getSourceAddress().getNpi()) {
-            case SmppConstants.NPI_UNKNOWN:
-                sourceAddrNpi = smscPropertiesManagement.getDefaultNpi();
-                break;
-            case SmppConstants.NPI_E164:
-                sourceAddrNpi = event.getSourceAddress().getNpi();
-                break;
-            default:
-                throw new SmscProcessingException("SourceAddress NPI not supported: " + event.getSourceAddress().getNpi(), SmppConstants.STATUS_INVSRCNPI,
-                        MAPErrorCode.systemFailure, null);
-            }
-        }
+        int sourceAddrTon = event.getSourceAddress().getTon();
+        int sourceAddrNpi = event.getSourceAddress().getNpi();
+
+
+
+//        switch (event.getSourceAddress().getTon()) {
+//        case SmppConstants.TON_UNKNOWN:
+//            sourceAddrTon = smscPropertiesManagement.getDefaultTon();
+//            break;
+//        case SmppConstants.TON_INTERNATIONAL:
+//            sourceAddrTon = event.getSourceAddress().getTon();
+//            break;
+//        case SmppConstants.TON_NATIONAL:
+//            sourceAddrTon = event.getSourceAddress().getTon();
+//            break;
+//        case SmppConstants.TON_ALPHANUMERIC:
+//            sourceAddrTon = event.getSourceAddress().getTon();
+//            break;
+//        default:
+//            throw new SmscProcessingException("SourceAddress TON not supported: " + event.getSourceAddress().getTon(),
+//                    SmppConstants.STATUS_INVSRCTON, MAPErrorCode.systemFailure, null);
+//        }
+//        if (event.getSourceAddress().getTon() == SmppConstants.TON_ALPHANUMERIC) {
+//            // TODO: when alphanumerical orig address (TON_ALPHANUMERIC) - which
+//            // should we NPI select
+//            // sms.setSourceAddrNpi(SmppConstants.NPI_UNKNOWN);
+//        } else {
+//            switch (event.getSourceAddress().getNpi()) {
+//            case SmppConstants.NPI_UNKNOWN:
+//                sourceAddrNpi = smscPropertiesManagement.getDefaultNpi();
+//                break;
+//            case SmppConstants.NPI_E164:
+//                sourceAddrNpi = event.getSourceAddress().getNpi();
+//                break;
+//            default:
+//                throw new SmscProcessingException("SourceAddress NPI not supported: " + event.getSourceAddress().getNpi(), SmppConstants.STATUS_INVSRCNPI,
+//                        MAPErrorCode.systemFailure, null);
+//            }
+//        }
+
+
+
+
 
         int dcs = event.getDataCoding();
         String err = MessageUtil.checkDataCodingSchemeSupport(dcs);

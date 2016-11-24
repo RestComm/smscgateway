@@ -948,7 +948,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
     protected SmsSignalInfo createSignalInfo(Sms sms, String msg, byte[] udhData, boolean moreMessagesToSend,
             int messageReferenceNumber, int messageSegmentCount, int messageSegmentNumber, DataCodingScheme dataCodingScheme,
-            int nationalLanguageLockingShift, int nationalLanguageSingleShift) throws MAPException {
+            int nationalLanguageLockingShift, int nationalLanguageSingleShift, int sourceAddrTon, int sourceAddrNpi)
+            throws MAPException {
 
         UserDataHeader userDataHeader;
         if (udhData != null) {
@@ -993,7 +994,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
         SmsDeliverTpdu smsDeliverTpdu = this.mapSmsTpduParameterFactory.createSmsDeliverTpdu(moreMessagesToSend, false,
                 ((sms.getEsmClass() & SmppConstants.ESM_CLASS_REPLY_PATH_MASK) != 0), false,
-                this.getSmsTpduOriginatingAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr()),
+                this.getSmsTpduOriginatingAddress(sourceAddrTon, sourceAddrNpi, sms.getSourceAddr()),
                 this.mapSmsTpduParameterFactory.createProtocolIdentifier(sms.getProtocolId()), serviceCentreTimeStamp, ud);
 
         SmsSignalInfo smsSignalInfo = this.mapParameterFactory.createSmsSignalInfo(smsDeliverTpdu, isoCharset);
@@ -1052,6 +1053,21 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				mtFOSmsDialogACI.attach(this.sbbContext.getSbbLocalObject());
 			}
 
+            // setting TON / NPI to unknown for unsupported source TON / NPI
+            int sourceAddrTon = sms.getSourceAddrTon();
+            if (sourceAddrTon < 0 || sourceAddrTon > 6)
+                sourceAddrTon = 0;
+            int sourceAddrNpi = sms.getSourceAddrNpi();
+            if (sourceAddrTon == SmppConstants.TON_ALPHANUMERIC) {
+                sourceAddrNpi = SmppConstants.NPI_UNKNOWN;
+            } else {
+                if (sourceAddrNpi >= 0 && sourceAddrNpi <= 1 || sourceAddrNpi >= 3 && sourceAddrNpi <= 9 || sourceAddrNpi >= 10
+                        && sourceAddrNpi <= 1 || sourceAddrNpi == 18) {
+                } else {
+                    sourceAddrNpi = SmppConstants.NPI_UNKNOWN;
+                }
+            }
+
 			SM_RP_DA sm_RP_DA = this.getSmRpDa();
 			SM_RP_OA sm_RP_OA = this.getSmRpOa();
 
@@ -1087,7 +1103,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     // message already contains UDH - we can not slice it
                     segments = new SmsSignalInfo[1];
                     segments[0] = this.createSignalInfo(sms, sms.getShortMessageText(), sms.getShortMessageBin(), moreMessagesToSend, 0, 1, 1,
-                            dataCodingScheme, 0, 0);
+                            dataCodingScheme, 0, 0, sourceAddrTon, sourceAddrNpi);
 				} else if (sarMsgRefNum != null && sarTotalSegments != null && sarSegmentSeqnum != null) {
 					// we have tlv's that define message count/number/reference
 					int messageSegmentCount = sarTotalSegments.getValueAsUnsignedByte();
@@ -1096,7 +1112,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 					segments = new SmsSignalInfo[1];
                     segments[0] = this.createSignalInfo(sms, sms.getShortMessageText(), null, moreMessagesToSend,
                             messageReferenceNumber, messageSegmentCount, messageSegmentNumber, dataCodingScheme,
-                            sms.getNationalLanguageLockingShift(), sms.getNationalLanguageSingleShift());
+                            sms.getNationalLanguageLockingShift(), sms.getNationalLanguageSingleShift(), sourceAddrTon,
+                            sourceAddrNpi);
 				} else {
 					// possible a big message and segmentation
                     String[] segmentsByte;
@@ -1111,7 +1128,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 					for (int i1 = 0; i1 < segmentsByte.length; i1++) {
                         segments[i1] = this.createSignalInfo(sms, segmentsByte[i1], null, (i1 < segmentsByte.length - 1 ? true
                                 : moreMessagesToSend), messageReferenceNumber, segmentsByte.length, i1 + 1, dataCodingScheme,
-                                sms.getNationalLanguageLockingShift(), sms.getNationalLanguageSingleShift());
+                                sms.getNationalLanguageLockingShift(), sms.getNationalLanguageSingleShift(), sourceAddrTon,
+                                sourceAddrNpi);
 					}
 				}
 

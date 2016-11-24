@@ -937,9 +937,21 @@ public class MessageUtil {
     public static NumberingPlan getSccpNumberingPlan(int npi) {
         NumberingPlan np = NumberingPlan.ISDN_TELEPHONY;
         switch (npi) {
-        case SmppConstants.NPI_E164:
-            np = NumberingPlan.ISDN_TELEPHONY;
-            break;
+            case SmppConstants.NPI_UNKNOWN:
+                np = NumberingPlan.UNKNOWN;
+                break;
+            case SmppConstants.NPI_E164:
+                np = NumberingPlan.ISDN_TELEPHONY;
+                break;
+            case SmppConstants.NPI_X121:
+                np = NumberingPlan.DATA;
+                break;
+            case SmppConstants.NPI_TELEX:
+                np = NumberingPlan.TELEX;
+                break;
+            case SmppConstants.NPI_LAND_MOBILE:
+                np = NumberingPlan.LAND_MOBILE;
+                break;
         }
         return np;
     }
@@ -947,12 +959,18 @@ public class MessageUtil {
     public static NatureOfAddress getSccpNatureOfAddress(int ton) {
         NatureOfAddress na = NatureOfAddress.INTERNATIONAL;
         switch (ton) {
-        case SmppConstants.TON_INTERNATIONAL:
-            na = NatureOfAddress.INTERNATIONAL;
-            break;
-        case SmppConstants.TON_NATIONAL:
-            na = NatureOfAddress.NATIONAL;
-            break;
+            case SmppConstants.TON_UNKNOWN:
+                na = NatureOfAddress.UNKNOWN;
+                break;
+            case SmppConstants.TON_INTERNATIONAL:
+                na = NatureOfAddress.INTERNATIONAL;
+                break;
+            case SmppConstants.TON_NATIONAL:
+                na = NatureOfAddress.NATIONAL;
+                break;
+            case SmppConstants.TON_SUBSCRIBER:
+                na = NatureOfAddress.SUBSCRIBER;
+                break;
         }
         return na;
     }

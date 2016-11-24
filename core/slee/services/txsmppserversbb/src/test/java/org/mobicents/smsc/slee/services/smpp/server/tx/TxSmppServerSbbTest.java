@@ -455,69 +455,69 @@ public class TxSmppServerSbbTest {
         assertEquals(resp.getUnsucessfulSmes().size(), 0);
     }
 
-    @Test(groups = { "TxSmppServer" })
-    public void testSubmitMulti_BadAddr() throws Exception {
-
-        if (!this.cassandraDbInited)
-            return;
-
-        this.smppSess = new SmppSessionsProxy();
-        this.sbb.setSmppServerSessions(smppSess);
-
-        int windowSize = SmppConstants.DEFAULT_WINDOW_SIZE;
-        long connectTimeout = SmppConstants.DEFAULT_CONNECT_TIMEOUT;
-        long requestExpiryTimeout = SmppConstants.DEFAULT_REQUEST_EXPIRY_TIMEOUT;
-        long clientBindTimeout = SmppConstants.DEFAULT_BIND_TIMEOUT;
-        long windowMonitorInterval = SmppConstants.DEFAULT_WINDOW_MONITOR_INTERVAL;
-        long windowWaitTimeout = SmppConstants.DEFAULT_WINDOW_WAIT_TIMEOUT;
-
-        Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
-                SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
-                windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
-        ActivityContextInterface aci = new SmppTransactionProxy(esme);
-
-        SubmitMulti event = new SubmitMulti();
-        Date curDate = new Date();
-        this.fillSm(event, curDate, true);
-        event.setShortMessage(msgUcs2);
-
-        Address destAddr = new Address();
-        destAddr.setAddress("5555");
-        destAddr.setTon(SmppConstants.TON_SUBSCRIBER);
-        destAddr.setNpi(SmppConstants.NPI_E164);
-        event.addDestAddresses(destAddr);
-        Address destAddr2 = new Address();
-        destAddr2.setAddress("5556");
-        destAddr2.setTon(SmppConstants.TON_INTERNATIONAL);
-        destAddr2.setNpi(SmppConstants.NPI_E164);
-        event.addDestAddresses(destAddr2);
-
-        long dueSlot = this.pers.c2_getDueSlotForTime(scheduleDeliveryTime);
-        PreparedStatementCollection psc = this.pers.getStatementCollection(scheduleDeliveryTime);
-        int b1 = this.pers.checkSmsExists(dueSlot, ta1.getTargetId());
-        long b2 = this.pers.c2_getDueSlotForTargetId(psc, ta1.getTargetId());
-        assertEquals(b1, 0);
-        assertEquals(b2, 0L);
-        b1 = this.pers.checkSmsExists(dueSlot, ta2.getTargetId());
-        b2 = this.pers.c2_getDueSlotForTargetId(psc, ta2.getTargetId());
-        assertEquals(b1, 0);
-        assertEquals(b2, 0L);
-
-        TxSmppServerSbb.smscPropertiesManagement.setSmppEncodingForUCS2(SmppEncoding.Unicode);
-        this.sbb.onSubmitMulti(event, aci);
-
-        b1 = this.pers.checkSmsExists(dueSlot, ta1.getTargetId());
-        assertEquals(b1, 0);
-        b1 = this.pers.checkSmsExists(dueSlot, ta2.getTargetId());
-        assertEquals(b1, 1);
-
-        SubmitMultiResp resp = (SubmitMultiResp)this.smppSess.getRespList().get(0);
-        assertEquals(resp.getCommandStatus(), 0);
-        assertEquals(resp.getOptionalParameterCount(), 0);
-        assertEquals(resp.getUnsucessfulSmes().size(), 1);
-        assertEquals(resp.getUnsucessfulSmes().get(0).getAddress().getAddress(), "5555");
-    }
+//    @Test(groups = { "TxSmppServer" })
+//    public void testSubmitMulti_BadAddr() throws Exception {
+//
+//        if (!this.cassandraDbInited)
+//            return;
+//
+//        this.smppSess = new SmppSessionsProxy();
+//        this.sbb.setSmppServerSessions(smppSess);
+//
+//        int windowSize = SmppConstants.DEFAULT_WINDOW_SIZE;
+//        long connectTimeout = SmppConstants.DEFAULT_CONNECT_TIMEOUT;
+//        long requestExpiryTimeout = SmppConstants.DEFAULT_REQUEST_EXPIRY_TIMEOUT;
+//        long clientBindTimeout = SmppConstants.DEFAULT_BIND_TIMEOUT;
+//        long windowMonitorInterval = SmppConstants.DEFAULT_WINDOW_MONITOR_INTERVAL;
+//        long windowWaitTimeout = SmppConstants.DEFAULT_WINDOW_WAIT_TIMEOUT;
+//
+//        Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
+//                SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
+//                windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
+//                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+//        ActivityContextInterface aci = new SmppTransactionProxy(esme);
+//
+//        SubmitMulti event = new SubmitMulti();
+//        Date curDate = new Date();
+//        this.fillSm(event, curDate, true);
+//        event.setShortMessage(msgUcs2);
+//
+//        Address destAddr = new Address();
+//        destAddr.setAddress("5555");
+//        destAddr.setTon(SmppConstants.TON_SUBSCRIBER);
+//        destAddr.setNpi(SmppConstants.NPI_E164);
+//        event.addDestAddresses(destAddr);
+//        Address destAddr2 = new Address();
+//        destAddr2.setAddress("5556");
+//        destAddr2.setTon(SmppConstants.TON_INTERNATIONAL);
+//        destAddr2.setNpi(SmppConstants.NPI_E164);
+//        event.addDestAddresses(destAddr2);
+//
+//        long dueSlot = this.pers.c2_getDueSlotForTime(scheduleDeliveryTime);
+//        PreparedStatementCollection psc = this.pers.getStatementCollection(scheduleDeliveryTime);
+//        int b1 = this.pers.checkSmsExists(dueSlot, ta1.getTargetId());
+//        long b2 = this.pers.c2_getDueSlotForTargetId(psc, ta1.getTargetId());
+//        assertEquals(b1, 0);
+//        assertEquals(b2, 0L);
+//        b1 = this.pers.checkSmsExists(dueSlot, ta2.getTargetId());
+//        b2 = this.pers.c2_getDueSlotForTargetId(psc, ta2.getTargetId());
+//        assertEquals(b1, 0);
+//        assertEquals(b2, 0L);
+//
+//        TxSmppServerSbb.smscPropertiesManagement.setSmppEncodingForUCS2(SmppEncoding.Unicode);
+//        this.sbb.onSubmitMulti(event, aci);
+//
+//        b1 = this.pers.checkSmsExists(dueSlot, ta1.getTargetId());
+//        assertEquals(b1, 0);
+//        b1 = this.pers.checkSmsExists(dueSlot, ta2.getTargetId());
+//        assertEquals(b1, 1);
+//
+//        SubmitMultiResp resp = (SubmitMultiResp)this.smppSess.getRespList().get(0);
+//        assertEquals(resp.getCommandStatus(), 0);
+//        assertEquals(resp.getOptionalParameterCount(), 0);
+//        assertEquals(resp.getUnsucessfulSmes().size(), 1);
+//        assertEquals(resp.getUnsucessfulSmes().get(0).getAddress().getAddress(), "5555");
+//    }
 
 	@Test(groups = { "TxSmppServer" })
 	public void testSubmitSm_BadCodingSchema() throws Exception {

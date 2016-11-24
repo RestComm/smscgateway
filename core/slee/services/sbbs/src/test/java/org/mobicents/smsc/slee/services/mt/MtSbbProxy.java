@@ -116,9 +116,11 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
 
     protected SmsSignalInfo createSignalInfo(Sms sms, String msg, byte[] udhData, boolean moreMessagesToSend,
             int messageReferenceNumber, int messageSegmentCount, int messageSegmentNumber, DataCodingScheme dataCodingScheme,
-            int nationalLanguageLockingShift, int nationalLanguageSingleShift) throws MAPException {
+            int nationalLanguageLockingShift, int nationalLanguageSingleShift, int sourceAddrTon, int sourceAddrNpi)
+            throws MAPException {
         return super.createSignalInfo(sms, msg, udhData, moreMessagesToSend, messageReferenceNumber, messageSegmentCount,
-                messageSegmentNumber, dataCodingScheme, nationalLanguageLockingShift, nationalLanguageSingleShift);
+                messageSegmentNumber, dataCodingScheme, nationalLanguageLockingShift, nationalLanguageSingleShift,
+                sourceAddrTon, sourceAddrNpi);
     }
 
     public void makeDlvIsNotInited() {

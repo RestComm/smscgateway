@@ -60,11 +60,13 @@ import org.mobicents.protocols.ss7.map.api.service.sms.SmsSignalInfo;
 import org.mobicents.protocols.ss7.map.api.smstpdu.AbsoluteTimeStamp;
 import org.mobicents.protocols.ss7.map.api.smstpdu.AddressField;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.mobicents.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsCommandTpdu;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverReportTpdu;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverTpdu;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsSubmitTpdu;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsTpdu;
+import org.mobicents.protocols.ss7.map.api.smstpdu.TypeOfNumber;
 import org.mobicents.protocols.ss7.map.api.smstpdu.UserData;
 import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
 import org.mobicents.protocols.ss7.map.api.smstpdu.ValidityPeriod;
@@ -739,40 +741,48 @@ public abstract class MoSbb extends MoCommonSbb {
 		}
 
         String digits = af.getAddressValue();
-		int destTon, destNpi;
-		switch (af.getTypeOfNumber()) {
-		case Unknown:
+        int destTon, destNpi;
+        if (af.getTypeOfNumber() == TypeOfNumber.Alphanumeric) {
+            destTon = TypeOfNumber.Alphanumeric.getCode();
+            destNpi = NumberingPlanIdentification.Unknown.getCode();
+        } else {
             destTon = af.getTypeOfNumber().getCode();
+            destNpi = af.getNumberingPlanIdentification().getCode();
+        }
 
-            // removing of MoUnknownTypeOfNumberPrefix prefix here -> moving to mproc
-//            destTon = smscPropertiesManagement.getDefaultTon();
-//            if (smscPropertiesManagement.getMoUnknownTypeOfNumberPrefix() != null && smscPropertiesManagement.getMoUnknownTypeOfNumberPrefix().length() > 0) {
-//                digits = smscPropertiesManagement.getMoUnknownTypeOfNumberPrefix() + digits;
-//                destTon = TypeOfNumber.InternationalNumber.getCode();
-//            }
-			break;
-        case InternationalNumber:
-            destTon = af.getTypeOfNumber().getCode();
-            break;
-        case NationalNumber:
-            destTon = af.getTypeOfNumber().getCode();
-            break;
-		default:
-			throw new SmscProcessingException("MO DestAddress TON not supported: " + af.getTypeOfNumber().getCode(),
-					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
-		}
-		switch (af.getNumberingPlanIdentification()) {
-		case Unknown:
-			destNpi = smscPropertiesManagement.getDefaultNpi();
-			break;
-		case ISDNTelephoneNumberingPlan:
-			destNpi = af.getNumberingPlanIdentification().getCode();
-			break;
-		default:
-			throw new SmscProcessingException("MO DestAddress NPI not supported: "
-					+ af.getNumberingPlanIdentification().getCode(), SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
+//		switch (af.getTypeOfNumber()) {
+//		case Unknown:
+//            destTon = af.getTypeOfNumber().getCode();
+//
+//            // removing of MoUnknownTypeOfNumberPrefix prefix here -> moving to mproc
+////            destTon = smscPropertiesManagement.getDefaultTon();
+////            if (smscPropertiesManagement.getMoUnknownTypeOfNumberPrefix() != null && smscPropertiesManagement.getMoUnknownTypeOfNumberPrefix().length() > 0) {
+////                digits = smscPropertiesManagement.getMoUnknownTypeOfNumberPrefix() + digits;
+////                destTon = TypeOfNumber.InternationalNumber.getCode();
+////            }
+//			break;
+//        case InternationalNumber:
+//            destTon = af.getTypeOfNumber().getCode();
+//            break;
+//        case NationalNumber:
+//            destTon = af.getTypeOfNumber().getCode();
+//            break;
+//		default:
+//			throw new SmscProcessingException("MO DestAddress TON not supported: " + af.getTypeOfNumber().getCode(),
+//					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
+//		}
+//		switch (af.getNumberingPlanIdentification()) {
+//		case Unknown:
+//			destNpi = smscPropertiesManagement.getDefaultNpi();
+//			break;
+//		case ISDNTelephoneNumberingPlan:
+//			destNpi = af.getNumberingPlanIdentification().getCode();
+//			break;
+//		default:
+//			throw new SmscProcessingException("MO DestAddress NPI not supported: "
+//					+ af.getNumberingPlanIdentification().getCode(), SmppConstants.STATUS_SYSERR,
+//					MAPErrorCode.unexpectedDataValue, null);
+//		}
 
 		TargetAddress ta = new TargetAddress(destTon, destNpi, digits, networkId);
 		return ta;
@@ -781,32 +791,40 @@ public abstract class MoSbb extends MoCommonSbb {
     private TargetAddress createDestTargetAddress(ISDNAddressString isdn, int networkId) throws SmscProcessingException {
 
         int destTon, destNpi;
-        switch (isdn.getAddressNature()) {
-        case unknown:
-            destTon = smscPropertiesManagement.getDefaultTon();
-            break;
-        case international_number:
-            destTon = isdn.getAddressNature().getIndicator();
-            break;
-        case national_significant_number:
-            destTon = isdn.getAddressNature().getIndicator();
-            break;
-        default:
-            throw new SmscProcessingException("HomeRouting: DestAddress TON not supported: " + isdn.getAddressNature().getIndicator(),
-                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
-        }
-        switch (isdn.getNumberingPlan()) {
-        case unknown:
-            destNpi = smscPropertiesManagement.getDefaultNpi();
-            break;
-        case ISDN:
-            destNpi = isdn.getNumberingPlan().getIndicator();
-            break;
-        default:
-            throw new SmscProcessingException("HomeRouting: DestAddress NPI not supported: "
-                    + isdn.getNumberingPlan().getIndicator(), SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.unexpectedDataValue, null);
-        }
+        destTon = isdn.getAddressNature().getIndicator();
+        destNpi = isdn.getNumberingPlan().getIndicator();        
+        
+        
+//        switch (isdn.getAddressNature()) {
+//        case unknown:
+//            destTon = smscPropertiesManagement.getDefaultTon();
+//            break;
+//        case international_number:
+//            destTon = isdn.getAddressNature().getIndicator();
+//            break;
+//        case national_significant_number:
+//            destTon = isdn.getAddressNature().getIndicator();
+//            break;
+//        default:
+//            throw new SmscProcessingException("HomeRouting: DestAddress TON not supported: " + isdn.getAddressNature().getIndicator(),
+//                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
+//        }
+//        switch (isdn.getNumberingPlan()) {
+//        case unknown:
+//            destNpi = smscPropertiesManagement.getDefaultNpi();
+//            break;
+//        case ISDN:
+//            destNpi = isdn.getNumberingPlan().getIndicator();
+//            break;
+//        default:
+//            throw new SmscProcessingException("HomeRouting: DestAddress NPI not supported: "
+//                    + isdn.getNumberingPlan().getIndicator(), SmppConstants.STATUS_SYSERR,
+//                    MAPErrorCode.unexpectedDataValue, null);
+//        }
+
+
+
+
 
         TargetAddress ta = new TargetAddress(destTon, destNpi, isdn.getAddress(), networkId);
         return ta;
@@ -919,35 +937,40 @@ public abstract class MoSbb extends MoCommonSbb {
 					MAPErrorCode.unexpectedDataValue, null);
 		}
 		sms.setSourceAddr(callingPartyAddress.getAddress());
-		switch (callingPartyAddress.getAddressNature()) {
-		case unknown:
-			sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
-			break;
-        case international_number:
-            sms.setSourceAddrTon(callingPartyAddress.getAddressNature().getIndicator());
-            break;
-        case national_significant_number:
-            sms.setSourceAddrTon(callingPartyAddress.getAddressNature().getIndicator());
-            break;
-		default:
-			throw new SmscProcessingException("MO SourceAddress TON not supported: "
-					+ callingPartyAddress.getAddressNature(), SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
-		sms.setOriginatorSccpAddress(originatorSccpAddress);
 
-		switch (callingPartyAddress.getNumberingPlan()) {
-		case unknown:
-			sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
-			break;
-		case ISDN:
-			sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlan().getIndicator());
-			break;
-		default:
-			throw new SmscProcessingException("MO SourceAddress NPI not supported: "
-					+ callingPartyAddress.getNumberingPlan(), SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
+		sms.setSourceAddrTon(callingPartyAddress.getAddressNature().getIndicator());
+		sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlan().getIndicator());		
+		
+//		switch (callingPartyAddress.getAddressNature()) {
+//		case unknown:
+//			sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
+//			break;
+//        case international_number:
+//            sms.setSourceAddrTon(callingPartyAddress.getAddressNature().getIndicator());
+//            break;
+//        case national_significant_number:
+//            sms.setSourceAddrTon(callingPartyAddress.getAddressNature().getIndicator());
+//            break;
+//		default:
+//			throw new SmscProcessingException("MO SourceAddress TON not supported: "
+//					+ callingPartyAddress.getAddressNature(), SmppConstants.STATUS_SYSERR,
+//					MAPErrorCode.unexpectedDataValue, null);
+//		}
+//		sms.setOriginatorSccpAddress(originatorSccpAddress);
+//
+//		switch (callingPartyAddress.getNumberingPlan()) {
+//		case unknown:
+//			sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
+//			break;
+//		case ISDN:
+//			sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlan().getIndicator());
+//			break;
+//		default:
+//			throw new SmscProcessingException("MO SourceAddress NPI not supported: "
+//					+ callingPartyAddress.getNumberingPlan(), SmppConstants.STATUS_SYSERR,
+//					MAPErrorCode.unexpectedDataValue, null);
+//		}
+
 
         sms.setOrigNetworkId(networkId);
 
@@ -972,29 +995,6 @@ public abstract class MoSbb extends MoCommonSbb {
 					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
 		}
 		sms.setDataCoding(dcs);
-
-//		switch (dataCodingScheme.getCharacterSet()) {
-//		case GSM7:
-//			UserDataHeader udh = userData.getDecodedUserDataHeader();
-//			if (udh != null) {
-//				byte[] buf1 = udh.getEncodedData();
-//				if (buf1 != null) {
-//					byte[] buf2 = CharsetUtil.encode(userData.getDecodedMessage(), CharsetUtil.CHARSET_GSM);
-//					smsPayload = new byte[buf1.length + buf2.length];
-//					System.arraycopy(buf1, 0, smsPayload, 0, buf1.length);
-//					System.arraycopy(buf2, 0, smsPayload, buf1.length, buf2.length);
-//				} else {
-//					smsPayload = CharsetUtil.encode(userData.getDecodedMessage(), CharsetUtil.CHARSET_GSM);
-//				}
-//			} else {
-//				smsPayload = CharsetUtil.encode(userData.getDecodedMessage(), CharsetUtil.CHARSET_GSM);
-//			}
-//			break;
-//		default:
-//			smsPayload = userData.getEncodedData();
-//			break;
-//		}
-//		sms.setShortMessage(smsPayload);
 
 		sms.setShortMessageText(userData.getDecodedMessage());
         UserDataHeader udh = userData.getDecodedUserDataHeader();
@@ -1030,31 +1030,15 @@ public abstract class MoSbb extends MoCommonSbb {
 
         SmsSet smsSet;
 
-        
-        
-//        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//            try {
-//                smsSet = store.obtainSmsSet(ta);
-//            } catch (PersistenceException e1) {
-//                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
-//                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
-//            }
-//        } else {
-
-
         smsSet = new SmsSet();
         smsSet.setDestAddr(ta.getAddr());
         smsSet.setDestAddrNpi(ta.getAddrNpi());
         smsSet.setDestAddrTon(ta.getAddrTon());
 
         smsSet.setNetworkId(networkId);        
-
-//        }
-        
         
 		smsSet.addSms(sms);
 
-//        long messageId = this.smppServerSessions.getNextMessageId();
         long messageId = store.c2_getNextMessageId();
         SmscStatProvider.getInstance().setCurrentMessageId(messageId);
 		sms.setMessageId(messageId);
@@ -1067,140 +1051,140 @@ public abstract class MoSbb extends MoCommonSbb {
 		return sms;
 	}
 
-	private Sms createSmsEvent(SmsDeliverTpdu smsDeliverTpdu, TargetAddress ta, PersistenceRAInterface store,
-			AddressField callingPartyAddress, int networkId, String originatorSccpAddress) throws SmscProcessingException {
-
-		UserData userData = smsDeliverTpdu.getUserData();
-		try {
-			userData.decode();
-		} catch (MAPException e) {
-			throw new SmscProcessingException("MT MAPException when decoding user data", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
-
-		Sms sms = new Sms();
-		sms.setDbId(UUID.randomUUID());
-        sms.setOriginationType(OriginationType.SS7_HR);
-
-		// checking parameters first
-		if (callingPartyAddress == null || callingPartyAddress.getAddressValue() == null
-				|| callingPartyAddress.getAddressValue().isEmpty()) {
-			throw new SmscProcessingException("MT TP-OA digits are absent", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
-		if (callingPartyAddress.getTypeOfNumber() == null) {
-			throw new SmscProcessingException("MT TP-OA TypeOfNumber is absent", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
-		if (callingPartyAddress.getNumberingPlanIdentification() == null) {
-			throw new SmscProcessingException("MT TP-OA NumberingPlanIdentification is absent",
-					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
-		}
-		sms.setSourceAddr(callingPartyAddress.getAddressValue());
-		sms.setOriginatorSccpAddress(originatorSccpAddress);		
-		switch (callingPartyAddress.getTypeOfNumber()) {
-		case Unknown:
-			sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
-			break;
-		case InternationalNumber:
-			sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
-			break;
-		case NationalNumber:
-			sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
-			break;			
-		default:
-			throw new SmscProcessingException("MT TP-OA TypeOfNumber not supported: "
-					+ callingPartyAddress.getTypeOfNumber(), SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
-
-		switch (callingPartyAddress.getNumberingPlanIdentification()) {
-		case Unknown:
-			sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
-			break;
-		case ISDNTelephoneNumberingPlan:
-			sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlanIdentification().getCode());
-			break;
-		default:
-			throw new SmscProcessingException("MT TP_OA NumberingPlanIdentification not supported: "
-					+ callingPartyAddress.getNumberingPlanIdentification(), SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
-
-        sms.setOrigNetworkId(networkId);
-
-		sms.setSubmitDate(new Timestamp(System.currentTimeMillis()));
-
-		sms.setEsmClass(0x03 + (smsDeliverTpdu.getUserDataHeaderIndicator() ? SmppConstants.ESM_CLASS_UDHI_MASK : 0)
-				+ (smsDeliverTpdu.getReplyPathExists() ? SmppConstants.ESM_CLASS_REPLY_PATH_MASK : 0));
-		sms.setProtocolId(smsDeliverTpdu.getProtocolIdentifier().getCode());
-		sms.setPriority(0);
-
-		// TODO: do we need somehow care with RegisteredDelivery ?
-		sms.setReplaceIfPresent(0);
-
-		// TODO: care with smsSubmitTpdu.getStatusReportRequest() parameter
-		// sending back SMS_STATUS_REPORT tpdu ?
-
-		DataCodingScheme dataCodingScheme = smsDeliverTpdu.getDataCodingScheme();
-		byte[] smsPayload = null;
-		int dcs = dataCodingScheme.getCode();
-		String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
-		if (err != null) {
-			throw new SmscProcessingException("MO DataCoding scheme does not supported: " + dcs + " - " + err,
-					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
-		}
-		sms.setDataCoding(dcs);
-
-        sms.setShortMessageText(userData.getDecodedMessage());
-        UserDataHeader udh = userData.getDecodedUserDataHeader();
-        if (udh != null) {
-            sms.setShortMessageBin(udh.getEncodedData());
-        }
-		
-		// ValidityPeriod processing
-        MessageUtil.applyValidityPeriod(sms, null, false, smscPropertiesManagement.getMaxValidityPeriodHours(),
-                smscPropertiesManagement.getDefaultValidityPeriodHours());
-
-        SmsSet smsSet;
-        
-        
-//        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//            try {
-//                smsSet = store.obtainSmsSet(ta);
-//            } catch (PersistenceException e1) {
-//                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
-//                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
-//            }
-//        } else {
-
-
-
-        smsSet = new SmsSet();
-        smsSet.setDestAddr(ta.getAddr());
-        smsSet.setDestAddrNpi(ta.getAddrNpi());
-        smsSet.setDestAddrTon(ta.getAddrTon());
-        smsSet.setNetworkId(networkId);
-        smsSet.addSms(sms);            
-
-
+//	private Sms createSmsEvent(SmsDeliverTpdu smsDeliverTpdu, TargetAddress ta, PersistenceRAInterface store,
+//			AddressField callingPartyAddress, int networkId, String originatorSccpAddress) throws SmscProcessingException {
+//
+//		UserData userData = smsDeliverTpdu.getUserData();
+//		try {
+//			userData.decode();
+//		} catch (MAPException e) {
+//			throw new SmscProcessingException("MT MAPException when decoding user data", SmppConstants.STATUS_SYSERR,
+//					MAPErrorCode.unexpectedDataValue, null);
+//		}
+//
+//		Sms sms = new Sms();
+//		sms.setDbId(UUID.randomUUID());
+//        sms.setOriginationType(OriginationType.SS7_HR);
+//
+//		// checking parameters first
+//		if (callingPartyAddress == null || callingPartyAddress.getAddressValue() == null
+//				|| callingPartyAddress.getAddressValue().isEmpty()) {
+//			throw new SmscProcessingException("MT TP-OA digits are absent", SmppConstants.STATUS_SYSERR,
+//					MAPErrorCode.unexpectedDataValue, null);
+//		}
+//		if (callingPartyAddress.getTypeOfNumber() == null) {
+//			throw new SmscProcessingException("MT TP-OA TypeOfNumber is absent", SmppConstants.STATUS_SYSERR,
+//					MAPErrorCode.unexpectedDataValue, null);
+//		}
+//		if (callingPartyAddress.getNumberingPlanIdentification() == null) {
+//			throw new SmscProcessingException("MT TP-OA NumberingPlanIdentification is absent",
+//					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
+//		}
+//		sms.setSourceAddr(callingPartyAddress.getAddressValue());
+//		sms.setOriginatorSccpAddress(originatorSccpAddress);		
+//		switch (callingPartyAddress.getTypeOfNumber()) {
+//		case Unknown:
+//			sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
+//			break;
+//		case InternationalNumber:
+//			sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
+//			break;
+//		case NationalNumber:
+//			sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
+//			break;			
+//		default:
+//			throw new SmscProcessingException("MT TP-OA TypeOfNumber not supported: "
+//					+ callingPartyAddress.getTypeOfNumber(), SmppConstants.STATUS_SYSERR,
+//					MAPErrorCode.unexpectedDataValue, null);
+//		}
+//
+//		switch (callingPartyAddress.getNumberingPlanIdentification()) {
+//		case Unknown:
+//			sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
+//			break;
+//		case ISDNTelephoneNumberingPlan:
+//			sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlanIdentification().getCode());
+//			break;
+//		default:
+//			throw new SmscProcessingException("MT TP_OA NumberingPlanIdentification not supported: "
+//					+ callingPartyAddress.getNumberingPlanIdentification(), SmppConstants.STATUS_SYSERR,
+//					MAPErrorCode.unexpectedDataValue, null);
+//		}
+//
+//        sms.setOrigNetworkId(networkId);
+//
+//		sms.setSubmitDate(new Timestamp(System.currentTimeMillis()));
+//
+//		sms.setEsmClass(0x03 + (smsDeliverTpdu.getUserDataHeaderIndicator() ? SmppConstants.ESM_CLASS_UDHI_MASK : 0)
+//				+ (smsDeliverTpdu.getReplyPathExists() ? SmppConstants.ESM_CLASS_REPLY_PATH_MASK : 0));
+//		sms.setProtocolId(smsDeliverTpdu.getProtocolIdentifier().getCode());
+//		sms.setPriority(0);
+//
+//		// TODO: do we need somehow care with RegisteredDelivery ?
+//		sms.setReplaceIfPresent(0);
+//
+//		// TODO: care with smsSubmitTpdu.getStatusReportRequest() parameter
+//		// sending back SMS_STATUS_REPORT tpdu ?
+//
+//		DataCodingScheme dataCodingScheme = smsDeliverTpdu.getDataCodingScheme();
+//		byte[] smsPayload = null;
+//		int dcs = dataCodingScheme.getCode();
+//		String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
+//		if (err != null) {
+//			throw new SmscProcessingException("MO DataCoding scheme does not supported: " + dcs + " - " + err,
+//					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
+//		}
+//		sms.setDataCoding(dcs);
+//
+//        sms.setShortMessageText(userData.getDecodedMessage());
+//        UserDataHeader udh = userData.getDecodedUserDataHeader();
+//        if (udh != null) {
+//            sms.setShortMessageBin(udh.getEncodedData());
 //        }
-        
-        
-		sms.setSmsSet(smsSet);
-
-//		long messageId = this.smppServerSessions.getNextMessageId();
-        long messageId = store.c2_getNextMessageId();
-        SmscStatProvider.getInstance().setCurrentMessageId(messageId);
-		sms.setMessageId(messageId);
-		// sms.setMoMessageRef(smsDeliverTpdu.getMessageReference());
-
-		// TODO: process case when smsSubmitTpdu.getRejectDuplicates()==true: we
-		// need reject message with same MessageId+same source and dest
-		// addresses ?
-
-		return sms;
-	}
+//		
+//		// ValidityPeriod processing
+//        MessageUtil.applyValidityPeriod(sms, null, false, smscPropertiesManagement.getMaxValidityPeriodHours(),
+//                smscPropertiesManagement.getDefaultValidityPeriodHours());
+//
+//        SmsSet smsSet;
+//        
+//        
+////        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+////            try {
+////                smsSet = store.obtainSmsSet(ta);
+////            } catch (PersistenceException e1) {
+////                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
+////                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
+////            }
+////        } else {
+//
+//
+//
+//        smsSet = new SmsSet();
+//        smsSet.setDestAddr(ta.getAddr());
+//        smsSet.setDestAddrNpi(ta.getAddrNpi());
+//        smsSet.setDestAddrTon(ta.getAddrTon());
+//        smsSet.setNetworkId(networkId);
+//        smsSet.addSms(sms);            
+//
+//
+////        }
+//        
+//        
+//		sms.setSmsSet(smsSet);
+//
+////		long messageId = this.smppServerSessions.getNextMessageId();
+//        long messageId = store.c2_getNextMessageId();
+//        SmscStatProvider.getInstance().setCurrentMessageId(messageId);
+//		sms.setMessageId(messageId);
+//		// sms.setMoMessageRef(smsDeliverTpdu.getMessageReference());
+//
+//		// TODO: process case when smsSubmitTpdu.getRejectDuplicates()==true: we
+//		// need reject message with same MessageId+same source and dest
+//		// addresses ?
+//
+//		return sms;
+//	}
 
     private Sms createSmsEvent(SmsDeliverTpdu smsDeliverTpdu, TargetAddress ta, PersistenceRAInterface store,
             CorrelationIdValue civ, int networkId, String originatorSccpAddress) throws SmscProcessingException {
@@ -1235,39 +1219,48 @@ public abstract class MoSbb extends MoCommonSbb {
         }
         sms.setSourceAddr(callingPartyAddress.getAddressValue());
         sms.setOriginatorSccpAddress(originatorSccpAddress);        
-        switch (callingPartyAddress.getTypeOfNumber()) {
-        case Unknown:
-            sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
-            break;
-        case InternationalNumber:
+
+        if (callingPartyAddress.getTypeOfNumber() == TypeOfNumber.Alphanumeric) {
+            sms.setSourceAddrTon(TypeOfNumber.Alphanumeric.getCode());
+            sms.setSourceAddrNpi(NumberingPlanIdentification.Unknown.getCode());
+        } else {
             sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
-            break;
-        case NationalNumber:
-            sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
-            break;          
-        case Alphanumeric:
-            sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
-            break;          
-        default:
-            throw new SmscProcessingException("Home routing: TPDU OriginatingAddress TypeOfNumber not supported: "
-                    + callingPartyAddress.getTypeOfNumber(), SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.unexpectedDataValue, null);
+            sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlanIdentification().getCode());
         }
 
-        switch (callingPartyAddress.getNumberingPlanIdentification()) {
-        case Unknown:
-            // we stay here "Unknown" code for home routing originated messages
-            sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlanIdentification().getCode());
-//            sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
-            break;
-        case ISDNTelephoneNumberingPlan:
-            sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlanIdentification().getCode());
-            break;
-        default:
-            throw new SmscProcessingException("Home routing: TPDU OriginatingAddress NumberingPlanIdentification not supported: "
-                    + callingPartyAddress.getNumberingPlanIdentification(), SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.unexpectedDataValue, null);
-        }
+//        switch (callingPartyAddress.getTypeOfNumber()) {
+//        case Unknown:
+//            sms.setSourceAddrTon(smscPropertiesManagement.getDefaultTon());
+//            break;
+//        case InternationalNumber:
+//            sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
+//            break;
+//        case NationalNumber:
+//            sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
+//            break;          
+//        case Alphanumeric:
+//            sms.setSourceAddrTon(callingPartyAddress.getTypeOfNumber().getCode());
+//            break;          
+//        default:
+//            throw new SmscProcessingException("Home routing: TPDU OriginatingAddress TypeOfNumber not supported: "
+//                    + callingPartyAddress.getTypeOfNumber(), SmppConstants.STATUS_SYSERR,
+//                    MAPErrorCode.unexpectedDataValue, null);
+//        }
+//
+//        switch (callingPartyAddress.getNumberingPlanIdentification()) {
+//        case Unknown:
+//            // we stay here "Unknown" code for home routing originated messages
+//            sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlanIdentification().getCode());
+////            sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
+//            break;
+//        case ISDNTelephoneNumberingPlan:
+//            sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlanIdentification().getCode());
+//            break;
+//        default:
+//            throw new SmscProcessingException("Home routing: TPDU OriginatingAddress NumberingPlanIdentification not supported: "
+//                    + callingPartyAddress.getNumberingPlanIdentification(), SmppConstants.STATUS_SYSERR,
+//                    MAPErrorCode.unexpectedDataValue, null);
+//        }
 
         sms.setOrigNetworkId(networkId);
 

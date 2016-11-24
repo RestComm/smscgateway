@@ -31,8 +31,6 @@ import javax.slee.ActivityContextInterface;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
 
-import org.mobicents.protocols.ss7.indicator.NatureOfAddress;
-import org.mobicents.protocols.ss7.indicator.NumberingPlan;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
@@ -46,6 +44,7 @@ import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
+import org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan;
 import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
 import org.mobicents.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
 import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
@@ -563,15 +562,17 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
     protected SccpAddress getServiceCenterSccpAddress(int networkId) {
         if (networkId == 0) {
             if (this.serviceCenterSCCPAddress == null) {
-                this.serviceCenterSCCPAddress = MessageUtil.getSccpAddress(sccpParameterFact, smscPropertiesManagement.getServiceCenterGt(),
-                        NatureOfAddress.INTERNATIONAL.getValue(), NumberingPlan.ISDN_TELEPHONY.getValue(), smscPropertiesManagement.getServiceCenterSsn(),
+                this.serviceCenterSCCPAddress = MessageUtil.getSccpAddress(sccpParameterFact,
+                        smscPropertiesManagement.getServiceCenterGt(), AddressNature.international_number.getIndicator(),
+                        NumberingPlan.ISDN.getIndicator(), smscPropertiesManagement.getServiceCenterSsn(),
                         smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
             }
             return this.serviceCenterSCCPAddress;
         } else {
             return MessageUtil.getSccpAddress(sccpParameterFact, smscPropertiesManagement.getServiceCenterGt(networkId),
-                    NatureOfAddress.INTERNATIONAL.getValue(), NumberingPlan.ISDN_TELEPHONY.getValue(), smscPropertiesManagement.getServiceCenterSsn(),
-                    smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
+                    AddressNature.international_number.getIndicator(), NumberingPlan.ISDN.getIndicator(),
+                    smscPropertiesManagement.getServiceCenterSsn(), smscPropertiesManagement.getGlobalTitleIndicator(),
+                    smscPropertiesManagement.getTranslationType());
         }
     }
 

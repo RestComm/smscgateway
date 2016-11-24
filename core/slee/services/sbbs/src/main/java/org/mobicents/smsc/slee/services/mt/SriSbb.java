@@ -194,20 +194,36 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             if (smsSet.getDestAddrTon() == SmppConstants.TON_ALPHANUMERIC) {
                 // bad TON at the destination address: alphanumerical is not supported
                 this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.BAD_TYPE_OF_NUMBER,
-                        "TON \"alhpanumerical\" is not supported for as a destination address", true, null, false, ProcessingType.SS7_SRI);
+                        "TON \"alhpanumerical\" is not supported for as a destination address", true, null, false,
+                        ProcessingType.SS7_SRI);
+                return;
+            }
+            if (smsSet.getDestAddrTon() != SmppConstants.TON_UNKNOWN
+                    && smsSet.getDestAddrTon() != SmppConstants.TON_INTERNATIONAL
+                    && smsSet.getDestAddrTon() != SmppConstants.TON_NATIONAL
+                    && smsSet.getDestAddrTon() != SmppConstants.TON_SUBSCRIBER) {
+                // we support only following TON for a dest address
+                this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.BAD_TYPE_OF_NUMBER,
+                        "TON " + smsSet.getDestAddrTon() + " is not supported for as a destination address", true, null, false,
+                        ProcessingType.SS7_SRI);
+                return;
+            }
+            if (smsSet.getDestAddrNpi() != SmppConstants.NPI_UNKNOWN && smsSet.getDestAddrNpi() != SmppConstants.NPI_E164
+                    && smsSet.getDestAddrNpi() != SmppConstants.NPI_X121 && smsSet.getDestAddrNpi() != SmppConstants.NPI_TELEX
+                    && smsSet.getDestAddrNpi() != SmppConstants.NPI_LAND_MOBILE) {
+                // we support only following TON for a dest address
+                this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.BAD_NPI, "NPI " + smsSet.getDestAddrNpi()
+                        + " is not supported for as a destination address", true, null, false, ProcessingType.SS7_SRI);
                 return;
             }
 
             Sms sms = this.obtainNextMessage(ProcessingType.SS7_SRI);
-//            Sms sms = this.getCurrentMessage(0);
             if (sms == null) {
                 // this means that no messages with good ScheduleDeliveryTime or
                 // no messages at all we have to reschedule
                 this.markDeliveringIsEnded(true);
                 return;
             }
-
-//            sms.setDeliveryCount(sms.getDeliveryCount() + 1);
 
             // checking for correlationId - may be we do not need SRI
             String correlationID = smsSet.getCorrelationId();
