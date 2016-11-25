@@ -96,6 +96,7 @@ public class SmppMessageParamForm extends JDialog {
     private JRadioButton rbDR_Error8;
     private JCheckBox cbDRAfter2Min;
     private JCheckBox cbIdResponseTlv;
+    private JCheckBox cbWrongMessageIdInDlr;
     private final ButtonGroup buttonGroup_2 = new ButtonGroup();
 
 	public SmppMessageParamForm(JDialog owner) {
@@ -379,6 +380,10 @@ public class SmppMessageParamForm extends JDialog {
 						cbIdResponseTlv.setBounds(6, 125, 364, 23);
 						panel_resp.add(cbIdResponseTlv);
 						
+						cbWrongMessageIdInDlr = new JCheckBox("Wrong messageId in delivery receipt");
+						cbWrongMessageIdInDlr.setBounds(6, 151, 364, 23);
+						panel_resp.add(cbWrongMessageIdInDlr);
+						
 						JPanel panel_bulk = new JPanel();
 						tabbedPane.addTab("Bulk", null, panel_bulk, null);
 						panel_bulk.setLayout(null);
@@ -567,6 +572,7 @@ public class SmppMessageParamForm extends JDialog {
         this.cbRejectIncomingDeliveryMessage.setSelected(this.data.isRejectIncomingDeliveryMessage());
         this.cbDRAfter2Min.setSelected(this.data.isDeliveryResponseAfter2Min());
         this.cbIdResponseTlv.setSelected(this.data.isIdResponseTlv());
+        this.cbWrongMessageIdInDlr.setSelected(this.data.isWrongMessageIdInDlr());
         switch (this.data.getDeliveryResponseGenerating()) {
             case No:
                 this.rbDR_No.setSelected(true);
@@ -670,6 +676,8 @@ public class SmppMessageParamForm extends JDialog {
         this.data.setRejectIncomingDeliveryMessage(this.cbRejectIncomingDeliveryMessage.isSelected());
         this.data.setDeliveryResponseAfter2Min(this.cbDRAfter2Min.isSelected());
         this.data.setIdResponseTlv(this.cbIdResponseTlv.isSelected());
+        this.data.setWrongMessageIdInDlr(this.cbWrongMessageIdInDlr.isSelected());
+
         if (rbDR_No.isSelected())
             this.data.setDeliveryResponseGenerating(SmppSimulatorParameters.DeliveryResponseGenerating.No);
         if (rbDR_Success.isSelected())

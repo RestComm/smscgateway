@@ -46,6 +46,7 @@ public class SmppSimulatorParameters {
     private DeliveryResponseGenerating deliveryResponseGenerating = DeliveryResponseGenerating.No;
     private boolean deliveryResponseAfter2Min = false;
     private boolean idResponseTlv = false;
+    private boolean wrongMessageIdInDlr = false;
 
 	private TON sourceTon = TON.International;
 	private NPI sourceNpi = NPI.ISDN;
@@ -372,6 +373,14 @@ public class SmppSimulatorParameters {
 
     public void setIdResponseTlv(boolean hexMessageIdResponse) {
         this.idResponseTlv = hexMessageIdResponse;
+    }
+
+    public boolean isWrongMessageIdInDlr() {
+        return wrongMessageIdInDlr;
+    }
+
+    public void setWrongMessageIdInDlr(boolean wrongMessageIdInDlr) {
+        this.wrongMessageIdInDlr = wrongMessageIdInDlr;
     }
 
     public enum EncodingType {

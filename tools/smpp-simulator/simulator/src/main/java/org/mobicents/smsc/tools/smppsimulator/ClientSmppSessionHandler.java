@@ -202,9 +202,13 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                 msgId = String.format("%08X", mId);
                 msgId2 = MessageUtil.createMessageIdString(mId);
                 msgId3 = msgId;
+                if (this.testingForm.getSmppSimulatorParameters().isWrongMessageIdInDlr())
+                    msgId3 = msgId3 + "XYZ";
             } else {
                 msgId = MessageUtil.createMessageIdString(mId);
                 msgId2 = MessageUtil.createMessageIdString(mId);
+                if (this.testingForm.getSmppSimulatorParameters().isWrongMessageIdInDlr())
+                    msgId2 = msgId2 + "XYZ";
                 msgId3 = null;
             }
 
