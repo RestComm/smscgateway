@@ -115,12 +115,6 @@
         </dependency>
 
         <!--END OF HTTP SERVLET RA-->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>scheduler-ratype</artifactId>
-            <version>${project.version}</version>
-            <!--<type>test-jar</type>-->
-        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
