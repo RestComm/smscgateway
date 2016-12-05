@@ -89,7 +89,7 @@ public class DBOperations {
 	public static final int CURRENT_DUE_SLOT = 0;
     public static final int NEXT_MESSAGE_ID = 1;
     public static final int NEXT_CORRELATION_ID = 2;
-	public static final long MAX_MESSAGE_ID = 10000000000L;
+//	public static final long MAX_MESSAGE_ID = 10000000000L;
     public static final long MESSAGE_ID_LAG = 1000;
     public static final long DUE_SLOT_WRITING_POSSIBILITY_DELAY = 10;
 
@@ -127,6 +127,11 @@ public class DBOperations {
 	// Timeout of life cycle of SmsSet in SmsSetCashe.ProcessingSmsSet in
 	// seconds
 	private int processingSmsSetTimeout;
+
+	// Min value of messageId value for SMPP responses
+    private long minMessageId;
+    // Max value of messageId value for SMPP responses
+    private long maxMessageId;
 
 	// data for processing
 
@@ -209,8 +214,8 @@ public class DBOperations {
         return this.session;
     }
 
-	public void start(String hosts, int port, String keyspace, int secondsForwardStoring, int reviseSecondsOnSmscStart,
-			int processingSmsSetTimeout) throws Exception {
+    public void start(String hosts, int port, String keyspace, int secondsForwardStoring, int reviseSecondsOnSmscStart,
+            int processingSmsSetTimeout, long minMessageId, long maxMessageId) throws Exception {
 		if (this.started) {
 			throw new Exception("DBOperations already started");
 		}
@@ -220,6 +225,8 @@ public class DBOperations {
 		this.dueSlotForwardStoring = secondsForwardStoring * 1000 / slotMSecondsTimeArea;
 		this.dueSlotReviseOnSmscStart = reviseSecondsOnSmscStart * 1000 / slotMSecondsTimeArea;
         this.processingSmsSetTimeout = processingSmsSetTimeout;
+        this.minMessageId = minMessageId;
+        this.maxMessageId = maxMessageId;
 
 		this.pcsDate = null;
 		currentSessionUUID = UUID.randomUUID();
@@ -393,8 +400,10 @@ public class DBOperations {
 	 */
 	public synchronized long c2_getNextMessageId() {
 		messageId++;
-		if (messageId >= MAX_MESSAGE_ID)
-			messageId = 1;
+        if (messageId < minMessageId)
+            messageId = minMessageId;
+        if (messageId >= maxMessageId)
+            messageId = minMessageId;
 		if (messageId % MESSAGE_ID_LAG == 0 && databaseAvailable) {
 			try {
 				c2_setCurrentSlotTable(NEXT_MESSAGE_ID, messageId);

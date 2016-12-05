@@ -1,0 +1,12 @@
+Name
+	smsc get maxmessageid
+
+SYNOPSIS
+	smsc get maxmessageid
+
+DESCRIPTION
+	This command is used to get the value of maximum MessageId value
+	that is put into SMPP submit_sm_response.
+
+SEE ALSO
+	smsc set maxmessageid, smsc set minmessageid

@@ -341,4 +341,12 @@ public interface SmscPropertiesManagementMBean {
 
     public void setHttpEncodingForUCS2(HttpEncoding httpEncodingForUCS2);
 
+    public long getMinMessageId();
+
+    public void setMinMessageId(long minMessageId) throws IllegalArgumentException;
+
+    public long getMaxMessageId();
+
+    public void setMaxMessageId(long maxMessageId) throws IllegalArgumentException;
+
 }

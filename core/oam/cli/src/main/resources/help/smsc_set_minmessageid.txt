@@ -1,0 +1,14 @@
+Name
+	smsc set minmessageid
+
+SYNOPSIS
+	smsc set minmessageid <min-MessageId-value>
+
+DESCRIPTION
+	This command is used to set the value of minimum MessageId value
+	that is put into SMPP submit_sm_response.
+	Default value is 1.
+	You need to restart SMSC GW in order to changing will make effect.
+
+SEE ALSO
+	smsc get minmessageid, smsc set maxmessageid

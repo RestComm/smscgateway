@@ -967,6 +967,13 @@ public class SMSCShellExecutor implements ShellExecutor {
                             "UTF8 or UNICODE are possible");
                 }
 
+            } else if (parName.equals("minmessageid")) {
+                long val = Long.parseLong(options[3]);
+                smscPropertiesManagement.setMinMessageId(val);
+            } else if (parName.equals("maxmessageid")) {
+                long val = Long.parseLong(options[3]);
+                smscPropertiesManagement.setMaxMessageId(val);
+
             } else if (parName.equals("deliverypause")) {
                 boolean val = Boolean.parseBoolean(options[3]);
                 smscPropertiesManagement.setDeliveryPause(val);
@@ -1211,6 +1218,11 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getHttpEncodingForGsm7());
             } else if (parName.equals("httpencodingforucs2")) {
                 sb.append(smscPropertiesManagement.getHttpEncodingForUCS2());
+
+            } else if (parName.equals("minmessageid")) {
+                sb.append(smscPropertiesManagement.getMinMessageId());
+            } else if (parName.equals("maxmessageid")) {
+                sb.append(smscPropertiesManagement.getMaxMessageId());
 
             } else if (parName.equals("deliverypause")) {
                 sb.append(smscPropertiesManagement.isDeliveryPause());
@@ -1535,6 +1547,14 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("httpencodingforucs2 = ");
             sb.append(smscPropertiesManagement.getHttpEncodingForUCS2());
+            sb.append("\n");
+
+            sb.append("minmessageid = ");
+            sb.append(smscPropertiesManagement.getMinMessageId());
+            sb.append("\n");
+
+            sb.append("maxmessageid = ");
+            sb.append(smscPropertiesManagement.getMaxMessageId());
             sb.append("\n");
 
             sb.append("deliverypause = ");

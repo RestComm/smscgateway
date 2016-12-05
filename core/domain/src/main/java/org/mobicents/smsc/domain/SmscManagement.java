@@ -252,8 +252,10 @@ public class SmscManagement implements SmscManagementMBean {
 
         String hosts = smscPropertiesManagement.getDbHosts();
         int port = smscPropertiesManagement.getDbPort();
-        DBOperations.getInstance().start(hosts, port, this.smscPropertiesManagement.getKeyspaceName(), this.smscPropertiesManagement.getFirstDueDelay(),
-                this.smscPropertiesManagement.getReviseSecondsOnSmscStart(), this.smscPropertiesManagement.getProcessingSmsSetTimeout());
+        DBOperations.getInstance().start(hosts, port, this.smscPropertiesManagement.getKeyspaceName(),
+                this.smscPropertiesManagement.getFirstDueDelay(), this.smscPropertiesManagement.getReviseSecondsOnSmscStart(),
+                this.smscPropertiesManagement.getProcessingSmsSetTimeout(), this.smscPropertiesManagement.getMinMessageId(),
+                this.smscPropertiesManagement.getMaxMessageId());
 
         // Step 3 SmsSetCashe.start()
         SmsSetCache.start(this.smscPropertiesManagement.getCorrelationIdLiveTime(),

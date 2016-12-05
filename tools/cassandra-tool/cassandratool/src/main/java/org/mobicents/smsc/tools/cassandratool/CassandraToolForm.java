@@ -272,7 +272,7 @@ public class CassandraToolForm {
         }
         String keyspace = this.tbKeyspace.getText();
         try {
-            this.dbOperations.start(hosts, port, keyspace, 60, 60, 60 * 10);
+            this.dbOperations.start(hosts, port, keyspace, 60, 60, 60 * 10, 1, 10000000000L);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(getJFrame(), "Can not connect to cassandra database:\n" + e.getMessage());
             return;

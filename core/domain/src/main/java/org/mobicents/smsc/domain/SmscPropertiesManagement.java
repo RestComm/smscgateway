@@ -126,6 +126,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String HTTP_DEFAULT_DATA_CODING = "httpDefaultDataCoding";
     private static final String HTTP_ENCODING_FOR_UCS2 = "httpEncodingForUCS2";
     private static final String HTTP_ENCODING_FOR_GSM7 = "httpEncodingForGsm7";
+    private static final String MIN_MESSAGE_ID = "minMessageId";
+    private static final String MAX_MESSAGE_ID = "maxMessageId";
 
     private static final String DELIVERY_PAUSE = "deliveryPause";
 
@@ -344,6 +346,11 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // Encoding type at HTTP part for data coding schema==8 (UCS2)
     // 0-UTF8, 1-UNICODE
     private HttpEncoding httpEncodingForUCS2 = HttpEncoding.Utf8;
+
+    // Min value of messageId value for SMPP responses
+    private long minMessageId = 1;
+    // Max value of messageId value for SMPP responses
+    private long maxMessageId = 10000000000L;
 
     // if set to true:
     // SMSC does not try to deliver any messages from cassandra database to SS7
@@ -600,6 +607,43 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
+    @Override
+    public long getMinMessageId() {
+        return minMessageId;
+    }
+
+    @Override
+    public void setMinMessageId(long minMessageId) throws IllegalArgumentException {
+        if (minMessageId < 0)
+            throw new IllegalArgumentException("minMessageId must be geater or equal 0");
+        if (minMessageId > maxMessageId)
+            throw new IllegalArgumentException("minMessageId must be less then maxMessageId");
+        if (maxMessageId - minMessageId < 1000000)
+            throw new IllegalArgumentException("minMessageId must be less then maxMessageId at least for 1000000");
+
+        this.minMessageId = minMessageId;
+        this.store();
+    }
+
+    @Override
+    public long getMaxMessageId() {
+        return maxMessageId;
+    }
+
+    @Override
+    public void setMaxMessageId(long maxMessageId) throws IllegalArgumentException {
+        if (maxMessageId < 0)
+            throw new IllegalArgumentException("maxMessageId must be geater or equal 0");
+        if (minMessageId > maxMessageId)
+            throw new IllegalArgumentException("maxMessageId must be more then minMessageId");
+        if (maxMessageId - minMessageId < 1000000)
+            throw new IllegalArgumentException("minMessageId must be less then maxMessageId at least for 1000000");
+
+        this.maxMessageId = maxMessageId;
+        this.store();
+    }
+
+
 	// TODO : Let port be defined independently instead of ip:prt. Also when
 	// cluster will be used there will be more ip's. Hosts should be comma
 	// separated ip's
@@ -692,25 +736,6 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
-	// @Override
-	// public int getCdrDatabaseExportDuration() {
-	// return cdrDatabaseExportDuration;
-	// }
-	//
-	// @Override
-	// public void setCdrDatabaseExportDuration(int cdrDatabaseExportDuration) {
-	// if (cdrDatabaseExportDuration != 0 && cdrDatabaseExportDuration != 1 &&
-	// cdrDatabaseExportDuration != 2 && cdrDatabaseExportDuration != 5
-	// && cdrDatabaseExportDuration != 10 && cdrDatabaseExportDuration != 15 &&
-	// cdrDatabaseExportDuration != 20 && cdrDatabaseExportDuration != 30
-	// && cdrDatabaseExportDuration != 60)
-	// throw new
-	// IllegalArgumentException("cdrDatabaseExportDuration value must be 1,2,5,10,15,20,30 or 60 minutes or 0 if CDR export is disabled");
-	//
-	// this.cdrDatabaseExportDuration = cdrDatabaseExportDuration;
-	// this.store();
-	// }
-
 	@Override
 	public String getEsmeDefaultClusterName() {
 		return esmeDefaultClusterName;
@@ -721,17 +746,6 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 		esmeDefaultClusterName = val;
 		this.store();
 	}
-
-//	@Override
-//	public boolean getSMSHomeRouting() {
-//		return this.isSMSHomeRouting;
-//	}
-//
-//	@Override
-//	public void setSMSHomeRouting(boolean isSMSHomeRouting) {
-//		this.isSMSHomeRouting = isSMSHomeRouting;
-//		this.store();
-//	}
 
 	public int getReviseSecondsOnSmscStart() {
 		return this.reviseSecondsOnSmscStart;
@@ -1351,6 +1365,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.generateArchiveTable.getValue(), GENERATE_ARCHIVE_TABLE, Integer.class);
 
             writer.write(this.storeAndForwordMode.toString(), STORE_AND_FORWORD_MODE, String.class);
+
+            writer.write(this.minMessageId, MIN_MESSAGE_ID, Long.class);
+            writer.write(this.maxMessageId, MAX_MESSAGE_ID, Long.class);
+
             writer.write(this.moCharging.toString(), MO_CHARGING, String.class);
             writer.write(this.hrCharging.toString(), HR_CHARGING, String.class);
 			writer.write(this.txSmppCharging.toString(), TX_SMPP_CHARGING, String.class);
@@ -1578,6 +1596,13 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             vals = reader.read(STORE_AND_FORWORD_MODE, String.class);
             if (vals != null)
                 this.storeAndForwordMode = Enum.valueOf(StoreAndForwordMode.class, vals);
+
+            vall = reader.read(MIN_MESSAGE_ID, Long.class);
+            if (vall != null)
+                this.minMessageId = vall;
+            vall = reader.read(MAX_MESSAGE_ID, Long.class);
+            if (vall != null)
+                this.maxMessageId = vall;
 
             vals = reader.read(MO_CHARGING, String.class);
             if (vals != null) {

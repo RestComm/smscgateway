@@ -1,0 +1,14 @@
+Name
+	smsc set maxmessageid
+
+SYNOPSIS
+	smsc set maxmessageid <max-MessageId-value>
+
+DESCRIPTION
+	This command is used to set the value of maximum MessageId value
+	that is put into SMPP submit_sm_response.
+	Default value is 10000000000L.
+	You need to restart SMSC GW in order to changing will make effect.
+
+SEE ALSO
+	smsc get maxmessageid, smsc set minmessageid

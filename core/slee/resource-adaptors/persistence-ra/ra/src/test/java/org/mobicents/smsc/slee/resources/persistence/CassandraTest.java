@@ -90,6 +90,23 @@ public class CassandraTest {
         this.sbb.stop();
     }
 
+    @Test(groups = { "cassandra" })
+    public void testingMinMaxMessageId() throws Exception {
+        if (!this.cassandraDbInited)
+            return;
+
+        sbb.stop();
+        sbb.startMinMaxMessageId(80000000, 80000002);
+
+        long l1 = sbb.c2_getNextMessageId();
+        assertEquals(l1, 80000000);
+        l1 = sbb.c2_getNextMessageId();
+        assertEquals(l1, 80000001);
+        l1 = sbb.c2_getNextMessageId();
+        assertEquals(l1, 80000000);
+        l1 = sbb.c2_getNextMessageId();
+        assertEquals(l1, 80000001);
+    }
 
     @Test(groups = { "cassandra" })
     public void testingDueSlotForTime() throws Exception {

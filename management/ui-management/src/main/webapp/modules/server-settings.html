@@ -504,7 +504,22 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									</select>
 								</span> 								
 							</div>														
-							
+
+							<h5 style="border-bottom: 1px solid #DDD;">MessageId value</h5>
+
+							<div id="div-minmessageid" class="control-group">        
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Minimum MessageId value that is put into SMPP submit_sm_response. You need to restart SMSC GW in order to changing will make effect.">
+									<span class="add-on">Minimum MessageId value</span>
+									<input id="minmessageid" type="text" class="input-mini" style="width: 130px; margin-right: 12px; text-align: center;" value="0" />
+								</span>	
+							</div>
+							<div id="div-maxmessageid" class="control-group">        
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Maximum MessageId value that is put into SMPP submit_sm_response. You need to restart SMSC GW in order to changing will make effect.">
+									<span class="add-on">Maximum MessageId value</span>
+									<input id="maxmessageid" type="text" class="input-mini" style="width: 130px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>
+
 							<div class="control-group">
 								<span class="span12" style="text-align: left;">
 									&nbsp;<button class="btn btn-danger" onclick="updateProcessing();"><i class="icon-undo"></i> Revert</button>
@@ -910,6 +925,9 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										} else {
 											origNetworkIdForReceipts.options[1].selected = true;
 										}										
+
+										$("#minmessageid").val(response.value.MinMessageId);
+										$("#maxmessageid").val(response.value.MaxMessageId);
 									}],
 									error: function(value) {
 										errorUID = ("st" + new Date().getTime()).hashCode();
@@ -1828,9 +1846,23 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						
 						e = document.getElementById("origNetworkIdForReceipts");
 						var origNetworkIdForReceipts = e.options[e.selectedIndex].text;
-						
-						
-						
+
+						var minmessageidVal = $("#minmessageid").val();
+						if(minmessageidVal.trim() == "") {
+			    			$("#div-minmessageid").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-minmessageid").hasClass("error")) {
+			    			$("#div-minmessageid").removeClass("error");		
+			    		}
+
+						var maxmessageidVal = $("#maxmessageid").val();
+						if(maxmessageidVal.trim() == "") {
+			    			$("#div-minmessageid").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-minmessageid").hasClass("error")) {
+			    			$("#div-minmessageid").removeClass("error");		
+			    		}
+
 						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
 						jolokia.request(
 								[
@@ -1839,6 +1871,8 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "EnableIntermediateReceipts", value: enableintermediatereceipts },
 									{ type: "write", mbean: mbeanSearch, attribute: "IncomeReceiptsProcessing", value: incomereceiptsprocessing },
 									{ type: "write", mbean: mbeanSearch, attribute: "OrigNetworkIdForReceipts", value: origNetworkIdForReceipts },
+									{ type: "write", mbean: mbeanSearch, attribute: "MinMessageId", value: minmessageidVal },
+									{ type: "write", mbean: mbeanSearch, attribute: "MaxMessageId", value: maxmessageidVal },
 								],
 								{
 									success: function(response) {
