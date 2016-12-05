@@ -204,6 +204,12 @@ public class MProcMessageHrImpl implements MProcMessage {
     }
 
     @Override
+    public long getSmppCommandStatus() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
     public boolean isDeliveryReceipt() {
         // TODO Auto-generated method stub
         return false;

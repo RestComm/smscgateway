@@ -64,7 +64,8 @@ public class SmsSet implements Serializable {
 	private int inSystem;
 	private Date inSystemDate;
 
-	private ErrorCode status;
+    private ErrorCode status;
+    private long smppCommandStatus;
     private SmType type;
 
     private Date lastDelivery;
@@ -254,16 +255,27 @@ public class SmsSet implements Serializable {
 		this.inSystemDate = inSystemDate;
 	}
 
-	/**
-	 * ErrorCode value will be put here for last attempt (0==success / no attempts yet, !=0 � ErrorCode of the last attempt)
-	 */
-	public ErrorCode getStatus() {
-		return status;
-	}
+    /**
+     * ErrorCode value will be put here for last attempt (0==success / no attempts yet, !=0 � ErrorCode of the last attempt)
+     */
+    public ErrorCode getStatus() {
+        return status;
+    }
 
-	public void setStatus(ErrorCode status) {
-		this.status = status;
-	}
+    public void setStatus(ErrorCode status) {
+        this.status = status;
+    }
+
+    /**
+     * smppCommandStatus - error code when SMPP delivering - CommandStatus from responding 
+     */
+    public long getSmppCommandStatus() {
+        return smppCommandStatus;
+    }
+
+    public void setSmppCommandStatus(long smppCommandStatus) {
+        this.smppCommandStatus = smppCommandStatus;
+    }
 
 	/**
 	 * 0-esme terminated, 1-MT
@@ -545,8 +557,12 @@ public class SmsSet implements Serializable {
 		sb.append(", dueDelay=");
 		sb.append(dueDelay);
 		sb.append(", status=");
-		sb.append(status);
-		sb.append(", type=");
+        sb.append(status);
+        if (smppCommandStatus != 0) {
+            sb.append(", smppCommandStatus=");
+            sb.append(smppCommandStatus);
+        }
+        sb.append(", type=");
 		sb.append(type);
 		sb.append(", lastDelivery=");
 		sb.append(lastDelivery);

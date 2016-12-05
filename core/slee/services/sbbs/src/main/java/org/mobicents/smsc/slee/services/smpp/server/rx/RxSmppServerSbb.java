@@ -628,6 +628,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             }
         } else {
             ErrorAction errorAction = ErrorAction.permanentFailure;
+            smsSet.setSmppCommandStatus(status);
             if (status == SmppConstants.STATUS_THROTTLED || status == SmppConstants.STATUS_X_T_APPN
                     || status == SmppConstants.STATUS_SYSERR || status == SmppConstants.STATUS_INVBNDSTS)
                 errorAction = ErrorAction.temporaryFailure;

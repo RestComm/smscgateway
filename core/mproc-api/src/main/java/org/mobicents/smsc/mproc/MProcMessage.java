@@ -91,6 +91,8 @@ public interface MProcMessage {
      */
     int getErrorCode();
 
+    long getSmppCommandStatus();
+
     // delivery receipt staff
 
     /**

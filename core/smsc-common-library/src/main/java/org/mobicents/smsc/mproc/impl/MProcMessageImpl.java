@@ -189,6 +189,11 @@ public class MProcMessageImpl implements MProcMessage {
     }
 
     @Override
+    public long getSmppCommandStatus() {
+        return sms.getSmsSet().getSmppCommandStatus();
+    }
+
+    @Override
     public ProcessingType getProcessingType() {
         return processingType;
     }
