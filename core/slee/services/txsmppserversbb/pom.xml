@@ -12,16 +12,33 @@
 	<name>Core : SLEE : Services Tx SMPP Server SBB</name>
 	<dependencies>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.5.0</version>
-			<scope>test</scope>
+			<artifactId>map-api</artifactId>
+			<groupId>org.mobicents.protocols.ss7.map</groupId>
+			<version>${jss7.restcomm.version}</version>
 		</dependency>
+		<dependency>
+			<artifactId>map-impl</artifactId>
+			<groupId>org.mobicents.protocols.ss7.map</groupId>
+			<version>${jss7.restcomm.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.mobicents.servers.jainslee.api</groupId>
 			<artifactId>jain-slee-11-ext</artifactId>
 			<version>${jslee.ext.version}</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>domain</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
+			<artifactId>smpp-server-ra-ratype</artifactId>
+			<version>${smpp.ra.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>persistence-ra-library</artifactId>
@@ -33,36 +50,12 @@
 			<groupId>${project.groupId}</groupId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<artifactId>persistence-ratype</artifactId>
-			<groupId>${project.groupId}</groupId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.smsc</groupId>
-			<artifactId>smpp-server-ra-library</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.resources</groupId>
-			<artifactId>restcomm-slee-ra-map-ratype</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.smsc</groupId>
-			<artifactId>smpp-server-ra-ratype</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<artifactId>smpp-server-ra-events</artifactId>
-			<groupId>${project.groupId}</groupId>
-		</dependency>
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>charging-sbb</artifactId>
 			<version>${project.version}</version>
-		</dependency>			
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -73,27 +66,18 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>${project.groupId}</groupId>
-					<artifactId>persistence-ra</artifactId>
-					<version>${project.version}</version>
-					<type>test-jar</type>
-				</dependency>			
-				<dependency>
 					<groupId>org.testng</groupId>
 					<artifactId>testng</artifactId>
 					<version>${testng.version}</version>
 					<scope>test</scope>
 				</dependency>
-                <dependency>
-                    <artifactId>statistics-api</artifactId>
-                    <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${jss7.restcomm.version}</version>
-                </dependency>       
-                <dependency>
-                    <artifactId>statistics-impl</artifactId>
-                    <groupId>org.mobicents.protocols.ss7.statistics</groupId>
-                    <version>${jss7.restcomm.version}</version>
-                </dependency>       
+
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>persistence-ra</artifactId>
+					<version>${project.version}</version>
+					<type>test-jar</type>
+				</dependency>			
 			</dependencies>
 		</profile>
 		<profile>

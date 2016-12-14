@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<deploy-config>
-	<ra-entity
-		resource-adaptor-id="ResourceAdaptorID[name=HectorClientResourceAdaptor,vendor=org.mobicents,version=1.0]"
-		entity-name="HectorClientResourceAdaptor">
-		<properties />
-		<ra-link name="HectorClientResourceAdaptor" />
-	</ra-entity>
-</deploy-config>

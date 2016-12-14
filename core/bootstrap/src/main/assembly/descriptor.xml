@@ -29,15 +29,16 @@
 				
 				<!-- SMSC libraris -->
 				<include>org.mobicents.smsc:bootstrap</include>
-				<include>org.mobicents.smsc:smpp</include>
 				<include>org.mobicents.smsc:domain</include>
 				<include>org.mobicents.smsc:smsc-common-library</include>
 				<include>org.mobicents.smsc:mproc-api</include>
 
-				<!-- cloudhopper library -->
-				<include>com.fizzed:ch-smpp</include>
-				<include>com.cloudhopper:ch-commons-charset</include>
-				<include>com.cloudhopper:ch-commons-util</include>
+				<!-- smpp library -->
+				<include>org.restcomm.smpp:ch-commons-util</include>
+				<include>org.restcomm.smpp:ch-commons-charset</include>
+				<include>org.restcomm.smpp:ch-smpp</include>
+				<include>org.restcomm.smpp:smpp-extensions</include>
+
 				<include>joda-time:joda-time</include>
 				<include>org.slf4j:slf4j-api</include>
 

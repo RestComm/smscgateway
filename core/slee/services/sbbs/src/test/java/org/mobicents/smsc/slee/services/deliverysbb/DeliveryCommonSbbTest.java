@@ -51,7 +51,7 @@ import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
-import org.mobicents.smsc.smpp.GenerateType;
+import org.restcomm.smpp.GenerateType;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

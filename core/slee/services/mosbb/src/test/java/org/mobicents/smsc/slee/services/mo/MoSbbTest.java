@@ -28,10 +28,6 @@ import java.nio.charset.Charset;
 import java.util.Date;
 
 import javax.slee.ActivityContextInterface;
-import javax.slee.SLEEException;
-import javax.slee.SbbLocalObject;
-import javax.slee.TransactionRequiredLocalException;
-import javax.slee.TransactionRolledbackLocalException;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -93,10 +89,7 @@ import org.mobicents.smsc.slee.resources.persistence.SmppSessionsProxy;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
-import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
-import org.mobicents.smsc.slee.resources.smpp.server.SmppTransaction;
-import org.mobicents.smsc.smpp.Esme;
-import org.mobicents.smsc.smpp.SmppManagement;
+import org.restcomm.smpp.SmppManagement;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -155,8 +148,8 @@ public class MoSbbTest {
             return;
 
 //        this.clearDatabase();
-        SmppSessionsProxy smppServerSessions = new SmppSessionsProxy();
-        this.sbb.setSmppServerSessions(smppServerSessions);
+//        SmppSessionsProxy smppServerSessions = new SmppSessionsProxy();
+//        this.sbb.setSmppServerSessions(smppServerSessions);
 
 
         AddressString serviceCentreAddressDA = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "1111");
@@ -260,8 +253,8 @@ public class MoSbbTest {
             return;
 
 //        this.clearDatabase();
-        SmppSessionsProxy smppServerSessions = new SmppSessionsProxy();
-        this.sbb.setSmppServerSessions(smppServerSessions);
+//        SmppSessionsProxy smppServerSessions = new SmppSessionsProxy();
+//        this.sbb.setSmppServerSessions(smppServerSessions);
 
 
         AddressString serviceCentreAddressDA = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "1111");
@@ -371,8 +364,8 @@ public class MoSbbTest {
             return;
 
 //        this.clearDatabase();
-        SmppSessionsProxy smppServerSessions = new SmppSessionsProxy();
-        this.sbb.setSmppServerSessions(smppServerSessions);
+//        SmppSessionsProxy smppServerSessions = new SmppSessionsProxy();
+//        this.sbb.setSmppServerSessions(smppServerSessions);
 
 
         AddressString serviceCentreAddressDA = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "1111");
@@ -478,8 +471,8 @@ public class MoSbbTest {
         if (!this.cassandraDbInited)
             return;
 
-        SmppSessionsProxy smppServerSessions = new SmppSessionsProxy();
-        this.sbb.setSmppServerSessions(smppServerSessions);
+//        SmppSessionsProxy smppServerSessions = new SmppSessionsProxy();
+//        this.sbb.setSmppServerSessions(smppServerSessions);
 
 
         AddressString serviceCentreAddressDA = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "1111");
@@ -608,7 +601,7 @@ public class MoSbbTest {
         // TODO: ***** make proper mproc rules testing
 
         SmppSessionsProxy smppServerSessions = new SmppSessionsProxy();
-        this.sbb.setSmppServerSessions(smppServerSessions);
+//        this.sbb.setSmppServerSessions(smppServerSessions);
 
 
         AddressString serviceCentreAddressDA = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "1111");
@@ -829,9 +822,9 @@ public class MoSbbTest {
             return cassandraSbb;
         }
 
-        public void setSmppServerSessions(SmppSessions smppServerSessions) {
-            this.smppServerSessions = smppServerSessions;
-        }
+//        public void setSmppServerSessions(SmppSessions smppServerSessions) {
+//            this.smppServerSessions = smppServerSessions;
+//        }
 
         @Override
         public void setProcessingState(MoProcessingState processingState) {
@@ -858,53 +851,53 @@ public class MoSbbTest {
         }
     }
 
-    private class SmppTransactionProxy implements SmppTransaction, ActivityContextInterface {
-
-        private Esme esme;
-
-        public SmppTransactionProxy(Esme esme) {
-            this.esme = esme;
-        }
-
-        @Override
-        public Esme getEsme() {
-            return this.esme;
-        }
-
-        @Override
-        public void attach(SbbLocalObject arg0) throws NullPointerException, TransactionRequiredLocalException, TransactionRolledbackLocalException,
-                SLEEException {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void detach(SbbLocalObject arg0) throws NullPointerException, TransactionRequiredLocalException, TransactionRolledbackLocalException,
-                SLEEException {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public Object getActivity() throws TransactionRequiredLocalException, SLEEException {
-            // TODO Auto-generated method stub
-            return this;
-        }
-
-        @Override
-        public boolean isAttached(SbbLocalObject arg0) throws NullPointerException, TransactionRequiredLocalException, TransactionRolledbackLocalException,
-                SLEEException {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        @Override
-        public boolean isEnding() throws TransactionRequiredLocalException, SLEEException {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-    }
+//    private class SmppTransactionProxy implements SmppTransaction, ActivityContextInterface {
+//
+//        private Esme esme;
+//
+//        public SmppTransactionProxy(Esme esme) {
+//            this.esme = esme;
+//        }
+//
+//        @Override
+//        public Esme getEsme() {
+//            return this.esme;
+//        }
+//
+//        @Override
+//        public void attach(SbbLocalObject arg0) throws NullPointerException, TransactionRequiredLocalException, TransactionRolledbackLocalException,
+//                SLEEException {
+//            // TODO Auto-generated method stub
+//
+//        }
+//
+//        @Override
+//        public void detach(SbbLocalObject arg0) throws NullPointerException, TransactionRequiredLocalException, TransactionRolledbackLocalException,
+//                SLEEException {
+//            // TODO Auto-generated method stub
+//
+//        }
+//
+//        @Override
+//        public Object getActivity() throws TransactionRequiredLocalException, SLEEException {
+//            // TODO Auto-generated method stub
+//            return this;
+//        }
+//
+//        @Override
+//        public boolean isAttached(SbbLocalObject arg0) throws NullPointerException, TransactionRequiredLocalException, TransactionRolledbackLocalException,
+//                SLEEException {
+//            // TODO Auto-generated method stub
+//            return false;
+//        }
+//
+//        @Override
+//        public boolean isEnding() throws TransactionRequiredLocalException, SLEEException {
+//            // TODO Auto-generated method stub
+//            return false;
+//        }
+//
+//    }
 
     private class SchedulerResourceAdaptorProxy implements SchedulerRaSbbInterface {
 

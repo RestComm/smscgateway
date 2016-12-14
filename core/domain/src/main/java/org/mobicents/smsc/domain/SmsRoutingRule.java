@@ -21,7 +21,7 @@
  */
 package org.mobicents.smsc.domain;
 
-import org.mobicents.smsc.smpp.EsmeManagement;
+import org.restcomm.smpp.EsmeManagement;
 
 /**
  * @author Amit Bhayani

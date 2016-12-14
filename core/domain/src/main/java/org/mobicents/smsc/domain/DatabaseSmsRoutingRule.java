@@ -29,7 +29,7 @@ import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.SmsRoutingRuleType;
 import org.mobicents.smsc.library.DbSmsRoutingRule;
-import org.mobicents.smsc.smpp.EsmeManagement;
+import org.restcomm.smpp.EsmeManagement;
 
 /**
  * @author Amit Bhayani

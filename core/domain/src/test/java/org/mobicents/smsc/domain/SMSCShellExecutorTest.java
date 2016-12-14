@@ -31,7 +31,7 @@ import org.mobicents.smsc.domain.SMSCShellExecutor;
 import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.impl.MProcRuleDefaultImpl;
 import org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault;
-import org.mobicents.smsc.smpp.SmppManagement;
+import org.restcomm.smpp.SmppManagement;
 import org.testng.annotations.Test;
 
 /**

@@ -6,8 +6,7 @@ package org.mobicents.smsc.domain;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mobicents.smsc.smpp.SmppOamMessages;
-
+import org.restcomm.smpp.oam.SmppOamMessages;
 
 import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;

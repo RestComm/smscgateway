@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-import org.mobicents.smsc.smpp.TlvSet;
+import org.restcomm.smpp.parameter.TlvSet;
 
 
 /**

@@ -216,15 +216,15 @@
     <!-- SMPP -->
     <!-- SmppManagement is managing SMPP part -->
     <!-- ==================================================================== -->
-    <bean name="SmppManagement" class="org.mobicents.smsc.smpp.SmppManagement">
-        <constructor factoryClass="org.mobicents.smsc.smpp.SmppManagement"
+    <bean name="SmppManagement" class="org.restcomm.smpp.SmppManagement">
+        <constructor factoryClass="org.restcomm.smpp.SmppManagement"
             factoryMethod="getInstance">
             <parameter>SmppManagement</parameter>
         </constructor>
         <property name="persistDir">${jboss.server.data.dir}</property>
     </bean>
 
-    <bean name="SmppShellExecutor" class="org.mobicents.smsc.smpp.SmppShellExecutor">
+    <bean name="SmppShellExecutor" class="org.restcomm.smpp.oam.SmppShellExecutor">
         <property name="smppManagement">
             <inject bean="SmppManagement" />
         </property>

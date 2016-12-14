@@ -56,7 +56,6 @@ import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
-import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
 
 /**
  * 
@@ -85,7 +84,7 @@ public abstract class MoCommonSbb implements Sbb {
     protected SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
     protected SchedulerRaSbbInterface scheduler = null;
 
-	protected SmppSessions smppServerSessions = null;
+//	protected SmppSessions smppServerSessions = null;
 
 	protected PersistenceRAInterface persistence;
 	public MoCommonSbb(String className) {
@@ -242,7 +241,7 @@ public abstract class MoCommonSbb implements Sbb {
 			this.mapProvider = (MAPProvider) ctx.lookup("slee/resources/map/2.0/provider");
 			this.mapParameterFactory = this.mapProvider.getMAPParameterFactory();
 			
-			this.smppServerSessions = (SmppSessions) ctx.lookup("slee/resources/smpp/server/1.0/provider");
+//			this.smppServerSessions = (SmppSessions) ctx.lookup("slee/resources/smpp/server/1.0/provider");
 
 			this.logger = this.sbbContext.getTracer(this.className);
 

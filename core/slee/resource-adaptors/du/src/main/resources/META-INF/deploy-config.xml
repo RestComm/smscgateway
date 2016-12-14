@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy-config>
 	<ra-entity
-		resource-adaptor-id="ResourceAdaptorID[name=SMPPServerResourceAdaptor,vendor=org.mobicents,version=1.0]"
-		entity-name="SmppServerRA">
-		<properties />
-		<ra-link name="SmppServerRA" />
-	</ra-entity>
-	<ra-entity
 		resource-adaptor-id="ResourceAdaptorID[name=PersistenceResourceAdaptor,vendor=org.mobicents,version=1.0]"
 		entity-name="PersistenceResourceAdaptor">
 		<properties />

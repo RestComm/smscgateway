@@ -25,30 +25,16 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javolution</groupId>
-			<artifactId>javolution</artifactId>
-			<version>${javolution.version}</version>
-		</dependency>
-		<!-- cloudhopper smpp -->
-		<dependency>
-			<groupId>${ch.smpp.namespace}</groupId>
-			<artifactId>ch-smpp</artifactId>
-			<version>${ch.smpp.version}</version>
+			<version>${log4j.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>smpp-server-ra-library</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>smsc-common-library</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

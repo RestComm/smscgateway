@@ -6,8 +6,8 @@ import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mobicents.smsc.smpp.Esme;
-import org.mobicents.smsc.smpp.EsmeManagement;
+import org.restcomm.smpp.Esme;
+import org.restcomm.smpp.EsmeManagement;
 import org.testng.annotations.Test;
 
 public class A1Test {

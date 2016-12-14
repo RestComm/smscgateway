@@ -17,8 +17,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
 			<artifactId>smpp-server-ra-events</artifactId>
-			<groupId>${project.groupId}</groupId>
+			<version>${smpp.ra.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>smsc-common-library</artifactId>
@@ -26,8 +27,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
 			<artifactId>smpp-server-ra-ratype</artifactId>
-			<groupId>${project.groupId}</groupId>
+			<version>${smpp.ra.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>scheduler-ratype</artifactId>
@@ -72,10 +74,10 @@
 					<type>test-jar</type>
 				</dependency>			
                 <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>smpp</artifactId>
-                    <version>${project.version}</version>
-                    <type>test-jar</type>
+					<groupId>org.restcomm.smpp</groupId>
+					<artifactId>smpp-extensions</artifactId>
+					<version>${smpp.extensions.version}</version>
+					<type>test-jar</type>
                 </dependency>           
 				<dependency>
 					<groupId>org.testng</groupId>

@@ -32,16 +32,17 @@
 		</dependency>
 
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>smsc-common-library</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<artifactId>map-impl</artifactId>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>smsc-library</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

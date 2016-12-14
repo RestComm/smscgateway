@@ -11,10 +11,12 @@
 	<artifactId>scheduler-ra-events</artifactId>
 	<name>Core : SLEE : Scheduler RA Events</name>
 	<dependencies>
+<!--
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>smpp</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.restcomm.smpp</groupId>
+			<artifactId>smpp-extensions</artifactId>
+			<version>${smpp.extensions.version}</version>
 		</dependency>
+-->
 	</dependencies>
 </project>

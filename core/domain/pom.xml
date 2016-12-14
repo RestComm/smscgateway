@@ -14,15 +14,17 @@
 	<description>SMSC Gateway Domain Object</description>
 
 	<dependencies>
+		<!-- javolution -->
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>smsc-common-library</artifactId>
-			<version>${project.version}</version>
+			<groupId>javolution</groupId>
+			<artifactId>javolution</artifactId>
+			<version>${javolution.version}</version>
 		</dependency>
+
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>smpp</artifactId>
-			<version>${project.version}</version>
+			<groupId>javax.slee</groupId>
+			<artifactId>jain-slee</artifactId>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -31,21 +33,40 @@
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.restcomm.commons</groupId>
+			<artifactId>restcomm-statistics</artifactId>
+			<version>${restcomm.commons.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>${metrics.version}</version>
+		</dependency>
+
+		<!-- jss7 -->
+		<dependency>
 			<artifactId>jmxss7</artifactId>
 			<groupId>org.mobicents.protocols.ss7.oam.common</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
+		<!-- smpp -->
 		<dependency>
-			<groupId>org.restcomm.commons</groupId>
-			<artifactId>restcomm-statistics</artifactId>
-			<version>${restcomm.commons.version}</version>
+			<groupId>org.restcomm.smpp</groupId>
+			<artifactId>smpp-extensions</artifactId>
+			<version>${smpp.extensions.version}</version>
 		</dependency>
 
+		<!-- smsc projects -->
 		<dependency>
-			<groupId>io.dropwizard.metrics</groupId>
-			<artifactId>metrics-core</artifactId>
-			<version>${metrics.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mproc-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>smsc-common-library</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

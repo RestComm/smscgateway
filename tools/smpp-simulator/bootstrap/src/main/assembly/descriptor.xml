@@ -35,11 +35,11 @@
 				<include>io.netty:netty</include>
 				<include>org.slf4j:slf4j-api</include>
 				<include>org.slf4j:slf4j-log4j12</include>
-				<include>com.fizzed:ch-smpp</include>
-				<include>com.cloudhopper:ch-commons-charset</include>
-				<include>com.cloudhopper:ch-commons-util</include>
+				<include>org.restcomm.smpp:ch-smpp</include>
+				<include>org.restcomm.smpp:ch-commons-charset</include>
+				<include>org.restcomm.smpp:ch-commons-util</include>
 
-				<include>org.mobicents.smsc:smpp-server-ra-library</include>
+				<include>org.restcomm.slee.resource.smpp:smpp-server-ra-ra</include>
 
                 <!-- SS7 library -->
                 <include>org.mobicents.protocols.ss7.map:map-api</include>

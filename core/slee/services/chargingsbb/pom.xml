@@ -13,13 +13,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.5.0</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<artifactId>restcomm-slee-ra-diameter-cca-common-library</artifactId>
 			<groupId>org.mobicents.resources</groupId>
 			<version>${jdiameter.version}</version>
@@ -41,18 +34,8 @@
 		</dependency>
 
 		<dependency>
-			<artifactId>smsc-common-library</artifactId>
-			<groupId>${project.groupId}</groupId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<artifactId>persistence-ratype</artifactId>
 			<groupId>${project.groupId}</groupId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>domain</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         <dependency>
@@ -60,13 +43,6 @@
             <groupId>${project.groupId}</groupId>
             <version>${project.version}</version>
         </dependency>
-
-		<!-- javolution -->
-		<dependency>
-			<groupId>javolution</groupId>
-			<artifactId>javolution</artifactId>
-			<version>${javolution.version}</version>
-		</dependency>
 	</dependencies>
 
 	<profiles>

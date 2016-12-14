@@ -26,7 +26,6 @@ import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
-import org.mobicents.smsc.smpp.SmppOamMessages;
 
 /**
 *
@@ -89,7 +88,7 @@ public class HttpUser implements HttpUserMBean {
         sb.append(SMSCOAMMessages.SHOW_HTTPUSER_NAME).append(this.userName).append(SMSCOAMMessages.SHOW_HTTPUSER_PASSWORD)
                 .append(this.password);
 
-        sb.append(SmppOamMessages.NEW_LINE);
+        sb.append(SMSCOAMMessages.NEW_LINE);
     }
 
     @Override

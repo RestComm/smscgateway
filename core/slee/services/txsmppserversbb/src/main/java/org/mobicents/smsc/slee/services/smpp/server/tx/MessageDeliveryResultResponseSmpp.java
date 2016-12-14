@@ -24,8 +24,8 @@ package org.mobicents.smsc.slee.services.smpp.server.tx;
 
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
-import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
-import org.mobicents.smsc.smpp.Esme;
+import org.restcomm.slee.resource.smpp.SmppSessions;
+import org.restcomm.smpp.Esme;
 
 import javax.slee.facilities.Tracer;
 

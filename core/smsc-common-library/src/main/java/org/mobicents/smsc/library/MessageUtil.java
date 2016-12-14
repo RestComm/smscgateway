@@ -55,8 +55,8 @@ import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.impl.DeliveryReceiptDataImpl;
-import org.mobicents.smsc.smpp.GenerateType;
-import org.mobicents.smsc.smpp.TlvSet;
+import org.restcomm.smpp.GenerateType;
+import org.restcomm.smpp.parameter.TlvSet;
 
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.tlv.Tlv;

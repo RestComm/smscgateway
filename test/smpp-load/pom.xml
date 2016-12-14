@@ -32,11 +32,18 @@
 			<artifactId>log4j</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
+
 		<dependency>
-			<groupId>${ch.smpp.namespace}</groupId>
+			<groupId>org.restcomm.smpp</groupId>
 			<artifactId>ch-smpp</artifactId>
 			<version>${ch.smpp.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.cloudhopper</groupId>
+			<artifactId>ch-commons-charset</artifactId>
+			<version>${ch-commons-charset.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty</artifactId>
@@ -46,11 +53,6 @@
 			<groupId>com.cloudhopper</groupId>
 			<artifactId>ch-commons-util</artifactId>
 			<version>${ch-commons-util.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.cloudhopper</groupId>
-			<artifactId>ch-commons-charset</artifactId>
-			<version>${ch-commons-charset.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

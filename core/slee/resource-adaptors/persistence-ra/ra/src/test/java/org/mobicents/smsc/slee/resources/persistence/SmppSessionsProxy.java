@@ -28,9 +28,9 @@ import javax.slee.SLEEException;
 import javax.slee.resource.ActivityAlreadyExistsException;
 import javax.slee.resource.StartActivityException;
 
-import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
-import org.mobicents.smsc.slee.resources.smpp.server.SmppTransaction;
-import org.mobicents.smsc.smpp.Esme;
+import org.restcomm.slee.resource.smpp.SmppSessions;
+import org.restcomm.slee.resource.smpp.SmppTransaction;
+import org.restcomm.smpp.Esme;
 
 import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;

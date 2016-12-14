@@ -15,7 +15,6 @@
 
 	<modules>
 		<module>common-library</module>
-		<module>smpp-server-ra</module>
 		<module>persistence-ra</module>
 		<module>scheduler-ra</module>
 		<module>du</module>

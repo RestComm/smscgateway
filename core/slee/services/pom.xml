@@ -30,15 +30,16 @@
 
 	<dependencyManagement>
 		<dependencies>
+<!--
 			<dependency>
+				<groupId>org.restcomm.slee.resource.smpp</groupId>
 				<artifactId>smpp-server-ra-events</artifactId>
-				<groupId>${project.groupId}</groupId>
-				<version>${project.version}</version>
+				<version>${smpp.ra.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.restcomm.slee.resource.smpp</groupId>
 				<artifactId>smpp-server-ra-ratype</artifactId>
-				<groupId>${project.groupId}</groupId>
-				<version>${project.version}</version>
+				<version>${smpp.ra.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mobicents.resources</groupId>
@@ -50,6 +51,7 @@
 				<groupId>org.mobicents.resources</groupId>
 				<version>${restcomm.resources.map.version}</version>
 			</dependency>
+-->
 		</dependencies>
 	</dependencyManagement>
 </project>

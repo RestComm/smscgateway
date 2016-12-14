@@ -80,7 +80,7 @@ import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
-import org.mobicents.smsc.smpp.SmppEncoding;
+import org.restcomm.smpp.SmppEncoding;
 
 /**
  * 

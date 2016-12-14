@@ -66,7 +66,6 @@ import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
-import org.mobicents.smsc.slee.resources.smpp.server.SmppSessions;
 
 /**
  * 
@@ -95,7 +94,7 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
 			.getInstance();
     protected PersistenceRAInterface persistence;
 
-	protected SmppSessions smppServerSessions = null;
+//	protected SmppSessions smppServerSessions = null;
     protected ParameterFactory sccpParameterFact;
     private SccpAddress serviceCenterSCCPAddress = null;
     private AddressString serviceCenterAddress;
@@ -310,8 +309,8 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
             this.mapErrorMessageFactory = this.mapProvider.getMAPErrorMessageFactory();
             this.sccpParameterFact = new ParameterFactoryImpl();
 
-			this.smppServerSessions = (SmppSessions) ctx
-					.lookup("slee/resources/smpp/server/1.0/provider");
+//			this.smppServerSessions = (SmppSessions) ctx
+//					.lookup("slee/resources/smpp/server/1.0/provider");
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, PERSISTENCE_LINK);
 
 			this.logger = this.sbbContext.getTracer(this.className);

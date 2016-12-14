@@ -65,11 +65,6 @@
 		<!-- SMSC Dependency -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>smpp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>smsc-common-library</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -84,11 +79,16 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- cloudhopper smpp -->
+		<!-- smpp -->
 		<dependency>
-			<groupId>${ch.smpp.namespace}</groupId>
+			<groupId>org.restcomm.smpp</groupId>
 			<artifactId>ch-smpp</artifactId>
 			<version>${ch.smpp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.smpp</groupId>
+			<artifactId>smpp-extensions</artifactId>
+			<version>${smpp.extensions.version}</version>
 		</dependency>
 
 		<!-- javolution -->

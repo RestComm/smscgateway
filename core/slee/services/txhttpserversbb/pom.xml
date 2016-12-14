@@ -27,20 +27,33 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.0</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.restcomm.smpp</groupId>
+			<artifactId>smpp-extensions</artifactId>
+			<version>${smpp.extensions.version}</version>
+		</dependency>           
+
         <dependency>
             <groupId>org.mobicents.servers.jainslee.api</groupId>
             <artifactId>jain-slee-11-ext</artifactId>
             <version>${jslee.ext.version}</version>
             <scope>provided</scope>
         </dependency>
+
+		<dependency>
+			<groupId>org.mobicents.resources</groupId>
+			<artifactId>restcomm-slee-ra-map-ratype</artifactId>
+			<version>${restcomm.resources.map.version}</version>
+		</dependency>
+
+		<dependency>
+			<artifactId>domain</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
+		</dependency>
+
         <dependency>
-            <artifactId>persistence-ra-library</artifactId>
+            <artifactId>persistence-ratype</artifactId>
             <groupId>${project.groupId}</groupId>
             <version>${project.version}</version>
         </dependency>
@@ -48,35 +61,6 @@
             <artifactId>scheduler-ratype</artifactId>
             <groupId>${project.groupId}</groupId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <artifactId>persistence-ratype</artifactId>
-            <groupId>${project.groupId}</groupId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>persistence-ra</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mobicents.smsc</groupId>
-            <artifactId>smpp-server-ra-library</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mobicents.resources</groupId>
-            <artifactId>restcomm-slee-ra-map-ratype</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mobicents.smsc</groupId>
-            <artifactId>smpp-server-ra-ratype</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <artifactId>smpp-server-ra-events</artifactId>
-            <groupId>${project.groupId}</groupId>
         </dependency>
 
         <dependency>
@@ -91,7 +75,44 @@
             </exclusions>
         </dependency>
 
+<!--
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <artifactId>persistence-ra-library</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>persistence-ra</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
+			<artifactId>smpp-server-ra-library</artifactId>
+			<version>${smpp.ra.version}</version>
+        </dependency>
+
+        <dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
+			<artifactId>smpp-server-ra-ratype</artifactId>
+			<version>${smpp.ra.version}</version>
+        </dependency>
+
+        <dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
+			<artifactId>smpp-server-ra-events</artifactId>
+			<version>${smpp.ra.version}</version>
+        </dependency>
+-->
         <!--HTTP SERVLET RA-->
+
+<!--
         <dependency>
             <groupId>org.mobicents.resources</groupId>
             <artifactId>http-servlet-ratype</artifactId>
@@ -102,6 +123,8 @@
             <artifactId>http-servlet-ra</artifactId>
             <version>${org.mobicents.http.ra.version}</version>
         </dependency>
+-->
+
         <dependency>
             <groupId>org.mobicents.resources</groupId>
             <artifactId>http-servlet-events</artifactId>
@@ -116,19 +139,19 @@
 
         <!--END OF HTTP SERVLET RA-->
 
+<!--
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>scheduler-ra</artifactId>
             <version>${project.version}</version>
-            <!--<type>test-jar</type>-->
         </dependency>
+-->
 
         <!--TEST-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
-            <!--<scope>test</scope>-->
         </dependency>
 
         <!--SPRING-->
@@ -164,6 +187,7 @@
         </dependency>
 
         <!--HTTP SERVER-->
+<!--
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
@@ -182,13 +206,15 @@
             <version>8.1.19.v20160209</version>
             <scope>test</scope>
         </dependency>
+-->
 
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
-            <!--<scope>test</scope>-->
         </dependency>
+
+<!--
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -203,6 +229,7 @@
             <version>2.23.2</version>
             <scope>test</scope>
         </dependency>
+-->
     </dependencies>
 
     <profiles>
@@ -213,11 +240,19 @@
             </activation>
             <dependencies>
                 <dependency>
+                    <groupId>org.testng</groupId>
+                    <artifactId>testng</artifactId>
+                    <version>${testng.version}</version>
+                    <scope>test</scope>
+                </dependency>
+
+                <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>persistence-ra</artifactId>
                     <version>${project.version}</version>
                     <type>test-jar</type>
                 </dependency>
+<!--
                 <dependency>
                     <artifactId>persistence-ra-library</artifactId>
                     <groupId>${project.groupId}</groupId>
@@ -229,12 +264,6 @@
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.testng</groupId>
-                    <artifactId>testng</artifactId>
-                    <version>${testng.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
                     <artifactId>statistics-api</artifactId>
                     <groupId>org.mobicents.protocols.ss7.statistics</groupId>
                     <version>${jss7.restcomm.version}</version>
@@ -244,6 +273,7 @@
                     <groupId>org.mobicents.protocols.ss7.statistics</groupId>
                     <version>${jss7.restcomm.version}</version>
                 </dependency>
+-->
             </dependencies>
         </profile>
         <profile>

@@ -29,8 +29,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
 			<artifactId>smpp-server-ra-events</artifactId>
-			<groupId>${project.groupId}</groupId>
+			<version>${smpp.ra.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>smsc-common-library</artifactId>
@@ -43,8 +44,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
 			<artifactId>smpp-server-ra-ratype</artifactId>
-			<groupId>${project.groupId}</groupId>
+			<version>${smpp.ra.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servers.jainslee.api</groupId>
@@ -58,9 +60,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
 			<artifactId>smpp-server-ra-library</artifactId>
-			<version>${project.version}</version>
+			<version>${smpp.ra.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>

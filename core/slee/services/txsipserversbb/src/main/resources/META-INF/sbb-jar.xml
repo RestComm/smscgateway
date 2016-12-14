@@ -2,7 +2,7 @@
 <!DOCTYPE sbb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE SBB 1.1//EN"
                          "http://java.sun.com/dtd/slee-sbb-jar_1_1.dtd">
 <sbb-jar>
-	<sbb id="txSmppServerSbb">
+	<sbb id="txSipServerSbb">
 		<description>SBB listening for SMS from ESME and routing to Mt</description>
 		<sbb-name>TxSipServerSbb</sbb-name>
 		<sbb-vendor>org.mobicents</sbb-vendor>

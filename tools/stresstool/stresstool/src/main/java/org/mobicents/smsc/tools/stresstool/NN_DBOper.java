@@ -19,7 +19,7 @@ import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.Schema;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.smpp.TlvSet;
+import org.restcomm.smpp.parameter.TlvSet;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;

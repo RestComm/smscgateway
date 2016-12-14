@@ -12,13 +12,25 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.github.stephenc.eaio-uuid</groupId>
+			<artifactId>uuid</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>scheduler-ratype</artifactId>
+			<artifactId>domain</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>domain</artifactId>
+			<artifactId>common-library</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>scheduler-ratype</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

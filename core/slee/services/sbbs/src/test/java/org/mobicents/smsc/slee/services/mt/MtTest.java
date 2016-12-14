@@ -105,7 +105,7 @@ import org.mobicents.smsc.slee.resources.persistence.MAPDialogSmsProxy.MAPTestEv
 import org.mobicents.smsc.slee.resources.persistence.MAPDialogSmsProxy.MAPTestEventType;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
-import org.mobicents.smsc.smpp.SmppManagement;
+import org.restcomm.smpp.SmppManagement;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

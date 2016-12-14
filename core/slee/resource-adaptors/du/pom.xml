@@ -11,8 +11,8 @@
 	<name>Core : SLEE : SMSC Resource Adaptors DU</name>
 
 	<dependencies>
-	    <!-- common -->
-	    	<dependency>
+		<!-- common -->
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>common-library</artifactId>
 			<version>${project.version}</version>
@@ -55,7 +55,9 @@
 			<artifactId>scheduler-ra</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<!-- SMPP -->
+<!--
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>smpp-server-ra-library</artifactId>
@@ -76,6 +78,7 @@
 			<artifactId>smpp-server-ra-ra</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+-->
 	</dependencies>
 
 	<build>

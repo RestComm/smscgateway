@@ -39,8 +39,8 @@ import org.mobicents.smsc.library.DbSmsRoutingRule;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.mproc.MProcRule;
 import org.mobicents.smsc.mproc.impl.MProcRuleOamMessages;
-import org.mobicents.smsc.smpp.SmppEncoding;
 import org.mobicents.ss7.management.console.ShellExecutor;
+import org.restcomm.smpp.SmppEncoding;
 
 /**
  * @author amit bhayani

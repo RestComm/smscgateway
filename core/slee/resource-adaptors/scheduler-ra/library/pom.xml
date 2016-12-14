@@ -18,14 +18,6 @@
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- for some reason'compile' time from ^^^ are not included... <dependency> 
-			<artifactId>common-library</artifactId> <groupId>${project.groupId}</groupId> 
-			<version>${project.version}</version> <scope>compile</scope> </dependency> <dependency> 
-			<artifactId>smpp-server-ra-library</artifactId> <groupId>${project.groupId}</groupId> 
-			<version>${project.version}</version> <scope>compile</scope> </dependency> <dependency> 
-			<artifactId>restcomm-slee-ra-map-library</artifactId> <groupId>org.mobicents.resources</groupId> 
-			<version>${restcomm.resources.map.version}</version> <scope>compile</scope> 
-			</dependency> -->
 	</dependencies>
 
 

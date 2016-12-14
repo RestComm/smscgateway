@@ -29,7 +29,7 @@ import static org.testng.Assert.assertNull;
 import java.util.Date;
 
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
-import org.mobicents.smsc.smpp.TlvSet;
+import org.restcomm.smpp.parameter.TlvSet;
 import org.testng.annotations.Test;
 
 import com.cloudhopper.smpp.SmppConstants;

@@ -14,27 +14,11 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.mobicents.smsc</groupId>
-			<artifactId>smpp-simulator</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>urbanophile</groupId>
 			<artifactId>java-getopt</artifactId>
 			<version>1.0.9</version>
 		</dependency>
 
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-
-		<!-- dependency>
-			<groupId>com.sun.jdmk</groupId>
-			<artifactId>jmxtools</artifactId>
-			<version>1.2.1</version>
-		</dependency-->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -44,6 +28,18 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${slf4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
+			<artifactId>smpp-server-ra-ra</artifactId>
+			<version>${smpp.ra.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mobicents.smsc</groupId>
+			<artifactId>smpp-simulator</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

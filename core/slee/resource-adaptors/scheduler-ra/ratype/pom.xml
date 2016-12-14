@@ -15,6 +15,14 @@
 			<groupId>javax.slee</groupId>
 			<artifactId>jain-slee</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>smsc-common-library</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	
+<!--
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>scheduler-ra-library</artifactId>
@@ -25,5 +33,6 @@
 			<artifactId>scheduler-ra-events</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+-->
 	</dependencies>
 </project>

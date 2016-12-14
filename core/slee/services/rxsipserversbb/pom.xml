@@ -17,8 +17,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.restcomm.slee.resource.smpp</groupId>
 			<artifactId>smpp-server-ra-events</artifactId>
-			<groupId>${project.groupId}</groupId>
+			<version>${smpp.ra.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>smsc-common-library</artifactId>

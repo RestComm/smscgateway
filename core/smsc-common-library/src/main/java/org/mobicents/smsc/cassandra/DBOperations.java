@@ -54,7 +54,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.smpp.TlvSet;
+import org.restcomm.smpp.parameter.TlvSet;
 
 import com.cloudhopper.smpp.SmppConstants;
 import com.datastax.driver.core.BoundStatement;

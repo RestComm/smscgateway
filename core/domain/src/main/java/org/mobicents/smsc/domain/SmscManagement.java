@@ -42,7 +42,7 @@ import org.jboss.mx.util.MBeanServerLocator;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.mproc.MProcRuleFactory;
-import org.mobicents.smsc.smpp.SmppManagement;
+import org.restcomm.smpp.SmppManagement;
 
 /**
  * @author Amit Bhayani

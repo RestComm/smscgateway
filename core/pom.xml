@@ -13,11 +13,9 @@
 	<name>Core</name>
 
 	<modules>
-		<module>smpp</module>
 		<module>mproc-api</module>
 		<module>smsc-common-library</module>
-        <module>oam/clismpp</module>
-        <module>oam/cli</module>
+		<module>oam/cli</module>
 		<module>domain</module>
 		<module>slee</module>
 		<module>bootstrap</module>
