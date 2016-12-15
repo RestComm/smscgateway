@@ -90,13 +90,15 @@
 					<artifactId>persistence-ra</artifactId>
 					<version>${project.version}</version>
 					<type>test-jar</type>
-				</dependency>			
+				</dependency>
+<!--
 				<dependency>
 					<groupId>org.restcomm.smpp</groupId>
 					<artifactId>smpp-extensions</artifactId>
 					<version>${smpp.extensions.version}</version>
 					<type>test-jar</type>
-				</dependency>           
+				</dependency>
+-->
 			</dependencies>
 		</profile>
 		<profile>
