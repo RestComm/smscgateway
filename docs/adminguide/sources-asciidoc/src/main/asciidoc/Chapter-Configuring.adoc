@@ -1349,6 +1349,27 @@ Home Routing enables operators to offer a full range of value-added services to 
 You need to configure SMSC GW before you can use SMS Home Routing.
 For more details refer to <<_smsc_gateway_server_hr>>.
 
+
+[[_smpp_interface_description]]
+== SMPP interface description
+
+[[_smpp_interface_encoding]]
+=== Encoding in SMPP interface
+
+When message sending and recieveing via SMPP interface of SMSC GW we need to care of message body encoding and assigning of a parameter DCS (data coding schema).
+
+DCS parameter means the encoding that will be used when a message will be transferred at SS7 part. The most common parameteres for DCS are:
+
+* 0 - GSM7 encoding (english characters and a little set of extra characters are supported). 7-bit encoding is used at SS7 network message transferring
+* 4 - GSM8 encoding (used mostly for binary messages). No recoding is applied. Binary messages are just transferred to the destination without any changes.
+* 8 - UCS2 encoding (all characters are supported). 2-bytes encoding is used at SS7 network message transferring.
+
+For DCS 0 (GSM7 encdoing) and 8 (UCS2 encoding) SMSC GW decodes messages when receiving from SMPP connector and encode messages before sending them into SMPP connector. For this task it is important which data coding schema will be used for messages decoding / encoding.
+SMSC GW has two configurable parameters for decoding / encodoing, one for GSM 7 ancoding and another for UCS2 encoding (SMPP Encoding for GSM7 / SMPP Encoding for UCS2). See following chapter for configuring details: <<_smpp_encoding_for_ucs2>>. A user schould configure these parameters before of SMSC GW usage depending on which encoding are used by user's SMPP applications for message body encoding.
+
+One of indication that says that message encoding parameters are wrongly configured is messages in server.log like `Message length in bytes is too big for solid message: 268>134`. This may mean that SMPP application sends messages to SMSC GW in UCS2 encoding and SMSC GW decodes them in UTF8 encodoing and a message bode becomes too big length after it.
+
+
 [[_http_interface_description]]
 == HTTP interface description
 
