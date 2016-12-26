@@ -36,12 +36,12 @@ SYNOPSIS
 	<delivery processing type: SS7_SRI | SS7_MT | SMPP | SIP | -1> errorcode <internal SMSC
 	GW delivery error code value> newnetworkid <new networkId value> newdestton <new
 	destination type of number> newdestnpi <new destination numbering plan indicator>
-	adddestdigprefix <prefix value> newsourceton <new source type of number> newsourcenpi 
+	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
+	newsourceton <new source type of number> newsourcenpi 
 	<new source numbering plan indicator> newsourceaddr <new source address value> hrbypass 
 	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value> 
 	newnetworkidafterpermfail <networkId value> dropaftertempfail <false | true> 
 	newnetworkidaftertempfail <networkId value>
-
 
 DESCRIPTION
 
@@ -75,6 +75,7 @@ PARAMETERS
 	newdestton - an optional parameter.
 	newdestnpi - an optional parameter.
 	adddestdigprefix - an optional parameter.
+	addsourcedigprefix - an optional parameter.
 	newsourceton - an optional parameter.
 	newsourcenpi - an optional parameter.
 	newsourceaddr - an optional parameter.
@@ -136,8 +137,9 @@ SYNOPSIS
 	<delivery processing type: SS7_SRI | SS7_MT | SMPP | SIP | -1> errorcode <internal SMSC
 	GW delivery error code value> newnetworkid <new networkId value> newdestton <new
 	destination type of number> newdestnpi <new destination numbering plan indicator>
-	adddestdigprefix <prefix value> newsourceton <new source type of number> newsourcenpi 
-	<new source numbering plan indicator> newsourceaddr <new source address value> hrbypass 
+	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
+	newsourceton <new source type of number> newsourcenpi <new source numbering plan
+	indicator> newsourceaddr <new source address value> hrbypass 
 	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value> 
 	newnetworkidafterpermfail <networkId value> dropaftertempfail <false | true> 
 	newnetworkidaftertempfail <networkId value>
@@ -172,6 +174,7 @@ PARAMETERS
 	newdestton - an optional parameter.
 	newdestnpi - an optional parameter.
 	adddestdigprefix - an optional parameter.
+	addsourcedigprefix - an optional parameter.
 	newsourceton - an optional parameter.
 	newsourcenpi - an optional parameter.
 	newsourceaddr - an optional parameter.

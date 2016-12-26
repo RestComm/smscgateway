@@ -330,14 +330,21 @@
 						</select>
 					</span>	
 				</div>	
-				
-				<div id="div-addestdigprefix" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's destination number will be prefixed with adddestdigprefix set here. Set this to -1 or leave leave empty to keep original destination number. Dfault value is -1.">
-						<span class="add-on">Address prefix</span>
-						<input id="addestdigprefix" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
-					</span>				
+
+				<div id="div-adddestdigprefix" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's destination number will be prefixed with adddestdigprefix set here. Set this to -1 or leave leave empty to keep original destination number. Default value is -1.">
+						<span class="add-on">Destination address prefix</span>
+						<input id="adddestdigprefix" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Destination digits mask" />
+					</span>
 				</div>																		
-				
+
+				<div id="div-addsourcedigprefix" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's source number will be prefixed with addsourcedigprefix set here. Set this to -1 or leave leave empty to keep original source number. Default value is -1.">
+						<span class="add-on">Source address prefix</span>
+						<input id="addsourcedigprefix" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Source digits mask" />
+					</span>
+				</div>																		
+
 				<div id="div-newsourceton" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, the target SMS's source address type of number(TON) will be changed to one set here. Set this to -1 to keep original TON. Default value is -1.">
 						<span class="add-on">New Type Of Number (TON)</span>
@@ -629,7 +636,8 @@
 										var newnetworkid = processRuleParameters(ruleparameters, "newnetworkid");
 										var newdestton = processRuleParameters(ruleparameters, "newdestton");
 										var newdestnpi = processRuleParameters(ruleparameters, "newdestnpi");
-										var addestdigprefix = processRuleParameters(ruleparameters, "adddestdigprefix");
+										var adddestdigprefix = processRuleParameters(ruleparameters, "adddestdigprefix");
+										var addsourcedigprefix = processRuleParameters(ruleparameters, "addsourcedigprefix");
 										var newsourceton = processRuleParameters(ruleparameters, "newsourceton");
 										var newsourcenpi = processRuleParameters(ruleparameters, "newsourcenpi");
 										var newsourceaddr = processRuleParameters(ruleparameters, "newsourceaddr");
@@ -977,20 +985,36 @@
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewDestNpi"+']\').toggle(); $(\'input[id^='+id+"NewDestNpi"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+
-																		
-																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s destination number will be prefixed with adddestdigprefix set here. Set this to -1 or leave blank to keep original destination number. Dfault value is -1.">'+
+
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s destination number will be prefixed with adddestdigprefix set here. Set this to -1 or leave blank to keep original destination number. Default value is -1.">'+
 																			'<td style="font-size: 0.9em;">Destination Digits Prefix</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
 																				'<div id="div-' + id +'AddDestDigPrefix-input" class="control-group">'+
 																				'<span id="' + id +'AddDestDigPrefix-input" style="display: none;">'+
-																					'<input type="text" class="input-small" value="' + addestdigprefix + '" /> ' +
+																					'<input type="text" class="input-small" value="' + adddestdigprefix + '" /> ' +
 																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'adddestdigprefix\', \'' + id+"AddDestDigPrefix" + '\', \'true\')"></i> ' +
 																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"AddDestDigPrefix"+']\').toggle(); $(\'input[id^='+id+"AddDestDigPrefix"+']\').focus();"></i>' + 
 																				'</span>'+
 																				'</div>' +
-																				'<span id="' +id + 'AddDestDigPrefix-text">' + addestdigprefix + '</span>'+
+																				'<span id="' +id + 'AddDestDigPrefix-text">' + adddestdigprefix + '</span>'+
 																			'</td>'+
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"AddDestDigPrefix"+']\').toggle(); $(\'input[id^='+id+"AddDestDigPrefix"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+
+																		'<tr data-toggle="tooltip" title="Once rule match\'s, the target SMS\'s source number will be prefixed with addsourcedigprefix set here. Set this to -1 or leave blank to keep original source number. Default value is -1.">'+
+																			'<td style="font-size: 0.9em;">Source Digits Prefix</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'AddSourceDigPrefix-input" class="control-group">'+
+																				'<span id="' + id +'AddSourceDigPrefix-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + addsourcedigprefix + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'addsourcedigprefix\', \'' + id+"AddSourceDigPrefix" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"AddSourceDigPrefix"+']\').toggle(); $(\'input[id^='+id+"AddSourceDigPrefix"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'AddSourceDigPrefix-text">' + addsourcedigprefix + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"AddSourceDigPrefix"+']\').toggle(); $(\'input[id^='+id+"AddSourceDigPrefix"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+
 
@@ -1485,11 +1509,18 @@
 			parametersstring = parametersstring + " newdestnpi "+newdestnpi;
 		}
 		
-		var addestdigprefix = $("#addestdigprefix").val();
-		if(addestdigprefix == "") {
-			addestdigprefix = null;
+		var adddestdigprefix = $("#adddestdigprefix").val();
+		if(adddestdigprefix == "") {
+			adddestdigprefix = null;
 		} else {
-			parametersstring = parametersstring + " adddestdigprefix "+addestdigprefix;
+			parametersstring = parametersstring + " adddestdigprefix "+adddestdigprefix;
+		}
+
+		var addsourcedigprefix = $("#addsourcedigprefix").val();
+		if(addsourcedigprefix == "") {
+			addsourcedigprefix = null;
+		} else {
+			parametersstring = parametersstring + " addsourcedigprefix "+addsourcedigprefix;
 		}
 		
 		var nsrc = document.getElementById("newsourceton");

@@ -19,8 +19,9 @@ SYNOPSIS
 	<delivery processing type: SS7_SRI | SS7_MT | SMPP | SIP | -1> errorcode <internal SMSC
 	GW delivery error code value> newnetworkid <new networkId value> newdestton <new
 	destination type of number> newdestnpi <new destination numbering plan indicator>
-	adddestdigprefix <prefix value> newsourceton <new source type of number> newsourcenpi 
-	<new source numbering plan indicator> newsourceaddr <new source address value> hrbypass 
+	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
+	newsourceton <new source type of number> newsourcenpi <new source numbering plan
+	indicator> newsourceaddr <new source address value> hrbypass 
 	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value> 
 	newnetworkidafterpermfail <networkId value> dropaftertempfail <false | true> 
 	newnetworkidaftertempfail <networkId value>
@@ -186,6 +187,11 @@ PARAMETERS
 					
 	adddestdigprefix- Once rule match's, the target SMS's destination number will be prefixed with 
 					adddestdigprefix set here. Set this to -1 or null to keep original destination number. 
+					Default value is -1.
+					This action is for Arrival trigger.
+
+	addsourcedigprefix  - Once rule match's, the source SMS's source number will be prefixed with 
+					addsourcedigprefix set here. Set this to -1 or null to keep original source number. 
 					Default value is -1.
 					This action is for Arrival trigger.
 

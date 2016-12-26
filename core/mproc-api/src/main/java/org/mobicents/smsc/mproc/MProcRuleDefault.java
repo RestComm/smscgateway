@@ -177,6 +177,13 @@ public interface MProcRuleDefault extends MProcRule {
     void setAddDestDigPrefix(String addDestDigPrefix);
 
     /**
+     * @return if !="-1" / != null: the specified prefix will be added into a source address digits of a message
+     */
+    String getAddSourceDigPrefix();
+
+    void setAddSourceDigPrefix(String addSourceDigPrefix);
+
+    /**
      * @return if !=-1: the new source address type of number will be assigned to a message
      */
     int getNewSourceTon();
