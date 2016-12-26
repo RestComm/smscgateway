@@ -841,15 +841,17 @@ public abstract class DeliveryCommonSbb implements Sbb {
      *
      * @param lstPermFailured
      * @param lstTempFailured
+     * @param newDueTime
      */
-    protected void createFailureLists(ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstTempFailured, ErrorAction errorAction) {
+    protected void createFailureLists(ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstTempFailured, ErrorAction errorAction,
+            Date newDueTime) {
         // unsent messages in SendingPool
         int sendingPoolMessageCount = this.getSendingPoolMessageCount();
         for (int i1 = 0; i1 < sendingPoolMessageCount; i1++) {
             if (!this.isMessageConfirmedInSendingPool(i1)) {
                 Sms sms = this.getMessageInSendingPool(i1);
                 if (sms != null) {
-                    doCreateFailureLists(lstPermFailured, lstTempFailured, sms, errorAction);
+                    doCreateFailureLists(lstPermFailured, lstTempFailured, sms, errorAction, newDueTime);
                 }
             }
         }
@@ -862,12 +864,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
         for (int i1 = 0; i1 < totalUnsentMessageCount; i1++) {
             Sms sms = this.getUnsentMessage(i1);
             if (sms != null) {
-                doCreateFailureLists(lstPermFailured, lstTempFailured, sms, errorAction);
+                doCreateFailureLists(lstPermFailured, lstTempFailured, sms, errorAction, newDueTime);
             }
         }
     }
 
-    private void doCreateFailureLists(ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstTempFailured, Sms sms, ErrorAction errorAction) {
+    private void doCreateFailureLists(ArrayList<Sms> lstPermFailured, ArrayList<Sms> lstTempFailured, Sms sms,
+            ErrorAction errorAction, Date newDueTime) {
         if (errorAction == ErrorAction.permanentFailure) {
             lstPermFailured.add(sms);
         } else {
@@ -877,16 +880,16 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 // for time for now + 2 min)
 
                 // TODO: ValidityPeriod was removed !!!
-
-                // if (sms.getValidityPeriod() != null
-                // && sms.getValidityPeriod().getTime() <= System.currentTimeMillis() + 1000 * 120) {
-                // lstPermFailured.add(sms);
-                // } else {
-
-                lstTempFailured.add(sms);
-
-                // }
-
+//                if (sms.getValidityPeriod() != null
+//                        && sms.getValidityPeriod().getTime() <= System.currentTimeMillis() + 1000 * 120) {
+                if (sms.getValidityPeriod() != null
+                        && sms.getValidityPeriod().getTime() < newDueTime.getTime()
+                        && sms.getValidityPeriod().getTime() < System.currentTimeMillis() + 1000
+                                * smscPropertiesManagement.getVpProlong()) {
+                    lstPermFailured.add(sms);
+                } else {
+                    lstTempFailured.add(sms);
+                }
             } else {
                 // datagramm or transactional
                 lstPermFailured.add(sms);
@@ -1019,28 +1022,49 @@ public abstract class DeliveryCommonSbb implements Sbb {
     }
 
     /**
+     * Calculating of new due delay for SmsSet
+     * @param smsSet
+     * @param busySubscriber true if a network reported of "busySubscriber" state that means that we need to reschedule of
+     *        delivering in a very short time
+     * @return
+     */
+    protected int calculateNewDueDelay(SmsSet smsSet, boolean busySubscriber) {
+        int prevDueDelay = smsSet.getDueDelay();
+        int newDueDelay;
+        if (busySubscriber) {
+            newDueDelay = MessageUtil.computeDueDelaySubscriberBusy(smscPropertiesManagement.getSubscriberBusyDueDelay());
+        } else {
+            newDueDelay = MessageUtil.computeNextDueDelay(prevDueDelay, smscPropertiesManagement.getSecondDueDelay(),
+                    smscPropertiesManagement.getDueDelayMultiplicator(), smscPropertiesManagement.getMaxDueDelay());
+        }
+        return newDueDelay;
+    }
+
+    /**
+     * Calculating of new due time for SmsSet
+     * @param smsSet
+     * @param newDueDelay
+     * @return
+     */
+    protected Date calculateNewDueTime(SmsSet smsSet, int newDueDelay) {
+        Date newDueDate = new Date(new Date().getTime() + newDueDelay * 1000);
+        return newDueDate;
+    }
+
+    /**
      * Processing messages that were failed temporary and will be rescheduled (sms.inSystem=sent in live database, message
      * rescheduling).
      *
      * @param smsSet
      * @param lstTempFailured
-     * @param busySubscriber true if a network reported of "busySubscriber" state that means that we need to reschedule of
-     *        delivering in a very short time
+     * @param int newDueDelay
+     * @param newDueDate
      * @param isCheckScheduleDeliveryTimeNeeded true if we need to schedule messages for time to the nearest
      *        ScheduleDeliveryTime (for SS7 network case)
      */
-    protected void postProcessTempFailures(SmsSet smsSet, ArrayList<Sms> lstTempFailured, boolean busySubscriber,
+    protected void postProcessTempFailures(SmsSet smsSet, ArrayList<Sms> lstTempFailured, int newDueDelay, Date newDueDate,
             boolean isCheckScheduleDeliveryTimeNeeded) {
         try {
-            int prevDueDelay = smsSet.getDueDelay();
-            int newDueDelay;
-            if (busySubscriber) {
-                newDueDelay = MessageUtil.computeDueDelaySubscriberBusy(smscPropertiesManagement.getSubscriberBusyDueDelay());
-            } else {
-                newDueDelay = MessageUtil.computeNextDueDelay(prevDueDelay, smscPropertiesManagement.getSecondDueDelay(),
-                        smscPropertiesManagement.getDueDelayMultiplicator(), smscPropertiesManagement.getMaxDueDelay());
-            }
-            Date newDueDate = new Date(new Date().getTime() + newDueDelay * 1000);
             if (isCheckScheduleDeliveryTimeNeeded)
                 newDueDate = MessageUtil.checkScheduleDeliveryTime(lstTempFailured, newDueDate);
 

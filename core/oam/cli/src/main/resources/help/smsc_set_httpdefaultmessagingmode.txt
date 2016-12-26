@@ -7,14 +7,17 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to set a value for default messaging mode
 	value for messages from an HTTP connector.
-	Possible values: 0-default SMSC mode, 1-datagram, 2-transaction,
-	3-storeAndForward.
+	Possible values: 0-default SMSC mode, 1-datagram, 2-transactional,
+	3-storeAndForward. Transactional mode mode is not supported now.
 	Default value is 1.
 
 EXAMPLES
 	smsc set httpdefaultmessagingmode 1
 
 SEE ALSO
-	smsc set httpdefaultsourceton, smsc set httpdefaultsourcenpi,
-	smsc set httpdefaultdestton, smsc set httpdefaultdestnpi,
-	smsc set httpdefaultnetworkid
+	smsc set hrdefaultmessagingmode, smsc set httpdefaultsourceton,
+	smsc set httpdefaultsourcenpi, smsc set httpdefaultdestton,
+	smsc set httpdefaultdestnpi, smsc set httpdefaultnetworkid,
+	smsc get httpdefaultmessagingmode, smsc set modefaultmessagingmode,
+	smsc set sipdefaultmessagingmode, smsc set hrdefaultmessagingmode
+	

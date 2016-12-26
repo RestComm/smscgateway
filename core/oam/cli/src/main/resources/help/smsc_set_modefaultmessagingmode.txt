@@ -1,0 +1,19 @@
+Name
+	smsc set modefaultmessagingmode
+
+SYNOPSIS
+	smsc set modefaultmessagingmode <messaging mode value>
+
+DESCRIPTION
+	This command is used to set a value for default messaging mode
+	value for mobile originated (MO) messages.
+	Possible values: 0-default SMSC mode, 1-datagram, 2-transactional,
+	3-storeAndForward.
+	Default value is 3.
+
+EXAMPLES
+	smsc set modefaultmessagingmode 3
+
+SEE ALSO
+	smsc get modefaultmessagingmode, smsc set httpdefaultmessagingmode,
+	smsc set hrdefaultmessagingmode, smsc set sipdefaultmessagingmode,

@@ -77,6 +77,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private static final String FETCH_MAX_ROWS = "fetchMaxRows";
     private static final String MAX_ACTIVITY_COUNT = "maxActivityCount";
     private static final String DELIVERY_TIMEOUT = "deliveryTimeout";
+    private static final String VP_PROLONG = "vpProlong";
     private static final String SMPP_ENCODING_FOR_UCS2 = "smppEncodingForUCS2";
     private static final String SMPP_ENCODING_FOR_GSM7 = "smppEncodingForGsm7";
 	private static final String SMS_HOME_ROUTING = "smsHomeRouting";
@@ -90,6 +91,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String INCOME_RECEIPTS_PROCESSING = "incomeReceiptsProcessing";
     private static final String ENABLE_INTERMEDIATE_RECEIPTS = "enableIntermediateReceipts";
     private static final String ORIG_NETWORK_ID_FOR_RECEIPTS = "origNetworkIdForReceipts";
+    private static final String MO_DEFAULT_MESSAGING_MODE = "moDefaultMessagingMode";
+    private static final String HR_DEFAULT_MESSAGING_MODE = "hrDefaultMessagingMode";
+    private static final String SIP_DEFAULT_MESSAGING_MODE = "sipDefaultMessagingMode";
     private static final String GENERATE_CDR = "generateCdr";
     private static final String GENERATE_ARCHIVE_TABLE = "generateArchiveTable";
     private static final String STORE_AND_FORWORD_MODE = "storeAndForwordMode";
@@ -203,6 +207,16 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // delivery process timeout in seconds (timeout occurs if no actions for delivering (delivery confirmation or deliver a new
     // item) for long time)
     private int deliveryTimeout = 120;
+    // Validity period scheduling prolongation.
+    // Conditions when a message with validity period will be scheduled after delivery failure:
+    // a) validity period end time >= the time for next schedule time
+    // or
+    // b) validity period end time >= now + Validity period scheduling prolongation
+    // By changing of "Validity period scheduling prolongation" you can specify will a message be scheduled after validity period end time or not.
+    // Setting this parameter to 0 lead that all messages will be scheduled.
+    // Setting this parameter to a very big value lead that no message will be scheduled.
+    // The general rule is - you can allow messages to be scheduled for after validity period end time when scheduling is for after long time from now.
+    private int vpProlong = 120;
 
 	// if destinationAddress does not match to any esme (any ClusterName) or
 	// a message will be routed to defaultClusterName (only for
@@ -232,6 +246,12 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private boolean enableIntermediateReceipts = false;
     // true: for receipts the original networkId will be assigned
     private boolean origNetworkIdForReceipts = false;
+    // default messaging mode for MO originated messages (0-default SMSC mode, 1-datagram, 2-transaction, 3-storeAndForward)
+    private int moDefaultMessagingMode = 3;
+    // default messaging mode for HR originated messages (0-default SMSC mode, 1-datagram, 2-transaction, 3-storeAndForward)
+    private int hrDefaultMessagingMode = 3;
+    // default messaging mode for SIP originated messages (0-default SMSC mode, 1-datagram, 3-storeAndForward) (we do not support transactions so far)
+    private int sipDefaultMessagingMode = 3;
 
     // generating CDR's option
     private GenerateType generateCdr = new GenerateType(true, true, true);
@@ -736,6 +756,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
+    @Override
+    public int getVpProlong() {
+        return vpProlong;
+    }
+
+    @Override
+    public void setVpProlong(int vpProlong) {
+        this.vpProlong = vpProlong;
+        this.store();
+    }
+
 	@Override
 	public String getEsmeDefaultClusterName() {
 		return esmeDefaultClusterName;
@@ -747,66 +778,113 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 		this.store();
 	}
 
+    @Override
 	public int getReviseSecondsOnSmscStart() {
 		return this.reviseSecondsOnSmscStart;
 	}
 
+    @Override
 	public void setReviseSecondsOnSmscStart(int reviseSecondsOnSmscStart) {
 		this.reviseSecondsOnSmscStart = reviseSecondsOnSmscStart;
 		this.store();
 	}
 
+    @Override
 	public int getProcessingSmsSetTimeout() {
 		return this.processingSmsSetTimeout;
 	}
 
+    @Override
 	public void setProcessingSmsSetTimeout(int processingSmsSetTimeout) {
 		this.processingSmsSetTimeout = processingSmsSetTimeout;
 		this.store();
 	}
 
+    @Override
 	public boolean getGenerateReceiptCdr() {
 		return this.generateReceiptCdr;
 	}
 
+    @Override
 	public void setGenerateReceiptCdr(boolean generateReceiptCdr) {
 		this.generateReceiptCdr = generateReceiptCdr;
 		this.store();
 	}
 
+    @Override
     public boolean getReceiptsDisabling() {
         return this.receiptsDisabling;
     }
 
+    @Override
     public void setReceiptsDisabling(boolean receiptsDisabling) {
         this.receiptsDisabling = receiptsDisabling;
         this.store();
     }
 
+    @Override
     public boolean getEnableIntermediateReceipts() {
         return this.enableIntermediateReceipts;
     }
 
+    @Override
     public void setEnableIntermediateReceipts(boolean enableIntermediateReceipts) {
         this.enableIntermediateReceipts = enableIntermediateReceipts;
         this.store();
     }
 
+    @Override
     public boolean getIncomeReceiptsProcessing() {
         return incomeReceiptsProcessing;
     }
 
+    @Override
     public void setIncomeReceiptsProcessing(boolean incomeReceiptsProcessing) {
         this.incomeReceiptsProcessing = incomeReceiptsProcessing;
         this.store();
     }
 
+    @Override
     public boolean getOrigNetworkIdForReceipts() {
         return this.origNetworkIdForReceipts;
     }
 
+    @Override
     public void setOrigNetworkIdForReceipts(boolean origNetworkIdForReceipts) {
         this.origNetworkIdForReceipts = origNetworkIdForReceipts;
+        this.store();
+    }
+
+    @Override
+    public int getMoDefaultMessagingMode() {
+        return this.moDefaultMessagingMode;
+    }
+
+    @Override
+    public void setMoDefaultMessagingMode(int moDefaultMessagingMode) {
+        this.moDefaultMessagingMode = moDefaultMessagingMode;
+        this.store();
+    }
+
+    @Override
+    public int getHrDefaultMessagingMode() {
+        return this.hrDefaultMessagingMode;
+    }
+
+    @Override
+    public void setHrDefaultMessagingMode(int hrDefaultMessagingMode) {
+        this.hrDefaultMessagingMode = hrDefaultMessagingMode;
+        this.store();
+    }
+
+    @Override
+    public int getSipDefaultMessagingMode() {
+        return this.sipDefaultMessagingMode;
+    }
+
+    @Override
+    public void setSipDefaultMessagingMode(int sipDefaultMessagingMode) {
+        this.sipDefaultMessagingMode = sipDefaultMessagingMode;
         this.store();
     }
 
@@ -1348,6 +1426,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			writer.write(this.esmeDefaultClusterName, ESME_DEFAULT_CLUSTER_NAME, String.class);
             writer.write(this.maxActivityCount, MAX_ACTIVITY_COUNT, Integer.class);
             writer.write(this.deliveryTimeout, DELIVERY_TIMEOUT, Integer.class);
+            writer.write(this.vpProlong, VP_PROLONG, Integer.class);
 //			writer.write(this.isSMSHomeRouting, SMS_HOME_ROUTING, Boolean.class);
             writer.write(this.smppEncodingForGsm7.toString(), SMPP_ENCODING_FOR_GSM7, String.class);
             writer.write(this.smppEncodingForUCS2.toString(), SMPP_ENCODING_FOR_UCS2, String.class);
@@ -1361,6 +1440,11 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.incomeReceiptsProcessing, INCOME_RECEIPTS_PROCESSING, Boolean.class);
             writer.write(this.enableIntermediateReceipts, ENABLE_INTERMEDIATE_RECEIPTS, Boolean.class);
             writer.write(this.origNetworkIdForReceipts, ORIG_NETWORK_ID_FOR_RECEIPTS, Boolean.class);
+
+            writer.write(this.moDefaultMessagingMode, MO_DEFAULT_MESSAGING_MODE, Integer.class);
+            writer.write(this.hrDefaultMessagingMode, HR_DEFAULT_MESSAGING_MODE, Integer.class);
+            writer.write(this.sipDefaultMessagingMode, SIP_DEFAULT_MESSAGING_MODE, Integer.class);
+
             writer.write(this.generateCdr.getValue(), GENERATE_CDR, Integer.class);
             writer.write(this.generateArchiveTable.getValue(), GENERATE_ARCHIVE_TABLE, Integer.class);
 
@@ -1534,6 +1618,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             val = reader.read(DELIVERY_TIMEOUT, Integer.class);
             if (val != null)
                 this.deliveryTimeout = val;
+            val = reader.read(VP_PROLONG, Integer.class);
+            if (val != null)
+                this.vpProlong = val;
 
 			// this line is for backward compatibility
 			valB = reader.read(SMS_HOME_ROUTING, Boolean.class);
@@ -1585,6 +1672,16 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             if (valB != null) {
                 this.origNetworkIdForReceipts = valB.booleanValue();
             }
+
+            val = reader.read(MO_DEFAULT_MESSAGING_MODE, Integer.class);
+            if (val != null)
+                this.moDefaultMessagingMode = val;
+            val = reader.read(HR_DEFAULT_MESSAGING_MODE, Integer.class);
+            if (val != null)
+                this.hrDefaultMessagingMode = val;
+            val = reader.read(SIP_DEFAULT_MESSAGING_MODE, Integer.class);
+            if (val != null)
+                this.sipDefaultMessagingMode = val;
 
             val = reader.read(GENERATE_CDR, Integer.class);
             if (val != null)

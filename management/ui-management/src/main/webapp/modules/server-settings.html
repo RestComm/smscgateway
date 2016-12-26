@@ -138,7 +138,25 @@ Delay after every consecutive delivery failure = prev-due-delay * due-delay-mult
 									<span class="add-on">Due delay multiplicator</span>
 									<input id="duedelaymultiplicator" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
 								</span>												
-							</div>	
+							</div>
+							<div id="div-vpProlong" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="This command is used to set the value of Validity period scheduling
+prolongation in seconds.
+Conditions when a message with validity period will be scheduled after delivery
+failure:
+a) validity period end time >= the time for next schedule time
+or
+b) validity period end time >= now + Validity period scheduling prolongation
+By changing of 'Validity period scheduling prolongation' parameter you can specify will
+a message be scheduled after validity period end time or not.
+Setting this parameter to 0 lead that all messages will be scheduled.
+Setting this parameter to a very big value lead that no message will be scheduled.
+The general rule is - you can allow messages to be scheduled for after validity
+period end time when scheduling is for for after long time from now.">
+									<span class="add-on">Validity period scheduling prolongation (sec)</span>
+									<input id="vpProlong" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
 							
 							&nbsp;
 																			
@@ -455,6 +473,42 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
                         
            				<div class="tab-pane" id="processing">
 							<h5 style="border-bottom: 1px solid #DDD;">Processing Options</h5>
+
+							<div id="div-modefaultmessagingmode" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default messaging mode for mobile originated (MO) messages (from SS7 connector)">
+									<span class="add-on">Default messaging mode - MO messages</span>
+									<select id="modefaultmessagingmode" >
+										<option value="0">Default SMSC mode</option>
+										<option value="1">Datagram</option>
+										<option value="2">Transactional</option>
+										<option value="3">StoreAndForward</option>
+									</select>
+								</span>
+							</div>
+
+							<div id="div-hrdefaultmessagingmode" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default messaging mode for messages that came by SS7 Home Routing procedure (from SS7 connector) (this means HR transparent mode).">
+									<span class="add-on">Default messaging mode - HR messages</span>
+									<select id="hrdefaultmessagingmode" >
+										<option value="0">Default SMSC mode</option>
+										<option value="1">Datagram</option>
+										<option value="2">Transactional</option>
+										<option value="3">StoreAndForward</option>
+									</select>
+								</span>
+							</div>
+
+							<div id="div-sipdefaultmessagingmode" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Default messaging mode for SIP originated messages.">
+									<span class="add-on">Default messaging mode - SIP messages</span>
+									<select id="sipdefaultmessagingmode" >
+										<option value="0">Default SMSC mode</option>
+										<option value="1">Datagram</option>
+										<option value="3">StoreAndForward</option>
+									</select>
+								</span>
+							</div>
+
 							<div id="div-deliverypause" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="set to true to disable delivery of SMS. SMS will not be delivered to any medium. Use with great caution.">
 									<span class="add-on">Delivery Pause</span>
@@ -753,6 +807,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										$("#propmaxduedel").val(response.value.MaxDueDelay);
 										
 										$("#duedelaymultiplicator").val(response.value.DueDelayMultiplicator);
+										$("#vpProlong").val(response.value.VpProlong);
 										
 										//var smsHomeRoutingTmp = response.value.SMSHomeRouting
 										//if(smsHomeRoutingTmp){
@@ -887,7 +942,38 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								{ success: [
 									function(response) {
 										var deliverypauseVar = response.value.DeliveryPause;
-										
+
+										var moDefaultMessagingMode = response.value.MoDefaultMessagingMode;
+										if(moDefaultMessagingMode == 0){
+											modefaultmessagingmode.options[0].selected = true;
+										} else if(moDefaultMessagingMode == 1){ 
+											modefaultmessagingmode.options[1].selected = true;
+										} else if(moDefaultMessagingMode == 2){ 
+											modefaultmessagingmode.options[2].selected = true;
+										} else { 
+											modefaultmessagingmode.options[3].selected = true;
+										}										
+
+										var hrDefaultMessagingMode = response.value.HrDefaultMessagingMode;
+										if(hrDefaultMessagingMode == 0){
+											hrdefaultmessagingmode.options[0].selected = true;
+										} else if(hrDefaultMessagingMode == 1){ 
+											hrdefaultmessagingmode.options[1].selected = true;
+										} else if(hrDefaultMessagingMode == 2){ 
+											hrdefaultmessagingmode.options[2].selected = true;
+										} else { 
+											hrdefaultmessagingmode.options[3].selected = true;
+										}										
+
+										var sipDefaultMessagingMode = response.value.SipDefaultMessagingMode;
+										if(sipDefaultMessagingMode == 0){
+											sipdefaultmessagingmode.options[0].selected = true;
+										} else if(sipDefaultMessagingMode == 1){ 
+											sipdefaultmessagingmode.options[1].selected = true;
+										} else { 
+											sipdefaultmessagingmode.options[2].selected = true;
+										}										
+
 										if(deliverypauseVar){
 											deliveryPause.options[0].selected = true;
 										} else {
@@ -1341,6 +1427,13 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 			    			$("#div-duedelaymultiplicator").removeClass("error");		
 			    		}
 						
+						var vpProlong = $("#vpProlong").val();
+						if(vpProlong.trim() == "") {
+			    			$("#div-vpProlong").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-vpProlong").hasClass("error")) {
+			    			$("#div-vpProlong").removeClass("error");		
+			    		}	
 						
 						if(formInvalid) {
 							$("#login-settings-error").show();
@@ -1369,6 +1462,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "SecondDueDelay", value: propsecduedel },
 									{ type: "write", mbean: mbeanSearch, attribute: "MaxDueDelay", value: propmaxduedel },
 									{ type: "write", mbean: mbeanSearch, attribute: "DueDelayMultiplicator", value: duedelaymultiplicator },
+									{ type: "write", mbean: mbeanSearch, attribute: "VpProlong", value: vpProlong },
 								],
 								{
 									success: function(response) {
@@ -1706,7 +1800,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 			    		} else if($("#div-processingSmsSetTimeout").hasClass("error")) {
 			    			$("#div-processingSmsSetTimeout").removeClass("error");		
 			    		}	
-						
+
 						var deliveryTimeout = $("#deliveryTimeout").val();
 						if(deliveryTimeout.trim() == "") {
 			    			$("#div-deliveryTimeout").addClass("error");					    			
@@ -1831,7 +1925,15 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 					}	
 					
 					function applyProcessing() {
-						
+						var e = document.getElementById("modefaultmessagingmode");
+						var moDefaultMessagingModeVar = e.options[e.selectedIndex].value;
+
+						e = document.getElementById("hrdefaultmessagingmode");
+						var hrDefaultMessagingModeVar = e.options[e.selectedIndex].value;
+
+						e = document.getElementById("sipdefaultmessagingmode");
+						var sipDefaultMessagingModeVar = e.options[e.selectedIndex].value;
+
 						e = document.getElementById("deliveryPause");
 						var deliverypauseVar = e.options[e.selectedIndex].text;
 						
@@ -1866,6 +1968,9 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
 						jolokia.request(
 								[
+									{ type: "write", mbean: mbeanSearch, attribute: "MoDefaultMessagingMode", value: moDefaultMessagingModeVar},
+									{ type: "write", mbean: mbeanSearch, attribute: "HrDefaultMessagingMode", value: hrDefaultMessagingModeVar},
+									{ type: "write", mbean: mbeanSearch, attribute: "SipDefaultMessagingMode", value: sipDefaultMessagingModeVar},
 									{ type: "write", mbean: mbeanSearch, attribute: "DeliveryPause", value: deliverypauseVar },
 									{ type: "write", mbean: mbeanSearch, attribute: "ReceiptsDisabling", value: receiptsdisabling },
 									{ type: "write", mbean: mbeanSearch, attribute: "EnableIntermediateReceipts", value: enableintermediatereceipts },

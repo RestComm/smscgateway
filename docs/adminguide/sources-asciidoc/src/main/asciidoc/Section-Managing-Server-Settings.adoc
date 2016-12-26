@@ -616,6 +616,56 @@ EXAMPLES
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+
+[[_vpprolong]]
+=== Validity period scheduling prolongation
+
+[[_vpprolong_cli]]
+==== Using CLI
+
+You can set the 'Validity period scheduling prolongation (sec)' value by issuing the command `smsc set vpprolong` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get vpprolong` which will display the value set for this property. 
+
+----
+
+Name
+	smsc set vpprolong
+
+SYNOPSIS
+	smsc set vpprolong <vpprolong>
+
+DESCRIPTION
+	This command is used to set the value of Validity period scheduling
+	prolongation in seconds.
+	Conditions when a message with validity period will be scheduled after delivery
+	failure:
+	a) validity period end time >= the time for next schedule time
+	or
+	b) validity period end time >= now + Validity period scheduling prolongation
+	By changing of "Validity period scheduling prolongation" you can specify will
+	a message be scheduled after validity period end time or not.
+	Setting this parameter to 0 lead that all messages will be scheduled.
+	Setting this parameter to a very big value lead that no message will be scheduled.
+	The general rule is - you can allow messages to be scheduled for after validity
+	period end time when scheduling is for for after long time from now.
+	Default value: 120 (seconds).
+
+EXAMPLES
+	smsc set vpprolong 120
+----
+
+[[_vpprolong_gui]]
+==== Using GUI
+
+.Procedure: Set Validity period scheduling prolongation using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Properties' tab in the GUI. 
+. You can specify the Validity period scheduling prolongation by entering the value in the text field 'Validity period scheduling prolongation (sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
 [[_smsc_ss7_settings]]
 == SS7 Settings
 
@@ -2395,6 +2445,123 @@ DESCRIPTION
 
 [[_smsc_gateway_server_processing]]
 == Processing
+
+[[_modefaultmessagingmode]]
+=== Messaging mode for MO messages
+
+[[_modefaultmessagingmode_cli]]
+==== Using CLI
+
+You can set the messaging mode for MO originated messages value by issuing the command `smsc set modefaultmessagingmode` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get modefaultmessagingmode` which will display the value set for this property. 
+
+----
+
+Name
+	smsc set modefaultmessagingmode
+
+SYNOPSIS
+	smsc set modefaultmessagingmode <messaging mode value>
+
+DESCRIPTION
+	This command is used to set a value for default messaging mode
+	value for mobile originated (MO) messages.
+	Possible values: 0-default SMSC mode, 1-datagram, 2-transactional,
+	3-storeAndForward.
+	Default value is 3.
+
+EXAMPLES
+	smsc set modefaultmessagingmode 3
+----
+
+[[_modefaultmessagingmode_gui]]
+==== Using GUI
+
+.Procedure: Set the messaging mode for MO originated messages option using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Processing' tab in the GUI.
+. You can specify the messaging mode for MO originated messages option by selecting an appropriate value in the field "Default messaging mode - MO messages". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+[[_hrdefaultmessagingmode]]
+=== Messaging mode for HR messages
+
+[[_hrdefaultmessagingmode_cli]]
+==== Using CLI
+
+You can set the messaging mode for HR originated messages value by issuing the command `smsc set hrdefaultmessagingmode` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get hrdefaultmessagingmode` which will display the value set for this property. 
+
+----
+
+Name
+	smsc set hrdefaultmessagingmode
+
+SYNOPSIS
+	smsc set hrdefaultmessagingmode <messaging mode value>
+
+DESCRIPTION
+	This command is used to set a value for default messaging mode
+	value for messages that came by SS7 Home Routing procedure.
+	Possible values: 0-default SMSC mode, 1-datagram, 2-transactional
+	(this means HR transparent mode), 3-storeAndForward.
+	Default value is 3.
+
+EXAMPLES
+	smsc set hrdefaultmessagingmode 3
+----
+
+[[_hrdefaultmessagingmode_gui]]
+==== Using GUI
+
+.Procedure: Set the messaging mode for HR originated messages option using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Processing' tab in the GUI.
+. You can specify the messaging mode for HR originated messages option by selecting an appropriate value in the field "Default messaging mode - HR messages". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+[[_sipdefaultmessagingmode]]
+=== Messaging mode for SIP messages
+
+[[_sipdefaultmessagingmode_cli]]
+==== Using CLI
+
+You can set the messaging mode for SIP originated messages value by issuing the command `smsc set sipdefaultmessagingmode` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get sipdefaultmessagingmode` which will display the value set for this property. 
+
+----
+
+Name
+	smsc set sipdefaultmessagingmode
+
+SYNOPSIS
+	smsc set sipdefaultmessagingmode <messaging mode value>
+
+DESCRIPTION
+	This command is used to set a value for default messaging mode
+	value for messages from a SIP connector.
+	Possible values: 0-default SMSC mode, 1-datagram, 2-transactional,
+	3-storeAndForward. Transactional mode mode is not supported now.
+	Default value is 3.
+
+EXAMPLES
+	smsc set sipdefaultmessagingmode 1
+----
+
+[[_sipdefaultmessagingmode_gui]]
+==== Using GUI
+
+.Procedure: Set the messaging mode for SIP originated messages option using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Processing' tab in the GUI.
+. You can specify the messaging mode for SIP originated messages option by selecting an appropriate value in the field "Default messaging mode - SIP messages". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 === SMSC pausing
 

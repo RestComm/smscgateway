@@ -92,6 +92,10 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         set.addChild("httpdefaultrddeliveryreceipt");
         set.addChild("httpdefaultrdintermediatenotification");
         set.addChild("httpdefaultdatacoding");
+        set.addChild("modefaultmessagingmode");
+        set.addChild("hrdefaultmessagingmode");
+        set.addChild("sipdefaultmessagingmode");
+        set.addChild("vpprolong");
 
         txsmppcharging.addChild("None");
         txsmppcharging.addChild("Selected");
@@ -189,6 +193,10 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         get.addChild("httpdefaultrddeliveryreceipt");
         get.addChild("httpdefaultrdintermediatenotification");
         get.addChild("httpdefaultdatacoding");
+        get.addChild("modefaultmessagingmode");
+        get.addChild("hrdefaultmessagingmode");
+        get.addChild("sipdefaultmessagingmode");
+        get.addChild("vpprolong");
 
         Node smppencodingforgsm72 = get.addChild("smppencodingforgsm7");
         Node smppencodingforucs22 = get.addChild("smppencodingforucs2");

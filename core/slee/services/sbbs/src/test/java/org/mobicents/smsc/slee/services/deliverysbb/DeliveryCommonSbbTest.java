@@ -82,6 +82,7 @@ public class DeliveryCommonSbbTest {
         SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
         smscPropertiesManagement.setGenerateArchiveTable(new GenerateType(0));
         smscPropertiesManagement.setGenerateCdr(new GenerateType(0));
+        smscPropertiesManagement.setVpProlong(15 * 60); // 15 min
     }
 
     @AfterMethod
@@ -92,6 +93,7 @@ public class DeliveryCommonSbbTest {
         if (smscPropertiesManagement != null) {
             smscPropertiesManagement.setGenerateArchiveTable(new GenerateType(7));
             smscPropertiesManagement.setGenerateCdr(new GenerateType(7));
+            smscPropertiesManagement.setVpProlong(120);
         }
     }
 
@@ -311,13 +313,18 @@ public class DeliveryCommonSbbTest {
         smsSet.getSms(3).setStoringAfterFailure(true);
         smsSet.getSms(5).setStoringAfterFailure(true);
 
-        int year = (new Date()).getYear();
+        Date curDate = new Date();
+        int year = curDate.getYear();
         smsSet.getSms(1).setStored(true);
-        smsSet.getSms(1).setValidityPeriod(new Date(year + 1, 1, 1));
+        smsSet.getSms(1).setValidityPeriod(new Date(year + 1, 1, 1)); // validity period is too far (more then several days)
         smsSet.getSms(2).setStored(true);
         smsSet.getSms(2).setValidityPeriod(new Date(year - 1, 1, 1));
         smsSet.getSms(6).setStored(true);
         smsSet.getSms(6).setValidityPeriod(new Date(year - 1, 1, 1));
+        smsSet.getSms(7).setStored(true);
+        smsSet.getSms(7).setValidityPeriod(new Date(curDate.getTime() + 20 * 60 * 1000)); // validity period is not far - 20 min
+        smsSet.getSms(8).setStored(true);
+        smsSet.getSms(8).setValidityPeriod(new Date(curDate.getTime() + 10 * 60 * 1000)); // validity period is not far - 10 min
 
         sbb.addInitialMessageSet(smsSet);
         SmsSetCache.getInstance().addProcessingSmsSet(smsSet.getTargetId(), smsSet, 0);
@@ -353,17 +360,18 @@ public class DeliveryCommonSbbTest {
 
         ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
         ArrayList<Sms> lstTempFailured = new ArrayList<Sms>();
-        sbb.createFailureLists(lstPermFailured, lstTempFailured, ErrorAction.temporaryFailure);
+        sbb.createFailureLists(lstPermFailured, lstTempFailured, ErrorAction.temporaryFailure, new Date(
+                curDate.getTime() + 30 * 60 * 1000));
 
         assertEquals(lstTempFailured.size(), 3);
         assertEquals(lstPermFailured.size(), 14);
 
         assertEquals(lstTempFailured.get(0).getMessageId(), 1);
         assertEquals(lstTempFailured.get(1).getMessageId(), 5);
-        assertEquals(lstTempFailured.get(2).getMessageId(), 6);
+        assertEquals(lstTempFailured.get(2).getMessageId(), 7);
 
         assertEquals(lstPermFailured.get(0).getMessageId(), 4);
-        assertEquals(lstPermFailured.get(1).getMessageId(), 7);
+        assertEquals(lstPermFailured.get(1).getMessageId(), 6);
         assertEquals(lstPermFailured.get(2).getMessageId(), 8);
         assertEquals(lstPermFailured.get(3).getMessageId(), 9);
         assertEquals(lstPermFailured.get(13).getMessageId(), 19);
@@ -427,15 +435,16 @@ public class DeliveryCommonSbbTest {
 
         ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
         ArrayList<Sms> lstTempFailured = new ArrayList<Sms>();
-        sbb.createFailureLists(lstPermFailured, lstTempFailured, ErrorAction.temporaryFailure);
+        sbb.createFailureLists(lstPermFailured, lstTempFailured, ErrorAction.temporaryFailure, new Date(
+                (new Date()).getTime() + 1 * 60 * 1000));
 
-        assertEquals(lstTempFailured.size(), 2);
-        assertEquals(lstPermFailured.size(), 1);
+        assertEquals(lstTempFailured.size(), 1);
+        assertEquals(lstPermFailured.size(), 2);
 
-        assertEquals(lstTempFailured.get(0).getMessageId(), 3);
-        assertEquals(lstTempFailured.get(1).getMessageId(), 4);
+        assertEquals(lstTempFailured.get(0).getMessageId(), 4);
 
         assertEquals(lstPermFailured.get(0).getMessageId(), 2);
+        assertEquals(lstPermFailured.get(1).getMessageId(), 3);
     }
 
     @Test(groups = { "DeliveryCommonSbb" })

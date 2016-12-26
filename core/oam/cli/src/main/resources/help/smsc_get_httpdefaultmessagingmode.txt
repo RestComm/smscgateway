@@ -18,4 +18,5 @@ SEE ALSO
 	smsc set httpdefaultmessagingmode
 	smsc get httpdefaultsourceton, smsc get httpdefaultsourcenpi,
 	smsc get httpdefaultdestton, smsc get httpdefaultdestnpi,
-	smsc get httpdefaultnetworkid
+	smsc get httpdefaultnetworkid, smsc set hrdefaultmessagingmode,
+	smsc set modefaultmessagingmode, smsc set sipdefaultmessagingmode,

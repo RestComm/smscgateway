@@ -142,6 +142,10 @@ public interface SmscPropertiesManagementMBean {
 
     public void setDeliveryTimeout(int deliveryTimeout);
 
+    public int getVpProlong();
+
+    public void setVpProlong(int vpProlong);
+
     public String getEsmeDefaultClusterName();
 
 	public void setEsmeDefaultClusterName(String val);
@@ -262,6 +266,18 @@ public interface SmscPropertiesManagementMBean {
     public boolean getOrigNetworkIdForReceipts();
 
     public void setOrigNetworkIdForReceipts(boolean origNetworkIdForReceipts);
+
+    public int getMoDefaultMessagingMode();
+
+    public void setMoDefaultMessagingMode(int moDefaultMessagingMode);
+
+    public int getHrDefaultMessagingMode();
+
+    public void setHrDefaultMessagingMode(int hrDefaultMessagingMode);
+
+    public int getSipDefaultMessagingMode();
+
+    public void setSipDefaultMessagingMode(int sipDefaultMessagingMode);
 
     public String getHrHlrNumber();
 

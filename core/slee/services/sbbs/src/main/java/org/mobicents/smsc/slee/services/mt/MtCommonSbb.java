@@ -410,8 +410,12 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 
                     smsSet.setStatus(smStatus);
 
+                    // calculating of newDueDelay and NewDueTime
+                    int newDueDelay = calculateNewDueDelay(smsSet, (errorAction == ErrorAction.subscriberBusy));
+                    Date newDueTime = calculateNewDueTime(smsSet, newDueDelay);
+
                     // creating of failure lists
-                    this.createFailureLists(lstPermFailured, lstTempFailured, errorAction);
+                    this.createFailureLists(lstPermFailured, lstTempFailured, errorAction, newDueTime);
 
                     // mproc rules applying for delivery phase
                     this.applyMprocRulesOnFailure(lstPermFailured, lstTempFailured, lstPermFailured2, lstTempFailured2,
@@ -422,7 +426,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 
                     // Processing messages that were temp or permanent failed or rerouted
                     this.postProcessPermFailures(lstPermFailured2, null, null);
-                    this.postProcessTempFailures(smsSet, lstTempFailured2, (errorAction == ErrorAction.subscriberBusy), true);
+                    this.postProcessTempFailures(smsSet, lstTempFailured2, newDueDelay, newDueTime, true);
                     this.postProcessRerouted(lstRerouted, lstNewNetworkId);
 
                     // generating CDRs for permanent failure messages

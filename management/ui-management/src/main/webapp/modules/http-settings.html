@@ -104,7 +104,6 @@
 									<select id="httpdefaultmessagingmode" >
 										<option value="0">Default SMSC mode</option>
 										<option value="1">Datagram</option>
-										<option value="2">Transaction</option>
 										<option value="3">StoreAndForward</option>
 									</select>
 								</span>
@@ -290,10 +289,8 @@
 											httpdefaultmessagingmode.options[0].selected = true;
 										} else if(httpDefaultMessagingMode == 1){ 
 											httpdefaultmessagingmode.options[1].selected = true;
-										} else if(httpDefaultMessagingMode == 2){ 
-											httpdefaultmessagingmode.options[2].selected = true;
 										} else { 
-											httpdefaultmessagingmode.options[3].selected = true;
+											httpdefaultmessagingmode.options[2].selected = true;
 										}										
 
 										var httpDefaultRDDeliveryReceipt = response.value.HttpDefaultRDDeliveryReceipt;

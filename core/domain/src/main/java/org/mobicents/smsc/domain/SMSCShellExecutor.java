@@ -813,6 +813,9 @@ public class SMSCShellExecutor implements ShellExecutor {
             } else if (parName.equals("deliverytimeout")) {
                 int val = Integer.parseInt(options[3]);
                 smscPropertiesManagement.setDeliveryTimeout(val);
+            } else if (parName.equals("vpprolong")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setVpProlong(val);
             } else if (parName.equals("esmedefaultcluster")) {
 				smscPropertiesManagement.setEsmeDefaultClusterName(options[3]);
             } else if (parName.equals("correlationidlivetime")) {
@@ -931,11 +934,27 @@ public class SMSCShellExecutor implements ShellExecutor {
                 if (val < 0 || val > 3)
                     return SMSCOAMMessages.MESSAGING_MODE_BAD_VALUES;
                 smscPropertiesManagement.setHttpDefaultMessagingMode(val);
-            } else if (parName.equals("httpdefaultrddeliveryreceipt")) {
+            } else if (parName.equals("modefaultmessagingmode")) {
                 int val = Integer.parseInt(options[3]);
                 if (val < 0 || val > 3)
+                    return SMSCOAMMessages.MESSAGING_MODE_BAD_VALUES;
+                smscPropertiesManagement.setMoDefaultMessagingMode(val);
+            } else if (parName.equals("hrdefaultmessagingmode")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 3)
+                    return SMSCOAMMessages.MESSAGING_MODE_BAD_VALUES;
+                smscPropertiesManagement.setHrDefaultMessagingMode(val);
+            } else if (parName.equals("sipdefaultmessagingmode")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 3 || val == 2)
+                    return SMSCOAMMessages.MESSAGING_MODE_BAD_VALUES;
+                smscPropertiesManagement.setSipDefaultMessagingMode(val);
+            } else if (parName.equals("httpdefaultrddeliveryreceipt")) {
+                int val = Integer.parseInt(options[3]);
+                if (val < 0 || val > 3 || val == 2)
                     return SMSCOAMMessages.DELIVERY_RECEIPT_BAD_VALUES;
                 smscPropertiesManagement.setHttpDefaultRDDeliveryReceipt(val);
+
             } else if (parName.equals("httpdefaultrdintermediatenotification")) {
                 int val = Integer.parseInt(options[3]);
                 if (val < 0 || val > 1)
@@ -1124,8 +1143,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 				sb.append(smscPropertiesManagement.getMaxActivityCount());
             } else if (parName.equals("deliverytimeout")) {
                 sb.append(smscPropertiesManagement.getDeliveryTimeout());
-			} else if (parName.equals("esmedefaultcluster")) {
-				sb.append(smscPropertiesManagement.getEsmeDefaultClusterName());
+            } else if (parName.equals("vpprolong")) {
+                sb.append(smscPropertiesManagement.getVpProlong());
+            } else if (parName.equals("esmedefaultcluster")) {
+                sb.append(smscPropertiesManagement.getEsmeDefaultClusterName());
             } else if (parName.equals("correlationidlivetime")) {
                 sb.append(smscPropertiesManagement.getCorrelationIdLiveTime());
             } else if (parName.equals("sriresponselivetime")) {
@@ -1206,8 +1227,16 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getHttpDefaultDestNpi());
             } else if (parName.equals("httpdefaultnetworkid")) {
                 sb.append(smscPropertiesManagement.getHttpDefaultNetworkId());
+
             } else if (parName.equals("httpdefaultmessagingmode")) {
                 sb.append(smscPropertiesManagement.getHttpDefaultMessagingMode());
+            } else if (parName.equals("modefaultmessagingmode")) {
+                sb.append(smscPropertiesManagement.getMoDefaultMessagingMode());
+            } else if (parName.equals("hrdefaultmessagingmode")) {
+                sb.append(smscPropertiesManagement.getHrDefaultMessagingMode());
+            } else if (parName.equals("sipdefaultmessagingmode")) {
+                sb.append(smscPropertiesManagement.getSipDefaultMessagingMode());
+
             } else if (parName.equals("httpdefaultrddeliveryreceipt")) {
                 sb.append(smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt());
             } else if (parName.equals("httpdefaultrdintermediatenotification")) {
@@ -1365,6 +1394,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("deliverytimeout = ");
             sb.append(smscPropertiesManagement.getDeliveryTimeout());
+            sb.append("\n");
+
+            sb.append("vpprolong = ");
+            sb.append(smscPropertiesManagement.getVpProlong());
             sb.append("\n");
 
 			// sb.append("cdrDatabaseExportDuration = ");
@@ -1527,6 +1560,18 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("httpdefaultmessagingmode = ");
             sb.append(smscPropertiesManagement.getHttpDefaultMessagingMode());
+            sb.append("\n");
+
+            sb.append("modefaultmessagingmode = ");
+            sb.append(smscPropertiesManagement.getMoDefaultMessagingMode());
+            sb.append("\n");
+
+            sb.append("hrdefaultmessagingmode = ");
+            sb.append(smscPropertiesManagement.getHrDefaultMessagingMode());
+            sb.append("\n");
+
+            sb.append("sipdefaultmessagingmode = ");
+            sb.append(smscPropertiesManagement.getSipDefaultMessagingMode());
             sb.append("\n");
 
             sb.append("httpdefaultrddeliveryreceipt = ");

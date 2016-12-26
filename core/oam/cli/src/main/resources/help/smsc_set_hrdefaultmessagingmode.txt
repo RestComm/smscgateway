@@ -1,0 +1,19 @@
+Name
+	smsc set hrdefaultmessagingmode
+
+SYNOPSIS
+	smsc set hrdefaultmessagingmode <messaging mode value>
+
+DESCRIPTION
+	This command is used to set a value for default messaging mode
+	value for messages that came by SS7 Home Routing procedure.
+	Possible values: 0-default SMSC mode, 1-datagram, 2-transactional
+	(this means HR transparent mode), 3-storeAndForward.
+	Default value is 3.
+
+EXAMPLES
+	smsc set hrdefaultmessagingmode 3
+
+SEE ALSO
+	smsc get hrdefaultmessagingmode, smsc set httpdefaultmessagingmode,
+	smsc set modefaultmessagingmode, smsc set sipdefaultmessagingmode,

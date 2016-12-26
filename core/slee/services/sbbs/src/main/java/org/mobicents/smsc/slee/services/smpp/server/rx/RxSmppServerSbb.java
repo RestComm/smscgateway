@@ -669,8 +669,12 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     smsSet.setStatus(smStatus);
                     this.markDeliveringIsEnded(true);
 
+                    // calculating of newDueDelay and NewDueTime
+                    int newDueDelay = calculateNewDueDelay(smsSet, false);
+                    Date newDueTime = calculateNewDueTime(smsSet, newDueDelay);
+
                     // creating of failure lists
-                    this.createFailureLists(lstPermFailured, lstTempFailured, errorAction);
+                    this.createFailureLists(lstPermFailured, lstTempFailured, errorAction, newDueTime);
 
                     // mproc rules applying for delivery phase
                     this.applyMprocRulesOnFailure(lstPermFailured, lstTempFailured, lstPermFailured2, lstTempFailured2,
@@ -681,7 +685,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
                     // Processing messages that were temp or permanent failed or rerouted
                     this.postProcessPermFailures(lstPermFailured2, null, null);
-                    this.postProcessTempFailures(smsSet, lstTempFailured2, false, false);
+                    this.postProcessTempFailures(smsSet, lstTempFailured2, newDueDelay, newDueTime, false);
                     this.postProcessRerouted(lstRerouted, lstNewNetworkId);
 
                     // generating CDRs for permanent failure messages

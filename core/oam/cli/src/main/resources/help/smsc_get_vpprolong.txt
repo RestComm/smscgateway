@@ -1,0 +1,28 @@
+Name
+	smsc get vpprolong
+
+SYNOPSIS
+	smsc get vpprolong
+
+DESCRIPTION
+	This command is used to get the value of Validity period scheduling
+	prolongation in seconds.
+	Conditions when a message with validity period will be scheduled after delivery
+	failure:
+	a) validity period end time >= the time for next schedule time
+	or
+	b) validity period end time >= now + Validity period scheduling prolongation
+	By changing of "Validity period scheduling prolongation" you can specify will
+	a message be scheduled after validity period end time or not.
+	Setting this parameter to 0 lead that all messages will be scheduled.
+	Setting this parameter to a very big value lead that no message will be scheduled.
+	The general rule is - you can allow messages to be scheduled for after validity
+	period end time when scheduling is for for after long time from now.
+
+EXAMPLES
+	smsc get vpprolong
+
+SEE ALSO
+	smsc set vpprolong, smsc set fetchperiod, smsc set firstduedelay,
+	smsc set secondduedelay, smsc set duedelaymultiplicator
+

@@ -443,6 +443,9 @@ public abstract class TxSipServerSbb implements Sbb {
 			sms.setSourceAddrNpi(smscPropertiesManagement.getDefaultNpi());
 		}
 
+        int messageingMode = (smscPropertiesManagement.getSipDefaultMessagingMode() & 0x03);
+        sms.setEsmClass(messageingMode);
+
         sms.setOrigNetworkId(networkId);
 
 		// checking for a destination address
@@ -480,14 +483,6 @@ public abstract class TxSipServerSbb implements Sbb {
 			esmClass = esmClass | 0x40;// Add UDH
 			sms.setEsmClass(esmClass);
 		}
-		// boolean gsm7Encoding = GSMCharset.checkAllCharsCanBeEncoded(msg,
-		// GSMCharset.BYTE_TO_CHAR_DefaultAlphabet, null);
-		// DataCodingScheme dataCodingScheme;
-		// if (gsm7Encoding) {
-		// dataCodingScheme = dcsGsm7;
-		// } else {
-		// dataCodingScheme = dcsUsc2;
-		// }
 		sms.setDataCoding(dataCodingScheme.getCode());
 
 		// checking max message length
@@ -508,30 +503,12 @@ public abstract class TxSipServerSbb implements Sbb {
 				smscPropertiesManagement.getDefaultValidityPeriodHours());
 
 		SmsSet smsSet;
-
-
-//		if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//			try {
-//				smsSet = store.obtainSmsSet(ta);
-//			} catch (PersistenceException e1) {
-//				throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: "
-//						+ ta.toString() + "\n" + e1.getMessage(), SmppConstants.STATUS_SUBMITFAIL,
-//						MAPErrorCode.systemFailure, null, e1);
-//			}
-//		} else {
-
-
-
         smsSet = new SmsSet();
         smsSet.setDestAddr(ta.getAddr());
         smsSet.setDestAddrNpi(ta.getAddrNpi());
         smsSet.setDestAddrTon(ta.getAddrTon());
         smsSet.setNetworkId(networkId);
         smsSet.addSms(sms);			
-
-//		}
-
-
 		sms.setSmsSet(smsSet);
 
 		long messageId = store.c2_getNextMessageId();
@@ -605,37 +582,36 @@ public abstract class TxSipServerSbb implements Sbb {
 
                 try {
                     synchronized (lock) {
-                        // store and forward
-                        if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+                        if (!storeAndForwMode) {
                             try {
-                                sms.setStoringAfterFailure(true);
                                 this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                             } catch (Exception e) {
                                 throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
                                         SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
                             }
                         } else {
-                            try {
-                                sms.setStored(true);
-
-                                // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-                                // store.createLiveSms(sms);
-                                // if (sms.getScheduleDeliveryTime() == null)
-                                // store.setNewMessageScheduled(sms.getSmsSet(),
-                                // MessageUtil.computeDueDate(MessageUtil.computeFirstDueDelay(smscPropertiesManagement.getFirstDueDelay())));
-                                // else
-                                // store.setNewMessageScheduled(sms.getSmsSet(), sms.getScheduleDeliveryTime());
-                                // } else {
-
-                                this.scheduler.setDestCluster(sms.getSmsSet());
-                                store.c2_scheduleMessage_ReschedDueSlot(sms,
-                                        smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, false);
-
-                                // }
-
-                            } catch (PersistenceException e) {
-                                throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : "
-                                        + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
+                            // store and forward
+                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+                                try {
+                                    sms.setStoringAfterFailure(true);
+                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+                                } catch (Exception e) {
+                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
+                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+                                }
+                            } else {
+                                try {
+                                    sms.setStored(true);
+                                    this.scheduler.setDestCluster(sms.getSmsSet());
+                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
+                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+                                            false);
+                                } catch (PersistenceException e) {
+                                    throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : "
+                                            + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+                                            null, e);
+                                }
                             }
                         }
                     }

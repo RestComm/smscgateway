@@ -1,0 +1,18 @@
+Name
+	smsc get sipdefaultmessagingmode
+
+SYNOPSIS
+	smsc get sipdefaultmessagingmode
+
+DESCRIPTION
+	This command is used to get a value for default messaging mode
+	value for messages from a SIP connector.
+	Possible values: 0-default SMSC mode, 1-datagram, 2-transactional,
+	3-storeAndForward. Transactional mode mode is not supported now.
+
+EXAMPLES
+	smsc get sipdefaultmessagingmode
+
+SEE ALSO
+	smsc set hrdefaultmessagingmode, smsc set httpdefaultmessagingmode,
+	smsc set modefaultmessagingmode, smsc set sipdefaultmessagingmode,
