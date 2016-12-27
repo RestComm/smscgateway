@@ -323,7 +323,14 @@ Open a Web Browser and navigate to http://IP:8080/{this-folder}-management/ (whe
 You will notice that only the tabs of products whose binaries are installed already will be shown enabled and active in the GUI.
 If you have successfully installed the {this-platform} {this-application} you will find the tabs for JAIN-SLEE, JMX, SS7 and SMSC GW active and enabled.
 For more details on using the GUI for SS7 or JAIN-SLEE please refer to their respective user guides.
-This document only provides instructions for using the GUI to configure the SMSC Gateway. 
+This document only provides instructions for using the GUI to configure the SMSC Gateway.
+
+Some versions do not have an integrated console. In this case you can use separate GUI consoles for configuring:
+
+* http://IP:8080/smsc-management/ - for access for general SMSC GW settings, SIP setting, mproc rules settings
+* http://IP:8080/smpp-management/ - for access for SMPP server options and ESME configuring
+* http://IP:8080/jss7-management-console/ - for access for SS7 part configuring
+
 
 Switch to the SMSC GW tab and you will find that the window will look similar to the figure below.
 The GUI is divided into three sections: 
