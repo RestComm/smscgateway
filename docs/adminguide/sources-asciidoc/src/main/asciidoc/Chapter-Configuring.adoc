@@ -1349,6 +1349,11 @@ Home Routing enables operators to offer a full range of value-added services to 
 You need to configure SMSC GW before you can use SMS Home Routing.
 For more details refer to <<_smsc_gateway_server_hr>>.
 
+There are two possible modes of home routing functionality:
+
+* non-transparent mode - default mode when SMSC GW returns with successfull responses to incoming MT requests (without waiting till a message is delivered to a destination).
+* transparent mode - SMSC GW waits (after a MT request) till a message is delivered to a destination and responds to the MT request with a result of message delivering (success / failure). To activate this mode you need to configure the option <<_hrdefaultmessagingmode>> to "Transactional".
+
 
 [[_smpp_interface_description]]
 == SMPP interface description
