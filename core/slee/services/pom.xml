@@ -17,7 +17,9 @@
 
 		<module>alertsbb</module>
 		<module>chargingsbb</module>
+<!--
 		<module>txsmppserversbb</module>
+-->
 		<module>txsipserversbb</module>
 		<module>txhttpserversbb</module>
 		<module>mosbb</module>

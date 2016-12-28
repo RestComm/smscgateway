@@ -34,11 +34,6 @@
             <version>${project.version}</version>
         </dependency>
 		<dependency>
-			<artifactId>tx-smppserver-sbb</artifactId>
-			<groupId>${project.groupId}</groupId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<artifactId>mo-sbb</artifactId>
 			<groupId>${project.groupId}</groupId>
 			<version>${project.version}</version>
@@ -59,6 +54,12 @@
 			<version>${project.version}</version>
 		</dependency>
 <!--
+		<dependency>
+			<artifactId>tx-smppserver-sbb</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<artifactId>mt-sbb</artifactId>
 			<groupId>${project.groupId}</groupId>

@@ -9,26 +9,26 @@
 		<sbb-version>1.0</sbb-version>
 		<sbb-alias>TxSmppServerSbb</sbb-alias>
 
-        <sbb-ref>
-            <sbb-name>ChargingSbb</sbb-name>
-            <sbb-vendor>org.mobicents</sbb-vendor>
-            <sbb-version>1.0</sbb-version>
-            <sbb-alias>ChargingSbb</sbb-alias>
-        </sbb-ref>
+		<sbb-ref>
+			<sbb-name>ChargingSbb</sbb-name>
+			<sbb-vendor>org.mobicents</sbb-vendor>
+			<sbb-version>1.0</sbb-version>
+			<sbb-alias>ChargingSbb</sbb-alias>
+		</sbb-ref>
 
 		<sbb-classes>
 			<sbb-abstract-class>
 				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.smpp.server.tx.TxSmppServerSbb</sbb-abstract-class-name>
 
-                <get-child-relation-method>
-                    <sbb-alias-ref>
-                        ChargingSbb
-                    </sbb-alias-ref>
-                    <get-child-relation-method-name>
-                        getChargingSbb
-                    </get-child-relation-method-name>
-                    <default-priority>0</default-priority>
-                </get-child-relation-method>
+				<get-child-relation-method>
+					<sbb-alias-ref>
+						ChargingSbb
+					</sbb-alias-ref>
+					<get-child-relation-method-name>
+						getChargingSbb
+					</get-child-relation-method-name>
+					<default-priority>0</default-priority>
+				</get-child-relation-method>
 			</sbb-abstract-class>
 		</sbb-classes>
 
@@ -61,15 +61,15 @@
 			<initial-event-select variable="ActivityContext" />
 		</event>
 
-        <event event-direction="Receive" initial-event="True">
-            <event-name>SubmitMulti</event-name>
-            <event-type-ref>
-                <event-type-name>org.restcomm.slee.resource.smpp.SUBMIT_MULTI</event-type-name>
-                <event-type-vendor>org.restcomm</event-type-vendor>
-                <event-type-version>1.0</event-type-version>
-            </event-type-ref>
-            <initial-event-select variable="ActivityContext" />
-        </event>
+		<event event-direction="Receive" initial-event="True">
+			<event-name>SubmitMulti</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SUBMIT_MULTI</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>
 
 		<event event-direction="Receive" initial-event="False">
 			<event-name>PduRequestTimeout</event-name>
@@ -126,22 +126,21 @@
 				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
 				<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
 			</resource-adaptor-type-ref>
-			
 			<resource-adaptor-entity-binding>
 				<resource-adaptor-object-name>slee/resources/persistence/1.0/provider</resource-adaptor-object-name>
 				<resource-adaptor-entity-link>PersistenceResourceAdaptor</resource-adaptor-entity-link>
 			</resource-adaptor-entity-binding>
 		</resource-adaptor-type-binding>
-        <resource-adaptor-type-binding>
-            <resource-adaptor-type-ref>
-                <resource-adaptor-type-name>SchedulerResourceAdaptorType</resource-adaptor-type-name>
-                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
-                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
-            </resource-adaptor-type-ref>
-
-            <resource-adaptor-entity-binding>
-                <resource-adaptor-object-name>slee/resources/scheduler/1.0/provider</resource-adaptor-object-name>
-                <resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
-            </resource-adaptor-entity-binding>
-        </resource-adaptor-type-binding>    	</sbb>
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>SchedulerResourceAdaptorType</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>slee/resources/scheduler/1.0/provider</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>
+	</sbb>
 </sbb-jar>

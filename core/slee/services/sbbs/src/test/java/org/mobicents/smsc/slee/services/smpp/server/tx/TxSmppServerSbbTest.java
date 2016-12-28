@@ -686,6 +686,8 @@ public class TxSmppServerSbbTest {
         smscManagement.setSmppManagement(smppManagement);
         mProcManagement.setSmscManagement(smscManagement);
         smscManagement.registerRuleFactory(new MProcRuleFactoryDefault());
+//        this.pers.stop();
+        DBOperations.getInstance().stop();
         smscManagement.start();
 
         try {
@@ -1030,19 +1032,20 @@ public class TxSmppServerSbbTest {
 
 	private class TxSmppServerSbbProxy extends TxSmppServerSbb {
 
-		private PersistenceRAInterfaceProxy cassandraSbb;
+//		private PersistenceRAInterfaceProxy cassandraSbb;
 
 		public TxSmppServerSbbProxy(PersistenceRAInterfaceProxy cassandraSbb) {
-			this.cassandraSbb = cassandraSbb;
+//            this.cassandraSbb = cassandraSbb;
+            this.persistence = cassandraSbb;
 			this.logger = new TraceProxy();
 			this.scheduler = new SchedulerResourceAdaptorProxy();
 			TxSmppServerSbb.smscPropertiesManagement = SmscPropertiesManagement.getInstance("Test");
 		}
 
-		@Override
-		public PersistenceRAInterfaceProxy getStore() {
-			return cassandraSbb;
-		}
+//		@Override
+//		public PersistenceRAInterfaceProxy getStore() {
+//			return cassandraSbb;
+//		}
 
 		public void setSmppServerSessions(SmppSessions smppServerSessions) {
 			this.smppServerSessions = smppServerSessions;
