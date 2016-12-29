@@ -181,41 +181,60 @@ public abstract class SubmitCommonSbb implements Sbb {
     // *********
     // general processing methods
 
-    protected void checkSmscState(Sms sms, SmscCongestionControl smscCongestionControl, double maxActivityCountFactor)
-            throws SmscProcessingException {
+    protected void checkSmscState(Sms sms, SmscCongestionControl smscCongestionControl,
+            MaxActivityCountFactor maxActivityCountFactor) throws SmscProcessingException {
+
         // checking if SMSC is stopped
         if (smscPropertiesManagement.isSmscStopped()) {
-            SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR, 0, null);
+            SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR,
+                    MAPErrorCode.facilityNotSupported, null);
             e.setSkipErrorLogging(true);
             throw e;
         }
         // checking if SMSC is paused
         if (smscPropertiesManagement.isDeliveryPause()
                 && (!MessageUtil.isStoreAndForward(sms) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
-            SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR, 0, null);
+            SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR,
+                    MAPErrorCode.facilityNotSupported, null);
             e.setSkipErrorLogging(true);
             throw e;
         }
         // checking if cassandra database is available
         if (!persistence.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms)) {
-            SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR, 0,
-                    null);
+            SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR,
+                    MAPErrorCode.facilityNotSupported, null);
             e.setSkipErrorLogging(true);
             throw e;
         }
         if (!MessageUtil.isStoreAndForward(sms)
                 || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
             // checking if delivery query is overloaded
-            int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * maxActivityCountFactor);
             int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
-            if (activityCount >= fetchMaxRows) {
-                smscCongestionControl.registerMaxActivityCount1_2Threshold();
-                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
-                        0, null);
-                e.setSkipErrorLogging(true);
-                throw e;
-            } else {
-                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
+            switch (maxActivityCountFactor) {
+                case factor_12:
+                    int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
+                    if (activityCount >= fetchMaxRows) {
+                        smscCongestionControl.registerMaxActivityCount1_2Threshold();
+                        SmscProcessingException e = new SmscProcessingException("SMSC is overloaded",
+                                SmppConstants.STATUS_THROTTLED, MAPErrorCode.resourceLimitation, null);
+                        e.setSkipErrorLogging(true);
+                        throw e;
+                    } else {
+                        smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
+                    }
+                    break;
+                case factor_14:
+                    fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.4);
+                    if (activityCount >= fetchMaxRows) {
+                        smscCongestionControl.registerMaxActivityCount1_4Threshold();
+                        SmscProcessingException e = new SmscProcessingException("SMSC is overloaded",
+                                SmppConstants.STATUS_THROTTLED, MAPErrorCode.resourceLimitation, null);
+                        e.setSkipErrorLogging(true);
+                        throw e;
+                    } else {
+                        smscCongestionControl.registerMaxActivityCount1_4BackToNormal();
+                    }
+                    break;
             }
         }
     }
@@ -294,10 +313,10 @@ public abstract class SubmitCommonSbb implements Sbb {
             if (mProcResult.isMessageRejected()) {
                 sms0.setMessageDeliveryResultResponse(null);
                 SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-                        SmppConstants.STATUS_SUBMITFAIL, 0, null);
+                        SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null);
                 e.setSkipErrorLogging(true);
                 if (logger.isInfoEnabled()) {
-                    logger.info("TxSmpp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
+                    logger.info("Incoming message is rejected by mProc rules, message=[" + sms0 + "]");
                 }
                 throw e;
             }
@@ -305,7 +324,7 @@ public abstract class SubmitCommonSbb implements Sbb {
                 sms0.setMessageDeliveryResultResponse(null);
                 smscStatAggregator.updateMsgInFailedAll();
                 if (logger.isInfoEnabled()) {
-                    logger.info("TxSmpp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+                    logger.info("Incoming message is dropped by mProc rules, message=[" + sms0 + "]");
                 }
                 return;
             }
@@ -328,6 +347,10 @@ public abstract class SubmitCommonSbb implements Sbb {
                     break;
             }
         }
+    }
+
+    public enum MaxActivityCountFactor {
+        factor_12, factor_14,
     }
 
 }

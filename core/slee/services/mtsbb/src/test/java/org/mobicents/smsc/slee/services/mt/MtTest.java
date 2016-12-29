@@ -81,6 +81,7 @@ import org.mobicents.slee.resource.map.events.DialogClose;
 import org.mobicents.slee.resource.map.events.DialogDelimiter;
 import org.mobicents.slee.resource.map.events.DialogReject;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
+import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.PreparedStatementCollection;
 import org.mobicents.smsc.domain.MProcManagement;
@@ -3854,6 +3855,7 @@ public class MtTest {
         smscManagement.setSmppManagement(smppManagement);
         mProcManagement.setSmscManagement(smscManagement);
         smscManagement.registerRuleFactory(new MProcRuleFactoryDefault());
+        DBOperations.getInstance().stop();
         smscManagement.start();
 
         try {

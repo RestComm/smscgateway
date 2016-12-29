@@ -35,8 +35,6 @@ import javax.slee.ServiceID;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
 
-import javolution.util.FastList;
-
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
 import org.mobicents.protocols.ss7.map.api.MAPDialog;
@@ -73,7 +71,6 @@ import org.mobicents.protocols.ss7.map.api.smstpdu.ValidityPeriod;
 import org.mobicents.protocols.ss7.map.api.smstpdu.ValidityPeriodFormat;
 import org.mobicents.protocols.ss7.sccp.parameter.GlobalTitle;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
-import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.resource.map.events.DialogDelimiter;
 import org.mobicents.slee.resource.map.events.DialogNotice;
 import org.mobicents.slee.resource.map.events.DialogProviderAbort;
@@ -83,11 +80,8 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
-import org.mobicents.smsc.cassandra.PersistenceException;
-import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.SmscStatProvider;
-import org.mobicents.smsc.domain.StoreAndForwordMode;
 import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
@@ -97,10 +91,8 @@ import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
-import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
-import org.mobicents.smsc.slee.services.charging.ChargingMedium;
+import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 
 import com.cloudhopper.smpp.SmppConstants;
 
@@ -120,11 +112,60 @@ public abstract class MoSbb extends MoCommonSbb {
 		super(className);
 	}
 
-	public void onDialogRequest(DialogRequest evt, ActivityContextInterface aci) {
-		super.onDialogRequest(evt, aci);
+    // *********
+    // SBB staff
 
-		this.setProcessingState(MoProcessingState.OnlyRequestRecieved);
-	}
+    public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        ServiceID serviceID = event.getService();
+        this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
+        SbbStates.setMoServiceState(true);
+    }
+
+    public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
+        if (isServiceActivity) {
+            this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
+            SbbStates.setMoServiceState(false);
+        }
+    }
+
+    // *********
+    // Initial event selector method to check if the Event should initialize the
+
+    public InitialEventSelector initialEventSelect(InitialEventSelector ies) {
+        Object event = ies.getEvent();
+        DialogRequest dialogRequest = null;
+
+        if (event instanceof DialogRequest) {
+            dialogRequest = (DialogRequest) event;
+
+            if (MAPApplicationContextName.shortMsgMORelayContext == dialogRequest.getMAPDialog().getApplicationContext().getApplicationContextName()
+                    || MAPApplicationContextName.shortMsgMTRelayContext == dialogRequest.getMAPDialog().getApplicationContext().getApplicationContextName()) {
+                ies.setInitialEvent(true);
+                ies.setActivityContextSelected(true);
+            } else {
+                ies.setInitialEvent(false);
+            }
+        }
+
+        return ies;
+    }
+
+    // *********
+    // cmp fields
+    
+    public abstract void setProcessingState(MoProcessingState processingState);
+
+    public abstract MoProcessingState getProcessingState();
+
+    // *********
+    // MAP Events
+
+    public void onDialogRequest(DialogRequest evt, ActivityContextInterface aci) {
+        super.onDialogRequest(evt, aci);
+
+        this.setProcessingState(MoProcessingState.OnlyRequestRecieved);
+    }
 
 	public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
 		super.onDialogDelimiter(evt, aci);
@@ -186,9 +227,9 @@ public abstract class MoSbb extends MoCommonSbb {
 		this.setProcessingState(MoProcessingState.OtherDataRecieved);
 	}
 
-	/**
-	 * SMS Event Handlers
-	 */
+    // *********
+    // SMS Event Handlers
+
 	/**
 	 * Received incoming SMS for ACN v3. Send back ack
 	 * 
@@ -455,6 +496,16 @@ public abstract class MoSbb extends MoCommonSbb {
         }
 	}
 
+    /**
+     * Received Ack for MO SMS. But this is error we should never receive this
+     * 
+     * @param evt
+     * @param aci
+     */
+    public void onForwardShortMessageResponse(ForwardShortMessageResponse evt, ActivityContextInterface aci) {
+        this.logger.severe("Received FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
+    }
+
 	/**
 	 * 
 	 * @param evt
@@ -575,6 +626,9 @@ public abstract class MoSbb extends MoCommonSbb {
 
 	}
 
+    // *********
+    // incoming message processing
+
     private Sms processMtMessage(SM_RP_OA smRPOA, SM_RP_DA smRPDA, SmsSignalInfo smsSignalInfo, int networkId,String originatorSccpAddress,
             boolean isMoOperation, MAPDialogSms dialog, SmsMessage evt, long invokeId) throws SmscProcessingException {
 
@@ -640,7 +694,6 @@ public abstract class MoSbb extends MoCommonSbb {
         smsSignalInfo.setGsm8Charset(isoCharset);
 
 		ISDNAddressString callingPartyAddress = smRPOA.getMsisdn();
-//        if (callingPartyAddress == null && !smscPropertiesManagement.getSMSHomeRouting() ) {
         if (callingPartyAddress == null) {
             throw new SmscProcessingException("MO callingPartyAddress is absent", SmppConstants.STATUS_SYSERR,
                     MAPErrorCode.unexpectedDataValue, null);
@@ -701,192 +754,24 @@ public abstract class MoSbb extends MoCommonSbb {
         return sms;
 	}
 
-	private TargetAddress createDestTargetAddress(IMSI imsi, int networkId) throws SmscProcessingException {
-		if (imsi == null || imsi.getData() == null || imsi.getData().isEmpty()) {
-			throw new SmscProcessingException("Mt DA IMSI digits are absent", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
-
-		// TODO is this correct?
-		int destTon = 1;//International 
-		int destNpi = 6;//Land Mobile (E.212) 
-
-		TargetAddress ta = new TargetAddress(destTon, destNpi, imsi.getData(), networkId);
-		return ta;
-	}
-
-	private TargetAddress createDestTargetAddress(AddressField af, int networkId) throws SmscProcessingException {
-
-		if (af == null || af.getAddressValue() == null || af.getAddressValue().isEmpty()) {
-			throw new SmscProcessingException("MO DestAddress digits are absent", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
-		}
-
-        String digits = af.getAddressValue();
-        int destTon, destNpi;
-        if (af.getTypeOfNumber() == TypeOfNumber.Alphanumeric) {
-            destTon = TypeOfNumber.Alphanumeric.getCode();
-            destNpi = NumberingPlanIdentification.Unknown.getCode();
-        } else {
-            destTon = af.getTypeOfNumber().getCode();
-            destNpi = af.getNumberingPlanIdentification().getCode();
-        }
-
-//		switch (af.getTypeOfNumber()) {
-//		case Unknown:
-//            destTon = af.getTypeOfNumber().getCode();
-//
-//            // removing of MoUnknownTypeOfNumberPrefix prefix here -> moving to mproc
-////            destTon = smscPropertiesManagement.getDefaultTon();
-////            if (smscPropertiesManagement.getMoUnknownTypeOfNumberPrefix() != null && smscPropertiesManagement.getMoUnknownTypeOfNumberPrefix().length() > 0) {
-////                digits = smscPropertiesManagement.getMoUnknownTypeOfNumberPrefix() + digits;
-////                destTon = TypeOfNumber.InternationalNumber.getCode();
-////            }
-//			break;
-//        case InternationalNumber:
-//            destTon = af.getTypeOfNumber().getCode();
-//            break;
-//        case NationalNumber:
-//            destTon = af.getTypeOfNumber().getCode();
-//            break;
-//		default:
-//			throw new SmscProcessingException("MO DestAddress TON not supported: " + af.getTypeOfNumber().getCode(),
-//					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
-//		}
-//		switch (af.getNumberingPlanIdentification()) {
-//		case Unknown:
-//			destNpi = smscPropertiesManagement.getDefaultNpi();
-//			break;
-//		case ISDNTelephoneNumberingPlan:
-//			destNpi = af.getNumberingPlanIdentification().getCode();
-//			break;
-//		default:
-//			throw new SmscProcessingException("MO DestAddress NPI not supported: "
-//					+ af.getNumberingPlanIdentification().getCode(), SmppConstants.STATUS_SYSERR,
-//					MAPErrorCode.unexpectedDataValue, null);
-//		}
-
-		TargetAddress ta = new TargetAddress(destTon, destNpi, digits, networkId);
-		return ta;
-	}
-
-    private TargetAddress createDestTargetAddress(ISDNAddressString isdn, int networkId) throws SmscProcessingException {
-
-        int destTon, destNpi;
-        destTon = isdn.getAddressNature().getIndicator();
-        destNpi = isdn.getNumberingPlan().getIndicator();        
-        
-        
-//        switch (isdn.getAddressNature()) {
-//        case unknown:
-//            destTon = smscPropertiesManagement.getDefaultTon();
-//            break;
-//        case international_number:
-//            destTon = isdn.getAddressNature().getIndicator();
-//            break;
-//        case national_significant_number:
-//            destTon = isdn.getAddressNature().getIndicator();
-//            break;
-//        default:
-//            throw new SmscProcessingException("HomeRouting: DestAddress TON not supported: " + isdn.getAddressNature().getIndicator(),
-//                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
-//        }
-//        switch (isdn.getNumberingPlan()) {
-//        case unknown:
-//            destNpi = smscPropertiesManagement.getDefaultNpi();
-//            break;
-//        case ISDN:
-//            destNpi = isdn.getNumberingPlan().getIndicator();
-//            break;
-//        default:
-//            throw new SmscProcessingException("HomeRouting: DestAddress NPI not supported: "
-//                    + isdn.getNumberingPlan().getIndicator(), SmppConstants.STATUS_SYSERR,
-//                    MAPErrorCode.unexpectedDataValue, null);
-//        }
-
-
-
-
-
-        TargetAddress ta = new TargetAddress(destTon, destNpi, isdn.getAddress(), networkId);
-        return ta;
-    }
-
-	/**
-	 * Received Ack for MO SMS. But this is error we should never receive this
-	 * 
-	 * @param evt
-	 * @param aci
-	 */
-	public void onForwardShortMessageResponse(ForwardShortMessageResponse evt, ActivityContextInterface aci) {
-		this.logger.severe("Received FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
-	}
-
-	/**
-	 * Initial event selector method to check if the Event should initialize the
-	 */
-	public InitialEventSelector initialEventSelect(InitialEventSelector ies) {
-		Object event = ies.getEvent();
-		DialogRequest dialogRequest = null;
-
-		if (event instanceof DialogRequest) {
-			dialogRequest = (DialogRequest) event;
-
-//            if (MAPApplicationContextName.shortMsgMORelayContext == dialogRequest.getMAPDialog().getApplicationContext().getApplicationContextName()
-//                    || (smscPropertiesManagement.getSMSHomeRouting() && MAPApplicationContextName.shortMsgMTRelayContext == dialogRequest.getMAPDialog()
-//                            .getApplicationContext().getApplicationContextName())) {
-            if (MAPApplicationContextName.shortMsgMORelayContext == dialogRequest.getMAPDialog().getApplicationContext().getApplicationContextName()
-                    || MAPApplicationContextName.shortMsgMTRelayContext == dialogRequest.getMAPDialog().getApplicationContext().getApplicationContextName()) {
-                ies.setInitialEvent(true);
-				ies.setActivityContextSelected(true);
-			} else {
-				ies.setInitialEvent(false);
-			}
-		}
-
-		return ies;
-	}
-
-	/**
-	 * Private Methods
-	 * 
-	 * @throws MAPException
-	 */
-
     private Sms handleSmsSubmitTpdu(SmsSubmitTpdu smsSubmitTpdu, AddressString callingPartyAddress, int networkId,
             String originatorSccpAddress, boolean isMoOperation, MAPDialogSms dialog, SmsMessage evt, long invokeId,
             String origMoServiceCentreAddressDA) throws SmscProcessingException {
 
         TargetAddress ta = createDestTargetAddress(smsSubmitTpdu.getDestinationAddress(), networkId);
-        PersistenceRAInterface store = obtainStore(ta);
 
-        Sms sms = this.createSmsEvent(smsSubmitTpdu, ta, store, callingPartyAddress, networkId, originatorSccpAddress);
+        Sms sms = this.createSmsEvent(smsSubmitTpdu, ta, persistence, callingPartyAddress, networkId, originatorSccpAddress);
         sms.setOrigMoServiceCentreAddressDA(origMoServiceCentreAddressDA);
-        return this.processSms(sms, store, smscPropertiesManagement.getMoCharging(), isMoOperation, dialog, evt, invokeId);
+        return this.processSms(sms, persistence, smscPropertiesManagement.getMoCharging(), isMoOperation, dialog, evt, invokeId);
     }
-
-//    private Sms handleSmsDeliverTpdu(SmsDeliverTpdu smsDeliverTpdu, IMSI destinationImsi, int networkId, boolean isMoOperation,
-//            MAPDialogSms dialog, SmsMessage evt, long invokeId, String origMoServiceCentreAddressDA)
-//            throws SmscProcessingException {
-//
-//        AddressField tpOAAddress = smsDeliverTpdu.getOriginatingAddress();
-//
-//        TargetAddress ta = createDestTargetAddress(destinationImsi, networkId);
-//        PersistenceRAInterface store = obtainStore(ta);
-//
-//        Sms sms = this.createSmsEvent(smsDeliverTpdu, ta, store, tpOAAddress, networkId);
-//        sms.setOrigMoServiceCentreAddressDA(origMoServiceCentreAddressDA);
-//        return this.processSms(sms, store, smscPropertiesManagement.getHrCharging(), isMoOperation, dialog, evt, invokeId);
-//    }
 
     private Sms handleSmsDeliverTpdu(SmsDeliverTpdu smsDeliverTpdu, CorrelationIdValue civ, int networkId,
     		String originatorSccpAddress, boolean isMoOperation, MAPDialogSms dialog, SmsMessage evt, long invokeId) throws SmscProcessingException {
 
         TargetAddress ta = createDestTargetAddress(civ.getMsisdn(), networkId);
-        PersistenceRAInterface store = obtainStore(ta);
 
-        Sms sms = this.createSmsEvent(smsDeliverTpdu, ta, store, civ, networkId, originatorSccpAddress);
-        return this.processSms(sms, store, smscPropertiesManagement.getHrCharging(), isMoOperation, dialog, evt, invokeId);
+        Sms sms = this.createSmsEvent(smsDeliverTpdu, ta, persistence, civ, networkId, originatorSccpAddress);
+        return this.processSms(sms, persistence, smscPropertiesManagement.getHrCharging(), isMoOperation, dialog, evt, invokeId);
 	}
 
     private Sms createSmsEvent(SmsSubmitTpdu smsSubmitTpdu, TargetAddress ta, PersistenceRAInterface store, AddressString callingPartyAddress, int networkId,
@@ -1081,20 +966,6 @@ public abstract class MoSbb extends MoCommonSbb {
                 smscPropertiesManagement.getDefaultValidityPeriodHours());
 
         SmsSet smsSet;
-
-
-
-//        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//            try {
-//                smsSet = store.obtainSmsSet(ta);
-//            } catch (PersistenceException e1) {
-//                throw new SmscProcessingException("PersistenceException when reading SmsSet from a database: " + ta.toString() + "\n" + e1.getMessage(),
-//                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e1);
-//            }
-//        } else {
-
-
-
         smsSet = new SmsSet();
         smsSet.setDestAddr(ta.getAddr());
         smsSet.setDestAddrNpi(ta.getAddrNpi());
@@ -1105,13 +976,8 @@ public abstract class MoSbb extends MoCommonSbb {
         smsSet.setImsi(civ.getImsi());
         smsSet.setLocationInfoWithLMSI(civ.getLocationInfoWithLMSI());
 
-        smsSet.addSms(sms);            
+        smsSet.addSms(sms);
 
-
-//        }
-        
-        
-        
         sms.setSmsSet(smsSet);
 
         long messageId = store.c2_getNextMessageId();
@@ -1127,44 +993,45 @@ public abstract class MoSbb extends MoCommonSbb {
 
     private Sms processSms(Sms sms0, PersistenceRAInterface store, MoChargingType chargingType, boolean isMoOperation,
             MAPDialogSms dialog, SmsMessage evt, long invokeId) throws SmscProcessingException {
-        // TODO: we can make this some check will we send this message or not
 
-        // checking if SMSC is stopped
-        if (smscPropertiesManagement.isSmscStopped()) {
-            SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR, MAPErrorCode.facilityNotSupported, null);
-            e.setSkipErrorLogging(true);
-            throw e;
-        }
-        // checking if SMSC is paused
-        if (smscPropertiesManagement.isDeliveryPause()
-                && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
-            SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.facilityNotSupported, null);
-            e.setSkipErrorLogging(true);
-            throw e;
-        }
-        // checking if cassandra database is available
-        if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
-            SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.facilityNotSupported, null);
-            e.setSkipErrorLogging(true);
-            throw e;
-        }
-        if (!MessageUtil.isStoreAndForward(sms0)
-                || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-            // checking if delivery query is overloaded
-            int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.4);
-            int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
-            if (activityCount >= fetchMaxRows) {
-                smscCongestionControl.registerMaxActivityCount1_4Threshold();
-                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
-                        MAPErrorCode.resourceLimitation, null);
-                e.setSkipErrorLogging(true);
-                throw e;
-            } else {
-                smscCongestionControl.registerMaxActivityCount1_4BackToNormal();
-            }
-        }
+        this.checkSmscState(sms0, smscCongestionControl, SubmitCommonSbb.MaxActivityCountFactor.factor_14);
+        
+//        // checking if SMSC is stopped
+//        if (smscPropertiesManagement.isSmscStopped()) {
+//            SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR, MAPErrorCode.facilityNotSupported, null);
+//            e.setSkipErrorLogging(true);
+//            throw e;
+//        }
+//        // checking if SMSC is paused
+//        if (smscPropertiesManagement.isDeliveryPause()
+//                && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
+//            SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR,
+//                    MAPErrorCode.facilityNotSupported, null);
+//            e.setSkipErrorLogging(true);
+//            throw e;
+//        }
+//        // checking if cassandra database is available
+//        if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
+//            SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR,
+//                    MAPErrorCode.facilityNotSupported, null);
+//            e.setSkipErrorLogging(true);
+//            throw e;
+//        }
+//        if (!MessageUtil.isStoreAndForward(sms0)
+//                || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+//            // checking if delivery query is overloaded
+//            int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.4);
+//            int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
+//            if (activityCount >= fetchMaxRows) {
+//                smscCongestionControl.registerMaxActivityCount1_4Threshold();
+//                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
+//                        MAPErrorCode.resourceLimitation, null);
+//                e.setSkipErrorLogging(true);
+//                throw e;
+//            } else {
+//                smscCongestionControl.registerMaxActivityCount1_4BackToNormal();
+//            }
+//        }
 
         // transactional mode / or charging request
         boolean isTransactional = MessageUtil.isTransactional(sms0);
@@ -1174,140 +1041,154 @@ public abstract class MoSbb extends MoCommonSbb {
             sms0.setMessageDeliveryResultResponse(messageDeliveryResultResponse);
         }
 
-        switch (chargingType) {
-            case accept:
-                // applying of MProc
-                MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+        if (chargingType == MoChargingType.reject)
+            return null;
 
-                FastList<Sms> smss = mProcResult.getMessageList();
-                for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
-                    Sms sms = n.getValue();
-                    TargetAddress ta = new TargetAddress(sms.getSmsSet());
-                    TargetAddress lock = store.obtainSynchroObject(ta);
+        this.forwardMessage(sms0, chargingType == MoChargingType.diameter, smscStatAggregator);
 
-                    try {
-                        synchronized (lock) {
-                            boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-                            if (!storeAndForwMode) {
-                                try {
-                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                                } catch (Exception e) {
-                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
-                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
-                                }
-                            } else {
-                                // store and forward
-                                if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-                                    try {
-                                        sms.setStoringAfterFailure(true);
-                                        this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                                    } catch (Exception e) {
-                                        throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
-                                                + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
-                                                null, e);
-                                    }
-                                } else {
-                                    try {
-                                        sms.setStored(true);
-                                        this.scheduler.setDestCluster(sms.getSmsSet());
-                                        store.c2_scheduleMessage_ReschedDueSlot(sms,
-                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-                                                false);
-                                    } catch (PersistenceException e) {
-                                        throw new SmscProcessingException("MO PersistenceException when storing LIVE_SMS : "
-                                                + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
-                                                null, e);
-                                    }
-                                }
-                            }
-                        }
-                    } finally {
-                        store.releaseSynchroObject(lock);
-                    }
-                }
-
-                if (mProcResult.isMessageRejected()) {
-                    sms0.setMessageDeliveryResultResponse(null);
-                    SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-                            SmppConstants.STATUS_SUBMITFAIL, 0, null);
-                    e.setSkipErrorLogging(true);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("TxSmpp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
-                    }
-                    throw e;
-                }
-                if (mProcResult.isMessageDropped()) {
-                    sms0.setMessageDeliveryResultResponse(null);
-                    smscStatAggregator.updateMsgInFailedAll();
-                    if (logger.isInfoEnabled()) {
-                        logger.info("TxSmpp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
-                    }
-                    return sms0;
-                }
-
-                smscStatAggregator.updateMsgInReceivedAll();
-                smscStatAggregator.updateMsgInReceivedSs7();
-                if (sms0.getOriginationType() == OriginationType.SS7_MO) {
-                    smscStatAggregator.updateMsgInReceivedSs7Mo();
-                } else {
-                    smscStatAggregator.updateMsgInReceivedSs7Hr();
-                }
-
-                return sms0;
-            case reject:
-                // this case is already processed
-                return null;
-            case diameter:
-                ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
-                chargingSbb.setupChargingRequestInterface(ChargingMedium.MoOrig, sms0);
-                return sms0;
-        }
-        return null;
+        return sms0;
+        
+//        switch (chargingType) {
+//            case accept:
+//                // applying of MProc
+//                MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+//
+//                FastList<Sms> smss = mProcResult.getMessageList();
+//                for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
+//                    Sms sms = n.getValue();
+//                    TargetAddress ta = new TargetAddress(sms.getSmsSet());
+//                    TargetAddress lock = store.obtainSynchroObject(ta);
+//
+//                    try {
+//                        synchronized (lock) {
+//                            boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+//                            if (!storeAndForwMode) {
+//                                try {
+//                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+//                                } catch (Exception e) {
+//                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
+//                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+//                                }
+//                            } else {
+//                                // store and forward
+//                                if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+//                                    try {
+//                                        sms.setStoringAfterFailure(true);
+//                                        this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+//                                    } catch (Exception e) {
+//                                        throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
+//                                                + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+//                                                null, e);
+//                                    }
+//                                } else {
+//                                    try {
+//                                        sms.setStored(true);
+//                                        this.scheduler.setDestCluster(sms.getSmsSet());
+//                                        store.c2_scheduleMessage_ReschedDueSlot(sms,
+//                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+//                                                false);
+//                                    } catch (PersistenceException e) {
+//                                        throw new SmscProcessingException("MO PersistenceException when storing LIVE_SMS : "
+//                                                + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+//                                                null, e);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    } finally {
+//                        store.releaseSynchroObject(lock);
+//                    }
+//                }
+//
+//                if (mProcResult.isMessageRejected()) {
+//                    sms0.setMessageDeliveryResultResponse(null);
+//                    SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
+//                            SmppConstants.STATUS_SUBMITFAIL, 0, null);
+//                    e.setSkipErrorLogging(true);
+//                    if (logger.isInfoEnabled()) {
+//                        logger.info("TxSmpp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
+//                    }
+//                    throw e;
+//                }
+//                if (mProcResult.isMessageDropped()) {
+//                    sms0.setMessageDeliveryResultResponse(null);
+//                    smscStatAggregator.updateMsgInFailedAll();
+//                    if (logger.isInfoEnabled()) {
+//                        logger.info("TxSmpp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+//                    }
+//                    return sms0;
+//                }
+//
+//                smscStatAggregator.updateMsgInReceivedAll();
+//                smscStatAggregator.updateMsgInReceivedSs7();
+//                if (sms0.getOriginationType() == OriginationType.SS7_MO) {
+//                    smscStatAggregator.updateMsgInReceivedSs7Mo();
+//                } else {
+//                    smscStatAggregator.updateMsgInReceivedSs7Hr();
+//                }
+//
+//                return sms0;
+//            case reject:
+//                // this case is already processed
+//                return null;
+//            case diameter:
+//                ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
+//                chargingSbb.setupChargingRequestInterface(ChargingMedium.MoOrig, sms0);
+//                return sms0;
+//        }
+//        return null;
 	}
+
+    // *********
+    // private methods
+
+//  private TargetAddress createDestTargetAddress(IMSI imsi, int networkId) throws SmscProcessingException {
+//      if (imsi == null || imsi.getData() == null || imsi.getData().isEmpty()) {
+//          throw new SmscProcessingException("Mt DA IMSI digits are absent", SmppConstants.STATUS_SYSERR,
+//                  MAPErrorCode.unexpectedDataValue, null);
+//      }
+//
+//      // TODO is this correct?
+//      int destTon = 1;//International 
+//      int destNpi = 6;//Land Mobile (E.212) 
+//
+//      TargetAddress ta = new TargetAddress(destTon, destNpi, imsi.getData(), networkId);
+//      return ta;
+//  }
+
+    private TargetAddress createDestTargetAddress(AddressField af, int networkId) throws SmscProcessingException {
+
+        if (af == null || af.getAddressValue() == null || af.getAddressValue().isEmpty()) {
+            throw new SmscProcessingException("MO DestAddress digits are absent", SmppConstants.STATUS_SYSERR,
+                    MAPErrorCode.unexpectedDataValue, null);
+        }
+
+        String digits = af.getAddressValue();
+        int destTon, destNpi;
+        if (af.getTypeOfNumber() == TypeOfNumber.Alphanumeric) {
+            destTon = TypeOfNumber.Alphanumeric.getCode();
+            destNpi = NumberingPlanIdentification.Unknown.getCode();
+        } else {
+            destTon = af.getTypeOfNumber().getCode();
+            destNpi = af.getNumberingPlanIdentification().getCode();
+        }
+
+        TargetAddress ta = new TargetAddress(destTon, destNpi, digits, networkId);
+        return ta;
+    }
+
+    private TargetAddress createDestTargetAddress(ISDNAddressString isdn, int networkId) throws SmscProcessingException {
+
+        int destTon, destNpi;
+        destTon = isdn.getAddressNature().getIndicator();
+        destNpi = isdn.getNumberingPlan().getIndicator();        
+
+        TargetAddress ta = new TargetAddress(destTon, destNpi, isdn.getAddress(), networkId);
+        return ta;
+    }
 
 	public enum MoProcessingState {
 		OnlyRequestRecieved, OtherDataRecieved,
 	}
-
-	public abstract void setProcessingState(MoProcessingState processingState);
-
-	public abstract MoProcessingState getProcessingState();
-
-	/**
-     * Get child ChargingSBB
-     *
-     * @return
-     */
-    public abstract ChildRelationExt getChargingSbb();
-
-    private ChargingSbbLocalObject getChargingSbbObject() {
-        ChildRelationExt relation = getChargingSbb();
-
-        ChargingSbbLocalObject ret = (ChargingSbbLocalObject) relation.get(ChildRelationExt.DEFAULT_CHILD_NAME);
-        if (ret == null) {
-            try {
-                ret = (ChargingSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
-            } catch (Exception e) {
-                if (this.logger.isSevereEnabled()) {
-                    this.logger.severe("Exception while trying to creat ChargingSbb child", e);
-                }
-            }
-        }
-        return ret;
-    }
-
-    public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
-        ServiceID serviceID = event.getService();
-        this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
-        SbbStates.setMoServiceState(true);
-    }
-
-    public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
-        boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
-        if (isServiceActivity) {
-            this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
-            SbbStates.setMoServiceState(false);
-        }
-    }
 
 }

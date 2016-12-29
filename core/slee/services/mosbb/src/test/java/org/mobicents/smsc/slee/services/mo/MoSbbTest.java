@@ -84,7 +84,6 @@ import org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault;
 import org.mobicents.smsc.slee.resources.persistence.MAPDialogSmsProxy;
 import org.mobicents.smsc.slee.resources.persistence.MAPProviderProxy;
 import org.mobicents.smsc.slee.resources.persistence.MAPServiceSmsProxy;
-import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.persistence.SmppSessionsProxy;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
@@ -808,19 +807,19 @@ public class MoSbbTest {
 
     private class MoSbbProxy extends MoSbb {
 
-        private PersistenceRAInterfaceProxy cassandraSbb;
+//        private PersistenceRAInterfaceProxy cassandraSbb;
 
         public MoSbbProxy(PersistenceRAInterfaceProxy cassandraSbb) {
-            this.cassandraSbb = cassandraSbb;
+            this.persistence = cassandraSbb;
             this.logger = new TraceProxy();
             this.mapProvider = new MAPProviderProxy();
             this.scheduler = new SchedulerResourceAdaptorProxy();
         }
 
-        @Override
-        public PersistenceRAInterface getStore() {
-            return cassandraSbb;
-        }
+//        @Override
+//        public PersistenceRAInterface getStore() {
+//            return cassandraSbb;
+//        }
 
 //        public void setSmppServerSessions(SmppSessions smppServerSessions) {
 //            this.smppServerSessions = smppServerSessions;

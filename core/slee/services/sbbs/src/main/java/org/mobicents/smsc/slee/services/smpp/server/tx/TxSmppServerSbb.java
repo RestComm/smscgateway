@@ -123,6 +123,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
     @Override
     public void setSbbContext(SbbContext sbbContext) {
+        super.setSbbContext(sbbContext);
+
         try {
             Context ctx = (Context) new InitialContext().lookup("java:comp/env");
 
@@ -1184,8 +1186,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             logger.info(String.format("\nReceived %s to ESME: %s, sms=%s", incomingMessageType.toString(), esme.getName(),
                     sms0.toString()));
         }
-        
-        checkSmscState(sms0, smscCongestionControl, 1.2);
+
+        this.checkSmscState(sms0, smscCongestionControl, SubmitCommonSbb.MaxActivityCountFactor.factor_12);
 
 //        // checking if SMSC is stopped
 //        if (smscPropertiesManagement.isSmscStopped()) {
@@ -1297,7 +1299,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
         }
 
-        forwardMessage(sms0, withCharging, smscStatAggregator);
+        this.forwardMessage(sms0, withCharging, smscStatAggregator);
         
 //        if (withCharging) {
 //            ChargingSbbLocalObject chargingSbb = getChargingSbbObject();

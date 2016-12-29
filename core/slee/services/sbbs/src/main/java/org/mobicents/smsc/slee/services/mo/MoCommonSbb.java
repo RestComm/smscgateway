@@ -25,16 +25,11 @@ package org.mobicents.smsc.slee.services.mo;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.slee.ActivityContextInterface;
-import javax.slee.CreateException;
-import javax.slee.RolledBackContext;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
-import javax.slee.facilities.Tracer;
-import javax.slee.resource.ResourceAdaptorTypeID;
 
 import org.mobicents.protocols.ss7.map.api.MAPParameterFactory;
 import org.mobicents.protocols.ss7.map.api.MAPProvider;
-import org.mobicents.slee.SbbContextExt;
 import org.mobicents.slee.resource.map.MAPContextInterfaceFactory;
 import org.mobicents.slee.resource.map.events.DialogAccept;
 import org.mobicents.slee.resource.map.events.DialogClose;
@@ -50,12 +45,8 @@ import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
 import org.mobicents.smsc.domain.SmscCongestionControl;
-import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
-import org.mobicents.smsc.library.SmscProcessingException;
-import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
-import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 
 /**
  * 
@@ -63,46 +54,52 @@ import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
  * @author servey vetyutnev
  * 
  */
-public abstract class MoCommonSbb implements Sbb {
-    
-    private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID("PersistenceResourceAdaptorType", "org.mobicents", "1.0");
-    private static final String PERSISTENCE_LINK = "PersistenceResourceAdaptor";
-    private static final ResourceAdaptorTypeID SCHEDULER_ID = new ResourceAdaptorTypeID("SchedulerResourceAdaptorType",
-            "org.mobicents", "1.0");
-    private static final String SCHEDULER_LINK = "SchedulerResourceAdaptor";
-    protected static final SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
-
-	private final String className;
-
-	protected Tracer logger;
-	protected SbbContextExt sbbContext;
+public abstract class MoCommonSbb extends SubmitCommonSbb implements Sbb {
 
 	protected MAPContextInterfaceFactory mapAcif;
 	protected MAPProvider mapProvider;
 	protected MAPParameterFactory mapParameterFactory;
     protected SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
     protected SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
-    protected SchedulerRaSbbInterface scheduler = null;
 
-//	protected SmppSessions smppServerSessions = null;
-
-	protected PersistenceRAInterface persistence;
 	public MoCommonSbb(String className) {
-		this.className = className;
+        super(className);
 	}
 
-	public PersistenceRAInterface getStore() {
-		return this.persistence;
-	}
+    // *********
+    // SBB staff
 
-	protected PersistenceRAInterface obtainStore(TargetAddress ta) throws SmscProcessingException {
-	    PersistenceRAInterface store = this.getStore();
-		return store;
-	}
+    @Override
+    public void setSbbContext(SbbContext sbbContext) {
+        super.setSbbContext(sbbContext);
 
-	/**
-	 * MAP Components Events
-	 */
+        try {
+            Context ctx = (Context) new InitialContext().lookup("java:comp/env");
+            this.mapAcif = (MAPContextInterfaceFactory) ctx.lookup("slee/resources/map/2.0/acifactory");
+            this.mapProvider = (MAPProvider) ctx.lookup("slee/resources/map/2.0/provider");
+            this.mapParameterFactory = this.mapProvider.getMAPParameterFactory();
+        } catch (Exception ne) {
+            logger.severe("Could not set SBB context:", ne);
+        }
+    }
+
+    @Override
+    public void sbbLoad() {
+        super.sbbLoad();
+    }
+
+    @Override
+    public void sbbStore() {
+        super.sbbStore();
+    }
+
+    // *********
+    // Sbb ACI
+
+    public abstract MoActivityContextInterface asSbbActivityContextInterface(ActivityContextInterface aci);
+
+    // *********
+    // MAP Components Events
 
 	public void onInvokeTimeout(InvokeTimeout evt, ActivityContextInterface aci) {
 		this.logger.severe("\nRx :  onInvokeTimeout" + evt);
@@ -116,9 +113,9 @@ public abstract class MoCommonSbb implements Sbb {
 		this.logger.severe("\nRx :  onRejectComponent" + event);
 	}
 
-	/**
-	 * Dialog Events
-	 */
+    // *********
+    // MAP Dialog Events
+
 	public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
 			this.logger.fine("\nRx :  onDialogDelimiter=" + evt);
@@ -173,94 +170,4 @@ public abstract class MoCommonSbb implements Sbb {
 		}
 	}
 
-	/**
-	 * Life cycle methods
-	 */
-
-	@Override
-	public void sbbActivate() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbCreate() throws CreateException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbExceptionThrown(Exception arg0, Object arg1, ActivityContextInterface arg2) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbLoad() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbPassivate() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbPostCreate() throws CreateException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbRemove() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbRolledBack(RolledBackContext arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbStore() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setSbbContext(SbbContext sbbContext) {
-		this.sbbContext = (SbbContextExt) sbbContext;
-
-		try {
-			Context ctx = (Context) new InitialContext().lookup("java:comp/env");
-			this.mapAcif = (MAPContextInterfaceFactory) ctx.lookup("slee/resources/map/2.0/acifactory");
-			this.mapProvider = (MAPProvider) ctx.lookup("slee/resources/map/2.0/provider");
-			this.mapParameterFactory = this.mapProvider.getMAPParameterFactory();
-			
-//			this.smppServerSessions = (SmppSessions) ctx.lookup("slee/resources/smpp/server/1.0/provider");
-
-			this.logger = this.sbbContext.getTracer(this.className);
-
-            this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, PERSISTENCE_LINK);
-            this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID, SCHEDULER_LINK);
-		} catch (Exception ne) {
-			logger.severe("Could not set SBB context:", ne);
-		}
-		// TODO : Handle proper error
-
-	}
-
-	@Override
-	public void unsetSbbContext() {
-
-	}
-
-	/**
-	 * Sbb ACI
-	 */
-	public abstract MoActivityContextInterface asSbbActivityContextInterface(ActivityContextInterface aci);
 }

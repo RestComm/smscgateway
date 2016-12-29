@@ -11,6 +11,7 @@
 	<artifactId>rx-smppserver-sbb</artifactId>
 	<name>Core : SLEE : Services Rx SMPP Server SBB</name>
 	<dependencies>
+<!--
 		<dependency>
 			<artifactId>persistence-ratype</artifactId>
 			<groupId>${project.groupId}</groupId>
@@ -58,6 +59,13 @@
             <version>1.5.0</version>
             <scope>test</scope>
         </dependency>
+-->
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>sbbs</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

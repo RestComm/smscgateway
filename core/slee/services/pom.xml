@@ -17,15 +17,19 @@
 
 		<module>alertsbb</module>
 		<module>chargingsbb</module>
-<!--
-		<module>txsmppserversbb</module>
--->
-		<module>txsipserversbb</module>
-		<module>txhttpserversbb</module>
-		<module>mosbb</module>
-		<module>homeroutingsbb</module>
 
 		<module>sbbs</module>
+
+		<module>txsmppserversbb</module>
+		<module>txhttpserversbb</module>
+		<module>txsipserversbb</module>
+		<module>mosbb</module>
+
+		<module>rxsmppserversbb</module>
+		<module>rxsipserversbb</module>
+		<module>mtsbb</module>
+
+		<module>homeroutingsbb</module>
 
 		<module>du</module>
 	</modules>
