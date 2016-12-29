@@ -19,9 +19,13 @@
 		<assemble.dir>${project.build.directory}/load</assemble.dir>
 		<build.xml.template.file>${basedir}/build_template.xml</build.xml.template.file>
 		<build.xml.replacement.file>${basedir}/build.xml</build.xml.replacement.file>
+
+<!--
 		<ch-commons-util.version>6.0.1</ch-commons-util.version>
 		<ch-commons-charset.version>3.0.2</ch-commons-charset.version>
 		<ch-commons-gsm.version>3.0.0</ch-commons-gsm.version>
+-->
+
 		<joda-time.version>2.6</joda-time.version>
 		<guava.version>18.0</guava.version>
 	</properties>
@@ -38,21 +42,23 @@
 			<artifactId>ch-smpp</artifactId>
 			<version>${ch.smpp.version}</version>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>com.cloudhopper</groupId>
 			<artifactId>ch-commons-charset</artifactId>
 			<version>${ch-commons-charset.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.cloudhopper</groupId>
+			<artifactId>ch-commons-util</artifactId>
+			<version>${ch-commons-util.version}</version>
+		</dependency>
+-->
 
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty</artifactId>
 			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.cloudhopper</groupId>
-			<artifactId>ch-commons-util</artifactId>
-			<version>${ch-commons-util.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

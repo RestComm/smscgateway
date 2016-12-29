@@ -33,6 +33,10 @@
 					<groupId>com.sun.jdmk</groupId>
 					<artifactId>jmxtools</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.cloudhopper</groupId>
+					<artifactId>ch-smpp</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
