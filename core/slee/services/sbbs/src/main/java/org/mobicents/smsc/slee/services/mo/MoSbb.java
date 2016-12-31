@@ -103,7 +103,6 @@ import com.cloudhopper.smpp.SmppConstants;
  * 
  */
 public abstract class MoSbb extends MoCommonSbb {
-
 	private static final String className = MoSbb.class.getSimpleName();
 
 	private static Charset isoCharset = Charset.forName("ISO-8859-1");

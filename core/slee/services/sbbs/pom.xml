@@ -79,6 +79,18 @@
 			<artifactId>charging-sbb</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+        <dependency>
+            <groupId>org.mobicents.resources</groupId>
+            <artifactId>http-servlet-events</artifactId>
+            <version>${org.mobicents.http.ra.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 	</dependencies>
 
 	<profiles>

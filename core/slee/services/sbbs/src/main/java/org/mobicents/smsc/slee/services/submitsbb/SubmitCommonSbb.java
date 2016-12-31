@@ -254,6 +254,9 @@ public abstract class SubmitCommonSbb implements Sbb {
             case SIP:
                 chargingMedium = ChargingMedium.TxSipOrig;
                 break;
+            case HTTP:
+                chargingMedium = ChargingMedium.HttpOrig;
+                break;
         }
 
         if (withCharging) {

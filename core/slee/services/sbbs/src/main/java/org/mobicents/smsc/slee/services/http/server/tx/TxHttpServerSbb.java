@@ -23,12 +23,10 @@
 package org.mobicents.smsc.slee.services.http.server.tx;
 
 import com.cloudhopper.smpp.SmppConstants;
-import javolution.util.FastList;
+
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
 
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
-import org.mobicents.slee.ChildRelationExt;
-import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.*;
 import org.mobicents.smsc.library.MessageState;
@@ -38,14 +36,9 @@ import org.mobicents.smsc.library.QuerySmResponse;
 import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
-import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
-import org.mobicents.smsc.slee.services.charging.ChargingMedium;
-import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
 import org.mobicents.smsc.slee.services.http.server.tx.data.*;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestParameter;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.ResponseFormat;
@@ -55,14 +48,13 @@ import org.mobicents.smsc.slee.services.http.server.tx.exceptions.UnauthorizedEx
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpUtils;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.ResponseFormatter;
+import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.slee.*;
-import javax.slee.facilities.Tracer;
-import javax.slee.resource.ResourceAdaptorTypeID;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
 
@@ -77,25 +69,10 @@ import java.util.UUID;
 /**
  * Created by tpalucki on 05.09.16.
  */
-public abstract class TxHttpServerSbb implements Sbb {
-
-    protected static SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
+    private static final String className = TxHttpServerSbb.class.getSimpleName();
 
     protected static HttpUsersManagement httpUsersManagement = HttpUsersManagement.getInstance();
-
-
-    private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID(
-            "PersistenceResourceAdaptorType", "org.mobicents", "1.0");
-    private static final String PERSISTENCE_LINK = "PersistenceResourceAdaptor";
-    private static final ResourceAdaptorTypeID SCHEDULER_ID = new ResourceAdaptorTypeID(
-            "SchedulerResourceAdaptorType", "org.mobicents", "1.0");
-    private static final String SCHEDULER_LINK = "SchedulerResourceAdaptor";
-
-    protected Tracer logger;
-    private SbbContextExt sbbContext;
-
-    protected PersistenceRAInterface persistence = null;
-    protected SchedulerRaSbbInterface scheduler = null;
 
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
     private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
@@ -109,8 +86,8 @@ public abstract class TxHttpServerSbb implements Sbb {
     private final String SEND_SMS = "sendSms";
     private final String MSG_QUERY = "msgQuery";
 
-    public PersistenceRAInterface getStore() {
-        return persistence;
+    public TxHttpServerSbb() {
+        super(className);
     }
 
     public InitialEventSelector isInitialHttpRequestEvent(final InitialEventSelector ies) {
@@ -391,12 +368,11 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
         outgoingData.setStatus(Status.ERROR);
 
-        PersistenceRAInterface store = getStore();
         SendMessageParseResult parseResult;
         try {
-            parseResult = createSmsEventMultiDest(incomingData, store);
+            parseResult = createSmsEventMultiDest(incomingData, persistence);
             for (Sms sms : parseResult.getParsedMessages()) {
-                processSms(sms, store, incomingData);
+                processSms(sms, persistence, incomingData);
             }
         } catch (SmscProcessingException e1) {
             if (!e1.isSkipErrorLogging()) {
@@ -450,7 +426,6 @@ public abstract class TxHttpServerSbb implements Sbb {
         if (logger.isFineEnabled()) {
             logger.fine("\nReceived getMessageIdStatus = " + incomingData);
         }
-        PersistenceRAInterface store = getStore();
         final Long messageId = incomingData.getMsgId();
         QuerySmResponse querySmResponse = null;
         MessageState messageState = null;
@@ -458,7 +433,7 @@ public abstract class TxHttpServerSbb implements Sbb {
         HttpGetMessageIdStatusOutgoingData outgoingData;
         try {
             final long msgId = messageId.longValue();
-            querySmResponse = store.c2_getQuerySmResponse(msgId);
+            querySmResponse = persistence.c2_getQuerySmResponse(msgId);
             if(querySmResponse == null){
                 throw new HttpApiException("Cannot retrieve QuerySmResponse from database. Returned object is null.");
             }
@@ -492,15 +467,23 @@ public abstract class TxHttpServerSbb implements Sbb {
 
     @Override
     public void setSbbContext(SbbContext sbbContext) {
-        this.sbbContext = (SbbContextExt) sbbContext;
+        super.setSbbContext(sbbContext);
+
         try {
             Context ctx = (Context) new InitialContext().lookup("java:comp/env");
-            logger = this.sbbContext.getTracer(getClass().getSimpleName());
-            persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, PERSISTENCE_LINK);
-            scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID, SCHEDULER_LINK);
         } catch (Exception ne) {
             logger.severe("Could not set SBB context:", ne);
         }
+    }
+
+    @Override
+    public void sbbLoad() {
+        super.sbbLoad();
+    }
+
+    @Override
+    public void sbbStore() {
+        super.sbbStore();
     }
 
     public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
@@ -631,188 +614,124 @@ public abstract class TxHttpServerSbb implements Sbb {
             logger.info(String.format("\nReceived sms=%s", sms0.toString()));
         }
 
-        // checking if SMSC is stopped
-        if (smscPropertiesManagement.isSmscStopped()) {
-            SmscProcessingException e = new SmscProcessingException("SMSC is stopped", 0, 0, null);
-            e.setSkipErrorLogging(true);
-            throw e;
-        }
-        // checking if SMSC is paused
-        if (smscPropertiesManagement.isDeliveryPause()
-                && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
-            SmscProcessingException e = new SmscProcessingException("SMSC is paused", 0, 0, null);
-            e.setSkipErrorLogging(true);
-            throw e;
-        }
-        // checking if cassandra database is available
-        if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
-            SmscProcessingException e = new SmscProcessingException("Database is unavailable", 0, 0,
-                    null);
-            e.setSkipErrorLogging(true);
-            throw e;
-        }
-        if (!MessageUtil.isStoreAndForward(sms0)
-                || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-            // checking if delivery query is overloaded
-            int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
-            int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
-            if (activityCount >= fetchMaxRows) {
-                smscCongestionControl.registerMaxActivityCount1_2Threshold();
-                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", 0,
-                        0, null);
-                e.setSkipErrorLogging(true);
-                throw e;
-            } else {
-                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
-            }
-        }
+        this.checkSmscState(sms0, smscCongestionControl, SubmitCommonSbb.MaxActivityCountFactor.factor_12);
+
+//        // checking if SMSC is stopped
+//        if (smscPropertiesManagement.isSmscStopped()) {
+//            SmscProcessingException e = new SmscProcessingException("SMSC is stopped", 0, 0, null);
+//            e.setSkipErrorLogging(true);
+//            throw e;
+//        }
+//        // checking if SMSC is paused
+//        if (smscPropertiesManagement.isDeliveryPause()
+//                && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
+//            SmscProcessingException e = new SmscProcessingException("SMSC is paused", 0, 0, null);
+//            e.setSkipErrorLogging(true);
+//            throw e;
+//        }
+//        // checking if cassandra database is available
+//        if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
+//            SmscProcessingException e = new SmscProcessingException("Database is unavailable", 0, 0,
+//                    null);
+//            e.setSkipErrorLogging(true);
+//            throw e;
+//        }
+//        if (!MessageUtil.isStoreAndForward(sms0)
+//                || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+//            // checking if delivery query is overloaded
+//            int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
+//            int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
+//            if (activityCount >= fetchMaxRows) {
+//                smscCongestionControl.registerMaxActivityCount1_2Threshold();
+//                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", 0,
+//                        0, null);
+//                e.setSkipErrorLogging(true);
+//                throw e;
+//            } else {
+//                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
+//            }
+//        }
+
         // TODO how to check if charging is used for http request? Is it turned on for all requests?
         boolean withCharging = false;
-        if (withCharging) {
-            ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
-            chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
-        } else {
-            // applying of MProc
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, store);
-            if (mProcResult.isMessageRejected()) {
-                sms0.setMessageDeliveryResultResponse(null);
-                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-                        0, 0, null);
-                e.setSkipErrorLogging(true);
-                if (logger.isInfoEnabled()) {
-                    logger.info("TxHttp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
-                }
-                throw e;
-            }
-            if (mProcResult.isMessageDropped()) {
-                sms0.setMessageDeliveryResultResponse(null);
-                smscStatAggregator.updateMsgInFailedAll();
-                if (logger.isInfoEnabled()) {
-                    logger.info("TxHttp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
-                }
-                return;
-            }
 
-            smscStatAggregator.updateMsgInReceivedAll();
+        this.forwardMessage(sms0, withCharging, smscStatAggregator);
 
-            FastList<Sms> smss = mProcResult.getMessageList();
-            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end; ) {
-                Sms sms = n.getValue();
-                TargetAddress ta = new TargetAddress(sms.getSmsSet());
-                TargetAddress lock = store.obtainSynchroObject(ta);
 
-                try {
-                    synchronized (lock) {
-                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-                        if (!storeAndForwMode) {
-                            try {
-                                scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                            } catch (Exception e) {
-                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-                                        0, MAPErrorCode.systemFailure, null, e);
-                            }
-                        } else {
-                            // store and forward
-                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast && sms.getScheduleDeliveryTime() == null) {
-                                try {
-                                    sms.setStoringAfterFailure(true);
-                                    scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                                } catch (Exception e) {
-                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-                                            0, MAPErrorCode.systemFailure, null, e);
-                                }
-                            } else {
-                                try {
-                                    sms.setStored(true);
-                                    scheduler.setDestCluster(sms.getSmsSet());
-                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
-                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-                                            false);
-                                } catch (PersistenceException e) {
-                                    throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
-                                            0, MAPErrorCode.systemFailure, null, e);
-                                }
-                            }
-                        }
-                    }
-                } finally {
-                    store.releaseSynchroObject(lock);
-                }
-            }
-        }
-    }
+//        if (withCharging) {
+//            ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
+//            chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
+//        } else {
+//            // applying of MProc
+//            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, store);
+//            if (mProcResult.isMessageRejected()) {
+//                sms0.setMessageDeliveryResultResponse(null);
+//                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
+//                        0, 0, null);
+//                e.setSkipErrorLogging(true);
+//                if (logger.isInfoEnabled()) {
+//                    logger.info("TxHttp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
+//                }
+//                throw e;
+//            }
+//            if (mProcResult.isMessageDropped()) {
+//                sms0.setMessageDeliveryResultResponse(null);
+//                smscStatAggregator.updateMsgInFailedAll();
+//                if (logger.isInfoEnabled()) {
+//                    logger.info("TxHttp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+//                }
+//                return;
+//            }
+//
+//            smscStatAggregator.updateMsgInReceivedAll();
+//
+//            FastList<Sms> smss = mProcResult.getMessageList();
+//            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end; ) {
+//                Sms sms = n.getValue();
+//                TargetAddress ta = new TargetAddress(sms.getSmsSet());
+//                TargetAddress lock = store.obtainSynchroObject(ta);
+//
+//                try {
+//                    synchronized (lock) {
+//                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+//                        if (!storeAndForwMode) {
+//                            try {
+//                                scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+//                            } catch (Exception e) {
+//                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+//                                        0, MAPErrorCode.systemFailure, null, e);
+//                            }
+//                        } else {
+//                            // store and forward
+//                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast && sms.getScheduleDeliveryTime() == null) {
+//                                try {
+//                                    sms.setStoringAfterFailure(true);
+//                                    scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+//                                } catch (Exception e) {
+//                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+//                                            0, MAPErrorCode.systemFailure, null, e);
+//                                }
+//                            } else {
+//                                try {
+//                                    sms.setStored(true);
+//                                    scheduler.setDestCluster(sms.getSmsSet());
+//                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
+//                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+//                                            false);
+//                                } catch (PersistenceException e) {
+//                                    throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
+//                                            0, MAPErrorCode.systemFailure, null, e);
+//                                }
+//                            }
+//                        }
+//                    }
+//                } finally {
+//                    store.releaseSynchroObject(lock);
+//                }
+//            }
+//        }
 
-    /**
-     * Get child ChargingSBB
-     *
-     * @return
-     */
-    public abstract ChildRelationExt getChargingSbb();
 
-    private ChargingSbbLocalObject getChargingSbbObject() {
-        ChildRelationExt relation = getChargingSbb();
-
-        ChargingSbbLocalObject ret = (ChargingSbbLocalObject) relation.get(ChildRelationExt.DEFAULT_CHILD_NAME);
-        if (ret == null) {
-            try {
-                ret = (ChargingSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
-            } catch (Exception e) {
-                if (logger.isSevereEnabled()) {
-                    logger.severe("Exception while trying to creat ChargingSbb child", e);
-                }
-            }
-        }
-        return ret;
-    }
-
-    @Override
-    public void sbbActivate() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void sbbCreate() throws CreateException {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void sbbExceptionThrown(Exception arg0, Object arg1, ActivityContextInterface arg2) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void sbbLoad() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void sbbPassivate() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void sbbPostCreate() throws CreateException {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void sbbRemove() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void sbbRolledBack(RolledBackContext arg0) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void sbbStore() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void unsetSbbContext() {
-        // TODO Auto-generated method stub
 
     }
 }

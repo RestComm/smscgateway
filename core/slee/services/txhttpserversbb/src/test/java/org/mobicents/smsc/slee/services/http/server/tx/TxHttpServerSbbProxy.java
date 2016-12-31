@@ -15,19 +15,19 @@ import javax.slee.RolledBackContext;
  */
 public class TxHttpServerSbbProxy extends TxHttpServerSbb {
 
-    private PersistenceRAInterfaceProxy cassandraSbb;
+//    private PersistenceRAInterfaceProxy cassandraSbb;
 
     public TxHttpServerSbbProxy(PersistenceRAInterfaceProxy cassandraSbb) {
-        this.cassandraSbb = cassandraSbb;
+        this.persistence = cassandraSbb;
         this.logger = new TraceProxy();
         this.scheduler = new SchedulerResourceAdaptorProxy();
         TxHttpServerSbb.smscPropertiesManagement = SmscPropertiesManagement.getInstance("Test");
     }
 
-    @Override
-    public PersistenceRAInterfaceProxy getStore() {
-        return cassandraSbb;
-    }
+//    @Override
+//    public PersistenceRAInterfaceProxy getStore() {
+//        return cassandraSbb;
+//    }
 
     //        @Override
     public ChildRelationExt getChargingSbb() {

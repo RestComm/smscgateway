@@ -40,49 +40,35 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 import javax.slee.ActivityContextInterface;
 import javax.slee.ActivityEndEvent;
-import javax.slee.CreateException;
 import javax.slee.EventContext;
-import javax.slee.RolledBackContext;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
 import javax.slee.ServiceID;
-import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
 
-import javolution.util.FastList;
 import net.java.slee.resource.sip.SleeSipProvider;
 
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingGroup;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
-import org.mobicents.slee.ChildRelationExt;
-import org.mobicents.slee.SbbContextExt;
-import org.mobicents.smsc.cassandra.PersistenceException;
-import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.Sip;
 import org.mobicents.smsc.domain.SipManagement;
 import org.mobicents.smsc.domain.SipXHeaders;
 import org.mobicents.smsc.domain.SmscCongestionControl;
-import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
-import org.mobicents.smsc.domain.StoreAndForwordMode;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
 import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
-import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
-import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
-import org.mobicents.smsc.slee.services.charging.ChargingMedium;
-import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
+import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 
 import com.cloudhopper.smpp.SmppConstants;
 
@@ -92,38 +78,23 @@ import com.cloudhopper.smpp.SmppConstants;
  * @author servey vetyutnev
  * 
  */
-public abstract class TxSipServerSbb implements Sbb {
-	protected static SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
-
-	private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID(
-			"PersistenceResourceAdaptorType", "org.mobicents", "1.0");
-	private static final String PERSISTENCE_LINK = "PersistenceResourceAdaptor";
-	private static final ResourceAdaptorTypeID SCHEDULER_ID = new ResourceAdaptorTypeID("SchedulerResourceAdaptorType",
-			"org.mobicents", "1.0");
-	private static final String SCHEDULER_LINK = "SchedulerResourceAdaptor";
+public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
+    private static final String className = TxSipServerSbb.class.getSimpleName();
 
 	// SIP RA
 	private static final ResourceAdaptorTypeID SIP_RA_TYPE_ID = new ResourceAdaptorTypeID("JAIN SIP", "javax.sip",
 			"1.2");
 	private static final String SIP_RA_LINK = "SipRA";
 	private SleeSipProvider sipRA;
-	protected SchedulerRaSbbInterface scheduler = null;
 
 	private MessageFactory messageFactory;
-	// private AddressFactory addressFactory;
-	// private HeaderFactory headerFactory;
 
-	protected Tracer logger;
-	private SbbContextExt sbbContext;
-
-	protected PersistenceRAInterface persistence = null;
 	private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
     private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
 	private static final SipManagement sipManagement = SipManagement.getInstance();
 
 	private static Charset utf8 = Charset.forName("UTF-8");
-	// private static Charset ucs2 = Charset.forName("UTF-16BE");
 	private static DataCodingSchemeImpl dcsGsm7 = new DataCodingSchemeImpl(DataCodingGroup.GeneralGroup, null, null,
 			null, CharacterSet.GSM7, false);
 	private static DataCodingSchemeImpl dcsUsc2 = new DataCodingSchemeImpl(DataCodingGroup.GeneralGroup, null, null,
@@ -133,12 +104,54 @@ public abstract class TxSipServerSbb implements Sbb {
 			null, CharacterSet.GSM8, false);
 
 	public TxSipServerSbb() {
-		// TODO Auto-generated constructor stub
+        super(className);
 	}
 
-	/**
-	 * Event Handler methods
-	 */
+    // *********
+    // SBB staff
+
+    @Override
+    public void setSbbContext(SbbContext sbbContext) {
+        super.setSbbContext(sbbContext);
+
+        try {
+            // get SIP stuff
+            this.sipRA = (SleeSipProvider) this.sbbContext.getResourceAdaptorInterface(SIP_RA_TYPE_ID, SIP_RA_LINK);
+
+            this.messageFactory = this.sipRA.getMessageFactory();
+            // this.headerFactory = this.sipRA.getHeaderFactory();
+            // this.addressFactory = this.sipRA.getAddressFactory();
+        } catch (Exception ne) {
+            logger.severe("Could not set SBB context:", ne);
+        }
+    }
+
+    @Override
+    public void sbbLoad() {
+        super.sbbLoad();
+    }
+
+    @Override
+    public void sbbStore() {
+        super.sbbStore();
+    }
+
+    public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        ServiceID serviceID = event.getService();
+        this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
+        SbbStates.setSmscTxSipServerServiceState(true);
+    }
+
+    public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
+        if (isServiceActivity) {
+            this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
+            SbbStates.setSmscTxSipServerServiceState(false);
+        }
+    }
+
+    // *********
+    // SIP Event Handlers
 
 	public void onMESSAGE(javax.sip.RequestEvent event, ActivityContextInterface aci) {
 		if (this.logger.isFineEnabled()) {
@@ -160,7 +173,6 @@ public abstract class TxSipServerSbb implements Sbb {
 
 			// Persist this message
 			TargetAddress ta = this.createDestTargetAddress(toUser, sip.getNetworkId());
-			PersistenceRAInterface store = getStore();
 
 			byte[] udh = null;
 
@@ -208,8 +220,8 @@ public abstract class TxSipServerSbb implements Sbb {
 
 			Sms sms;
 			try {
-                sms = this.createSmsEvent(fromUser, message, ta, store, udh, codingSchme, validityPeriod, regDeliveryInt, sip.getNetworkId());
-                this.processSms(sms, store);
+                sms = this.createSmsEvent(fromUser, message, ta, persistence, udh, codingSchme, validityPeriod, regDeliveryInt, sip.getNetworkId());
+                this.processSms(sms, persistence);
 			} catch (SmscProcessingException e1) {
                 if (!e1.isSkipErrorLogging()) {
                     this.logger.severe("SmscProcessingException while processing a message from sip", e1);
@@ -296,116 +308,8 @@ public abstract class TxSipServerSbb implements Sbb {
 		this.logger.severe("onTRANSACTION " + event);
 	}
 
-	public PersistenceRAInterface getStore() {
-		return this.persistence;
-	}
-
-	private TargetAddress createDestTargetAddress(String address, int networkId) {
-
-		int destTon, destNpi;
-		destTon = smscPropertiesManagement.getDefaultTon();
-		destNpi = smscPropertiesManagement.getDefaultNpi();
-
-		TargetAddress ta = new TargetAddress(destTon, destNpi, address, networkId);
-		return ta;
-	}
-
-	@Override
-	public void sbbActivate() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbCreate() throws CreateException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbExceptionThrown(Exception arg0, Object arg1, ActivityContextInterface arg2) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbLoad() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbPassivate() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbPostCreate() throws CreateException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbRemove() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbRolledBack(RolledBackContext arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sbbStore() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setSbbContext(SbbContext sbbContext) {
-		this.sbbContext = (SbbContextExt) sbbContext;
-
-		try {
-			this.logger = this.sbbContext.getTracer(getClass().getSimpleName());
-
-			// get SIP stuff
-			this.sipRA = (SleeSipProvider) this.sbbContext.getResourceAdaptorInterface(SIP_RA_TYPE_ID, SIP_RA_LINK);
-
-			this.messageFactory = this.sipRA.getMessageFactory();
-			// this.headerFactory = this.sipRA.getHeaderFactory();
-			// this.addressFactory = this.sipRA.getAddressFactory();
-
-			this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID,
-					PERSISTENCE_LINK);
-			this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID,
-					SCHEDULER_LINK);
-		} catch (Exception ne) {
-			logger.severe("Could not set SBB context:", ne);
-		}
-	}
-
-	@Override
-	public void unsetSbbContext() {
-		// TODO Auto-generated method stub
-
-	}
-
-    public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
-        ServiceID serviceID = event.getService();
-        this.logger.info("Rx: onServiceStartedEvent: event=" + event + ", serviceID=" + serviceID);
-        SbbStates.setSmscTxSipServerServiceState(true);
-    }
-
-    public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
-        boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
-        if (isServiceActivity) {
-            this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
-            SbbStates.setSmscTxSipServerServiceState(false);
-        }
-    }
+    // *********
+    // Messages processing
 
 	protected Sms createSmsEvent(String fromUser, byte[] message, TargetAddress ta, PersistenceRAInterface store,
 			byte[] udh, DataCodingSchemeImpl dataCodingScheme, Date validityPeriod, int regDeliveryInt, int networkId)
@@ -519,42 +423,45 @@ public abstract class TxSipServerSbb implements Sbb {
 	}
 
 	private void processSms(Sms sms0, PersistenceRAInterface store) throws SmscProcessingException {
-		// checking if SMSC is stopped
-		if (smscPropertiesManagement.isSmscStopped()) {
-			SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR, 0,
-					null);
-			e.setSkipErrorLogging(true);
-			throw e;
-		}
-        // checking if SMSC is paused
-        if (smscPropertiesManagement.isDeliveryPause()
-                && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
-            SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR, 0, null);
-            e.setSkipErrorLogging(true);
-            throw e;
-        }
-        // checking if cassandra database is available
-        if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
-            SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR, 0,
-                    null);
-            e.setSkipErrorLogging(true);
-            throw e;
-        }
-        if (!MessageUtil.isStoreAndForward(sms0)
-                || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-            // checking if delivery query is overloaded
-            int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
-            int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
-            if (activityCount >= fetchMaxRows) {
-                smscCongestionControl.registerMaxActivityCount1_2Threshold();
-                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
-                        0, null);
-                e.setSkipErrorLogging(true);
-                throw e;
-            } else {
-                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
-            }
-        }
+
+        this.checkSmscState(sms0, smscCongestionControl, SubmitCommonSbb.MaxActivityCountFactor.factor_12);
+
+//	    // checking if SMSC is stopped
+//		if (smscPropertiesManagement.isSmscStopped()) {
+//			SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR, 0,
+//					null);
+//			e.setSkipErrorLogging(true);
+//			throw e;
+//		}
+//        // checking if SMSC is paused
+//        if (smscPropertiesManagement.isDeliveryPause()
+//                && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
+//            SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR, 0, null);
+//            e.setSkipErrorLogging(true);
+//            throw e;
+//        }
+//        // checking if cassandra database is available
+//        if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
+//            SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR, 0,
+//                    null);
+//            e.setSkipErrorLogging(true);
+//            throw e;
+//        }
+//        if (!MessageUtil.isStoreAndForward(sms0)
+//                || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+//            // checking if delivery query is overloaded
+//            int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
+//            int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
+//            if (activityCount >= fetchMaxRows) {
+//                smscCongestionControl.registerMaxActivityCount1_2Threshold();
+//                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
+//                        0, null);
+//                e.setSkipErrorLogging(true);
+//                throw e;
+//            } else {
+//                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
+//            }
+//        }
 
 		boolean withCharging = false;
 		switch (smscPropertiesManagement.getTxSipChargingType()) {
@@ -567,103 +474,104 @@ public abstract class TxSipServerSbb implements Sbb {
 			break;
 		}
 
-		if (withCharging) {
-			ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
-			chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSipOrig, sms0);
-		} else {
-            // applying of MProc
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+        this.forwardMessage(sms0, withCharging, smscStatAggregator);
 
-            FastList<Sms> smss = mProcResult.getMessageList();
-            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
-                Sms sms = n.getValue();
-                TargetAddress ta = new TargetAddress(sms.getSmsSet());
-                TargetAddress lock = store.obtainSynchroObject(ta);
-
-                try {
-                    synchronized (lock) {
-                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-                        if (!storeAndForwMode) {
-                            try {
-                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                            } catch (Exception e) {
-                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-                                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
-                            }
-                        } else {
-                            // store and forward
-                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-                                try {
-                                    sms.setStoringAfterFailure(true);
-                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                                } catch (Exception e) {
-                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
-                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
-                                }
-                            } else {
-                                try {
-                                    sms.setStored(true);
-                                    this.scheduler.setDestCluster(sms.getSmsSet());
-                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
-                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-                                            false);
-                                } catch (PersistenceException e) {
-                                    throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : "
-                                            + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
-                                            null, e);
-                                }
-                            }
-                        }
-                    }
-                } finally {
-                    store.releaseSynchroObject(lock);
-                }
-            }
-
-            if (mProcResult.isMessageRejected()) {
-                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-                        SmppConstants.STATUS_SUBMITFAIL, 0, null);
-                e.setSkipErrorLogging(true);
-                if (logger.isInfoEnabled()) {
-                    logger.info("TxSmpp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
-                }
-                throw e;
-            }
-            if (mProcResult.isMessageDropped()) {
-                smscStatAggregator.updateMsgInFailedAll();
-                if (logger.isInfoEnabled()) {
-                    logger.info("TxSmpp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
-                }
-                return;
-            }
-
-            smscStatAggregator.updateMsgInReceivedAll();
-            smscStatAggregator.updateMsgInReceivedSip();
-		}
+        
+        
+        
+        
+//		if (withCharging) {
+//			ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
+//			chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSipOrig, sms0);
+//		} else {
+//            // applying of MProc
+//            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+//
+//            FastList<Sms> smss = mProcResult.getMessageList();
+//            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
+//                Sms sms = n.getValue();
+//                TargetAddress ta = new TargetAddress(sms.getSmsSet());
+//                TargetAddress lock = store.obtainSynchroObject(ta);
+//
+//                try {
+//                    synchronized (lock) {
+//                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+//                        if (!storeAndForwMode) {
+//                            try {
+//                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+//                            } catch (Exception e) {
+//                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+//                                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+//                            }
+//                        } else {
+//                            // store and forward
+//                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+//                                try {
+//                                    sms.setStoringAfterFailure(true);
+//                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+//                                } catch (Exception e) {
+//                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
+//                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+//                                }
+//                            } else {
+//                                try {
+//                                    sms.setStored(true);
+//                                    this.scheduler.setDestCluster(sms.getSmsSet());
+//                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
+//                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+//                                            false);
+//                                } catch (PersistenceException e) {
+//                                    throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : "
+//                                            + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+//                                            null, e);
+//                                }
+//                            }
+//                        }
+//                    }
+//                } finally {
+//                    store.releaseSynchroObject(lock);
+//                }
+//            }
+//
+//            if (mProcResult.isMessageRejected()) {
+//                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
+//                        SmppConstants.STATUS_SUBMITFAIL, 0, null);
+//                e.setSkipErrorLogging(true);
+//                if (logger.isInfoEnabled()) {
+//                    logger.info("TxSmpp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
+//                }
+//                throw e;
+//            }
+//            if (mProcResult.isMessageDropped()) {
+//                smscStatAggregator.updateMsgInFailedAll();
+//                if (logger.isInfoEnabled()) {
+//                    logger.info("TxSmpp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+//                }
+//                return;
+//            }
+//
+//            smscStatAggregator.updateMsgInReceivedAll();
+//            smscStatAggregator.updateMsgInReceivedSip();
+//		}
+		
+		
+		
+		
+		
 	}
 
-	/**
-	 * Get child ChargingSBB
-	 * 
-	 * @return
-	 */
-	public abstract ChildRelationExt getChargingSbb();
+    // *********
+    // private methods
 
-	private ChargingSbbLocalObject getChargingSbbObject() {
-		ChildRelationExt relation = getChargingSbb();
+    private TargetAddress createDestTargetAddress(String address, int networkId) {
 
-		ChargingSbbLocalObject ret = (ChargingSbbLocalObject) relation.get(ChildRelationExt.DEFAULT_CHILD_NAME);
-		if (ret == null) {
-			try {
-				ret = (ChargingSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
-			} catch (Exception e) {
-				if (this.logger.isSevereEnabled()) {
-					this.logger.severe("Exception while trying to creat ChargingSbb child", e);
-				}
-			}
-		}
-		return ret;
-	}
+        int destTon, destNpi;
+        destTon = smscPropertiesManagement.getDefaultTon();
+        destNpi = smscPropertiesManagement.getDefaultNpi();
+
+        TargetAddress ta = new TargetAddress(destTon, destNpi, address, networkId);
+        return ta;
+    }
 
 	/**
 	 * Convert the String representation of Hex to byte[]
