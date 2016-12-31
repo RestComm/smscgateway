@@ -22,7 +22,7 @@
     <property name="release.map.dir" value="${base.dir}/checkout/map-release" />
 
 	<property name="restcomm.smsc.git.tag" value="master"/>
-	<property name="restcomm.smsc.release.version" value="7.2.0-SNAPSHOT"/>
+	<property name="restcomm.smsc.release.version" value="7.3.0-SNAPSHOT"/>
 
 	<!-- Options for referring to release resoure verions -->
 	<!-- SLEE staff -->
