@@ -7,7 +7,7 @@ You can either download the binary release or download the source code and set u
 [[_downloading_binary]]
 == Binary Download and Installation
 
-The binary release is available for download at TeleStax Customer Support Portal &THIS.RELEASE_BINARY_URL;link: 
+The binary release is available for download at the following link: {this-release-binary-url}
 
 .Procedure: Binary Download and Installation
 . Download the zip file `<filename>` to any folder of your choice. 
@@ -21,7 +21,7 @@ Downloads]$ unzip <filename>
 [[_dir_structure]]
 == Directory Structure
 
-When you download the binary release, you will notice that the top level directory is named `mobicents-smscgateway-<version>` and immediately below this are five sub-directories as explained below: 
+When you download the binary release, you will notice that the top level directory is named `{this-folder}-smscgateway-<version>` and immediately below this are five sub-directories as explained below: 
 
 * cassandra: Contains description of the Cassandra database tables' structure.
 * docs: Contains all relevant documentation in respective subfolders.
@@ -120,10 +120,10 @@ In addition you must have the following tools installed.
 +
 Use GIT to checkout a specific release source, the base URL is {this-trunk-source-code-url}, then add the specific release version. 
 +
-[source]
+[source,subs="attributes"]
 ----
 
-[usr]$ git clone https://userid@bitbucket.org/telestax/{this-folder}-smscgateway.git 
+[usr]$ git clone {this-trunk-source-code-url}.git
 [usr]$ cd {this-folder}-smscgateway
 [usr]$ git checkout <version>
 ----
