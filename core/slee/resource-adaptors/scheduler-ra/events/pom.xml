@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.mobicents.smsc</groupId>
 		<artifactId>scheduler-ra-parent</artifactId>
-		<version>7.3.0-SNAPSHOT</version>
+		<version>7.3.114</version>
 	</parent>
 
 	<artifactId>scheduler-ra-events</artifactId>
