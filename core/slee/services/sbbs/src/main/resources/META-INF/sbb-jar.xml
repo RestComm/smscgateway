@@ -1656,10 +1656,10 @@
                 <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
                 <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
             </resource-adaptor-type-ref>
-            <activity-context-interface-factory-name>${mobicents.http.ra.acifactory}</activity-context-interface-factory-name>
+            <activity-context-interface-factory-name>slee/resources/http-server/acifactory</activity-context-interface-factory-name>
             <resource-adaptor-entity-binding>
-                <resource-adaptor-object-name>${mobicents.http.ra.name}</resource-adaptor-object-name>
-                <resource-adaptor-entity-link>${mobicents.http.ra.link}</resource-adaptor-entity-link>
+                <resource-adaptor-object-name>slee/resources/http-server/sbbrainterface</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>HttpServletRA</resource-adaptor-entity-link>
             </resource-adaptor-entity-binding>
         </resource-adaptor-type-binding>
 	</sbb>
