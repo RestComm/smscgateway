@@ -22,13 +22,9 @@
 
 package org.mobicents.smsc.slee.services.mt;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Date;
-
-import javax.slee.ActivityContextInterface;
-import javax.slee.EventContext;
-
+import com.cloudhopper.smpp.SmppConstants;
+import com.cloudhopper.smpp.tlv.Tlv;
+import com.cloudhopper.smpp.tlv.TlvConvertException;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
@@ -46,6 +42,7 @@ import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageSMDeliveryFailu
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageSubscriberBusyForMtSms;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageSystemFailure;
 import org.mobicents.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCause;
+import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.LMSI;
@@ -95,9 +92,11 @@ import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
 
-import com.cloudhopper.smpp.SmppConstants;
-import com.cloudhopper.smpp.tlv.Tlv;
-import com.cloudhopper.smpp.tlv.TlvConvertException;
+import javax.slee.ActivityContextInterface;
+import javax.slee.EventContext;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -748,8 +747,11 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
         IMSI imsi = this.mapParameterFactory.createIMSI(imsiData);
         SM_RP_DA sm_RP_DA = this.mapParameterFactory.createSM_RP_DA(imsi);
-		SM_RP_OA sm_RP_OA = this.mapParameterFactory.createSM_RP_OA_ServiceCentreAddressOA(this
-				.getServiceCenterAddressString(networkId));
+		AddressString scAddress = this.getServiceCenterAddressString(networkId);
+		SM_RP_OA sm_RP_OA = this.mapParameterFactory.createSM_RP_OA_ServiceCentreAddressOA(scAddress);
+
+		smsSet.getSms(0).setMtServiceCenterAddress(scAddress.getAddress()); // we only set it for first sms in the list
+
 
 		this.setNnn(networkNode);
 		this.setNetworkNode(networkNodeSccpAddress);

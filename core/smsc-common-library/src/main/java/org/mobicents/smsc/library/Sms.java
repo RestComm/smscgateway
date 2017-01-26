@@ -22,11 +22,11 @@
 
 package org.mobicents.smsc.library;
 
+import org.restcomm.smpp.parameter.TlvSet;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
-
-import org.restcomm.smpp.parameter.TlvSet;
 
 
 /**
@@ -57,6 +57,7 @@ public class Sms implements Serializable {
     private int origNetworkId;
 
     private String originatorSccpAddress;
+	private String mtServiceCenterAddress;
 
 	private long messageId;
 	private int moMessageRef;
@@ -793,4 +794,11 @@ public class Sms implements Serializable {
         this.receiptLocalMessageId = receiptLocalMessageId;
     }
 
+	public String getMtServiceCenterAddress() {
+		return mtServiceCenterAddress;
+	}
+
+	public void setMtServiceCenterAddress( String mtServiceCenterAddress ) {
+		this.mtServiceCenterAddress = mtServiceCenterAddress;
+	}
 }
