@@ -21,9 +21,9 @@
  */
 package org.mobicents.smsc.library;
 
-import java.text.SimpleDateFormat;
-
 import org.apache.log4j.Logger;
+
+import java.text.SimpleDateFormat;
 
 /**
  * 
@@ -102,8 +102,16 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(smsEvent.getSmsSet().getCorrelationId())
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(getFirst20CharOfSMS(smsEvent.getShortMessageText()))
-                .append(CdrGenerator.CDR_SEPARATOR).append(reason);
+                .append(smsEvent.getOriginatorSccpAddress())
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(smsEvent.getOrigNetworkId())
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(smsEvent.getSmsSet().getNetworkId())
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(smsEvent.getSmsSet().getSms(0).getMtServiceCenterAddress())
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(getEscapedString(getFirst20CharOfSMS(smsEvent.getShortMessageText())))
+                .append(CdrGenerator.CDR_SEPARATOR).append(getEscapedString(reason));
 
         CdrGenerator.generateCdr(sb.toString());
     }
@@ -117,5 +125,9 @@ public class CdrGenerator {
             first20CharOfSms = first20CharOfSms.substring(0, 20);
         }
         return first20CharOfSms;
+    }
+
+    private static String getEscapedString(String value) {
+	    return value.replaceAll( "\n", "n" ).replaceAll( ","," " );
     }
 }
