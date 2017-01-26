@@ -95,5 +95,16 @@
                 <resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
             </resource-adaptor-entity-binding>
         </resource-adaptor-type-binding>
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
 	</sbb>
 </sbb-jar>

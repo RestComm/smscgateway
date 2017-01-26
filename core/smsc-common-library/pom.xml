@@ -53,6 +53,11 @@
 			<artifactId>mproc-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mproc-ratype</artifactId>
+            <scope>provided</scope>
+        </dependency>
 	</dependencies>
 
 	<profiles>

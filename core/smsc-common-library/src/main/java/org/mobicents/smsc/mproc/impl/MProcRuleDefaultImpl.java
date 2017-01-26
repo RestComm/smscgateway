@@ -35,6 +35,7 @@ import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
 import org.mobicents.smsc.mproc.MProcRuleBaseImpl;
 import org.mobicents.smsc.mproc.MProcRuleDefault;
+import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.PostArrivalProcessor;
 import org.mobicents.smsc.mproc.PostDeliveryProcessor;
@@ -839,7 +840,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     @Override
-    public void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception {
+    public void onPostArrival(final MProcRuleRaProvider anMProcRuleRa, PostArrivalProcessor factory, MProcMessage message)
+            throws Exception {
         // TODO: we need proper implementing
 //        if (this.getId() == MAGIC_RULES_ID_ARRIVAL_DROP) {
 //            factory.dropMessage();
@@ -909,17 +911,20 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     @Override
-    public void onPostHrSri(PostHrSriProcessor factory, MProcMessage message) throws Exception {
+    public void onPostHrSri(final MProcRuleRaProvider anMProcRuleRa, PostHrSriProcessor factory, MProcMessage message)
+            throws Exception {
         if (this.hrByPass)
             factory.byPassHr();
     }
 
     @Override
-    public void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception {
+    public void onPostPreDelivery(final MProcRuleRaProvider anMProcRuleRa, PostPreDeliveryProcessor factory,
+            MProcMessage message) throws Exception {
     }
 
     @Override
-    public void onPostImsiRequest(PostImsiProcessor factory, MProcMessage messages) throws Exception {
+    public void onPostImsiRequest(final MProcRuleRaProvider anMProcRuleRa, PostImsiProcessor factory, MProcMessage messages)
+            throws Exception {
         // TODO: we need proper implementing
 //        if (this.getId() == MAGIC_RULES_ID_NNN_CHECK) {
 //            if (factory.getNnnDigits().startsWith("1")) {
@@ -937,7 +942,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     @Override
-    public void onPostDelivery(PostDeliveryProcessor factory, MProcMessage message)
+    public void onPostDelivery(final MProcRuleRaProvider anMProcRuleRa, PostDeliveryProcessor factory, MProcMessage message)
             throws Exception {
         // TODO: we need proper implementing
 //        if (this.getId() == MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT) {
@@ -961,7 +966,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     @Override
-    public void onPostDeliveryTempFailure(PostDeliveryTempFailureProcessor factory, MProcMessage message) throws Exception {
+    public void onPostDeliveryTempFailure(final MProcRuleRaProvider anMProcRuleRa, PostDeliveryTempFailureProcessor factory,
+            MProcMessage message) throws Exception {
         if (this.dropAfterTempFail) {
             factory.dropMessage();
         } else {

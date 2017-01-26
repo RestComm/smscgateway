@@ -12,4 +12,8 @@
 		<properties />
 		<ra-link name="SchedulerResourceAdaptor" />
 	</ra-entity>
+    <ra-entity resource-adaptor-id="ResourceAdaptorID[name=MProcResourceAdaptor,vendor=org.mobicents,version=1.0]" entity-name="MProcResourceAdaptor">
+        <properties />
+        <ra-link name="MProcResourceAdaptor" />
+    </ra-entity>
 </deploy-config>

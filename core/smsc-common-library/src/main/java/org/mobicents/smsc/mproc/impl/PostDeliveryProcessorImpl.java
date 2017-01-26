@@ -37,7 +37,7 @@ import org.mobicents.smsc.mproc.PostDeliveryProcessor;
 * @author sergey vetyutnev
 *
 */
-public class PostDeliveryProcessorImpl implements PostDeliveryProcessor {
+public class PostDeliveryProcessorImpl extends PostProcessorBaseImpl implements PostDeliveryProcessor {
 
     private Logger logger;
     private int defaultValidityPeriodHours;

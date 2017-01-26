@@ -4,13 +4,14 @@ target
 .classpath
 .project
 .settings
+.checkstyle
 #something
 /Notes
 /ACNNotSupportedAnalysis.ods
 #linux editor tmp file
 *.*~
 /SmppSimulatorParameters.xml
-/test-output
+test-output
 ${env.JBOSS_HOME}
 
 /SmscPropertiesManagementTest_smscproperties.xml

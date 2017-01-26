@@ -80,7 +80,9 @@ import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.impl.MProcResult;
+import org.mobicents.smsc.slee.resources.mproc.MProcRuleRaVersion;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 
@@ -108,6 +110,7 @@ public abstract class ChargingSbb implements Sbb {
     private static final ResourceAdaptorTypeID SCHEDULER_ID = new ResourceAdaptorTypeID(
             "SchedulerResourceAdaptorType", "org.mobicents", "1.0");
     private static final String SCHEDULER_LINK = "SchedulerResourceAdaptor";
+    private static final String MPROC_RA_LINK = "MProcResourceAdaptor";
 
     private static Charset utf8Charset = Charset.forName("UTF-8");
 
@@ -134,6 +137,7 @@ public abstract class ChargingSbb implements Sbb {
 	private PersistenceRAInterface persistence;
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
     protected SchedulerRaSbbInterface scheduler = null;
+    private MProcRuleRaProvider itsMProcRa;
 
 	private static final TimerOptions defaultTimerOptions = createDefaultTimerOptions();
 	private NullActivityContextInterfaceFactory nullActivityContextInterfaceFactory;
@@ -242,6 +246,8 @@ public abstract class ChargingSbb implements Sbb {
 
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, LINK_PERS);
             this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID, SCHEDULER_LINK);
+            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MProcRuleRaVersion.MPROC_RATYPE_ID,
+                    MPROC_RA_LINK);
 		} catch (Exception ne) {
 			logger.severe("Could not set SBB context:", ne);
 		}
@@ -252,8 +258,8 @@ public abstract class ChargingSbb implements Sbb {
 		if (logger.isFineEnabled()) {
 			logger.fine("unsetSbbContext invoked.");
 		}
-
 		this.sbbContext = null;
+		itsMProcRa = null;
 	}
 
 //	public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci) {
@@ -538,7 +544,7 @@ public abstract class ChargingSbb implements Sbb {
 		}
 	}
 
-	private void acceptSms(ChargingData chargingData) throws SmscProcessingException {
+    private void acceptSms(ChargingData chargingData) throws SmscProcessingException {
 		Sms sms0 = chargingData.getSms();
 		if (logger.isInfoEnabled()) {
 			logger.info("ChargingSbb: accessGranted for: chargingType=" + chargingData.getChargingType()
@@ -546,7 +552,7 @@ public abstract class ChargingSbb implements Sbb {
 		}
 
 		try {
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(itsMProcRa, sms0, persistence);
 
             FastList<Sms> smss = mProcResult.getMessageList();
             for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {

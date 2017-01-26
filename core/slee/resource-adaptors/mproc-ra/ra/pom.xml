@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mobicents.smsc</groupId>
+        <artifactId>mproc-ra-parent</artifactId>
+        <version>7.3.0-TelScale-SNAPSHOT</version>
+    </parent>
+    <artifactId>mproc-ra</artifactId>
+    <name>Core : SLEE : MProc RA</name>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mproc-ratype</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mproc-ra-library</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mobicents.smsc</groupId>
+            <artifactId>domain</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>

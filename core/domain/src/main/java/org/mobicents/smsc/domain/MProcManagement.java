@@ -1,8 +1,8 @@
 /*
- * TeleStax, Open Source Cloud Communications  
- * Copyright 2012, Telestax Inc and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Telestax, Open Source Cloud Communications Copyright 2011-2017,
+ * Telestax Inc and individual contributors by the @authors tag.
+ * See the copyright.txt in the distribution for a full listing of
+ * individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -38,23 +38,16 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
-import javolution.text.TextBuilder;
-import javolution.util.FastList;
-import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
-
 import org.apache.log4j.Logger;
 import org.jboss.mx.util.MBeanServerLocator;
-import org.mobicents.smsc.domain.SmscManagement;
 import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcNewMessage;
-import org.mobicents.smsc.mproc.MProcRuleFactory;
 import org.mobicents.smsc.mproc.MProcRule;
+import org.mobicents.smsc.mproc.MProcRuleFactory;
 import org.mobicents.smsc.mproc.MProcRuleMBean;
+import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.mproc.impl.MProcMessageHrImpl;
 import org.mobicents.smsc.mproc.impl.MProcMessageImpl;
@@ -68,6 +61,13 @@ import org.mobicents.smsc.mproc.impl.PostDeliveryTempFailureProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostHrSriProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostImsiProcessorImpl;
 import org.mobicents.smsc.mproc.impl.PostPreDeliveryProcessorImpl;
+
+import javolution.text.TextBuilder;
+import javolution.util.FastList;
+import javolution.xml.XMLBinding;
+import javolution.xml.XMLObjectReader;
+import javolution.xml.XMLObjectWriter;
+import javolution.xml.stream.XMLStreamException;
 
 /**
 *
@@ -98,7 +98,7 @@ public class MProcManagement implements MProcManagementMBean {
 
     private SmscManagement smscManagement = null;
     private SmscPropertiesManagement smscPropertiesManagement = null;
-
+    
     private MProcManagement(String name) {
         this.name = name;
 
@@ -233,7 +233,8 @@ public class MProcManagement implements MProcManagementMBean {
         return mProcRule;
     }
 
-    public MProcResult applyMProcArrival(Sms sms, PersistenseCommonInterface persistence) {
+    public MProcResult applyMProcArrival(final MProcRuleRaProvider anMProcRuleRa, Sms sms,
+            PersistenseCommonInterface persistence) {
         if (this.mprocs.size() == 0) {
             FastList<Sms> res0 = new FastList<Sms>();
             res0.add(sms);
@@ -255,7 +256,7 @@ public class MProcManagement implements MProcManagementMBean {
                     if (logger.isDebugEnabled()) {
                         logger.debug("MRule matches at Arrival phase to a message:\nrule: " + rule + "\nmessage: " + sms);
                     }
-                    rule.onPostArrival(pap, message);
+                    rule.onPostArrival(anMProcRuleRa, pap, message);
                 }
             }
         } catch (Throwable e) {
@@ -286,7 +287,7 @@ public class MProcManagement implements MProcManagementMBean {
         return res;
     }
 
-    public MProcResult applyMProcHrSri(CorrelationIdValue correlationIdValue) {
+    public MProcResult applyMProcHrSri(final MProcRuleRaProvider anMProcRuleRa, CorrelationIdValue correlationIdValue) {
         if (this.mprocs.size() == 0) {
             return new MProcResult();
         }
@@ -304,7 +305,7 @@ public class MProcManagement implements MProcManagementMBean {
                                 + correlationIdValue);
                     }
 
-                    rule.onPostHrSri(pap, message);
+                    rule.onPostHrSri(anMProcRuleRa, pap, message);
                 }
             }
         } catch (Throwable e) {
@@ -321,7 +322,7 @@ public class MProcManagement implements MProcManagementMBean {
         return res;
     }
 
-    public MProcResult applyMProcPreDelivery(Sms sms, ProcessingType processingType) {
+    public MProcResult applyMProcPreDelivery(final MProcRuleRaProvider anMProcRuleRa, Sms sms, ProcessingType processingType) {
         if (this.mprocs.size() == 0) {
             return new MProcResult();
         }
@@ -338,7 +339,7 @@ public class MProcManagement implements MProcManagementMBean {
                     if (logger.isDebugEnabled()) {
                         logger.debug("MRule matches at PreDelivery phase to a message:\nrule: " + rule + "\nmessage: " + sms);
                     }
-                    rule.onPostPreDelivery(pap, message);
+                    rule.onPostPreDelivery(anMProcRuleRa, pap, message);
                 }
             }
         } catch (Throwable e) {
@@ -368,7 +369,7 @@ public class MProcManagement implements MProcManagementMBean {
         return res;
     }
 
-    public MProcResult applyMProcImsiRequest(Sms sms, String imsi, String nnnDigits, int nnnNumberingPlan,
+    public MProcResult applyMProcImsiRequest(final MProcRuleRaProvider anMProcRuleRa, Sms sms, String imsi, String nnnDigits, int nnnNumberingPlan,
             int nnnAddressNature) {
         if (this.mprocs.size() == 0)
             return new MProcResult();
@@ -384,7 +385,7 @@ public class MProcManagement implements MProcManagementMBean {
                     if (logger.isDebugEnabled()) {
                         logger.debug("MRule matches at ImsiRequest phase to a message:\nrule: " + rule + "\nmessage: " + sms);
                     }
-                    rule.onPostImsiRequest(pap, message);
+                    rule.onPostImsiRequest(anMProcRuleRa, pap, message);
                 }
             }
         } catch (Throwable e) {
@@ -406,7 +407,7 @@ public class MProcManagement implements MProcManagementMBean {
         return new MProcResult();
     }
 
-    public MProcResult applyMProcDelivery(Sms sms, boolean deliveryFailure, ProcessingType processingType) {
+    public MProcResult applyMProcDelivery(final MProcRuleRaProvider anMProcRuleRa, Sms sms, boolean deliveryFailure, ProcessingType processingType) {
         if (this.mprocs.size() == 0) {
             return new MProcResult();
         }
@@ -424,7 +425,7 @@ public class MProcManagement implements MProcManagementMBean {
                     if (logger.isDebugEnabled()) {
                         logger.debug("MRule matches at Delivery phase to a message:\nrule: " + rule + "\nmessage: " + sms);
                     }
-                    rule.onPostDelivery(pap, message);
+                    rule.onPostDelivery(anMProcRuleRa, pap, message);
                 }
             }
         } catch (Throwable e) {
@@ -451,7 +452,7 @@ public class MProcManagement implements MProcManagementMBean {
         return res;
     }
 
-    public MProcResult applyMProcDeliveryTempFailure(Sms sms, ProcessingType processingType) {
+    public MProcResult applyMProcDeliveryTempFailure(final MProcRuleRaProvider anMProcRuleRa, Sms sms, ProcessingType processingType) {
         if (this.mprocs.size() == 0) {
             return new MProcResult();
         }
@@ -469,7 +470,7 @@ public class MProcManagement implements MProcManagementMBean {
                     if (logger.isDebugEnabled()) {
                         logger.debug("MRule matches at DeliveryTempFailure phase to a message:\nrule: " + rule + "\nmessage: " + sms);
                     }
-                    rule.onPostDeliveryTempFailure(pap, message);
+                    rule.onPostDeliveryTempFailure(anMProcRuleRa, pap, message);
                 }
             }
         } catch (Throwable e) {
@@ -499,7 +500,7 @@ public class MProcManagement implements MProcManagementMBean {
         return res;
     }
 
-    public void start() throws Exception {
+    public void start() {
 
         this.smscPropertiesManagement = SmscPropertiesManagement.getInstance();
 
@@ -542,7 +543,7 @@ public class MProcManagement implements MProcManagementMBean {
         }
     }
 
-    public void stop() throws Exception {
+    public void stop() {
         this.store();
 
         for (MProcRule rule : this.mprocs) {
@@ -612,7 +613,7 @@ public class MProcManagement implements MProcManagementMBean {
     }
 
     protected void bindAlias(MProcRuleFactory ruleFactory) {
-        Class cls = ruleFactory.createMProcRuleInstance().getClass();
+        Class<?> cls = ruleFactory.createMProcRuleInstance().getClass();
         String alias = ruleFactory.getRuleClassName();
         binding.setAlias(cls, alias);
     }

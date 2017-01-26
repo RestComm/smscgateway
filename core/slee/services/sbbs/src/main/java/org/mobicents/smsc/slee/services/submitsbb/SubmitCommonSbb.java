@@ -30,8 +30,6 @@ import javax.slee.SbbContext;
 import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 
-import javolution.util.FastList;
-
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
@@ -46,13 +44,17 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.impl.MProcResult;
+import org.mobicents.smsc.slee.resources.mproc.MProcRuleRaVersion;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.services.charging.ChargingMedium;
 import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
 
 import com.cloudhopper.smpp.SmppConstants;
+
+import javolution.util.FastList;
 
 /**
 *
@@ -69,12 +71,14 @@ public abstract class SubmitCommonSbb implements Sbb {
             "org.mobicents", "1.0");
     private static final String PERSISTENCE_LINK = "PersistenceResourceAdaptor";
     private static final String SCHEDULE_LINK = "SchedulerResourceAdaptor";
+    private static final String MPROC_RA_LINK = "MProcResourceAdaptor";
 
     protected Tracer logger;
     protected SbbContextExt sbbContext;
 
     protected PersistenceRAInterface persistence;
     protected SchedulerRaSbbInterface scheduler;
+    private MProcRuleRaProvider itsMProcRa;
 
     private final String className;
 
@@ -96,6 +100,8 @@ public abstract class SubmitCommonSbb implements Sbb {
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID,
                     PERSISTENCE_LINK);
             this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULE_ID, SCHEDULE_LINK);
+            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MProcRuleRaVersion.MPROC_RATYPE_ID,
+                    MPROC_RA_LINK);
         } catch (Exception ne) {
             logger.severe("Could not set SBB context:", ne);
         }
@@ -153,8 +159,7 @@ public abstract class SubmitCommonSbb implements Sbb {
 
     @Override
     public void unsetSbbContext() {
-        // TODO Auto-generated method stub
-
+        itsMProcRa = null;
     }
 
     // *********
@@ -264,7 +269,7 @@ public abstract class SubmitCommonSbb implements Sbb {
             chargingSbb.setupChargingRequestInterface(chargingMedium, sms0);
         } else {
             // applying of MProc
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(itsMProcRa, sms0, persistence);
 
             FastList<Sms> smss = mProcResult.getMessageList();
             for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {

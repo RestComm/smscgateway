@@ -1,0 +1,76 @@
+<!--
+    Telestax, Open Source Cloud Communications Copyright 2011-2017,
+    Telestax Inc and individual contributors by the @authors tag.
+    See the copyright.txt in the distribution for a full listing of
+    individual contributors.
+
+    This is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as
+    published by the Free Software Foundation; either version 2.1 of
+    the License, or (at your option) any later version.
+
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this software; if not, write to the Free
+    Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+    02110-1301 USA, or see the FSF site: http://www.fsf.org.
+    Polska.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mobicents.smsc</groupId>
+        <artifactId>mproc-ra-parent</artifactId>
+        <version>7.3.0-TelScale-SNAPSHOT</version>
+    </parent>
+    <artifactId>mproc-ra-library</artifactId>
+    <name>Core : SLEE : MProc RA Library</name>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.mobicents.tools</groupId>
+                <artifactId>maven-library-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-descriptor</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <library-name>org.mobicents.smsc</library-name>
+                    <library-vendor>mproc</library-vendor>
+                    <library-version>1.0.0</library-version>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.slee</groupId>
+            <artifactId>jain-slee</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>

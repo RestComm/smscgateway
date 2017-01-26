@@ -31,7 +31,7 @@ import org.mobicents.smsc.mproc.PostHrSriProcessor;
 * @author sergey vetyutnev
 *
 */
-public class PostHrSriProcessorImpl implements PostHrSriProcessor {
+public class PostHrSriProcessorImpl extends PostProcessorBaseImpl implements PostHrSriProcessor {
 
     private Logger logger;
     private boolean actionAdded = false;

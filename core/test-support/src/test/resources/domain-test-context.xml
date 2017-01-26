@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Telestax, Open Source Cloud Communications Copyright 2011-2017,
+    Telestax Inc and individual contributors by the @authors tag.
+    See the copyright.txt in the distribution for a full listing of
+    individual contributors.
+
+    This is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as
+    published by the Free Software Foundation; either version 2.1 of
+    the License, or (at your option) any later version.
+
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this software; if not, write to the Free
+    Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+    02110-1301 USA, or see the FSF site: http://www.fsf.org.
+    Polska.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Import test configuration -->
+    <bean id="propertyPlaceholderConfigurer"
+        class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="locations">
+            <list>
+                <value>domain-test-context.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="forceCassandra" class="java.lang.Boolean">
+        <constructor-arg value="${cassandra.force}" />
+    </bean>
+
+    <bean id="cassandraIpAddress" class="java.lang.String">
+        <constructor-arg value="${cassandra.ipAddress}" />
+    </bean>
+
+    <bean id="cassandraKeySpace" class="java.lang.String">
+        <constructor-arg value="${cassandra.keySpace}" />
+    </bean>
+
+    <bean id="persistenceRaProxy"
+        class="org.mobicents.smsc.slee.resources.proxy.PersistenceRAInterfaceProxy">
+        <property name="ipAddress" value="${cassandra.ipAddress}" />
+        <property name="keySpaceName" value="${cassandra.keySpace}" />
+    </bean>
+
+    <bean id="mkrMbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
+        <property name="defaultDomain" value="jboss" />
+        <property name="registerWithFactory" value="true" />
+    </bean>
+
+    <bean id="smscPropertiesManagementLocator"
+        class="org.mobicents.smsc.slee.resources.proxy.SmscPropertiesManagementLocator">
+        <property name="name" value="Test" />
+    </bean>
+
+    <bean id="smscPropertiesManagement" factory-bean="smscPropertiesManagementLocator"
+        factory-method="getInstance">
+        <property name="autoLoadAndStore" value="false" />
+        <property name="removingLiveTablesDays" value="0" />
+        <property name="removingArchiveTablesDays" value="0" />
+        <property name="keyspaceName" value="${cassandra.keySpace}" />
+    </bean>
+
+    <bean id="mProcManagement" class="org.mobicents.smsc.domain.MProcManagement">
+        <property name="name" value="TestMoSbb" />
+    </bean>
+
+    <bean id="mProcRa"
+        class="org.mobicents.smsc.slee.resources.mproc.TelestaxMProcResourceAdaptor">
+        <property name="externalMProcManagement" ref="mProcManagement" />
+    </bean>
+
+    <bean id="mProcRaWrapper" class="org.mobicents.smsc.slee.resources.ResourceAdaptorWrapperImpl">
+        <property name="raEntityLinkName" value="MProcResourceAdaptor" />
+        <property name="raTypeName" value="MProcResourceAdaptorType" />
+        <property name="raTypeVendor" value="org.mobicents" />
+        <property name="raTypeVersion" value="1.0" />
+        <property name="resourceAdaptor" ref="mProcRa" />
+        <property name="configuration">
+            <map>
+                <entry key="Name" value="java.lang.String::Test" />
+                <entry key="PersistDir" value="java.lang.String::." />
+                <entry key="RuleFactories"
+                    value="java.lang.String::org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="dbOperationsLocator" class="org.mobicents.smsc.slee.resources.proxy.DbOperationsLocator">
+        <property name="hosts" value="${cassandra.ipAddress}" />
+        <property name="autoStart" value="false" />
+    </bean>
+
+    <bean id="dbOperations" factory-bean="dbOperationsLocator"
+        factory-method="getInstance" />
+
+    <bean id="smscDbMgmtLocator"
+        class="org.mobicents.smsc.slee.resources.proxy.SmscDatabaseManagementLocator"
+        depends-on="dbOperationsLocator">
+        <property name="name" value="Test" />
+    </bean>
+
+    <bean id="smscDbMgmt" factory-bean="smscDbMgmtLocator" factory-method="getInstance" />
+
+</beans>

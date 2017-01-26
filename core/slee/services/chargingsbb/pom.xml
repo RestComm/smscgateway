@@ -43,6 +43,21 @@
             <groupId>${project.groupId}</groupId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <artifactId>mproc-ratype</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mproc-ra-library</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mproc-ra</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<profiles>

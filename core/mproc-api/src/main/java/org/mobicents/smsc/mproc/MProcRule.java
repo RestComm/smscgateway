@@ -69,32 +69,32 @@ public interface MProcRule extends MProcRuleMBean {
     /**
      * the event occurs when SMSC GW receives SRI response from a local HLR in HR procedure
      */
-    void onPostHrSri(PostHrSriProcessor factory, MProcMessage message) throws Exception;
+    void onPostHrSri(MProcRuleRaProvider anMProcRuleRa, PostHrSriProcessor factory, MProcMessage message) throws Exception;
 
     /**
      * the event occurs when a message has just come to SMSC
      */
-    void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception;
+    void onPostArrival(MProcRuleRaProvider anMProcRuleRa, PostArrivalProcessor factory, MProcMessage message) throws Exception;
 
     /**
      * the event occurs before a message delivery will start
      */
-    void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception;
+    void onPostPreDelivery(MProcRuleRaProvider anMProcRuleRa, PostPreDeliveryProcessor factory, MProcMessage message) throws Exception;
 
     /**
      * the event occurs when IMSI / NNN has been received from HLR (succeeded SRI response)
      */
-    void onPostImsiRequest(PostImsiProcessor factory, MProcMessage message) throws Exception;
+    void onPostImsiRequest(MProcRuleRaProvider anMProcRuleRa, PostImsiProcessor factory, MProcMessage message) throws Exception;
 
     /**
      * the event occurs when a message delivery was ended (success or permanent delivery failure)
      */
-    void onPostDelivery(PostDeliveryProcessor factory, MProcMessage message) throws Exception;
+    void onPostDelivery(MProcRuleRaProvider anMProcRuleRa, PostDeliveryProcessor factory, MProcMessage message) throws Exception;
 
     /**
      * the event occurs when a message has temporary delivery failure
      */
-    void onPostDeliveryTempFailure(PostDeliveryTempFailureProcessor factory, MProcMessage message) throws Exception;
+    void onPostDeliveryTempFailure(MProcRuleRaProvider anMProcRuleRa, PostDeliveryTempFailureProcessor factory, MProcMessage message) throws Exception;
 
     // applying of rule parameters from CLI / GUI interfaces
 
@@ -107,5 +107,5 @@ public interface MProcRule extends MProcRuleMBean {
      * this method must implement setting of rule parameters as for provided CLI string at the step of rules modifying
      */
     void updateRuleParameters(String parametersString) throws Exception;
-
+    
 }

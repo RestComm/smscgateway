@@ -65,6 +65,8 @@ import org.mobicents.smsc.domain.HomeRoutingManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.MessageUtil;
+import org.mobicents.smsc.mproc.MProcRuleRaProvider;
+import org.mobicents.smsc.slee.resources.mproc.MProcRuleRaVersion;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 
 /**
@@ -77,6 +79,7 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
 
     private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID("PersistenceResourceAdaptorType", "org.mobicents", "1.0");
     private static final String PERSISTENCE_LINK = "PersistenceResourceAdaptor";
+    private static final String MPROC_RA_LINK = "MProcResourceAdaptor";
 
     protected static final SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
     protected static final HomeRoutingManagement homeRoutingManagement = HomeRoutingManagement.getInstance();
@@ -93,6 +96,7 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
 	protected SmscStatAggregator smscStatAggregator = SmscStatAggregator
 			.getInstance();
     protected PersistenceRAInterface persistence;
+    private MProcRuleRaProvider itsMProcRa;
 
 //	protected SmppSessions smppServerSessions = null;
     protected ParameterFactory sccpParameterFact;
@@ -314,6 +318,8 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, PERSISTENCE_LINK);
 
 			this.logger = this.sbbContext.getTracer(this.className);
+            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MProcRuleRaVersion.MPROC_RATYPE_ID,
+                    MPROC_RA_LINK);
 		} catch (Exception ne) {
 			logger.severe("Could not set SBB context:", ne);
 		}
@@ -323,7 +329,16 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
 
 	@Override
 	public void unsetSbbContext() {
-
+	    itsMProcRa = null;
+	}
+	
+	/**
+     * Gets the MProc rule RA.
+     *
+     * @return the MProc rule RA
+     */
+	protected final MProcRuleRaProvider getMProcRuleRa() {
+	    return itsMProcRa;
 	}
 
     protected SccpAddress getServiceCenterSccpAddress(int networkId) {

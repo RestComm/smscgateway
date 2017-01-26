@@ -38,8 +38,6 @@ import javax.slee.facilities.TimerOptions;
 import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 
-import javolution.util.FastList;
-
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.slee.SbbContextExt;
@@ -57,11 +55,15 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.mproc.impl.MProcResult;
+import org.mobicents.smsc.slee.resources.mproc.MProcRuleRaVersion;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+
+import javolution.util.FastList;
 
 /**
  *
@@ -78,6 +80,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             "org.mobicents", "1.0");
     private static final String PERSISTENCE_LINK = "PersistenceResourceAdaptor";
     private static final String SCHEDULE_LINK = "SchedulerResourceAdaptor";
+    private static final String MPROC_RA_LINK = "MProcResourceAdaptor";
 
     private static final int MAX_POSSIBLE_REROUTING = 9;
 
@@ -89,6 +92,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
     protected PersistenceRAInterface persistence;
     protected SchedulerRaSbbInterface scheduler;
     protected TimerFacility timerFacility;
+    private MProcRuleRaProvider itsMProcRa;
 
     private final String className;
 
@@ -159,6 +163,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID,
                     PERSISTENCE_LINK);
             this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULE_ID, SCHEDULE_LINK);
+            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MProcRuleRaVersion.MPROC_RATYPE_ID,
+                    MPROC_RA_LINK);
         } catch (Exception ne) {
             logger.severe("Could not set SBB context:", ne);
         }
@@ -224,11 +230,9 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     @Override
     public void unsetSbbContext() {
-        // TODO Auto-generated method stub
-
+        itsMProcRa = null;
     }
-
-
+    
     // *********
     // Methods for starting / ending of processing
 
@@ -556,7 +560,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
     }
 
     private boolean applyMProcPreDelivery(Sms sms, ProcessingType processingType) {
-        MProcResult mProcResult = MProcManagement.getInstance().applyMProcPreDelivery(sms, processingType);
+        MProcResult mProcResult = MProcManagement.getInstance().applyMProcPreDelivery(itsMProcRa, sms, processingType);
 
         if (mProcResult.isMessageIsRerouted()) {
             // firstly we check if rerouting attempts was not too many
@@ -927,7 +931,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             this.logger.info(sb.toString());
 
         // mproc rules applying for delivery phase
-        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true, processingType);
+        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(itsMProcRa, sms, true, processingType);
 
         if (mProcResult.isMessageIsRerouted()) {
             // we do not reroute a message with expired validity period
@@ -1117,7 +1121,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected void applyMprocRulesOnSuccess(Sms sms, ProcessingType processingType) {
         // PostDeliveryProcessor - success case
-        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, false, processingType);
+        MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(itsMProcRa, sms, false, processingType);
         FastList<Sms> addedMessages = mProcResult.getMessageList();
         if (addedMessages != null) {
             for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
@@ -1154,7 +1158,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             ArrayList<Integer> lstNewNetworkId, ProcessingType processingType) {
         // TempFailureProcessor
         for (Sms sms : lstTempFailured) {
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDeliveryTempFailure(sms, processingType);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDeliveryTempFailure(itsMProcRa, sms, processingType);
 
             if (mProcResult.isMessageIsRerouted()) {
                 // firstly we check if rerouting attempts was not too many
@@ -1225,7 +1229,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
         // PostDeliveryProcessor - failure case
         for (Sms sms : lstPermFailured) {
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(sms, true, processingType);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDelivery(itsMProcRa, sms, true, processingType);
 
             if (mProcResult.isMessageIsRerouted()) {
                 if (sms.getReroutingCount() >= MAX_POSSIBLE_REROUTING) {
@@ -1295,7 +1299,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         Sms sms = this.getMessageInSendingPool(0);
         if (sms != null) {
             while (true) {
-                MProcResult mProcResult = MProcManagement.getInstance().applyMProcImsiRequest(sms, imsiData,
+                MProcResult mProcResult = MProcManagement.getInstance().applyMProcImsiRequest(itsMProcRa, sms, imsiData,
                         networkNode.getAddress(), networkNode.getNumberingPlan().getIndicator(),
                         networkNode.getAddressNature().getIndicator());
 
@@ -1515,7 +1519,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     // *********
     // sending of generated messages (delivery receipts and messages that were generated by mproc rules)
-
+    
     private void sendNewGeneratedMessage(Sms sms, TargetAddress ta) {
         boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
 

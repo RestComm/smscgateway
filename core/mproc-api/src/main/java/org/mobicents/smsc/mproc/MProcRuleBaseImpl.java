@@ -34,7 +34,7 @@ import javolution.xml.stream.XMLStreamException;
 public abstract class MProcRuleBaseImpl implements MProcRule {
 
     private static final String ID = "id";
-
+    
     private int id;
 
     @Override
@@ -108,27 +108,33 @@ public abstract class MProcRuleBaseImpl implements MProcRule {
     }
 
     @Override
-    public void onPostHrSri(PostHrSriProcessor factory, MProcMessage message) throws Exception {
+    public void onPostHrSri(final MProcRuleRaProvider anMProcRuleRa, PostHrSriProcessor factory, MProcMessage message)
+            throws Exception {
     }
 
     @Override
-    public void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception {
+    public void onPostArrival(final MProcRuleRaProvider anMProcRuleRa, PostArrivalProcessor factory, MProcMessage message)
+            throws Exception {
     }
 
     @Override
-    public void onPostPreDelivery(PostPreDeliveryProcessor factory, MProcMessage message) throws Exception {
+    public void onPostPreDelivery(final MProcRuleRaProvider anMProcRuleRa, PostPreDeliveryProcessor factory,
+            MProcMessage message) throws Exception {
     }
 
     @Override
-    public void onPostImsiRequest(PostImsiProcessor factory, MProcMessage messages) throws Exception {
+    public void onPostImsiRequest(final MProcRuleRaProvider anMProcRuleRa, PostImsiProcessor factory, MProcMessage messages)
+            throws Exception {
     }
 
     @Override
-    public void onPostDelivery(PostDeliveryProcessor factory, MProcMessage message) throws Exception {
+    public void onPostDelivery(final MProcRuleRaProvider anMProcRuleRa, PostDeliveryProcessor factory, MProcMessage message)
+            throws Exception {
     }
 
     @Override
-    public void onPostDeliveryTempFailure(PostDeliveryTempFailureProcessor factory, MProcMessage message) throws Exception {
+    public void onPostDeliveryTempFailure(final MProcRuleRaProvider anMProcRuleRa, PostDeliveryTempFailureProcessor factory,
+            MProcMessage message) throws Exception {
     }
 
     /**

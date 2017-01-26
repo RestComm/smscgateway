@@ -37,7 +37,7 @@ import org.mobicents.smsc.mproc.PostDeliveryTempFailureProcessor;
 * @author sergey vetyutnev
 *
 */
-public class PostDeliveryTempFailureProcessorImpl implements PostDeliveryTempFailureProcessor {
+public class PostDeliveryTempFailureProcessorImpl extends PostProcessorBaseImpl implements PostDeliveryTempFailureProcessor {
 
     private Logger logger;
     private int defaultValidityPeriodHours;
