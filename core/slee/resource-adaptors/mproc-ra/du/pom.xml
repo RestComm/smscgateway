@@ -32,7 +32,36 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>deploy-DU</id>
+						<phase>install</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<copy overwrite="true" file="target/${project.build.finalName}.jar" todir="${jboss.home}/server/${node}/deploy" />
+							</tasks>
+						</configuration>
+					</execution>
+					<execution>
+						<id>undeploy-DU</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<delete file="${jboss.home}/server/${node}/deploy/${project.build.finalName}.jar" />
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
     </build>
 
 </project>

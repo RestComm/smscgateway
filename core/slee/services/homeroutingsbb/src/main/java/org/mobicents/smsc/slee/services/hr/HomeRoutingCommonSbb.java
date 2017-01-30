@@ -66,7 +66,6 @@ import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.mproc.MProcRuleRaProvider;
-import org.mobicents.smsc.slee.resources.mproc.MProcRuleRaVersion;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 
 /**
@@ -79,6 +78,8 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
 
     private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID("PersistenceResourceAdaptorType", "org.mobicents", "1.0");
     private static final String PERSISTENCE_LINK = "PersistenceResourceAdaptor";
+    public static final ResourceAdaptorTypeID MPROC_RATYPE_ID = new ResourceAdaptorTypeID("MProcResourceAdaptorType",
+            "org.mobicents", "1.0");
     private static final String MPROC_RA_LINK = "MProcResourceAdaptor";
 
     protected static final SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
@@ -318,7 +319,7 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, PERSISTENCE_LINK);
 
 			this.logger = this.sbbContext.getTracer(this.className);
-            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MProcRuleRaVersion.MPROC_RATYPE_ID,
+            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MPROC_RATYPE_ID,
                     MPROC_RA_LINK);
 		} catch (Exception ne) {
 			logger.severe("Could not set SBB context:", ne);

@@ -80,6 +80,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
             "org.mobicents", "1.0");
     private static final String PERSISTENCE_LINK = "PersistenceResourceAdaptor";
     private static final String SCHEDULE_LINK = "SchedulerResourceAdaptor";
+    public static final ResourceAdaptorTypeID MPROC_RATYPE_ID = new ResourceAdaptorTypeID("MProcResourceAdaptorType",
+            "org.mobicents", "1.0");
     private static final String MPROC_RA_LINK = "MProcResourceAdaptor";
 
     private static final int MAX_POSSIBLE_REROUTING = 9;
@@ -163,7 +165,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID,
                     PERSISTENCE_LINK);
             this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULE_ID, SCHEDULE_LINK);
-            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MProcRuleRaVersion.MPROC_RATYPE_ID,
+            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MPROC_RATYPE_ID,
                     MPROC_RA_LINK);
         } catch (Exception ne) {
             logger.severe("Could not set SBB context:", ne);

@@ -33,7 +33,7 @@ public final class MProcRuleRaVersion {
     }
 
     /** The Constant MPROC_RATYPE_ID. */
-    public static final ResourceAdaptorTypeID MPROC_RATYPE_ID = new ResourceAdaptorTypeID("MProcResourceAdaptorType",
-            "org.mobicents", "1.0");
+//    public static final ResourceAdaptorTypeID MPROC_RATYPE_ID = new ResourceAdaptorTypeID("MProcResourceAdaptorType",
+//            "org.mobicents", "1.0");
 
 }

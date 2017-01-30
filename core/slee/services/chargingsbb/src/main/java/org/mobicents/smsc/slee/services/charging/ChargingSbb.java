@@ -110,6 +110,8 @@ public abstract class ChargingSbb implements Sbb {
     private static final ResourceAdaptorTypeID SCHEDULER_ID = new ResourceAdaptorTypeID(
             "SchedulerResourceAdaptorType", "org.mobicents", "1.0");
     private static final String SCHEDULER_LINK = "SchedulerResourceAdaptor";
+    public static final ResourceAdaptorTypeID MPROC_RATYPE_ID = new ResourceAdaptorTypeID("MProcResourceAdaptorType",
+            "org.mobicents", "1.0");
     private static final String MPROC_RA_LINK = "MProcResourceAdaptor";
 
     private static Charset utf8Charset = Charset.forName("UTF-8");
@@ -246,8 +248,7 @@ public abstract class ChargingSbb implements Sbb {
 
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, LINK_PERS);
             this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID, SCHEDULER_LINK);
-            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MProcRuleRaVersion.MPROC_RATYPE_ID,
-                    MPROC_RA_LINK);
+            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MPROC_RATYPE_ID, MPROC_RA_LINK);
 		} catch (Exception ne) {
 			logger.severe("Could not set SBB context:", ne);
 		}
