@@ -10,8 +10,6 @@
     <artifactId>mproc-ra-parent</artifactId>
     <name>Core : SLEE : MProc RA Parent</name>
     <modules>
-        <module>library</module>
-        <module>events</module>
         <module>ratype</module>
         <module>ra</module>
     </modules>

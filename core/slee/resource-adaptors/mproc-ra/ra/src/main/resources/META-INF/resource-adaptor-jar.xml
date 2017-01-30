@@ -11,14 +11,9 @@
             <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
             <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
         </resource-adaptor-type-ref>
-        <library-ref>
-            <library-name>org.mobicents.smsc</library-name>
-            <library-vendor>common</library-vendor>
-            <library-version>1.0.0</library-version>
-        </library-ref>
         <resource-adaptor-classes>
             <resource-adaptor-class>
-                <resource-adaptor-class-name>org.mobicents.smsc.slee.resources.mproc.MProcRuleResourceAdaptor</resource-adaptor-class-name>
+                <resource-adaptor-class-name>org.mobicents.smsc.slee.resources.mproc.MProcRuleRaDefault</resource-adaptor-class-name>
             </resource-adaptor-class>
         </resource-adaptor-classes>
     </resource-adaptor>

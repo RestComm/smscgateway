@@ -19,35 +19,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.mobicents.smsc.slee.resources;
+package org.mobicents.smsc.slee.resources.mproc;
 
-import javax.slee.resource.ResourceAdaptor;
-import javax.slee.resource.ResourceAdaptorTypeID;
+import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 
 /**
- * The Interface ResourceAdaptorWrapper.
+ * The Interface MProcRuleRaType.
  */
-public interface ResourceAdaptorWrapper {
-
-    /**
-     * Gets the RA entity link name.
-     *
-     * @return the RA entity link name
-     */
-    String getRaEntityLinkName();
-
-    /**
-     * Gets the resource adaptor type ID.
-     *
-     * @return the resource adaptor type ID
-     */
-    ResourceAdaptorTypeID getResourceAdaptorTypeId();
-
-    /**
-     * Gets the resource adaptor.
-     *
-     * @return the resource adaptor
-     */
-    ResourceAdaptor getResourceAdaptor();
+public interface MProcRuleRaType extends MProcRuleRaProvider {
 
 }

@@ -7,26 +7,15 @@
         <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
         <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
         <library-ref>
-            <library-name>MProcAPI</library-name>
-            <library-vendor>org.mobicents</library-vendor>
-            <library-version>1.0</library-version>
+            <library-name>org.mobicents.smsc</library-name>
+            <library-vendor>common</library-vendor>
+            <library-version>1.0.0</library-version>
         </library-ref>
         <resource-adaptor-type-classes>
-            <activity-type>
-                <activity-type-name>org.mobicents.smsc.slee.resources.mproc.MProcActivity</activity-type-name>
-            </activity-type>
-            <activity-context-interface-factory-interface>
-                <activity-context-interface-factory-interface-name>org.mobicents.smsc.slee.resources.mproc.MProcActivityContextInterfaceFactory</activity-context-interface-factory-interface-name>
-            </activity-context-interface-factory-interface>
             <resource-adaptor-interface>
-                <resource-adaptor-interface-name>org.mobicents.smsc.slee.resources.mproc.MProcRaProvider</resource-adaptor-interface-name>
+                <resource-adaptor-interface-name>org.mobicents.smsc.slee.resources.mproc.MProcRuleRaType</resource-adaptor-interface-name>
             </resource-adaptor-interface>
         </resource-adaptor-type-classes>
-        <event-type-ref>
-            <event-type-name>MProc</event-type-name>
-            <event-type-vendor>org.mobicents</event-type-vendor>
-            <event-type-version>1.0</event-type-version>
-        </event-type-ref>
     </resource-adaptor-type>
 </resource-adaptor-type-jar>
 

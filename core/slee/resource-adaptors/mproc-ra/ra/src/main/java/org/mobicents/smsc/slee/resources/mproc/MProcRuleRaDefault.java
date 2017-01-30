@@ -23,48 +23,23 @@
 package org.mobicents.smsc.slee.resources.mproc;
 
 import org.mobicents.smsc.mproc.MProcMessage;
-import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.PostArrivalProcessor;
 import org.mobicents.smsc.mproc.PostDeliveryProcessor;
 import org.mobicents.smsc.mproc.PostDeliveryTempFailureProcessor;
 import org.mobicents.smsc.mproc.PostHrSriProcessor;
 import org.mobicents.smsc.mproc.PostImsiProcessor;
 import org.mobicents.smsc.mproc.PostPreDeliveryProcessor;
-import org.mobicents.smsc.slee.resources.mproc.base.MProcResourceAdapterBase;
 
 /**
- * The Class MProcRuleResourceAdaptor.
+ * The Class MProcRuleRaDefault.
  */
-public final class MProcRuleResourceAdaptor extends MProcResourceAdapterBase implements MProcRuleRaProvider {
-
-    private static final String CONTEXT_FILE_NAME = "mproc-ra-context-unifonic.xml";
+public final class MProcRuleRaDefault extends MProcRuleRaBase implements MProcRuleRaType {
 
     /**
      * Instantiates a new Telestax MProc resource adaptor.
      */
-    public MProcRuleResourceAdaptor() {
+    public MProcRuleRaDefault() {
         super();
-    }
-
-    @Override
-    public final Object getResourceAdaptorInterface(final String aClassName) {
-        finest("About to return RA interface.");
-        return this;
-    }
-
-    @Override
-    protected final Class<?> getRaClass() {
-        return MProcRuleResourceAdaptor.class;
-    }
-
-    @Override
-    protected final String[] getRaConfiguration() {
-        return new String[0];
-    }
-
-    @Override
-    protected final String getContextFileName() {
-        return CONTEXT_FILE_NAME;
     }
 
     @Override

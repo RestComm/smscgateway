@@ -12,17 +12,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mproc-ratype</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mproc-ra-library</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mobicents.smsc</groupId>
-            <artifactId>domain</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
