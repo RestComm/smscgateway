@@ -500,7 +500,7 @@ public class MProcManagement implements MProcManagementMBean {
         return res;
     }
 
-    public void start() {
+    public void start() throws Exception {
 
         this.smscPropertiesManagement = SmscPropertiesManagement.getInstance();
 

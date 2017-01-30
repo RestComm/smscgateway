@@ -1313,7 +1313,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     }
 
 
-    public void start() {
+    public void start() throws Exception {
 
 		this.persistFile.clear();
 

@@ -73,7 +73,7 @@ public class SmscDatabaseManagement implements SmscDatabaseManagementMBean, Runn
         return name;
     }
 
-    public void start() {
+    public void start() throws Exception {
         dbOperations_C2 = DBOperations.getInstance();
 
         this.setUnprocessed();
