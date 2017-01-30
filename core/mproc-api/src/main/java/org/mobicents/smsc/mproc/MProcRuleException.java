@@ -27,9 +27,11 @@ package org.mobicents.smsc.mproc;
 * @author sergey vetyutnev
 *
 */
-public class MProcRuleException extends Exception {
+public final class MProcRuleException extends Exception {
 
-    public MProcRuleException(String message) {
+    private static final long serialVersionUID = 1L;
+
+    public MProcRuleException(final String message) {
         super(message);
     }
 

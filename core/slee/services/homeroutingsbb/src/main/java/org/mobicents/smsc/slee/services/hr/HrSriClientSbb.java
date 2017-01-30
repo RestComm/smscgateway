@@ -417,7 +417,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
             correlationIdValue.setLocationInfoWithLMSI(sendRoutingInfoForSMResponse.getLocationInfoWithLMSI());
             correlationIdValue.setSendRoutingInfoForSMResponse(sendRoutingInfoForSMResponse);
 
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcHrSri(correlationIdValue);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcHrSri(getMProcRuleRa(), correlationIdValue);
 
             if (mProcResult.isHrIsByPassed()) {
                 this.returnSriHrByPass(correlationIdValue);

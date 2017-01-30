@@ -27,6 +27,8 @@ import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.MProcRuleBaseImpl;
+import org.mobicents.smsc.mproc.MProcRuleException;
+import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.PostArrivalProcessor;
 
 /**
@@ -97,7 +99,8 @@ public class MProcRuleTestImpl extends MProcRuleBaseImpl {
     }
 
     @Override
-    public void onPostArrival(PostArrivalProcessor factory, MProcMessage message) throws Exception {
+    public void onPostArrival(final MProcRuleRaProvider anMProcRuleRa, PostArrivalProcessor factory, MProcMessage message)
+            throws MProcRuleException {
         String destAddr = this.par2 + message.getDestAddr();
         factory.updateMessageDestAddr(message, destAddr);
     }

@@ -145,6 +145,17 @@
 				<resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
 			</resource-adaptor-entity-binding>
 		</resource-adaptor-type-binding>		
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
 	</sbb>
 
 	<sbb id="sriSbb">
@@ -469,6 +480,17 @@
 				<resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
 			</resource-adaptor-entity-binding>
 		</resource-adaptor-type-binding>		
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
 	</sbb>
 
 	<sbb id="mtSbb">
@@ -763,6 +785,17 @@
 				<resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
 			</resource-adaptor-entity-binding>
 		</resource-adaptor-type-binding>		
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
 	</sbb>
 
 	<sbb id="rsdsSbb">
@@ -952,6 +985,17 @@
 				<resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
 			</resource-adaptor-entity-binding>
 		</resource-adaptor-type-binding>		
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
 	</sbb>
 
 	<sbb id="rxSipServerSbb">
@@ -1114,6 +1158,17 @@
 				<resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
 			</resource-adaptor-entity-binding>
 		</resource-adaptor-type-binding>		
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
 	</sbb>
 
 	<sbb id="txSmppServerSbb">
@@ -1256,6 +1311,17 @@
 				<resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
 			</resource-adaptor-entity-binding>
 		</resource-adaptor-type-binding>
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
 	</sbb>
 
 	<sbb id="moSbb">
@@ -1550,6 +1616,17 @@
                 <resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
             </resource-adaptor-entity-binding>
         </resource-adaptor-type-binding>
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
 	</sbb>
 
 	<sbb id="TxHttpServerSbb">
@@ -1660,6 +1737,17 @@
             <resource-adaptor-entity-binding>
                 <resource-adaptor-object-name>slee/resources/http-server/sbbrainterface</resource-adaptor-object-name>
                 <resource-adaptor-entity-link>HttpServletRA</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
             </resource-adaptor-entity-binding>
         </resource-adaptor-type-binding>
 	</sbb>
@@ -1821,6 +1909,17 @@
             <resource-adaptor-entity-binding>
                 <resource-adaptor-object-name>slee/resources/scheduler/1.0/provider</resource-adaptor-object-name>
                 <resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
             </resource-adaptor-entity-binding>
         </resource-adaptor-type-binding>
 	</sbb>

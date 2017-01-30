@@ -215,9 +215,9 @@ public class DBOperations {
     }
 
     public void start(String hosts, int port, String keyspace, int secondsForwardStoring, int reviseSecondsOnSmscStart,
-            int processingSmsSetTimeout, long minMessageId, long maxMessageId) throws Exception {
+            int processingSmsSetTimeout, long minMessageId, long maxMessageId) throws IllegalStateException, PersistenceException {
 		if (this.started) {
-			throw new Exception("DBOperations already started");
+			throw new IllegalStateException("DBOperations already started");
 		}
 
 		if (secondsForwardStoring < 3)

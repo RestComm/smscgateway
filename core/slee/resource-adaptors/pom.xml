@@ -17,6 +17,7 @@
 		<module>common-library</module>
 		<module>persistence-ra</module>
 		<module>scheduler-ra</module>
+		<module>mproc-ra</module>
 		<module>du</module>
 	</modules>
 </project>

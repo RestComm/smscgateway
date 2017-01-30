@@ -166,7 +166,7 @@ public class HttpUsersManagement implements HttpUsersManagementMBean {
         return httpUser;
     }
 
-    public void start() throws Exception {
+    public void start() {
         logger.info("Starting of HttpUsersManagement");
 
         try {
