@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 * @author sergey vetyutnev
 *
 */
-public interface PostImsiProcessor extends PostProcessorBase {
+public interface PostImsiProcessor {
 
     // access to environmental parameters
     /**

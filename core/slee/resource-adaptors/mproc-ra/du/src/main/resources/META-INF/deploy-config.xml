@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy-config>
+    <ra-entity resource-adaptor-id="ResourceAdaptorID[name=MProcResourceAdaptor,vendor=org.mobicents,version=1.0]" entity-name="MProcResourceAdaptor">
+        <properties />
+        <ra-link name="MProcResourceAdaptor" />
+    </ra-entity>
+</deploy-config>

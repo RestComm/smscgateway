@@ -40,7 +40,7 @@ import org.mobicents.smsc.mproc.PostArrivalProcessor;
 * @author sergey vetyutnev
 *
 */
-public class PostArrivalProcessorImpl extends PostProcessorBaseImpl implements PostArrivalProcessor {
+public class PostArrivalProcessorImpl implements PostArrivalProcessor {
 
     private Logger logger;
     private int defaultValidityPeriodHours;

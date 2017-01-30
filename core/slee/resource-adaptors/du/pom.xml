@@ -55,16 +55,6 @@
 			<artifactId>scheduler-ra</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mproc-ratype</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mproc-ra</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
 		<!-- SMPP -->
 <!--

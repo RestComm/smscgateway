@@ -75,13 +75,13 @@ public final class MProcRuleRaDefault extends MProcRuleRaBase implements MProcRu
     @Override
     public String invokeTaskSynch(final String aTask) throws Exception {
         fine("NOP for InvokeTaskSynch for: ", aTask, ".");
-        return aTask;
+        return null;
     }
 
     @Override
     public Object invokeTaskSynch(final Object aTask) throws Exception {
         fine("NOP for InvokeTaskSynch for: ", aTask, ".");
-        return aTask;
+        return null;
     }
 
     @Override

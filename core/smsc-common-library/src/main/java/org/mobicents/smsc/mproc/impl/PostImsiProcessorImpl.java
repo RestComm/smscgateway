@@ -31,7 +31,7 @@ import org.mobicents.smsc.mproc.PostImsiProcessor;
 * @author sergey vetyutnev
 *
 */
-public class PostImsiProcessorImpl extends PostProcessorBaseImpl implements PostImsiProcessor {
+public class PostImsiProcessorImpl implements PostImsiProcessor {
 
     private Logger logger;
     private boolean actionAdded = false;
