@@ -750,7 +750,9 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		AddressString scAddress = this.getServiceCenterAddressString(networkId);
 		SM_RP_OA sm_RP_OA = this.mapParameterFactory.createSM_RP_OA_ServiceCentreAddressOA(scAddress);
 
-		smsSet.getSms(0).setMtServiceCenterAddress(scAddress.getAddress()); // we only set it for first sms in the list
+        Sms sms0 = smsSet.getSms(0);
+        if (sms0 != null)
+		    sms0.setMtServiceCenterAddress(scAddress.getAddress()); // we only set it for first sms in the list
 
 
 		this.setNnn(networkNode);

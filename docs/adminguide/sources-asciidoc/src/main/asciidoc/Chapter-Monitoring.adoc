@@ -108,11 +108,14 @@ This page gets auto-refreshed every 2.5 seconds and therefore the statistics get
 The CDR generated in the text file is of the below format: 
 ----
 
-SIMBIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,Message_Delivery_Status,ORIG_SYSTEM_ID,MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,First 20 characters of SMS, Reason_For_Failure
+DELIVERY_DATE,SIMBIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,Message_Delivery_Status,ORIG_SYSTEM_ID,MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,ORIGINATOR_SCCP_ADDRESS,ORIG_NETWORK_ID,NETWORK_ID,MtServiceCenterAddress,First 20 characters of SMS, Reason_For_Failure
 ----
 where `ADDR_SRC_DIGITS, ADDR_SRC_TON, ADDR_SRC_NPI, ADDR_DST_DIGITS, ADDR_DST_TON, ADDR_DST_NPI, ORIG_SYSTEM_ID, MESSAGE_ID, NNN_DIGITS, IMSI` and `CORR_ID` are as explained in <<_slot_messages_table_yyyy_mm_dd>>; `SIMBIT_DATE`, `Message_Delivery_Status` and `Reason_For_Failure` are described below in this section. 
 
 NOTE: `NNN_DIGITS` and `IMSI` fields are present only in the case of SS7 terminated messages when there is a SRI positive response. `CORR_ID` is present only if a message has come to the SMSC Gateway via "home-routing" procedure. 
+
+.DELIVERY_DATE
+Time when CDR is created (and is equals the time when the message delivery is succeded / failed at SMSC Gateway)
 
 .SIMBIT_DATE
 Time when the message reached the SMSC Gateway. 
@@ -175,7 +178,10 @@ mproc_rejected::
 mproc_dropped::
   A mproc rule dropped an incoming message (and accept response was sent to a message originator). 	
 
-.
+.MtServiceCenterAddress
+Local SMSC GW address (GT) that is used in MT procedure (for mobile terminated messages).
+
+.Reason_For_Failure
 The last field in the CDR generated is `Reason_For_Failure`, which records the reason for delivery failure and is empty if the delivery is successful.
 The possible delivery failure cases are explained below. 
 

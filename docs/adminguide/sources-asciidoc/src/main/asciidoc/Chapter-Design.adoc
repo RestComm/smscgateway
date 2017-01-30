@@ -146,10 +146,10 @@ The fields "DUE_SLOT", "TARGET_ID", "ID" together act as the primary key.
 | DUE_DELAY | INT | Duration (in seconds) after which a new delivery attempt will be done. If the SMS has just arrived in the system, this value is 0.
 | SM_STATUS | INT | Error Code value for the last attempt (0==no attempts yet). For more details on Error Codes please refer to <<_appendix_smsc_errorcodes>>
 | ALERTING_SUPPORTED | BOOLEAN | The value is 'true' if SMSC was successfully registered at HLR after delivery failure. However this field is currently not being used because this demands extra database access.
-| MESSAGE_ID | BIGINT | A unique message ID assigned by SMSC. Max value is 10 000 000 000 (because of limitation of delivery receipts IDs), so this value may repeats in some big time.
+| MESSAGE_ID | BIGINT | A unique message ID assigned by SMSC. Max value is 10 000 000 000 (because of limitation of delivery receipts IDs), so this value may repeats in some big time. This messageId is used in SMPP protocol at the leg when a client is sending (submitting) a message to SMSC GW.
 | MO_MESSAGE_REF | INT | SMS TPDU Message Reference field.
 | ORIG_ESME_ID | TEXT | SMSC internal name of origination ESME (empty for MO, HR and HTTP messages).
-| ORIG_SYSTEM_ID | TEXT | SMPP systemId of origination ESME for SMPP originated messages, HTTP account name for HTTP messages, empty for MO, HR and SIP messages.
+| ORIG_SYSTEM_ID | TEXT | SMPP systemId of origination ESME for SMPP originated messages, HTTP account name for HTTP originated messages, empty for MO, HR and SIP originated messages.
 | DEST_CLUSTER_NAME | TEXT | Name of cluster for destination ESME terminated massages (empty for MT messages).
 | DEST_ESME_ID | TEXT | SMSC internal name of destination ESME (empty for MT messages).
 | DEST_SYSTEM_ID | TEXT | SMPP name of destination ESME (empty for MT messages).
@@ -169,9 +169,9 @@ The fields "DUE_SLOT", "TARGET_ID", "ID" together act as the primary key.
 | OPTIONAL_PARAMETERS | TEXT | TLVs.
 | SCHEDULE_DELIVERY_TIME | TIMESTAMP | SMPP parameter (schedule_delivery_time) - time when SMSC should start a delivery (may be null if immediate message delivery).
 | VALIDITY_PERIOD | TIMESTAMP | The validity period of this message. If ESME has not defined (or for MO messages) this field is filled by default SMSC settings.
-| IMSI | ASCII | From SRI response.
-| CORR_ID | ASCII | This field is used for keeping of correlationId value for home routing procedure. This table will keep this value when StoreAndForward mode for time between storing of message and scheduling it for delivering.
-| NNN_DIGITS | ASCII | NetworkNodeNumber = MSC that serves MS – from SRI response.
+| IMSI | ASCII | IMSI of a mobile station (in SS7 network). This value is obtained after a successful SRI request. SRI request is executed in two cases: a) when delivering messages into SS7 network (MT procedure), b) when submitting (receiving) of a message from SS7 network b Home Routing procedure (if a request to a local HLR was made).
+| CORR_ID | ASCII | This field is used for keeping of correlationId value for home routing procedure (SS7 originating messages). CorrelationId value plays a role of a fake “IMSI” when remote SMSC GW sends a short message to SMSC GW. Empty for messages that come to SMSC GW not via a Home Routing procedure. This table will keep this value when StoreAndForward mode for time between storing of message and scheduling it for delivering.
+| NNN_DIGITS | ASCII | NetworkNodeNumber = MSC/VLR address that serves a mobile station (in SS7 network). This value is obtained after a successful SRI request. SRI request is executed in two cases: a) when delivering messages into SS7 network (MT procedure), b) when submitting (receiving) of a message from SS7 network b Home Routing procedure (if a request to a local HLR was made).
 | NNN_AN | INT | AddressNature for NetworkNodeNumber
 | NNN_NP | INT | NumberingPlan for NetworkNodeNumber
 | SM_TYPE | INT | 0-ESME terminated, 1-MT terminated, 2-SIP terminated
@@ -212,10 +212,10 @@ The fields "ADDR_DST_DIGITS", "ID" together act as the primary key.
 | DUE_DELAY | INT | Duration (in seconds) after which a new delivery attempt will be done - value before the last delivery attempt.
 | SM_STATUS | INT | Error Code value for the last attempt (0==no attempts yet). For more details on Error Codes please refer to <<_appendix_smsc_errorcodes>>
 | ALERTING_SUPPORTED | BOOLEAN | The value is 'true' if SMSC was successfully registered at HLR after delivery failure. However this field is currently not being used because this demands extra database access.
-| MESSAGE_ID | BIGINT | A unique message ID assigned by SMSC. Max value is 10 000 000 000 (because of limitation of delivery receipts IDs), so this value may repeats in some big time.
+| MESSAGE_ID | BIGINT | A unique message ID assigned by SMSC. Max value is 10 000 000 000 (because of limitation of delivery receipts IDs), so this value may repeats in some big time. This messageId is used in SMPP protocol at the leg when a client is sending (submitting) a message to SMSC GW.
 | MO_MESSAGE_REF | INT | SMS TPDU Message Reference field.
 | ORIG_ESME_ID | TEXT | SMSC internal name of origination ESME (empty for MO, HR, SIP and HTTP messages).
-| ORIG_SYSTEM_ID | TEXT | SMPP systemId of origination ESME for SMPP originated messages, HTTP account name for HTTP messages, empty for MO, HR and SIP messages.
+| ORIG_SYSTEM_ID | TEXT | SMPP systemId of origination ESME for SMPP originated messages, HTTP account name for HTTP originated messages, empty for MO, HR and SIP originated messages.
 | DEST_CLUSTER_NAME | TEXT | Name of cluster for destination ESME terminated massages (empty for MT messages).
 | DEST_ESME_ID | TEXT | SMSC internal name of destination ESME (empty for MT messages).
 | DEST_SYSTEM_ID | TEXT | SMPP name of destination ESME (empty for MT messages).
@@ -235,9 +235,9 @@ The fields "ADDR_DST_DIGITS", "ID" together act as the primary key.
 | OPTIONAL_PARAMETERS | TEXT | TLVs.
 | SCHEDULE_DELIVERY_TIME | TIMESTAMP | SMPP parameter (schedule_delivery_time) - time when SMSC should start a delivery (may be null if immediate message delivery).
 | VALIDITY_PERIOD | TIMESTAMP | The validity period of this message. If ESME has not defined (or for MO messages) this field is filled by default SMSC settings.
-| IMSI | ASCII | From SRI response.
-| CORR_ID | ASCII | This field is used for keeping of correlationId value for home routing procedure. This table will keep this value for logging purpose.
-| NNN_DIGITS | ASCII | NetworkNodeNumber = MSC that serves MS – from SRI response.
+| IMSI | ASCII | IMSI of a mobile station (in SS7 network). This value is obtained after a successful SRI request. SRI request is executed in two cases: a) when delivering messages into SS7 network (MT procedure), b) when submitting (receiving) of a message from SS7 network b Home Routing procedure (if a request to a local HLR was made).
+| CORR_ID | ASCII | This field is used for keeping of correlationId value for home routing procedure (SS7 originating messages). CorrelationId value plays a role of a fake “IMSI” when remote SMSC GW sends a short message to SMSC GW. Empty for messages that come to SMSC GW not via a Home Routing procedure. This table will keep this value for logging purpose.
+| NNN_DIGITS | ASCII | NetworkNodeNumber = MSC/VLR address that serves a mobile station (in SS7 network). This value is obtained after a successful SRI request. SRI request is executed in two cases: a) when delivering messages into SS7 network (MT procedure), b) when submitting (receiving) of a message from SS7 network b Home Routing procedure (if a request to a local HLR was made).
 | NNN_AN | INT | AddressNature for NetworkNodeNumber
 | NNN_NP | INT | NumberingPlan for NetworkNodeNumber
 | SM_TYPE | INT | 0-ESME terminated, 1-MT terminated, 2-SIP terminated
