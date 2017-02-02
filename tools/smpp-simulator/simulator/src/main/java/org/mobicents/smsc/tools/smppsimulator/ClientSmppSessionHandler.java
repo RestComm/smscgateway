@@ -334,7 +334,7 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
             pdu.setDestAddress(new Address(pdu.getSourceAddress().getTon(), pdu.getSourceAddress().getNpi(), pdu
                     .getSourceAddress().getAddress()));
 
-            pdu.setEsmClass((byte) 0x04);
+            pdu.setEsmClass((byte) (0x04 + 1)); // delivery receipt + datagramm mode
 
             pdu.setDataCoding((byte) 0);
             pdu.setRegisteredDelivery((byte) 0);
