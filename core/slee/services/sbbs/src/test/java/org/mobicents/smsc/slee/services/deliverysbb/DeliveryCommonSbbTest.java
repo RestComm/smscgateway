@@ -181,7 +181,8 @@ public class DeliveryCommonSbbTest {
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
         assertFalse(sbb.isMessageConfirmedInSendingPool(1));
 
-        sbb.confirmMessageInSendingPool(101);
+        ConfirmMessageInSendingPool res1 = sbb.confirmMessageInSendingPool(101);
+        assertFalse(res1.splittedMessage);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 4);
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
         assertTrue(sbb.isMessageConfirmedInSendingPool(1));
@@ -202,10 +203,10 @@ public class DeliveryCommonSbbTest {
         assertFalse(sbb.isMessageConfirmedInSendingPool(0));
         assertTrue(sbb.isMessageConfirmedInSendingPool(1));
 
-        sbb.confirmMessageInSendingPool(100);
-        sbb.confirmMessageInSendingPool(102);
-        sbb.confirmMessageInSendingPool(103);
-        sbb.confirmMessageInSendingPool(104);
+        res1 = sbb.confirmMessageInSendingPool(100);
+        res1 = sbb.confirmMessageInSendingPool(102);
+        res1 = sbb.confirmMessageInSendingPool(103);
+        res1 = sbb.confirmMessageInSendingPool(104);
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 0);
         assertTrue(sbb.isMessageConfirmedInSendingPool(0));
         assertTrue(sbb.isMessageConfirmedInSendingPool(1));
@@ -512,6 +513,7 @@ public class DeliveryCommonSbbTest {
         assertFalse(confirmMessageInSendingPool.sequenceNumberFound);
         assertFalse(confirmMessageInSendingPool.confirmed);
         assertNull(confirmMessageInSendingPool.sms);
+        assertFalse(confirmMessageInSendingPool.splittedMessage);
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(101);
         assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
         assertFalse(confirmMessageInSendingPool.confirmed);
@@ -519,10 +521,12 @@ public class DeliveryCommonSbbTest {
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(302);
         assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
         assertFalse(confirmMessageInSendingPool.confirmed);
+        assertTrue(confirmMessageInSendingPool.splittedMessage);
         assertNotNull(confirmMessageInSendingPool.sms);
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(102);
         assertTrue(confirmMessageInSendingPool.sequenceNumberFound);
         assertTrue(confirmMessageInSendingPool.confirmed);
+        assertFalse(confirmMessageInSendingPool.splittedMessage);
         assertNotNull(confirmMessageInSendingPool.sms);
 
         assertEquals(sbb.getCurrentMsgNumValue(), 5);
@@ -543,10 +547,13 @@ public class DeliveryCommonSbbTest {
 
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(100);
         assertTrue(confirmMessageInSendingPool.confirmed);
+        assertTrue(confirmMessageInSendingPool.splittedMessage);
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(201);
         assertFalse(confirmMessageInSendingPool.confirmed);
+        assertTrue(confirmMessageInSendingPool.splittedMessage);
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(202);
         assertTrue(confirmMessageInSendingPool.confirmed);
+        assertTrue(confirmMessageInSendingPool.splittedMessage);
 
         assertEquals(sbb.getCurrentMsgNumValue(), 5);
         assertEquals(sbb.getSendingPoolMessageCount(), 5);
@@ -565,6 +572,7 @@ public class DeliveryCommonSbbTest {
         assertFalse(confirmMessageInSendingPool.confirmed);
         confirmMessageInSendingPool = sbb.confirmMessageInSendingPool(104);
         assertTrue(confirmMessageInSendingPool.confirmed);
+        assertTrue(confirmMessageInSendingPool.splittedMessage);
 
         assertEquals(sbb.getUnconfirmedMessageCountInSendingPool(), 1);
 

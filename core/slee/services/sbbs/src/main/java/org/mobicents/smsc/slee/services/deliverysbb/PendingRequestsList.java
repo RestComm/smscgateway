@@ -62,6 +62,8 @@ public class PendingRequestsList implements Serializable {
                 this.confirmations[i1] = true;
                 res.sequenceNumberFound = true;
                 res.msgNum = i1;
+                if (this.sequenceNumbersExtra[i1] != null)
+                    res.splittedMessage = true;
                 if (isSent(i1)) {
                     res.confirmed = true;
                     this.unconfirmedCnt--;
@@ -75,6 +77,7 @@ public class PendingRequestsList implements Serializable {
                         this.confirmationsExtra[i1][i2] = true;
                         res.sequenceNumberFound = true;
                         res.msgNum = i1;
+                        res.splittedMessage = true;
                         if (isSent(i1)) {
                             res.confirmed = true;
                             this.unconfirmedCnt--;

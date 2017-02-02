@@ -1295,6 +1295,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                             deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_DELIVERED), null,
                             deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_ENROUTE));
                     sms0.setShortMessageText(updatedReceiptText);
+                } else {
+                    // we have not found a local message - marking as unrecognized receipt
+                    sms0.setReceiptLocalMessageId(-1L);
                 }
             }
         }

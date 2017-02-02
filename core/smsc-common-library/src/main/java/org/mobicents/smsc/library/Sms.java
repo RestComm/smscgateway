@@ -25,8 +25,14 @@ package org.mobicents.smsc.library;
 import org.restcomm.smpp.parameter.TlvSet;
 
 import java.io.Serializable;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.UUID;
+
+import javolution.xml.XMLObjectReader;
+import javolution.xml.XMLObjectWriter;
+import javolution.xml.stream.XMLStreamException;
 
 
 /**
@@ -59,11 +65,11 @@ public class Sms implements Serializable {
     private String originatorSccpAddress;
 	private String mtServiceCenterAddress;
 
-	private long messageId;
+    private long messageId;
+    private String dlvMessageId;
 	private int moMessageRef;
 
     private String receiptOrigMessageId;
-    private Long receiptLocalMessageId;
 
 	private String origSystemId;
     private String origEsmeName;
@@ -98,14 +104,14 @@ public class Sms implements Serializable {
     private int deliveryCount;
     private int reroutingCount;
 
-    private OriginationType originationType;
-
 	private TlvSet tlvSet = new TlvSet();
 
     private boolean statusReportRequest;
     private int deliveryAttempt;
     private String userData;
-    private String extraData;
+
+    private SmsExtraData extraData = new SmsExtraData();
+
     private String extraData_2;
     private String extraData_3;
     private String extraData_4;
@@ -532,20 +538,6 @@ public class Sms implements Serializable {
 		this.tlvSet = tlvSet;
 	}
 
-    /**
-     * Type of message originated source
-     */
-    public OriginationType getOriginationType() {
-        return originationType;
-    }
-
-    /**
-     * @param originationType the originationType to set
-     */
-    public void setOriginationType(OriginationType originationType) {
-        this.originationType = originationType;
-    }
-
     public MessageDeliveryResultResponseInterface getMessageDeliveryResultResponse() {
         return messageDeliveryResultResponse;
     }
@@ -589,17 +581,6 @@ public class Sms implements Serializable {
     public void setUserData(String userData) {
         this.userData = userData;
     }
-
-
-    public String getExtraData() {
-        return extraData;
-    }
-
-
-    public void setExtraData(String extraData) {
-        this.extraData = extraData;
-    }
-
 
     public String getExtraData_2() {
         return extraData_2;
@@ -655,15 +636,23 @@ public class Sms implements Serializable {
         sb.append(", origNetworkId=");
         sb.append(origNetworkId);
 		sb.append(", messageId=");
-		sb.append(messageId);
+        sb.append(messageId);
+        if (dlvMessageId != null) {
+            sb.append(", dlvMessageId=");
+            sb.append(dlvMessageId);
+        }
 
         if (receiptOrigMessageId != null) {
             sb.append(", receiptOrigMessageId=");
             sb.append(receiptOrigMessageId);
         }
-        if (receiptLocalMessageId != null) {
+        if (this.extraData.getReceiptLocalMessageId() != null) {
             sb.append(", receiptLocalMessageId=");
-            sb.append(receiptLocalMessageId);
+            sb.append(this.extraData.getReceiptLocalMessageId());
+        }
+        if (this.extraData.getMprocNotes() != null) {
+            sb.append(", mprocNotes=");
+            sb.append(this.extraData.getMprocNotes());
         }
 
         sb.append(", moMessageRef=");
@@ -707,7 +696,7 @@ public class Sms implements Serializable {
         sb.append(", reroutingCount=");
         sb.append(reroutingCount);
         sb.append(", originationType=");
-        sb.append(originationType);
+        sb.append(this.extraData.getOriginationType());
         sb.append(", originatorSccpAddress=");
         sb.append(originatorSccpAddress);
         sb.append(", shortMessageText=");
@@ -785,15 +774,6 @@ public class Sms implements Serializable {
     }
 
 
-    public Long getReceiptLocalMessageId() {
-        return receiptLocalMessageId;
-    }
-
-
-    public void setReceiptLocalMessageId(Long receiptLocalMessageId) {
-        this.receiptLocalMessageId = receiptLocalMessageId;
-    }
-
 	public String getMtServiceCenterAddress() {
 		return mtServiceCenterAddress;
 	}
@@ -801,4 +781,83 @@ public class Sms implements Serializable {
 	public void setMtServiceCenterAddress( String mtServiceCenterAddress ) {
 		this.mtServiceCenterAddress = mtServiceCenterAddress;
 	}
+
+    public String getDlvMessageId() {
+        return dlvMessageId;
+    }
+
+    public void setDlvMessageId(String dlvMessageId) {
+        this.dlvMessageId = dlvMessageId;
+    }
+
+    // extraData
+
+    public String getMprocNotes() {
+        return this.extraData.getMprocNotes();
+    }
+
+    public void setMprocNotes(String mprocNotes) {
+        this.extraData.setMprocNotes(mprocNotes);
+    }
+
+    /**
+     * Type of message originated source
+     */
+    public OriginationType getOriginationType() {
+        return this.extraData.getOriginationType();
+    }
+
+    /**
+     * @param originationType the originationType to set
+     */
+    public void setOriginationType(OriginationType originationType) {
+        this.extraData.setOriginationType(originationType);
+    }
+
+    public Long getReceiptLocalMessageId() {
+        return this.extraData.getReceiptLocalMessageId();
+    }
+
+    public void setReceiptLocalMessageId(Long receiptLocalMessageId) {
+        this.extraData.setReceiptLocalMessageId(receiptLocalMessageId);
+    }
+
+    public String getExtraData() {
+        if (this.extraData.isEmpty()) {
+            return null;
+        } else {
+            // serializing of extraData
+            try {
+                StringWriter sw = new StringWriter();
+                XMLObjectWriter writer = XMLObjectWriter.newInstance(sw);
+                writer.setIndentation("\t");
+                writer.write(this.extraData, "extraData", SmsExtraData.class);
+                writer.close();
+                return sw.toString();
+            } catch (XMLStreamException e) {
+                return null;
+            }
+        }
+    }
+
+    public void setExtraData(String extraData) {
+        if (extraData == null || extraData.length() == 0) {
+            this.extraData.clear();
+        } else {
+            // deserializing of extraData
+            try {
+                StringReader sr = new StringReader(extraData);
+                XMLObjectReader reader = XMLObjectReader.newInstance(sr);
+                SmsExtraData copy = reader.read("extraData", SmsExtraData.class);
+
+                if (copy != null) {
+                    this.extraData = copy;
+                }
+            } catch (XMLStreamException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

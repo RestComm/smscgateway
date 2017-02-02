@@ -58,7 +58,6 @@ import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.mproc.impl.MProcResult;
-import org.mobicents.smsc.slee.resources.mproc.MProcRuleRaVersion;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
@@ -1386,7 +1385,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 if (sms != null) {
                     String s1 = reason.replace("\n", "\t");
                     CdrGenerator.generateCdr(sms, status, s1, smscPropertiesManagement.getGenerateReceiptCdr(),
-                            MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
+                            MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
+                            smscPropertiesManagement.getCalculateMsgPartsLenCdr());
                     return;
                 }
             }
@@ -1397,7 +1397,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
         if (sms != null) {
             String s1 = reason.replace("\n", "\t");
             CdrGenerator.generateCdr(sms, status, s1, smscPropertiesManagement.getGenerateReceiptCdr(),
-                    MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
+                    MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr());
             return;
         }
     }
@@ -1407,10 +1408,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @param sms
      * @param status
      * @param reason
+     * @param messageIsSplitted
+     * @param lastSegment
      */
-    protected void generateCDR(Sms sms, String status, String reason) {
+    protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
         CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
-                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
+                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr());
     }
 
     /**
@@ -1422,7 +1426,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
     protected void generateCDRs(ArrayList<Sms> lstPermFailured, String status, String reason) {
         for (Sms sms : lstPermFailured) {
             CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
-                    MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
+                    MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr());
         }
     }
 

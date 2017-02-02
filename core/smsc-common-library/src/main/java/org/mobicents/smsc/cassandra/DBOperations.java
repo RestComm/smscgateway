@@ -1046,8 +1046,9 @@ public class DBOperations {
                 boundStatement.setString(Schema.COLUMN_USER_DATA, sms.getUserData());
             } else
                 boundStatement.setToNull(Schema.COLUMN_USER_DATA);
-            if (sms.getExtraData() != null) {
-                boundStatement.setString(Schema.COLUMN_EXTRA_DATA, sms.getExtraData());
+            String extraData = sms.getExtraData();
+            if (extraData != null) {
+                boundStatement.setString(Schema.COLUMN_EXTRA_DATA, extraData);
             } else
                 boundStatement.setToNull(Schema.COLUMN_EXTRA_DATA);
             if (sms.getExtraData_2() != null) {

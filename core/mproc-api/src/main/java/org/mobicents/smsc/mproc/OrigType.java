@@ -28,5 +28,5 @@ package org.mobicents.smsc.mproc;
  *
  */
 public enum OrigType {
-    SMPP, SS7_MO, SS7_HR, SIP, HTTP
+    LOCAL_ORIG, SMPP, SS7_MO, SS7_HR, SIP, HTTP
 }

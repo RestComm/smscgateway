@@ -165,6 +165,14 @@ public interface SmscPropertiesManagementMBean {
 
 	public void setGenerateReceiptCdr(boolean generateReceiptCdr);
 
+    public boolean getGenerateTempFailureCdr();
+
+    public void setGenerateTempFailureCdr(boolean generateTempFailureCdr);
+
+    public boolean getCalculateMsgPartsLenCdr();
+
+    public void setCalculateMsgPartsLenCdr(boolean calculateMsgPartsLenCdr);
+
     public MoChargingType getMoCharging();
 
     public void setMoCharging(MoChargingType moCharging);

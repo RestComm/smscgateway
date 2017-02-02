@@ -829,9 +829,13 @@ public class SMSCShellExecutor implements ShellExecutor {
 				smscPropertiesManagement.setReviseSecondsOnSmscStart(val);
 			} else if (parName.equals("processingsmssettimeout")) {
 				int val = Integer.parseInt(options[3]);
-				smscPropertiesManagement.setProcessingSmsSetTimeout(val);
+                smscPropertiesManagement.setProcessingSmsSetTimeout(val);
             } else if (parName.equals("generatereceiptcdr")) {
                 smscPropertiesManagement.setGenerateReceiptCdr(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("generatetempfailurecdr")) {
+                smscPropertiesManagement.setGenerateTempFailureCdr(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("calculatemsgpartslencdr")) {
+                smscPropertiesManagement.setCalculateMsgPartsLenCdr(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("receiptsdisabling")) {
                 smscPropertiesManagement.setReceiptsDisabling(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("enableintermediatereceipts")) {
@@ -1157,6 +1161,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 				sb.append(smscPropertiesManagement.getProcessingSmsSetTimeout());
             } else if (parName.equals("generatereceiptcdr")) {
                 sb.append(smscPropertiesManagement.getGenerateReceiptCdr());
+            } else if (parName.equals("generatetempfailurecdr")) {
+                sb.append(smscPropertiesManagement.getGenerateTempFailureCdr());
+            } else if (parName.equals("calculatemsgpartslencdr")) {
+                sb.append(smscPropertiesManagement.getCalculateMsgPartsLenCdr());
             } else if (parName.equals("receiptsdisabling")) {
                 sb.append(smscPropertiesManagement.getReceiptsDisabling());
             } else if (parName.equals("enableintermediatereceipts")) {
@@ -1430,6 +1438,14 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("generatereceiptcdr = ");
             sb.append(smscPropertiesManagement.getGenerateReceiptCdr());
+            sb.append("\n");
+
+            sb.append("generatetempfailurecdr = ");
+            sb.append(smscPropertiesManagement.getGenerateTempFailureCdr());
+            sb.append("\n");
+
+            sb.append("calculatemsgpartslencdr = ");
+            sb.append(smscPropertiesManagement.getCalculateMsgPartsLenCdr());
             sb.append("\n");
 
             sb.append("receiptsdisabling = ");

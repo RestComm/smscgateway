@@ -87,6 +87,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private static final String REVISE_SECONDS_ON_SMSC_START = "reviseSecondsOnSmscStart";
 	private static final String PROCESSING_SMS_SET_TIMEOUT = "processingSmsSetTimeout";
     private static final String GENERATE_RECEIPT_CDR = "generateReceiptCdr";
+    private static final String GENERATE_TEMP_FAILURE_CDR = "generateTempFailureCdr";
+    private static final String CALCULATE_MSG_PARTS_LEN_CDR = "calculateMsgPartsLenCdr";
     private static final String RECEIPTS_DISABLING = "receiptsDisabling";
     private static final String INCOME_RECEIPTS_PROCESSING = "incomeReceiptsProcessing";
     private static final String ENABLE_INTERMEDIATE_RECEIPTS = "enableIntermediateReceipts";
@@ -237,6 +239,12 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	// true: we generate CDR for both receipt and regular messages
 	// false: we generate CDR only for regular messages
     private boolean generateReceiptCdr = false;
+    // true: we generate CDR also for temp failures (along with success and permanent failure cases)
+    // false: we generate CDR only for success and permanent failure cases (no CDRs for temp failures)
+    private boolean generateTempFailureCdr = true;
+    // true: when CDR generating SMSC GW will calculate MSG_PARTS and CHAR_NUMBERS fields (that demands extra calculating)
+    // false: not calculate
+    private boolean calculateMsgPartsLenCdr = false;
     // true: generating of delivery receipts will be disabled for all messages
     private boolean receiptsDisabling = false;
     // true: processing of incoming delivery receipts from remote SMSC GW: replacing of messageId in a receipt by a local
@@ -810,6 +818,28 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 		this.generateReceiptCdr = generateReceiptCdr;
 		this.store();
 	}
+
+    @Override
+    public boolean getGenerateTempFailureCdr() {
+        return this.generateTempFailureCdr;
+    }
+
+    @Override
+    public void setGenerateTempFailureCdr(boolean generateTempFailureCdr) {
+        this.generateTempFailureCdr = generateTempFailureCdr;
+        this.store();
+    }
+
+    @Override
+    public boolean getCalculateMsgPartsLenCdr() {
+        return this.calculateMsgPartsLenCdr;
+    }
+
+    @Override
+    public void setCalculateMsgPartsLenCdr(boolean calculateMsgPartsLenCdr) {
+        this.calculateMsgPartsLenCdr = calculateMsgPartsLenCdr;
+        this.store();
+    }
 
     @Override
     public boolean getReceiptsDisabling() {
@@ -1436,6 +1466,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			writer.write(this.reviseSecondsOnSmscStart, REVISE_SECONDS_ON_SMSC_START, Integer.class);
 			writer.write(this.processingSmsSetTimeout, PROCESSING_SMS_SET_TIMEOUT, Integer.class);
             writer.write(this.generateReceiptCdr, GENERATE_RECEIPT_CDR, Boolean.class);
+            writer.write(this.generateTempFailureCdr, GENERATE_TEMP_FAILURE_CDR, Boolean.class);
+            writer.write(this.calculateMsgPartsLenCdr, CALCULATE_MSG_PARTS_LEN_CDR, Boolean.class);
+
             writer.write(this.receiptsDisabling, RECEIPTS_DISABLING, Boolean.class);
             writer.write(this.incomeReceiptsProcessing, INCOME_RECEIPTS_PROCESSING, Boolean.class);
             writer.write(this.enableIntermediateReceipts, ENABLE_INTERMEDIATE_RECEIPTS, Boolean.class);
@@ -1656,6 +1689,15 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             if (valB != null) {
                 this.generateReceiptCdr = valB.booleanValue();
             }
+            valB = reader.read(GENERATE_TEMP_FAILURE_CDR, Boolean.class);
+            if (valB != null) {
+                this.generateTempFailureCdr = valB.booleanValue();
+            }
+            valB = reader.read(CALCULATE_MSG_PARTS_LEN_CDR, Boolean.class);
+            if (valB != null) {
+                this.calculateMsgPartsLenCdr = valB.booleanValue();
+            }
+
             valB = reader.read(RECEIPTS_DISABLING, Boolean.class);
             if (valB != null) {
                 this.receiptsDisabling = valB.booleanValue();

@@ -264,7 +264,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
             // success CDR generating
             boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
             this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL_SIP : CdrGenerator.CDR_SUCCESS_SIP,
-                    CdrGenerator.CDR_SUCCESS_NO_REASON);
+                    CdrGenerator.CDR_SUCCESS_NO_REASON, false, true);
 
             // adding a success receipt if it is needed
             this.generateSuccessReceipt(smsSet, sms);
@@ -526,7 +526,8 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
             smscStatAggregator.updateMsgOutFailedAll();
 
             // generating of a temporary failure CDR (one record for all unsent messages)
-            this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED_SIP, reason);
+            if (smscPropertiesManagement.getGenerateTempFailureCdr())
+                this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED_SIP, reason);
 
             ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
             ArrayList<Sms> lstTempFailured = new ArrayList<Sms>();

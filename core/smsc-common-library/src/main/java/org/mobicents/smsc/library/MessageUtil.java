@@ -421,6 +421,51 @@ public class MessageUtil {
         }
     }
 
+    public static int calculateMsgParts(String msg, DataCodingScheme dataCodingScheme, int nationalLanguageLockingShift,
+            int nationalLanguageSingleShift) {
+        int lenSolid = MessageUtil.getMaxSolidMessageCharsLength(dataCodingScheme);
+        int lenSegmented = MessageUtil.getMaxSegmentedMessageCharsLength(dataCodingScheme);
+
+        UserDataHeader udh = null;
+        if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7
+                && (nationalLanguageLockingShift > 0 || nationalLanguageSingleShift > 0)) {
+            udh = MessageUtil.getNationalLanguageIdentifierUdh(nationalLanguageLockingShift, nationalLanguageSingleShift);
+            if (nationalLanguageLockingShift > 0) {
+                lenSolid -= 3;
+                lenSegmented -= 3;
+            }
+            if (nationalLanguageSingleShift > 0) {
+                lenSolid -= 3;
+                lenSegmented -= 3;
+            }
+        }
+
+        int msgLenInChars = msg.length();
+        if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7 && msgLenInChars * 2 > lenSolid) {
+            // GSM7 data coding. We need to care if some characters occupy two char places
+            msgLenInChars = UserDataImpl.checkEncodedDataLengthInChars(msg, udh);
+        }
+        if (msgLenInChars <= lenSolid) {
+            return 1;
+        } else {
+            if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7) {
+                String[] res = UserDataImpl.sliceString(msg, lenSegmented, udh);
+                return res.length;
+            } else {
+                ArrayList<String> res = new ArrayList<String>();
+                int segmCnt = (msg.length() - 1) / lenSegmented + 1;
+                for (int i1 = 0; i1 < segmCnt; i1++) {
+                    if (i1 == segmCnt - 1) {
+                        res.add(msg.substring(i1 * lenSegmented, msg.length()));
+                    } else {
+                        res.add(msg.substring(i1 * lenSegmented, (i1 + 1) * lenSegmented));
+                    }
+                }
+                return res.size();
+            }
+        }
+    }
+
     public static String[] sliceMessage(String msg, DataCodingScheme dataCodingScheme, int nationalLanguageLockingShift,
             int nationalLanguageSingleShift) {
         int lenSolid = MessageUtil.getMaxSolidMessageCharsLength(dataCodingScheme);
@@ -621,6 +666,8 @@ public class MessageUtil {
         receipt.setDataCoding(0);
 
         receipt.setShortMessageText(rcpt);
+        receipt.setReceiptLocalMessageId(sms.getMessageId());
+        receipt.setOriginationType(OriginationType.LOCAL_ORIG);
 
         receipt.setEsmClass(ESME_DELIVERY_ACK | (sms.getEsmClass() & 0x03));
 

@@ -566,13 +566,15 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             }
             Sms sms = confirmMessageInSendingPool.sms;
             if (!confirmMessageInSendingPool.confirmed) {
-                this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON);
+                this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false);
                 return;
             }
 
             // firstly we store remote messageId if sms has a request to delivery receipt
             String clusterName = smsSet.getDestClusterName();
             String dlvMessageId = event.getMessageId();
+            sms.setDlvMessageId(dlvMessageId);
+
 //            if (MessageUtil.isDeliveryReceiptRequest(sms)) {
 //                SmsSetCache.getInstance().putDeliveredRemoteMsgIdValue(dlvMessageId, clusterName, sms.getMessageId(), 30);
 //            }
@@ -591,7 +593,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             // success CDR generating
             boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
             this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL_ESME : CdrGenerator.CDR_SUCCESS_ESME,
-                    CdrGenerator.CDR_SUCCESS_NO_REASON);
+                    CdrGenerator.CDR_SUCCESS_NO_REASON, confirmMessageInSendingPool.splittedMessage, true);
 
             // adding a success receipt if it is needed
             this.generateSuccessReceipt(smsSet, sms);
@@ -653,7 +655,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             smscStatAggregator.updateMsgOutFailedAll();
 
             // generating of a temporary failure CDR (one record for all unsent messages)
-            this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED_ESME, reason);
+            if (smscPropertiesManagement.getGenerateTempFailureCdr())
+                this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED_ESME, reason);
 
             ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
             ArrayList<Sms> lstTempFailured = new ArrayList<Sms>();

@@ -22,6 +22,8 @@
 package org.mobicents.smsc.library;
 
 import org.apache.log4j.Logger;
+import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 
 import java.text.SimpleDateFormat;
 
@@ -48,7 +50,7 @@ public class CdrGenerator {
     public static final String CDR_PARTIAL_ESME = "partial_esme";
     public static final String CDR_FAILED_ESME = "failed_esme";
     public static final String CDR_TEMP_FAILED_ESME = "temp_failed_esme";
-    
+
     public static final String CDR_SUCCESS_SIP = "success_sip";
     public static final String CDR_PARTIAL_SIP = "partial_sip";
     public static final String CDR_FAILED_SIP = "failed_sip";
@@ -62,7 +64,8 @@ public class CdrGenerator {
 		logger.debug(message);
 	}
 
-	public static void generateCdr(Sms smsEvent, String status, String reason, boolean generateReceiptCdr, boolean generateCdr) {
+    public static void generateCdr(Sms smsEvent, String status, String reason, boolean generateReceiptCdr, boolean generateCdr,
+            boolean messageIsSplitted, boolean lastSegment, boolean calculateMsgPartsLenCdr) {
         // Format is
         // SUBMIT_DATE,SOURCE_ADDRESS,SOURCE_TON,SOURCE_NPI,DESTINATION_ADDRESS,DESTINATION_TON,DESTINATION_NPI,STATUS,SYSTEM-ID,MESSAGE-ID,
 	    // VLR, IMSI, CorrelationID, First 20 char of SMS, REASON
@@ -74,6 +77,24 @@ public class CdrGenerator {
             // we do not generate CDR's for receipt if generateReceiptCdr option is off
             return;
 
+        int msgParts = 0, charNumbers = 0;
+        if (calculateMsgPartsLenCdr) {
+            if (messageIsSplitted) {
+                msgParts = 1;
+            } else {
+                DataCodingScheme dataCodingScheme = new DataCodingSchemeImpl(smsEvent.getDataCoding());
+                msgParts = MessageUtil.calculateMsgParts(smsEvent.getShortMessageText(), dataCodingScheme,
+                        smsEvent.getNationalLanguageLockingShift(), smsEvent.getNationalLanguageSingleShift());
+            }
+            if (lastSegment) {
+                charNumbers = smsEvent.getShortMessageText().length();
+            } else {
+                charNumbers = 0;
+            }
+        }
+
+        Long receiptLocalMessageId = smsEvent.getReceiptLocalMessageId();
+        
         StringBuffer sb = new StringBuffer();
         sb.append(DATE_FORMAT.format(smsEvent.getSubmitDate()))
                 .append(CdrGenerator.CDR_SEPARATOR)
@@ -91,9 +112,17 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(status)
                 .append(CdrGenerator.CDR_SEPARATOR)
+                .append(smsEvent.getOriginationType())
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(smsEvent.getReceiptLocalMessageId() == null ? "message" : "dlr")
+                .append(CdrGenerator.CDR_SEPARATOR)
                 .append(smsEvent.getOrigSystemId())
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(smsEvent.getMessageId())
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(smsEvent.getDlvMessageId())
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append((receiptLocalMessageId != null && receiptLocalMessageId == -1) ? "xxxx" : smsEvent.getReceiptLocalMessageId())
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(smsEvent.getSmsSet().getLocationInfoWithLMSI() != null ? smsEvent.getSmsSet().getLocationInfoWithLMSI()
                         .getNetworkNodeNumber().getAddress() : null)
@@ -104,11 +133,17 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(smsEvent.getOriginatorSccpAddress())
                 .append(CdrGenerator.CDR_SEPARATOR)
+                .append(smsEvent.getSmsSet().getSms(0).getMtServiceCenterAddress())
+                .append(CdrGenerator.CDR_SEPARATOR)
                 .append(smsEvent.getOrigNetworkId())
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(smsEvent.getSmsSet().getNetworkId())
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(smsEvent.getSmsSet().getSms(0).getMtServiceCenterAddress())
+                .append(smsEvent.getMprocNotes())
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(msgParts)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(charNumbers)
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(getEscapedString(getFirst20CharOfSMS(smsEvent.getShortMessageText())))
                 .append(CdrGenerator.CDR_SEPARATOR).append(getEscapedString(reason));

@@ -35,6 +35,7 @@ public class ConfirmMessageInSendingPool {
     public boolean confirmed;
     public Sms sms;
     public int msgNum;
+    public boolean splittedMessage;
 
     @Override
     public String toString() {
@@ -47,6 +48,8 @@ public class ConfirmMessageInSendingPool {
             sb.append(", confirmed, msgNum=");
             sb.append(msgNum);
         }
+        if (splittedMessage)
+            sb.append(", splittedMessage");
         sb.append("]");
 
         return sb.toString();

@@ -82,7 +82,6 @@ import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.impl.MProcResult;
-import org.mobicents.smsc.slee.resources.mproc.MProcRuleRaVersion;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 
@@ -681,8 +680,10 @@ public abstract class ChargingSbb implements Sbb {
 			// TODO: if CCR gives some response verbal reject reason
 			// we need replace CdrGenerator.CDR_SUCCESS_NO_REASON with this
 			// reason
-            CdrGenerator.generateCdr(sms, CdrGenerator.CDR_OCS_REJECTED, CdrGenerator.CDR_SUCCESS_NO_REASON, smscPropertiesManagement.getGenerateReceiptCdr(),
-                    MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
+            CdrGenerator.generateCdr(sms, CdrGenerator.CDR_OCS_REJECTED, CdrGenerator.CDR_SUCCESS_NO_REASON,
+                    smscPropertiesManagement.getGenerateReceiptCdr(),
+                    MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr());
 		} catch (PersistenceException e) {
 			throw new SmscProcessingException(
 					"PersistenceException when storing into Archive rejected by OCS message : " + e.getMessage(),
@@ -734,7 +735,8 @@ public abstract class ChargingSbb implements Sbb {
 
             CdrGenerator.generateCdr(sms, (isRejected ? CdrGenerator.CDR_MPROC_REJECTED : CdrGenerator.CDR_MPROC_DROPPED),
                     CdrGenerator.CDR_SUCCESS_NO_REASON, smscPropertiesManagement.getGenerateReceiptCdr(),
-                    MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()));
+                    MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr());
         } catch (PersistenceException e) {
             throw new SmscProcessingException(
                     "PersistenceException when storing into Archive rejected by MProc message : " + e.getMessage(),

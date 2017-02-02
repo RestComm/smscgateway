@@ -859,7 +859,8 @@ public class CassandraTest {
         sms.setStatusReportRequest(true);
         sms.setDeliveryAttempt(321);
         sms.setUserData("userdata");
-        sms.setExtraData("extradata_1");
+        sms.setMprocNotes("mproc notes xxx");
+//        sms.setExtraData("extradata_1");
         sms.setExtraData_2("extradata_2");
         sms.setExtraData_3("extradata_3");
         sms.setExtraData_4("extradata_4");
@@ -918,7 +919,8 @@ public class CassandraTest {
         assertTrue(sms.isStatusReportRequest());
         assertEquals(sms.getDeliveryAttempt(), 321);
         assertEquals(sms.getUserData(), "userdata");
-        assertEquals(sms.getExtraData(), "extradata_1");
+        assertEquals(sms.getMprocNotes(), "mproc notes xxx");
+//        assertEquals(sms.getExtraData(), "extradata_1 .....................");
         assertEquals(sms.getExtraData_2(), "extradata_2");
         assertEquals(sms.getExtraData_3(), "extradata_3");
         assertEquals(sms.getExtraData_4(), "extradata_4");

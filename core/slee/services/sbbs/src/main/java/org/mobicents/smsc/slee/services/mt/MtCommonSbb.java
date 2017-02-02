@@ -380,7 +380,8 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
             smscStatAggregator.updateMsgOutFailedAll();
 
             // generating of a temporary failure CDR
-            this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED, reason);
+            if (smscPropertiesManagement.getGenerateTempFailureCdr())
+                this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED, reason);
 
             StringBuilder sb = new StringBuilder();
             sb.append("onDeliveryError: errorAction=");
