@@ -121,4 +121,16 @@ public interface MProcMessage {
      */
     MProcMessage getOriginMessageForDeliveryReceipt(long messageId);
 
+    /**
+     * @return already saved mproc notes by previousely processed mproc rules
+     */
+    String getMprocNotes();
+
+    /**
+     * Add a verbal note for which actions were done by a mproc rule. This note will be added into a CDR.
+     * 
+     * @param note
+     */
+    void addMprocNote(String note);
+
 }

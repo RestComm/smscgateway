@@ -239,6 +239,17 @@ public class MProcMessageImpl implements MProcMessage {
     }
 
     @Override
+    public String getMprocNotes() {
+        return sms.getMprocNotes();
+    }
+
+    @Override
+    public void addMprocNote(String note) {
+        String curMsg = sms.getMprocNotes();
+        sms.setMprocNotes(MessageUtil.mergeMprocNotes(curMsg, note));
+    }
+
+    @Override
     public String toString() {
         return "MProcMessage: " + sms;
     }

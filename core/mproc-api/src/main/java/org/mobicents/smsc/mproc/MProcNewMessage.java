@@ -192,4 +192,12 @@ public interface MProcNewMessage {
 
     void setRegisteredDelivery_DeliveryReceiptOnSuccess();
 
+
+    /**
+     * Add a verbal note for which actions were done by a mproc rule. This note will be added into a CDR.
+     * 
+     * @param note
+     */
+    void addMprocNote(String note);
+
 }

@@ -170,7 +170,6 @@ public class MProcNewMessageImpl implements MProcNewMessage {
         validityPeriod = MProcUtility.checkValidityPeriod(validityPeriod, defaultValidityPeriodHours, maxValidityPeriodHours);
         sms.setValidityPeriod(validityPeriod);
     }
-    // ..................................
 
     @Override
     public int getDataCoding() {
@@ -300,6 +299,11 @@ public class MProcNewMessageImpl implements MProcNewMessage {
     @Override
     public void setRegisteredDelivery_DeliveryReceiptOnSuccess() {
         sms.setRegisteredDelivery(MProcUtility.setRegisteredDelivery_DeliveryReceiptOnSuccess(sms.getRegisteredDelivery()));
+    }
+
+    @Override
+    public void addMprocNote(String note) {
+        sms.setMprocNotes(note);
     }
 
     @Override

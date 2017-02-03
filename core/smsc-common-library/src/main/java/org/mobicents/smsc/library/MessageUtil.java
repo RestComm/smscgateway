@@ -1056,5 +1056,18 @@ public class MessageUtil {
 
         return sccpParameterFact.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, gt, 0, ssn);
     }
+
+    public static String mergeMprocNotes(String currentValue, String addingValue) {
+        if (currentValue == null)
+            return addingValue;
+        else {
+            StringBuilder sb = new StringBuilder();
+            sb.append(currentValue);
+            sb.append(";");
+            sb.append(addingValue);
+            return sb.toString();
+        }
+    }
+
 }
 

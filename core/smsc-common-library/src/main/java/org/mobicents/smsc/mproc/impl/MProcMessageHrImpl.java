@@ -233,4 +233,16 @@ public class MProcMessageHrImpl implements MProcMessage {
         return null;
     }
 
+    @Override
+    public String getMprocNotes() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void addMprocNote(String note) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }
