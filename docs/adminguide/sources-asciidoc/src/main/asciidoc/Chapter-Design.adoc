@@ -180,7 +180,7 @@ The fields "DUE_SLOT", "TARGET_ID", "ID" together act as the primary key.
 | DELIVERY_ATTEMPT | INT | A field for future usage.
 | STATUS_REPORT_REQUEST | ASCII | A field for future usage.
 | USER_DATA | ASCII | A field for future usage.
-| EXTRA_DATA | ASCII | A field for future usage.
+| EXTRA_DATA | ASCII | A compound field that contains XML serialized info for several auxiliary fields.
 | EXTRA_DATA_2 | ASCII | A field for future usage.
 | EXTRA_DATA_3 | ASCII | A field for future usage.
 | EXTRA_DATA_4 | ASCII | A field for future usage.
@@ -246,7 +246,7 @@ The fields "ADDR_DST_DIGITS", "ID" together act as the primary key.
 | DELIVERY_ATTEMPT | INT | A field for future usage.
 | STATUS_REPORT_REQUEST | ASCII | A field for future usage.
 | USER_DATA | ASCII | A field for future usage.
-| EXTRA_DATA | ASCII | A field for future usage.
+| EXTRA_DATA | ASCII | A compound field that contains XML serialized info for several auxiliary fields.
 | EXTRA_DATA_2 | ASCII | A field for future usage.
 | EXTRA_DATA_3 | ASCII | A field for future usage.
 | EXTRA_DATA_4 | ASCII | A field for future usage.

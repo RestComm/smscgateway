@@ -108,9 +108,9 @@ This page gets auto-refreshed every 2.5 seconds and therefore the statistics get
 The CDR generated in the text file is of the below format: 
 ----
 
-DELIVERY_DATE,SIMBIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,Message_Delivery_Status,ORIG_SYSTEM_ID,MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,ORIGINATOR_SCCP_ADDRESS,ORIG_NETWORK_ID,NETWORK_ID,MtServiceCenterAddress,First 20 characters of SMS, Reason_For_Failure
+DELIVERY_DATE,SIMBIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,Message_Delivery_Status,ORIGINATION_TYPE,MESSAGE_TYPE,ORIG_SYSTEM_ID,MESSAGE_ID,DVL_MESSAGE_ID,RECEIPT_LOCAL_MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,ORIGINATOR_SCCP_ADDRESS,MtServiceCenterAddress,ORIG_NETWORK_ID,NETWORK_ID,MPROC_NOTES,MSG_PARTS,CHAR_NUMBERS,First 20 characters of SMS,Reason_For_Failure
 ----
-where `ADDR_SRC_DIGITS, ADDR_SRC_TON, ADDR_SRC_NPI, ADDR_DST_DIGITS, ADDR_DST_TON, ADDR_DST_NPI, ORIG_SYSTEM_ID, MESSAGE_ID, NNN_DIGITS, IMSI` and `CORR_ID` are as explained in <<_slot_messages_table_yyyy_mm_dd>>; `SIMBIT_DATE`, `Message_Delivery_Status` and `Reason_For_Failure` are described below in this section. 
+where `ADDR_SRC_DIGITS, ADDR_SRC_TON, ADDR_SRC_NPI, ADDR_DST_DIGITS, ADDR_DST_TON, ADDR_DST_NPI, ORIG_SYSTEM_ID, MESSAGE_ID, NNN_DIGITS, IMSI, ORIG_NETWORK_ID, NETWORK_ID` and `CORR_ID` are as explained in <<_slot_messages_table_yyyy_mm_dd>> and other values are described below in this section. 
 
 NOTE: `NNN_DIGITS` and `IMSI` fields are present only in the case of SS7 terminated messages when there is a SRI positive response. `CORR_ID` is present only if a message has come to the SMSC Gateway via "home-routing" procedure. 
 
@@ -178,8 +178,33 @@ mproc_rejected::
 mproc_dropped::
   A mproc rule dropped an incoming message (and accept response was sent to a message originator). 	
 
+.ORIGINATION_TYPE
+A message origination: SMPP, SS7_MO, SS7_HR, SIP, HTTP, LOCAL_ORIG (delivery receipts that are created by SMSC GW).
+
+.MESSAGE_TYPE
+message::
+  Regular messages
+  
+dlr::
+  Delivery receipts
+
+.DVL_MESSAGE_ID
+A messageID that is used at SMPP protocol when sending a message to a peer. Only for SMPP terminated messages. "MESSAGE_ID" feild displays a messageId value for a leg when SMSC GW receives a message from a SMPP peer.
+
+.RECEIPT_LOCAL_MESSAGE_ID
+This field is used for delivery receipt – an original messageId that was used in the original message in field MESSAGE_ID (for correlation between an original message and DLR). If a message is a DLR but the original message is not known for SMSC GW this field will be filled by `xxxx` value.
+
 .MtServiceCenterAddress
 Local SMSC GW address (GT) that is used in MT procedure (for mobile terminated messages).
+
+.MPROC_NOTES
+Some custom mproc rules implementations may put here some verbal remarks of made processing.
+
+.MSG_PARTS
+A count of message parts for which SMSC GW will split a message when delivering to SS7 network. If a message is short or already splitted then this field will contain `1`.
+
+.CHAR_NUMBERS
+A count of characters that are present in the message / message segment. If SMSC GW is making a message splitting for a long message then only a last segment (with Message_Delivery_Status `success` or `success_esme`) will contain a character number for all segments. Non-last segments in this case (with Message_Delivery_Status `partial` or `partial_esme`) will contain 0 in this field. This is because of a way how SMSC GW makes of message splitting.
 
 .Reason_For_Failure
 The last field in the CDR generated is `Reason_For_Failure`, which records the reason for delivery failure and is empty if the delivery is successful.

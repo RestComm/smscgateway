@@ -9,7 +9,11 @@ DESCRIPTION
 	or generate CDR only for regular messages. By default the SMSC will generate CDR
 	for regular messages only. However if you require the SMSC to generate CDR for
 	receipt messages as well, you must set the parameter 'generatereceiptcdr' to true.
+	Default value: false
+
+EXAMPLES
+	smsc set generatereceiptcdr false
+
 SEE ALSO
-	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
-	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
-	smsc set maxmapv
+	smsc get generatereceiptcdr, smsc set generatetempfailurecdr,
+	smsc set calculatemsgpartslencdr, smsc set generatecdr

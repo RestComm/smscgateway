@@ -1,0 +1,21 @@
+Name
+	smsc set generatetempfailurecdr
+
+SYNOPSIS
+	smsc set generatetempfailurecdr <true | false>
+
+DESCRIPTION
+	The SMSC can be configured to generate CDR for a successful delivery case,
+	a permanent failure case and a temporary failure case. If we configure
+	generatetempfailurecdr to true then CDR will be generated for all cases.
+	If we configure generatetempfailurecdr to false then CDR will be generated for
+	successful delivery and permanent failure cases and not for a temporary failure
+	case.
+	Default value: true
+
+EXAMPLES
+	smsc set generatetempfailurecdr true
+
+SEE ALSO
+	smsc set generatereceiptcdr, smsc get generatetempfailurecdr,
+	smsc set calculatemsgpartslencdr, smsc set generatecdr

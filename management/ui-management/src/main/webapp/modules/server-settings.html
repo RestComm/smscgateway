@@ -581,7 +581,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								</span>
 							</div>															
                         </div>
-                        
+
            				<div class="tab-pane" id="cdr">
                         	<h5 style="border-bottom: 1px solid #DDD;">CDR Configuration</h5>
 							<div id="div-generateReceiptCdr" class="control-group">
@@ -593,6 +593,26 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									</select>
 								</span>                         
 							</div>	
+							<div id="div-generateTempFailureCdr" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="The SMSC can be configured to generate CDR for a successful delivery case, a permanent failure case and a temporary failure case. This option allow to avoid of generating of CDR records for a temporary failure case.">
+									<span class="add-on">Generate CDR for a temporary failure case</span>
+									<select id="generateTempFailureCdr" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span>                         
+							</div>	
+							<div id="div-calculateMsgPartsLenCdr" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When SMSC GW generates CDR records it can calculate message parts and characters count per a CDR record. Message parts count means a count of parts to that SMSC GW will have to split a long messages when sending messages into SS7 network. This demands some extra calculating and therefore is disabled by default. You can turn it on by this option.">
+									<span class="add-on">Calculating of message parts and characters count per a CDR record</span>
+									<select id="calculateMsgPartsLenCdr" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span>                         
+							</div>	
+
+
 							&nbsp;
 							<div id="div-generateCdr" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="SMSC generates CDR's in simple .txt file and also adds detailed CDR in MESSAGES_YYYY_MM_DD table of Cassandra. Generate CDR defines which CDR's should be added in .txt file if at all. None means no CDR is added in text file. Datagram means CDR only for SMPP originated messages with datagram mode will logged. Transactional means CDR only for SMPP originated messages with transcation mode will logged. Store And Forward means CDR for SMPP originated with transcation mode, all SS7, all SIP messages will be logged. Select all three options to log all CDR's in .txt file">
@@ -1038,7 +1058,19 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										} else {
 											generateReceiptCdr.options[1].selected = true;
 										}
-										
+										var generateTempFailureCdrTmp = response.value.GenerateTempFailureCdr
+										if(generateTempFailureCdrTmp){
+											generateTempFailureCdr.options[0].selected = true;
+										} else {
+											generateTempFailureCdr.options[1].selected = true;
+										}
+										var calculateMsgPartsLenCdrTmp = response.value.CalculateMsgPartsLenCdr
+										if(calculateMsgPartsLenCdrTmp){
+											calculateMsgPartsLenCdr.options[0].selected = true;
+										} else {
+											calculateMsgPartsLenCdr.options[1].selected = true;
+										}
+
 										var FLAG_DATAGRAMM = 0x01;
 										var FLAG_TRANSACTIONAL = 0x02;
 										var FLAG_STORE_AND_FORWARD = 0x04;
@@ -1995,7 +2027,11 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						
 						var e1 = document.getElementById("generateReceiptCdr");
 						var generateReceiptCdr = e1.options[e1.selectedIndex].text;
-						
+						e1 = document.getElementById("generateTempFailureCdr");
+						var generateTempFailureCdr = e1.options[e1.selectedIndex].text;
+						e1 = document.getElementById("calculateMsgPartsLenCdr");
+						var calculateMsgPartsLenCdr = e1.options[e1.selectedIndex].text;
+
 						var FLAG_DATAGRAMM = 0x01;
 						var FLAG_TRANSACTIONAL = 0x02;
 						var FLAG_STORE_AND_FORWARD = 0x04;
@@ -2031,6 +2067,8 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						jolokia.request(
 								[
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateReceiptCdr", value: generateReceiptCdr },
+									{ type: "write", mbean: mbeanSearch, attribute: "GenerateTempFailureCdr", value: generateTempFailureCdr },
+									{ type: "write", mbean: mbeanSearch, attribute: "CalculateMsgPartsLenCdr", value: calculateMsgPartsLenCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateCdrInt", value: generateCdrTmp },
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateArchiveTableInt", value: generateArchiveTableTmp },
 								],

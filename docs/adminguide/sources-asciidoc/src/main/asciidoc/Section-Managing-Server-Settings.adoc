@@ -2313,7 +2313,7 @@ EXAMPLES
   Results will be shown in the bottom of the screen For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 
 [[_smsc_gateway_server_cdr]]
-== CDR
+== CDRs and archive tables
 
 [[_generatecdr]]
 === CDR generation
@@ -2326,28 +2326,30 @@ You can set the 'generatecdr' option by issuing the command ``smsc set generatec
 You can verify this by issuing the command `smsc get generatecdr` which will display the value set for this property. 
 
 ----
-
 Name
-    smsc set generatecdr
+	smsc set generatecdr
 
 SYNOPSIS
-    smsc set generatecdr <digital option>
+	smsc set generatecdr <0 | 1 | 2 | 4 | 7>
 
 DESCRIPTION
-    This command is used to set which messages (or none) will be stored into
-    CDR log file. Details of CDR log format can be found in "8.2. CDR Log"
-    Options will have following bits values:
-    bit 1 - records will be done for SMPP originated messages with datagramm
-            mode
-    bit 2 - records will be done for SMPP originated messages with
-            transactional mode
-    bit 4 - records will be done for SMPP originated messages with
-            storeAndForward mode and for all SS7 or SIP originated messages
-    Value 0 will mean store none and value 7 - store all.
-    Default value: 7 (store all)
+	This command is used to set the generatecdr value. generatecdr
+	defines which messages records will be added into .txt CDR's
+	
+	Options will have following bits values:
+	
+	1 - records will be done for SMPP originated messages with 
+	datagramm mode
+	2 - records will be done for SMPP originated messages with 
+	transactional mode
+	4 - records will be done for SMPP originated messages with 
+	storeAndForward mode and for all SS7 or SIP originated messages
+	
+	Value 0 will mean store none and value 7 - store all.
+	Default value: 7
 
 EXAMPLES
-    smsc set generatecdr 7
+	smsc set generatecdr 7
 ----
 
 [[_generatecdr_gui]]
@@ -2356,7 +2358,7 @@ EXAMPLES
 .Procedure: Set CDRs generation SMSC option using the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI. 
 . You can specify CDR generation option by selecting an appropriate value in the field "CDR generation". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
@@ -2403,10 +2405,11 @@ EXAMPLES
 .Procedure: Set archive table CDRs generation SMSC option using the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI. 
 . You can specify archive table CDR generation option by selecting an appropriate value in the field "Archive table generation". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
 
 [[_generatereceiptcdr]]
 === Generate CDR for Receipt Messages
@@ -2418,7 +2421,6 @@ You can set the 'generatereceiptcdr' value to true/false by issuing the command 
 You can verify this by issuing the command `smsc get generatereceiptcdr` which will display the value set for this property. 
 
 ----
-
 Name
 	smsc set generatereceiptcdr
 
@@ -2430,6 +2432,10 @@ DESCRIPTION
 	or generate CDR only for regular messages. By default the SMSC will generate CDR
 	for regular messages only. However if you require the SMSC to generate CDR for
 	receipt messages as well, you must set the parameter 'generatereceiptcdr' to true.
+	Default value: false
+
+EXAMPLES
+	smsc set generatereceiptcdr false
 ----
 
 [[_generatereceiptcdr_gui]]
@@ -2438,10 +2444,96 @@ DESCRIPTION
 .Procedure: Set 'generate CDR for receipt messages'  using the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI. 
 . You can specify if the SMSC should generate CDR for receipt messages by choosing the value true for the field 'Generate receipt CDR'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
+[[_generatetempfailurecdr]]
+=== Generate CDR for temporary failure case
+
+[[_generatetempfailurecdr_cli]]
+==== Using CLI
+
+You can set the 'generatetempfailurecdr' value to true/false by issuing the command `smsc set generatetempfailurecdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get generatetempfailurecdr` which will display the value set for this property. 
+
+----
+Name
+	smsc set generatetempfailurecdr
+
+SYNOPSIS
+	smsc set generatetempfailurecdr <true | false>
+
+DESCRIPTION
+	The SMSC can be configured to generate CDR for a successful delivery case,
+	a permanent failure case and a temporary failure case. If we configure
+	generatetempfailurecdr to true then CDR will be generated for all cases.
+	If we configure generatetempfailurecdr to false then CDR will be generated for
+	successful delivery and permanent failure cases and not for a temporary failure
+	case.
+	Default value: true
+
+EXAMPLES
+	smsc set generatetempfailurecdr true
+----
+
+[[_generatetempfailurecdr_gui]]
+==== Using GUI
+
+.Procedure: Set 'generate CDR for a temporary failure case'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI. 
+. You can specify if the SMSC should generate CDR for for a temporary failure case by choosing the value true for the field 'Generate CDR for a temporary failure case'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
+[[_calculatemsgpartslencdr]]
+=== Calculating of message parts and characters count per a CDR record
+
+[[_calculatemsgpartslencdr_cli]]
+==== Using CLI
+
+You can set the 'calculatemsgpartslencdr' value to true/false by issuing the command `smsc set calculatemsgpartslencdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get calculatemsgpartslencdr` which will display the value set for this property. 
+
+----
+Name
+	smsc set calculatemsgpartslencdr
+
+SYNOPSIS
+	smsc set calculatemsgpartslencdr <true | false>
+
+DESCRIPTION
+	When SMSC GW generates CDR records it can calculate message parts and characters
+	count per a CDR record. Message parts count means a count of parts to that
+	SMSC GW will have to split a long messages when sending messages into SS7 network.
+	This demands some extra calculating and therefore is disabled by default.
+	You can turn it on by setting to a true of calculatemsgpartslencdr option.
+	Default value: false
+
+EXAMPLES
+	smsc set calculatemsgpartslencdr false
+----
+
+[[_calculatemsgpartslencdr_gui]]
+==== Using GUI
+
+.Procedure: Set 'calculating of message parts and characters count per a CDR record'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI. 
+. You can specify if the SMSC should calculating of message parts and characters count per a CDR record by choosing the value true for the field 'Calculating of message parts and characters count per a CDR record'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
+
+
+
 
 [[_smsc_gateway_server_processing]]
 == Processing

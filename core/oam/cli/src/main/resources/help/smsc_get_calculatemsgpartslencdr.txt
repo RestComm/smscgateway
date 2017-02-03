@@ -1,0 +1,19 @@
+Name
+	smsc get calculatemsgpartslencdr
+
+SYNOPSIS
+	smsc get calculatemsgpartslencdr
+
+DESCRIPTION
+	When SMSC GW generates CDR records it can calculate message parts and characters
+	count per a CDR record. Message parts count means a count of parts to that
+	SMSC GW will have to split a long messages when sending messages into SS7 network.
+	This demands some extra calculating and therefore is disabled by default.
+	You can turn it on by setting to a true of calculatemsgpartslencdr option.
+
+EXAMPLES
+	smsc get calculatemsgpartslencdr
+
+SEE ALSO
+	smsc set generatereceiptcdr, smsc set generatetempfailurecdr,
+	smsc set calculatemsgpartslencdr, smsc set generatecdr

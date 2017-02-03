@@ -2,7 +2,7 @@ Name
 	smsc set generatecdr
 
 SYNOPSIS
-	smsc set generatecdr <0 | 1 | 2 | 4 |7 >
+	smsc set generatecdr <0 | 1 | 2 | 4 | 7>
 
 DESCRIPTION
 	This command is used to set the generatecdr value. generatecdr
@@ -18,11 +18,11 @@ DESCRIPTION
 	storeAndForward mode and for all SS7 or SIP originated messages
 	
 	Value 0 will mean store none and value 7 - store all.
+	Default value: 7
 
 EXAMPLES
-	smsc set generatecdr
+	smsc set generatecdr 7
 
 SEE ALSO
-	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
-	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
-	smsc set maxmapv
+	smsc set generatereceiptcdr, smsc set generatetempfailurecdr,
+	smsc set calculatemsgpartslencdr, smsc get generatecdr
