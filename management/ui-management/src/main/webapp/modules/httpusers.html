@@ -61,6 +61,13 @@
 					</span>					
 				</div>
 
+        <div id="div-networkId" class="control-group">
+          <span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="NetworkId sending messages to HTTP connector">
+            <span class="add-on">NetworkId</span>
+            <input id="networkId" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="NetworkId" />
+          </span>         
+        </div>
+
 				<button id="add-entity-button" class="btn btn btn-primary" onclick="createHttpUser()">Create</button>
 			</span>
 		</p>
@@ -159,6 +166,7 @@
 				response = httpUserResponses[userName];
 
 				var password = response.value.Password;
+				var networkId = response.value.NetworkId;
 
 									$('#httpUsers-table').children('tbody').append('<tr class="service-row"><td style="vertical-align: middle; text-align: center;"><i style="color: ' + '#51A351' + ';" class="' + 'icon-play-circle' + '"></i></td>'+
 											'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + userName + '</td>' +
@@ -173,6 +181,7 @@
 									        '      <p class="muted">HTTP user Properties</p>'+
 													'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
 														'<dt>Password</dt> <dd>' + password + ' </dd>' + 
+							              '<dt>NetworkId</dt> <dd>' + networkId + ' </dd>' + 
 													'</dl>'+
 									        '    </div>'+
 
@@ -217,6 +226,22 @@
 																			'</td>'+
 																		'</tr>'+																	
 																		
+                                    '<tr data-toggle="tooltip" title="is used by the SMSC to assiggn a HTTP user with given Network ID">'+
+                                      '<td style="font-size: 0.9em;">NetworkId</td>'+
+                                      '<td style="font-size: 0.9em; padding: 0;">'+
+                                        '<div id="div-' + userName +'NetworkId-input" class="control-group">'+
+                                        '<span id="' + userName +'NetworkId-input" style="display: none;">'+
+                                          '<input type="text" class="input-small" value="' + networkId + '" /> ' +
+                                          '<i class="icon-ok" style="cursor: pointer;" onclick="onModifyHttpUserOk(\'' + userName + '\', \'NetworkId\', \'' + userName +"NetworkId" + '\', \'true\')"></i> ' +
+                                          '<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+userName+"NetworkId"+']\').toggle(); $(\'input[id^='+userName+"NetworkId"+']\').focus();"></i>' + 
+                                        '</span>'+
+                                        '</div>' +
+                                        '<span id="' +userName + 'NetworkId-text">' + networkId + '</span>'+
+                                      '</td>'+
+                                      '<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+userName+"NetworkId"+']\').toggle(); $(\'input[id^='+userName+"NetworkId"+']\').focus();"></i>' +
+                                      '</td>'+
+                                    '</tr>'+
+
 																	'</tbody>' +
 																'</table>' +															
 															'</div>'+
@@ -269,7 +294,12 @@
 		if(password == "") {
 			password = null;
 		}
-		
+
+    var networkId = $("#networkId").val();
+    if(networkId == "") {
+    	networkId = null;
+    }
+
 		if(formInvalid) {
 			$("#login-settings-error").show();
 			logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
@@ -278,7 +308,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.mobicents.smsc:layer=HttpUserManagement,name=SmscManagement","createHttpUser", userName,password, 
+		jolokia.execute("org.mobicents.smsc:layer=HttpUserManagement,name=SmscManagement","createHttpUser", userName, password, networkId,
 				{
 					success: function(value) {
 						updateHttpUsers();

@@ -177,6 +177,8 @@ public interface SMSCOAMMessages {
 
     public static final String SHOW_HTTPUSER_PASSWORD = " password=";
 
+    public static final String SHOW_HTTPUSER_NETWORK_ID = " networkId=";
+
     public static final String HTTPUSER_CREATE_SUCCESS = "Successfully created HttpUser userName=%s";
 
     public static final String HTTPUSER_MODIFY_SUCCESS = "Successfully modified HttpUser userName=%s";

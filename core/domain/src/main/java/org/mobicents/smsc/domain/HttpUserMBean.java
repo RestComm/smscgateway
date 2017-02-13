@@ -1,8 +1,8 @@
 /*
- * TeleStax, Open Source Cloud Communications  
- * Copyright 2012, Telestax Inc and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Telestax, Open Source Cloud Communications Copyright 2011-2017,
+ * Telestax Inc and individual contributors by the @authors tag.
+ * See the copyright.txt in the distribution for a full listing of
+ * individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -34,5 +34,19 @@ public interface HttpUserMBean {
     String getPassword();
 
     void setPassword(String password);
+    
+    /**
+     * Gets the network ID.
+     *
+     * @return the network ID
+     */
+    int getNetworkId();
+    
+    /**
+     * Sets the network ID.
+     *
+     * @param aNetworkId the new network ID
+     */
+    void setNetworkId(int aNetworkId);
 
 }

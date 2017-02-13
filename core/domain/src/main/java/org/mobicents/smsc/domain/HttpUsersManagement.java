@@ -120,7 +120,7 @@ public class HttpUsersManagement implements HttpUsersManagementMBean {
     }
 
     @Override
-    public HttpUser createHttpUser(String userName, String password) throws Exception {
+    public HttpUser createHttpUser(String userName, String password, final int aNetworkId) throws Exception {
         if (userName == null || userName.isEmpty()) {
             throw new Exception("userName must not be null or an empty String");
         }
@@ -137,7 +137,7 @@ public class HttpUsersManagement implements HttpUsersManagementMBean {
             }
         }
 
-        HttpUser httpUser = new HttpUser(userName, password);
+        HttpUser httpUser = new HttpUser(userName, password, aNetworkId);
 
         httpUser.httpUsersManagement = this;
 

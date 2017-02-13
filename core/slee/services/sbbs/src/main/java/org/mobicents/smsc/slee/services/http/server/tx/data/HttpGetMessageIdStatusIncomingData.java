@@ -58,6 +58,7 @@ public class HttpGetMessageIdStatusIncomingData extends BaseIncomingData {
         return "HttpSendMessageIncomingData{" +
                 "userId='" + userId + '\'' +
                 ", password='" + password + '\'' +
+                ", networkId='" + getNetworkId() + '\'' +
                 ", msgid='" + msgId + '\'' +
                 '}';
     }

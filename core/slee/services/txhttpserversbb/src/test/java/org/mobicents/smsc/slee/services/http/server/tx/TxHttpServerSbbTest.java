@@ -99,7 +99,7 @@ public class TxHttpServerSbbTest {
         HttpUsersManagement usersManagement = HttpUsersManagement.getInstance("Test");
         if(usersManagement.getHttpUserByName("user_4321") == null) {
             //add if not exists
-            usersManagement.createHttpUser("user_4321", "password");
+            usersManagement.createHttpUser("user_4321", "password", 0);
         }
 
         this.sbb = new TxHttpServerSbbProxy(this.pers);

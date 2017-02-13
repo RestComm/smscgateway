@@ -1,8 +1,8 @@
 /*
- * TeleStax, Open Source Cloud Communications  
- * Copyright 2012, Telestax Inc and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Telestax, Open Source Cloud Communications Copyright 2011-2017,
+ * Telestax Inc and individual contributors by the @authors tag.
+ * See the copyright.txt in the distribution for a full listing of
+ * individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -35,7 +35,16 @@ public interface HttpUsersManagementMBean {
 
     HttpUser getHttpUserByName(String userName);
 
-    HttpUser createHttpUser(String userName, String password) throws Exception;
+    /**
+     * Creates the http user.
+     *
+     * @param userName the user name
+     * @param password the password
+     * @param aNetworkId the network ID
+     * @return the http user
+     * @throws Exception the exception
+     */
+    HttpUser createHttpUser(String userName, String password, int aNetworkId) throws Exception;
 
     HttpUser destroyHttpUser(String userName) throws Exception;
 

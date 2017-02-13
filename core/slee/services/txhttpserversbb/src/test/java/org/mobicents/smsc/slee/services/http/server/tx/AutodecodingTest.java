@@ -23,7 +23,7 @@ public class AutodecodingTest {
             httpUsersManagement.destroyHttpUser("userId");
         } catch (Exception e) {
         }
-        httpUsersManagement.createHttpUser("userId", "password");
+        httpUsersManagement.createHttpUser("userId", "password", 0);
 
         HttpSendMessageIncomingData idata = new HttpSendMessageIncomingData("userId", "password", "msg", null, null, null,
                 "wwwwww", null, null, new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement,"");
@@ -66,7 +66,7 @@ public class AutodecodingTest {
             httpUsersManagement.destroyHttpUser("userId");
         } catch (Exception e) {
         }
-        httpUsersManagement.createHttpUser("userId", "password");
+        httpUsersManagement.createHttpUser("userId", "password", 0);
 
         HttpSendMessageIncomingData idata = new HttpSendMessageIncomingData("userId", "password", "msg", null, null, null,
                 "wwwwww", null, null, new String[] { "6666" }, smscPropertiesManagement, httpUsersManagement,"");

@@ -453,14 +453,18 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         }
     }
 
-    private TargetAddress createDestTargetAddress(String addr) throws SmscProcessingException {
+    private TargetAddress createDestTargetAddress(String addr, final int anUserSpecificNetworkId) throws SmscProcessingException {
         if (addr == null || "".equals(addr)) {
             throw new SmscProcessingException("DestAddress digits are absent", 0, MAPErrorCode.systemFailure, addr);
         }
         int destTon, destNpi, networkId;
         destTon = smscPropertiesManagement.getHttpDefaultDestTon();
         destNpi = smscPropertiesManagement.getHttpDefaultDestNpi();
-        networkId = smscPropertiesManagement.getHttpDefaultNetworkId();
+        if (anUserSpecificNetworkId < 0) {
+            networkId = smscPropertiesManagement.getHttpDefaultNetworkId();
+        } else {
+            networkId = anUserSpecificNetworkId;
+        }
         TargetAddress ta = new TargetAddress(destTon, destNpi, addr, networkId);
         return ta;
     }
@@ -544,7 +548,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             boolean succAddr = false;
             TargetAddress ta = null;
             try {
-                ta = createDestTargetAddress(address);
+                ta = createDestTargetAddress(address, incomingData.getNetworkId());
                 succAddr = true;
             } catch (SmscProcessingException e) {
                 logger.severe("SmscProcessingException while processing message to destination: "+address, e);

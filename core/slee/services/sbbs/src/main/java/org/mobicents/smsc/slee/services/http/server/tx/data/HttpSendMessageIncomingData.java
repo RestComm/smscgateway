@@ -303,6 +303,7 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
         return "HttpSendMessageIncomingData{" +
                 "userId='" + userId + '\'' +
                 ", password='" + password + '\'' +
+                ", networkId='" + getNetworkId() + '\'' +
                 ", msg='" + msg + '\'' +
                 ", format='" + format + '\'' +
                 ", smscEncoding=" + smscEncoding +

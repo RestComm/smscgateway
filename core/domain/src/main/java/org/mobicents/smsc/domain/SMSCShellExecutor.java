@@ -323,6 +323,7 @@ public class SMSCShellExecutor implements ShellExecutor {
 
         int count = 4;
         String password = "";
+        int networkId = -1;
 
         while (count < args.length) {
             // These are all optional parameters for a Tx/Rx/Trx binds
@@ -333,12 +334,14 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             if (key.equals("password")) {
                 password = args[count++];
+            } else if (key.equals("networkId")) {
+                networkId = Integer.parseInt(args[count++]);
             } else {
                 return SMSCOAMMessages.INVALID_COMMAND;
             }
         }
 
-        httpUsersManagement.createHttpUser(userName, password);
+        httpUsersManagement.createHttpUser(userName, password, networkId);
 
         return String.format(SMSCOAMMessages.HTTPUSER_CREATE_SUCCESS, userName);
     }
@@ -371,6 +374,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             if (key.equals("password")) {
                 httpUser.setPassword(args[count++]);
+            } else if (key.equals("networkId")) {
+                httpUser.setNetworkId(Integer.parseInt(args[count++]));
             } else {
                 return SMSCOAMMessages.INVALID_COMMAND;
             }
