@@ -636,8 +636,8 @@ public abstract class MoSbb extends MoCommonSbb {
 
         IMSI destinationImsi = smRPDA.getIMSI();
 		if (destinationImsi == null) {
-			throw new SmscProcessingException("Home routing: Mt DA IMSI is absent", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
+            throw new SmscProcessingException("Home routing: Mt DA IMSI is absent", SmppConstants.STATUS_SYSERR,
+                    MAPErrorCode.unexpectedDataValue, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
 		}
 
 		// obtaining correlationId
@@ -646,12 +646,14 @@ public abstract class MoSbb extends MoCommonSbb {
 		try {
 		    civ = SmsSetCache.getInstance().getCorrelationIdCacheElement(correlationID);
         } catch (Exception e) {
-            throw new SmscProcessingException("Home routing: Error when getting of CorrelationIdCacheElement", SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null,
-                    e);
+            throw new SmscProcessingException("Home routing: Error when getting of CorrelationIdCacheElement",
+                    SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
+                    null, e);
         }
         if (civ == null) {
             smscStatAggregator.updateHomeRoutingCorrIdFail();
-            throw new SmscProcessingException("Home routing: No data is found for: CorrelationId=" + correlationID, SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+            throw new SmscProcessingException("Home routing: No data is found for: CorrelationId=" + correlationID,
+                    SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
                     null);
         }
 
@@ -695,7 +697,7 @@ public abstract class MoSbb extends MoCommonSbb {
 		ISDNAddressString callingPartyAddress = smRPOA.getMsisdn();
         if (callingPartyAddress == null) {
             throw new SmscProcessingException("MO callingPartyAddress is absent", SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.unexpectedDataValue, null);
+                    MAPErrorCode.unexpectedDataValue, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
 
         SmsTpdu smsTpdu = null;
@@ -780,8 +782,8 @@ public abstract class MoSbb extends MoCommonSbb {
 		try {
 			userData.decode();
 		} catch (MAPException e) {
-			throw new SmscProcessingException("MO MAPException when decoding user data", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
+            throw new SmscProcessingException("MO MAPException when decoding user data", SmppConstants.STATUS_SYSERR,
+                    MAPErrorCode.unexpectedDataValue, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
 		}
 
 		Sms sms = new Sms();
@@ -791,16 +793,16 @@ public abstract class MoSbb extends MoCommonSbb {
 		// checking parameters first
 		if (callingPartyAddress == null || callingPartyAddress.getAddress() == null
 				|| callingPartyAddress.getAddress().isEmpty()) {
-			throw new SmscProcessingException("MO SourceAddress digits are absent", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
+            throw new SmscProcessingException("MO SourceAddress digits are absent", SmppConstants.STATUS_SYSERR,
+                    MAPErrorCode.unexpectedDataValue, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
 		}
 		if (callingPartyAddress.getAddressNature() == null) {
-			throw new SmscProcessingException("MO SourceAddress AddressNature is absent", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
+            throw new SmscProcessingException("MO SourceAddress AddressNature is absent", SmppConstants.STATUS_SYSERR,
+                    MAPErrorCode.unexpectedDataValue, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
 		}
 		if (callingPartyAddress.getNumberingPlan() == null) {
-			throw new SmscProcessingException("MO SourceAddress NumberingPlan is absent", SmppConstants.STATUS_SYSERR,
-					MAPErrorCode.unexpectedDataValue, null);
+            throw new SmscProcessingException("MO SourceAddress NumberingPlan is absent", SmppConstants.STATUS_SYSERR,
+                    MAPErrorCode.unexpectedDataValue, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
 		}
 		sms.setSourceAddr(callingPartyAddress.getAddress());
 
@@ -827,8 +829,9 @@ public abstract class MoSbb extends MoCommonSbb {
 		int dcs = dataCodingScheme.getCode();
 		String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
 		if (err != null) {
-			throw new SmscProcessingException("MO DataCoding scheme does not supported: " + dcs + " - " + err,
-					SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
+            throw new SmscProcessingException("MO DataCoding scheme does not supported: " + dcs + " - " + err,
+                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
 		}
 		sms.setDataCoding(dcs);
 
@@ -895,7 +898,7 @@ public abstract class MoSbb extends MoCommonSbb {
             userData.decode();
         } catch (MAPException e) {
             throw new SmscProcessingException("MT MAPException when decoding user data", SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.unexpectedDataValue, null);
+                    MAPErrorCode.unexpectedDataValue, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
 
         Sms sms = new Sms();
@@ -907,16 +910,19 @@ public abstract class MoSbb extends MoCommonSbb {
         // checking parameters first
         if (callingPartyAddress == null || callingPartyAddress.getAddressValue() == null
                 || callingPartyAddress.getAddressValue().isEmpty()) {
-            throw new SmscProcessingException("Home routing: TPDU OriginatingAddress digits are absent", SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.unexpectedDataValue, null);
+            throw new SmscProcessingException("Home routing: TPDU OriginatingAddress digits are absent",
+                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
         if (callingPartyAddress.getTypeOfNumber() == null) {
-            throw new SmscProcessingException("Home routing: TPDU OriginatingAddress TypeOfNumber is absent", SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.unexpectedDataValue, null);
+            throw new SmscProcessingException("Home routing: TPDU OriginatingAddress TypeOfNumber is absent",
+                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
         if (callingPartyAddress.getNumberingPlanIdentification() == null) {
             throw new SmscProcessingException("Home routing: TPDU OriginatingAddress NumberingPlanIdentification is absent",
-                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
+                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
         sms.setSourceAddr(callingPartyAddress.getAddressValue());
         sms.setOriginatorSccpAddress(originatorSccpAddress);        
@@ -950,7 +956,8 @@ public abstract class MoSbb extends MoCommonSbb {
         String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
         if (err != null) {
             throw new SmscProcessingException("Home routing: DataCoding scheme does not supported: " + dcs + " - " + err,
-                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue, null);
+                    SmppConstants.STATUS_SYSERR, MAPErrorCode.unexpectedDataValue,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
         sms.setDataCoding(dcs);
 
@@ -1159,7 +1166,7 @@ public abstract class MoSbb extends MoCommonSbb {
 
         if (af == null || af.getAddressValue() == null || af.getAddressValue().isEmpty()) {
             throw new SmscProcessingException("MO DestAddress digits are absent", SmppConstants.STATUS_SYSERR,
-                    MAPErrorCode.unexpectedDataValue, null);
+                    MAPErrorCode.unexpectedDataValue, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
 
         String digits = af.getAddressValue();

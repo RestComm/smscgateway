@@ -50,6 +50,16 @@ public interface PostArrivalProcessor {
      */
     void rejectMessage() throws MProcRuleException;
 
+    /**
+     * Reject message.
+     *
+     * @param anSmppErrorCode the SMPP error code
+     * @param aMapErrorCode the MAP error code
+     * @param aHttpErrorCode the HTTP error code
+     * @throws MProcRuleException the MProc rule exception
+     */
+    void rejectMessage(int anSmppErrorCode, int aMapErrorCode, int aHttpErrorCode) throws MProcRuleException;
+
     // updating of a message section
     void updateMessageNetworkId(MProcMessage message, int newNetworkId);
 

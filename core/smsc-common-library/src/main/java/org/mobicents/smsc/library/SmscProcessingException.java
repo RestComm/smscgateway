@@ -30,35 +30,44 @@ import com.cloudhopper.smpp.SmppConstants;
  * 
  */
 public class SmscProcessingException extends Exception {
+    
+    /** The Constant HTTP_ERROR_CODE_NOT_SET. */
+    public static final int HTTP_ERROR_CODE_NOT_SET = -1;
 
 	private int smppErrorCode = SmppConstants.STATUS_SYSERR;
 	private int mapErrorCode = 0;
     private Object extraErrorData;
     private boolean skipErrorLogging = false;
+    private final int itsHttpErrorCode;
 
 	public SmscProcessingException() {
+	    itsHttpErrorCode = HTTP_ERROR_CODE_NOT_SET;
     }
 
-    public SmscProcessingException(String message, int smppErrorCode, int mapErrorCode, Object extraErrorData) {
+    public SmscProcessingException(String message, int smppErrorCode, int mapErrorCode, final int aHttpErrorCode,
+            Object extraErrorData) {
         super(message);
 
-		this.smppErrorCode = smppErrorCode;
-		this.mapErrorCode = mapErrorCode;
-		this.extraErrorData = extraErrorData;
+        this.smppErrorCode = smppErrorCode;
+        this.mapErrorCode = mapErrorCode;
+        this.extraErrorData = extraErrorData;
+        itsHttpErrorCode = aHttpErrorCode;
     }
 
     public SmscProcessingException(Throwable cause) {
         super(cause);
+        itsHttpErrorCode = HTTP_ERROR_CODE_NOT_SET;
     }
 
-    public SmscProcessingException(String message, int smppErrorCode, int mapErrorCode, Object extraErrorData, Throwable cause) {
+    public SmscProcessingException(String message, int smppErrorCode, int mapErrorCode, final int aHttpErrorCode,
+            Object extraErrorData, Throwable cause) {
         super(message, cause);
 
         this.smppErrorCode = smppErrorCode;
-		this.mapErrorCode = mapErrorCode;
-		this.extraErrorData = extraErrorData;
+        this.mapErrorCode = mapErrorCode;
+        this.extraErrorData = extraErrorData;
+        itsHttpErrorCode = aHttpErrorCode;
     }
-
 
     public int getSmppErrorCode() {
 		return smppErrorCode;
@@ -78,6 +87,15 @@ public class SmscProcessingException extends Exception {
 
     public void setSkipErrorLogging(boolean skipErrorLogging) {
         this.skipErrorLogging = skipErrorLogging;
+    }
+
+    /**
+     * Gets the http error code.
+     *
+     * @return the http error code
+     */
+    public int getHttpErrorCode() {
+        return itsHttpErrorCode;
     }
 
 }

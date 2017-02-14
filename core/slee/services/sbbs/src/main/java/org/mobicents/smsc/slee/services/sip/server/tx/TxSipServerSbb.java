@@ -362,17 +362,19 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 			}
 		}
 		if (!isDigital) {
-			throw new SmscProcessingException(
-					"Destination address contains not only digits, *, #, a, b, or c characters: " + ta.getAddr(),
-					SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, null);
+            throw new SmscProcessingException(
+                    "Destination address contains not only digits, *, #, a, b, or c characters: " + ta.getAddr(),
+                    SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, null);
 		}
 		if (ta.getAddr().length() > 20) {
-			throw new SmscProcessingException("Destination address has too long length: " + ta.getAddr(),
-					SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, null);
+            throw new SmscProcessingException("Destination address has too long length: " + ta.getAddr(),
+                    SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, null);
 		}
 		if (ta.getAddr().length() == 0) {
-			throw new SmscProcessingException("Destination address has no digits", SmppConstants.STATUS_SUBMITFAIL,
-					MAPErrorCode.systemFailure, null, null);
+            throw new SmscProcessingException("Destination address has no digits", SmppConstants.STATUS_SUBMITFAIL,
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, null);
 		}
 
 		// processing of a message text
@@ -395,8 +397,10 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 		int lenSegmented = MessageUtil.getMaxSegmentedMessageBytesLength();
 		// splitting by SMSC is supported for all messages from SIP
 		if (messageLen > lenSegmented * 255) {
-			throw new SmscProcessingException("Message length in bytes is too big for segmented message: " + messageLen
-					+ ">" + lenSegmented, SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure, null);
+            throw new SmscProcessingException(
+                    "Message length in bytes is too big for segmented message: " + messageLen + ">" + lenSegmented,
+                    SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
+                    null);
 		}
 
 		sms.setSubmitDate(new Timestamp(System.currentTimeMillis()));

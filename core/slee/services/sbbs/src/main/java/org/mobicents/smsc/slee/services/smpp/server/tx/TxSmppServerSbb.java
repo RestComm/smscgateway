@@ -669,7 +669,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         if (event.getSourceAddress() == null || event.getSourceAddress().getAddress() == null
                 || event.getSourceAddress().getAddress().isEmpty()) {
             throw new SmscProcessingException("SourceAddress digits are absent", SmppConstants.STATUS_INVSRCADR,
-                    MAPErrorCode.systemFailure, null);
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
         sms.setSourceAddr(event.getSourceAddress().getAddress());
         sms.setSourceAddrTon(event.getSourceAddress().getTon());
@@ -681,7 +681,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
         if (err != null) {
             throw new SmscProcessingException("TxSmpp DataCoding scheme does not supported: " + dcs + " - " + err,
-                    SmppExtraConstants.ESME_RINVDCS, MAPErrorCode.systemFailure, null);
+                    SmppExtraConstants.ESME_RINVDCS, MAPErrorCode.systemFailure,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
 
         // storing additional parameters
@@ -783,15 +784,17 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
         // checking of min / max length
         if (origEsme.getMinMessageLength() >= 0 && msg.length() < origEsme.getMinMessageLength()) {
-            SmscProcessingException e = new SmscProcessingException("Message length is less than a min length limit for ESME="
-                    + origEsme.getName() + ", len=" + msg.length(), SmppConstants.STATUS_INVMSGLEN, MAPErrorCode.systemFailure,
+            SmscProcessingException e = new SmscProcessingException(
+                    "Message length is less than a min length limit for ESME=" + origEsme.getName() + ", len=" + msg.length(),
+                    SmppConstants.STATUS_INVMSGLEN, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
                     null);
             e.setSkipErrorLogging(true);
             throw e;
         }
         if (origEsme.getMaxMessageLength() >= 0 && msg.length() > origEsme.getMaxMessageLength()) {
-            SmscProcessingException e = new SmscProcessingException("Message length is more than a max length limit for ESME="
-                    + origEsme.getName() + ", len=" + msg.length(), SmppConstants.STATUS_INVMSGLEN, MAPErrorCode.systemFailure,
+            SmscProcessingException e = new SmscProcessingException(
+                    "Message length is more than a max length limit for ESME=" + origEsme.getName() + ", len=" + msg.length(),
+                    SmppConstants.STATUS_INVMSGLEN, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
                     null);
             e.setSkipErrorLogging(true);
             throw e;
@@ -821,8 +824,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (udhData != null)
                 lenSolid -= udhData.length;
             if (messageLen > lenSolid) {
-                throw new SmscProcessingException("Message length in bytes is too big for solid message: " + messageLen + ">"
-                        + lenSolid, SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure, null);
+                throw new SmscProcessingException(
+                        "Message length in bytes is too big for solid message: " + messageLen + ">" + lenSolid,
+                        SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure,
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
             }
         } else {
             // here splitting by SMSC is supported
@@ -843,8 +848,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     }
                 }
                 if (messageLen > lenSegmented * 255) {
-                    throw new SmscProcessingException("Message length in bytes is too big for segmented message: " + messageLen
-                            + ">" + lenSegmented, SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure, null);
+                    throw new SmscProcessingException(
+                            "Message length in bytes is too big for segmented message: " + messageLen + ">" + lenSegmented,
+                            SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure,
+                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
                 }
             } else {
                 if (udh != null) {
@@ -868,8 +875,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 valTime = (new Date()).getTime() + tlvQosTimeToLive.getValueAsInt();
             } catch (TlvConvertException e) {
-                throw new SmscProcessingException("TlvConvertException when getting TAG_QOS_TIME_TO_LIVE tlv field: "
-                        + e.getMessage(), SmppConstants.STATUS_INVOPTPARAMVAL, MAPErrorCode.systemFailure, null, e);
+                throw new SmscProcessingException(
+                        "TlvConvertException when getting TAG_QOS_TIME_TO_LIVE tlv field: " + e.getMessage(),
+                        SmppConstants.STATUS_INVOPTPARAMVAL, MAPErrorCode.systemFailure,
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
             }
             validityPeriod = new Date(valTime);
         } else {
@@ -877,8 +886,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 validityPeriod = MessageUtil.parseSmppDate(event.getValidityPeriod());
             } catch (ParseException e) {
                 throw new SmscProcessingException(
-                        "ParseException when parsing ValidityPeriod field: " + e.getMessage(),
-                        SmppConstants.STATUS_INVEXPIRY, MAPErrorCode.systemFailure, null, e);
+                        "ParseException when parsing ValidityPeriod field: " + e.getMessage(), SmppConstants.STATUS_INVEXPIRY,
+                        MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
             }
         }
         MessageUtil.applyValidityPeriod(sms, validityPeriod, true, smscPropertiesManagement.getMaxValidityPeriodHours(),
@@ -889,8 +898,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         try {
             scheduleDeliveryTime = MessageUtil.parseSmppDate(event.getScheduleDeliveryTime());
         } catch (ParseException e) {
-            throw new SmscProcessingException("ParseException when parsing ScheduleDeliveryTime field: "
-                    + e.getMessage(), SmppConstants.STATUS_INVSCHED, MAPErrorCode.systemFailure, null, e);
+            throw new SmscProcessingException("ParseException when parsing ScheduleDeliveryTime field: " + e.getMessage(),
+                    SmppConstants.STATUS_INVSCHED, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
+                    null, e);
         }
         MessageUtil.applyScheduleDeliveryTime(sms, scheduleDeliveryTime);
 
@@ -917,14 +927,15 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
         List<Address> addrList = event.getDestAddresses();
         if (addrList == null || addrList.size() == 0) {
-            throw new SmscProcessingException("For received SubmitMulti no DestAddresses found: ", SmppConstants.STATUS_INVDLNAME, MAPErrorCode.systemFailure,
+            throw new SmscProcessingException("For received SubmitMulti no DestAddresses found: ",
+                    SmppConstants.STATUS_INVDLNAME, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
                     null);
         }
 
         if (event.getSourceAddress() == null || event.getSourceAddress().getAddress() == null
                 || event.getSourceAddress().getAddress().isEmpty()) {
             throw new SmscProcessingException("SourceAddress digits are absent", SmppConstants.STATUS_INVSRCADR,
-                    MAPErrorCode.systemFailure, null);
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
 
         // checking parameters first
@@ -936,7 +947,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
         if (err != null) {
             throw new SmscProcessingException("TxSmpp DataCoding scheme does not supported: " + dcs + " - " + err,
-                    SmppExtraConstants.ESME_RINVDCS, MAPErrorCode.systemFailure, null);
+                    SmppExtraConstants.ESME_RINVDCS, MAPErrorCode.systemFailure,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
 
         DataCodingScheme dataCodingScheme = new DataCodingSchemeImpl(dcs);
@@ -1036,9 +1048,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 messageLen += udhData.length;
 
             if (messageLen > lenSolid) {
-                throw new SmscProcessingException("Message length in bytes is too big for solid message: "
-                        + messageLen + ">" + lenSolid, SmppConstants.STATUS_INVPARLEN,
-                        MAPErrorCode.systemFailure, null);
+                throw new SmscProcessingException(
+                        "Message length in bytes is too big for solid message: " + messageLen + ">" + lenSolid,
+                        SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure,
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
             }
         } else {
             // here splitting by SMSC is supported
@@ -1057,8 +1070,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                             .getCode();
                 }
                 if (messageLen > lenSegmented * 255) {
-                    throw new SmscProcessingException("Message length in bytes is too big for segmented message: " + messageLen
-                            + ">" + lenSegmented, SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure, null);
+                    throw new SmscProcessingException(
+                            "Message length in bytes is too big for segmented message: " + messageLen + ">" + lenSegmented,
+                            SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure,
+                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
                 }
             }
         }
@@ -1071,17 +1086,19 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 valTime = (new Date()).getTime() + tlvQosTimeToLive.getValueAsInt();
             } catch (TlvConvertException e) {
-                throw new SmscProcessingException("TlvConvertException when getting TAG_QOS_TIME_TO_LIVE tlv field: "
-                        + e.getMessage(), SmppConstants.STATUS_INVOPTPARAMVAL, MAPErrorCode.systemFailure, null, e);
+                throw new SmscProcessingException(
+                        "TlvConvertException when getting TAG_QOS_TIME_TO_LIVE tlv field: " + e.getMessage(),
+                        SmppConstants.STATUS_INVOPTPARAMVAL, MAPErrorCode.systemFailure,
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
             }
             validityPeriod = new Date(valTime);
         } else {
             try {
                 validityPeriod = MessageUtil.parseSmppDate(event.getValidityPeriod());
             } catch (ParseException e) {
-                throw new SmscProcessingException(
-                        "ParseException when parsing ValidityPeriod field: " + e.getMessage(),
-                        SmppConstants.STATUS_INVEXPIRY, MAPErrorCode.systemFailure, null, e);
+                throw new SmscProcessingException("ParseException when parsing ValidityPeriod field: " + e.getMessage(),
+                        SmppConstants.STATUS_INVEXPIRY, MAPErrorCode.systemFailure,
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
             }
         }
 
@@ -1090,8 +1107,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         try {
             scheduleDeliveryTime = MessageUtil.parseSmppDate(event.getScheduleDeliveryTime());
         } catch (ParseException e) {
-            throw new SmscProcessingException("ParseException when parsing ScheduleDeliveryTime field: "
-                    + e.getMessage(), SmppConstants.STATUS_INVSCHED, MAPErrorCode.systemFailure, null, e);
+            throw new SmscProcessingException("ParseException when parsing ScheduleDeliveryTime field: " + e.getMessage(),
+                    SmppConstants.STATUS_INVSCHED, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
+                    null, e);
         }
 
         long messageId = store.c2_getNextMessageId();
@@ -1404,7 +1422,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
     private TargetAddress createDestTargetAddress(Address addr, int networkId) throws SmscProcessingException {
         if (addr == null || addr.getAddress() == null || addr.getAddress().isEmpty()) {
-            throw new SmscProcessingException("DestAddress digits are absent", SmppConstants.STATUS_INVDSTADR, MAPErrorCode.systemFailure, addr);
+            throw new SmscProcessingException("DestAddress digits are absent", SmppConstants.STATUS_INVDSTADR,
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, addr);
         }
 
         int destTon = addr.getTon();

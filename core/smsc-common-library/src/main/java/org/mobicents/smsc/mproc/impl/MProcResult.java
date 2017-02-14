@@ -32,15 +32,24 @@ import org.mobicents.smsc.library.Sms;
 *
 */
 public class MProcResult {
-
+    
+    private static final int ERROR_CODE_NOT_SET = -1;
+    
     private FastList<Sms> messageList;
     private boolean messageIsRejected;
     private boolean messageIsDropped;
     private boolean messageIsRerouted;
     private boolean hrIsByPassed;
     private int newNetworkId;
+    
+    private int itsMapErrorCode;
+    private int itsHttpErrorCode;
+    private int itsSmppErrorCode;
 
     public MProcResult() {
+        itsMapErrorCode = ERROR_CODE_NOT_SET;
+        itsHttpErrorCode = ERROR_CODE_NOT_SET;
+        itsSmppErrorCode = ERROR_CODE_NOT_SET;
     }
 
     public FastList<Sms> getMessageList() {
@@ -89,6 +98,55 @@ public class MProcResult {
 
     public void setNewNetworkId(int newNetworkId) {
         this.newNetworkId = newNetworkId;
+    }
+
+    /**
+     * Gets the map error code.
+     *
+     * @return the map error code
+     */
+    public int getMapErrorCode() {
+        return itsMapErrorCode;
+    }
+
+    /**
+     * Sets the map error code.
+     *
+     * @param mapErrorCode the new map error code
+     */
+    public void setMapErrorCode(final int mapErrorCode) {
+        itsMapErrorCode = mapErrorCode;
+    }
+
+    /**
+     * Gets the http error code.
+     *
+     * @return the http error code
+     */
+    public int getHttpErrorCode() {
+        return itsHttpErrorCode;
+    }
+
+    public void setHttpErrorCode(final int httpErrorCode) {
+        itsHttpErrorCode = httpErrorCode;
+    }
+
+    /**
+     * Gets the SMPP error code.
+     *
+     * @return the SMPP error code
+     */
+    public int getSmppErrorCode() {
+        return itsSmppErrorCode;
+    }
+
+    /**
+     * Sets the SMPP error code.
+     *
+     * @param smppErrorCode the new SMPP error code
+     */
+    public void setSmppErrorCode(final int smppErrorCode) {
+        itsSmppErrorCode = smppErrorCode;
     }
 
 }

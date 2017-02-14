@@ -462,9 +462,8 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
 
 			clientTransaction.sendRequest();
 		} catch (Exception e) {
-			throw new SmscProcessingException(
-					"RxSipServerSbb.sendMessage(): Exception while trying to send SIP Message =" + e.getMessage()
-							+ "\nMessage: " + sms, 0, 0, null, e);
+            throw new SmscProcessingException("RxSipServerSbb.sendMessage(): Exception while trying to send SIP Message ="
+                    + e.getMessage() + "\nMessage: " + sms, 0, 0, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
 		}
 	}
 

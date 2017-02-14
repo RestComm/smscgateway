@@ -300,7 +300,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 if (sms == null) {
                     // this should not be
                     throw new SmscProcessingException(
-                            "sendDeliverSm: getCurrentMessage() returns null sms for msgNum in SendingPool " + poolIndex, 0, 0, null);
+                            "sendDeliverSm: getCurrentMessage() returns null sms for msgNum in SendingPool " + poolIndex, 0, 0,
+                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
                 }
 
                 // message splitting staff
@@ -472,7 +473,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         } catch (Throwable e) {
             throw new SmscProcessingException(
                     "RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
-                            + e.getMessage() + "\nsmsSet: " + smsSet, 0, 0, null, e);
+                            + e.getMessage() + "\nsmsSet: " + smsSet,
+                    0, 0, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
 		}
 	}
 

@@ -1033,11 +1033,13 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
         SmsSet smsSet = getSmsSet();
         if (smsSet == null) {
-            throw new SmscProcessingException("CMP smsSet is missed", -1, -1, null);
+            throw new SmscProcessingException("CMP smsSet is missed", -1, -1, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
+                    null);
         }
         Sms sms = this.getMessageInSendingPool(0);
         if (sms == null) {
-            throw new SmscProcessingException("sms is missed in CMP", -1, -1, null);
+            throw new SmscProcessingException("sms is missed in CMP", -1, -1, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
+                    null);
         }
 
 		boolean moreMessagesToSend = false;
@@ -1190,11 +1192,13 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		} catch (MAPException e) {
 			if (mapDialogSms != null)
 				mapDialogSms.release();
-            throw new SmscProcessingException("MAPException when sending MtForwardSM. \nSms=" + sms, -1, -1, null, e);
+            throw new SmscProcessingException("MAPException when sending MtForwardSM. \nSms=" + sms, -1, -1,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
 		} catch (TlvConvertException e) {
 			if (mapDialogSms != null)
 				mapDialogSms.release();
-			throw new SmscProcessingException("TlvConvertException when sending MtForwardSM", -1, -1, null, e);
+            throw new SmscProcessingException("TlvConvertException when sending MtForwardSM", -1, -1,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
 		}
 	}
 

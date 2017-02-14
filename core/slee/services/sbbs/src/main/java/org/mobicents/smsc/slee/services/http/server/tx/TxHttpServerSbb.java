@@ -380,8 +380,12 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 smscStatAggregator.updateMsgInFailedAll();
             }
             try {
-                final String message = "Error while trying to send send SMS message to multiple destinations.";
-                outgoingData.setStatus(Status.ERROR);
+                final String message = "Error while trying to send SMS message.";
+                if (e1.getHttpErrorCode() < 0) {
+                    outgoingData.setStatus(Status.ERROR);
+                } else {
+                    outgoingData.setStatus(e1.getHttpErrorCode());
+                }
                 outgoingData.setMessage(message  + " " + e1.getMessage());
                 HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(),
                         HttpServletResponse.SC_OK,
@@ -455,7 +459,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
     private TargetAddress createDestTargetAddress(String addr, final int anUserSpecificNetworkId) throws SmscProcessingException {
         if (addr == null || "".equals(addr)) {
-            throw new SmscProcessingException("DestAddress digits are absent", 0, MAPErrorCode.systemFailure, addr);
+            throw new SmscProcessingException("DestAddress digits are absent", 0, MAPErrorCode.systemFailure,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, addr);
         }
         int destTon, destNpi, networkId;
         destTon = smscPropertiesManagement.getHttpDefaultDestTon();
@@ -507,7 +512,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
     protected SendMessageParseResult createSmsEventMultiDest(HttpSendMessageIncomingData incomingData, PersistenceRAInterface store) throws SmscProcessingException {
         List<String> addressList = incomingData.getDestAddresses();
         if (addressList == null || addressList.size() == 0) {
-            throw new SmscProcessingException("For received SubmitMessage no DestAddresses found: ", 0, MAPErrorCode.systemFailure, null);
+            throw new SmscProcessingException("For received SubmitMessage no DestAddresses found: ", 0,
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
 
         String msg = incomingData.getShortMessage();
@@ -530,8 +536,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
         String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
         if (err != null) {
-            throw new SmscProcessingException("TxHttp DataCoding scheme does not supported: " + dcs + " - " + err,
-                    0, MAPErrorCode.systemFailure, null);
+            throw new SmscProcessingException("TxHttp DataCoding scheme does not supported: " + dcs + " - " + err, 0,
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
         }
 
         // checking max message length

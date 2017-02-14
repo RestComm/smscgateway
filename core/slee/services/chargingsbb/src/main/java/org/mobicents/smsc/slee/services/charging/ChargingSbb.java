@@ -568,7 +568,8 @@ public abstract class ChargingSbb implements Sbb {
                                 this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                             } catch (Exception e) {
                                 throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-                                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+                                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+                                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
                             }
                         } else {
                             if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
@@ -576,8 +577,10 @@ public abstract class ChargingSbb implements Sbb {
                                     sms.setStoringAfterFailure(true);
                                     this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                                 } catch (Exception e) {
-                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): "
-                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+                                    throw new SmscProcessingException(
+                                            "Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+                                            SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+                                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
                                 }
                             } else {
                                 sms.setStored(true);
@@ -635,8 +638,9 @@ public abstract class ChargingSbb implements Sbb {
             }
             
 		} catch (PersistenceException e) {
-			throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
-					SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
+            throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
+                    SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
 		}
 	}
 
@@ -685,9 +689,10 @@ public abstract class ChargingSbb implements Sbb {
                     MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
                     smscPropertiesManagement.getCalculateMsgPartsLenCdr());
 		} catch (PersistenceException e) {
-			throw new SmscProcessingException(
-					"PersistenceException when storing into Archive rejected by OCS message : " + e.getMessage(),
-					SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
+            throw new SmscProcessingException(
+                    "PersistenceException when storing into Archive rejected by OCS message : " + e.getMessage(),
+                    SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
 		}
 	}
 
@@ -740,7 +745,8 @@ public abstract class ChargingSbb implements Sbb {
         } catch (PersistenceException e) {
             throw new SmscProcessingException(
                     "PersistenceException when storing into Archive rejected by MProc message : " + e.getMessage(),
-                    SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
+                    SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
         }
     }
 

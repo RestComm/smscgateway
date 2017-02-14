@@ -36,10 +36,10 @@ import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.PostArrivalProcessor;
 
 /**
-*
-* @author sergey vetyutnev
-*
-*/
+ *
+ * @author sergey vetyutnev
+ *
+ */
 public class PostArrivalProcessorImpl implements PostArrivalProcessor {
 
     private Logger logger;
@@ -50,6 +50,10 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     private boolean needDropMessage = false;
     private boolean needRejectMessage = false;
     private FastList<MProcNewMessage> postedMessages = new FastList<MProcNewMessage>();
+
+    private int itsMapErrorCode;
+    private int itsHttpErrorCode;
+    private int itsSmppErrorCode;
 
     public PostArrivalProcessorImpl(int defaultValidityPeriodHours, int maxValidityPeriodHours, Logger logger) {
         this.defaultValidityPeriodHours = defaultValidityPeriodHours;
@@ -64,6 +68,33 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
 
     public boolean isNeedRejectMessage() {
         return needRejectMessage;
+    }
+
+    /**
+     * Gets the MAP error code.
+     *
+     * @return the MAP error code
+     */
+    public int getMapErrorCode() {
+        return itsMapErrorCode;
+    }
+
+    /**
+     * Gets the HTTP error code.
+     *
+     * @return the HTTP error code
+     */
+    public int getHttpErrorCode() {
+        return itsHttpErrorCode;
+    }
+
+    /**
+     * Gets the SMPP error code.
+     *
+     * @return the SMPP error code
+     */
+    public int getSmppErrorCode() {
+        return itsSmppErrorCode;
     }
 
     public FastList<MProcNewMessage> getPostedMessages() {
@@ -92,6 +123,19 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
 
         actionAdded = true;
         needRejectMessage = true;
+    }
+
+    @Override
+    public void rejectMessage(final int anSmppErrorCode, final int aMapErrorCode, final int aHttpErrorCode)
+            throws MProcRuleException {
+        if (actionAdded) {
+            throw new MProcRuleException("Another action already added");
+        }
+        actionAdded = true;
+        needRejectMessage = true;
+        itsSmppErrorCode = anSmppErrorCode;
+        itsMapErrorCode = aMapErrorCode;
+        itsHttpErrorCode = aHttpErrorCode;
     }
 
     @Override
@@ -303,7 +347,8 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     public void updateRegisteredDelivery_DeliveryReceiptOnSuccessOrFailure(MProcMessage message) {
         MProcMessageImpl msg = (MProcMessageImpl) message;
         Sms sms = msg.getSmsContent();
-        sms.setRegisteredDelivery(MProcUtility.setRegisteredDelivery_DeliveryReceiptOnSuccessOrFailure(sms.getRegisteredDelivery()));
+        sms.setRegisteredDelivery(
+                MProcUtility.setRegisteredDelivery_DeliveryReceiptOnSuccessOrFailure(sms.getRegisteredDelivery()));
     }
 
     @Override
