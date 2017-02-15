@@ -16,7 +16,7 @@ Name
 	smsc httpuser add
 
 SYNOPSIS
-	smsc httpuser add <userName> password <password>
+	smsc httpuser add <userName> password <password> networkId <networkId>
 
 DESCRIPTION
 	This command is used to configure a new HTTP User account
@@ -29,6 +29,7 @@ PARAMETERS
 	Optional Parameters
 
 	password      - Password for accestting of HTTP connector.	
+	networkId     - Network ID assigned with this user account. 
 ----
 
 [[_httpuser_settings_add_gui]]
@@ -59,7 +60,7 @@ Name
 	smsc httpuser modify
 
 SYNOPSIS
-	smsc httpuser modify <userName> password <password>
+	smsc httpuser modify <userName> password <password> networkId <networkId>
 
 DESCRIPTION
 	This command is used to modify parameters of a HTTP User account.
@@ -71,6 +72,7 @@ PARAMETERS
 	Optional Parameters
 
 	password      - Password for accessing of HTTP connector.	
+	networkId     - Network ID assigned with this user account. 
 ----
 
 [[_httpuser_settings_modify_gui]]
