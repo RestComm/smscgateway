@@ -12,6 +12,7 @@
     <modules>
         <module>ratype</module>
         <module>ra</module>
-        <module>du</module>
+        <module>du-ratype</module>
+        <module>du-ra</module>
     </modules>
 </project>
