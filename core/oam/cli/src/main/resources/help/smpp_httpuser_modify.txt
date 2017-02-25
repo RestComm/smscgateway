@@ -2,7 +2,7 @@ Name
 	smsc httpuser modify
 
 SYNOPSIS
-	smsc httpuser modify <userName> password <password>
+	smsc httpuser modify <userName> password <password> networkId <networkId>
 
 DESCRIPTION
 	This command is used to modify parameters of a HTTP User account.
@@ -14,6 +14,9 @@ PARAMETERS
 	Optional Parameters
 
 	password      - Password for accessing of HTTP connector.	
+	networkId     - Network ID assigned with this user account.
+	                If the value is lower than 0 or not specified, the default
+	                networkId area is used (defined in HTTP Settings section).
 
 SEE ALSO
 	smsc httpuser add, smsc httpuser remove, smsc httpuser show 

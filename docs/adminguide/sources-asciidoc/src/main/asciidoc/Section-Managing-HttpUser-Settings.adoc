@@ -28,8 +28,10 @@ PARAMETERS
 
 	Optional Parameters
 
-	password      - Password for accestting of HTTP connector.	
-	networkId     - Network ID assigned with this user account. 
+	password      - Password for accessing of HTTP connector.	
+	networkId     - Network ID assigned with this user account.
+	                If the value is lower than 0 or not specified, the default
+	                networkId area is used (defined in HTTP Settings section).
 ----
 
 [[_httpuser_settings_add_gui]]
@@ -72,7 +74,9 @@ PARAMETERS
 	Optional Parameters
 
 	password      - Password for accessing of HTTP connector.	
-	networkId     - Network ID assigned with this user account. 
+	networkId     - Network ID assigned with this user account.
+	                If the value is lower than 0 or not specified, the default
+	                networkId area is used (defined in HTTP Settings section).
 ----
 
 [[_httpuser_settings_modify_gui]]
