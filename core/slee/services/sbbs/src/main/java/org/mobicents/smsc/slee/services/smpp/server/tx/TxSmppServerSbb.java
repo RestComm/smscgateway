@@ -1315,6 +1315,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     sms0.setShortMessageText(updatedReceiptText);
                 } else {
                     // we have not found a local message - marking as unrecognized receipt
+                    logger.warning("Remote delivery receipt - but no original message is found in local cache: clusterName="
+                            + clusterName + ", dlvMessageId=" + dlvMessageId + ", dlvTlvMessageId=" + dlvTlvMessageId
+                            + ", receipt=" + sms0.getShortMessageText() + ", drFormat=" + drFormat);
+
                     sms0.setReceiptLocalMessageId(-1L);
                 }
             }
