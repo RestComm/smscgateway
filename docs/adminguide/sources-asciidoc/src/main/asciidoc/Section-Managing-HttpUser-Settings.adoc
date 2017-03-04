@@ -8,7 +8,7 @@
 [[_httpuser_settings_add_cli]]
 === Using CLI
 
-You can configure a new HTTP user account by issuing the command `smsc httpuser add` with appropriate parameters as described below. If the optional parameter `networkid` is not specified, the default network area ID is used as configured in general HTTP Settings (<<_smsc_gateway_http_properties>>).
+You can configure a new HTTP user account by issuing the command `smsc httpuser add` with appropriate parameters as described below. If the optional parameter `networkid` is not specified, the default network area ID is used as configured in general HTTP Settings (<<_httpdefaultnetworkid>>).
 
 ----
 
@@ -54,7 +54,7 @@ PARAMETERS
 [[_httpuser_settings_modify_cli]]
 === Using CLI
 
-You can modify an existing HTTP user account by issuing the command `smsc httpuser modify` with appropriate parameters as described below. If the optional parameter `networkid` is not specified, the default network area ID is used as configured in general HTTP Settings (<<_smsc_gateway_http_properties>>).
+You can modify an existing HTTP user account by issuing the command `smsc httpuser modify` with appropriate parameters as described below. If the optional parameter `networkid` is not specified, the default network area ID is used as configured in general HTTP Settings (<<_httpdefaultnetworkid>>).
 
 ----
 
