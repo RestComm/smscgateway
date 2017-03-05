@@ -133,7 +133,7 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(smsEvent.getOriginatorSccpAddress())
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(smsEvent.getSmsSet().getSms(0).getMtServiceCenterAddress())
+                .append(smsEvent.getMtServiceCenterAddress())
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(smsEvent.getOrigNetworkId())
                 .append(CdrGenerator.CDR_SEPARATOR)

@@ -163,7 +163,9 @@ public class SmsSetCache {
 	}
 
     public SmsSet getProcessingSmsSet(String targetId) {
-        return lstSmsSetInProcessing.get(targetId);
+        synchronized (lstSmsSetInProcessing) {
+            return lstSmsSetInProcessing.get(targetId);
+        }
     }
 
     public SmsSet addProcessingSmsSet(String targetId, SmsSet smsSet, int processingSmsSetTimeout) {
@@ -206,7 +208,7 @@ public class SmsSetCache {
                 res += n.getValue().getSmsCountWithoutDelivered();
             }
             return res;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // this block is not synchronized. We will return 0 in any Exception
             return 0;
         }
@@ -216,18 +218,22 @@ public class SmsSetCache {
         if (this.lstSmsSetWithBigMessageCount.size() == 0)
             return null;
 
-        StringBuilder sb = new StringBuilder();
-        for (FastMap.Entry<String, SmsSet> n = this.lstSmsSetWithBigMessageCount.head(), end = this.lstSmsSetWithBigMessageCount
-                .tail(); (n = n.getNext()) != end && n != null;) {
-            SmsSet smsSet = n.getValue();
-            sb.append(smsSet.getTargetId());
-            sb.append(" - ");
-            sb.append(smsSet.getSmsCount());
-            sb.append(" - ");
-            sb.append(smsSet.getSmsCountWithoutDelivered());
-            sb.append("\n");
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (FastMap.Entry<String, SmsSet> n = this.lstSmsSetWithBigMessageCount.head(), end = this.lstSmsSetWithBigMessageCount
+                    .tail(); (n = n.getNext()) != end && n != null;) {
+                SmsSet smsSet = n.getValue();
+                sb.append(smsSet.getTargetId());
+                sb.append(" - ");
+                sb.append(smsSet.getSmsCount());
+                sb.append(" - ");
+                sb.append(smsSet.getSmsCountWithoutDelivered());
+                sb.append("\n");
+            }
+            return sb.toString();
+        } catch (Throwable e) {
+            return "Exception when getLstSmsSetWithBigMessageCountState() = " + e.getMessage();
         }
-        return sb.toString();
     }
 
     public void garbadeCollectProcessingSmsSet() {
