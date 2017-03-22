@@ -127,14 +127,14 @@ public abstract class DeliveryCommonSbb implements Sbb {
             if (dlvIsInited && !dlvIsEnded) {
                 targetId = this.getTargetId();
                 if (targetId == null) {
-                    this.logger.warning("targetId is null for DeliveryCommonSbb in dlvIsInited state:\n"
-                            + MessageUtil.stackTraceToString());
+                    this.logger.warning("targetId is null for DeliveryCommonSbb in dlvIsInited state: " + ", targetId"
+                            + this.getTargetId() + "\n" + MessageUtil.stackTraceToString());
                     return;
                 }
                 smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
                 if (smsSet == null) {
-                    this.logger.warning("smsSet is null for DeliveryCommonSbb in dlvIsInited state:\n"
-                            + MessageUtil.stackTraceToString());
+                    this.logger.warning("smsSet is null for DeliveryCommonSbb in dlvIsInited state: " + ", targetId"
+                            + this.getTargetId() + "\n" + MessageUtil.stackTraceToString());
                     return;
                 }
             }

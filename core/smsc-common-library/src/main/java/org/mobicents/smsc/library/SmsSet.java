@@ -570,6 +570,8 @@ public class SmsSet implements Serializable {
         sb.append(alertingSupported);
         sb.append(", markedSmsAsDelivered=");
         sb.append(markedSmsAsDelivered);
+        sb.append(", smsCount=");
+        sb.append(getSmsCount());
 
 		sb.append("]");
 
