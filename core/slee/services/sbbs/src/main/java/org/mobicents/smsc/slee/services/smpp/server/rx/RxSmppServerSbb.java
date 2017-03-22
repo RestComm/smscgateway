@@ -217,7 +217,12 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
 	public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
 		try {
-			SmsSet smsSet = getSmsSet();
+	        if (isDeliveringEnded()) {
+	            logger.info("RxSmppServerSbb.onPduRequestTimeout(): received PduRequestTimeout but delivery process is already ended, dropping of an event");
+	            return;
+	        }
+
+	        SmsSet smsSet = getSmsSet();
 			if (smsSet == null) {
                 logger.severe("RxSmppServerSbb.onPduRequestTimeout(): CMP smsSet is missed");
                 markDeliveringIsEnded(true);
@@ -239,6 +244,11 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
 			EventContext eventContext) {
 		try {
+            if (isDeliveringEnded()) {
+                logger.info("RxSmppServerSbb.onRecoverablePduException(): received RecoverablePduException but delivery process is already ended, dropping of an event");
+                return;
+            }
+
             SmsSet smsSet = getSmsSet();
 			if (smsSet == null) {
                 logger.severe("RxSmppServerSbb.onRecoverablePduException(): In onDeliverSmResp CMP smsSet is missed");
@@ -544,6 +554,11 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             if (logger.isFineEnabled()) {
                 this.logger.fine("SMPP Response received when DeliveringEnded state: status=" + event.getCommandStatus());
             }
+        }
+
+        if (isDeliveringEnded()) {
+            logger.info("RxSmppServerSbb.handleResponse(): received submit/deliver_sm_response but delivery process is already ended, dropping of a response");
+            return;
         }
 
         SmsSet smsSet = getSmsSet();
