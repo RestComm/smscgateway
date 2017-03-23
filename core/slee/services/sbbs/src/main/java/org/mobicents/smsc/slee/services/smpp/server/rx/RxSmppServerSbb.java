@@ -653,8 +653,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 errorAction = ErrorAction.temporaryFailure;
             logger.warning("RxSmppServerSbb.handleResponse(): error code response received: status=" + status + ", errorAction="
                     + errorAction + ", smsSet=" + smsSet);
-            this.onDeliveryError(smsSet, errorAction, ErrorCode.SC_SYSTEM_ERROR, "DeliverSm response has a bad status: "
-                    + status);
+            this.onDeliveryError(smsSet, errorAction, ErrorCode.SC_SYSTEM_ERROR, event.getName()
+                    + " has a bad status: " + status);
         }
     }
 
