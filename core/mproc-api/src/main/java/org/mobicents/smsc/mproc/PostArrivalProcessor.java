@@ -203,6 +203,8 @@ public interface PostArrivalProcessor {
 
     void updateRegisteredDelivery_DeliveryReceiptOnSuccess(MProcMessage message);
 
+    void removeTlvParameter(short tag);
+
     // new message posting section
     /**
      * Creating a new message template for filling and sending by postNewMessage() method
