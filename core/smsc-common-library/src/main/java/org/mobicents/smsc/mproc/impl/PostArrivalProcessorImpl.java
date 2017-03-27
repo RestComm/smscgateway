@@ -34,6 +34,7 @@ import org.mobicents.smsc.mproc.MProcNewMessage;
 import org.mobicents.smsc.mproc.MProcRuleException;
 import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.PostArrivalProcessor;
+import org.restcomm.smpp.parameter.TlvSet;
 
 /**
  *
@@ -363,6 +364,22 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
         MProcMessageImpl msg = (MProcMessageImpl) message;
         Sms sms = msg.getSmsContent();
         sms.setRegisteredDelivery(MProcUtility.setRegisteredDelivery_DeliveryReceiptOnSuccess(sms.getRegisteredDelivery()));
+    }
+
+    @Override
+    public void removeTlvParameter(short tag) {
+        for (FastList.Node<MProcNewMessage> n = postedMessages.head(), end = postedMessages.tail(); (n = n.getNext()) != end;) {
+            MProcMessageImpl msg = (MProcMessageImpl) n.getValue();
+
+            Sms sms = msg.getSmsContent();
+            if (sms != null) {
+                TlvSet ts = sms.getTlvSet();
+                //NB: null check unecessary but we will leave it
+                if (ts!=null && ts.hasOptionalParameter(tag)) {
+                    ts.removeOptionalParameter(tag);
+                }
+            }
+        }
     }
 
     @Override

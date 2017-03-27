@@ -35,6 +35,7 @@ import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.ProcessingType;
+import org.restcomm.smpp.parameter.TlvSet;
 
 /**
 *
@@ -177,6 +178,11 @@ public class MProcMessageImpl implements MProcMessage {
             }
         }
         return null;
+    }
+
+    @Override
+    public TlvSet getTlvSet() {
+        return sms.getTlvSet();
     }
 
     @Override
