@@ -22,6 +22,7 @@
 
 package org.mobicents.smsc.mproc;
 
+import org.restcomm.smpp.parameter.TlvSet;
 import java.util.Date;
 
 /**
@@ -80,6 +81,8 @@ public interface MProcMessage {
     String getImsiDigits();
 
     String getNnnDigits();
+
+    TlvSet getTlvSet();
 
     /**
      * @return Procedure that has given an error / success

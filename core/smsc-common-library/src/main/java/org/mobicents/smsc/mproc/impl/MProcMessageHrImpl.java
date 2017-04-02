@@ -29,6 +29,7 @@ import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.MProcMessage;
 import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.ProcessingType;
+import org.restcomm.smpp.parameter.TlvSet;
 
 /**
 *
@@ -90,6 +91,11 @@ public class MProcMessageHrImpl implements MProcMessage {
     @Override
     public String getImsiDigits() {
         return correlationIdValue.getImsi();
+    }
+
+    @Override
+    public TlvSet getTlvSet() {
+        return null;
     }
 
     @Override
