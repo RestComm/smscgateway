@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.slee.ActivityContextInterface;
+import javax.slee.Address;
 import javax.slee.EventContext;
 import javax.slee.NotAttachedException;
 import javax.slee.SLEEException;
@@ -58,6 +59,7 @@ import javax.slee.serviceactivity.ServiceActivityFactory;
 
 import org.jboss.netty.channel.Channel;
 import org.mobicents.protocols.ss7.map.MAPSmsTpduParameterFactoryImpl;
+import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.slee.SbbLocalObjectExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
@@ -72,6 +74,7 @@ import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
+import org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
@@ -97,6 +100,7 @@ import com.cloudhopper.smpp.pdu.BaseBindResp;
 import com.cloudhopper.smpp.pdu.DeliverSmResp;
 import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;
+import com.cloudhopper.smpp.pdu.SubmitSmResp;
 import com.cloudhopper.smpp.tlv.Tlv;
 import com.cloudhopper.smpp.type.RecoverablePduException;
 import com.cloudhopper.smpp.type.SmppChannelException;
@@ -571,6 +575,37 @@ public class RxSmppServerSbbTest {
 
         @Override
         public void setDeliveryTimerID(TimerID val) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void fireSubmitSmRespChild(SubmitSmResp event, ActivityContextInterface activity, javax.slee.Address address) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void fireDeliverSmRespChild(DeliverSmResp event, ActivityContextInterface activity, Address address) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ChildRelationExt getRxSmppServerChildSbb() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void firePduRequestTimeoutChild(PduRequestTimeout2 event, ActivityContextInterface aci, Address address) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void fireRecoverablePduExceptionChild(RecoverablePduException event, ActivityContextInterface aci,
+                Address address) {
             // TODO Auto-generated method stub
             
         }

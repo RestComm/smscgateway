@@ -2,12 +2,20 @@
 <!DOCTYPE sbb-jar PUBLIC "-//Sun Microsystems, Inc.//DTD JAIN SLEE SBB 1.1//EN"
                          "http://java.sun.com/dtd/slee-sbb-jar_1_1.dtd">
 <sbb-jar>
+
 	<sbb id="rxSmppServerSbb">
 		<description>SBB listening for SMS from Mo or Mt and routing to ESME</description>
 		<sbb-name>RxSmppServerSbb</sbb-name>
 		<sbb-vendor>org.mobicents</sbb-vendor>
 		<sbb-version>1.0</sbb-version>
 		<sbb-alias>RxSmppServerSbb</sbb-alias>
+
+		<sbb-ref>
+			<sbb-name>RxSmppServerChildSbb</sbb-name>
+			<sbb-vendor>org.mobicents</sbb-vendor>
+			<sbb-version>1.0</sbb-version>
+			<sbb-alias>RxSmppServerChildSbb</sbb-alias>
+		</sbb-ref>
 
 		<sbb-classes>
 			<sbb-abstract-class>
@@ -19,6 +27,16 @@
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>deliveryTimerID</cmp-field-name></cmp-field>
+
+				<get-child-relation-method>
+					<sbb-alias-ref>
+						RxSmppServerChildSbb
+					</sbb-alias-ref>
+					<get-child-relation-method-name>
+						getRxSmppServerChildSbb
+					</get-child-relation-method-name>
+					<default-priority>0</default-priority>
+				</get-child-relation-method>
 			</sbb-abstract-class>
 		</sbb-classes>
 
@@ -31,11 +49,29 @@
 			</event-type-ref>
 			<initial-event-select variable="ActivityContext" />
 		</event>
-		
+
 		<event event-direction="Receive" initial-event="False">
 			<event-name>DeliverSmResp</event-name>
 			<event-type-ref>
 				<event-type-name>org.restcomm.slee.resource.smpp.DELIVER_SM_RESP</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>DeliverSmRespParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.DELIVER_SM_RESP_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Fire" initial-event="False">
+			<event-name>DeliverSmRespChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.DELIVER_SM_RESP_CHILD</event-type-name>
 				<event-type-vendor>org.restcomm</event-type-vendor>
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
@@ -51,6 +87,24 @@
 		</event>				
 
 		<event event-direction="Receive" initial-event="False">
+			<event-name>SubmitSmRespParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SUBMIT_SM_RESP_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>				
+
+		<event event-direction="Fire" initial-event="False">
+			<event-name>SubmitSmRespChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SUBMIT_SM_RESP_CHILD</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>				
+
+		<event event-direction="Receive" initial-event="False">
 			<event-name>PduRequestTimeout</event-name>
 			<event-type-ref>
 				<event-type-name>org.restcomm.slee.resource.smpp.REQUEST_TIMEOUT</event-type-name>
@@ -60,9 +114,45 @@
 		</event>
 
 		<event event-direction="Receive" initial-event="False">
+			<event-name>PduRequestTimeoutParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.REQUEST_TIMEOUT_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Fire" initial-event="False">
+			<event-name>PduRequestTimeoutChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.REQUEST_TIMEOUT_CHILD</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
 			<event-name>RecoverablePduException</event-name>
 			<event-type-ref>
 				<event-type-name>org.restcomm.slee.resource.smpp.RECOVERABLE_PDU_EXCEPTION</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>RecoverablePduExceptionParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.RECOVERABLE_PDU_EXCEPTION_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Fire" initial-event="False">
+			<event-name>RecoverablePduExceptionChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.RECOVERABLE_PDU_EXCEPTION_CHILD</event-type-name>
 				<event-type-vendor>org.restcomm</event-type-vendor>
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
@@ -96,6 +186,158 @@
 			</event-type-ref>
 		</event>
 
+
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>MAPResourceAdaptorType</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>2.0</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			<activity-context-interface-factory-name>slee/resources/map/2.0/acifactory</activity-context-interface-factory-name>
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>slee/resources/map/2.0/provider</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>MAPRA</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>SMPPServerResourceAdaptorType</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>org.restcomm</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			<activity-context-interface-factory-name>slee/resources/smppp/server/1.0/acifactory</activity-context-interface-factory-name>
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>slee/resources/smpp/server/1.0/provider</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>SmppServerRA</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>PersistenceResourceAdaptorType</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+			
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>slee/resources/persistence/1.0/provider</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>PersistenceResourceAdaptor</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>		
+		<resource-adaptor-type-binding>
+			<resource-adaptor-type-ref>
+				<resource-adaptor-type-name>SchedulerResourceAdaptorType</resource-adaptor-type-name>
+				<resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+				<resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+			</resource-adaptor-type-ref>
+
+			<resource-adaptor-entity-binding>
+				<resource-adaptor-object-name>slee/resources/scheduler/1.0/provider</resource-adaptor-object-name>
+				<resource-adaptor-entity-link>SchedulerResourceAdaptor</resource-adaptor-entity-link>
+			</resource-adaptor-entity-binding>
+		</resource-adaptor-type-binding>		
+        <resource-adaptor-type-binding>
+            <resource-adaptor-type-ref>
+                <resource-adaptor-type-name>MProcResourceAdaptorType</resource-adaptor-type-name>
+                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
+            </resource-adaptor-type-ref>
+            <resource-adaptor-entity-binding>
+                <resource-adaptor-object-name>slee/resources/mproc/1.0/provider</resource-adaptor-object-name>
+                <resource-adaptor-entity-link>MProcResourceAdaptor</resource-adaptor-entity-link>
+            </resource-adaptor-entity-binding>
+        </resource-adaptor-type-binding>
+	</sbb>
+
+	<sbb id="rxSmppServerChildSbb">
+		<description>Child SBB for rxSmppServerSbb</description>
+		<sbb-name>RxSmppServerChildSbb</sbb-name>
+		<sbb-vendor>org.mobicents</sbb-vendor>
+		<sbb-version>1.0</sbb-version>
+		<sbb-alias>RxSmppServerChildSbb</sbb-alias>
+
+		<sbb-classes>
+			<sbb-abstract-class>
+				<sbb-abstract-class-name>org.mobicents.smsc.slee.services.smpp.server.rx.RxSmppServerChildSbb</sbb-abstract-class-name>
+			</sbb-abstract-class>
+
+			<sbb-local-interface>
+				<sbb-local-interface-name>
+					org.mobicents.smsc.slee.services.smpp.server.rx.RxSmppServerChildLocalObject
+				</sbb-local-interface-name>
+			</sbb-local-interface>
+		</sbb-classes>
+
+		<event event-direction="Receive" initial-event="True">
+			<event-name>DeliverSmRespChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.DELIVER_SM_RESP_CHILD</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>				
+		<event event-direction="Fire" initial-event="True">
+			<event-name>DeliverSmRespParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.DELIVER_SM_RESP_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>				
+		<event event-direction="Receive" initial-event="True">
+			<event-name>SubmitSmRespChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SUBMIT_SM_RESP_CHILD</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>				
+		<event event-direction="Fire" initial-event="True">
+			<event-name>SubmitSmRespParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SUBMIT_SM_RESP_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>				
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>PduRequestTimeoutChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.REQUEST_TIMEOUT_CHILD</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>
+		<event event-direction="Fire" initial-event="False">
+			<event-name>PduRequestTimeoutParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.REQUEST_TIMEOUT_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+		<event event-direction="Receive" initial-event="False">
+			<event-name>RecoverablePduExceptionChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.RECOVERABLE_PDU_EXCEPTION_CHILD</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>
+		<event event-direction="Fire" initial-event="False">
+			<event-name>RecoverablePduExceptionParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.RECOVERABLE_PDU_EXCEPTION_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
 
 		<resource-adaptor-type-binding>
 			<resource-adaptor-type-ref>

@@ -60,6 +60,24 @@ DESCRIPTION
 ----
 
 Name
+	smpp smppserver set writetimeout
+
+SYNOPSIS
+	smpp smppserver set writetimeout <bind-timeout>
+
+DESCRIPTION
+	This command is used to set a value for write-timeout in milli-seconds.
+	This parameter sets a timeout which occurs when we can not properly sent
+	a message into TCP channel.
+
+	If unspecified, the default value is 0 (no timeout).
+
+	You must restart the SMPP Server for the new value to take effect.
+----
+
+----
+
+Name
 	smpp smppserver set systemid
 
 SYNOPSIS

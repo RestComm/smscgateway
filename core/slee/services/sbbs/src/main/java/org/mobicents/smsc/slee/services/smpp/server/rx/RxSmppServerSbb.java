@@ -50,6 +50,7 @@ import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetEncoder;
 import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetEncodingData;
 import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorAction;
@@ -61,6 +62,7 @@ import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.ProcessingType;
+import org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2;
 import org.mobicents.smsc.slee.services.deliverysbb.ConfirmMessageInSendingPool;
 import org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
@@ -187,22 +189,30 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     // *********
     // SMPP events
 
-	public void onSubmitSmResp(SubmitSmResp event, ActivityContextInterface aci, EventContext eventContext){
-		try {
-			if (logger.isFineEnabled()) {
-				logger.fine(String.format("onSubmitSmResp : SubmitSmResp=%s", event));
-			}
+    public void onSubmitSmRespParent(SubmitSmResp event, ActivityContextInterface aci, EventContext eventContext) {       
+        // !!!!-
+//        logger.warning("onSubmitSmRespParent : aci=" + aci + ", activity=" + aci.getActivity());
+        // !!!!-
 
-			this.handleResponse(event);
-		} catch (Throwable e1) {
-			logger.severe("Exception in RxSmppServerSbb.onDeliverSmResp() when fetching records and issuing events: "
-					+ e1.getMessage(), e1);
+        try {
+            if (logger.isFineEnabled()) {
+                logger.fine(String.format("onSubmitSmResp : SubmitSmResp=%s", event));
+            }
+
+            this.handleResponse(event);
+        } catch (Throwable e1) {
+            logger.severe("Exception in RxSmppServerSbb.onDeliverSmResp() when fetching records and issuing events: "
+                    + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
-		}
-	}
+        }
+    }
 
-	public void onDeliverSmResp(DeliverSmResp event, ActivityContextInterface aci, EventContext eventContext) {
-		try {
+    public void onDeliverSmRespParent(DeliverSmResp event, ActivityContextInterface aci, EventContext eventContext) {
+        // !!!!-
+//        logger.warning("onDeliverSmRespParent : aci=" + aci + ", activity" + aci.getActivity());
+        // !!!!-
+
+        try {
 			if (logger.isFineEnabled()) {
 				logger.fine(String.format("\nonDeliverSmResp : DeliverSmResp=%s", event));
 			}
@@ -215,7 +225,11 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 		}
 	}
 
-	public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
+	public void onPduRequestTimeoutParent(PduRequestTimeout2 event, ActivityContextInterface aci, EventContext eventContext) {
+        // !!!!-
+//        logger.warning("onPduRequestTimeoutParent : aci=" + aci + ", activity" + aci.getActivity());
+        // !!!!-
+
 		try {
 	        if (isDeliveringEnded()) {
 	            logger.info("RxSmppServerSbb.onPduRequestTimeout(): received PduRequestTimeout but delivery process is already ended, dropping of an event");
@@ -241,32 +255,125 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 		}
 	}
 
-    public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
-			EventContext eventContext) {
-		try {
+    public void onRecoverablePduExceptionParent(RecoverablePduException event, ActivityContextInterface aci,
+            EventContext eventContext) {
+        // !!!!-
+//        logger.warning("onRecoverablePduExceptionParent : aci=" + aci + ", activity" + aci.getActivity());
+        // !!!!-
+
+        try {
             if (isDeliveringEnded()) {
                 logger.info("RxSmppServerSbb.onRecoverablePduException(): received RecoverablePduException but delivery process is already ended, dropping of an event");
                 return;
             }
 
             SmsSet smsSet = getSmsSet();
-			if (smsSet == null) {
+            if (smsSet == null) {
                 logger.severe("RxSmppServerSbb.onRecoverablePduException(): In onDeliverSmResp CMP smsSet is missed");
                 markDeliveringIsEnded(true);
                 return;
-			}
+            }
 
             logger.severe(String.format("\nonRecoverablePduException : targetId=" + smsSet.getTargetId()
                     + ", RecoverablePduException=" + event));
 
             this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, "RecoverablePduException: ");
-		} catch (Throwable e1) {
-			logger.severe(
-					"Exception in RxSmppServerSbb.onRecoverablePduException() when fetching records and issuing events: "
-							+ e1.getMessage(), e1);
+        } catch (Throwable e1) {
+            logger.severe(
+                    "Exception in RxSmppServerSbb.onRecoverablePduException() when fetching records and issuing events: "
+                            + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
-		}
-	}
+        }
+    }
+
+    public void onDeliverSmResp(DeliverSmResp event, ActivityContextInterface aci, EventContext eventContext) {
+        if (logger.isFineEnabled())
+            logger.warning("onDeliverSmResp - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
+
+        RxSmppServerChildLocalObject rxSmppServerSbbLocalObject = this.getRxSmppServerChildSbbObject();
+
+        if (rxSmppServerSbbLocalObject != null) {
+            ActivityContextInterface act = getSchedulerActivityContextInterface();
+            if (act != null) {
+                act.attach(rxSmppServerSbbLocalObject);
+                fireDeliverSmRespChild(event, act, null);
+            }
+        }
+    }
+
+    public void onSubmitSmResp(SubmitSmResp event, ActivityContextInterface aci, EventContext eventContext) {
+        if (logger.isFineEnabled())
+            logger.warning("onSubmitSmResp - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
+
+        RxSmppServerChildLocalObject rxSmppServerSbbLocalObject = this.getRxSmppServerChildSbbObject();
+
+        if (rxSmppServerSbbLocalObject != null) {
+            ActivityContextInterface act = getSchedulerActivityContextInterface();
+            if (act != null) {
+                act.attach(rxSmppServerSbbLocalObject);
+                fireSubmitSmRespChild(event, act, null);
+            }
+        }
+    }
+
+    public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
+        if (logger.isFineEnabled())
+            logger.warning("onPduRequestTimeout - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
+
+        RxSmppServerChildLocalObject rxSmppServerSbbLocalObject = this.getRxSmppServerChildSbbObject();
+
+        if (rxSmppServerSbbLocalObject != null) {
+            ActivityContextInterface act = getSchedulerActivityContextInterface();
+            if (act != null) {
+                act.attach(rxSmppServerSbbLocalObject);
+                PduRequestTimeout2 event2 = new PduRequestTimeout2(event.getPduRequest(), event.getSystemId());
+                firePduRequestTimeoutChild(event2, act, null);
+            }
+        }
+    }
+
+    public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
+            EventContext eventContext) {
+        if (logger.isFineEnabled())
+            logger.warning("onRecoverablePduException - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
+
+        RxSmppServerChildLocalObject rxSmppServerSbbLocalObject = this.getRxSmppServerChildSbbObject();
+
+        if (rxSmppServerSbbLocalObject != null) {
+            ActivityContextInterface act = getSchedulerActivityContextInterface();
+            if (act != null) {
+                act.attach(rxSmppServerSbbLocalObject);
+                fireRecoverablePduExceptionChild(event, act, null);
+            }
+        }
+    }
+
+    public abstract void fireDeliverSmRespChild(DeliverSmResp event, ActivityContextInterface activity,
+            javax.slee.Address address);
+
+    public abstract void fireSubmitSmRespChild(SubmitSmResp event, ActivityContextInterface activity, javax.slee.Address address);
+
+    public abstract void firePduRequestTimeoutChild(PduRequestTimeout2 event, ActivityContextInterface aci, javax.slee.Address address);
+
+    public abstract void fireRecoverablePduExceptionChild(RecoverablePduException event, ActivityContextInterface aci, javax.slee.Address address);
+
+    public abstract ChildRelationExt getRxSmppServerChildSbb();
+
+    private RxSmppServerChildLocalObject getRxSmppServerChildSbbObject() {
+        ChildRelationExt relation = getRxSmppServerChildSbb();
+
+        RxSmppServerChildLocalObject ret = (RxSmppServerChildLocalObject) relation.get(ChildRelationExt.DEFAULT_CHILD_NAME);
+        if (ret == null) {
+            try {
+                ret = (RxSmppServerChildLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
+            } catch (Exception e) {
+                if (this.logger.isSevereEnabled()) {
+                    this.logger.severe("Exception while trying to creat RxSmppServerSbb child", e);
+                }
+            }
+        }
+        return ret;
+    }
 
     // *********
     // Main service methods
@@ -336,7 +443,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         // we need to split a message for segments
                         lstStrings.clear();
                         lstUdhs.clear();
-                        int messageReferenceNumber = this.getNextMessageReferenceNumber();
+                        int messageReferenceNumber = getNextMessageReferenceNumber();
                         esmClass |= SmppConstants.ESM_CLASS_UDHI_MASK;
                         int messageSegmentCount = segmentsStrings.length;
 

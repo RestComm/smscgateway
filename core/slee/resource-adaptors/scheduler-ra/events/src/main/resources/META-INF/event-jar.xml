@@ -52,4 +52,61 @@
 		<event-class-name>javax.slee.facilities.TimerEvent</event-class-name>
 	</event-definition>
 -->
+
+	<event-definition>	
+		<description>Resending of SUBMIT_SM_RESP</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.SUBMIT_SM_RESP_CHILD</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>com.cloudhopper.smpp.pdu.SubmitSmResp</event-class-name>
+	</event-definition>
+	<event-definition>	
+		<description>Resending of SUBMIT_SM_RESP</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.SUBMIT_SM_RESP_PARENT</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>com.cloudhopper.smpp.pdu.SubmitSmResp</event-class-name>
+	</event-definition>
+	<event-definition>	
+		<description>Resending of DELIVER_SM_RESP</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.DELIVER_SM_RESP_CHILD</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>com.cloudhopper.smpp.pdu.DeliverSmResp</event-class-name>
+	</event-definition>
+	<event-definition>	
+		<description>Resending of DELIVER_SM_RESP</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.DELIVER_SM_RESP_PARENT</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>com.cloudhopper.smpp.pdu.DeliverSmResp</event-class-name>
+	</event-definition>
+	<event-definition>	
+		<description>Resending of REQUEST_TIMEOUT</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.REQUEST_TIMEOUT_CHILD</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2</event-class-name>
+	</event-definition>
+	<event-definition>	
+		<description>Resending of REQUEST_TIMEOUT</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.REQUEST_TIMEOUT_PARENT</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2</event-class-name>
+	</event-definition>
+	<event-definition>	
+		<description>Resending of RECOVERABLE_PDU_EXCEPTION</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.RECOVERABLE_PDU_EXCEPTION_CHILD</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>com.cloudhopper.smpp.type.RecoverablePduException</event-class-name>
+	</event-definition>
+	<event-definition>	
+		<description>Resending of RECOVERABLE_PDU_EXCEPTION</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.RECOVERABLE_PDU_EXCEPTION_PARENT</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>com.cloudhopper.smpp.type.RecoverablePduException</event-class-name>
+	</event-definition>
 </event-jar>
