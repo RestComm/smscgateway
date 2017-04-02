@@ -794,23 +794,23 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             return false;
 
         //check tlv here
-        if( (this.tlvTagToMatch != -1 && tlvValueToMatch.length!=0)) {
-            TlvSet tlvSet = message.getTlvSet();
-            if(tlvSet.hasOptionalParameter(this.tlvTagToMatch))
-            {
-                Tlv tlv = tlvSet.getOptionalParameter(this.tlvTagToMatch);
-                try {
-                    if(!Arrays.equals(tlv.getValue(), this.tlvValueToMatch)){
-                        return false;
-                    }
-                    //TODO: logger
-                } catch (Exception e) {
-                    return false;
-                }
-
-            }
-            return false;
-        }
+//        if( (this.tlvTagToMatch != -1 && tlvValueToMatch.length!=0)) {
+//            TlvSet tlvSet = message.getTlvSet();
+//            if(tlvSet.hasOptionalParameter(this.tlvTagToMatch))
+//            {
+//                Tlv tlv = tlvSet.getOptionalParameter(this.tlvTagToMatch);
+//                try {
+//                    if(!Arrays.equals(tlv.getValue(), this.tlvValueToMatch)){
+//                        return false;
+//                    }
+//                    //TODO: logger
+//                } catch (Exception e) {
+//                    return false;
+//                }
+//
+//            }
+//            return false;
+//        }
 
         return true;
     }
@@ -940,7 +940,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         }
 
         if (this.tlvTagToRemove != -1) {
-            factory.removeTlvParameter(this.tlvTagToRemove);
+            factory.removeTlvParameter(message, this.tlvTagToRemove);
         }
     }
 
@@ -1480,12 +1480,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (newNetworkIdAfterTempFail != -1) {
             writeParameter(sb, parNumber++, "newNetworkIdAfterTempFail", newNetworkIdAfterTempFail, ", ", "=");
         }
-        if (this.tlvTagToMatch != -1 && tlvValueToMatch.length!=0) {
-            writeParameter(sb, parNumber++, "tlvTagToMatch", this.tlvTagToMatch, ", ", "=");
-        }
-        if (tlvTagToMatch != -1) {
-            writeParameter(sb, parNumber++, "tlvTagToRemove", this.tlvTagToRemove, ", ", "=");
-        }
+//        if (this.tlvTagToMatch != -1 && tlvValueToMatch.length!=0) {
+//            writeParameter(sb, parNumber++, "tlvTagToMatch", this.tlvTagToMatch, ", ", "=");
+//        }
+//        if (tlvTagToMatch != -1) {
+//            writeParameter(sb, parNumber++, "tlvTagToRemove", this.tlvTagToRemove, ", ", "=");
+//        }
         return sb.toString();
     }
 
@@ -1549,9 +1549,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.newNetworkIdAfterTempFail = xml.getAttribute(NEW_NETWORK_ID_AFTER_TEMP_FAIL, -1);
 
             //FIXME:bad cast?
-            mProcRule.tlvTagToMatch = xml.getAttribute(TLV_TAG_TO_MATCH, (short)-1);
-            mProcRule.tlvValueToMatch = xml.getAttribute(TLV_VALUE_TO_MATCH, new byte[]{});
-            mProcRule.tlvTagToRemove = xml.getAttribute(TLV_TAG_TO_REMOVE , (short)-1);
+//            mProcRule.tlvTagToMatch = xml.getAttribute(TLV_TAG_TO_MATCH, (short)-1);
+//            mProcRule.tlvValueToMatch = xml.getAttribute(TLV_VALUE_TO_MATCH, new byte[]{});
+//            mProcRule.tlvTagToRemove = xml.getAttribute(TLV_TAG_TO_REMOVE , (short)-1);
 
             mProcRule.resetPattern();
         }
@@ -1641,12 +1641,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             if (mProcRule.newNetworkIdAfterTempFail != -1)
                 xml.setAttribute(NEW_NETWORK_ID_AFTER_TEMP_FAIL, mProcRule.newNetworkIdAfterTempFail);
 
-            if (mProcRule.tlvTagToMatch != -1)
-                xml.setAttribute(TLV_TAG_TO_MATCH, mProcRule.tlvTagToMatch);
-            if (mProcRule.tlvValueToMatch.length!=0)
-                xml.setAttribute(TLV_VALUE_TO_MATCH, mProcRule.tlvValueToMatch);
-            if (mProcRule.tlvTagToRemove != -1)
-                xml.setAttribute(TLV_TAG_TO_REMOVE, mProcRule.tlvTagToRemove);
+//            if (mProcRule.tlvTagToMatch != -1)
+//                xml.setAttribute(TLV_TAG_TO_MATCH, mProcRule.tlvTagToMatch);
+//            if (mProcRule.tlvValueToMatch.length!=0)
+//                xml.setAttribute(TLV_VALUE_TO_MATCH, mProcRule.tlvValueToMatch);
+//            if (mProcRule.tlvTagToRemove != -1)
+//                xml.setAttribute(TLV_TAG_TO_REMOVE, mProcRule.tlvTagToRemove);
         }
     };
 

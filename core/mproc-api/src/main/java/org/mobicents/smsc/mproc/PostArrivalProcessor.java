@@ -203,7 +203,7 @@ public interface PostArrivalProcessor {
 
     void updateRegisteredDelivery_DeliveryReceiptOnSuccess(MProcMessage message);
 
-    void removeTlvParameter(short tag);
+    void removeTlvParameter(MProcMessage message, short tag);
 
     // new message posting section
     /**

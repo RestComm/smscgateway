@@ -367,19 +367,12 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     }
 
     @Override
-    public void removeTlvParameter(short tag) {
-        for (FastList.Node<MProcNewMessage> n = postedMessages.head(), end = postedMessages.tail(); (n = n.getNext()) != end;) {
-            MProcMessageImpl msg = (MProcMessageImpl) n.getValue();
+    public void removeTlvParameter(MProcMessage message, short tag) {
+        MProcMessageImpl msg = (MProcMessageImpl) message;
+        Sms sms = msg.getSmsContent();
 
-            Sms sms = msg.getSmsContent();
-            if (sms != null) {
-                TlvSet ts = sms.getTlvSet();
-                //NB: null check unecessary but we will leave it
-                if (ts!=null && ts.hasOptionalParameter(tag)) {
-                    ts.removeOptionalParameter(tag);
-                }
-            }
-        }
+        TlvSet ts = sms.getTlvSet();
+        ts.removeOptionalParameter(tag);
     }
 
     @Override
