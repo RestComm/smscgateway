@@ -78,6 +78,7 @@
 		<module>test/smpp-simulator</module>
 		 -->
 		<module>test/smpp-load</module>
+                <module>test/http-load</module>
 		<module>tools</module>
 		<module>management/ui-management</module>
 	</modules>
