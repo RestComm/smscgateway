@@ -51,7 +51,7 @@
 	<property name="restcomm-smpp-ra.version" value="7.0" />
 
 	<!-- Cassandra community version -->
-	<property name="community-cassandra.version" value="3.9" /> <!-- 2.2.6 -->
+	<property name="community-cassandra.version" value="3.10" /> <!-- 2.2.6 -->
 
 
 	<!-- JainSlee SIP RA DU - we do not use it now - getting from SLEE binaries -->
@@ -98,7 +98,7 @@
 	<property name="checkout.community-cassandra.dir" value="${cassandra.dir}/apache-${community-cassandra.version}" />
 	<property name="community-cassandra.download.distro.file" value="apache-cassandra-${community-cassandra.version}-bin.tar.gz" />
 	<property name="community-cassandra.untar.distro.file" value="apache-cassandra-${community-cassandra.version}-bin.tar" />
-	<property name="community-cassandra.download.url" value="http://mirror.cc.columbia.edu/pub/software/apache/cassandra/${community-cassandra.version}/${community-cassandra.download.distro.file}" />
+	<property name="community-cassandra.download.url" value="http://www-eu.apache.org/dist/cassandra/${community-cassandra.version}/${community-cassandra.download.distro.file}" />
 	<property name="community-cassandra.distro.zip.path" value="${checkout.dir}/${community-cassandra.download.distro.file}" />
 	<property name="community-cassandra.distro.untar.path" value="${checkout.dir}/${community-cassandra.untar.distro.file}" />
 
