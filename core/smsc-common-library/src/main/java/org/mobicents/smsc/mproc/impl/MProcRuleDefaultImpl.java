@@ -22,7 +22,6 @@
 
 package org.mobicents.smsc.mproc.impl;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +45,6 @@ import org.mobicents.smsc.mproc.PostPreDeliveryProcessor;
 import org.mobicents.smsc.mproc.ProcessingType;
 import org.restcomm.smpp.parameter.TlvSet;
 
-import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.tlv.Tlv;
 
 /**
@@ -55,7 +53,6 @@ import com.cloudhopper.smpp.tlv.Tlv;
 *
 */
 public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRuleDefault {
-
     private static final String DEST_TON_MASK = "destTonMask";
     private static final String DEST_NPI_MASK = "destNpiMask";
     private static final String DEST_DIG_MASK = "destDigMask";
@@ -72,6 +69,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String NNN_DIGITS_MASK = "nnnDigitsMask";
     private static final String PROCESSING_TYPE = "processingType";
     private static final String ERROR_CODE = "errorCode";
+    private static final String TLV_TAG_TO_MATCH = "tlvTagToMatch";
+    private static final String TLV_VALUE_TYPE_TO_MATCH = "tlvValueTypeToMatch";
+    private static final String TLV_VALUE_TO_MATCH = "tlvValueToMatch";
 
     private static final String NEW_NETWORK_ID = "newNetworkId";
     private static final String NEW_DEST_TON = "newDestTon";
@@ -88,8 +88,6 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String NEW_NETWORK_ID_AFTER_PERM_FAIL = "newNetworkIdAfterPermFail";
     private static final String NEW_NETWORK_ID_AFTER_TEMP_FAIL = "newNetworkIdAfterTempFail";
     private static final String HR_BY_PASS = "hrByPass";
-    private static final String TLV_TAG_TO_MATCH = "tlvTagToMatch";
-    private static final String TLV_VALUE_TO_MATCH = "tlvValueToMatch";
     private static final String TLV_TAG_TO_REMOVE = "tlvTagToRemove";
 
     // TODO: we need proper implementing
@@ -122,6 +120,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private String nnnDigitsMask = "-1";
     private ProcessingType processingType = null;
     private String errorCode = "-1";
+    short tlvTagToMatch = -1;
+    TlvValueType tlvValueTypeToMatch = TlvValueType.STRING;
+    String tlvValueToMatch = "";
 
     private int newNetworkId = -1;
     private int newDestTon = -1;
@@ -138,8 +139,6 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private int newNetworkIdAfterPermFail = -1;
     private int newNetworkIdAfterTempFail = -1;
     private boolean hrByPass = false;
-    private short tlvTagToMatch = -1;
-    private byte[] tlvValueToMatch = new byte[]{};
     private short tlvTagToRemove = -1;
 
     private Pattern destDigMaskPattern;
@@ -367,6 +366,50 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.resetPattern();
     }
 
+    /**
+     * @Value
+     */
+    @Override
+    public short getTlvTagToMatch() {
+        return tlvTagToMatch;
+    }
+
+    @Override
+    public void setTlvTagToMatch(short tlvTagToMatch) {
+        this.tlvTagToMatch = tlvTagToMatch;
+
+        this.resetPattern();
+    }
+
+    /**
+     * @Value
+     */
+    @Override
+    public TlvValueType getTlvValueTypeToMatch() {
+        return tlvValueTypeToMatch;
+    }
+
+    @Override
+    public void setTlvValueTypeToMatch(TlvValueType tlvValueTypeToMatch) {
+        this.tlvValueTypeToMatch = tlvValueTypeToMatch;
+
+        this.resetPattern();
+    }
+
+    /**
+     * @Value
+     */
+    @Override
+    public String getTlvValueToMatch() {
+        return tlvValueToMatch;
+    }
+
+    @Override
+    public void setTlvValueToMatch(String tlvValueToMatch) {
+        this.tlvValueToMatch = tlvValueToMatch;
+
+        this.resetPattern();
+    }
 
     /**
      * @return if !=-1: the new networkId will be assigned to a message
@@ -523,6 +566,19 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     /**
+     * @return if !=-1: remove tag
+     */
+    @Override
+    public short getTlvTagToRemove() {
+        return tlvTagToRemove;
+    }
+
+    @Override
+    public void setTlvTagToRemove(short tlvTagToRemove) {
+        this.tlvTagToRemove = tlvTagToRemove;
+    }
+
+    /**
      * @return if true - HR procedure will be bypassed (original IMSI and NNN will be sent as SRI response).
      */
     @Override
@@ -609,7 +665,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             int newDestNpi, String addDestDigPrefix, String addSourceDigPrefix, int newSourceTon, int newSourceNpi,
             String newSourceAddr, boolean makeCopy, boolean hrByPass, boolean dropAfterSri, boolean dropAfterTempFail,
             int newNetworkIdAfterSri, int newNetworkIdAfterPermFail, int newNetworkIdAfterTempFail,
-            short tlvTagToMatch, byte[] tlvValueToMatch, short tlvTagToRemove) {
+            short tlvTagToMatch, TlvValueType tlvValueTypeToMatch, String tlvValueToMatch, short tlvTagToRemove) {
         this.destTonMask = destTonMask;
         this.destNpiMask = destNpiMask;
         this.destDigMask = destDigMask;
@@ -626,6 +682,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.nnnDigitsMask = nnnDigitsMask;
         this.processingType = processingType;
         this.errorCode = errorCode;
+        this.tlvTagToMatch = tlvTagToMatch;
+        this.tlvValueTypeToMatch = tlvValueTypeToMatch;
+        this.tlvValueToMatch = tlvValueToMatch;
 
         this.newNetworkId = newNetworkId;
         this.newDestTon = newDestTon;
@@ -642,8 +701,6 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.newNetworkIdAfterSri = newNetworkIdAfterSri;
         this.newNetworkIdAfterPermFail = newNetworkIdAfterPermFail;
         this.newNetworkIdAfterTempFail = newNetworkIdAfterTempFail;
-        this.tlvTagToMatch = tlvTagToMatch;
-        this.tlvValueToMatch = tlvValueToMatch;
         this.tlvTagToRemove = tlvTagToRemove;
         this.resetPattern();
     }
@@ -658,7 +715,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                         .equals("-1"))
                 || (this.newSourceAddr != null && !this.newSourceAddr.equals("") && !this.newSourceAddr.equals("-1"))
                 || this.newDestNpi != -1 || this.newDestTon != -1 || this.newSourceNpi != -1 || this.newSourceTon != -1
-                || (this.tlvTagToMatch != -1 && tlvValueToMatch.length != 0 ) || this.tlvTagToRemove != -1) {
+                || (this.tlvTagToMatch != -1 && !tlvValueToMatch.isEmpty() )
+                || this.tlvTagToRemove != -1) {
             return true;
         } else
             return false;
@@ -793,25 +851,37 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 && this.originatorSccpAddressMask.charAt(0) != message.getOriginatorSccpAddress().charAt(0))
             return false;
 
-        //check tlv here
-//        if( (this.tlvTagToMatch != -1 && tlvValueToMatch.length!=0)) {
-//            TlvSet tlvSet = message.getTlvSet();
-//            if(tlvSet.hasOptionalParameter(this.tlvTagToMatch))
-//            {
-//                Tlv tlv = tlvSet.getOptionalParameter(this.tlvTagToMatch);
-//                try {
-//                    if(!Arrays.equals(tlv.getValue(), this.tlvValueToMatch)){
-//                        return false;
-//                    }
-//                    //TODO: logger
-//                } catch (Exception e) {
-//                    return false;
-//                }
-//
-//            }
-//            return false;
-//        }
+        //check tlv
+        if( (this.tlvTagToMatch != -1 && !tlvValueToMatch.isEmpty())) {
+            TlvSet tlvSet = message.getTlvSet();
+            if(tlvSet.hasOptionalParameter(this.tlvTagToMatch))
+            {
+                Tlv tlv = tlvSet.getOptionalParameter(this.tlvTagToMatch);
+                try {
+                    String val = "";
+                    switch(this.tlvValueTypeToMatch) {
+                    case BYTE:
+                        val = (new Byte(tlv.getValueAsByte())).toString();
+                        break;
+                    case INT:
+                        val = (new Integer(tlv.getValueAsInt())).toString();
+                        break;
+                    case STRING:
+                    default:
+                        val = tlv.getValueAsString();
+                        break;
+                    }
+                    if( !this.tlvValueToMatch.equals(val) ) {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    return false;
+                }
 
+            } else {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -1040,6 +1110,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         String nnnDigitsMask = "-1";
         String processingType = "-1";
         String errorCode = "-1";
+        short tlvTagToMatch = -1;
+        TlvValueType tlvValueTypeToMatch = TlvValueType.STRING;
+        String tlvValueToMatch = "";
 
         int newNetworkId = -1;
         int newDestTon = -1;
@@ -1056,8 +1129,6 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int newNetworkIdAfterSri = -1;
         int newNetworkIdAfterPermFail = -1;
         int newNetworkIdAfterTempFail = -1;
-        short tlvTagToMatch = -1;
-        byte[] tlvValueToMatch = new byte[]{};
         short tlvTagToRemove = -1;
 
         while (count < args.length) {
@@ -1096,6 +1167,20 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     processingType = value;
                 } else if (command.equals("errorcode")) {
                     errorCode = value;
+                } else if (command.startsWith("tlv_")) {
+                    try {
+                        int upos = command.indexOf("_", 4);
+                        tlvTagToMatch = Short.parseShort(command.substring(upos+1));
+                        //find value type
+                        String valType = command.substring(4, upos);
+                        tlvValueTypeToMatch = TlvValueType.valueOf(valType.toUpperCase());
+                        tlvValueToMatch = value;
+                        success = true;
+                    } catch (Exception e) {
+                        tlvTagToMatch = -1;
+                        tlvValueTypeToMatch = TlvValueType.STRING;
+                        tlvValueToMatch = "";
+                    }
 
                 } else if (command.equals("newnetworkid")) {
                     newNetworkId = Integer.parseInt(value);
@@ -1142,31 +1227,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } else if (command.equals("newnetworkidaftertempfail")) {
                     newNetworkIdAfterTempFail = Integer.parseInt(value);
                     success = true;
-                } else if (command.startsWith("tlv_")) {
-                    short tag = -1;
-                    // check if tlv tag exists
-                    try {
-                        tag = Short.parseShort(command.substring(4));
-                        if (SmppConstants.TAG_NAME_MAP.containsKey(tag)) {
-                            tlvTagToMatch = tag;
-                            //FIXME:validate value?
-                            tlvValueToMatch = value.getBytes();
-                            success = true;
-                        }
-                    } catch (Exception e) {
-                        // dont have to do anything
-                    }
-
                 } else if (command.equals("remove_tlv")) {
-                    //FIXME: duplicated code
-                    short tag = -1;
-                    // check if tlv tag exists
                     try {
-                        tag = Short.parseShort(value);
-                        if (SmppConstants.TAG_NAME_MAP.containsKey(tag)) {
-                            tlvTagToRemove = tag;
-                            success = true;
-                        }
+                        tlvTagToRemove = Short.parseShort(value);
+                        success = true;
                     } catch (Exception e) {
                         // dont have to do anything
                     }
@@ -1194,7 +1258,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode, newNetworkId,
                 newDestTon, newDestNpi, addDestDigPrefix, addSourceDigPrefix, newSourceTon, newSourceNpi, newSourceAddr,
                 makeCopy, hrByPass, dropAfterSri, dropAfterTempFail, newNetworkIdAfterSri, newNetworkIdAfterPermFail,
-                newNetworkIdAfterTempFail, tlvTagToMatch, tlvValueToMatch, tlvTagToRemove);
+                newNetworkIdAfterTempFail, tlvTagToMatch, tlvValueTypeToMatch, tlvValueToMatch, tlvTagToRemove);
     }
 
     @Override
@@ -1274,6 +1338,23 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } else if (command.equals("errorcode")) {
                     this.setErrorCode(value);
                     success = true;
+                } else if (command.startsWith("tlv_")) {
+                    short prevTlvTagToMatch = this.tlvTagToMatch ;
+                    TlvValueType prevTlvValueTypeToMatch = this.tlvValueTypeToMatch;
+                    String prevTlvValueToMatch = this.tlvValueToMatch;
+                    try {
+                        int upos = command.indexOf("_", 4);
+                        this.tlvTagToMatch = Short.parseShort(command.substring(upos+1));
+                        //find value type
+                        String valType = command.substring(4, upos);
+                        this.tlvValueTypeToMatch = TlvValueType.valueOf(valType.toUpperCase());
+                        this.tlvValueToMatch = value;
+                        success = true;
+                    } catch (Exception e) {
+                        this.tlvTagToMatch = prevTlvTagToMatch;
+                        this.tlvValueTypeToMatch = prevTlvValueTypeToMatch;
+                        this.tlvValueToMatch = prevTlvValueToMatch;
+                    }
 
                 } else if (command.equals("newnetworkid")) {
                     int val = Integer.parseInt(value);
@@ -1332,30 +1413,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     int val = Integer.parseInt(value);
                     this.setNewNetworkIdAfterTempFail(val);
                     success = true;
-                } else if (command.startsWith("tlv_")) {
-                    short tag = -1;
-                    // check if tlv tag exists
-                    try {
-                        tag = Short.parseShort(command.substring(4));
-                        if (SmppConstants.TAG_NAME_MAP.containsKey(tag)) {
-                            this.tlvTagToMatch = tag;
-                            //FIXME:validate value?
-                            this.tlvValueToMatch = value.getBytes();
-                            success = true;
-                        }
-                    } catch (Exception e) {
-                        // dont have to do anything
-                    }
-
                 } else if (command.equals("remove_tlv")) {
-                    short tag = -1;
-                    // check if tlv tag exists
                     try {
-                        tag = Short.parseShort(value);
-                        if (SmppConstants.TAG_NAME_MAP.containsKey(tag)) {
-                            this.tlvTagToRemove = tag;
-                            success = true;
-                        }
+                        this.tlvTagToRemove = Short.parseShort(value);
+                        success = true;
                     } catch (Exception e) {
                         // dont have to do anything
                     }
@@ -1434,6 +1495,18 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (this.errorCode != null && !this.errorCode.equals("") && !this.errorCode.equals("-1")) {
             writeParameter(sb, parNumber++, "errorCode", errorCode, ", ", "=");
         }
+        if (this.tlvTagToMatch != -1 && !tlvValueToMatch.isEmpty()) {
+            //FIXME: really bad, could use a library instead or regex?
+            StringBuilder param = new StringBuilder();
+            String valTypeStr = this.tlvValueTypeToMatch.toString();
+            param.append("tlv")
+                .append(valTypeStr.substring(0, 1))
+                .append(valTypeStr.substring(1).toLowerCase())
+                .append("_")
+                .append(this.tlvTagToMatch);
+
+            writeParameter(sb, parNumber++, param.toString(), this.tlvValueToMatch, ", ", "=");
+        }
 
         if (newNetworkId != -1) {
             writeParameter(sb, parNumber++, "newNetworkId", newNetworkId, ", ", "=");
@@ -1480,12 +1553,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (newNetworkIdAfterTempFail != -1) {
             writeParameter(sb, parNumber++, "newNetworkIdAfterTempFail", newNetworkIdAfterTempFail, ", ", "=");
         }
-//        if (this.tlvTagToMatch != -1 && tlvValueToMatch.length!=0) {
-//            writeParameter(sb, parNumber++, "tlvTagToMatch", this.tlvTagToMatch, ", ", "=");
-//        }
-//        if (tlvTagToMatch != -1) {
-//            writeParameter(sb, parNumber++, "tlvTagToRemove", this.tlvTagToRemove, ", ", "=");
-//        }
+        if (tlvTagToRemove != -1) {
+            writeParameter(sb, parNumber++, "tlvTagToRemove", this.tlvTagToRemove, ", ", "=");
+        }
         return sb.toString();
     }
 
@@ -1531,7 +1601,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             }
 
             mProcRule.errorCode = xml.getAttribute(ERROR_CODE, "-1");
-            
+            mProcRule.tlvTagToMatch = xml.getAttribute(TLV_TAG_TO_MATCH, (short)-1);
+            mProcRule.tlvValueTypeToMatch = xml.getAttribute(TLV_VALUE_TYPE_TO_MATCH, TlvValueType.STRING);
+            mProcRule.tlvValueToMatch = xml.getAttribute(TLV_VALUE_TO_MATCH, "");
+
             mProcRule.newNetworkId = xml.getAttribute(NEW_NETWORK_ID, -1);
             mProcRule.newDestTon = xml.getAttribute(NEW_DEST_TON, -1);
             mProcRule.newDestNpi = xml.getAttribute(NEW_DEST_NPI, -1);
@@ -1547,11 +1620,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.newNetworkIdAfterSri = xml.getAttribute(NEW_NETWORK_ID_AFTER_SRI, -1);
             mProcRule.newNetworkIdAfterPermFail = xml.getAttribute(NEW_NETWORK_ID_AFTER_PERM_FAIL, -1);
             mProcRule.newNetworkIdAfterTempFail = xml.getAttribute(NEW_NETWORK_ID_AFTER_TEMP_FAIL, -1);
-
-            //FIXME:bad cast?
-//            mProcRule.tlvTagToMatch = xml.getAttribute(TLV_TAG_TO_MATCH, (short)-1);
-//            mProcRule.tlvValueToMatch = xml.getAttribute(TLV_VALUE_TO_MATCH, new byte[]{});
-//            mProcRule.tlvTagToRemove = xml.getAttribute(TLV_TAG_TO_REMOVE , (short)-1);
+            mProcRule.tlvTagToRemove = xml.getAttribute(TLV_TAG_TO_REMOVE , (short)-1);
 
             mProcRule.resetPattern();
         }
@@ -1601,6 +1670,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 xml.setAttribute(PROCESSING_TYPE, mProcRule.processingType.toString());
             if (mProcRule.errorCode != null && !mProcRule.errorCode.equals("") && !mProcRule.errorCode.equals("-1"))
                 xml.setAttribute(ERROR_CODE, mProcRule.errorCode);
+            if (mProcRule.tlvTagToMatch != -1)
+                xml.setAttribute(TLV_TAG_TO_MATCH, mProcRule.tlvTagToMatch);
+            if (mProcRule.tlvValueTypeToMatch != null )
+                xml.setAttribute(TLV_VALUE_TYPE_TO_MATCH, mProcRule.tlvValueTypeToMatch);
+            if (!mProcRule.tlvValueToMatch.isEmpty())
+                xml.setAttribute(TLV_VALUE_TO_MATCH, mProcRule.tlvValueToMatch);
 
             if (mProcRule.newNetworkId != -1)
                 xml.setAttribute(NEW_NETWORK_ID, mProcRule.newNetworkId);
@@ -1641,12 +1716,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             if (mProcRule.newNetworkIdAfterTempFail != -1)
                 xml.setAttribute(NEW_NETWORK_ID_AFTER_TEMP_FAIL, mProcRule.newNetworkIdAfterTempFail);
 
-//            if (mProcRule.tlvTagToMatch != -1)
-//                xml.setAttribute(TLV_TAG_TO_MATCH, mProcRule.tlvTagToMatch);
-//            if (mProcRule.tlvValueToMatch.length!=0)
-//                xml.setAttribute(TLV_VALUE_TO_MATCH, mProcRule.tlvValueToMatch);
-//            if (mProcRule.tlvTagToRemove != -1)
-//                xml.setAttribute(TLV_TAG_TO_REMOVE, mProcRule.tlvTagToRemove);
+            if (mProcRule.tlvTagToRemove != -1)
+                xml.setAttribute(TLV_TAG_TO_REMOVE, mProcRule.tlvTagToRemove);
         }
     };
 
