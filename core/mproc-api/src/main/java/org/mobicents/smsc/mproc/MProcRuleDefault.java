@@ -28,6 +28,7 @@ package org.mobicents.smsc.mproc;
 *
 */
 public interface MProcRuleDefault extends MProcRule {
+    public enum TlvValueType { BYTE, INT, STRING };
 
     // *** conditions ***
     int getDestTonMask();
@@ -143,6 +144,26 @@ public interface MProcRuleDefault extends MProcRule {
 
     void setErrorCode(String errorCode);
 
+    /**
+     * @Value
+     */
+    public short getTlvTagToMatch();
+
+    public void setTlvTagToMatch(short tlvTagToMatch);
+
+    /**
+     * @Value
+     */
+    public TlvValueType getTlvValueTypeToMatch();
+
+    public void setTlvValueTypeToMatch(TlvValueType tlvValueTypeToMatch);
+
+    /**
+     * @Value
+     */
+    public String getTlvValueToMatch();
+
+    public void setTlvValueToMatch(String tlvValueToMatch);
 
     // *** actions ***
     
@@ -238,6 +259,12 @@ public interface MProcRuleDefault extends MProcRule {
 
     void setNewNetworkIdAfterPermFail(int newNetworkIdAfterPermFail);
 
+    /**
+     * @return if !=-1: remove tag
+     */
+    short getTlvTagToRemove();
+
+    public void setTlvTagToRemove(short tlvTagToRemove);
 
     // *** PostDeliveryTempFailureProcessor ***
 
