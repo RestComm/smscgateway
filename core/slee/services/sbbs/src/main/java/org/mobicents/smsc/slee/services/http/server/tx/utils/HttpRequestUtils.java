@@ -28,8 +28,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.slee.facilities.Tracer;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 
 /**
  * Created by tpalucki on 16.09.16.
@@ -46,32 +50,57 @@ public class HttpRequestUtils {
     public final static String P_SMSC_ENCODING = "smscEncoding";
     public final static String P_MESSAGE_BODY_ENCODING = "messageBodyEncoding";
 
-    public static Map<String,String[]> extractParametersFromPost(Tracer logger, HttpServletRequest request) throws HttpApiException {
+    public static Map<String, String[]> extractParametersFromPost(Tracer logger, HttpServletRequest request) throws HttpApiException {
         try {
             Map<String, String[]> map = new HashMap<>();
             BufferedReader reader = request.getReader();
-            if(reader == null) {
+            if (reader == null) {
                 return map;
             }
             logger.finest("### Reading lines from POST Request");
             String line = null;
             StringBuilder sb = new StringBuilder();
-            while((line = reader.readLine()) != null){
-                logger.finest("### Line: "+line);
+            while ((line = reader.readLine()) != null) {
+                logger.finest("### Line: " + line);
                 sb.append(line);
             }
             String body = sb.toString();
 
-            String[] splitted = body.split("\\&");
+            List<String> paramsList = new ArrayList<>(Arrays.asList(P_MSG, P_SENDER, P_TO, P_USERID,
+                    P_PASSWORD, P_MSGID, P_FORMAT, P_SMSC_ENCODING, P_MESSAGE_BODY_ENCODING));
 
-            for(String item: splitted){
+            String[] splitted = body.split("&");
+            List<String> splittedList = new ArrayList<>();
+            boolean isParam = false;
+
+            for (int i = 0; i < splitted.length; i++) {
+                String item = splitted[i];
+                for (String param : paramsList) {
+                    isParam = false;
+                    if (item.startsWith(param)) {
+                        splittedList.add(item);
+                        isParam = true;
+                        break;
+                    }
+                }
+                if (!isParam && i > 0) {
+                    item = splittedList.get(splittedList.size() - 1) + "&" + item;
+                    splittedList.set(splittedList.size() - 1, item);
+                }
+            }
+            for (String item : splittedList) {
                 String[] pair = item.split("=");
-                if(pair.length != 2){
-                    logger.severe("#### Length is different than 2." + item + " will be omitted");
+                if (pair.length == 1) {
+                    logger.fine("Empty value for key " + pair[0]);
                 } else {
+                    if (pair.length > 2) {
+                        for (int i = 2; i < pair.length; i++) {
+                            pair[1] += "=" + pair[i];
+                        }
+                    }
                     String first = pair[0];
                     String second = pair[1];
-                    if (second.contains(",")) {
+                    if (P_TO.equals(first) && second.contains(",")) {
                         map.put(first, second.split(","));
                     } else {
                         map.put(first, new String[]{second});

@@ -49,6 +49,7 @@ public class TxHttpServerSbbTest {
     private static final String SENDER_ID_DEFAULT = "1231241243";
     private static final String SENDER_ALPHANUMERIC = "ABC1231241243";
     private static final String MESSAGE_DEFAULT = "SMS message ;P";
+    private static final String MESSAGE_TEXT_WITH_LINK = "SMS=message&emot=;P&a=b";
 
     private static final String SENDER_TON_DEFAULT = "1";
     private static final String SENDER_NPI_DEFAULT = "1";
@@ -455,6 +456,34 @@ public class TxHttpServerSbbTest {
         MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
 
         MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_DEFAULT, FORMAT_STRING,
+                ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
+        event.setRequest(request);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        event.setResponse(response);
+
+        // perform the action
+        this.sbb.onHttpPost(event, aci);
+
+        MockHttpServletResponse resp = (MockHttpServletResponse) event.getResponse();
+
+        printResponseData(resp);
+
+        Assert.assertTrue(isValid(resp, FORMAT_STRING, true, 1), "Response is not valid");
+    }
+
+    @Test
+    public void sendMessagePOSTStringWithMessageLinkSuccessTest() {
+        System.out.println("sendMessagePOSTStringWithMessageLinkSuccessTest");
+        if (!this.cassandraDbInited) {
+//            Assert.fail("Cassandra DB is not inited");
+            return;
+        }
+        //  prepare
+        ActivityContextInterface aci = new HttpActivityContextInterface();
+        MockHttpServletRequestEvent event = new MockHttpServletRequestEvent();
+
+        MockHttpServletRequest request = buildSendMessageRequest(METHOD_POST, URL_SEND_MESSAGE, USER_DEFAULT, PASSWORD_DEFAULT, MESSAGE_TEXT_WITH_LINK, FORMAT_STRING,
                 ENCODING_GSM7, BODY_ENCODING_UTF8, SENDER_ID_DEFAULT, SENDER_TON_DEFAULT, SENDER_NPI_DEFAULT, TO_ONE);
         event.setRequest(request);
 
