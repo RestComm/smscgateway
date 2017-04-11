@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -16,11 +17,7 @@ public class StatsPrinter implements Runnable, Closeable {
     private static final String[] COUNTER_HDRS = {
         "CreatedScenario",
         "FailedScenario",
-        "CompletedScenario",
-        "ResponseTimeSamples1",
-        "ResponseTimeSum1",
-        
-        /*"onErrorComponent",
+        "CompletedScenario" /*"onErrorComponent",
         "onRejectComponent",
         "onInvokeTimeout",
         "onProcessUnstructuredSSRequest",
@@ -55,12 +52,12 @@ public class StatsPrinter implements Runnable, Closeable {
         "onRegisterPasswordRequest",
         "onRegisterPasswordResponse",
         "onUnstructuredSSNotifyResponse",
-        "onMAPMessage"*/
-    };
+        "onMAPMessage"*/};
 
     private static final String CSV_SEPARATOR = ";";
     GlobalContext ctx;
     PrintWriter writer;
+    boolean headerPrinted = false;
 
     public StatsPrinter(GlobalContext ctx) throws FileNotFoundException, UnsupportedEncodingException {
         this.ctx = ctx;
@@ -69,7 +66,18 @@ public class StatsPrinter implements Runnable, Closeable {
             csvFilePath = "smppp-" + System.currentTimeMillis() + ".csv";
         }
         writer = new PrintWriter(csvFilePath, "UTF-8");
-        printRow(Arrays.asList(COUNTER_HDRS));
+    }
+
+    private void printHeader(Map<String, AtomicLong> retrieveAndResetCurrentCounters) {
+        List columns = new ArrayList(COUNTER_HDRS.length);
+        columns.addAll(Arrays.asList(COUNTER_HDRS));
+        for (int i = 1; i < 5; i++) {
+            String rSamplesKey = "ResponseTimeSamples" + i;
+            if (retrieveAndResetCurrentCounters.containsKey(rSamplesKey)) {
+                columns.add("ResponseTime" + i);
+            }
+        }
+        printRow(columns);
     }
 
     private void printRow(List columns) {
@@ -86,12 +94,28 @@ public class StatsPrinter implements Runnable, Closeable {
     public void run() {
         List columns = new ArrayList(COUNTER_HDRS.length);
         Map<String, AtomicLong> retrieveAndResetCurrentCounters = ctx.retrieveAndResetCurrentCounters();
+
+        if (!headerPrinted) {
+            printHeader(retrieveAndResetCurrentCounters);
+            headerPrinted = true;
+        }
+
         for (String counterKey : COUNTER_HDRS) {
             AtomicLong counter = retrieveAndResetCurrentCounters.get(counterKey);
             if (counter != null) {
                 columns.add(counter);
             } else {
                 columns.add("0");
+            }
+        }
+        for (int i = 1; i < 5; i++) {
+            String rSamplesKey = "ResponseTimeSamples" + i;
+            if (retrieveAndResetCurrentCounters.containsKey(rSamplesKey)) {
+                String rSumKey = "ResponseTimeSum" + i;
+                AtomicLong samples = retrieveAndResetCurrentCounters.get(rSamplesKey);
+                AtomicLong sum = retrieveAndResetCurrentCounters.get(rSumKey);
+                double avg = sum.get() / samples.get();
+                columns.add(String.format(Locale.US, "%.2f", avg));
             }
         }
         printRow(columns);
