@@ -31,10 +31,8 @@ public class GlobalContext {
     final Logger logger = Logger.getLogger("smppp.msglog");
     final private Properties props;
     final Map<String, Object> data = new HashMap();
-    
-    Map<String,ScenarioContext> scenariosMap;
-    
 
+    Map<String, ScenarioContext> scenariosMap;
 
     public GlobalContext(Properties props) {
         this.props = props;
@@ -51,12 +49,9 @@ public class GlobalContext {
         //order is important
         initializersList.add(new SMPPInitializer());
 
-
         fsm = GlobalFSM.createNewInstance(this);
-        
+
     }
-
-
 
     Integer getIntegerProp(String pName) {
         return Integer.valueOf(props.getProperty(pName).trim());
@@ -90,10 +85,10 @@ public class GlobalContext {
         }
         return counter.incrementAndGet();
     }
-    
+
     synchronized long incrementResponseTimeCounter(String counterIndex, long newResTime) {
-        incrementCounter("ResponseTimeSamples"+counterIndex);
-        String avgCounterId = "ResponseTimeSum"+counterIndex;
+        incrementCounter("ResponseTimeSamples" + counterIndex);
+        String avgCounterId = "ResponseTimeSum" + counterIndex;
         AtomicLong avgCounter = counters.get(avgCounterId);
         if (avgCounter == null) {
             avgCounter = new AtomicLong(0);
@@ -103,9 +98,7 @@ public class GlobalContext {
             }
         }
         return avgCounter.addAndGet(newResTime);
-    }    
-    
-    
+    }
 
     public Properties getProps() {
         return props;

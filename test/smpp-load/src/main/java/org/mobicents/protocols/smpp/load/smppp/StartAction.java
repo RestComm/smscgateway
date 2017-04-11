@@ -24,7 +24,7 @@ public class StartAction implements Action<GlobalFSM, GlobalState, GlobalEvent, 
 
 
             
-            ctx.csvFuture = ctx.executor.scheduleAtFixedRate(new StatsPrinter(ctx), 0,
+            ctx.csvFuture = ctx.executor.scheduleAtFixedRate(new StatsPrinter(ctx), ctx.getIntegerProp("smppp.csvFrequency"),
                     ctx.getIntegerProp("smppp.csvFrequency"), TimeUnit.SECONDS);
 
         } catch (Exception ex) {
