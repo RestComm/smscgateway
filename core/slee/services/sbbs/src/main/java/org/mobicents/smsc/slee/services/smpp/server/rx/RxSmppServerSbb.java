@@ -288,7 +288,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
     public void onDeliverSmResp(DeliverSmResp event, ActivityContextInterface aci, EventContext eventContext) {
         if (logger.isFineEnabled())
-            logger.warning("onDeliverSmResp - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
+            logger.fine("onDeliverSmResp - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
 
         RxSmppServerChildLocalObject rxSmppServerSbbLocalObject = this.getRxSmppServerChildSbbObject();
 
@@ -303,7 +303,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
     public void onSubmitSmResp(SubmitSmResp event, ActivityContextInterface aci, EventContext eventContext) {
         if (logger.isFineEnabled())
-            logger.warning("onSubmitSmResp - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
+            logger.fine("onSubmitSmResp - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
 
         RxSmppServerChildLocalObject rxSmppServerSbbLocalObject = this.getRxSmppServerChildSbbObject();
 
@@ -318,7 +318,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
     public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
         if (logger.isFineEnabled())
-            logger.warning("onPduRequestTimeout - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
+            logger.fine("onPduRequestTimeout - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
 
         RxSmppServerChildLocalObject rxSmppServerSbbLocalObject = this.getRxSmppServerChildSbbObject();
 
@@ -335,7 +335,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
             EventContext eventContext) {
         if (logger.isFineEnabled())
-            logger.warning("onRecoverablePduException - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
+            logger.fine("onRecoverablePduException - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
 
         RxSmppServerChildLocalObject rxSmppServerSbbLocalObject = this.getRxSmppServerChildSbbObject();
 
