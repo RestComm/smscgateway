@@ -21,11 +21,12 @@
  */
 package org.mobicents.smsc.library;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
-
-import java.text.SimpleDateFormat;
 
 /**
  * 
@@ -35,6 +36,7 @@ import java.text.SimpleDateFormat;
 public class CdrGenerator {
 	private static final Logger logger = Logger.getLogger(CdrGenerator.class);
 
+	public static final String CDR_EMPTY = "";
 	public static final String CDR_SEPARATOR = ",";
     public static final String CDR_SUCCESS = "success";
     public static final String CDR_PARTIAL = "partial";
@@ -58,7 +60,7 @@ public class CdrGenerator {
 
     public static final String CDR_SUCCESS_NO_REASON = "";
     
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS Z");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 	public static void generateCdr(String message) {
 		logger.debug(message);
@@ -145,9 +147,21 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(charNumbers)
                 .append(CdrGenerator.CDR_SEPARATOR)
+                .append(getProcessingTime(smsEvent.getSubmitDate()))
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(getDeliveryDelayMilis(smsEvent.getSubmitDate(), smsEvent.getDeliverDate()))
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(getScheduleDeliveryDelayMilis(smsEvent.getSubmitDate(), smsEvent.getScheduleDeliveryTime()))
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(smsEvent.getDeliveryCount())
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append("\"")
                 .append(getEscapedString(getFirst20CharOfSMS(smsEvent.getShortMessageText())))
-                .append(CdrGenerator.CDR_SEPARATOR).append(getEscapedString(reason));
-
+                .append("\"")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append("\"")
+                .append(getEscapedString(reason))
+                .append("\"");
         CdrGenerator.generateCdr(sb.toString());
     }
 
@@ -162,7 +176,35 @@ public class CdrGenerator {
         return first20CharOfSms;
     }
 
-    private static String getEscapedString(String value) {
-	    return value.replaceAll( "\n", "n" ).replaceAll( ","," " );
+    private static String getEscapedString(final String aValue) {
+	    return aValue.replaceAll("\n", "n").replaceAll(",", " ").replace("\"", "'").replace('\u0000', '?').replace('\u0006', '?');
     }
+
+    private static String getProcessingTime(final Date aSubmitDate) {
+        if (aSubmitDate == null) {
+            return CDR_EMPTY;
+}
+        return String.valueOf(System.currentTimeMillis() - aSubmitDate.getTime());
+    }
+
+    private static String getDeliveryDelayMilis(final Date aSubmitDate, final Date aDeliveryDate) {
+        if (aSubmitDate == null) {
+            return CDR_EMPTY;
+        }
+        if (aDeliveryDate == null) {
+            return CDR_EMPTY;
+        }
+        return String.valueOf(aDeliveryDate.getTime() - aSubmitDate.getTime());
+    }
+
+    private static String getScheduleDeliveryDelayMilis(final Date aSubmitDate, final Date aScheduleDeliveryDate) {
+        if (aSubmitDate == null) {
+            return CDR_EMPTY;
+        }
+        if (aScheduleDeliveryDate == null) {
+            return CDR_EMPTY;
+        }
+        return String.valueOf(aScheduleDeliveryDate.getTime() - aSubmitDate.getTime());
+    }
+    
 }
