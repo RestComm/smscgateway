@@ -82,7 +82,7 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
             throw new HttpApiException("'" + RequestParameter.TO.getName() + "' parameter is not set in the Http Request.");
         }
 
-        this.destAddresses = new ArrayList<String>(Arrays.asList(to));
+        this.destAddresses = new ArrayList<String>(removePlusPrefixFromDestNumbers(Arrays.asList(to)));
         //check only digits
         List<String> notValidNumbers = validateDestNumbersAndRemoveEmpty(this.destAddresses);
         if (!notValidNumbers.isEmpty()) {
@@ -236,6 +236,20 @@ public class HttpSendMessageIncomingData extends BaseIncomingData {
             }
         }
         return notValidDestinationNumbers;
+    }
+
+    private List<String> removePlusPrefixFromDestNumbers(List<String> toCheck) {
+        for (int i=0; i<toCheck.size(); i++) {
+            String number = toCheck.get(i).trim();
+            if (number.startsWith("+")) {
+                number = number.substring(1);
+            }
+            if (number.startsWith("%2B")) {
+                number = number.substring(3);
+            }
+            toCheck.set(i, number);
+        }
+        return toCheck;
     }
 
     private byte[] udhToByte(String udhDecoded) throws HttpApiException {
