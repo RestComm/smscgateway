@@ -120,9 +120,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private String nnnDigitsMask = "-1";
     private ProcessingType processingType = null;
     private String errorCode = "-1";
-    short tlvTagToMatch = -1;
-    TlvValueType tlvValueTypeToMatch = TlvValueType.STRING;
-    String tlvValueToMatch = "";
+    private short tlvTagToMatch = -1;
+    private TlvValueType tlvValueTypeToMatch = null;
+    private String tlvValueToMatch = "-1";
 
     private int newNetworkId = -1;
     private int newDestTon = -1;
@@ -715,8 +715,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                         .equals("-1"))
                 || (this.newSourceAddr != null && !this.newSourceAddr.equals("") && !this.newSourceAddr.equals("-1"))
                 || this.newDestNpi != -1 || this.newDestTon != -1 || this.newSourceNpi != -1 || this.newSourceTon != -1
-                || (this.tlvTagToMatch != -1 && !tlvValueToMatch.isEmpty() )
-                || this.tlvTagToRemove != -1) {
+                || (this.tlvTagToMatch != -1 && tlvValueTypeToMatch != null && tlvValueToMatch != null && !tlvValueToMatch
+                        .isEmpty()) || this.tlvTagToRemove != -1) {
             return true;
         } else
             return false;
@@ -852,7 +852,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             return false;
 
         //check tlv
-        if( (this.tlvTagToMatch != -1 && !tlvValueToMatch.isEmpty())) {
+        if ((this.tlvTagToMatch != -1 && this.tlvValueTypeToMatch != null && tlvValueToMatch != null && !tlvValueToMatch
+                .isEmpty())) {
             TlvSet tlvSet = message.getTlvSet();
             if(tlvSet.hasOptionalParameter(this.tlvTagToMatch))
             {
@@ -1495,7 +1496,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (this.errorCode != null && !this.errorCode.equals("") && !this.errorCode.equals("-1")) {
             writeParameter(sb, parNumber++, "errorCode", errorCode, ", ", "=");
         }
-        if (this.tlvTagToMatch != -1 && !tlvValueToMatch.isEmpty()) {
+        if (this.tlvTagToMatch != -1 && this.tlvValueTypeToMatch != null && tlvValueToMatch != null
+                && !tlvValueToMatch.isEmpty()) {
             //FIXME: really bad, could use a library instead or regex?
             StringBuilder param = new StringBuilder();
             String valTypeStr = this.tlvValueTypeToMatch.toString();
@@ -1602,8 +1604,14 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
             mProcRule.errorCode = xml.getAttribute(ERROR_CODE, "-1");
             mProcRule.tlvTagToMatch = xml.getAttribute(TLV_TAG_TO_MATCH, (short)-1);
-            mProcRule.tlvValueTypeToMatch = xml.getAttribute(TLV_VALUE_TYPE_TO_MATCH, TlvValueType.STRING);
-            mProcRule.tlvValueToMatch = xml.getAttribute(TLV_VALUE_TO_MATCH, "");
+            val = xml.getAttribute(TLV_VALUE_TYPE_TO_MATCH, "");
+            if (val != null) {
+                try {
+                    mProcRule.tlvValueTypeToMatch = Enum.valueOf(TlvValueType.class, val);
+                } catch (Exception e) {
+                }
+            }
+            mProcRule.tlvValueToMatch = xml.getAttribute(TLV_VALUE_TO_MATCH, "-1");
 
             mProcRule.newNetworkId = xml.getAttribute(NEW_NETWORK_ID, -1);
             mProcRule.newDestTon = xml.getAttribute(NEW_DEST_TON, -1);
@@ -1673,8 +1681,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             if (mProcRule.tlvTagToMatch != -1)
                 xml.setAttribute(TLV_TAG_TO_MATCH, mProcRule.tlvTagToMatch);
             if (mProcRule.tlvValueTypeToMatch != null )
-                xml.setAttribute(TLV_VALUE_TYPE_TO_MATCH, mProcRule.tlvValueTypeToMatch);
-            if (!mProcRule.tlvValueToMatch.isEmpty())
+                xml.setAttribute(TLV_VALUE_TYPE_TO_MATCH, mProcRule.tlvValueTypeToMatch.toString());
+            if (mProcRule.tlvValueToMatch != null && !mProcRule.tlvValueToMatch.isEmpty()
+                    && !mProcRule.tlvValueToMatch.equals("-1"))
                 xml.setAttribute(TLV_VALUE_TO_MATCH, mProcRule.tlvValueToMatch);
 
             if (mProcRule.newNetworkId != -1)
