@@ -660,8 +660,8 @@ public class MessageUtil {
         receipt.setValidityPeriod(validityPeriod);
 
         String rcpt = createDeliveryReceiptMessage(sms.getMessageIdText(), sms.getSubmitDate(),
-                new Timestamp(System.currentTimeMillis()), sms.getSmsSet().getStatus(), sms.getShortMessageText(), delivered,
-                extraString, tempFailure);
+                new Timestamp(System.currentTimeMillis()), sms.getSmsSet().getStatus().getCode(), sms.getShortMessageText(),
+                delivered, extraString, tempFailure);
 
         // TODO: now we are sending all in GSM7 encoding
         receipt.setDataCoding(0);
@@ -676,7 +676,7 @@ public class MessageUtil {
     }
 
     public static String createDeliveryReceiptMessage(String messageId, Date submitDate, Date deliveryDate,
-            ErrorCode errorCode, String origMsgText, boolean delivered, String extraString, boolean tempFailure) {
+            int errorCode, String origMsgText, boolean delivered, String extraString, boolean tempFailure) {
         StringBuffer sb = new StringBuffer();
 
         sb.append(DELIVERY_ACK_ID);
@@ -705,7 +705,8 @@ public class MessageUtil {
                 sb.append(DELIVERY_ACK_STATE_ENROUTE);
             }
             sb.append(DELIVERY_ACK_ERR);
-            sb.append(errorCode != null ? errorCode.getCodeText() : "null");
+            // sb.append(errorCode != null ? errorCode.getCodeText() : "null");
+            sb.append(String.format("%03d", errorCode));
         }
         sb.append(DELIVERY_ACK_TEXT);
         sb.append(getFirst20CharOfSMS(origMsgText));

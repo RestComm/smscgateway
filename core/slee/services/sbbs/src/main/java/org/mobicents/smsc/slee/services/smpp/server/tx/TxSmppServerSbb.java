@@ -58,7 +58,6 @@ import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
-import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
 import org.mobicents.smsc.library.SbbStates;
@@ -1307,9 +1306,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     sms0.setReceiptLocalMessageId(messageId);
 
                     String messageIdStr = MessageUtil.createMessageIdString(messageId);
-                    String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr,
-                            deliveryReceiptData.getSubmitDate(), deliveryReceiptData.getDoneDate(),
-                            ErrorCode.fromInt(deliveryReceiptData.getError()), deliveryReceiptData.getText(),
+                    String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr, deliveryReceiptData
+                            .getSubmitDate(), deliveryReceiptData.getDoneDate(), deliveryReceiptData.getError(),
+                            deliveryReceiptData.getText(),
                             deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_DELIVERED), null,
                             deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_ENROUTE));
                     sms0.setShortMessageText(updatedReceiptText);

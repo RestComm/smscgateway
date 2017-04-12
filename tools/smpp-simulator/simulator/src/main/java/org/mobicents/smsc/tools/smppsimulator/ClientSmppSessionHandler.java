@@ -347,7 +347,7 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                 errorCode = ErrorCode.ABSENT_SUBSCRIBER;
             }
 
-            String rcpt = MessageUtil.createDeliveryReceiptMessage(messageId, submitDate, new Date(), errorCode, "origMsgText",
+            String rcpt = MessageUtil.createDeliveryReceiptMessage(messageId, submitDate, new Date(), errorCode.getCode(), "origMsgText",
                     delivered, null, tempFailure);
             byte[] buf = rcpt.getBytes(utf8Charset);
 
