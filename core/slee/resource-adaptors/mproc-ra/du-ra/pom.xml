@@ -12,6 +12,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>mproc-ra</artifactId>
         </dependency>
+	<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mproc-ratype</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

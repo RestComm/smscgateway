@@ -522,7 +522,7 @@
 		</copy>
 		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/mproc-ra/du-ratype/target/mproc-ratype-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/mproc-ra/du/target/mproc-ra-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
+		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/mproc-ra/du-ra/target/mproc-ra-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 		<copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 		<copy file="${checkout.dir}/${restcomm-map-ra.download.jar.file}" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
 		<copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy" failonerror="true" />
@@ -539,7 +539,7 @@
 		</copy>
 		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/du/target/smsc-resource-adaptors-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/mproc-ra/du-ratype/target/mproc-ratype-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/simulator/default/deploy" failonerror="true" />
-		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/mproc-ra/du/target/mproc-ra-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
+		<copy file="${checkout.restcomm-smsc.dir}/core/slee/resource-adaptors/mproc-ra/du-ra/target/mproc-ra-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 		<copy file="${checkout.restcomm-smsc.dir}/core/slee/services/du/target/smsc-services-du-${restcomm.smsc.release.version}.jar" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
     	<copy file="${checkout.dir}/${restcomm-map-ra.download.jar.file}" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
 		<copy file="${checkout.restcomm-smsc.dir}/management/ui-management/target/smsc-management.war" todir="${release.dir}/jboss-5.1.0.GA/server/simulator/deploy" failonerror="true" />
