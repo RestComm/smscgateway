@@ -40,14 +40,14 @@
 	<property name="restcomm-map-ra.release" value="7.1.57" />
 
 	<!-- Diameter mux and RAs -->
-	<property name="restcomm-diam.build-number" value="89" />
+	<property name="restcomm-diam.build-number" value="152" />
 	<property name="restcomm-diam.version" value="1.7.0" />
 	<property name="restcomm-diam.resources.version" value="2.8.0-SNAPSHOT" />
 
 	<!-- SMPP extentions and and RAs -->
-	<property name="restcomm-smpp-extensions.build-number" value="13" />
+	<property name="restcomm-smpp-extensions.build-number" value="17" />
 	<property name="restcomm-smpp-extensions.version" value="1.0" />
-	<property name="restcomm-smpp-ra.build-number" value="24" />
+	<property name="restcomm-smpp-ra.build-number" value="27" />
 	<property name="restcomm-smpp-ra.version" value="7.0" />
 
 	<!-- Cassandra community version -->
