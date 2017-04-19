@@ -14,5 +14,6 @@
         <module>ra</module>
         <module>du-ratype</module>
         <module>du-ra</module>
+        <module>du</module>
     </modules>
 </project>
