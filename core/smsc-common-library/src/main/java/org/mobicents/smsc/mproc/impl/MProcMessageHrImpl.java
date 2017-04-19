@@ -44,6 +44,11 @@ public class MProcMessageHrImpl implements MProcMessage {
         this.correlationIdValue = correlationIdValue;
     }
 
+    @Override
+    public String getMessageId() {
+        return correlationIdValue.getCorrelationID();
+    }
+
     // meaningful values
     @Override
     public int getDestAddrTon() {
