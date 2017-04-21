@@ -214,8 +214,8 @@ public class DBOperations {
         return this.session;
     }
 
-    public void start(String hosts, int port, String keyspace, int secondsForwardStoring, int reviseSecondsOnSmscStart,
-            int processingSmsSetTimeout, long minMessageId, long maxMessageId) throws Exception {
+    public void start(String hosts, int port, String keyspace, String user, String password, int secondsForwardStoring,
+                      int reviseSecondsOnSmscStart, int processingSmsSetTimeout, long minMessageId, long maxMessageId) throws Exception {
 		if (this.started) {
 			throw new IllegalStateException("DBOperations already started");
 		}
@@ -237,6 +237,7 @@ public class DBOperations {
             String[] cassHostsArray = hosts.split(",");
             builder.addContactPoints(cassHostsArray);
             builder.withPort(port);
+            builder.withCredentials(user, password);
 
             this.cluster = builder.build().init();
         } catch (Exception e) {

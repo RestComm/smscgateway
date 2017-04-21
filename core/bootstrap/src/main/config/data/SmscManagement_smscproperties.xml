@@ -44,6 +44,8 @@
 <globalTitleIndicator value="GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS"/>
 <translationType value="0"/>
 <correlationIdLiveTime value="60"/>
+<cassandraUser value="cassandra"/>
+<cassandraPass value="cassandra"/>
 <diameterDestRealm value="telestax.com"/>
 <diameterDestHost value="127.0.0.1"/>
 <diameterDestPort value="3868"/>

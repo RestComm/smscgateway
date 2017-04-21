@@ -80,6 +80,8 @@ public class CassandraToolForm {
 
     private JTextField tbHost;
     private JTextField tbPort;
+    private JTextField tbUser;
+    private JTextField tbPass;
     private JTextField tbKeyspace;
     private JTable tResult;
     protected JFrame frmSmppSimulator;
@@ -198,6 +200,7 @@ public class CassandraToolForm {
         
         tbPort = new JTextField();
         tbPort.setBounds(145, 40, 125, 20);
+
         panel_2.add(tbPort);
         tbPort.setText("9042");
         tbPort.setColumns(10);
@@ -207,6 +210,18 @@ public class CassandraToolForm {
         panel_2.add(tbHost);
         tbHost.setText("127.0.0.1");
         tbHost.setColumns(10);
+
+        tbUser = new JTextField();
+        tbPort.setBounds(145, 40, 125, 20);
+        panel_2.add(tbUser);
+        tbUser.setText("cassandra");
+        tbUser.setColumns(10);
+
+        tbPass = new JTextField();
+        tbPort.setBounds(145, 40, 125, 20);
+        panel_2.add(tbPass);
+        tbPass.setText("cassandra");
+        tbPass.setColumns(10);
 
         btConnect = new JButton("Connect");
         btConnect.addActionListener(new ActionListener() {
@@ -263,6 +278,8 @@ public class CassandraToolForm {
         this.dbOperations = new DBOperationsProxy();
         String hosts = this.tbHost.getText();
         String strPort = this.tbPort.getText();
+        String user = this.tbUser.getText();
+        String pass = this.tbPass.getText();
         int port = 0;
         try {
             port = Integer.parseInt(strPort);
@@ -272,7 +289,7 @@ public class CassandraToolForm {
         }
         String keyspace = this.tbKeyspace.getText();
         try {
-            this.dbOperations.start(hosts, port, keyspace, 60, 60, 60 * 10, 1, 10000000000L);
+            this.dbOperations.start(hosts, port, keyspace, user, pass, 60, 60, 60 * 10, 1, 10000000000L);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(getJFrame(), "Can not connect to cassandra database:\n" + e.getMessage());
             return;
