@@ -45,6 +45,7 @@ import org.restcomm.smpp.SmppEncoding;
 /**
  * @author amit bhayani
  * @author sergey vetyutnev
+ * @author tran nhan
  * 
  */
 public class SMSCShellExecutor implements ShellExecutor {
@@ -1005,7 +1006,13 @@ public class SMSCShellExecutor implements ShellExecutor {
             } else if (parName.equals("deliverypause")) {
                 boolean val = Boolean.parseBoolean(options[3]);
                 smscPropertiesManagement.setDeliveryPause(val);
-			} else {
+			} else if (parName.equals("cassandrauser")) {
+                String val = String.valueOf(options[3]);
+                smscPropertiesManagement.setCassandraUser(val);
+            } else if (parName.equals("cassandrapass")) {
+                String val = String.valueOf(options[3]);
+                smscPropertiesManagement.setCassandraPass(val);
+            } else {
 				return SMSCOAMMessages.INVALID_COMMAND;
 			}
 		} catch (IllegalArgumentException e) {
@@ -1268,7 +1275,12 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             } else if (parName.equals("deliverypause")) {
                 sb.append(smscPropertiesManagement.isDeliveryPause());
-			} else {
+			} else if (parName.equals("cassandrauser")) {
+                sb.append(smscPropertiesManagement.getCassandraPass());
+            } else if (parName.equals("cassandrapass")) {
+                sb.append(smscPropertiesManagement.getCassandraPass());
+            }
+            else {
 				return SMSCOAMMessages.INVALID_COMMAND;
 			}
 
@@ -1627,7 +1639,15 @@ public class SMSCShellExecutor implements ShellExecutor {
             sb.append(smscPropertiesManagement.isDeliveryPause());
             sb.append("\n");
 
-			return sb.toString();
+            sb.append("cassandrauser = ");
+            sb.append(smscPropertiesManagement.getCassandraUser());
+            sb.append("\n");
+
+            sb.append("cassandrapass = ");
+            sb.append(smscPropertiesManagement.getCassandraPass());
+            sb.append("\n");
+
+            return sb.toString();
 		}
 	}
 

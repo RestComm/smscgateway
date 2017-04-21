@@ -303,6 +303,20 @@ Empty TC-BEGIN is used in MAP Version 2 and 3 for forwardSM and Mt- ForwardSM re
 									<input id="cassandraclustername" type="text" class="input-mini" style="width: 100px; margin-right: 12px; text-align: center;" value="0" />
 								</span>                         
 							</div>
+                             <div id="div-cassandrauser" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="cassandra user name">
+									<span class="add-on">User</span>
+									<input id="cassandrauser" type="text" class="input-mini" style="width: 100px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>
+
+							<div id="div-cassandrapass" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="cassandra password">
+									<span class="add-on">Password</span>
+									<input id="cassandrapass" type="text" class="input-mini" style="width: 100px; margin-right: 12px; text-align: center;" value="0" />
+								</span>
+							</div>
+
 							<h5 style="border-bottom: 1px solid #DDD;">Archive Table Configuration</h5>
 							<div id="div-removinglivetablesdays" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="configure the SMSC to automatically drop LIVE tables from the Cassandra Database. The SMSC will attempt to delete tables just after midnight and after every SMSC restart. This parameter is used to specify the number of days the LIVE tables should be kept before attempting to drop them automatically. If this value is specified as 0, the SMSC will not drop tables automatically. In this case you must manually drop tables. You must specify a value of 3 or more. You can not set this value to 1 or 2 days. This is to ensure the tables will be kept for a minimum of 2 days after creation date. The SMSC wil attempt to delete tables for one day. If the Cassandra Database keeps tables for older days, then the administrator should drop these manually.">
@@ -915,6 +929,8 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										$("#cassandraport").val(cassandraport);
 										$("#cassandrakeyspace").val(response.value.KeyspaceName);
 										$("#cassandraclustername").val(response.value.ClusterName);
+										$("#cassandrauser").val(response.value.CassandraUser);
+										$("#cassandrapass").val(response.value.CassandraPass);
 										
 										$("#removinglivetablesdays").val(response.value.RemovingLiveTablesDays);
 										$("#removingarchivetabledays").val(response.value.RemovingArchiveTablesDays);										
@@ -1714,7 +1730,22 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 			    		}
 						
 						var cassandraclustername = $("#cassandraclustername").val();
-						
+
+						var cassandrauser = $("#cassandrauser").val();
+						if(cassandrauser.trim() == "") {
+			    			$("#div-cassandrauser").addClass("error");
+			    			formInvalid = true;
+			    		} else if($("#div-cassandrauser").hasClass("error")) {
+			    			$("#div-cassandrauser").removeClass("error");
+			    		}
+
+						var cassandrapass =  $("#cassandrapass").val();
+						if(cassandrapass.trim() == "") {
+			    			$("#div-cassandrapass").addClass("error");
+			    			formInvalid = true;
+			    		} else if($("#div-cassandrapass").hasClass("error")) {
+			    			$("#div-cassandrapass").removeClass("error");
+			    		}
 						
 						var removinglivetablesdays = $("#removinglivetablesdays").val();
 						if(removinglivetablesdays.trim() == "") {
@@ -1749,6 +1780,8 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "DbPort", value: cassandraport },
 									{ type: "write", mbean: mbeanSearch, attribute: "KeyspaceName", value: cassandrakeyspace },
 									{ type: "write", mbean: mbeanSearch, attribute: "ClusterName", value: cassandraclustername },
+									{ type: "write", mbean: mbeanSearch, attribute: "CassandraUser", value: cassandrauser },
+									{ type: "write", mbean: mbeanSearch, attribute: "CassandraPass", value: cassandrapass },
 									{ type: "write", mbean: mbeanSearch, attribute: "RemovingLiveTablesDays", value: removinglivetablesdays },
 									{ type: "write", mbean: mbeanSearch, attribute: "RemovingArchiveTablesDays", value: removingarchivetabledays },
 								],

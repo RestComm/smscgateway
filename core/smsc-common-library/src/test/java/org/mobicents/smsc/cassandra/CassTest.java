@@ -14,7 +14,7 @@ public class CassTest {
 //            int g1 = 0;
 //            g1++;
 //        }                
-        db.start("127.0.0.1", 9042, keySpacename, 60, 60, 60 * 10, 1, 10000000000L);
+        db.start("127.0.0.1", 9042, keySpacename, "cassandra", "cassandra", 60, 60, 60 * 10, 1, 10000000000L);
 
 
         db.c2_setCurrentDueSlot(2009);
@@ -22,7 +22,7 @@ public class CassTest {
 
 //        Thread.sleep(1000);
 
-        db.start("127.0.0.1", 9042, keySpacename, 60, 60, 60 * 10, 1, 10000000000L);
+        db.start("127.0.0.1", 9042, keySpacename, "cassandra", "cassandra", 60, 60, 60 * 10, 1, 10000000000L);
 
         long l1 = db.c2_getCurrentSlotTable(0);
         long l2 = db.c2_getCurrentSlotTable(0);

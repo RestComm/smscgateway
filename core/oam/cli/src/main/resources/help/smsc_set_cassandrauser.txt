@@ -1,0 +1,18 @@
+Name
+	smsc set cassandrauser <user-name>
+
+SYNOPSIS
+	smsc set cassandrauser
+
+DESCRIPTION
+	This command is used to set the user account for Cassandra Database
+	access.
+	The command need SMSC GW to be restarted to take effect.
+
+EXAMPLES
+	smsc set cassandrauser cassandra
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
+	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
+	smsc set maxmapv

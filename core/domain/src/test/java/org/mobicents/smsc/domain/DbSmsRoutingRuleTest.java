@@ -51,7 +51,7 @@ public class DbSmsRoutingRuleTest {
         this.cassandraDbInited = this.sbb.testCassandraAccess();
         if (!this.cassandraDbInited)
             return;
-        this.sbb.start("127.0.0.1", 9042, "RestCommSMSC", 60, 60, 60 * 10, 1, 10000000000L);
+        this.sbb.start("127.0.0.1", 9042, "RestCommSMSC", "cassandra", "cassandra", 60, 60, 60 * 10, 1, 10000000000L);
 //        String ip, int port, String keyspace, int secondsForwardStoring, int reviseSecondsOnSmscStart,
 //        int processingSmsSetTimeout
     }

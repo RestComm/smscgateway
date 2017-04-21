@@ -142,6 +142,8 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         set.addChild("receiptsdisabling");
         set.addChild("incomereceiptsprocessing");
         set.addChild("orignetworkidforreceipts");
+        set.addChild("cassandrauser");
+        set.addChild("cassandrapass");
 
 		Node get = parent.addChild("get");
 		get.addChild("scgt");
@@ -213,6 +215,8 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         get.addChild("receiptsdisabling");
         get.addChild("incomereceiptsprocessing");
         get.addChild("orignetworkidforreceipts");
+        get.addChild("cassandrauser");
+        get.addChild("cassandrapass");
 
         Node remove = parent.addChild("remove");
         remove.addChild("esmedefaultcluster");
