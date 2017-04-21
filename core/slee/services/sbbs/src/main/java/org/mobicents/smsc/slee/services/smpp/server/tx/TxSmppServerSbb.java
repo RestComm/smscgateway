@@ -1,8 +1,8 @@
 /*
- * TeleStax, Open Source Cloud Communications  
- * Copyright 2012, Telestax Inc and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Telestax, Open Source Cloud Communications Copyright 2011-2017,
+ * Telestax Inc and individual contributors by the @authors tag.
+ * See the copyright.txt in the distribution for a full listing of
+ * individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -68,6 +68,7 @@ import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
+import org.mobicents.smsc.slee.services.util.SbbStatsUtils;
 import org.restcomm.slee.resource.smpp.PduRequestTimeout;
 import org.restcomm.slee.resource.smpp.SmppExtraConstants;
 import org.restcomm.slee.resource.smpp.SmppSessions;
@@ -102,6 +103,8 @@ import com.cloudhopper.smpp.util.TlvUtil;
  */
 public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     private static final String className = TxSmppServerSbb.class.getSimpleName();
+    
+    private static final long ONE = 1L;
 
 	private SmppTransactionACIFactory smppServerTransactionACIFactory = null;
 	protected SmppSessions smppServerSessions = null;
@@ -144,6 +147,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     public void sbbStore() {
         super.sbbStore();
     }
+ 
+    /**
+     * Gets the default SBB usage parameter set.
+     *
+     * @return the default SBB usage parameter set
+     */
+    public abstract TxSmppServerSbbUsage getDefaultSbbUsageParameterSet();
 
     public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
         ServiceID serviceID = event.getService();
@@ -152,6 +162,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     }
 
     public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci, EventContext eventContext) {
+        final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
+        sbbu.incrementCounterActivityEnd(ONE);
         boolean isServiceActivity = (aci.getActivity() instanceof ServiceActivity);
         if (isServiceActivity) {
             this.logger.info("Rx: onActivityEndEvent: event=" + event + ", isServiceActivity=" + isServiceActivity);
@@ -162,7 +174,57 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     // *********
     // SMPP Event Handlers
 
-	public void onSubmitSm(com.cloudhopper.smpp.pdu.SubmitSm event, ActivityContextInterface aci) {
+    public void onSubmitSm(com.cloudhopper.smpp.pdu.SubmitSm event, ActivityContextInterface aci) {
+        final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
+        sbbu.incrementCounterSubmitSm(ONE);
+        final long start = System.currentTimeMillis();
+        onSubmitSmLocal(sbbu, event, aci);
+        sbbu.sampleSubmitSm(System.currentTimeMillis() - start);
+    }
+
+	public void onDataSm(com.cloudhopper.smpp.pdu.DataSm event, ActivityContextInterface aci) {
+        final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
+        sbbu.incrementCounterDataSm(ONE);
+        final long start = System.currentTimeMillis();
+        onDataSmLocal(sbbu, event, aci);
+        sbbu.sampleDataSm(System.currentTimeMillis() - start);
+    }
+
+    public void onSubmitMulti(com.cloudhopper.smpp.pdu.SubmitMulti event, ActivityContextInterface aci) {
+        final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
+        sbbu.incrementCounterSubmitMultiSm(ONE);
+        final long start = System.currentTimeMillis();
+        onSubmitMultiLocal(sbbu, event, aci);
+        sbbu.sampleSubmitMultiSm(System.currentTimeMillis() - start);
+    }
+
+    public void onDeliverSm(com.cloudhopper.smpp.pdu.DeliverSm event, ActivityContextInterface aci) {
+        final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
+        sbbu.incrementCounterDeliverSm(ONE);
+        final long start = System.currentTimeMillis();
+        onDeliverSmLocal(sbbu, event, aci);
+        sbbu.sampleDeliverSm(System.currentTimeMillis() - start);
+    }
+
+    public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
+        final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
+        sbbu.incrementCounterErrorPduRequestTimeout(ONE);
+        sbbu.samplePduRequestTimeout(0L);
+    	logger.severe(String.format("\nonPduRequestTimeout : PduRequestTimeout=%s", event));
+    	// TODO : Handle this
+    }
+
+    public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
+    		EventContext eventContext) {
+        final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
+        sbbu.incrementErrorRecoverablePduException(ONE);
+        sbbu.sampleRecoverablePduException(0L);
+    	logger.severe(String.format("\nonRecoverablePduException : RecoverablePduException=%s", event));
+    	// TODO : Handle this
+    }
+
+    private void onSubmitSmLocal(final TxSmppServerSbbUsage anSbbUsage, final com.cloudhopper.smpp.pdu.SubmitSm event,
+	        final ActivityContextInterface aci) {
 		// TODO remove it ...........................
 		// long l2 = Date.parse(event.getServiceType());
 		// Date dt0 = new Date(l2);
@@ -195,6 +257,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
+                anSbbUsage.incrementCounterErrorSubmitSm(ONE);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -202,7 +265,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             } catch (Exception e) {
-                this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+                anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage()
+                    + ".\nResponse: " + response + ".", e);
             }
             return;
         }
@@ -214,6 +279,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             sms = this.createSmsEvent(event, esme, ta, persistence);
             this.processSms(sms, persistence, esme, event, null, null, IncomingMessageType.submit_sm);
 		} catch (SmscProcessingException e1) {
+            anSbbUsage.incrementCounterErrorSubmitSm(ONE);
+		    SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
                 this.logger.severe(e1.getMessage(), e1);
                 smscStatAggregator.updateMsgInFailedAll();
@@ -238,11 +305,14 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 			try {
 				this.smppServerSessions.sendResponsePdu(esme, event, response);
 			} catch (Exception e) {
-				this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+			    anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage()
+                    + ".\nResponse: " + response + ".", e);
 			}
 
 			return;
 		} catch (Throwable e1) {
+		    anSbbUsage.incrementCounterErrorSubmitSm(ONE);
 			String s = "Exception when processing SubmitSm message: " + e1.getMessage();
 			this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
@@ -263,7 +333,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 			try {
 				this.smppServerSessions.sendResponsePdu(esme, event, response);
 			} catch (Exception e) {
-				this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+			    anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage()
+                    + ".\nResponse: " + response + ".", e);
 			}
 
 			return;
@@ -278,7 +350,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             }
 		} catch (Throwable e) {
-			this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+		    anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+            this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage()
+                + ".\nResponse: " + response + ".", e);
 		}
 
 		// TODO remove it ...........................
@@ -289,7 +363,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
 	}
 
-	public void onDataSm(com.cloudhopper.smpp.pdu.DataSm event, ActivityContextInterface aci) {
+    private void onDataSmLocal(final TxSmppServerSbbUsage anSbbUsage, final com.cloudhopper.smpp.pdu.DataSm event,
+            ActivityContextInterface aci) {
 		SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
 		Esme esme = smppServerTransaction.getEsme();
 		String esmeName = esme.getName();
@@ -315,6 +390,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
+                anSbbUsage.incrementCounterErrorDataSm(ONE);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -322,6 +398,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             } catch (Exception e) {
+                anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
                 this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
             }
             return;
@@ -334,6 +411,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             sms = this.createSmsEvent(event, esme, ta, persistence);
             this.processSms(sms, persistence, esme, null, event, null, IncomingMessageType.data_sm);
 		} catch (SmscProcessingException e1) {
+		    anSbbUsage.incrementCounterErrorDataSm(ONE);
+            SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
                 this.logger.severe(e1.getMessage(), e1);
                 smscStatAggregator.updateMsgInFailedAll();
@@ -358,11 +437,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 			try {
 				this.smppServerSessions.sendResponsePdu(esme, event, response);
 			} catch (Exception e) {
+			    anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
 				this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
 			}
 
 			return;
 		} catch (Throwable e1) {
+		    anSbbUsage.incrementCounterErrorDataSm(ONE);
 			String s = "Exception when processing dataSm message: " + e1.getMessage();
 			this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
@@ -383,6 +464,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 			try {
 				this.smppServerSessions.sendResponsePdu(esme, event, response);
 			} catch (Exception e) {
+			    anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
 				this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
 			}
 
@@ -398,11 +480,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             }
 		} catch (Exception e) {
+		    anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
 			this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
 		}
 	}
 
-    public void onSubmitMulti(com.cloudhopper.smpp.pdu.SubmitMulti event, ActivityContextInterface aci) {
+    private void onSubmitMultiLocal(final TxSmppServerSbbUsage anSbbUsage,
+            final com.cloudhopper.smpp.pdu.SubmitMulti event, final ActivityContextInterface aci) {
         SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
         Esme esme = smppServerTransaction.getEsme();
         String esmeName = esme.getName();
@@ -432,6 +516,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
+                anSbbUsage.incrementCounterErrorSubmitMultiSm(ONE);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -439,6 +524,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             } catch (Exception e) {
+                anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
             }
             return;
@@ -452,6 +538,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.processSms(sms, persistence, esme, null, null, event, IncomingMessageType.submit_multi);
             }
         } catch (SmscProcessingException e1) {
+            anSbbUsage.incrementCounterErrorSubmitMultiSm(ONE);
+            SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
                 this.logger.severe(e1.getMessage(), e1);
                 smscStatAggregator.updateMsgInFailedAll();
@@ -476,11 +564,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             } catch (Exception e) {
+                anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
             }
 
             return;
         } catch (Throwable e1) {
+            anSbbUsage.incrementCounterErrorSubmitMultiSm(ONE);
             String s = "Exception when processing SubmitMulti message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
@@ -500,6 +590,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             // Lets send the Response with error here
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
+                anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
             } catch (Exception e) {
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
             }
@@ -528,11 +619,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             }
         } catch (Throwable e) {
+            anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
             this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
         }
     }
 
-	public void onDeliverSm(com.cloudhopper.smpp.pdu.DeliverSm event, ActivityContextInterface aci) {
+    private void onDeliverSmLocal(final TxSmppServerSbbUsage anSbbUsage, final com.cloudhopper.smpp.pdu.DeliverSm event,
+	        final ActivityContextInterface aci) {
 		SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
 		Esme esme = smppServerTransaction.getEsme();
 		String esmeName = esme.getName();
@@ -558,6 +651,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
+                anSbbUsage.incrementCounterErrorDeliverSm(ONE);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -565,6 +659,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             } catch (Exception e) {
+                anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
                 this.logger.severe("Error while trying to send DeliverSmResponse=" + response, e);
             }
             return;
@@ -577,6 +672,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             sms = this.createSmsEvent(event, esme, ta, persistence);
             this.processSms(sms, persistence, esme, null, null, null, IncomingMessageType.deliver_sm);
 		} catch (SmscProcessingException e1) {
+            anSbbUsage.incrementCounterErrorDeliverSm(ONE);
+            SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
                 this.logger.severe(e1.getMessage(), e1);
                 smscStatAggregator.updateMsgInFailedAll();
@@ -601,11 +698,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 			try {
 				this.smppServerSessions.sendResponsePdu(esme, event, response);
 			} catch (Exception e) {
+                anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
 				this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
 			}
 
 			return;
 		} catch (Throwable e1) {
+            anSbbUsage.incrementCounterErrorDeliverSm(ONE);
 			String s = "Exception when processing SubmitSm message: " + e1.getMessage();
 			this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
@@ -626,6 +725,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 			try {
 				this.smppServerSessions.sendResponsePdu(esme, event, response);
 			} catch (Exception e) {
+                anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
 				this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
 			}
 
@@ -639,20 +739,12 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 		try {
 			this.smppServerSessions.sendResponsePdu(esme, event, response);
 		} catch (Throwable e) {
+            anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
 			this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
 		}
 	}
 
-	public void onPduRequestTimeout(PduRequestTimeout event, ActivityContextInterface aci, EventContext eventContext) {
-		logger.severe(String.format("\nonPduRequestTimeout : PduRequestTimeout=%s", event));
-		// TODO : Handle this
-	}
-
-	public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
-			EventContext eventContext) {
-		logger.severe(String.format("\nonRecoverablePduException : RecoverablePduException=%s", event));
-		// TODO : Handle this
-	}
+	
 
     // *********
     // General Sms creating and processing methods
@@ -668,7 +760,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         if (event.getSourceAddress() == null || event.getSourceAddress().getAddress() == null
                 || event.getSourceAddress().getAddress().isEmpty()) {
             throw new SmscProcessingException("SourceAddress digits are absent", SmppConstants.STATUS_INVSRCADR,
-                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
+                    SmscProcessingException.INTERNAL_ERROR_MISC_SRC_ADDR_INVALID);
         }
         sms.setSourceAddr(event.getSourceAddress().getAddress());
         sms.setSourceAddrTon(event.getSourceAddress().getTon());
@@ -681,7 +774,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         if (err != null) {
             throw new SmscProcessingException("TxSmpp DataCoding scheme does not supported: " + dcs + " - " + err,
                     SmppExtraConstants.ESME_RINVDCS, MAPErrorCode.systemFailure,
-                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
+                    SmscProcessingException.INTERNAL_ERROR_MISC_DATA_CODING_INVALID);
         }
 
         // storing additional parameters
@@ -786,7 +880,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             SmscProcessingException e = new SmscProcessingException(
                     "Message length is less than a min length limit for ESME=" + origEsme.getName() + ", len=" + msg.length(),
                     SmppConstants.STATUS_INVMSGLEN, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
-                    null);
+                    null, SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_SHORT);
             e.setSkipErrorLogging(true);
             throw e;
         }
@@ -794,7 +888,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             SmscProcessingException e = new SmscProcessingException(
                     "Message length is more than a max length limit for ESME=" + origEsme.getName() + ", len=" + msg.length(),
                     SmppConstants.STATUS_INVMSGLEN, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
-                    null);
+                    null, SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_LONG);
             e.setSkipErrorLogging(true);
             throw e;
         }
@@ -826,7 +920,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 throw new SmscProcessingException(
                         "Message length in bytes is too big for solid message: " + messageLen + ">" + lenSolid,
                         SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure,
-                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
+                        SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_LONG);
             }
         } else {
             // here splitting by SMSC is supported
@@ -850,7 +945,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     throw new SmscProcessingException(
                             "Message length in bytes is too big for segmented message: " + messageLen + ">" + lenSegmented,
                             SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure,
-                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
+                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
+                            SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_LONG);
                 }
             } else {
                 if (udh != null) {
@@ -877,7 +973,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 throw new SmscProcessingException(
                         "TlvConvertException when getting TAG_QOS_TIME_TO_LIVE tlv field: " + e.getMessage(),
                         SmppConstants.STATUS_INVOPTPARAMVAL, MAPErrorCode.systemFailure,
-                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
+                        SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_PARSING);
             }
             validityPeriod = new Date(valTime);
         } else {
@@ -886,7 +983,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             } catch (ParseException e) {
                 throw new SmscProcessingException(
                         "ParseException when parsing ValidityPeriod field: " + e.getMessage(), SmppConstants.STATUS_INVEXPIRY,
-                        MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
+                        MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
+                        SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_PARSING);
             }
         }
         MessageUtil.applyValidityPeriod(sms, validityPeriod, true, smscPropertiesManagement.getMaxValidityPeriodHours(),
@@ -899,7 +997,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         } catch (ParseException e) {
             throw new SmscProcessingException("ParseException when parsing ScheduleDeliveryTime field: " + e.getMessage(),
                     SmppConstants.STATUS_INVSCHED, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
-                    null, e);
+                    null, e, SmscProcessingException.INTERNAL_ERROR_MISC_SCHEDULER_DELIVERY_TIME_PARSING);
         }
         MessageUtil.applyScheduleDeliveryTime(sms, scheduleDeliveryTime);
 
@@ -928,13 +1026,14 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         if (addrList == null || addrList.size() == 0) {
             throw new SmscProcessingException("For received SubmitMulti no DestAddresses found: ",
                     SmppConstants.STATUS_INVDLNAME, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
-                    null);
+                    null, SmscProcessingException.INTERNAL_ERROR_MISC_DST_ADDR_INVALID);
         }
 
         if (event.getSourceAddress() == null || event.getSourceAddress().getAddress() == null
                 || event.getSourceAddress().getAddress().isEmpty()) {
             throw new SmscProcessingException("SourceAddress digits are absent", SmppConstants.STATUS_INVSRCADR,
-                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
+                    SmscProcessingException.INTERNAL_ERROR_MISC_SRC_ADDR_INVALID);
         }
 
         // checking parameters first
@@ -947,7 +1046,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         if (err != null) {
             throw new SmscProcessingException("TxSmpp DataCoding scheme does not supported: " + dcs + " - " + err,
                     SmppExtraConstants.ESME_RINVDCS, MAPErrorCode.systemFailure,
-                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
+                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
+                    SmscProcessingException.INTERNAL_ERROR_MISC_DATA_CODING_INVALID);
         }
 
         DataCodingScheme dataCodingScheme = new DataCodingSchemeImpl(dcs);
@@ -1050,7 +1150,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 throw new SmscProcessingException(
                         "Message length in bytes is too big for solid message: " + messageLen + ">" + lenSolid,
                         SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure,
-                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
+                        SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_LONG);
             }
         } else {
             // here splitting by SMSC is supported
@@ -1072,7 +1173,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     throw new SmscProcessingException(
                             "Message length in bytes is too big for segmented message: " + messageLen + ">" + lenSegmented,
                             SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure,
-                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
+                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
+                            SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_LONG);
                 }
             }
         }
@@ -1088,7 +1190,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 throw new SmscProcessingException(
                         "TlvConvertException when getting TAG_QOS_TIME_TO_LIVE tlv field: " + e.getMessage(),
                         SmppConstants.STATUS_INVOPTPARAMVAL, MAPErrorCode.systemFailure,
-                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
+                        SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_PARSING);
             }
             validityPeriod = new Date(valTime);
         } else {
@@ -1097,7 +1200,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             } catch (ParseException e) {
                 throw new SmscProcessingException("ParseException when parsing ValidityPeriod field: " + e.getMessage(),
                         SmppConstants.STATUS_INVEXPIRY, MAPErrorCode.systemFailure,
-                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
+                        SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_PARSING);
             }
         }
 
@@ -1108,7 +1212,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         } catch (ParseException e) {
             throw new SmscProcessingException("ParseException when parsing ScheduleDeliveryTime field: " + e.getMessage(),
                     SmppConstants.STATUS_INVSCHED, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
-                    null, e);
+                    null, e, SmscProcessingException.INTERNAL_ERROR_MISC_SCHEDULER_DELIVERY_TIME_PARSING);
         }
 
         long messageId = store.c2_getNextMessageId();
@@ -1426,7 +1530,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     private TargetAddress createDestTargetAddress(Address addr, int networkId) throws SmscProcessingException {
         if (addr == null || addr.getAddress() == null || addr.getAddress().isEmpty()) {
             throw new SmscProcessingException("DestAddress digits are absent", SmppConstants.STATUS_INVDSTADR,
-                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, addr);
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, addr,
+                    SmscProcessingException.INTERNAL_ERROR_MISC_DST_ADDR_INVALID);
         }
 
         int destTon = addr.getTon();

@@ -263,7 +263,7 @@ public class MessageUtil {
 		if (scheduleDeliveryTime.after(maxSchDelTime)) {
             throw new SmscProcessingException("Schedule delivery time is before 3 hours before than validity period expiration",
                     SmppConstants.STATUS_INVSCHED, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
-                    null);
+                    null, SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_INVALID);
 		}
 
 		sms.setScheduleDeliveryTime(scheduleDeliveryTime);

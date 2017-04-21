@@ -78,6 +78,7 @@ import org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
+import org.mobicents.smsc.slee.services.smpp.server.rx.stub.RxSmppServerSbbUsageStub;
 import org.restcomm.slee.resource.smpp.SmppSessions;
 import org.restcomm.slee.resource.smpp.SmppTransaction;
 import org.restcomm.slee.resource.smpp.SmppTransactionACIFactory;
@@ -608,6 +609,11 @@ public class RxSmppServerSbbTest {
                 Address address) {
             // TODO Auto-generated method stub
             
+        }
+
+        @Override
+        public RxSmppServerSbbUsage getDefaultSbbUsageParameterSet() {
+            return new RxSmppServerSbbUsageStub();
         }
     }
 
