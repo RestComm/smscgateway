@@ -373,4 +373,12 @@ public interface SmscPropertiesManagementMBean {
 
     public void setMaxMessageId(long maxMessageId) throws IllegalArgumentException;
 
+    public void setCassandraUser(String user) throws  IllegalArgumentException;
+
+    public String getCassandraUser();
+
+    public void setCassandraPass(String pass) throws  IllegalArgumentException;
+
+    public String getCassandraPass();
+
 }

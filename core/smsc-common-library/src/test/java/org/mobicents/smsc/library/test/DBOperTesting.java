@@ -34,7 +34,7 @@ public class DBOperTesting {
             logger.info("starting DBOperations_C2 ...");
             String keySpacename = "RestCommSMSC1";
 //            String keySpacename = "RestCommSMSC";
-            db.start("127.0.0.1", 9042, keySpacename, 60, 60, 60 * 10, 1, 10000000000L);
+            db.start("127.0.0.1", 9042, keySpacename, "cassandra", "cassandra", 60, 60, 60 * 10, 1, 10000000000L);
 
             logger.info("DBOperations_C2 is started");
             

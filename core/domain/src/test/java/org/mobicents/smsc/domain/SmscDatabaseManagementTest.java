@@ -29,7 +29,7 @@ public class SmscDatabaseManagementTest {
         if (cassandraDbInited) {
             try {
                 this.db = DBOperations.getInstance();
-                this.db.start(ip, 9042, keyspace, 60, 60, 60 * 10, 1, 10000000000L);
+                this.db.start(ip, 9042, keyspace, "cassandra", "cassandra", 60, 60, 60 * 10, 1, 10000000000L);
             } catch (Exception e) {
             }
         }

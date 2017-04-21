@@ -38,6 +38,8 @@ public class StressTool3 {
     private String host = "localhost";
     private int port = 9042;
     private String keyspace = "saturn";
+    private String user = "cassandra";
+    private String pass = "cassandra";
     private int dataTableDaysTimeArea = 10;
     private int smsSetRange = 10;
     private int recordCount = 500000;
@@ -83,7 +85,7 @@ public class StressTool3 {
         // -dDataTableDaysTimeArea
 
         this.dbOperations = new TT_DBOperationsProxy3();
-        this.dbOperations.start(host, port, keyspace, 60, 60, 60 * 10, 1, 10000000000L);
+        this.dbOperations.start(host, port, keyspace, user, pass, 60, 60, 60 * 10, 1, 10000000000L);
 
         
         

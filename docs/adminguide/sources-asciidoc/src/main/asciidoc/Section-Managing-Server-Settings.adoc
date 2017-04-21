@@ -1229,6 +1229,80 @@ EXAMPLES
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+----
+
+[[cassandra_user]]
+=== Cassandra Configuration - User Name
+
+[[_cassandra_user_cli]]
+==== Using CLI
+
+You can set the 'Cassandra User Name' by issuing the command `smsc set cassandrauser` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get cassandrauser` which will display the value set for this property.
+
+----
+
+Name
+	smsc set cassandrauser
+
+SYNOPSIS
+	smsc set cassandrauser <username>
+
+DESCRIPTION
+	This command is used to set the user name for Cassandra Database. Default user is `cassandra`
+	You must restart SMSC GW to take effect.
+
+----
+
+[[_cassandra_user_gui]]
+==== Using GUI
+
+.Procedure: Set Cassandra Configuration - User Name using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Cassandra' tab in the GUI.
+. You can specify the User Name by entering the value in the text field 'User Name'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+----
+
+[[cassandra_pass]]
+=== Cassandra Configuration - Password
+
+[[_cassandra_pass_cli]]
+==== Using CLI
+
+You can set the 'Cassandra Password' by issuing the command `smsc set cassandrapass` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get cassandrapass` which will display the value set for this property.
+
+----
+
+Name
+	smsc set cassandrapass
+
+SYNOPSIS
+	smsc set cassandrapass <password>
+
+DESCRIPTION
+	This command is used to set the password for Cassandra Database. Default password is `cassandra`
+	You must restart SMSC GW to take effect.
+
+----
+
+[[_cassandra_user_gui]]
+==== Using GUI
+
+.Procedure: Set Cassandra Configuration - Password using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Cassandra' tab in the GUI.
+. You can specify the Cassandra Password by entering the value in the text field 'Password'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+----
+
 [[_db_removinglivetablesdays]]
 === Cassandra Configuration - Removing Live Tables Days
 

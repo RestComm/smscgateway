@@ -1,0 +1,16 @@
+Name
+	smsc get cassandrauser
+
+SYNOPSIS
+	smsc get cassandrauser
+
+DESCRIPTION
+	This command is used to get the user account for Cassandra Database
+	access.
+
+EXAMPLES
+	smsc get calculatemsgpartslencdr
+
+SEE ALSO
+	smsc get generatereceiptcdr, smsc get generatetempfailurecdr,
+	smsc get calculatemsgpartslencdr, smsc get generatecdr

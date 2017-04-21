@@ -44,7 +44,7 @@ public class TT_PersistenceProxy extends DBOperations {
     private static final Logger logger = Logger.getLogger(TT_PersistenceProxy.class);
 
     public void start() throws Exception {
-        super.start("127.0.0.1", 9042, "RestCommSMSC", 60, 60, 60 * 10, 1, 10000000000L);
+        super.start("127.0.0.1", 9042, "RestCommSMSC", "cassandra", "cassandra", 60, 60, 60 * 10, 1, 10000000000L);
     }
 
     public boolean testCassandraAccess() {
