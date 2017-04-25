@@ -32,6 +32,8 @@ import java.util.Date;
  */
 public interface MProcMessage {
 
+    long getMessageId();
+
     // source address part
     int getSourceAddrTon();
 

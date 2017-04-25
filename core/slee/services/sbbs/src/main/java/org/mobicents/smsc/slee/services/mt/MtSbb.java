@@ -609,8 +609,11 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 							if (messageSegmentNumber < segments.length - 1) {
 								moreMessagesToSend = true;
 							}
-                            if (this.getTotalUnsentMessageCount() > 1) {
-                                moreMessagesToSend = true;
+                            try {
+                                if (this.getTotalUnsentMessageCount() > 1) {
+                                    moreMessagesToSend = true;
+                                }
+                            } catch (Throwable e) {
                             }
 
 							switch (mapDialogSms.getApplicationContext().getApplicationContextVersion()) {
@@ -771,21 +774,24 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		}
 		this.setMAPVersionTested(mapApplicationContextVersion);
 
-        // dropaftersri pmproc rules
-        if (this.getTotalUnsentMessageCount() > 0) {
-            ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
-            ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
-            ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
-            TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
-            try {
-                synchronized (lock) {
-                    this.applyMprocRulesOnImsiResponse(smsSet, lstPermFailured, lstRerouted, lstNewNetworkId, networkNode,
-                            imsiData);
-                    this.onImsiDrop(smsSet, lstPermFailured, lstRerouted, lstNewNetworkId, networkNode, imsiData);
+        // dropaftersri mproc rules
+        try {
+            if (this.getTotalUnsentMessageCount() > 0) {
+                ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
+                ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
+                ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
+                TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
+                try {
+                    synchronized (lock) {
+                        this.applyMprocRulesOnImsiResponse(smsSet, lstPermFailured, lstRerouted, lstNewNetworkId, networkNode,
+                                imsiData);
+                        this.onImsiDrop(smsSet, lstPermFailured, lstRerouted, lstNewNetworkId, networkNode, imsiData);
+                    }
+                } finally {
+                    persistence.releaseSynchroObject(lock);
                 }
-            } finally {
-                persistence.releaseSynchroObject(lock);
             }
+        } catch (Throwable e) {
         }
 
         if (this.getTotalUnsentMessageCount() == 0) {
@@ -1043,8 +1049,11 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         }
 
 		boolean moreMessagesToSend = false;
-        if (this.getTotalUnsentMessageCount() > 1) {
-            moreMessagesToSend = true;
+        try {
+            if (this.getTotalUnsentMessageCount() > 1) {
+                moreMessagesToSend = true;
+            }
+        } catch (Throwable e) {
         }
 
 		try {

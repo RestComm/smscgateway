@@ -53,9 +53,14 @@ public class MProcMessageImpl implements MProcMessage {
         this.processingType = processingType;
         this.persistence = persistence;
     }
-
+    
     protected Sms getSmsContent() {
         return sms;
+    }
+
+    @Override
+    public long getMessageId() {
+        return sms.getMessageId();
     }
 
     @Override

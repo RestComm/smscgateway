@@ -60,6 +60,7 @@ import org.mobicents.smsc.slee.resources.persistence.SmppSessionsProxy;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.services.smpp.server.tx.stub.TxSmppServerSbbUsageStub;
 import org.restcomm.slee.resource.smpp.SmppSessions;
 import org.restcomm.slee.resource.smpp.SmppTransaction;
 import org.restcomm.smpp.Esme;
@@ -1129,6 +1130,11 @@ public class TxSmppServerSbbTest {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+        public TxSmppServerSbbUsage getDefaultSbbUsageParameterSet() {
+            return new TxSmppServerSbbUsageStub();
+        }
 	}
 
 	private class SmppTransactionProxy implements SmppTransaction, ActivityContextInterface {

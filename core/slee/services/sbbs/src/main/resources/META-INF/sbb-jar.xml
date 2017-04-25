@@ -37,7 +37,11 @@
 					</get-child-relation-method-name>
 					<default-priority>0</default-priority>
 				</get-child-relation-method>
+                
 			</sbb-abstract-class>
+            <sbb-usage-parameters-interface>
+                <sbb-usage-parameters-interface-name>org.mobicents.smsc.slee.services.smpp.server.rx.RxSmppServerSbbUsage</sbb-usage-parameters-interface-name>
+            </sbb-usage-parameters-interface>
 		</sbb-classes>
 
 		<event event-direction="Receive" initial-event="True">
@@ -1441,6 +1445,9 @@
 					<default-priority>0</default-priority>
 				</get-child-relation-method>
 			</sbb-abstract-class>
+            <sbb-usage-parameters-interface>
+                <sbb-usage-parameters-interface-name>org.mobicents.smsc.slee.services.smpp.server.tx.TxSmppServerSbbUsage</sbb-usage-parameters-interface-name>
+            </sbb-usage-parameters-interface>
 		</sbb-classes>
 
 		<event event-direction="Receive" initial-event="True">

@@ -131,6 +131,9 @@ public abstract class DeliveryCommonSbb implements Sbb {
                             + this.getTargetId() + "\n" + MessageUtil.stackTraceToString());
                     return;
                 }
+
+                // ***** no lock ******
+
                 smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
                 if (smsSet == null) {
                     this.logger.warning("smsSet is null for DeliveryCommonSbb in dlvIsInited state: " + ", targetId"
@@ -292,12 +295,17 @@ public abstract class DeliveryCommonSbb implements Sbb {
     protected void markDeliveringIsEnded(boolean removeSmsSet) {
         checkSmsSetLoaded();
         if (smsSet != null) {
+            // ***** no lock ******
+
             if (removeSmsSet) {
                 // TODO: we use "removeSmsSet" only till we use SmsSetCache and do not keep SmsSet inside SBB. We need to remove
                 // "removeSmsSet" after this refactoring (always "removeSmsSet==true") !!!
 
                 SmsSetCache.getInstance().removeProcessingSmsSet(smsSet.getTargetId());
             }
+            
+            
+            
         }
 
         dlvIsEnded = true;
@@ -423,6 +431,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
         checkSmsSetLoaded();
         checkPendingRequestsListLoaded();
 
+        // ***** no lock ******
+
         if (numInSendingPool < 0 || numInSendingPool >= this.getSendingPoolMessageCount()) {
             // this is a case when a message number is outside sendingPoolMsgCount
             return null;
@@ -464,41 +474,54 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected int obtainNextMessagesSendingPool(int poolMessageCount, ProcessingType processingType) {
         commitSendingPoolMsgCount();
-
         if (smsSet != null) {
             int addedMessageCnt = 0;
-            int gotMessageCnt = 0;
-            int sendingPoolMsgCount = this.getTotalUnsentMessageCount();
-            for (int i1 = 0; i1 < sendingPoolMsgCount; i1++) {
-                if (addedMessageCnt >= poolMessageCount) {
-                    break;
-                }
+            TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
+            // ***** lock ******
+            try {
+                synchronized (lock) {
+                    int gotMessageCnt = 0;
+                    int sendingPoolMsgCount = this.getTotalUnsentMessageCount();
+                    for (int i1 = 0; i1 < sendingPoolMsgCount; i1++) {
+                        if (addedMessageCnt >= poolMessageCount) {
+                            break;
+                        }
 
-                gotMessageCnt++;
-                Sms sms = smsSet.getSms(currentMsgNum + i1);
-                if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
-                    this.endDeliveryAfterValidityPeriod(sms, processingType, null, null);
-                } else {
-                    boolean res1 = applyMProcPreDelivery(sms, processingType);
-                    if (res1) {
-                        addedMessageCnt++;
-                        sms.setDeliveryCount(sms.getDeliveryCount() + 1);
-                        smsSet.markSmsAsDelivered(currentMsgNum + i1);
-                        smsSet.addMessageToSendingPool(sms);
+                        gotMessageCnt++;
+                        Sms sms = smsSet.getSms(currentMsgNum + i1);
+                        if (sms == null) {
+                            this.logger.severe("RxSmpp obtainNextMessagesSendingPool() error: sms is not found num=" + i1
+                                    + " from " + sendingPoolMsgCount + ", smsSet=" + smsSet);
+                            break;
+                        }
+                        if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
+                            this.endDeliveryAfterValidityPeriod(sms, processingType, null, null);
+                        } else {
+                            boolean res1 = applyMProcPreDelivery(sms, processingType);
+                            if (res1) {
+                                addedMessageCnt++;
+                                sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+                                smsSet.markSmsAsDelivered(currentMsgNum + i1);
+                                smsSet.addMessageToSendingPool(sms);
+                            }
+                        }
                     }
+
+                    sequenceNumbers = new int[addedMessageCnt];
+                    sequenceNumbersExtra = new int[addedMessageCnt][];
+
+                    if (gotMessageCnt > 0) {
+                        currentMsgNum += gotMessageCnt;
+                        this.setCurrentMsgNum(currentMsgNum);
+                    }
+
+                    this.rescheduleDeliveryTimer();
+
                 }
-            }            
-
-            sequenceNumbers = new int[addedMessageCnt];
-            sequenceNumbersExtra = new int[addedMessageCnt][];
-
-            if (gotMessageCnt > 0) {
-                currentMsgNum += gotMessageCnt;
-                this.setCurrentMsgNum(currentMsgNum);
+            } finally {
+                persistence.releaseSynchroObject(lock);
             }
 
-            this.rescheduleDeliveryTimer();
-            
             return addedMessageCnt;
         } else
             return 0;
@@ -516,44 +539,57 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected Sms obtainNextMessage(ProcessingType processingType) {
         commitSendingPoolMsgCount();
-
         if (smsSet != null) {
-            int addedMessageCnt = 0;
-            int gotMessageCnt = 0;
-            int sendingPoolMsgCount = this.getTotalUnsentMessageCount();
             Sms sms = null;
-            for (int i1 = 0; i1 < sendingPoolMsgCount; i1++) {
-                if (addedMessageCnt >= 1) {
-                    break;
-                }
+            // ***** lock ******
+            TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
+            try {
+                synchronized (lock) {
+                    int addedMessageCnt = 0;
+                    int gotMessageCnt = 0;
+                    int sendingPoolMsgCount = this.getTotalUnsentMessageCount();
+                    for (int i1 = 0; i1 < sendingPoolMsgCount; i1++) {
+                        if (addedMessageCnt >= 1) {
+                            break;
+                        }
 
-                gotMessageCnt++;
-                sms = smsSet.getSms(currentMsgNum + i1);
-                if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
-                    this.endDeliveryAfterValidityPeriod(sms, processingType, null, null);
-                    sms = null;
-                } else {
-                    boolean res1 = applyMProcPreDelivery(sms, processingType);
-                    if (!res1) {
-                        sms = null;
-                    } else {
-                        addedMessageCnt++;
-                        sms.setDeliveryCount(sms.getDeliveryCount() + 1);
-                        smsSet.markSmsAsDelivered(currentMsgNum + i1);
-                        smsSet.addMessageToSendingPool(sms);
+                        gotMessageCnt++;
+                        sms = smsSet.getSms(currentMsgNum + i1);
+                        if (sms == null) {
+                            this.logger.severe("RxSmpp obtainNextMessage() error: sms is not found num=" + i1
+                                    + " from " + sendingPoolMsgCount + ", smsSet=" + smsSet);
+                            break;
+                        }
+                        if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
+                            this.endDeliveryAfterValidityPeriod(sms, processingType, null, null);
+                            sms = null;
+                        } else {
+                            boolean res1 = applyMProcPreDelivery(sms, processingType);
+                            if (!res1) {
+                                sms = null;
+                            } else {
+                                addedMessageCnt++;
+                                sms.setDeliveryCount(sms.getDeliveryCount() + 1);
+                                smsSet.markSmsAsDelivered(currentMsgNum + i1);
+                                smsSet.addMessageToSendingPool(sms);
+                            }
+                        }
                     }
+
+                    if (gotMessageCnt > 0) {
+                        currentMsgNum += gotMessageCnt;
+                        this.setCurrentMsgNum(currentMsgNum);
+                    }
+
+                    sequenceNumbers = null;
+                    sequenceNumbersExtra = null;
+
+                    this.rescheduleDeliveryTimer();
+
                 }
-            }            
-
-            if (gotMessageCnt > 0) {
-                currentMsgNum += gotMessageCnt;
-                this.setCurrentMsgNum(currentMsgNum);
+            } finally {
+                persistence.releaseSynchroObject(lock);
             }
-
-            sequenceNumbers = null;
-            sequenceNumbersExtra = null;
-
-            this.rescheduleDeliveryTimer();
 
             return sms;
         } else
@@ -562,7 +598,6 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     private boolean applyMProcPreDelivery(Sms sms, ProcessingType processingType) {
         MProcResult mProcResult = MProcManagement.getInstance().applyMProcPreDelivery(itsMProcRa, sms, processingType);
-
         if (mProcResult.isMessageIsRerouted()) {
             // firstly we check if rerouting attempts was not too many
             if (sms.getReroutingCount() >= MAX_POSSIBLE_REROUTING) {
@@ -1393,6 +1428,9 @@ public abstract class DeliveryCommonSbb implements Sbb {
         }
 
         // if no message was sent in a message pool, let's 
+
+        // ***** no lock ******
+        
         Sms sms = this.getUnsentMessage(0);
         if (sms != null) {
             String s1 = reason.replace("\n", "\t");

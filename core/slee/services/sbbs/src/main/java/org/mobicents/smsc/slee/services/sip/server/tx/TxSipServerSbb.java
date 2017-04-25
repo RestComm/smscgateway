@@ -400,7 +400,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
             throw new SmscProcessingException(
                     "Message length in bytes is too big for segmented message: " + messageLen + ">" + lenSegmented,
                     SmppConstants.STATUS_INVPARLEN, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
-                    null);
+                    null, SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_LONG);
 		}
 
 		sms.setSubmitDate(new Timestamp(System.currentTimeMillis()));
