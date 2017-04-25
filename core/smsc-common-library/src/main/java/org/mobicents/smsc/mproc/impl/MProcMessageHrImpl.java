@@ -45,8 +45,8 @@ public class MProcMessageHrImpl implements MProcMessage {
     }
 
     @Override
-    public String getMessageId() {
-        return correlationIdValue.getCorrelationID();
+    public long getMessageId() {
+        return 0;
     }
 
     // meaningful values

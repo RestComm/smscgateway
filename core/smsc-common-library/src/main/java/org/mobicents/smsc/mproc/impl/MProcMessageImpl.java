@@ -57,10 +57,10 @@ public class MProcMessageImpl implements MProcMessage {
     protected Sms getSmsContent() {
         return sms;
     }
-    
+
     @Override
-    public String getMessageId() {
-        return String.valueOf(sms.getMessageId());
+    public long getMessageId() {
+        return sms.getMessageId();
     }
 
     @Override
