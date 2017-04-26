@@ -805,6 +805,7 @@ public abstract class MoSbb extends MoCommonSbb {
                     MAPErrorCode.unexpectedDataValue, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null);
 		}
 		sms.setSourceAddr(callingPartyAddress.getAddress());
+		sms.setOriginatorSccpAddress(originatorSccpAddress);
 
 		sms.setSourceAddrTon(callingPartyAddress.getAddressNature().getIndicator());
 		sms.setSourceAddrNpi(callingPartyAddress.getNumberingPlan().getIndicator());		
@@ -825,7 +826,6 @@ public abstract class MoSbb extends MoCommonSbb {
         sms.setStatusReportRequest(smsSubmitTpdu.getStatusReportRequest());
 
 		DataCodingScheme dataCodingScheme = smsSubmitTpdu.getDataCodingScheme();
-		byte[] smsPayload = null;
 		int dcs = dataCodingScheme.getCode();
 		String err = MessageUtil.checkDataCodingSchemeSupport(dcs);
 		if (err != null) {
