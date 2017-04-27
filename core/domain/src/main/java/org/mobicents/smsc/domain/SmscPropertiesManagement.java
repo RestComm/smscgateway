@@ -137,6 +137,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
     private static final String DELIVERY_PAUSE = "deliveryPause";
 
+    private static final String CASSANDRA_USER = "cassandraUser";
+    private static final String CASSANDRA_PASS = "cassandraPass";
 
 	private static final String TAB_INDENT = "\t";
 	private static final String CLASS_ATTRIBUTE = "type";
@@ -198,6 +200,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private int dbPort = 9042;
 	private String keyspaceName = "RestCommSMSC";
 	private String clusterName = "RestCommSMSC";
+
+    // credential for cassandra
+    private String cassandraUser = "cassandra";
+    private String cassandraPass = "cassandra";
 
 	// period of fetching messages from a database for delivering
 	// private long fetchPeriod = 5000; // that was C1
@@ -579,6 +585,34 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 		this.dueDelayMultiplicator = dueDelayMultiplicator;
 		this.store();
 	}
+
+    public void setCassandraUser(String user) throws IllegalArgumentException {
+
+        if (user.trim().equals("")) {
+            throw new IllegalArgumentException("User name can not be empty");
+        }
+
+        this.cassandraUser = user.trim();
+        this.store();
+    }
+
+    public String getCassandraUser() {
+        return this.cassandraUser;
+    }
+
+    public void setCassandraPass(String pass) throws IllegalArgumentException {
+
+        if (pass.trim().equals("")) {
+            throw new IllegalArgumentException("Password can not be empty");
+        }
+
+        this.cassandraPass = pass.trim();
+        this.store();
+    }
+
+    public String getCassandraPass() {
+        return this.cassandraPass;
+    }
 
 	@Override
 	public int getMaxMessageLengthReducer() {
@@ -1507,6 +1541,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.httpDefaultRDIntermediateNotification, HTTP_DEFAULT_RD_INTERMEDIATE_NOTIFICATION, Integer.class);
             writer.write(this.httpDefaultDataCoding, HTTP_DEFAULT_DATA_CODING, Integer.class);
 
+            writer.write(this.cassandraUser, CASSANDRA_USER, String.class);
+            writer.write(this.cassandraPass, CASSANDRA_PASS, String.class);
+
             writer.write(this.diameterDestRealm, DIAMETER_DEST_REALM, String.class);
 			writer.write(this.diameterDestHost, DIAMETER_DEST_HOST, String.class);
 			writer.write(this.diameterDestPort, DIAMETER_DEST_PORT, Integer.class);
@@ -1822,6 +1859,14 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             val = reader.read(HTTP_DEFAULT_DATA_CODING, Integer.class);
             if (val != null)
                 this.httpDefaultDataCoding = val;
+
+            vals = reader.read(CASSANDRA_USER, String.class);
+            if (vals != null)
+                this.cassandraUser = vals;
+
+            vals = reader.read(CASSANDRA_PASS, String.class);
+            if (vals != null)
+                this.cassandraPass = vals;
 
             this.diameterDestRealm = reader.read(DIAMETER_DEST_REALM, String.class);
 

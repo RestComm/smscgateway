@@ -70,11 +70,11 @@ public class PersistenceRAInterfaceProxy extends DBOperations implements Persist
     }
 
     public void start() throws Exception {
-        super.start(ip, 9042, keyspace, 60, 60, 60 * 10, 1, 10000000000L);
+        super.start(ip, 9042, keyspace, "cassandra", "cassandra", 60, 60, 60 * 10, 1, 10000000000L);
     }
 
     public void startMinMaxMessageId(long minMessageId, long maxMessageId) throws Exception {
-        super.start(ip, 9042, keyspace, 60, 60, 60 * 10, minMessageId, maxMessageId);
+        super.start(ip, 9042, keyspace, "cassandra", "cassandra", 60, 60, 60 * 10, minMessageId, maxMessageId);
     }
 
     public void setOldShortMessageDbFormat(boolean val) {

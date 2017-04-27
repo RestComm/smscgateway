@@ -1,0 +1,17 @@
+Name
+	smsc get cassandrapass
+
+SYNOPSIS
+	smsc get cassandrapass
+
+DESCRIPTION
+	This command is used to get the password for Cassandra Database
+	access.
+
+EXAMPLES
+	smsc get cassandrapass
+
+SEE ALSO
+	smsc esme_create, smsc get scgt, smsc get scssn, smsc get scssn, smsc get hlrssn,
+	smsc get hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv,
+	smsc get maxmapv
