@@ -1229,8 +1229,6 @@ EXAMPLES
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
-----
-
 [[cassandra_user]]
 === Cassandra Configuration - User Name
 
@@ -1265,8 +1263,6 @@ DESCRIPTION
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
-----
-
 [[cassandra_pass]]
 === Cassandra Configuration - Password
 
@@ -1300,8 +1296,6 @@ DESCRIPTION
 . You can specify the Cassandra Password by entering the value in the text field 'Password'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
-
-----
 
 [[_db_removinglivetablesdays]]
 === Cassandra Configuration - Removing Live Tables Days

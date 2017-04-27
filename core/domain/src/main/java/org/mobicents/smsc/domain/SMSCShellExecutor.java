@@ -1276,7 +1276,7 @@ public class SMSCShellExecutor implements ShellExecutor {
             } else if (parName.equals("deliverypause")) {
                 sb.append(smscPropertiesManagement.isDeliveryPause());
 			} else if (parName.equals("cassandrauser")) {
-                sb.append(smscPropertiesManagement.getCassandraPass());
+                sb.append(smscPropertiesManagement.getCassandraUser());
             } else if (parName.equals("cassandrapass")) {
                 sb.append(smscPropertiesManagement.getCassandraPass());
             }
