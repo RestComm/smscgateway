@@ -278,7 +278,20 @@
 						<span class="add-on">Delivery error code value</span>
 						<input id="errorcode" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Delivery error code value" />
 					</span>				
-				</div>									
+				</div>
+
+				<div id="div-tlvtype" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Rule will be applied only if message contains an optional parameter with tag equalling &lt;tag key&gt; and has a tag value with a type which equals the &lt;value type&gt; and a value which equals the value set here. Value -1 will match any optional parameter. Possible values for &lt;value type&gt; are &#13; string &#13; int &#13; byte &#13;Default value for &lt;tag key&gt; is -1. Default value for &lt;value type&gt; is string. Default value for &lt;tag value&gt; is -1.">
+						<span class="add-on">Tlv To Match</span>
+						<input id="tlvkey" type="text" class="input-mini" style="width: 80px; text-align: center;" placeholder="Tlv key" />
+						<select id="tlvtype" style="width: 80px;">
+							<option value="string">String</option>
+							<option value="int">Integer</option>
+							<option value="byte">Byte</option>
+						</select>
+						<input id="tlvvalue" type="text" class="input-mini" style="width: 80px; margin-right: 12px; text-align: center;" placeholder="Tlv value" />
+					</span>
+				</div>
 
 
 
@@ -450,7 +463,13 @@
 					</span>				
 				</div>	
 
-												
+				<div id="div-remove_tlv" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule matches, the target SMS's optional parameter which matches the one set here will be removed. Set this to -1 to not remove any optional parameter. Default value is -1.">
+						<span class="add-on">Remove Tlv</span>
+						<input id="remove_tlv" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Remove tlv" />
+					</span>
+				</div>
+
 				<button id="add-entity-button" class="btn btn btn-primary" onclick="createMProc()">Create</button>
 			</span>
 		</p>
@@ -479,16 +498,40 @@
 				return "-1";
 			}
 		}
+		var result = null;
+		if(parameter === "tlv") {
+			var tlvtype = "string";
+			var tlvkey = -1;
+			var tlvvalue = -1;
+			//parse type
+			var typeStartIndex = index + 3;//"tlv"
+			var typeEndIndex = ruleparameters.indexOf("_", typeStartIndex);
+			if(typeEndIndex !=-1){
+				tlvtype = ruleparameters.substring(typeStartIndex,typeEndIndex);
 
-		var valueStartIndex = ruleparameters.indexOf("=", index);
-		valueStartIndex = valueStartIndex+1;
-		
-		var valueEndIndex = ruleparameters.indexOf(",", index);
-		if(valueEndIndex != -1){
-			return (ruleparameters.substring(valueStartIndex,valueEndIndex));
-		} 
-		
-		return (ruleparameters.substring(valueStartIndex));
+				//parse key
+				var keyStartIndex = typeEndIndex + 1;
+				var keyEndIndex = ruleparameters.indexOf("=", keyStartIndex);
+				//if(keyEndIndex != -1){
+				tlvkey = ruleparameters.substring(keyStartIndex,keyEndIndex);
+				//}
+				//parse value
+				var valueStartIndex = keyEndIndex + 1;
+				var valueEndIndex = ruleparameters.indexOf(",", valueStartIndex);
+				tlvvalue = ruleparameters.substring(valueStartIndex,valueEndIndex);
+			}
+			result = [tlvkey, tlvtype, tlvvalue];
+		} else {
+			var valueStartIndex = ruleparameters.indexOf("=", index);
+			valueStartIndex = valueStartIndex+1;
+
+			var valueEndIndex = ruleparameters.indexOf(",", index);
+			if(valueEndIndex != -1){
+				return (ruleparameters.substring(valueStartIndex,valueEndIndex));
+			}
+			result = (ruleparameters.substring(valueStartIndex));
+		}
+		return result;
 	}
 
 	function convertTon(ton){
@@ -632,6 +675,10 @@
 										var processingtype = processRuleParameters(ruleparameters, "processingtype");
 										processingtype = processingtype.toUpperCase();
 										var errorcode = processRuleParameters(ruleparameters, "errorcode");
+										var tlvarray = processRuleParameters(ruleparameters, "tlv");
+										var tlvkey = tlvarray[0];
+										var tlvtype = tlvarray[1];
+										var tlvvalue =tlvarray[2];
 
 										var newnetworkid = processRuleParameters(ruleparameters, "newnetworkid");
 										var newdestton = processRuleParameters(ruleparameters, "newdestton");
@@ -652,7 +699,8 @@
 										var dropaftertempfail = processRuleParameters(ruleparameters, "dropaftertempfail");
 										if(dropaftertempfail=="-1") { dropaftertempfail = "false"; }
 										var newnetworkidaftertempfail = processRuleParameters(ruleparameters, "newnetworkidaftertempfail");
-										
+										var removetlv = processRuleParameters(ruleparameters, "tlvTagToRemove");
+
 										$('#esmes-table-wrapper').append('<div id="entities-modal'+id+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
 												'<div class="modal-header">'+
 													'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
@@ -932,7 +980,25 @@
 																		'</td>'+
 																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"ErrorCode"+']\').toggle(); $(\'input[id^='+id+"ErrorCode"+']\').focus();"></i>' +
 																		'</td>'+
-																		'</tr>'+																		
+																		'</tr>'+
+
+																		'<tr data-toggle="tooltip" title="Rule will be applied only if message contains an optional parameter with tag equalling &lt;tag key&gt; and has a tag value with a type which equals the &lt;value type&gt; and a value which equals the value set here. Value -1 will match any optional parameter. Possible values for &lt;value type&gt; are &#13; string &#13; int &#13; byte &#13;Default value for &lt;tag key&gt; is -1. Default value for &lt;value type&gt; is string. Default value for &lt;tag value&gt; is -1.">'+
+																		'<td style="font-size: 0.9em;">Tlv To Match</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'TlvKey-input" class="control-group">'+
+																			'<span id="' + id +'TlvKey-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + tlvkey + '" /> ' +
+																				'<input type="text" class="input-small" value="' + tlvtype + '" /> ' +
+																				'<input type="text" class="input-small" value="' + tlvvalue + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'tlv_'+tlvtype+'_'+tlvkey +'\', \'' + id+"TlvKey" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"TlvKey"+']\').toggle(); $(\'input[id^='+id+"TlvKey"+']\').focus();"></i>' +
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'TlvKey-text">' + tlvkey +' '+tlvtype+' '+tlvvalue+ '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"TlvKey"+']\').toggle(); $(\'input[id^='+id+"TlvKey"+']\').focus();"></i>' +
+																		'</td>'+
+																		'</tr>'+
 																		
 																		'<tr>'+
 																			'<td style="font-size: 0.9em;">--- Actions ---</td>'+
@@ -1178,6 +1244,21 @@
 																			'</td>'+
 																		'</tr>'+																		
 
+																		'<tr data-toggle="tooltip" title="Once rule matches, the target SMS\'s optional parameter which matches the one set here will be removed. Set this to -1 to not remove any optional parameter. Default value is -1.">'+
+																			'<td style="font-size: 0.9em;">Remove Tlv</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'RemoveTlv-input" class="control-group">'+
+																				'<span id="' + id +'RemoveTlv-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + removetlv + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'remove_tlv\', \'' + id+"RemoveTlv" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"RemoveTlv"+']\').toggle(); $(\'input[id^='+id+"RemoveTlv"+']\').focus();"></i>' +
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'RemoveTlv-text">' + removetlv + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"RemoveTlv"+']\').toggle(); $(\'input[id^='+id+"RemoveTlv"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
 
 
 
@@ -1489,6 +1570,19 @@
 			parametersstring = parametersstring + " errorcode "+errorcode;
 		}
 
+		var tlvkey = $("#tlvkey").val();
+		e = document.getElementById("tlvtype");
+		var tlvtype = e.options[e.selectedIndex].value;
+		var tlvvalue = $("#tlvvalue").val();
+
+		if(tlvkey.trim() == "" ||
+		   tlvvalue.trim() == "") {
+			tlvkey = "-1";
+			tlvtype = "string";
+			tlvvalue = "-1";
+		} else {
+			parametersstring = parametersstring + " tlv_"+tlvtype+"_"+tlvkey+" "+tlvvalue;
+		}
 		
 		var newnetworkid = $("#newnetworkid").val();
 		if(newnetworkid.trim() == "") {
@@ -1579,7 +1673,14 @@
 		} else {
 			parametersstring = parametersstring + " newnetworkidaftertempfail "+newnetworkidaftertempfail;
 		}
-		
+
+		var remove_tlv = $("#remove_tlv").val();
+		if(remove_tlv.trim() == "") {
+			remove_tlv = "-1";
+		} else {
+			parametersstring = parametersstring + " remove_tlv "+remove_tlv;
+		}
+
 		parametersstring = parametersstring.trim();
 		
 		if(formInvalid) {
@@ -1667,14 +1768,25 @@
 	
 	function onModifyEsmeOk(mbeanName, propertyName, spanId, skipCheck){
 		var formInvalid = false;
-		
 		var spanElement = document.getElementById(spanId + "-input");
 		var eleChild = spanElement.childNodes;
-		var inputTextEle = eleChild[0];
 		var spanElementTxt = document.getElementById(spanId + "-text");
-		
-		var propValue = inputTextEle.value;
-		
+		var inputTextEle;
+		var propValue;
+		//FIXME: this is tlv magic number specific
+		if(eleChild.length>5){
+			inputTextEle = [];
+			inputTextEle[0] = eleChild[0];
+			inputTextEle[1] = eleChild[2];
+			inputTextEle[2] = eleChild[4];
+			//rewrite propertyname
+			propertyName = "tlv_"+inputTextEle[1].value+"_"+inputTextEle[0].value;
+			propValue = inputTextEle[2].value;
+		}else{
+			inputTextEle = eleChild[0];
+			propValue = inputTextEle.value;
+		}
+
 		if(!skipCheck){
 			if(propValue.trim() == "") {
 				$("#div-"+spanId + "-input").addClass("error");					    			
@@ -1691,20 +1803,24 @@
 				$("#login-settings-error").hide();
 			}
 		}
-		
+
 		if(propValue == ""){
 			propValue = "-1";
 		}
-		
+
 		var parametersstring = propertyName + " " + propValue;
-		
 		var mbeanSearch="org.mobicents.smsc:layer=MProcManagement,name=SmscManagement";
 		jolokia.execute(mbeanSearch,"modifyMProcRule",mbeanName,parametersstring,
 				{
 					success: function(value) {
 						updateMProc();
 						logToConsole('INFO', 'Successfully modified rule ' + mbeanName );
-						spanElementTxt.innerHTML= inputTextEle.value;
+						if(inputTextEle.length>1){
+							spanElementTxt.innerHTML = inputTextEle[0].value + " "+inputTextEle[1].value+" "+inputTextEle[2].value;
+						}else{
+							spanElementTxt.innerHTML = inputTextEle.value;
+						}
+
 					},
 					error: function(value){
 						errorUID = ("st" + new Date().getTime()).hashCode();
