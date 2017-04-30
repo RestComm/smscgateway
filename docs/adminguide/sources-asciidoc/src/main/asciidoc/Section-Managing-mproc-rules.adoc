@@ -27,21 +27,22 @@ SYNOPSIS
 	value> receiptnetworkidmask <networkId value> desttonmask <destination type of number>
 	destnpimask <destination numbering plan	indicator>
 	destdigmask <regular expression - destination number digits mask> sourcetonmask
-	<source type of number> sourcenpimask <source numbering plan indicator> 
+	<source type of number> sourcenpimask <source numbering plan indicator>
 	sourcedigmask <regular expression - source number digits mask>
 	imsidigitsmask <regular expression - imsi digits mask> nnndigitsmask <regular expression
 	- NetworkNodeNumber digits mask> originatingmask <SS7_MO | SS7_HR | SMPP | SIP | HTTP |
 	-1> origesmenamemask <regualar expression - origination ESME name mask>
 	originatorsccpaddressmask <originator SCCP CallingPartyAddress mask> processingtype
 	<delivery processing type: SS7_SRI | SS7_MT | SMPP | SIP | -1> errorcode <internal SMSC
-	GW delivery error code value> newnetworkid <new networkId value> newdestton <new
-	destination type of number> newdestnpi <new destination numbering plan indicator>
+	GW delivery error code value> tlv_<tlv tag key>_<tlv value type> <tlv value>
+	newnetworkid <new networkId value> newdestton <new destination type of number>
+	newdestnpi <new destination numbering plan indicator>
 	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
-	newsourceton <new source type of number> newsourcenpi 
-	<new source numbering plan indicator> newsourceaddr <new source address value> hrbypass 
-	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value> 
-	newnetworkidafterpermfail <networkId value> dropaftertempfail <false | true> 
-	newnetworkidaftertempfail <networkId value>
+	newsourceton <new source type of number> newsourcenpi
+	<new source numbering plan indicator> newsourceaddr <new source address value> hrbypass
+	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value>
+	newnetworkidafterpermfail <networkId value> dropaftertempfail <false | true>
+	newnetworkidaftertempfail <networkId value> remove_tlv <tlv tag key>
 
 DESCRIPTION
 
@@ -70,6 +71,7 @@ PARAMETERS
 	originatorsccpaddressmask - an optional parameter.
 	processingtype - an optional parameter.
 	errorcode - an optional parameter.
+	tlv_<valuetype>_<tagkey> - an optional parameter.
 
 	newnetworkid - an optional parameter.
 	newdestton - an optional parameter.
@@ -86,9 +88,11 @@ PARAMETERS
 	newnetworkidafterpermfail - an optional parameter.
 	dropaftertempfail - an optional parameter.
 	newnetworkidaftertempfail - an optional parameter.
+	remove_tlv - an optional parameter.
 
 EXAMPLES
 	smsc mproc add mproc 1 networkidmask 11 newnetworkid 12
+	smsc mproc add mproc 1 tlv_int_1550 13 newnetworkid 13
 ----
 	
 Description of parameters is in the chapter <<_mproc_rules_default>>.
@@ -126,23 +130,24 @@ SYNOPSIS
 	- Default mproc rules implementation:
 	smsc mproc modify <id> networkidmask <networkId value> originnetworkidmask <networkId
 	value> receiptnetworkidmask <networkId value> desttonmask <destination type of number>
-	destnpimask <destination numbering plan indicator>
-	destdigmask <regular expression - destination number digits mask> sourcetonmask 
-	<source type of number> sourcenpimask <source numbering plan indicator> 
+	destnpimask <destination numbering plan	indicator>
+	destdigmask <regular expression - destination number digits mask> sourcetonmask
+	<source type of number> sourcenpimask <source numbering plan indicator>
 	sourcedigmask <regular expression - source number digits mask>
 	imsidigitsmask <regular expression - imsi digits mask> nnndigitsmask <regular expression
 	- NetworkNodeNumber digits mask> originatingmask <SS7_MO | SS7_HR | SMPP | SIP | HTTP |
 	-1> origesmenamemask <regualar expression - origination ESME name mask>
 	originatorsccpaddressmask <originator SCCP CallingPartyAddress mask> processingtype
 	<delivery processing type: SS7_SRI | SS7_MT | SMPP | SIP | -1> errorcode <internal SMSC
-	GW delivery error code value> newnetworkid <new networkId value> newdestton <new
-	destination type of number> newdestnpi <new destination numbering plan indicator>
+	GW delivery error code value> tlv_<tlv tag key>_<tlv value type> <tlv value>
+	newnetworkid <new networkId value> newdestton <new destination type of number>
+	newdestnpi <new destination numbering plan indicator>
 	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
-	newsourceton <new source type of number> newsourcenpi <new source numbering plan
-	indicator> newsourceaddr <new source address value> hrbypass 
-	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value> 
-	newnetworkidafterpermfail <networkId value> dropaftertempfail <false | true> 
-	newnetworkidaftertempfail <networkId value>
+	newsourceton <new source type of number> newsourcenpi
+	<new source numbering plan indicator> newsourceaddr <new source address value> hrbypass
+	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value>
+	newnetworkidafterpermfail <networkId value> dropaftertempfail <false | true>
+	newnetworkidaftertempfail <networkId value> remove_tlv <tlv tag key>
 
 DESCRIPTION
 
@@ -169,6 +174,7 @@ PARAMETERS
 	originatorsccpaddressmask - an optional parameter.
 	processingtype - an optional parameter.
 	errorcode - an optional parameter.
+	tlv_<valuetype>_<tagkey> - an optional parameter.
 
 	newnetworkid - an optional parameter.
 	newdestton - an optional parameter.
@@ -185,6 +191,7 @@ PARAMETERS
 	newnetworkidafterpermfail - an optional parameter.
 	dropaftertempfail - an optional parameter.
 	newnetworkidaftertempfail - an optional parameter.
+	remove_tlv - an optional parameter.
 
 EXAMPLES
 	smsc mproc modify 1 newnetworkid 13
