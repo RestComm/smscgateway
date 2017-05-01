@@ -172,7 +172,7 @@ PARAMETERS
 					https://github.com/RestComm/smscgateway/blob/master/core/smsc-common-library/src/main/java/org/mobicents/smsc/library/ErrorCode.java
 
 	tlv_<value type>_<tag key> - Rule will be applied only if message contains an optional parameter
-					with tag equalling <tag key> and has a tag value with a type which equals the <value type>
+					with tag is equal <tag key> and has a tag value with a type which equals the <value type>
 					and a value which equals the value set here. Value -1 will match any optional parameter.
 					Possible values for <value type> are
 						string
@@ -262,7 +262,7 @@ PARAMETERS
 					This action is for DeliveryTempFailure trigger.
 
 	remove_tlv 		- Once rule match's, the target SMS's optional parameter which matches the one set here
-					will be removed. Set this to -1 to not remove any optional parameter. Default value is -1.
+					will be removed. Set this to -1 not to remove any optional parameter. Default value is -1.
 					This action is for Arrival trigger.
 	
 SEE ALSO
