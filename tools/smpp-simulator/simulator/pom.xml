@@ -15,6 +15,11 @@
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.restcomm.smpp</groupId>
+				<artifactId>smpp-extensions</artifactId>
+				<version>${smpp.extensions.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

@@ -22,6 +22,8 @@
 
 package org.mobicents.smsc.tools.smppsimulator;
 
+import org.restcomm.smpp.parameter.TlvSet;
+
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppSession;
 
@@ -77,6 +79,9 @@ public class SmppSimulatorParameters {
 	private int bulkDestAddressRangeStart = 500000;
 	private int bulkDestAddressRangeEnd = 600000;
 	private int bulkMessagePerSecond = 10;
+
+	private boolean sendOptionalParameter = false;
+	private TlvSet tlvset;
 
 	public int getWindowSize() {
 		return windowSize;
@@ -381,6 +386,22 @@ public class SmppSimulatorParameters {
 
     public void setWrongMessageIdInDlr(boolean wrongMessageIdInDlr) {
         this.wrongMessageIdInDlr = wrongMessageIdInDlr;
+    }
+
+    public TlvSet getTlvSet() {
+        return tlvset;
+    }
+
+    public void setTlvSet(TlvSet tlvset) {
+        this.tlvset = tlvset;
+    }
+
+    public boolean isSendOptionalParameter() {
+        return sendOptionalParameter;
+    }
+
+    public void setSendOptionalParameter(boolean sendOptionalParameter) {
+        this.sendOptionalParameter = sendOptionalParameter;
     }
 
     public enum EncodingType {
