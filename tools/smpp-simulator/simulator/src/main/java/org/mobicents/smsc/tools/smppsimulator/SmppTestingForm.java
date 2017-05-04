@@ -756,6 +756,12 @@ public class SmppTestingForm extends JDialog implements SmppAccepter {
                 pdu.addOptionalParameter(tlv);
             }
 
+            if(this.param.isSendOptionalParameter()){
+                for(Tlv tlv: this.param.getTlvSet().getOptionalParameters()){
+                    pdu.addOptionalParameter(tlv);
+                }
+            }
+
 	        WindowFuture<Integer,PduRequest,PduResponse> future0 = session0.sendRequestPdu(pdu, 10000, false);
 
 			this.messagesSent.incrementAndGet();

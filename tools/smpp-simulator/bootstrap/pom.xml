@@ -14,6 +14,12 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.restcomm.smpp</groupId>
+			<artifactId>smpp-extensions</artifactId>
+			<version>${smpp.extensions.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>urbanophile</groupId>
 			<artifactId>java-getopt</artifactId>
 			<version>1.0.9</version>
