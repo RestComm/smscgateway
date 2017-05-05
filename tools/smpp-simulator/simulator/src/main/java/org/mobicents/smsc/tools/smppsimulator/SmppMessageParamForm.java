@@ -432,16 +432,16 @@ public class SmppMessageParamForm extends JDialog {
                         tabbedPane.addTab("Optional Parameters", null, panel_tlv, null);
                         panel_tlv.setLayout(null);
 
-                        cbSendOptionalParameter = new JCheckBox("Sending Tlv");
+                        cbSendOptionalParameter = new JCheckBox("Sending Tlv (integer value)");
                         cbSendOptionalParameter.setBounds(6, 7, 320, 23);
                         panel_tlv.add(cbSendOptionalParameter);
 
                         //TODO: should be a JList instead to add many tlvs?
-                        JLabel lblTlvTagValue = new JLabel("Optional parameter tag value");
+                        JLabel lblTlvTagValue = new JLabel("Tlv tag");
                         lblTlvTagValue.setBounds(10, 41, 329, 14);
                         panel_tlv.add(lblTlvTagValue);
 
-                        JLabel lblTlvValue = new JLabel("Optional parameter value");
+                        JLabel lblTlvValue = new JLabel("Tlv value");
                         lblTlvValue.setBounds(10, 71, 329, 14);
                         panel_tlv.add(lblTlvValue);
 
@@ -738,11 +738,30 @@ public class SmppMessageParamForm extends JDialog {
         this.data.setSendOptionalParameter(cbSendOptionalParameter.isSelected());
         if(cbSendOptionalParameter.isSelected()) {
             tlvSet = new TlvSet();
-            try {
-                Tlv tlv = new Tlv(Short.parseShort(tbTlvTagValue.getText()), ByteArrayUtil.toByteArray(Integer.parseInt(tbTlvValue.getText())));
-                tlvSet.addOptionalParameter(tlv);
-            } catch (Exception e) {e.printStackTrace();}
 
+            short tag = -1;
+            try {
+                tag = Short.parseShort(tbTlvTagValue.getText());
+                if (tag < 0)
+                    throw new NumberFormatException();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Tlv tag - it must be digital and positive");
+                return;
+            }
+
+            int tlvValue = -1;
+            try {
+                tlvValue = Integer.parseInt(tbTlvValue.getText());
+                if (tlvValue < 0)
+                    throw new NumberFormatException();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Tlv value - it must be digital and positive");
+                return;
+            }
+            if (tag > 0 && tlvValue > 0) {
+                Tlv tlv = new Tlv(tag, ByteArrayUtil.toByteArray(tlvValue));
+                tlvSet.addOptionalParameter(tlv);
+            }
             this.data.setTlvSet(tlvSet);
         }
 

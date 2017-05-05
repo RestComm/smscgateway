@@ -38,6 +38,7 @@
 				<include>org.restcomm.smpp:ch-smpp</include>
 				<include>org.restcomm.smpp:ch-commons-charset</include>
 				<include>org.restcomm.smpp:ch-commons-util</include>
+				<include>org.restcomm.smpp:smpp-extensions</include>
 
 				<include>org.restcomm.slee.resource.smpp:smpp-server-ra-ra</include>
 
