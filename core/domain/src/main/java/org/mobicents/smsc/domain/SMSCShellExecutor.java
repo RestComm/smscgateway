@@ -841,6 +841,8 @@ public class SMSCShellExecutor implements ShellExecutor {
                 smscPropertiesManagement.setGenerateTempFailureCdr(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("calculatemsgpartslencdr")) {
                 smscPropertiesManagement.setCalculateMsgPartsLenCdr(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("delayparametersincdr")) {
+                smscPropertiesManagement.setDelayParametersInCdr(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("receiptsdisabling")) {
                 smscPropertiesManagement.setReceiptsDisabling(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("enableintermediatereceipts")) {

@@ -173,6 +173,10 @@ public interface SmscPropertiesManagementMBean {
 
     public void setCalculateMsgPartsLenCdr(boolean calculateMsgPartsLenCdr);
 
+    public boolean getDelayParametersInCdr();
+
+    public void setDelayParametersInCdr(boolean delayParametersInCdr);
+
     public MoChargingType getMoCharging();
 
     public void setMoCharging(MoChargingType moCharging);

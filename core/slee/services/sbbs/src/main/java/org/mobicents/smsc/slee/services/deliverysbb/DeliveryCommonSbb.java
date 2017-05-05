@@ -1421,7 +1421,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     String s1 = reason.replace("\n", "\t");
                     CdrGenerator.generateCdr(sms, status, s1, smscPropertiesManagement.getGenerateReceiptCdr(),
                             MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
-                            smscPropertiesManagement.getCalculateMsgPartsLenCdr());
+                            smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
                     return;
                 }
             }
@@ -1436,7 +1436,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             String s1 = reason.replace("\n", "\t");
             CdrGenerator.generateCdr(sms, status, s1, smscPropertiesManagement.getGenerateReceiptCdr(),
                     MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
-                    smscPropertiesManagement.getCalculateMsgPartsLenCdr());
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
             return;
         }
     }
@@ -1452,7 +1452,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
     protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
         CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
-                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr());
+                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 
     /**
@@ -1465,7 +1465,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         for (Sms sms : lstPermFailured) {
             CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                     MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
-                    smscPropertiesManagement.getCalculateMsgPartsLenCdr());
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
         }
     }
 
