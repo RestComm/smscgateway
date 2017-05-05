@@ -1754,6 +1754,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             if (valB != null) {
                 this.delayParametersInCdr = valB.booleanValue();
             }
+            valB = reader.read(DELAY_PARAMETERS_IN_CDR, Boolean.class);
+            if (valB != null) {
+                this.delayParametersInCdr = valB.booleanValue();
+            }
 
             valB = reader.read(RECEIPTS_DISABLING, Boolean.class);
             if (valB != null) {
