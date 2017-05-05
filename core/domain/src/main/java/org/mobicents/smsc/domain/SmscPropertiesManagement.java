@@ -89,6 +89,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String GENERATE_RECEIPT_CDR = "generateReceiptCdr";
     private static final String GENERATE_TEMP_FAILURE_CDR = "generateTempFailureCdr";
     private static final String CALCULATE_MSG_PARTS_LEN_CDR = "calculateMsgPartsLenCdr";
+    private static final String DELAY_PARAMETERS_IN_CDR = "delayParametersInCdr";
     private static final String RECEIPTS_DISABLING = "receiptsDisabling";
     private static final String INCOME_RECEIPTS_PROCESSING = "incomeReceiptsProcessing";
     private static final String ENABLE_INTERMEDIATE_RECEIPTS = "enableIntermediateReceipts";
@@ -251,6 +252,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // true: when CDR generating SMSC GW will calculate MSG_PARTS and CHAR_NUMBERS fields (that demands extra calculating)
     // false: not calculate
     private boolean calculateMsgPartsLenCdr = false;
+    // true: when CDR generating SMSC GW will calculate processingTime, deliveryDelay, scheduleDeliveryDelay and deliveryCount (that demands extra calculating)
+    // false: not calculate
+    private boolean delayParametersInCdr = false;
     // true: generating of delivery receipts will be disabled for all messages
     private boolean receiptsDisabling = false;
     // true: processing of incoming delivery receipts from remote SMSC GW: replacing of messageId in a receipt by a local
@@ -872,6 +876,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setCalculateMsgPartsLenCdr(boolean calculateMsgPartsLenCdr) {
         this.calculateMsgPartsLenCdr = calculateMsgPartsLenCdr;
+        this.store();
+    }
+
+    @Override
+    public boolean getDelayParametersInCdr() {
+        return this.delayParametersInCdr;
+    }
+
+    @Override
+    public void setDelayParametersInCdr(boolean delayParametersInCdr) {
+        this.delayParametersInCdr = delayParametersInCdr;
         this.store();
     }
 
@@ -1502,6 +1517,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.generateReceiptCdr, GENERATE_RECEIPT_CDR, Boolean.class);
             writer.write(this.generateTempFailureCdr, GENERATE_TEMP_FAILURE_CDR, Boolean.class);
             writer.write(this.calculateMsgPartsLenCdr, CALCULATE_MSG_PARTS_LEN_CDR, Boolean.class);
+            writer.write(this.delayParametersInCdr, DELAY_PARAMETERS_IN_CDR, Boolean.class);
 
             writer.write(this.receiptsDisabling, RECEIPTS_DISABLING, Boolean.class);
             writer.write(this.incomeReceiptsProcessing, INCOME_RECEIPTS_PROCESSING, Boolean.class);
@@ -1733,6 +1749,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             valB = reader.read(CALCULATE_MSG_PARTS_LEN_CDR, Boolean.class);
             if (valB != null) {
                 this.calculateMsgPartsLenCdr = valB.booleanValue();
+            }
+            valB = reader.read(DELAY_PARAMETERS_IN_CDR, Boolean.class);
+            if (valB != null) {
+                this.delayParametersInCdr = valB.booleanValue();
             }
 
             valB = reader.read(RECEIPTS_DISABLING, Boolean.class);

@@ -624,7 +624,16 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										<option>false</option>
 									</select>
 								</span>                         
-							</div>	
+							</div>
+							<div id="div-delayParametersInCdr" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When SMSC GW generates CDR records it can calculate a message processing time, delivery delay, schedule delivery delay and delivery count per a CDR record. This demands some extra calculating and therefore is disabled by default. You can turn it on by this option.">
+									<span class="add-on">Delay parameters in CDR</span>
+									<select id="delayParametersInCdr" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span>
+							</div>
 
 
 							&nbsp;
@@ -1086,7 +1095,12 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										} else {
 											calculateMsgPartsLenCdr.options[1].selected = true;
 										}
-
+										var delayParametersInCdrTmp = response.value.DelayParametersInCdr
+										if(delayParametersInCdrTmp){
+											delayParametersInCdr.options[0].selected = true;
+										} else {
+											delayParametersInCdr.options[1].selected = true;
+										}
 										var FLAG_DATAGRAMM = 0x01;
 										var FLAG_TRANSACTIONAL = 0x02;
 										var FLAG_STORE_AND_FORWARD = 0x04;
@@ -2064,7 +2078,8 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						var generateTempFailureCdr = e1.options[e1.selectedIndex].text;
 						e1 = document.getElementById("calculateMsgPartsLenCdr");
 						var calculateMsgPartsLenCdr = e1.options[e1.selectedIndex].text;
-
+						e1 = document.getElementById("delayParametersInCdr");
+						var delayParametersInCdr = e1.options[e1.selectedIndex].text;
 						var FLAG_DATAGRAMM = 0x01;
 						var FLAG_TRANSACTIONAL = 0x02;
 						var FLAG_STORE_AND_FORWARD = 0x04;
@@ -2102,6 +2117,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateReceiptCdr", value: generateReceiptCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateTempFailureCdr", value: generateTempFailureCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "CalculateMsgPartsLenCdr", value: calculateMsgPartsLenCdr },
+									{ type: "write", mbean: mbeanSearch, attribute: "DelayParametersInCdr", value: delayParametersInCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateCdrInt", value: generateCdrTmp },
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateArchiveTableInt", value: generateArchiveTableTmp },
 								],

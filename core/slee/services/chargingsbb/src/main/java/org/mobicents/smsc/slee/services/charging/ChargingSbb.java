@@ -687,7 +687,7 @@ public abstract class ChargingSbb implements Sbb {
             CdrGenerator.generateCdr(sms, CdrGenerator.CDR_OCS_REJECTED, CdrGenerator.CDR_SUCCESS_NO_REASON,
                     smscPropertiesManagement.getGenerateReceiptCdr(),
                     MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
-                    smscPropertiesManagement.getCalculateMsgPartsLenCdr());
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
 		} catch (PersistenceException e) {
             throw new SmscProcessingException(
                     "PersistenceException when storing into Archive rejected by OCS message : " + e.getMessage(),
@@ -741,7 +741,7 @@ public abstract class ChargingSbb implements Sbb {
             CdrGenerator.generateCdr(sms, (isRejected ? CdrGenerator.CDR_MPROC_REJECTED : CdrGenerator.CDR_MPROC_DROPPED),
                     CdrGenerator.CDR_SUCCESS_NO_REASON, smscPropertiesManagement.getGenerateReceiptCdr(),
                     MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
-                    smscPropertiesManagement.getCalculateMsgPartsLenCdr());
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
         } catch (PersistenceException e) {
             throw new SmscProcessingException(
                     "PersistenceException when storing into Archive rejected by MProc message : " + e.getMessage(),

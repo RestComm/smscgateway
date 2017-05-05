@@ -67,7 +67,7 @@ public class CdrGenerator {
 	}
 
     public static void generateCdr(Sms smsEvent, String status, String reason, boolean generateReceiptCdr, boolean generateCdr,
-            boolean messageIsSplitted, boolean lastSegment, boolean calculateMsgPartsLenCdr) {
+            boolean messageIsSplitted, boolean lastSegment, boolean calculateMsgPartsLenCdr, boolean delayParametersInCdr) {
         // Format is
         // SUBMIT_DATE,SOURCE_ADDRESS,SOURCE_TON,SOURCE_NPI,DESTINATION_ADDRESS,DESTINATION_TON,DESTINATION_NPI,STATUS,SYSTEM-ID,MESSAGE-ID,
 	    // VLR, IMSI, CorrelationID, First 20 char of SMS, REASON
@@ -147,13 +147,13 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(charNumbers)
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(getProcessingTime(smsEvent.getSubmitDate()))
+                .append(delayParametersInCdr ? getProcessingTime(smsEvent.getSubmitDate()) : CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(getDeliveryDelayMilis(smsEvent.getSubmitDate(), smsEvent.getDeliverDate()))
+                .append(delayParametersInCdr ? getDeliveryDelayMilis(smsEvent.getSubmitDate(), smsEvent.getDeliverDate()) : CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(getScheduleDeliveryDelayMilis(smsEvent.getSubmitDate(), smsEvent.getScheduleDeliveryTime()))
+                .append(delayParametersInCdr ? getScheduleDeliveryDelayMilis(smsEvent.getSubmitDate(), smsEvent.getScheduleDeliveryTime()) : CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(smsEvent.getDeliveryCount())
+                .append(delayParametersInCdr ? smsEvent.getDeliveryCount() : CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append("\"")
                 .append(getEscapedString(getFirst20CharOfSMS(smsEvent.getShortMessageText())))
@@ -206,5 +206,4 @@ public class CdrGenerator {
         }
         return String.valueOf(aScheduleDeliveryDate.getTime() - aSubmitDate.getTime());
     }
-    
 }
