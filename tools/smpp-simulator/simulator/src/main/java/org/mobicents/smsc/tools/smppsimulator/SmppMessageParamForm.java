@@ -41,6 +41,10 @@ import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 
 import org.mobicents.smsc.tools.smppsimulator.SmppSimulatorParameters.SendingMessageType;
+import org.restcomm.smpp.parameter.TlvSet;
+
+import com.cloudhopper.commons.util.ByteArrayUtil;
+import com.cloudhopper.smpp.tlv.Tlv;
 
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -98,6 +102,11 @@ public class SmppMessageParamForm extends JDialog {
     private JCheckBox cbIdResponseTlv;
     private JCheckBox cbWrongMessageIdInDlr;
     private final ButtonGroup buttonGroup_2 = new ButtonGroup();
+
+    private JCheckBox cbSendOptionalParameter;
+    private TlvSet tlvSet;
+    private JTextField tbTlvTagValue;
+    private JTextField tbTlvValue;
 
 	public SmppMessageParamForm(JDialog owner) {
 		super(owner, true);
@@ -418,6 +427,33 @@ public class SmppMessageParamForm extends JDialog {
 						tbBulkDestAddressRangeStart.setBounds(349, 38, 229, 20);
 						panel_bulk.add(tbBulkDestAddressRangeStart);
 						tbBulkDestAddressRangeStart.setColumns(10);
+
+                        JPanel panel_tlv = new JPanel();
+                        tabbedPane.addTab("Optional Parameters", null, panel_tlv, null);
+                        panel_tlv.setLayout(null);
+
+                        cbSendOptionalParameter = new JCheckBox("Sending Tlv (integer value)");
+                        cbSendOptionalParameter.setBounds(6, 7, 320, 23);
+                        panel_tlv.add(cbSendOptionalParameter);
+
+                        //TODO: should be a JList instead to add many tlvs?
+                        JLabel lblTlvTagValue = new JLabel("Tlv tag");
+                        lblTlvTagValue.setBounds(10, 41, 329, 14);
+                        panel_tlv.add(lblTlvTagValue);
+
+                        JLabel lblTlvValue = new JLabel("Tlv value");
+                        lblTlvValue.setBounds(10, 71, 329, 14);
+                        panel_tlv.add(lblTlvValue);
+
+                        tbTlvTagValue = new JTextField();
+                        tbTlvTagValue.setBounds(349, 38, 229, 20);
+                        panel_tlv.add(tbTlvTagValue);
+                        tbTlvTagValue.setColumns(10);
+
+                        tbTlvValue = new JTextField();
+                        tbTlvValue.setBounds(349, 69, 229, 20);
+                        panel_tlv.add(tbTlvValue);
+                        tbTlvValue.setColumns(10);
 	}
 
 	public void setData(SmppSimulatorParameters data) {
@@ -584,6 +620,20 @@ public class SmppMessageParamForm extends JDialog {
                 this.rbDR_Error8.setSelected(true);
                 break;
         }
+
+        this.cbSendOptionalParameter.setSelected(this.data.isSendOptionalParameter());
+        if(this.data.isSendOptionalParameter()) {
+            //TODO: should be JList and array instead
+            TlvSet tlvSet = this.data.getTlvSet();
+            try {
+                for(Tlv tlv: tlvSet.getOptionalParameters()){
+                    //FIXME: casting
+                    this.tbTlvTagValue.setText((new Short(tlv.getTag())).toString());
+                    this.tbTlvValue.setText((new Integer(tlv.getValueAsInt())).toString());
+                }
+            } catch (Exception e) {e.printStackTrace();}
+
+        }
 	}
 
 	public SmppSimulatorParameters getData() {
@@ -684,6 +734,36 @@ public class SmppMessageParamForm extends JDialog {
             this.data.setDeliveryResponseGenerating(SmppSimulatorParameters.DeliveryResponseGenerating.Success);
         if (rbDR_Error8.isSelected())
             this.data.setDeliveryResponseGenerating(SmppSimulatorParameters.DeliveryResponseGenerating.Error8);
+
+        this.data.setSendOptionalParameter(cbSendOptionalParameter.isSelected());
+        if(cbSendOptionalParameter.isSelected()) {
+            tlvSet = new TlvSet();
+
+            short tag = -1;
+            try {
+                tag = Short.parseShort(tbTlvTagValue.getText());
+                if (tag < 0)
+                    throw new NumberFormatException();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Tlv tag - it must be digital and positive");
+                return;
+            }
+
+            int tlvValue = -1;
+            try {
+                tlvValue = Integer.parseInt(tbTlvValue.getText());
+                if (tlvValue < 0)
+                    throw new NumberFormatException();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Tlv value - it must be digital and positive");
+                return;
+            }
+            if (tag > 0 && tlvValue > 0) {
+                Tlv tlv = new Tlv(tag, ByteArrayUtil.toByteArray(tlvValue));
+                tlvSet.addOptionalParameter(tlv);
+            }
+            this.data.setTlvSet(tlvSet);
+        }
 
 		this.dispose();
 	}
