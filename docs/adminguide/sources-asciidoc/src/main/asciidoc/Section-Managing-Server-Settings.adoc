@@ -2599,6 +2599,45 @@ EXAMPLES
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 
+[[_delayparametersincdr]]
+=== Adding of delay parameters into a CDR record
+
+[[_delayparametersincdr_cli]]
+==== Using CLI
+
+You can set the 'delayparametersincdr' value to true/false by issuing the command `smsc set delayparametersincdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get delayparametersincdr` which will display the value set for this property. 
+
+----
+Name
+	smsc set delayparametersincdr
+
+SYNOPSIS
+	smsc set delayparametersincdr <true | false>
+
+DESCRIPTION
+	When SMSC GW generates CDR records it can calculate a message processing time,
+	delivery delay, schedule delivery delay and delivery count per a CDR record.
+	This demands some extra calculating and therefore is disabled by default.
+	You can turn it on by this option.
+	Default value: false
+
+EXAMPLES
+	smsc set delayparametersincdr true
+----
+
+[[_delayparametersincdr_gui]]
+==== Using GUI
+
+.Procedure: Set 'Adding of delay parameters into a CDR record'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI. 
+. You can specify if the SMSC should add of delay parameters into a CDR record by choosing the value true for the field 'Delay parameters in CDR'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
 
 
 

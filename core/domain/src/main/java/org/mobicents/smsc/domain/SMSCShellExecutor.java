@@ -1179,6 +1179,8 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getGenerateTempFailureCdr());
             } else if (parName.equals("calculatemsgpartslencdr")) {
                 sb.append(smscPropertiesManagement.getCalculateMsgPartsLenCdr());
+            } else if (parName.equals("delayparametersincdr")) {
+                sb.append(smscPropertiesManagement.getDelayParametersInCdr());
             } else if (parName.equals("receiptsdisabling")) {
                 sb.append(smscPropertiesManagement.getReceiptsDisabling());
             } else if (parName.equals("enableintermediatereceipts")) {
@@ -1465,6 +1467,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("calculatemsgpartslencdr = ");
             sb.append(smscPropertiesManagement.getCalculateMsgPartsLenCdr());
+            sb.append("\n");
+
+            sb.append("delayparametersincdr = ");
+            sb.append(smscPropertiesManagement.getDelayParametersInCdr());
             sb.append("\n");
 
             sb.append("receiptsdisabling = ");

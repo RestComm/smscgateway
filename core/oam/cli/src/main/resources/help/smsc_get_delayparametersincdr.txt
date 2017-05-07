@@ -1,0 +1,20 @@
+Name
+	smsc get delayparametersincdr
+
+SYNOPSIS
+	smsc get delayparametersincdr
+
+DESCRIPTION
+	When SMSC GW generates CDR records it can calculate a message processing time,
+	delivery delay, schedule delivery delay and delivery count per a CDR record.
+	This demands some extra calculating and therefore is disabled by default.
+	You can turn it on by this option.
+	Default value: false
+
+EXAMPLES
+	smsc get delayparametersincdr
+
+SEE ALSO
+	smsc set delayparametersincdr, smsc set generatereceiptcdr,
+	smsc set generatetempfailurecdr, smsc set generatecdr,
+	smsc set calculatemsgpartslencdr

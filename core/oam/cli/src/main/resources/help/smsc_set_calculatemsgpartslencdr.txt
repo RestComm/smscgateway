@@ -17,4 +17,5 @@ EXAMPLES
 
 SEE ALSO
 	smsc set generatereceiptcdr, smsc set generatetempfailurecdr,
-	smsc get calculatemsgpartslencdr, smsc set generatecdr
+	smsc get calculatemsgpartslencdr, smsc set generatecdr,
+	smsc set delayparametersincdr
