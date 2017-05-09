@@ -293,10 +293,6 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     // SMPP events
 
 	private void onSubmitSmRespParentLocal(final RxSmppServerSbbUsage anSbbUsage, final SubmitSmResp event) {
-        // !!!!-
-//        logger.warning("onSubmitSmRespParent : aci=" + aci + ", activity=" + aci.getActivity());
-        // !!!!-
-
         try {
             if (logger.isFineEnabled()) {
                 logger.fine(String.format("onSubmitSmResp : SubmitSmResp=%s", event));
@@ -319,10 +315,6 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     }
 
     private void onDeliverSmRespParentLocal(final RxSmppServerSbbUsage anSbbUsage, final DeliverSmResp event) {
-        // !!!!-
-//        logger.warning("onDeliverSmRespParent : aci=" + aci + ", activity" + aci.getActivity());
-        // !!!!-
-
         try {
 			if (logger.isFineEnabled()) {
 				logger.fine(String.format("\nonDeliverSmResp : DeliverSmResp=%s", event));
@@ -345,10 +337,6 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 	}
     
     private void onPduRequestTimeoutParentLocal(final RxSmppServerSbbUsage anSbbUsage, final PduRequestTimeout2 event) {
-        // !!!!-
-//        logger.warning("onPduRequestTimeoutParent : aci=" + aci + ", activity" + aci.getActivity());
-        // !!!!-
-
 		try {
 	        if (isDeliveringEnded()) {
 	            logger.info("RxSmppServerSbb.onPduRequestTimeout(): received PduRequestTimeout but delivery process is already ended, dropping of an event");
@@ -374,12 +362,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             markDeliveringIsEnded(true);
 		}
 	}
-	
-	private void onRecoverablePduExceptionParentLocal(final RxSmppServerSbbUsage anSbbUsage, final RecoverablePduException event) {
-        // !!!!-
-//        logger.warning("onRecoverablePduExceptionParent : aci=" + aci + ", activity" + aci.getActivity());
-        // !!!!-
 
+	private void onRecoverablePduExceptionParentLocal(final RxSmppServerSbbUsage anSbbUsage, final RecoverablePduException event) {
         try {
             if (isDeliveringEnded()) {
                 logger.info("RxSmppServerSbb.onRecoverablePduException(): received RecoverablePduException but delivery process is already ended, dropping of an event");
@@ -416,8 +400,14 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         if (rxSmppServerSbbLocalObject != null) {
             ActivityContextInterface act = getSchedulerActivityContextInterface();
             if (act != null) {
-                act.attach(rxSmppServerSbbLocalObject);
-                fireDeliverSmRespChild(event, act, null);
+                try {
+                    act.attach(rxSmppServerSbbLocalObject);
+                    fireDeliverSmRespChild(event, act, null);
+                } catch (IllegalStateException e) {
+                    if (logger.isInfoEnabled())
+                        logger.info("onDeliverSmResp - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                                + act.getActivity() + ", event=" + event);
+                }
             }
         }
     }
@@ -432,8 +422,14 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         if (rxSmppServerSbbLocalObject != null) {
             ActivityContextInterface act = getSchedulerActivityContextInterface();
             if (act != null) {
-                act.attach(rxSmppServerSbbLocalObject);
-                fireSubmitSmRespChild(event, act, null);
+                try {
+                    act.attach(rxSmppServerSbbLocalObject);
+                    fireSubmitSmRespChild(event, act, null);
+                } catch (IllegalStateException e) {
+                    if (logger.isInfoEnabled())
+                        logger.info("onSubmitSmRespLocal - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                                + act.getActivity() + ", event=" + event);
+                }
             }
         }
     }
@@ -448,9 +444,15 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         if (rxSmppServerSbbLocalObject != null) {
             ActivityContextInterface act = getSchedulerActivityContextInterface();
             if (act != null) {
-                act.attach(rxSmppServerSbbLocalObject);
-                PduRequestTimeout2 event2 = new PduRequestTimeout2(event.getPduRequest(), event.getSystemId());
-                firePduRequestTimeoutChild(event2, act, null);
+                try {
+                    act.attach(rxSmppServerSbbLocalObject);
+                    PduRequestTimeout2 event2 = new PduRequestTimeout2(event.getPduRequest(), event.getSystemId());
+                    firePduRequestTimeoutChild(event2, act, null);
+                } catch (IllegalStateException e) {
+                    if (logger.isInfoEnabled())
+                        logger.info("onPduRequestTimeout - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                                + act.getActivity() + ", event=" + event);
+                }
             }
         }
     }
@@ -465,8 +467,14 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         if (rxSmppServerSbbLocalObject != null) {
             ActivityContextInterface act = getSchedulerActivityContextInterface();
             if (act != null) {
-                act.attach(rxSmppServerSbbLocalObject);
-                fireRecoverablePduExceptionChild(event, act, null);
+                try {
+                    act.attach(rxSmppServerSbbLocalObject);
+                    fireRecoverablePduExceptionChild(event, act, null);
+                } catch (IllegalStateException e) {
+                    if (logger.isInfoEnabled())
+                        logger.info("onRecoverablePduException - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                                + act.getActivity() + ", event=" + event);
+                }
             }
         }
     }

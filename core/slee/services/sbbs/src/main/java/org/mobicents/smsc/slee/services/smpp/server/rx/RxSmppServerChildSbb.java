@@ -50,59 +50,60 @@ public abstract class RxSmppServerChildSbb implements Sbb {
     protected SbbContextExt sbbContext;
 
     public void onSubmitSmRespChild(SubmitSmResp event, ActivityContextInterface aci, EventContext eventContext) {
-
-        // !!!! ....................
-//        logger.warning("RxSmppServerChildSbb : onSubmitSmRespChild **** ");
-        // !!!! ....................
-
-
-
         if (logger.isFineEnabled())
-            logger.fine("onDeliverSmRespChild : onSubmitSmRespChild - refire back to RxSmppServerSbb : activity=" + aci.getActivity());
+            logger.fine("onSubmitSmRespChild : onSubmitSmRespChild - refire back to RxSmppServerSbb : activity="
+                    + aci.getActivity());
 
-        fireSubmitSmRespParent(event, aci, null);
+        try {
+            fireSubmitSmRespParent(event, aci, null);
+        } catch (IllegalStateException e) {
+            if (logger.isInfoEnabled())
+                logger.info("onSubmitSmRespChild - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                        + aci.getActivity() + ", event=" + event);
+        }
     }
 
     public void onDeliverSmRespChild(DeliverSmResp event, ActivityContextInterface aci, EventContext eventContext) {
-
-        // !!!! ....................
-//        logger.warning("RxSmppServerChildSbb : onDeliverSmRespChild **** ");
-        // !!!! ....................
-
-
-
         if (logger.isFineEnabled())
-            logger.fine("onDeliverSmRespChild : onDeliverSmRespChild - refire back to RxSmppServerSbb : activity=" + aci.getActivity());
+            logger.fine("onDeliverSmRespChild : onDeliverSmRespChild - refire back to RxSmppServerSbb : activity="
+                    + aci.getActivity());
 
-        fireDeliverSmRespParent(event, aci, null);
+        try {
+            fireDeliverSmRespParent(event, aci, null);
+        } catch (IllegalStateException e) {
+            if (logger.isInfoEnabled())
+                logger.info("onDeliverSmRespChild - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                        + aci.getActivity() + ", event=" + event);
+        }
     }
 
     public void onPduRequestTimeoutChild(PduRequestTimeout2 event, ActivityContextInterface aci, EventContext eventContext) {
-
-        // !!!! ....................
-//        logger.warning("RxSmppServerChildSbb : onPduRequestTimeoutChild **** ");
-        // !!!! ....................
-
-
-
         if (logger.isFineEnabled())
-            logger.fine("onDeliverSmRespChild : onPduRequestTimeoutChild - refire back to RxSmppServerSbb : activity=" + aci.getActivity());
+            logger.fine("onPduRequestTimeoutChild : onPduRequestTimeoutChild - refire back to RxSmppServerSbb : activity="
+                    + aci.getActivity());
 
-        firePduRequestTimeoutParent(event, aci, null);
+        try {
+            firePduRequestTimeoutParent(event, aci, null);
+        } catch (IllegalStateException e) {
+            if (logger.isInfoEnabled())
+                logger.info("onPduRequestTimeoutChild - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                        + aci.getActivity() + ", event=" + event);
+        }
     }
 
-    public void onRecoverablePduExceptionChild(RecoverablePduException event, ActivityContextInterface aci, EventContext eventContext) {
-
-        // !!!! ....................
-//        logger.warning("RxSmppServerChildSbb : onRecoverablePduExceptionChild **** ");
-        // !!!! ....................
-
-
-
+    public void onRecoverablePduExceptionChild(RecoverablePduException event, ActivityContextInterface aci,
+            EventContext eventContext) {
         if (logger.isFineEnabled())
-            logger.fine("onDeliverSmRespChild : onRecoverablePduExceptionChild - refire back to RxSmppServerSbb : activity=" + aci.getActivity());
+            logger.fine("onRecoverablePduExceptionChild : onRecoverablePduExceptionChild - refire back to RxSmppServerSbb : activity="
+                    + aci.getActivity());
 
-        fireRecoverablePduExceptionParent(event, aci, null);
+        try {
+            fireRecoverablePduExceptionParent(event, aci, null);
+        } catch (IllegalStateException e) {
+            if (logger.isInfoEnabled())
+                logger.info("onRecoverablePduExceptionChild - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                        + aci.getActivity() + ", event=" + event);
+        }
     }
 
     public abstract void fireDeliverSmRespParent(DeliverSmResp event, ActivityContextInterface activity,
