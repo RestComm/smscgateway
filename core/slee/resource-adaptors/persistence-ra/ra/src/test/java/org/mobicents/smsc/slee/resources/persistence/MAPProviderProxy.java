@@ -122,4 +122,10 @@ public class MAPProviderProxy implements MAPProvider {
 		return null;
 	}
 
+    @Override
+    public int getCurrentDialogsCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
 }
