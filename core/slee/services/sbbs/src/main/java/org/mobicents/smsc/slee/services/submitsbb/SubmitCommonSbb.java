@@ -41,8 +41,10 @@ import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
 import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.EventType;
+import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.Sms;
+import org.mobicents.smsc.library.SmsRejectionException;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
@@ -78,7 +80,7 @@ public abstract class SubmitCommonSbb implements Sbb {
     public static final ResourceAdaptorTypeID MPROC_RATYPE_ID = new ResourceAdaptorTypeID("MProcResourceAdaptorType",
             "org.mobicents", "1.0");
     private static final String MPROC_RA_LINK = "MProcResourceAdaptor";
-    
+
     protected Tracer logger;
     protected SbbContextExt sbbContext;
 
@@ -256,8 +258,31 @@ public abstract class SubmitCommonSbb implements Sbb {
             }
         }
     }
+    
+    /**
+     * Forwards given SMS message.
+     *
+     * @param anSms the SMS
+     * @param withCharging the with charging
+     * @param smscStatAggregator the SMSC statistics
+     * @throws SmscProcessingException the smsc processing exception
+     */
+    protected void forwardMessage(final Sms anSms, final boolean withCharging, SmscStatAggregator smscStatAggregator, String messageType, int seqNumber)
+            throws SmscProcessingException {
+        try {
+            forwardMessageInternal(anSms, withCharging, smscStatAggregator, messageType, seqNumber);
+        } catch (SmsRejectionException e) {
+            if (logger.isFineEnabled()) {
+                logger.fine("SMS Rejection. Message: " + e.getMessage() + ".", e);
+            }
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                generateCdr(anSms, e);
+            }
+            throw e;
+        }
+    }
 
-    protected void forwardMessage(Sms sms0, boolean withCharging, SmscStatAggregator smscStatAggregator, String messageType, int seqNumber)
+    private void forwardMessageInternal(Sms sms0, boolean withCharging, SmscStatAggregator smscStatAggregator, String messageType, int seqNumber)
             throws SmscProcessingException {
 
         ChargingMedium chargingMedium = null;
@@ -359,11 +384,10 @@ public abstract class SubmitCommonSbb implements Sbb {
 
             if (mProcResult.isMessageRejected()) {
                 sms0.setMessageDeliveryResultResponse(null);
-                final SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules.",
+                final SmscProcessingException e = new SmsRejectionException("Message is rejected by MProc rules.",
                         getErrorCode(mProcResult.getSmppErrorCode(), SmppConstants.STATUS_SUBMITFAIL),
                         getErrorCode(mProcResult.getMapErrorCode(), MAPErrorCode.systemFailure),
-                        getErrorCode(mProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET),
-                        null, SmscProcessingException.INTERNAL_ERROR_MPROC_REJECT);
+                        getErrorCode(mProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET), null);
                 e.setSkipErrorLogging(true);
     			
     			if (eventTypeFailure != null) {
@@ -411,7 +435,7 @@ public abstract class SubmitCommonSbb implements Sbb {
     public enum MaxActivityCountFactor {
         factor_12, factor_14,
     }
-    
+
     private static int getErrorCode(final int anErrorCode, final int aDefaultErrorCode) {
         if (anErrorCode < 0) {
             return aDefaultErrorCode;
@@ -438,4 +462,10 @@ public abstract class SubmitCommonSbb implements Sbb {
         		smscPropertiesManagement.getGenerateDetailedCdr());
     }
 
+    private static final void generateCdr(final Sms anSms, final SmscProcessingException anError) {
+        CdrGenerator.generateCdr(anSms, CdrGenerator.CDR_FAILED, anError.getMessage(),
+                smscPropertiesManagement.getGenerateReceiptCdr(),
+                MessageUtil.isNeedWriteArchiveMessage(anSms, smscPropertiesManagement.getGenerateCdr()), false, true,
+                smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+    }
 }
