@@ -169,6 +169,10 @@ public interface SmscPropertiesManagementMBean {
 
     public void setGenerateTempFailureCdr(boolean generateTempFailureCdr);
 
+    public boolean isGenerateRejectionCdr();
+
+    public void setGenerateRejectionCdr(boolean aGenerateRejectionCdr);
+
     public boolean getCalculateMsgPartsLenCdr();
 
     public void setCalculateMsgPartsLenCdr(boolean calculateMsgPartsLenCdr);
