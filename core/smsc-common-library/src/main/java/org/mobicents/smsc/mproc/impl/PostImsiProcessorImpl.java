@@ -64,7 +64,7 @@ public class PostImsiProcessorImpl implements PostImsiProcessor {
     @Override
     public void dropMessage() throws MProcRuleException {
         if (actionAdded)
-            throw new MProcRuleException("Another action already added");
+            throw new MProcRuleException("Another action already added", true);
 
         actionAdded = true;
         needDropMessage = true;
@@ -73,7 +73,7 @@ public class PostImsiProcessorImpl implements PostImsiProcessor {
     @Override
     public void rerouteMessage(int newNetworkId) throws MProcRuleException {
         if (actionAdded)
-            throw new MProcRuleException("Another action already added");
+            throw new MProcRuleException("Another action already added", true);
 
         actionAdded = true;
         rerouteMessage = newNetworkId;
