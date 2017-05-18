@@ -76,6 +76,7 @@ import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.resources.scheduler.SendPduStatus2;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
 import org.mobicents.smsc.slee.services.smpp.server.rx.stub.RxSmppServerSbbUsageStub;
@@ -614,6 +615,12 @@ public class RxSmppServerSbbTest {
         @Override
         public RxSmppServerSbbUsage getDefaultSbbUsageParameterSet() {
             return new RxSmppServerSbbUsageStub();
+        }
+
+        @Override
+        public void fireSendPduStatusChild(SendPduStatus2 event, ActivityContextInterface aci, Address address) {
+            // TODO Auto-generated method stub
+            
         }
     }
 

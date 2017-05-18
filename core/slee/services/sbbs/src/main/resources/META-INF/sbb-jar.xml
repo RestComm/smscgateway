@@ -162,6 +162,33 @@
 			</event-type-ref>
 		</event>
 
+		<event event-direction="Receive" initial-event="False">
+			<event-name>SendPduStatus</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SEND_PDU_STATUS</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>SendPduStatusParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SEND_PDU_STATUS_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Fire" initial-event="False">
+			<event-name>SendPduStatusChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SEND_PDU_STATUS_CHILD</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
 		<event event-direction="Receive" initial-event="True">
 			<event-name>ServiceStartedEvent</event-name>
 			<event-type-ref>
@@ -338,6 +365,23 @@
 			<event-name>RecoverablePduExceptionParent</event-name>
 			<event-type-ref>
 				<event-type-name>org.restcomm.slee.resource.smpp.RECOVERABLE_PDU_EXCEPTION_PARENT</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+		<event event-direction="Receive" initial-event="False">
+			<event-name>SendPduStatusChild</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SEND_PDU_STATUS_CHILD</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+			<initial-event-select variable="ActivityContext" />
+		</event>
+		<event event-direction="Fire" initial-event="False">
+			<event-name>SendPduStatusParent</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SEND_PDU_STATUS_PARENT</event-type-name>
 				<event-type-vendor>org.restcomm</event-type-vendor>
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
@@ -1502,6 +1546,15 @@
 			<event-name>RecoverablePduException</event-name>
 			<event-type-ref>
 				<event-type-name>org.restcomm.slee.resource.smpp.RECOVERABLE_PDU_EXCEPTION</event-type-name>
+				<event-type-vendor>org.restcomm</event-type-vendor>
+				<event-type-version>1.0</event-type-version>
+			</event-type-ref>
+		</event>
+
+		<event event-direction="Receive" initial-event="False">
+			<event-name>SendPduStatus</event-name>
+			<event-type-ref>
+				<event-type-name>org.restcomm.slee.resource.smpp.SEND_PDU_STATUS</event-type-name>
 				<event-type-vendor>org.restcomm</event-type-vendor>
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>

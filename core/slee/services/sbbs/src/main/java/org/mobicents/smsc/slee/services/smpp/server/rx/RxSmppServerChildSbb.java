@@ -32,6 +32,7 @@ import javax.slee.facilities.Tracer;
 
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2;
+import org.mobicents.smsc.slee.resources.scheduler.SendPduStatus2;
 
 import com.cloudhopper.smpp.pdu.DeliverSmResp;
 import com.cloudhopper.smpp.pdu.SubmitSmResp;
@@ -106,6 +107,20 @@ public abstract class RxSmppServerChildSbb implements Sbb {
         }
     }
 
+    public void onSendPduStatusChild(SendPduStatus2 event, ActivityContextInterface aci, EventContext eventContext) {
+        if (logger.isFineEnabled())
+            logger.fine("onSendPduStatus : onSendPduStatus - refire back to RxSmppServerSbb : activity="
+                    + aci.getActivity());
+
+        try {
+            fireSendPduStatusParent(event, aci, null);
+        } catch (IllegalStateException e) {
+            if (logger.isInfoEnabled())
+                logger.info("onSendPduStatus - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                        + aci.getActivity() + ", event=" + event);
+        }
+    }
+
     public abstract void fireDeliverSmRespParent(DeliverSmResp event, ActivityContextInterface activity,
             javax.slee.Address address);
 
@@ -114,6 +129,8 @@ public abstract class RxSmppServerChildSbb implements Sbb {
     public abstract void firePduRequestTimeoutParent(PduRequestTimeout2 event, ActivityContextInterface aci, javax.slee.Address address);
 
     public abstract void fireRecoverablePduExceptionParent(RecoverablePduException event, ActivityContextInterface aci, javax.slee.Address address);
+
+    public abstract void fireSendPduStatusParent(SendPduStatus2 event, ActivityContextInterface aci, javax.slee.Address address);
 
     public RxSmppServerChildSbb() {
     }

@@ -70,6 +70,7 @@ import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 import org.mobicents.smsc.slee.services.util.SbbStatsUtils;
 import org.restcomm.slee.resource.smpp.PduRequestTimeout;
+import org.restcomm.slee.resource.smpp.SendPduStatus;
 import org.restcomm.slee.resource.smpp.SmppExtraConstants;
 import org.restcomm.slee.resource.smpp.SmppSessions;
 import org.restcomm.slee.resource.smpp.SmppTransaction;
@@ -221,6 +222,17 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         sbbu.sampleRecoverablePduException(0L);
     	logger.severe(String.format("\nonRecoverablePduException : RecoverablePduException=%s", event));
     	// TODO : Handle this
+    }
+
+    public void onSendPduStatus(SendPduStatus event, ActivityContextInterface aci, EventContext eventContext) {
+        if (logger.isFineEnabled()) {
+            logger.fine(String.format("onSendPduStatus : SendPduStatus=%s", event));
+        }
+
+        // TODO: we can add here an algo when we will not process a message further
+        // in case of failure of a response sending
+        // for this we need to avoid of processing a received message immediately
+        // and wait for this message
     }
 
     private void onSubmitSmLocal(final TxSmppServerSbbUsage anSbbUsage, final com.cloudhopper.smpp.pdu.SubmitSm event,

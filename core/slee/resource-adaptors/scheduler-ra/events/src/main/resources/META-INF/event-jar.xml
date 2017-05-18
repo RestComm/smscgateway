@@ -109,4 +109,18 @@
 		<event-type-version>1.0</event-type-version>
 		<event-class-name>com.cloudhopper.smpp.type.RecoverablePduException</event-class-name>
 	</event-definition>
+	<event-definition>	
+		<description>Resending of SEND_PDU_STATUS</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.SEND_PDU_STATUS_CHILD</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.resources.scheduler.SendPduStatus2</event-class-name>
+	</event-definition>
+	<event-definition>	
+		<description>Resending of SEND_PDU_STATUS</description>
+		<event-type-name>org.restcomm.slee.resource.smpp.SEND_PDU_STATUS_PARENT</event-type-name>
+		<event-type-vendor>org.restcomm</event-type-vendor>
+		<event-type-version>1.0</event-type-version>
+		<event-class-name>org.mobicents.smsc.slee.resources.scheduler.SendPduStatus2</event-class-name>
+	</event-definition>
 </event-jar>
