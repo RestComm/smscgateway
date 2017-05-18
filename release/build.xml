@@ -40,7 +40,7 @@
 	<property name="restcomm-map-ra.release" value="7.1.57" />
 
 	<!-- Diameter mux and RAs -->
-	<property name="restcomm-diam.build-number" value="164" />
+	<property name="restcomm-diam.build-number" value="170" />
 	<property name="restcomm-diam.version" value="1.7.0" />
 	<property name="restcomm-diam.resources.version" value="2.8.0-SNAPSHOT" />
 
