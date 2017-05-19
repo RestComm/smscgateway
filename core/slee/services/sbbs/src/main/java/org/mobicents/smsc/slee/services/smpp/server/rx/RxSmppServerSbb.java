@@ -30,6 +30,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -85,6 +86,7 @@ import com.cloudhopper.smpp.SmppSession.Type;
 import com.cloudhopper.smpp.pdu.BaseSmResp;
 import com.cloudhopper.smpp.pdu.DeliverSm;
 import com.cloudhopper.smpp.pdu.DeliverSmResp;
+import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.pdu.SubmitSmResp;
 import com.cloudhopper.smpp.tlv.Tlv;
@@ -591,6 +593,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 			smsSet.setDestSystemId(esme.getSystemId());
             smsSet.setDestEsmeName(esme.getName());
 
+            List<PduRequest> pendingMessages=new ArrayList<PduRequest>();
+            
             for (int poolIndex = 0; poolIndex < deliveryMsgCnt; poolIndex++) {
                 smscStatAggregator.updateMsgOutTryAll();
                 smscStatAggregator.updateMsgOutTrySmpp();
@@ -654,7 +658,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 }
 
                 for (int segmentIndex = 0; segmentIndex < segmCnt; segmentIndex++) {
-                    if (esme.getSmppSessionType() == Type.CLIENT) {
+                	if (esme.getSmppSessionType() == Type.CLIENT) {
                         SubmitSm submitSm = new SubmitSm();
                         submitSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(), sms
                                 .getSourceAddr()));
@@ -692,8 +696,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             submitSm.addOptionalParameter(tlv);
                         }
 
-                        SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, submitSm,
-                                esme.getWindowWaitTimeout());
+                        pendingMessages.add(submitSm);
+                        
                         if (logger.isInfoEnabled()) {
                             logger.info(String.format("\nSent submitSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                     esme.getName(), poolIndex, sms.toString()));
@@ -702,11 +706,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             sequenceNumber = submitSm.getSequenceNumber();
                         } else {
                             sequenceNumberExt[segmentIndex - 1] = submitSm.getSequenceNumber();
-                        }
-
-                        ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
-                                .getActivityContextInterface(smppServerTransaction);
-                        smppTxaci.attach(this.sbbContext.getSbbLocalObject());
+                        }                        
                     } else {
                         DeliverSm deliverSm = new DeliverSm();
                         deliverSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(),
@@ -748,8 +748,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         // TODO : waiting for 2 secs for window to accept our
                         // request,
                         // is it good? Should time be more here?
-                        SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, deliverSm,
-                                esme.getWindowWaitTimeout());
+                        
+                        pendingMessages.add(deliverSm);
                         if (logger.isInfoEnabled()) {
                             logger.info(String.format("\nSent deliverSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                     esme.getName(), poolIndex, sms.toString()));
@@ -760,16 +760,19 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             sequenceNumberExt[segmentIndex - 1] = deliverSm.getSequenceNumber();
                         }
 
-                        ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
-                                .getActivityContextInterface(smppServerTransaction);
-                        smppTxaci.attach(this.sbbContext.getSbbLocalObject());
+                        
                     }
                 }
-
+                
                 this.registerMessageInSendingPool(poolIndex, sequenceNumber, sequenceNumberExt);
             }
+            
             this.endRegisterMessageInSendingPool();
 
+            setPendingChunks(pendingMessages);
+            while(getPendingChunks()!=null && getPendingChunks().size()>0 && (esme.getDestAddrSendLimit()==0 || getDeliveryPendingCount() < esme.getDestAddrSendLimit()))
+        		sendNextChunk(smsSet,esme);
+            
         } catch (Throwable e) {
             throw new SmscProcessingException(
                     "RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
@@ -779,6 +782,27 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 		}
 	}
 
+    private void sendNextChunk(SmsSet smsSet,Esme esme) throws SmscProcessingException
+    {
+    	try
+    	{
+	    	SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, getPendingChunks().remove(0),
+	                esme.getWindowWaitTimeout());
+	        
+			ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
+	                .getActivityContextInterface(smppServerTransaction);
+	        smppTxaci.attach(this.sbbContext.getSbbLocalObject());
+	        
+	        setDeliveryPendingCount(getDeliveryPendingCount() + 1L);
+    	}
+    	catch (Throwable e) {
+            String s = "SmscProcessingException when sending initial sendDeliverSm()=RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
+                            + e.getMessage() + "\nsmsSet: " + smsSet + ", smsSet=" + smsSet;
+            logger.severe(s, e);
+            this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s);
+		}
+    }
+    
 	protected byte[] recodeShortMessage(int dataCoding, String msg, byte[] udhPart) {
 	    DataCodingScheme dataCodingScheme = new DataCodingSchemeImpl(dataCoding);
 
@@ -862,7 +886,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
         int status = event.getCommandStatus();
         if (status == 0) {
-            smscStatAggregator.updateMsgOutSentAll();
+        	smscStatAggregator.updateMsgOutSentAll();
             smscStatAggregator.updateMsgOutSentSmpp();
 
             ConfirmMessageInSendingPool confirmMessageInSendingPool = confirmMessageInSendingPool(event.getSequenceNumber());
@@ -873,6 +897,19 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         "Received undefined SequenceNumber: " + event.getSequenceNumber() + ", SmsSet=" + smsSet);
                 return;
             }
+            
+            setDeliveryPendingCount(getDeliveryPendingCount()-1L);        	
+            if(getPendingChunks()!=null && getPendingChunks().size()>0)
+            {
+            	EsmeManagement esmeManagement = EsmeManagement.getInstance();
+    			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+    			
+    			//response may be received before we completed sending all the messages from sendDeliverSm.
+            	//so checking if has window
+            	if(getDeliveryPendingCount() < esme.getDestAddrSendLimit())
+            		sendNextChunk(smsSet,esme);            	            	
+            }
+            
             Sms sms = confirmMessageInSendingPool.sms;
             if (!confirmMessageInSendingPool.confirmed) {
                 this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false);
@@ -981,6 +1018,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
             synchronized (lock) {
                 try {
+                	setPendingChunks(null);
+                	setDeliveryPendingCount(0L);
+                	
                     // ending of delivery process in this SBB
                     smsSet.setStatus(smStatus);
                     this.markDeliveringIsEnded(true);

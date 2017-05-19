@@ -24,6 +24,7 @@ package org.mobicents.smsc.slee.services.deliverysbb;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.CreateException;
@@ -61,6 +62,8 @@ import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+
+import com.cloudhopper.smpp.pdu.PduRequest;
 
 import javolution.util.FastList;
 
@@ -1619,6 +1622,14 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     public abstract long getCurrentMsgNum();
 
+    public abstract void setDeliveryPendingCount(long currentPendingCount);
+
+    public abstract long getDeliveryPendingCount();
+    
+    public abstract void setPendingChunks(List<PduRequest> value);
+
+    public abstract List<PduRequest> getPendingChunks();
+    
     public abstract void setDlvIsInited(boolean deliveringIsInited);
 
     public abstract boolean getDlvIsInited();

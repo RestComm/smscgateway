@@ -210,7 +210,7 @@ public class TxSmppServerSbbTest {
 		Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
 				SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
 				windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
 		ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
 		SubmitSm event = new SubmitSm();
@@ -264,7 +264,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitSm event = new SubmitSm();
@@ -339,7 +339,7 @@ public class TxSmppServerSbbTest {
 		Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
 				SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
 				windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
 		ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
 		DataSm event = new DataSm();
@@ -403,7 +403,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1",
-                true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+                true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitMulti event = new SubmitMulti();
@@ -539,7 +539,7 @@ public class TxSmppServerSbbTest {
 		Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
 				SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
 				windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
 		ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
 		SubmitSm event = new SubmitSm();
@@ -725,7 +725,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitSm event = new SubmitSm();
@@ -809,7 +809,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitSm event = new SubmitSm();
@@ -865,7 +865,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitSm event = new SubmitSm();

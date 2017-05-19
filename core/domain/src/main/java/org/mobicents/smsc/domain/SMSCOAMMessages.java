@@ -107,6 +107,8 @@ public interface SMSCOAMMessages {
 
     public static final String NATIONAL_LANGUAGE_SHIFT_BAD_VALUE = "National language shift shift value must be between 0 and 13";
 
+    public static final String DEST_ADDR_SEND_LIMIT_BAD_VALUE = "Destination address sending limit value must not be negative";
+    
     public static final String SKIP_UNSENT_MESSAGES_NEGATIVE_VALUE = "skip-unsent-messages command accepts only non negative values";
 
     public static final String SKIP_UNSENT_MESSAGES_ACCEPTED_VALUE = "skip-unsent-messages command has been accepted to skip unsent messages till time %s";

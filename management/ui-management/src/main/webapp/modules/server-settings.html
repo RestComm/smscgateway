@@ -102,7 +102,12 @@
 									<input id="nationalLanguageLockingShift" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
 								</span>                         
 							</div>																				
-							
+							<div id="div-destAddrSendLimit" class="control-group">
+        						<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="destination address sending limit will be used to limit the sent unconfirmed messages for a  destination address per an ESME. This is SMSC Gw level and can be overwritten for each ESME created. Possible values:  = 0  : no limitations">
+									<span class="add-on">Destination Address Send Limit</span>
+        							<input id="destAddrSendLimit" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
+        						</span>
+    						</div>
 							&nbsp;
                         	<h5 style="border-bottom: 1px solid #DDD;">Delivery Delay Configuration</h5>
                         	<div id="div-propsubbusduedel" class="control-group"> 
@@ -815,7 +820,8 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										
 										$("#nationalLanguageSingleShift").val(response.value.NationalLanguageSingleShift);
 										$("#nationalLanguageLockingShift").val(response.value.NationalLanguageLockingShift);
-										
+										$("#destAddrSendLimit").val(response.value.DestAddrSendLimit);
+
 										var smppEncodingForUCS2 = response.value.SmppEncodingForUCS2;
 										
 										if(smppEncodingForUCS2 == "Utf8"){
@@ -1439,7 +1445,13 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 			    		} else if($("#div-propdefaultnpi").hasClass("error")) {
 			    			$("#div-propdefaultnpi").removeClass("error");		
 			    		}						
-						
+						var propdestAddrSendLimit = $("#destAddrSendLimit").val();
+        				if (propdestAddrSendLimit.trim() == "") {
+					    	$("#div-propdefaultnpi").addClass("error");
+					    	formInvalid = true;
+						} else if($("#div-propdefaultnpi").hasClass("error")) {
+							$("#div-propdefaultnpi").removeClass("error");
+						}
 						var e = document.getElementById("smppencodingforucs2");
 						var smppencodingforucs2 = e.options[e.selectedIndex].text;
 						
@@ -1516,6 +1528,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "EsmeDefaultClusterName", value: propesmedefaultclustername },
 									{ type: "write", mbean: mbeanSearch, attribute: "NationalLanguageSingleShift", value: propnationalLanguageSingleShift },
 									{ type: "write", mbean: mbeanSearch, attribute: "NationalLanguageLockingShift", value: propnationalLanguageLockingShift },
+									{ type: "write", mbean: mbeanSearch, attribute: "DestAddrSendLimit", value: propdestAddrSendLimit },
 									{ type: "write", mbean: mbeanSearch, attribute: "SmppEncodingForUCS2", value: smppencodingforucs2 },
 									{ type: "write", mbean: mbeanSearch, attribute: "SmppEncodingForGsm7", value: smppencodingforgsm7 },
 									{ type: "write", mbean: mbeanSearch, attribute: "StoreAndForwordMode", value: storeandforwardmode },
