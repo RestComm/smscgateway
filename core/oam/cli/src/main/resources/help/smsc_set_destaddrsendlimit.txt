@@ -1,0 +1,17 @@
+Name
+	smsc set destaddrsendlimit
+
+SYNOPSIS
+	smsc set destaddrsendlimit <value>
+
+DESCRIPTION
+	This command is used to set the value of Destination
+	Address Sending Limit table. destaddrsendlimit will be
+	used to limit the sent unconfirmed messages for a 
+	destination address per an ESME. This is SMSC Gw level
+	and can be overwritten for each ESME created.
+	Possible values: 
+	   = 0  : no limitations 
+
+SEE ALSO
+	smsc get destaddrsendlimit

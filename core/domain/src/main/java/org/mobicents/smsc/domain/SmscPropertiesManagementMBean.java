@@ -321,6 +321,10 @@ public interface SmscPropertiesManagementMBean {
 
     public void setNationalLanguageLockingShift(int nationalLanguageLockingShift);
     
+    public int getDestAddrSendLimit();
+    
+    public void setDestAddrSendLimit(int destAddrSendLimit);
+    
     public int getSriResponseLiveTime();
     
     public void setSriResponseLiveTime(int sriresponselivetime);

@@ -1,6 +1,7 @@
 package org.mobicents.smsc.slee.services.mt;
 
 import java.util.Date;
+import java.util.List;
 
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertEquals;
@@ -32,6 +33,8 @@ import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
 import org.testng.annotations.Test;
+
+import com.cloudhopper.smpp.pdu.PduRequest;
 
 public class MtTest3 {
 
@@ -310,6 +313,30 @@ public class MtTest3 {
             // TODO Auto-generated method stub
             
         }
+
+		@Override
+		public void setDeliveryPendingCount(long currentPendingCount) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public long getDeliveryPendingCount() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void setPendingChunks(List<PduRequest> value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public List<PduRequest> getPendingChunks() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 
     }
 

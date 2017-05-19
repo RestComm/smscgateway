@@ -30,6 +30,7 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import javax.slee.ActivityContextInterface;
@@ -55,6 +56,8 @@ import org.restcomm.smpp.GenerateType;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.cloudhopper.smpp.pdu.PduRequest;
 
 /**
 *
@@ -758,6 +761,30 @@ public class DeliveryCommonSbbTest {
             // TODO Auto-generated method stub
             
         }
+
+		@Override
+		public void setDeliveryPendingCount(long currentPendingCount) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public long getDeliveryPendingCount() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void setPendingChunks(List<PduRequest> value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public List<PduRequest> getPendingChunks() {
+			// TODO Auto-generated method stub
+			return new ArrayList<PduRequest>();
+		}
     }
 
     public class TracerImpl implements Tracer {

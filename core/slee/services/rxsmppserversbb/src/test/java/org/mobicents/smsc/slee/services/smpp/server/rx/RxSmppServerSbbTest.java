@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -182,7 +183,7 @@ public class RxSmppServerSbbTest {
 //
         esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null, SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER,
                 SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, 0,
-                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
 
         SmsSetCache.getInstance().clearProcessingSmsSet();
 
@@ -622,6 +623,30 @@ public class RxSmppServerSbbTest {
             // TODO Auto-generated method stub
             
         }
+
+		@Override
+		public void setDeliveryPendingCount(long currentPendingCount) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public long getDeliveryPendingCount() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void setPendingChunks(List<PduRequest> value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public List<PduRequest> getPendingChunks() {
+			// TODO Auto-generated method stub
+			return null;
+		}
     }
 
     private class SmppTransactionProxy implements SmppTransaction, ActivityContextInterface {

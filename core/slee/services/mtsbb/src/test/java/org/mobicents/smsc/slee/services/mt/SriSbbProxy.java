@@ -24,6 +24,7 @@ package org.mobicents.smsc.slee.services.mt;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.Address;
@@ -53,6 +54,8 @@ import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
+
+import com.cloudhopper.smpp.pdu.PduRequest;
 
 /**
  * 
@@ -375,4 +378,28 @@ public class SriSbbProxy extends SriSbb implements ChildRelation, SbbLocalObject
         // TODO Auto-generated method stub
         
     }
+
+	@Override
+	public void setDeliveryPendingCount(long currentPendingCount) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public long getDeliveryPendingCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setPendingChunks(List<PduRequest> value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<PduRequest> getPendingChunks() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
