@@ -225,6 +225,7 @@
             factoryMethod="getInstance">
             <parameter>SmppManagement</parameter>
         </constructor>
+        <annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.restcomm.smpp:name=SmppManagement",exposedInterface=org.restcomm.smpp.SmppManagementMBean.class,registerDirectly=true)</annotation>
         <property name="persistDir">${jboss.server.data.dir}</property>
     </bean>
 
