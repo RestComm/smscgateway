@@ -106,7 +106,7 @@ This page gets auto-refreshed every 2.5 seconds and therefore the statistics get
 {this-platform} {this-application} provides a SLEE based statistics for SMPP services.
 
 .Procedure: View SLEE Based Statistics using the GUI
-. In the GUI Management Console for SLEE, click on 'Services' in the left panel.
+. In the SLEE Management Console for SLEE (thai is avalable by a link like `http://localhost:8080/slee-management-console/`), click on 'Services' in the left panel.
 . The main panel will display all of deployed services. Click on the 'Usage Parameters' tab.
 . Select one of the SMPP services and a SBB corresponding to the chosen one.
 . The main panel will display a parameter entries in 'Parameter Sets' tab. You can view the current SMPP statistics by clicking on the row corresponding to the name of the parameters set.
