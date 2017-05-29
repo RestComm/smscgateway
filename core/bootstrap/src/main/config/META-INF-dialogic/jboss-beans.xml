@@ -205,7 +205,7 @@
 	<!-- RestComm SS7 Service -->
 	<!-- ==================================================================== -->
 	<bean name="MAPSS7Service" class="org.mobicents.smsc.server.bootstrap.SS7Service">
-		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.ss7:service=SS7Service",exposedInterface=org.mobicents.smsc.server.bootstrap.SS7ServiceMBean.class,registerDirectly=true)
+		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.ss7:service=MAPSS7Service",exposedInterface=org.mobicents.smsc.server.bootstrap.SS7ServiceMBean.class,registerDirectly=true)
 		</annotation>
 		<constructor>
 			<parameter>MAP</parameter>
