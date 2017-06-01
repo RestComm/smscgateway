@@ -494,7 +494,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                         Sms sms = smsSet.getSms(currentMsgNum + i1);
                         if (sms == null) {
                             this.logger.severe("RxSmpp obtainNextMessagesSendingPool() error: sms is not found num=" + i1
-                                    + " from " + sendingPoolMsgCount + ", smsSet=" + smsSet);
+                                    + " from " + sendingPoolMsgCount + ", smsSet=" + smsSet + "\n"
+                                    + MessageUtil.stackTraceToString());
                             break;
                         }
                         if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
