@@ -925,11 +925,6 @@ public class SMSCShellExecutor implements ShellExecutor {
                     return SMSCOAMMessages.NATIONAL_LANGUAGE_SHIFT_BAD_VALUE;
                 smscPropertiesManagement.setNationalLanguageLockingShift(val);
 
-            } else if(parName.equals("destaddrsendlimit")) {
-            	int val = Integer.parseInt(options[3]);
-            	if(val < 0)
-            		return SMSCOAMMessages.DEST_ADDR_SEND_LIMIT_BAD_VALUE;
-            	smscPropertiesManagement.setDestAddrSendLimit(val);
             } else if (parName.equals("httpdefaultsourceton")) {
                 int val = Integer.parseInt(options[3]);
                 smscPropertiesManagement.setHttpDefaultSourceTon(val);
@@ -1246,8 +1241,6 @@ public class SMSCShellExecutor implements ShellExecutor {
             } else if (parName.equals("nationallanguagelockingshift")) {
                 sb.append(smscPropertiesManagement.getNationalLanguageLockingShift());
 
-            } else if (parName.equals("destAddrSendLimit")) {
-            	sb.append(smscPropertiesManagement.getDestAddrSendLimit());
             } else if (parName.equals("httpdefaultsourceton")) {
                 sb.append(smscPropertiesManagement.getHttpDefaultSourceTon());
             } else if (parName.equals("httpdefaultsourcenpi")) {
@@ -1586,10 +1579,6 @@ public class SMSCShellExecutor implements ShellExecutor {
             sb.append(smscPropertiesManagement.getNationalLanguageLockingShift());
             sb.append("\n");
 
-            sb.append("destAddrSendLimit = ");
-            sb.append(smscPropertiesManagement.getDestAddrSendLimit());
-            sb.append("\n");
-            
             sb.append("httpdefaultsourceton = ");
             sb.append(smscPropertiesManagement.getHttpDefaultSourceTon());
             sb.append("\n");

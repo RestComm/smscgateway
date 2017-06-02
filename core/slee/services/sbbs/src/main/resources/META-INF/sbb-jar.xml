@@ -27,7 +27,8 @@
                 <cmp-field><cmp-field-name>dlvIsInited</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>dlvIsEnded</cmp-field-name></cmp-field>
                 <cmp-field><cmp-field-name>deliveryTimerID</cmp-field-name></cmp-field>
-				<cmp-field><cmp-field-name>deliveryPendingCount</cmp-field-name></cmp-field>
+                <cmp-field><cmp-field-name>lastLocalSequenceNumber</cmp-field-name></cmp-field>
+				<cmp-field><cmp-field-name>sentChunks</cmp-field-name></cmp-field>
 				<cmp-field><cmp-field-name>pendingChunks</cmp-field-name></cmp-field>
 				<get-child-relation-method>
 					<sbb-alias-ref>
