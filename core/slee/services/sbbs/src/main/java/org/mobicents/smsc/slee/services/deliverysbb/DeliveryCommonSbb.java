@@ -1623,13 +1623,17 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     public abstract long getCurrentMsgNum();
 
-    public abstract void setDeliveryPendingCount(long currentPendingCount);
+    public abstract void setLastLocalSequenceNumber(int value);
 
-    public abstract long getDeliveryPendingCount();
+    public abstract int getLastLocalSequenceNumber();
     
-    public abstract void setPendingChunks(List<PduRequest> value);
+    public abstract void setSentChunks(ChunkDataList value);
 
-    public abstract List<PduRequest> getPendingChunks();
+    public abstract ChunkDataList getSentChunks();
+    
+    public abstract void setPendingChunks(ChunkDataList value);
+
+    public abstract ChunkDataList getPendingChunks();
     
     public abstract void setDlvIsInited(boolean deliveringIsInited);
 
