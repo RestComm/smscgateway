@@ -1,2 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<mprocList/>
+<mprocList>
+	<mproc id="1" destDigMask="6666" tlvValueTypeToMatch="STRING" newNetworkId="20"/>
+	<mproc id="2" destDigMask="6667" tlvValueTypeToMatch="STRING" newNetworkId="21"/>
+	<mproc id="3" destDigMask="5555" tlvValueTypeToMatch="STRING" newNetworkId="30"/>
+	<mproc id="4" destDigMask="^(?!6666|6667|5555).*" tlvValueTypeToMatch="STRING" newNetworkId="0"/>
+</mprocList>

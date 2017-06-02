@@ -1408,6 +1408,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                         sms0.setReceiptOrigMessageId(dlvMessageId);
                     }
                     sms0.setReceiptLocalMessageId(messageId);
+                    sms0.setDeliveryState(deliveryReceiptData.getStatus());
 
                     String messageIdStr = MessageUtil.createMessageIdString(messageId);
                     String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr, deliveryReceiptData

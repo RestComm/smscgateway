@@ -163,7 +163,7 @@
 	<!-- Shell Service -->
 	<!-- ==================================================================== -->
 	<!-- Define Shell Executor -->
-	<bean name="ShellExecutor" class="org.mobicents.ss7.management.console.ShellServer">
+	<bean name="ShellExecutor" class="org.mobicents.ss7.management.console.ShellServerJboss">
 		<constructor>
 			<parameter>
 				<inject bean="SS7Scheduler" />
@@ -205,7 +205,7 @@
 	<!-- RestComm SS7 Service -->
 	<!-- ==================================================================== -->
 	<bean name="MAPSS7Service" class="org.mobicents.smsc.server.bootstrap.SS7Service">
-		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.ss7:service=SS7Service",exposedInterface=org.mobicents.smsc.server.bootstrap.SS7ServiceMBean.class,registerDirectly=true)
+		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.ss7:service=MAPSS7Service",exposedInterface=org.mobicents.smsc.server.bootstrap.SS7ServiceMBean.class,registerDirectly=true)
 		</annotation>
 		<constructor>
 			<parameter>MAP</parameter>
@@ -225,6 +225,7 @@
             factoryMethod="getInstance">
             <parameter>SmppManagement</parameter>
         </constructor>
+        <annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.restcomm.smpp:name=SmppManagement",exposedInterface=org.restcomm.smpp.SmppManagementMBean.class,registerDirectly=true)</annotation>
         <property name="persistDir">${jboss.server.data.dir}</property>
     </bean>
 

@@ -82,7 +82,7 @@ Halting VM
 == Running the Gateway - Simulator Profile
 
 The {this-platform} {this-application} offers you an option to run the Gateway with a "simulator" profile for testing purpose.
-The "simulator" profile is a pre-configured profile to work with the jss7-simulator, the smpp-simulator and some SIP phone.
+The "simulator" profile is a pre-configured profile to work with the jss7-simulator, the smpp-simulator, some SIP phone and loading of messages via a HTTP connector.
 Starting the Gateway with the "simulator" profile is similar to the steps explained for the "default" profile except that you must pass the string value "simulator" to the -c command line option when invoking the run script.
  
 ----
@@ -102,36 +102,59 @@ The SMSC Gateway in a Simulator Profile is configured as it would have been if c
 ----
 
 
-sctp server create serv1 127.0.0.1 8012 sockettype SCTP
+sctp server create serv1 127.0.0.1 8012 sockettype TCP
 sctp server start serv1
-sctp association create ass1 SERVER serv1 127.0.0.1 8011 sockettype SCTP
+sctp association create ass1 SERVER serv1 127.0.0.1 8011 sockettype TCP
 
-m3ua as create as1 IPSP mode SE ipspType server rc 101 traffic-mode loadsharing network-appearance 102 
-m3ua asp create asp1 ass1 
-m3ua as add as1 asp1 
-m3ua asp start asp1 
+m3ua as create as1 IPSP mode SE ipspType server rc 101 traffic-mode loadsharing network-appearance 102
+m3ua asp create asp1 ass1
+m3ua as add as1 asp1
+m3ua asp start asp1
 m3ua route add as1 1 2 3
 
-sccp sap create 1 1 2 2 
-sccp dest create 1 1 1 1 0 255 255 
-sccp address create 1 82 1 8 0 1 4 000 
-sccp address create 2 82 2 8 0 1 4 000 
-sccp rule create 1 K 82 0 8 0 1 4 * solitary 1 origination-type localOriginated 
-sccp rule create 2 K 82 0 8 0 1 4 * solitary 2 origination-type remoteOriginated 
-sccp rsp create 1 1 0 0 
+sccp sap create 1 1 2 2
+sccp dest create 1 1 1 1 0 255 255
+sccp address create 1 82 1 8 0 1 4 000
+sccp address create 2 82 2 8 0 1 4 000
+sccp rule create 1 K 82 0 0 0 1 4 * solitary 1 origination-type localOriginated
+sccp rule create 2 K 82 0 0 0 1 4 * solitary 2 origination-type remoteOriginated
+sccp rsp create 1 1 0 0
 sccp rss create 1 1 8 0
 
-smsc set scgt 22220 
-smsc set scssn 8 
-smsc set hlrssn 8 
-smsc set mscssn 8 
+smsc set scgt 22220
+smsc set scssn 8
+smsc set hlrssn 8
+smsc set mscssn 8
 smsc set maxmapv 3
 
-smpp esme create test test 127.0.0.1 -1 TRANSCEIVER SERVER password test esme-ton -1 esme-npi -1 esme-range 6666 source-range 6666 routing-range 6666 charging-enabled false
-smpp esme start test
+smsc set httpdefaultnetworkid 10
+smsc httpuser add user password password networkId 10
 
-smsc sip modify SIP cluster-name SIP host 127.0.0.1 port 5065 routing-ton 1 routing-npi 1 routing-range 5555 counters-enabled false charging-enabled false
+smpp esme create test test 127.0.0.1 -1 TRANSCEIVER SERVER password test esme-ton -1 esme-npi -1 esme-range 6666 source-range ^[0-9a-zA-Z]* routing-range ^[0-9a-zA-Z]* networkid 20
+smpp esme create test2 test2 127.0.0.1 -1 TRANSCEIVER SERVER password test esme-ton -1 esme-npi -1 esme-range 6667 source-range ^[0-9a-zA-Z]* routing-range ^[0-9a-zA-Z]* networkid 21
+smpp esme start test
+smpp esme start test2
+
+smsc sip modify SIP cluster-name SIP host 127.0.0.1 port 5065 routing-ton 1 routingnpi 1 routing-range ^[0-9a-zA-Z]* counters-enabled false charging-enabled false networkid 30
+
+smsc mproc add mproc 1 destdigmask 6666 newnetworkid 20
+smsc mproc add mproc 2 destdigmask 6667 newnetworkid 21
+smsc mproc add mproc 3 destdigmask 5555 newnetworkid 30
+smsc mproc add mproc 4 destdigmask ^(?!6666|6667|5555).* newnetworkid 0
 ----
+
+We use following message Id values:
+
+.The list of Id values
+[cols="1,1", frame="all", options="header"]
+|===
+| Network Id value | Connector
+| 0 | SS7
+| 10 | HTTP
+| 20, 21 | SMPP
+| 30 | SIP
+|===
+
 
 [[_running_the_simulator_ss7]]
 === Running the jSS7 Simulator
@@ -291,6 +314,21 @@ Now you can run the following tests:
 . For testing sending messages from a SIP phone you can use the feature "Send message" to a concrete contact, type a message text and send.
   After about 1 minute you will receive the message on the SS7 Simulator or the SIP Simulator. 
 . For testing sending messages to the SIP phone you just need to send a message from the SS7 Simulator or SMPP Simulator to the address "5555". You must put the originating address as "1111" for SS7 Simulator and "6666" for SMPP Simulator. 
+
+
+[[_http_connector]]
+=== Usage of a HTTP connector for message uploading
+
+SMSC GW with a "simulator" profile is configured for accepting messages via HTTP connector with a preconfigured user name "user" and a password "password". Examples for sending of messages by a WEB browser are:
+
+[subs="attributes"]
+----
+127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user&password=password&msg=Thisisamessage_00001&sender=4444&to=6666
+127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user&password=password&msg=Thisisamessage_00002&sender=4444&to=1111
+----
+
+These examples send messages "Thisisamessage_00001" and "Thisisamessage_00002" to destination addresses "6666" (for delivering into SMPP Simulator) and "1111" (for delivering into SS7 Simulator).
+
 
 
 [[_running_shell]]

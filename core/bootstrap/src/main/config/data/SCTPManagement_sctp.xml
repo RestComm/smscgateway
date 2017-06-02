@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <connectdelay value="5000"/>
-<workerthreads value="8"/>
-<singlethread value="true"/>
 <servers>
 	<server name="serv1" started="true" hostAddress="127.0.0.1" hostPort="8012" ipChannelType="0" acceptAnonymousConnections="false" maxConcurrentConnectionsCount="0" extraHostAddresseSize="0">
 		<associations>

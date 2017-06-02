@@ -32,15 +32,15 @@
 		<!-- restcomm but not strictly ss7 -->
 		<asn.version>2.1.5</asn.version>
 		<stream.version>1.0.0.CR1</stream.version>
-		<sctp.version>1.7.8</sctp.version>
+		<sctp.version>1.8.15</sctp.version>
 		<commons.version>1.0.0.CR1</commons.version>
 		<log4j.version>1.2.14</log4j.version>
 		<junit.version>3.8.1</junit.version>
 		<!-- cloudhopper smpp -->
 		<!-- <ch.smpp.namespace>com.fizzed</ch.smpp.namespace> --> <!-- com.fizzed com.cloudhopper -->
 		<ch.smpp.version>5.0.5</ch.smpp.version> <!-- 5.0.9 5.0.10-SNAPSHOT -->
-		<smpp.extensions.version>1.0.15</smpp.extensions.version> <!-- 1.0.0-SNAPSHOT -->
-		<smpp.ra.version>7.0.27</smpp.ra.version> <!-- 7.0.0-SNAPSHOT -->
+		<smpp.extensions.version>7.0.31</smpp.extensions.version>
+		<smpp.ra.version>7.0.42</smpp.ra.version>
 		<slf4j.version>1.5.6</slf4j.version> <!-- 1.5.6, 1.6.0, 1.7.10 -->
 
         <org.mobicents.http.ra.version>2.8.50</org.mobicents.http.ra.version>
@@ -58,13 +58,13 @@
 		<jackson.version>1.9.2</jackson.version>
 		
 		<!-- restcomm properties -->
-		<jss7.restcomm.version>7.1.1385</jss7.restcomm.version>
+		<jss7.restcomm.version>7.3.1398</jss7.restcomm.version>
 		<dialogic.version>6.7.1</dialogic.version>
 		<ts.slee.version>2.8.10</ts.slee.version>
 		<jslee.ext.version>${ts.slee.version}</jslee.ext.version>
-		<restcomm.resources.map.version>2.8.26</restcomm.resources.map.version>
-		<restcomm.resources.sip.version>2.8.20</restcomm.resources.sip.version>
-		<jdiameter.version>2.8.21</jdiameter.version>
+		<restcomm.resources.map.version>7.3.72</restcomm.resources.map.version>
+		<restcomm.resources.sip.version>2.9.94</restcomm.resources.sip.version>
+		<jdiameter.version>7.1.18</jdiameter.version> <!-- 2.8.21 -->
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 
 		<restcomm.statistics.server>https://statistics.restcomm.com/rest/</restcomm.statistics.server>
@@ -78,6 +78,7 @@
 		<module>test/smpp-simulator</module>
 		 -->
 		<module>test/smpp-load</module>
+                <module>test/http-load</module>
 		<module>tools</module>
 		<module>management/ui-management</module>
 	</modules>

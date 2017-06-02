@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <port value="2776"/>
 <bindTimeout value="5000"/>
+<writeTimeout value="0"/>
 <systemId value="RestCommSMSC"/>
 <autoNegotiateInterfaceVersion value="true"/>
 <interfaceVersion value="3.3999999999999999"/>

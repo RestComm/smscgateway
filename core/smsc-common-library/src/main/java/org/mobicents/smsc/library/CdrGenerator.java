@@ -161,7 +161,9 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append("\"")
                 .append(getEscapedString(reason))
-                .append("\"");
+                .append("\"")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(smsEvent.getDeliveryState());
         CdrGenerator.generateCdr(sb.toString());
     }
 

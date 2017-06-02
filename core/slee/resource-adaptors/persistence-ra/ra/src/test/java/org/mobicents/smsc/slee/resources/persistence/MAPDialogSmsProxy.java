@@ -318,11 +318,11 @@ public class MAPDialogSmsProxy implements MAPDialogSms {
 		return 0;
 	}
 
-	@Override
-	public void addEricssonData(IMSI imsi, AddressString vlrNo) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void addEricssonData(AddressString arg0, AddressString arg1) {
+        // TODO Auto-generated method stub
+        
+    }
 
 	private int forwardSMLen;
 
