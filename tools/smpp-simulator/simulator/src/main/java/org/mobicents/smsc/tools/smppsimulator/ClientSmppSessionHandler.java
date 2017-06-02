@@ -228,9 +228,21 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
             testingForm.addMessage("PduResponseSent: " + resp.getName(), resp.toString());
         }
 
+        boolean delayRequired = testingForm.getSmppSimulatorParameters().getResponseDelay() > 0;
+        if(delayRequired) 
+        	await(testingForm.getSmppSimulatorParameters().getResponseDelay(), TimeUnit.MILLISECONDS);
+        
         return resp;
     }
 
+    private void await(long interval, TimeUnit unit) {
+    	try {
+    		unit.sleep(interval);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    }
+    
     @Override
     public void firePduRequestExpired(PduRequest pduRequest) {
         testingForm.addMessage("PduRequestExpired: " + pduRequest.getName(), pduRequest.toString());

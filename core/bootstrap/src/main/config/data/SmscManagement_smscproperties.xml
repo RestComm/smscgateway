@@ -25,7 +25,6 @@
 <removingArchiveTablesDays value="3"/>
 <nationalLanguageSingleShift value="0"/>
 <nationalLanguageLockingShift value="0"/>
-<destAddrSendLimit value="0" />
 <esmeDefaultCluster value=""/>
 <maxActivityCount value="500"/>
 <smppEncodingForGsm7 value="Utf8"/>

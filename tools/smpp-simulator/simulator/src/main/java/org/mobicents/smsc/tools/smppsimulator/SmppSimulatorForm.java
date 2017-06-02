@@ -28,6 +28,7 @@ import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -101,8 +102,8 @@ public class SmppSimulatorForm {
 		// trying to read the ini-file
 		SmppSimulatorParameters par = null;
 		try {
-			BufferedInputStream bis = new BufferedInputStream(new FileInputStream("SmppSimulatorParameters.xml"));
-			XMLDecoder d = new XMLDecoder(bis);
+			ClassLoader classLoader = getClass().getClassLoader();
+			XMLDecoder d = new XMLDecoder(classLoader.getResourceAsStream("SmppSimulatorParameters.xml"));
 			initPar = (SmppSimulatorParameters) d.readObject();
 			d.close();
 		} catch (Exception e) {
@@ -111,6 +112,8 @@ public class SmppSimulatorForm {
 		
 		if (par == null) {
 			this.par = new SmppSimulatorParameters();
+			if(initPar != null)
+				this.par.setResponseDelay(initPar.getResponseDelay());
 //		} else {
 //			this.par = par;
 		}
