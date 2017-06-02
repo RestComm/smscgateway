@@ -398,29 +398,6 @@ EXAMPLES
 	smsc set nationallanguagesingleshift 0
 	smsc set nationallanguagesingleshift 13
 ]]></screen>
-<para>
-You can set the 'Destination address send limit table' value by issuing the command smsc set destaddrsendlimit with appropriate parameters as described below.
-You can verify this by issuing the command smsc get destaddrsendlimit which will display the value set for this property.
-</para>
-<screen><![CDATA[
-Name
-	smsc set destaddrsendlimit
-
-SYNOPSIS
-	smsc set destaddrsendlimit 
-
-DESCRIPTION
-	This command is used to set the value of Destination
-	Address Sending Limit table. destaddrsendlimit will be
-	used to limit the sent unconfirmed messages for a 
-	destination address per an ESME. This is SMSC Gw level
-	and can be overwritten for each ESME created. Possible values: 
-	= 0  : no limitations
-
-EXAMPLES
-	smsc set destaddrsendlimit 0
-	smsc set destaddrsendlimit 13
-]]></screen>
 			</section>
 			<section id="single_s_table_GUI">
 			<title>Using GUI</title>
