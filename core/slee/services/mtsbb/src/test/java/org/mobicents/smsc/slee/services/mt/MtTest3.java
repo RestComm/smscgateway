@@ -1,6 +1,7 @@
 package org.mobicents.smsc.slee.services.mt;
 
 import java.util.Date;
+import java.util.List;
 
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertEquals;
@@ -28,10 +29,13 @@ import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsDeliveryReportData;
 import org.mobicents.smsc.library.SmsSet;
+import org.mobicents.smsc.slee.services.deliverysbb.ChunkDataList;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
 import org.testng.annotations.Test;
+
+import com.cloudhopper.smpp.pdu.PduRequest;
 
 public class MtTest3 {
 
@@ -310,6 +314,42 @@ public class MtTest3 {
             // TODO Auto-generated method stub
             
         }
+
+		@Override
+		public void setLastLocalSequenceNumber(int value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int getLastLocalSequenceNumber() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void setSentChunks(ChunkDataList value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public ChunkDataList getSentChunks() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setPendingChunks(ChunkDataList value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public ChunkDataList getPendingChunks() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 
     }
 

@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -76,6 +77,8 @@ import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.resources.scheduler.SendPduStatus2;
+import org.mobicents.smsc.slee.services.deliverysbb.ChunkDataList;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
 import org.mobicents.smsc.slee.services.smpp.server.rx.stub.RxSmppServerSbbUsageStub;
@@ -181,7 +184,7 @@ public class RxSmppServerSbbTest {
 //
         esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null, SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER,
                 SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, 0,
-                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, -1, -1);
+                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
 
         SmsSetCache.getInstance().clearProcessingSmsSet();
 
@@ -615,6 +618,48 @@ public class RxSmppServerSbbTest {
         public RxSmppServerSbbUsage getDefaultSbbUsageParameterSet() {
             return new RxSmppServerSbbUsageStub();
         }
+
+        @Override
+        public void fireSendPduStatusChild(SendPduStatus2 event, ActivityContextInterface aci, Address address) {
+            // TODO Auto-generated method stub
+            
+        }
+
+		@Override
+		public void setLastLocalSequenceNumber(int value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int getLastLocalSequenceNumber() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void setSentChunks(ChunkDataList value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public ChunkDataList getSentChunks() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setPendingChunks(ChunkDataList value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public ChunkDataList getPendingChunks() {
+			// TODO Auto-generated method stub
+			return null;
+		}
     }
 
     private class SmppTransactionProxy implements SmppTransaction, ActivityContextInterface {

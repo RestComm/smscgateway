@@ -24,6 +24,7 @@ package org.mobicents.smsc.slee.services.mt;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.Address;
@@ -54,9 +55,12 @@ import org.mobicents.smsc.slee.resources.persistence.MAPProviderProxy;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.services.deliverysbb.ChunkDataList;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendRsdsEvent;
+
+import com.cloudhopper.smpp.pdu.PduRequest;
 
 /**
  * 
@@ -483,6 +487,41 @@ public class MtSbbProxy extends MtSbb implements ChildRelationExt, MtSbbLocalObj
     @Override
     public void setDeliveryTimerID(TimerID val) {
         // TODO Auto-generated method stub
-        
     }
+
+	@Override
+	public void setLastLocalSequenceNumber(int value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getLastLocalSequenceNumber() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setSentChunks(ChunkDataList value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ChunkDataList getSentChunks() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPendingChunks(ChunkDataList value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ChunkDataList getPendingChunks() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

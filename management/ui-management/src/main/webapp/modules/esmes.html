@@ -395,6 +395,13 @@
 					</span>	
 				</div>
 				
+				<div id="div-destAddrSendLimit" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="destination address sending limit will be used to limit the sent unconfirmed messages for a  destination address per an ESME. This is SMSC Gw level and can be overwritten for each ESME created. Possible values:  = 0  : no limitations">
+						<span class="add-on">Destination Address Send Limit</span>
+						<input id="destAddrSendLimit" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
+					</span>
+				</div>
+
 				<div id="div-minMessageLength" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="minimum message length (in characters) acceptable to the SMSC GW, for messages coming from this ESME. If an incoming message length is less than the min-message-length it will be rejected by SMSC GW. The default value for this parameter is -1 and it implies no limitations. Any other negative value also implies no limitations.">
 						<span class="add-on">Min Message Length</span>
@@ -646,6 +653,7 @@
 		
 		var nationalLanguageSingleShift = response.value.NationalLanguageSingleShift;
 		var nationalLanguageLockingShift = response.value.NationalLanguageLockingShift;
+		var destAddrSendLimit = response.value.DestAddrSendLimit;
 		var minMessageLength = response.value.MinMessageLength;
 		var maxMessageLength = response.value.MaxMessageLength;
 		
@@ -765,6 +773,7 @@
 						'<dt>RemoteTypeName</dt> <dd>' + remoteTypeName + ' </dd>' +
 						'<dt>NationalLanguageSingleShift</dt> <dd>' + nationalLanguageSingleShift + ' </dd>' +
 						'<dt>NationalLanguageLockingShift</dt> <dd>' + nationalLanguageLockingShift + ' </dd>' +
+						'<dt>DestAddrSendLimit</dt> <dd>' + destAddrSendLimit + ' </dd>' +
 						'<dt>MinMessageLength</dt> <dd>' + minMessageLength + ' </dd>' +
 						'<dt>MaxMessageLength</dt> <dd>' + maxMessageLength + ' </dd>' +
 					    '<dt>SplitLongMessages</dt> <dd>' + splitLongMessages + ' </dd>' + 
@@ -1312,7 +1321,23 @@
 											'</td>'+
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"NationalLanguageLockingShift"+']\').toggle(); $(\'input[id^='+name+"NationalLanguageLockingShift"+']\').focus();"></i>' +
 											'</td>'+
-										'</tr>'+	
+										'</tr>'+
+
+										'<tr data-toggle="tooltip" title="destination address sending limit will be used to limit the sent unconfirmed messages for a  destination address per an ESME. This is SMSC Gw level and can be overwritten for each ESME created. Possible values:  = 0  : no limitations">' +
+											'<td style="font-size: 0.9em;">Destination Address Send Limit</td>' +
+											'<td style="font-size: 0.9em; padding: 0;">' +
+												'<div id="div-' + name + 'DestAddrSendLimit-input" class="control-group">' +
+												'<span id="' + name + 'DestAddrSendLimit-input" style="display: none;">' +
+												    '<input type="text" class="input-small" value="' + destAddrSendLimit + '" /> ' +
+												    '<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name + '\', \'DestAddrSendLimit\', \'' + name + "DestAddrSendLimit" + '\', \'false\')"></i> ' +
+												    '<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^=' + name + "DestAddrSendLimit" + ']\').toggle(); $(\'input[id^=' + name + "DestAddrSendLimit" + ']\').focus();"></i>' +
+												'</span>' +
+												'</div>' +
+												'<span id="' + name + 'DestAddrSendLimit-text">' + destAddrSendLimit + '</span>' +
+											'</td>' +
+											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^=' + name + "DestAddrSendLimit" + ']\').toggle(); $(\'input[id^=' + name + "DestAddrSendLimit" + ']\').focus();"></i>' +
+											'</td>' +
+										'</tr>' +	
 										
 										'<tr data-toggle="tooltip" title="minimum message length (in characters) acceptable to the SMSC GW, for messages coming from this ESME. If an incoming message length is less than the min-message-length it will be rejected by SMSC GW. The default value for this parameter is -1 and it implies no limitations. Any other negative value also implies no limitations.">'+
 											'<td style="font-size: 0.9em;">Min Message Length</td>'+
@@ -2170,6 +2195,11 @@
 			nationalLanguageLockingShift = "-1";
 		}
 		
+		var destAddrSendLimit = $("#destAddrSendLimit").val();
+		if (destAddrSendLimit == "") {
+			destAddrSendLimit = "-1";
+		}
+
 		var minMessageLength = $("#minMessageLength").val();
 		if(minMessageLength == "") {
 			minMessageLength = "-1";
@@ -2188,7 +2218,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,minMessageLength,maxMessageLength, 
+		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength, 
 				{
 					success: function(value) {
 						updateEsmes();

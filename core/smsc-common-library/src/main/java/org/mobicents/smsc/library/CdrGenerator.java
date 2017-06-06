@@ -149,8 +149,6 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(delayParametersInCdr ? getProcessingTime(smsEvent.getSubmitDate()) : CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(delayParametersInCdr ? getDeliveryDelayMilis(smsEvent.getSubmitDate(), smsEvent.getDeliverDate()) : CDR_EMPTY)
-                .append(CdrGenerator.CDR_SEPARATOR)
                 .append(delayParametersInCdr ? getScheduleDeliveryDelayMilis(smsEvent.getSubmitDate(), smsEvent.getScheduleDeliveryTime()) : CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(delayParametersInCdr ? smsEvent.getDeliveryCount() : CDR_EMPTY)
@@ -185,16 +183,6 @@ public class CdrGenerator {
             return CDR_EMPTY;
 }
         return String.valueOf(System.currentTimeMillis() - aSubmitDate.getTime());
-    }
-
-    private static String getDeliveryDelayMilis(final Date aSubmitDate, final Date aDeliveryDate) {
-        if (aSubmitDate == null) {
-            return CDR_EMPTY;
-        }
-        if (aDeliveryDate == null) {
-            return CDR_EMPTY;
-        }
-        return String.valueOf(aDeliveryDate.getTime() - aSubmitDate.getTime());
     }
 
     private static String getScheduleDeliveryDelayMilis(final Date aSubmitDate, final Date aScheduleDeliveryDate) {

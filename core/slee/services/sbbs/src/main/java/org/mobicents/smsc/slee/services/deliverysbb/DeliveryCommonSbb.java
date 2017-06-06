@@ -24,6 +24,7 @@ package org.mobicents.smsc.slee.services.deliverysbb;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.CreateException;
@@ -61,6 +62,8 @@ import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+
+import com.cloudhopper.smpp.pdu.PduRequest;
 
 import javolution.util.FastList;
 
@@ -491,7 +494,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                         Sms sms = smsSet.getSms(currentMsgNum + i1);
                         if (sms == null) {
                             this.logger.severe("RxSmpp obtainNextMessagesSendingPool() error: sms is not found num=" + i1
-                                    + " from " + sendingPoolMsgCount + ", smsSet=" + smsSet);
+                                    + " from " + sendingPoolMsgCount + ", smsSet=" + smsSet + "\n"
+                                    + MessageUtil.stackTraceToString());
                             break;
                         }
                         if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
@@ -1619,6 +1623,18 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     public abstract long getCurrentMsgNum();
 
+    public abstract void setLastLocalSequenceNumber(int value);
+
+    public abstract int getLastLocalSequenceNumber();
+    
+    public abstract void setSentChunks(ChunkDataList value);
+
+    public abstract ChunkDataList getSentChunks();
+    
+    public abstract void setPendingChunks(ChunkDataList value);
+
+    public abstract ChunkDataList getPendingChunks();
+    
     public abstract void setDlvIsInited(boolean deliveringIsInited);
 
     public abstract boolean getDlvIsInited();

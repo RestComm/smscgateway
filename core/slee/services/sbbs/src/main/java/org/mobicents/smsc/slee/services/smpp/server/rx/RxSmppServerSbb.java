@@ -30,6 +30,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -65,11 +66,15 @@ import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.ProcessingType;
 import org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2;
+import org.mobicents.smsc.slee.resources.scheduler.SendPduStatus2;
 import org.mobicents.smsc.slee.services.deliverysbb.ConfirmMessageInSendingPool;
 import org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb;
+import org.mobicents.smsc.slee.services.deliverysbb.ChunkData;
+import org.mobicents.smsc.slee.services.deliverysbb.ChunkDataList;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
 import org.mobicents.smsc.slee.services.util.SbbStatsUtils;
 import org.restcomm.slee.resource.smpp.PduRequestTimeout;
+import org.restcomm.slee.resource.smpp.SendPduStatus;
 import org.restcomm.slee.resource.smpp.SmppSessions;
 import org.restcomm.slee.resource.smpp.SmppTransaction;
 import org.restcomm.slee.resource.smpp.SmppTransactionACIFactory;
@@ -83,6 +88,7 @@ import com.cloudhopper.smpp.SmppSession.Type;
 import com.cloudhopper.smpp.pdu.BaseSmResp;
 import com.cloudhopper.smpp.pdu.DeliverSm;
 import com.cloudhopper.smpp.pdu.DeliverSmResp;
+import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.pdu.SubmitSmResp;
 import com.cloudhopper.smpp.tlv.Tlv;
@@ -185,7 +191,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
 	// *********
     // SMPP events
-    
+
     public void onSubmitSmRespParent(SubmitSmResp event, ActivityContextInterface aci, EventContext eventContext) {
         final RxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
         sbbu.incrementCounterSubmitSmRespParent(ONE);
@@ -217,6 +223,37 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         final long start = System.currentTimeMillis();
         onRecoverablePduExceptionParentLocal(sbbu, event);
         sbbu.sampleRecoverablePduExceptionParent(System.currentTimeMillis() - start);
+    }
+
+    public void onSendPduStatusParent(SendPduStatus2 event, ActivityContextInterface aci, EventContext eventContext) {
+        if (logger.isFineEnabled()) {
+            logger.fine(String.format("onSendPduStatus : SendPduStatus=%s", event));
+        }
+
+        if (!event.isSuccess()) {
+            try {
+                if (isDeliveringEnded()) {
+                    logger.info("RxSmppServerSbb.onSendPduStatus() with error: received onSendPduStatus but delivery process is already ended, dropping of an event");
+                    return;
+                }
+
+                SmsSet smsSet = getSmsSet();
+                if (smsSet == null) {
+                    logger.severe("RxSmppServerSbb.onSendPduStatus(): CMP smsSet is missed");
+                    markDeliveringIsEnded(true);
+                    return;
+                }
+
+                logger.severe(String.format("onSendPduStatus with error : targetId=" + smsSet.getTargetId()
+                        + ", SendPduStatus=" + event));
+
+                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
+                        "SendPduStatus: " + event);
+            } catch (Throwable e1) {
+                logger.severe("Exception in RxSmppServerSbb.onSendPduStatus(): " + e1.getMessage(), e1);
+                markDeliveringIsEnded(true);
+            }
+        }
     }
 
     public void onDeliverSmResp(DeliverSmResp event, ActivityContextInterface aci, EventContext eventContext) {
@@ -252,6 +289,10 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         sbbu.sampleRecoverablePduException(System.currentTimeMillis() - start);
     }
 
+    public void onSendPduStatus(SendPduStatus event, ActivityContextInterface aci, EventContext eventContext) {
+        onSendPduStatusLocal(event, aci);
+    }
+
     public abstract void fireDeliverSmRespChild(DeliverSmResp event, ActivityContextInterface activity,
     javax.slee.Address address);
 
@@ -260,6 +301,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     public abstract void firePduRequestTimeoutChild(PduRequestTimeout2 event, ActivityContextInterface aci, javax.slee.Address address);
 
     public abstract void fireRecoverablePduExceptionChild(RecoverablePduException event, ActivityContextInterface aci, javax.slee.Address address);
+
+    public abstract void fireSendPduStatusChild(SendPduStatus2 event, ActivityContextInterface aci, javax.slee.Address address);
 
     public abstract ChildRelationExt getRxSmppServerChildSbb();
 
@@ -479,6 +522,29 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         }
     }
 
+    private void onSendPduStatusLocal(final SendPduStatus event, final ActivityContextInterface aci) {
+        if (logger.isFineEnabled())
+            logger.fine("onSendPduStatusParent - refire to RxSmppServerChildSbb : activity=" + aci.getActivity());
+
+        RxSmppServerChildLocalObject rxSmppServerSbbLocalObject = this.getRxSmppServerChildSbbObject();
+
+        if (rxSmppServerSbbLocalObject != null) {
+            ActivityContextInterface act = getSchedulerActivityContextInterface();
+            if (act != null) {
+                try {
+                    act.attach(rxSmppServerSbbLocalObject);
+                    SendPduStatus2 event2 = new SendPduStatus2(event.getException(), event.getRequest(), event.getResponse(),
+                            event.getSystemId(), event.isSuccess());
+                    fireSendPduStatusChild(event2, act, null);
+                } catch (IllegalStateException e) {
+                    if (logger.isInfoEnabled())
+                        logger.info("onSendPduStatus - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
+                                + act.getActivity() + ", event=" + event);
+                }
+            }
+        }
+    }
+
     private RxSmppServerChildLocalObject getRxSmppServerChildSbbObject() {
         ChildRelationExt relation = getRxSmppServerChildSbb();
 
@@ -529,6 +595,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 			smsSet.setDestSystemId(esme.getSystemId());
             smsSet.setDestEsmeName(esme.getName());
 
+            List<ChunkData> pendingMessages=new ArrayList<ChunkData>();
+            
             for (int poolIndex = 0; poolIndex < deliveryMsgCnt; poolIndex++) {
                 smscStatAggregator.updateMsgOutTryAll();
                 smscStatAggregator.updateMsgOutTrySmpp();
@@ -592,7 +660,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 }
 
                 for (int segmentIndex = 0; segmentIndex < segmCnt; segmentIndex++) {
-                    if (esme.getSmppSessionType() == Type.CLIENT) {
+                	if (esme.getSmppSessionType() == Type.CLIENT) {
                         SubmitSm submitSm = new SubmitSm();
                         submitSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(), sms
                                 .getSourceAddr()));
@@ -630,21 +698,24 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             submitSm.addOptionalParameter(tlv);
                         }
 
-                        SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, submitSm,
-                                esme.getWindowWaitTimeout());
+                        int currLocalSequenceNumber=getLastLocalSequenceNumber();
+                        if(currLocalSequenceNumber==Integer.MAX_VALUE)
+                        	setLastLocalSequenceNumber(0);
+                        else
+                        	setLastLocalSequenceNumber(currLocalSequenceNumber+1);
+                        
+                        ChunkData currData=new ChunkData(submitSm, currLocalSequenceNumber);
+                        pendingMessages.add(currData);
+                        
                         if (logger.isInfoEnabled()) {
                             logger.info(String.format("\nSent submitSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                     esme.getName(), poolIndex, sms.toString()));
                         }
                         if (segmentIndex == 0) {
-                            sequenceNumber = submitSm.getSequenceNumber();
+                            sequenceNumber = currData.getLocalSequenceNumber();
                         } else {
-                            sequenceNumberExt[segmentIndex - 1] = submitSm.getSequenceNumber();
-                        }
-
-                        ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
-                                .getActivityContextInterface(smppServerTransaction);
-                        smppTxaci.attach(this.sbbContext.getSbbLocalObject());
+                            sequenceNumberExt[segmentIndex - 1] = currData.getLocalSequenceNumber();
+                        }                        
                     } else {
                         DeliverSm deliverSm = new DeliverSm();
                         deliverSm.setSourceAddress(new Address((byte) sms.getSourceAddrTon(), (byte) sms.getSourceAddrNpi(),
@@ -686,30 +757,40 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         // TODO : waiting for 2 secs for window to accept our
                         // request,
                         // is it good? Should time be more here?
-                        SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, deliverSm,
-                                esme.getWindowWaitTimeout());
+                        
+                        int currLocalSequenceNumber=getLastLocalSequenceNumber();
+                        if(currLocalSequenceNumber==Integer.MAX_VALUE)
+                        	setLastLocalSequenceNumber(0);
+                        else
+                        	setLastLocalSequenceNumber(currLocalSequenceNumber+1);
+                        
+                        ChunkData currData=new ChunkData(deliverSm, currLocalSequenceNumber);
+                        pendingMessages.add(currData);
+                        
                         if (logger.isInfoEnabled()) {
                             logger.info(String.format("\nSent deliverSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                     esme.getName(), poolIndex, sms.toString()));
                         }
                         if (segmentIndex == 0) {
-                            sequenceNumber = deliverSm.getSequenceNumber();
+                            sequenceNumber = currData.getLocalSequenceNumber();
                         } else {
-                            sequenceNumberExt[segmentIndex - 1] = deliverSm.getSequenceNumber();
-                        }
-
-                        ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
-                                .getActivityContextInterface(smppServerTransaction);
-                        smppTxaci.attach(this.sbbContext.getSbbLocalObject());
+                            sequenceNumberExt[segmentIndex - 1] = currData.getLocalSequenceNumber();
+                        }                        
                     }
                 }
-
+                
                 this.registerMessageInSendingPool(poolIndex, sequenceNumber, sequenceNumberExt);
             }
+            
             this.endRegisterMessageInSendingPool();
 
+            ChunkDataList pendingChunks = retreivePendingChunks();
+            pendingChunks.getPendingList().addAll(pendingMessages);            
+            setPendingChunks(pendingChunks);
+            while(retreivePendingChunks()!=null && !retreivePendingChunks().getPendingList().isEmpty() && (esme.getDestAddrSendLimit()==0 || retreiveSentChunks().getPendingList().size() < esme.getDestAddrSendLimit()))
+        		sendNextChunk(smsSet,esme);        	
         } catch (Throwable e) {
-            throw new SmscProcessingException(
+        	throw new SmscProcessingException(
                     "RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
                             + e.getMessage() + "\nsmsSet: " + smsSet,
                     0, 0, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
@@ -717,6 +798,33 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 		}
 	}
 
+    private void sendNextChunk(SmsSet smsSet,Esme esme) throws SmscProcessingException
+    {
+    	try
+    	{
+    		ChunkDataList chunks=retreivePendingChunks();
+    		ChunkData currData=chunks.getPendingList().remove(0);
+    		setPendingChunks(chunks);
+    		
+	    	SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, currData.getPduRequest(),
+	                esme.getWindowWaitTimeout());
+	        
+	    	ChunkDataList sentChunks=retreiveSentChunks();
+	    	sentChunks.getPendingList().add(currData);
+	    	setSentChunks(sentChunks);
+	    	
+			ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
+	                .getActivityContextInterface(smppServerTransaction);
+	        smppTxaci.attach(this.sbbContext.getSbbLocalObject());	   	        	       
+    	}
+    	catch (Throwable e) {
+            String s = "SmscProcessingException when sending initial sendDeliverSm()=RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
+                            + e.getMessage() + "\nsmsSet: " + smsSet + ", smsSet=" + smsSet;
+            logger.severe(s, e);
+            this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s);
+		}
+    }
+    
 	protected byte[] recodeShortMessage(int dataCoding, String msg, byte[] udhPart) {
 	    DataCodingScheme dataCodingScheme = new DataCodingSchemeImpl(dataCoding);
 
@@ -800,17 +908,47 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
         int status = event.getCommandStatus();
         if (status == 0) {
-            smscStatAggregator.updateMsgOutSentAll();
+        	smscStatAggregator.updateMsgOutSentAll();
             smscStatAggregator.updateMsgOutSentSmpp();
 
-            ConfirmMessageInSendingPool confirmMessageInSendingPool = confirmMessageInSendingPool(event.getSequenceNumber());
-            if (!confirmMessageInSendingPool.sequenceNumberFound) {
+            int realID=-1;
+            ChunkDataList list=retreiveSentChunks();
+            for(int i=0;i<list.getPendingList().size();i++)
+            {
+            	if(list.getPendingList().get(i).getPduRequest().getSequenceNumber()==event.getSequenceNumber())
+            	{
+            		realID=list.getPendingList().get(i).getLocalSequenceNumber();
+            		list.getPendingList().remove(i);
+            		setSentChunks(list);
+            		break;
+            	}
+            }
+            
+            ConfirmMessageInSendingPool confirmMessageInSendingPool = null;
+            if(realID!=-1)
+            	confirmMessageInSendingPool=confirmMessageInSendingPool(realID);
+            
+            if (realID==-1 || !confirmMessageInSendingPool.sequenceNumberFound) {
                 this.logger.severe("RxSmppServerSbb.handleResponse(): no sms in MessageInSendingPool: UnconfirmedCnt="
                         + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber());
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
                         "Received undefined SequenceNumber: " + event.getSequenceNumber() + ", SmsSet=" + smsSet);
                 return;
             }
+            
+            if(retreivePendingChunks()!=null && !retreivePendingChunks().getPendingList().isEmpty())
+            {            	
+            	EsmeManagement esmeManagement = EsmeManagement.getInstance();
+    			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+    			
+    			//response may be received before we completed sending all the messages from sendDeliverSm.
+            	//so checking if has window
+            	if(retreiveSentChunks().getPendingList().size() < esme.getDestAddrSendLimit())
+            	{
+            		sendNextChunk(smsSet,esme);
+            	}
+            }
+            
             Sms sms = confirmMessageInSendingPool.sms;
             if (!confirmMessageInSendingPool.confirmed) {
                 this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false);
@@ -919,6 +1057,11 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
             synchronized (lock) {
                 try {
+                	setPendingChunks(null);
+                	ChunkDataList sentList=retreiveSentChunks();
+                	sentList.getPendingList().clear();
+                	setSentChunks(sentList);
+                	
                     // ending of delivery process in this SBB
                     smsSet.setStatus(smStatus);
                     this.markDeliveringIsEnded(true);
@@ -962,4 +1105,21 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         }
 	}
 
+    private ChunkDataList retreivePendingChunks()
+    {
+    	ChunkDataList list=getPendingChunks();
+    	if(list==null)
+    		list=new ChunkDataList();
+    	
+    	return list;
+    }
+    
+    private ChunkDataList retreiveSentChunks()
+    {
+    	ChunkDataList list=getSentChunks();
+    	if(list==null)
+    		list=new ChunkDataList();
+    	
+    	return list;
+    }
 }

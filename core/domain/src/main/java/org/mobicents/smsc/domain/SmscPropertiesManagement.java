@@ -354,7 +354,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // national single and locking shift tables for the case when a message is SMPP originated and does not have included UDH
     private int nationalLanguageSingleShift = 0;
     private int nationalLanguageLockingShift = 0;
-
+    
     // TxHttp: default TON value for source addresses
     // -1: autodetect - international / national / alphanumerical
     // -2: autodetect - international / alphanumerical
@@ -1213,12 +1213,12 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
        return nationalLanguageLockingShift;
     }
 
-    public void setNationalLanguageLockingShift(int nationalLanguageLockingShift) {
+	public void setNationalLanguageLockingShift(int nationalLanguageLockingShift) {
         this.nationalLanguageLockingShift = nationalLanguageLockingShift;
         this.store();
     }
 
-    @Override
+	@Override
     public boolean isDeliveryPause() {
         return deliveryPause;
     }
@@ -1501,7 +1501,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
             writer.write(this.nationalLanguageSingleShift, NATIONAL_LANGUAGE_SINGLE_SHIFT, Integer.class);
             writer.write(this.nationalLanguageLockingShift, NATIONAL_LANGUAGE_LOCKING_SHIFT, Integer.class);
-
+            
 			writer.write(this.esmeDefaultClusterName, ESME_DEFAULT_CLUSTER_NAME, String.class);
             writer.write(this.maxActivityCount, MAX_ACTIVITY_COUNT, Integer.class);
             writer.write(this.deliveryTimeout, DELIVERY_TIMEOUT, Integer.class);
@@ -1694,7 +1694,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             val = reader.read(NATIONAL_LANGUAGE_LOCKING_SHIFT, Integer.class);
             if (val != null)
                 this.nationalLanguageLockingShift = val;
-
+            
 			this.esmeDefaultClusterName = reader.read(ESME_DEFAULT_CLUSTER_NAME, String.class);
 
 			val = reader.read(MAX_ACTIVITY_COUNT, Integer.class);
@@ -1749,6 +1749,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             valB = reader.read(CALCULATE_MSG_PARTS_LEN_CDR, Boolean.class);
             if (valB != null) {
                 this.calculateMsgPartsLenCdr = valB.booleanValue();
+            }
+            valB = reader.read(DELAY_PARAMETERS_IN_CDR, Boolean.class);
+            if (valB != null) {
+                this.delayParametersInCdr = valB.booleanValue();
             }
             valB = reader.read(DELAY_PARAMETERS_IN_CDR, Boolean.class);
             if (valB != null) {
