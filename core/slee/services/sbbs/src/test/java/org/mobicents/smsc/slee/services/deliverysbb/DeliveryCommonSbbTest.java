@@ -775,18 +775,6 @@ public class DeliveryCommonSbbTest {
 		}
 
 		@Override
-		public void setSentChunks(ChunkDataList value) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public ChunkDataList getSentChunks() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
 		public void setPendingChunks(ChunkDataList value) {
 			// TODO Auto-generated method stub
 			
@@ -794,6 +782,18 @@ public class DeliveryCommonSbbTest {
 
 		@Override
 		public ChunkDataList getPendingChunks() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setSentChunks(SentItemsList value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public SentItemsList getSentChunks() {
 			// TODO Auto-generated method stub
 			return null;
 		}

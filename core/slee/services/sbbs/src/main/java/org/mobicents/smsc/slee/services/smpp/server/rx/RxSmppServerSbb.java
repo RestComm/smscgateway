@@ -69,6 +69,8 @@ import org.mobicents.smsc.slee.resources.scheduler.PduRequestTimeout2;
 import org.mobicents.smsc.slee.resources.scheduler.SendPduStatus2;
 import org.mobicents.smsc.slee.services.deliverysbb.ConfirmMessageInSendingPool;
 import org.mobicents.smsc.slee.services.deliverysbb.DeliveryCommonSbb;
+import org.mobicents.smsc.slee.services.deliverysbb.SentItem;
+import org.mobicents.smsc.slee.services.deliverysbb.SentItemsList;
 import org.mobicents.smsc.slee.services.deliverysbb.ChunkData;
 import org.mobicents.smsc.slee.services.deliverysbb.ChunkDataList;
 import org.mobicents.smsc.slee.services.smpp.server.events.SmsSetEvent;
@@ -597,6 +599,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             List<ChunkData> pendingMessages=new ArrayList<ChunkData>();
             
+            boolean destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
             for (int poolIndex = 0; poolIndex < deliveryMsgCnt; poolIndex++) {
                 smscStatAggregator.updateMsgOutTryAll();
                 smscStatAggregator.updateMsgOutTrySmpp();
@@ -705,16 +708,23 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         	setLastLocalSequenceNumber(currLocalSequenceNumber+1);
                         
                         ChunkData currData=new ChunkData(submitSm, currLocalSequenceNumber);
-                        pendingMessages.add(currData);
+                        int sentSequenceNumber = currData.getLocalSequenceNumber();
+                        if(destAddressLimitationEnabled) {
+                        	pendingMessages.add(currData);
+                        }
+                        else {
+                        	SentItem sentItem = sendNextChunk(currData, smsSet, esme);
+                        	sentSequenceNumber = sentItem.getRemoteSequenceNumber();
+                        }
                         
                         if (logger.isInfoEnabled()) {
                             logger.info(String.format("\nSent submitSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                     esme.getName(), poolIndex, sms.toString()));
                         }
                         if (segmentIndex == 0) {
-                            sequenceNumber = currData.getLocalSequenceNumber();
+                            sequenceNumber = sentSequenceNumber;
                         } else {
-                            sequenceNumberExt[segmentIndex - 1] = currData.getLocalSequenceNumber();
+                            sequenceNumberExt[segmentIndex - 1] = sentSequenceNumber;
                         }                        
                     } else {
                         DeliverSm deliverSm = new DeliverSm();
@@ -765,16 +775,23 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         	setLastLocalSequenceNumber(currLocalSequenceNumber+1);
                         
                         ChunkData currData=new ChunkData(deliverSm, currLocalSequenceNumber);
-                        pendingMessages.add(currData);
+                        int sentSequenceNumber = currData.getLocalSequenceNumber();
+                        if(destAddressLimitationEnabled) {
+                        	pendingMessages.add(currData);
+                        }
+                        else {
+                        	SentItem sentItem = sendNextChunk(currData, smsSet, esme);
+                        	sentSequenceNumber = sentItem.getRemoteSequenceNumber();
+                        }
                         
                         if (logger.isInfoEnabled()) {
                             logger.info(String.format("\nSent deliverSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                     esme.getName(), poolIndex, sms.toString()));
                         }
                         if (segmentIndex == 0) {
-                            sequenceNumber = currData.getLocalSequenceNumber();
+                            sequenceNumber = sentSequenceNumber;
                         } else {
-                            sequenceNumberExt[segmentIndex - 1] = currData.getLocalSequenceNumber();
+                            sequenceNumberExt[segmentIndex - 1] = sentSequenceNumber;
                         }                        
                     }
                 }
@@ -784,11 +801,37 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             
             this.endRegisterMessageInSendingPool();
 
-            ChunkDataList pendingChunks = retreivePendingChunks();
-            pendingChunks.getPendingList().addAll(pendingMessages);            
-            setPendingChunks(pendingChunks);
-            while(retreivePendingChunks()!=null && !retreivePendingChunks().getPendingList().isEmpty() && (esme.getDestAddrSendLimit()==0 || retreiveSentChunks().getPendingList().size() < esme.getDestAddrSendLimit()))
-        		sendNextChunk(smsSet,esme);        	
+            if(destAddressLimitationEnabled) {
+            	ChunkDataList pendingChunks = retreivePendingChunks();
+                pendingChunks.getPendingList().addAll(pendingMessages);
+                
+                SentItemsList sentChunks=retreiveSentChunks();
+                
+                int pdusToSendSize = pendingChunks.getPendingList().size();
+                int allowedSendWindowSize = esme.getDestAddrSendLimit() - sentChunks.getSentList().size();
+                if(allowedSendWindowSize < pdusToSendSize)
+                	pdusToSendSize = allowedSendWindowSize;
+                
+                List<ChunkData> pdusToSend=new ArrayList<ChunkData>();
+    	        for (int i = 0; i < pdusToSendSize; i++) {
+    	        	pdusToSend.add(pendingChunks.getPendingList().remove(0));
+    	        }
+                	
+                setPendingChunks(pendingChunks);
+                
+                ArrayList<SentItem> sentResults=new ArrayList<SentItem>();
+                while(pdusToSend.size()>0)
+                {
+                	SentItem result=sendNextChunk(pdusToSend.remove(0),smsSet,esme);
+                	if(result!=null)
+                		sentResults.add(result);
+                }
+                
+                if(!sentResults.isEmpty()) {
+                	sentChunks.getSentList().addAll(sentResults);
+                	setSentChunks(sentChunks);
+                }
+            }
         } catch (Throwable e) {
         	throw new SmscProcessingException(
                     "RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
@@ -798,24 +841,20 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 		}
 	}
 
-    private void sendNextChunk(SmsSet smsSet,Esme esme) throws SmscProcessingException
+    private SentItem sendNextChunk(ChunkData currItem,SmsSet smsSet,Esme esme) throws SmscProcessingException
     {
     	try
     	{
-    		ChunkDataList chunks=retreivePendingChunks();
-    		ChunkData currData=chunks.getPendingList().remove(0);
-    		setPendingChunks(chunks);
-    		
-	    	SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, currData.getPduRequest(),
+    		SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, currItem.getPduRequest(),
 	                esme.getWindowWaitTimeout());
 	        
-	    	ChunkDataList sentChunks=retreiveSentChunks();
-	    	sentChunks.getPendingList().add(currData);
-	    	setSentChunks(sentChunks);
+    		SentItem result=new SentItem(currItem.getLocalSequenceNumber(),currItem.getPduRequest().getSequenceNumber());
 	    	
 			ActivityContextInterface smppTxaci = this.smppServerTransactionACIFactory
 	                .getActivityContextInterface(smppServerTransaction);
 	        smppTxaci.attach(this.sbbContext.getSbbLocalObject());	   	        	       
+	        
+	        return result;
     	}
     	catch (Throwable e) {
             String s = "SmscProcessingException when sending initial sendDeliverSm()=RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
@@ -823,6 +862,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             logger.severe(s, e);
             this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s);
 		}
+    	
+    	return null;
     }
     
 	protected byte[] recodeShortMessage(int dataCoding, String msg, byte[] udhPart) {
@@ -911,17 +952,27 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         	smscStatAggregator.updateMsgOutSentAll();
             smscStatAggregator.updateMsgOutSentSmpp();
 
+            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+			boolean destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
+			
             int realID=-1;
-            ChunkDataList list=retreiveSentChunks();
-            for(int i=0;i<list.getPendingList().size();i++)
-            {
-            	if(list.getPendingList().get(i).getPduRequest().getSequenceNumber()==event.getSequenceNumber())
-            	{
-            		realID=list.getPendingList().get(i).getLocalSequenceNumber();
-            		list.getPendingList().remove(i);
-            		setSentChunks(list);
-            		break;
-            	}
+            Boolean sentListChanged=false;
+            SentItemsList list = null;
+            if(destAddressLimitationEnabled) {
+            	list=retreiveSentChunks();
+                for(int i=0;i<list.getSentList().size();i++)
+                {
+                	if(list.getSentList().get(i).getRemoteSequenceNumber()==event.getSequenceNumber())
+                	{
+                		realID=list.getSentList().get(i).getLocalSequenceNumber();
+                		list.getSentList().remove(i);
+                		sentListChanged=true;
+                		break;
+                	}
+                }
+            } else {
+            	realID = event.getSequenceNumber();
             }
             
             ConfirmMessageInSendingPool confirmMessageInSendingPool = null;
@@ -933,21 +984,38 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber());
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
                         "Received undefined SequenceNumber: " + event.getSequenceNumber() + ", SmsSet=" + smsSet);
+                                
+                if(sentListChanged)
+                	setSentChunks(list);  
+                
                 return;
             }
             
-            if(retreivePendingChunks()!=null && !retreivePendingChunks().getPendingList().isEmpty())
-            {            	
-            	EsmeManagement esmeManagement = EsmeManagement.getInstance();
-    			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
-    			
-    			//response may be received before we completed sending all the messages from sendDeliverSm.
-            	//so checking if has window
-            	if(retreiveSentChunks().getPendingList().size() < esme.getDestAddrSendLimit())
-            	{
-            		sendNextChunk(smsSet,esme);
-            	}
+            if(destAddressLimitationEnabled)
+            {
+            	ChunkDataList dataList=retreivePendingChunks();
+            	if(dataList!=null && !dataList.getPendingList().isEmpty())
+            	{            	
+	    			//response may be received before we completed sending all the messages from sendDeliverSm.
+	            	//so checking if has window
+	            	if(list.getSentList().size() < esme.getDestAddrSendLimit())
+	            	{
+	            		ChunkData current=dataList.getPendingList().remove(0);
+	            		setPendingChunks(dataList);
+	            		
+	            		if(current!=null)
+	            		{
+	            			SentItem newItem=sendNextChunk(current,smsSet,esme);
+	            			SentItemsList sentChunks=retreiveSentChunks();
+	            	    	sentChunks.getSentList().add(newItem);
+	            	    	sentListChanged=true;
+	            		}
+	            	}
+	            }
             }
+            
+            if(sentListChanged)
+            	setSentChunks(list);        		
             
             Sms sms = confirmMessageInSendingPool.sms;
             if (!confirmMessageInSendingPool.confirmed) {
@@ -1059,9 +1127,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             synchronized (lock) {
                 try {
                 	setPendingChunks(null);
-                	ChunkDataList sentList=retreiveSentChunks();
-                	sentList.getPendingList().clear();
-                	setSentChunks(sentList);
+     				setSentChunks(null);
                 	
                     // ending of delivery process in this SBB
                     smsSet.setStatus(smStatus);
@@ -1115,11 +1181,11 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     	return list;
     }
     
-    private ChunkDataList retreiveSentChunks()
+    private SentItemsList retreiveSentChunks()
     {
-    	ChunkDataList list=getSentChunks();
+    	SentItemsList list=getSentChunks();
     	if(list==null)
-    		list=new ChunkDataList();
+    		list=new SentItemsList();
     	
     	return list;
     }
