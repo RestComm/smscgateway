@@ -1020,7 +1020,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             ErrorAction errorAction = ErrorAction.permanentFailure;
             smsSet.setSmppCommandStatus(status);
             if (status == SmppConstants.STATUS_THROTTLED || status == SmppConstants.STATUS_X_T_APPN
-                    || status == SmppConstants.STATUS_SYSERR || status == SmppConstants.STATUS_INVBNDSTS)
+                    || status == SmppConstants.STATUS_SYSERR || status == SmppConstants.STATUS_INVBNDSTS
+                    || status == SmppConstants.STATUS_MSGQFUL)
                 errorAction = ErrorAction.temporaryFailure;
             logger.warning("RxSmppServerSbb.handleResponse(): error code response received: status=" + status + ", errorAction="
                     + errorAction + ", smsSet=" + smsSet);
