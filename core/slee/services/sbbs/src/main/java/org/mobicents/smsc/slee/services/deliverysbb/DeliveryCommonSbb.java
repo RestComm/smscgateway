@@ -1626,9 +1626,9 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     public abstract int getLastLocalSequenceNumber();
     
-    public abstract void setSentChunks(ChunkDataList value);
+    public abstract void setSentChunks(SentItemsList value);
 
-    public abstract ChunkDataList getSentChunks();
+    public abstract SentItemsList getSentChunks();
     
     public abstract void setPendingChunks(ChunkDataList value);
 
