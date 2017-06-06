@@ -397,48 +397,6 @@ EXAMPLES
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
-[[_single_s_table]]
-=== Destination address sendint limit
-
-[[_single_s_table_cli]]
-==== Using CLI
-
-You can set the 'Destination address sendint limit' value by issuing the command smsc set destaddrsendlimit with appropriate parameters as described below.
-You can verify this by issuing the command smsc get destaddrsendlimit which will display the value set for this property. 
-
-----
-
-Name
-	smsc set destaddrsendlimit
-
-SYNOPSIS
-	smsc set destaddrsendlimit <value>
-
-DESCRIPTION
-	This command is used to set the value of Destination
-	Address Sending Limit table. destaddrsendlimit will be
-	used to limit the sent unconfirmed messages for a 
-	destination address per an ESME. This is SMSC Gw level
-	and can be overwritten for each ESME created.
-	Possible values: 
-	   = 0  : no limitations 
-
-EXAMPLES
-	smsc set destaddrsendlimit 0
-	smsc set destaddrsendlimit 13
-----
-
-[[_single_s_table_gui]]
-==== Using GUI
-
-.Procedure: Destination address sendint limit table using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
-. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
-. You can specify the Destination address sendint limit table by entering the value in the text field 'Destination address sendint limit'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section. 
-. You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
-
 [[_subscriberbusyduedelay]]
 === Subscriber busy due delay (in sec)
 

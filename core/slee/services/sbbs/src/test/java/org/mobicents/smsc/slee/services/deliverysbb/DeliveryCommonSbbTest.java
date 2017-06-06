@@ -763,27 +763,39 @@ public class DeliveryCommonSbbTest {
         }
 
 		@Override
-		public void setDeliveryPendingCount(long currentPendingCount) {
+		public void setLastLocalSequenceNumber(int value) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
-		public long getDeliveryPendingCount() {
+		public int getLastLocalSequenceNumber() {
 			// TODO Auto-generated method stub
 			return 0;
 		}
 
 		@Override
-		public void setPendingChunks(List<PduRequest> value) {
+		public void setPendingChunks(ChunkDataList value) {
 			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
-		public List<PduRequest> getPendingChunks() {
+		public ChunkDataList getPendingChunks() {
 			// TODO Auto-generated method stub
-			return new ArrayList<PduRequest>();
+			return null;
+		}
+
+		@Override
+		public void setSentChunks(SentItemsList value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public SentItemsList getSentChunks() {
+			// TODO Auto-generated method stub
+			return null;
 		}
     }
 

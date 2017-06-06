@@ -22,6 +22,8 @@
 
 package org.mobicents.smsc.tools.smppsimulator;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.restcomm.smpp.parameter.TlvSet;
 
 import com.cloudhopper.smpp.SmppBindType;
@@ -32,6 +34,7 @@ import com.cloudhopper.smpp.SmppSession;
  * @author sergey vetyutnev
  * 
  */
+@XmlRootElement
 public class SmppSimulatorParameters {
 
 	private int windowSize = 1;
@@ -82,6 +85,11 @@ public class SmppSimulatorParameters {
 
 	private boolean sendOptionalParameter = false;
 	private TlvSet tlvset;
+
+	private long responseDelay = 0L;
+	
+	public SmppSimulatorParameters() {
+	}
 
 	public int getWindowSize() {
 		return windowSize;
@@ -404,7 +412,15 @@ public class SmppSimulatorParameters {
         this.sendOptionalParameter = sendOptionalParameter;
     }
 
-    public enum EncodingType {
+    public long getResponseDelay() {
+		return responseDelay;
+	}
+
+	public void setResponseDelay(long responseDelay) {
+		this.responseDelay = responseDelay;
+	}
+
+	public enum EncodingType {
     	GSM7_DCS_0, GSM8_DCS_4, UCS2_DCS_8,
     }
 
