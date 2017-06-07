@@ -111,7 +111,7 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     @Override
     public void dropMessage() throws MProcRuleException {
         if (actionAdded)
-            throw new MProcRuleException("Another action already added");
+            throw new MProcRuleException("Another action already added", true);
 
         actionAdded = true;
         needDropMessage = true;
@@ -120,7 +120,7 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     @Override
     public void rejectMessage() throws MProcRuleException {
         if (actionAdded)
-            throw new MProcRuleException("Another action already added");
+            throw new MProcRuleException("Another action already added", true);
 
         actionAdded = true;
         needRejectMessage = true;
@@ -130,7 +130,7 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     public void rejectMessage(final int anSmppErrorCode, final int aMapErrorCode, final int aHttpErrorCode)
             throws MProcRuleException {
         if (actionAdded) {
-            throw new MProcRuleException("Another action already added");
+            throw new MProcRuleException("Another action already added", true);
         }
         actionAdded = true;
         needRejectMessage = true;

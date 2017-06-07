@@ -55,7 +55,7 @@ public class PostHrSriProcessorImpl implements PostHrSriProcessor {
     @Override
     public void byPassHr() throws MProcRuleException {
         if (actionAdded)
-            throw new MProcRuleException("Another action already added");
+            throw new MProcRuleException("Another action already added", true);
 
         actionAdded = true;
         hrByPassed = true;

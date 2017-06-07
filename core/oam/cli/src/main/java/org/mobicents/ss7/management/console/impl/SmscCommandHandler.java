@@ -83,7 +83,6 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         set.addChild("sriresponselivetime");
         set.addChild("nationallanguagesingleshift");
         set.addChild("nationallanguagelockingshift");
-        set.addChild("destaddrsendlimit");
         set.addChild("httpdefaultsourceton");
         set.addChild("httpdefaultsourcenpi");
         set.addChild("httpdefaultdestton");
@@ -187,7 +186,6 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         get.addChild("sriresponselivetime");
         get.addChild("nationallanguagesingleshift");
         get.addChild("nationallanguagelockingshift");
-        get.addChild("destaddrsendlimit");
         get.addChild("httpdefaultsourceton");
         get.addChild("httpdefaultsourcenpi");
         get.addChild("httpdefaultdestton");

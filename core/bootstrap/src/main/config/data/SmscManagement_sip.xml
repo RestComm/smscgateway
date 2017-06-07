@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <sipList>
-	<sip name="SIP" clusterName="SIP" host="127.0.0.1" port="5065" networkId="0" started="true" routingTon="1" routingNpi="1" routingAddressRange="5555" countersEnabled="false" chargingEnabled="false"/>
+	<sip name="SIP" clusterName="SIP" host="127.0.0.1" port="5065" networkId="30" started="true" routingTon="1" routingNpi="1" routingAddressRange="^[0-9a-zA-Z]*" countersEnabled="false" chargingEnabled="false"/>
 </sipList>

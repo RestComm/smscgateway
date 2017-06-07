@@ -41,6 +41,23 @@ DESCRIPTION
 ----
 
 Name
+	smpp smppserver set bindipaddress
+
+SYNOPSIS
+	smpp smppserver set bindipaddress <ip-address>
+
+DESCRIPTION
+	This command is used to set the IP for SMPP server.
+	The SMSC server will use this ip for listening incoming bind request from SMPP client.
+
+	If unspecified, the default value is 0.0.0.0, that means SMPP server will listen on all interfaces.
+
+	You must restart the SMPP Server for the new value to take effect.
+----
+
+----
+
+Name
 	smpp smppserver set bindtimeout
 
 SYNOPSIS

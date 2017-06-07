@@ -26,38 +26,38 @@
 
 	<!-- Options for referring to release resoure verions -->
 	<!-- SLEE staff -->
-	<property name="restcomm-slee.build-number" value="36.73" />
-	<property name="restcomm-slee.version" value="2.8" />
-	<property name="restcomm-slee.release" value="2.8.0.FINAL" />
+	<property name="restcomm-slee.build-number" value="128.93" />
+	<property name="restcomm-slee.version" value="2.9" />
+	<property name="restcomm-slee.release" value="2.9.128" />
 
 	<!-- jss7 stack and MAP RA -->
-	<property name="restcomm-jss7.build-number" value="1385" />
-	<property name="restcomm-jss7.version" value="7.1.${restcomm-jss7.build-number}" />
-	<property name="restcomm-jss7.release" value="7.1.1385" />
+	<property name="restcomm-jss7.build-number" value="1398" />
+	<property name="restcomm-jss7.version" value="7.3.${restcomm-jss7.build-number}" />
+	<property name="restcomm-jss7.release" value="7.3.1398" />
 
-	<property name="restcomm-map-ra.build-number" value="57" />
-	<property name="restcomm-map-ra.version" value="7.1.${restcomm-map-ra.build-number}" />
-	<property name="restcomm-map-ra.release" value="7.1.57" />
+	<property name="restcomm-map-ra.build-number" value="72" />
+	<property name="restcomm-map-ra.version" value="7.3.${restcomm-map-ra.build-number}" />
+	<property name="restcomm-map-ra.release" value="7.3.72" />
 
 	<!-- Diameter mux and RAs -->
-	<property name="restcomm-diam.build-number" value="169" />
+	<property name="restcomm-diam.build-number" value="178" />
 	<property name="restcomm-diam.version" value="1.7.0" />
-	<property name="restcomm-diam-ra.build-number" value="51" />
-	<property name="restcomm-diam.resources.version" value="2.8.51" />
+	<property name="restcomm-diam-ra.build-number" value="18" />
+	<property name="restcomm-diam.resources.version" value="7.1.18" />
 
 	<!-- SMPP extentions and and RAs -->
-	<property name="restcomm-smpp-extensions.build-number" value="20" />
-	<property name="restcomm-smpp-extensions.version" value="1.0" />
-	<property name="restcomm-smpp-ra.build-number" value="37" />
-	<property name="restcomm-smpp-ra.version" value="7.0" />
+	<property name="restcomm-smpp-extensions.build-number" value="35" />
+	<property name="restcomm-smpp-extensions.version" value="7.1" />
+	<property name="restcomm-smpp-ra.build-number" value="46" />
+	<property name="restcomm-smpp-ra.version" value="7.1" />
 
 	<!-- Cassandra community version -->
 	<property name="community-cassandra.version" value="3.10" /> <!-- 2.2.6 -->
 
 
 	<!-- JainSlee SIP RA DU - we do not use it now - getting from SLEE binaries -->
-	<property name="restcomm-slee-sip11.build-number" value="20" />	
-	<property name="restcomm-slee-sip11.tag" value="2.8.${restcomm-slee-sip11.build-number}" />
+	<property name="restcomm-slee-sip11.build-number" value="94" />	
+	<property name="restcomm-slee-sip11.tag" value="2.9.${restcomm-slee-sip11.build-number}" />
 	<property name="restcomm-slee-sip11.version" value="${restcomm-slee-sip11.tag}" />
 
 	<!-- Cloudhopper will be removed when the code ready in official github -->
@@ -88,10 +88,10 @@
 	<property name="restcomm-diam.download.url" value="${cloudbees.url}/job/RestComm-jDiameter-1.x/${restcomm-diam.build-number}/artifact/release/${restcomm-diam.download.distro.file}" />
 	<property name="restcomm-diam.distro.zip.path" value="${checkout.dir}/${restcomm-diam.download.distro.file}" />
 	<property name="restcomm-diam-ra-base.download.jar.file" value="diameter-restcomm-slee-ra-diameter-base-ra-DU-${restcomm-diam.resources.version}.jar" />
-	<property name="restcomm-diam-ra-base.download.url" value="${cloudbees.url}/job/Restcomm-JAIN-SLEE-jDiameter-RAs/${restcomm-diam-ra.build-number}/artifact/resources/diameter-base/du/target/${restcomm-diam-ra-base.download.jar.file}" />
+	<property name="restcomm-diam-ra-base.download.url" value="${cloudbees.url}/job/Restcomm-JAIN-SLEE-7-jDiameter-RAs/${restcomm-diam-ra.build-number}/artifact/resources/diameter-base/du/target/${restcomm-diam-ra-base.download.jar.file}" />
 	<property name="restcomm-diam-ra-base.distro.jar.path" value="${checkout.dir}/${restcomm-diam-ra-base.download.url}" />
 	<property name="restcomm-diam-ra-ro.download.jar.file" value="diameter-restcomm-slee-ra-diameter-ro-ra-DU-${restcomm-diam.resources.version}.jar" />
-	<property name="restcomm-diam-ra-ro.download.url" value="${cloudbees.url}/job/Restcomm-JAIN-SLEE-jDiameter-RAs/${restcomm-diam-ra.build-number}/artifact/resources/diameter-ro/du/target/${restcomm-diam-ra-ro.download.jar.file}" />
+	<property name="restcomm-diam-ra-ro.download.url" value="${cloudbees.url}/job/Restcomm-JAIN-SLEE-7-jDiameter-RAs/${restcomm-diam-ra.build-number}/artifact/resources/diameter-ro/du/target/${restcomm-diam-ra-ro.download.jar.file}" />
 	<property name="restcomm-diam-ra-ro.distro.jar.path" value="${checkout.dir}/${restcomm-diam-ra-ro.download.url}" />
 
 	<property name="restcomm-smpp-extensions.download.distro.file" value="restcomm-smpp-extensions-${restcomm-smpp-extensions.version}.${restcomm-smpp-extensions.build-number}.zip" />
@@ -276,7 +276,7 @@
 		<delete dir="${checkout.restcomm-jss7-ra.dir}" failonerror="false" />
 		<delete dir="${checkout.restcomm-map-ra.dir}" failonerror="false" />
 		<unzip src="${restcomm-map-ra.distro.docs.path}" dest="${checkout.restcomm-jss7-ra.dir}"/>
-		<unzip src="${checkout.restcomm-jss7-ra.dir}/MAP/generated-docs.zip" dest="${checkout.restcomm-map-ra.dir}"/>
+		<unzip src="${checkout.restcomm-jss7-ra.dir}/RA_docs/MAP/generated-docs.zip" dest="${checkout.restcomm-map-ra.dir}"/>
 	</target>
 
 	<available file="${restcomm-slee-sip11.distro.zip.path}" property="got-restcomm-sip-ra" />

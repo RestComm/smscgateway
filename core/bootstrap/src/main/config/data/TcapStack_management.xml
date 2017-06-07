@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dialogidletimeout value="60000"/>
 <invoketimeout value="30000"/>
-<maxdialogs value="25000"/>
+<maxdialogs value="5000"/>
 <dialogidrangestart value="1"/>
-<dialogidrangeend value="30000"/>
+<dialogidrangeend value="2147483647"/>
 <donotsendprotocolversion value="false"/>
+<slsrange value="All"/>
 <statisticsenabled value="false"/>

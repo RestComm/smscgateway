@@ -100,6 +100,18 @@ EXAMPLES
 +
 This page gets auto-refreshed every 2.5 seconds and therefore the statistics get refreshed automatically. 
 
+[[_slee_stat_get]]
+== View SLEE Based SMPP Statistics
+
+{this-platform} {this-application} provides a SLEE based statistics for SMPP services.
+
+.Procedure: View SLEE Based Statistics using the GUI
+. In the SLEE Management Console for SLEE (thai is avalable by a link like `http://localhost:8080/slee-management-console/`), click on 'Services' in the left panel.
+. The main panel will display all of deployed services. Click on the 'Usage Parameters' tab.
+. Select one of the SMPP services and a SBB corresponding to the chosen one.
+. The main panel will display a parameter entries in 'Parameter Sets' tab. You can view the current SMPP statistics by clicking on the row corresponding to the name of the parameters set.
++
+You can reset a counter for a single parameter by selecting the reset option in the 'Actions' column or reset all usage parameters by clicking on the button at the bottom of the page.
 
 [[_monitoring_smsc_cdr_log]]
 == CDR Log
@@ -108,7 +120,7 @@ This page gets auto-refreshed every 2.5 seconds and therefore the statistics get
 The CDR generated in the text file is of the below format: 
 ----
 
-DELIVERY_DATE,SUBMIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,Message_Delivery_Status,ORIGINATION_TYPE,MESSAGE_TYPE,ORIG_SYSTEM_ID,MESSAGE_ID,DVL_MESSAGE_ID,RECEIPT_LOCAL_MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,ORIGINATOR_SCCP_ADDRESS,MtServiceCenterAddress,ORIG_NETWORK_ID,NETWORK_ID,MPROC_NOTES,MSG_PARTS,CHAR_NUMBERS,PROCESSING_TIME,DELIVERY_DELAY,SCHEDULE_DELIVERY_DELAY,DELIVERY_COUNT,First 20 characters of SMS,Reason_For_Failure
+DELIVERY_DATE,SUBMIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,Message_Delivery_Status,ORIGINATION_TYPE,MESSAGE_TYPE,ORIG_SYSTEM_ID,MESSAGE_ID,DVL_MESSAGE_ID,RECEIPT_LOCAL_MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,ORIGINATOR_SCCP_ADDRESS,MtServiceCenterAddress,ORIG_NETWORK_ID,NETWORK_ID,MPROC_NOTES,MSG_PARTS,CHAR_NUMBERS,PROCESSING_TIME,SCHEDULE_DELIVERY_DELAY,DELIVERY_COUNT,First 20 characters of SMS,Reason_For_Failure
 ----
 where `ADDR_SRC_DIGITS, ADDR_SRC_TON, ADDR_SRC_NPI, ADDR_DST_DIGITS, ADDR_DST_TON, ADDR_DST_NPI, ORIG_SYSTEM_ID, MESSAGE_ID, NNN_DIGITS, IMSI, ORIG_NETWORK_ID, NETWORK_ID, DELIVERY_COUNT` and `CORR_ID` are as explained in <<_slot_messages_table_yyyy_mm_dd>> and other values are described below in this section.
 
@@ -207,13 +219,10 @@ A count of message parts for which SMSC GW will split a message when delivering 
 A count of characters that are present in the message / message segment. If SMSC GW is making a message splitting for a long message then only a last segment (with Message_Delivery_Status `success` or `success_esme`) will contain a character number for all segments. Non-last segments in this case (with Message_Delivery_Status `partial` or `partial_esme`) will contain 0 in this field. This is because of a way how SMSC GW makes of message splitting.
 
 .PROCESSING_TIME
-A processing time in milliseconds for message in SMSC GW calculated since the submit date.
-
-.DELIVERY_DELAY
-A delivery delay time in milliseconds for message calculated as time before submit date and delivery date.
+A processing time between a CDR generation time and a message submit time in milliseconds.
 
 .SCHEDULE_DELIVERY_DELAY
-A schedule delivery time in milliseconds for message calculated as time before submit date and schedule delivery date.
+A processing time between a time for which a message is scheduled and a message submit time in milliseconds (this field is empty if a message has not be scheduled to a database but was delivered immediately).
 
 .Reason_For_Failure
 The last field in the CDR generated is `Reason_For_Failure`, which records the reason for delivery failure and is empty if the delivery is successful.

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<userList>
+	<httpUser userName="user" password="password" networkId="10"/>
+</userList>

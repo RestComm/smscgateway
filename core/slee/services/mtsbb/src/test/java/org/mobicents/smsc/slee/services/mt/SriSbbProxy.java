@@ -50,6 +50,7 @@ import org.mobicents.smsc.slee.resources.persistence.MAPProviderProxy;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterfaceProxy;
 import org.mobicents.smsc.slee.resources.persistence.TraceProxy;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.services.deliverysbb.ChunkDataList;
 import org.mobicents.smsc.slee.services.deliverysbb.PendingRequestsList;
 import org.mobicents.smsc.slee.services.smpp.server.events.InformServiceCenterContainer;
 import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
@@ -380,25 +381,37 @@ public class SriSbbProxy extends SriSbb implements ChildRelation, SbbLocalObject
     }
 
 	@Override
-	public void setDeliveryPendingCount(long currentPendingCount) {
+	public void setLastLocalSequenceNumber(int value) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public long getDeliveryPendingCount() {
+	public int getLastLocalSequenceNumber() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public void setPendingChunks(List<PduRequest> value) {
+	public void setSentChunks(ChunkDataList value) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public List<PduRequest> getPendingChunks() {
+	public ChunkDataList getSentChunks() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPendingChunks(ChunkDataList value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ChunkDataList getPendingChunks() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -122,7 +122,6 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String HR_SRI_BYPASS_LIST = "hrSriBypassList";
     private static final String NATIONAL_LANGUAGE_SINGLE_SHIFT = "nationalLanguageSingleShift";
     private static final String NATIONAL_LANGUAGE_LOCKING_SHIFT = "nationalLanguageLockingShift";
-    private static final String DEST_ADDR_SEND_LIMIT = "destAddrSendLimit";
     private static final String HTTP_DEFAULT_SOURCE_TON = "httpDefaultSourceTon";
     private static final String HTTP_DEFAULT_SOURCE_NPI = "httpDefaultSourceNpi";
     private static final String HTTP_DEFAULT_DEST_TON = "httpDefaultDestTon";
@@ -356,8 +355,6 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private int nationalLanguageSingleShift = 0;
     private int nationalLanguageLockingShift = 0;
     
-    private int destAddrSendLimit = 0;
-
     // TxHttp: default TON value for source addresses
     // -1: autodetect - international / national / alphanumerical
     // -2: autodetect - international / alphanumerical
@@ -1221,15 +1218,6 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
-    public int getDestAddrSendLimit() {
-		return destAddrSendLimit;
-	}
-
-	public void setDestAddrSendLimit(int destAddrSendLimit) {
-		this.destAddrSendLimit = destAddrSendLimit;
-		this.store();
-	}
-
 	@Override
     public boolean isDeliveryPause() {
         return deliveryPause;
@@ -1513,7 +1501,6 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
             writer.write(this.nationalLanguageSingleShift, NATIONAL_LANGUAGE_SINGLE_SHIFT, Integer.class);
             writer.write(this.nationalLanguageLockingShift, NATIONAL_LANGUAGE_LOCKING_SHIFT, Integer.class);
-            writer.write(this.destAddrSendLimit, DEST_ADDR_SEND_LIMIT, Integer.class);
             
 			writer.write(this.esmeDefaultClusterName, ESME_DEFAULT_CLUSTER_NAME, String.class);
             writer.write(this.maxActivityCount, MAX_ACTIVITY_COUNT, Integer.class);
@@ -1707,9 +1694,6 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             val = reader.read(NATIONAL_LANGUAGE_LOCKING_SHIFT, Integer.class);
             if (val != null)
                 this.nationalLanguageLockingShift = val;
-            val = reader.read(DEST_ADDR_SEND_LIMIT, Integer.class);
-            if(val != null)
-            	this.destAddrSendLimit = val;
             
 			this.esmeDefaultClusterName = reader.read(ESME_DEFAULT_CLUSTER_NAME, String.class);
 
@@ -1765,6 +1749,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             valB = reader.read(CALCULATE_MSG_PARTS_LEN_CDR, Boolean.class);
             if (valB != null) {
                 this.calculateMsgPartsLenCdr = valB.booleanValue();
+            }
+            valB = reader.read(DELAY_PARAMETERS_IN_CDR, Boolean.class);
+            if (valB != null) {
+                this.delayParametersInCdr = valB.booleanValue();
             }
             valB = reader.read(DELAY_PARAMETERS_IN_CDR, Boolean.class);
             if (valB != null) {
