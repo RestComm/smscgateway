@@ -11,6 +11,12 @@
 	<name>RestComm Cassandra tool :: Tool</name>
 
 	<dependencies>
+        	<dependency>
+			<artifactId>persistence-ratype</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
+		</dependency>
+        </dependency>
 
 	</dependencies>
 	<dependencyManagement>
