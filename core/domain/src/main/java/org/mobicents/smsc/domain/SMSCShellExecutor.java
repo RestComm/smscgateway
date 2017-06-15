@@ -182,7 +182,7 @@ public class SMSCShellExecutor implements ShellExecutor {
      * esme | sip> networkidmask <networkId value> newnetworkid <new networkId
      * value> newdestton <new destination type of number> newdestnpi <new
      * destination numbering plan indicator> addestdigprefix <prefix> makecopy
-     * <false | true>
+     * <false | true> percent <percent value>
      * 
      * @param args
      * @return
@@ -229,7 +229,7 @@ public class SMSCShellExecutor implements ShellExecutor {
      * esme | sip> networkidmask <networkId value> newnetworkid <new networkId
      * value> newdestton <new destination type of number> newdestnpi <new
      * destination numbering plan indicator> addestdigprefix <prefix> makecopy
-     * <false | true>
+     * <false | true> percent <percent value>
      * 
      * @param args
      * @return

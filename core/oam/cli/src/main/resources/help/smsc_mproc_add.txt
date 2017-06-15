@@ -17,7 +17,7 @@ SYNOPSIS
 	-1> origesmenamemask <regualar expression - origination ESME name mask>
 	originatorsccpaddressmask <originator SCCP CallingPartyAddress mask> processingtype
 	<delivery processing type: SS7_SRI | SS7_MT | SMPP | SIP | -1> errorcode <internal SMSC
-	GW delivery error code value> tlv_<tlv tag key>_<tlv value type> <tlv value>
+	GW delivery error code value> tlv_<tlv tag key>_<tlv value type> <tlv value> percent <percent value>
 	newnetworkid <new networkId value> newdestton <new destination type of number>
 	newdestnpi <new destination numbering plan indicator>
 	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
@@ -202,6 +202,9 @@ PARAMETERS
 					Default value for <value type> is string.
 					Default value for <tag value> is -1.
 
+	percent			- Once rule matches, this parameter will define the probability with which this rule will 
+					be applied. 
+					Default value is -1. 
 
 	- actions
 

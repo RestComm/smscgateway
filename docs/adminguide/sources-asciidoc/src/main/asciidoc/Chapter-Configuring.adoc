@@ -337,6 +337,7 @@ If a message fits to all conditions then the rule will be applied to the message
 | processingtype | <SMPP \| SS7_SRI \| SS7_MT \| SIP> | mproc rule will be applied only if a Delivery step match's with this rule's processingtype value. | "-1" : acts as wild card and hence messages with any delivery step will match.
 | errorcode | <digital value of SMSC GW's internal error code> | mproc rule will be applied only if an internal SMSC GW's delivery error code value matches with this rule's errorcode. Value 0 means a successful delivery, non 0 value means some delivery error. You can specify several values via comma (example: "6,7,8"). Error code values list can be found in chapter <<_appendix_smsc_errorcodes>>. | "-1" : acts as wild card and hence messages with any delivery result will match.
 | tlv_<value type>_<tag key> | <tag value> | mproc rule will be applied only if message contains a TLV parameter which matches the tag key, value type, and tag value. | "-1", "string", "-1" : acts as wild card and hence messages with any optional parameter will match.
+| percent | <percent value> | Defines probability with which mproc rule will be applied to a message. For example, if percent is specified as 60, there will be 60% chance that this rule will be applied. Consequently, in 40% of cases, mproc rule will be skipped. | "-1". This means that mproc rule will be applied to 100% of messages.
 |===
 
 b) Actions, which will be applied to messages. 

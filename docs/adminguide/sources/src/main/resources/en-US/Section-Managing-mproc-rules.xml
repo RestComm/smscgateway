@@ -33,7 +33,7 @@ SYNOPSIS
 	<regualr expression - origination ESME name mask> newnetworkid
 	<new networkId value> newdestton<new destination type of number> newdestnpi
 	<new destination numbering plan indicator> adddestdigprefix <prefix>
-	makecopy <false | true> dropaftersri <false | true>
+	makecopy <false | true> dropaftersri <false | true> percent <percent value>
 
 DESCRIPTION
 
@@ -58,6 +58,7 @@ PARAMETERS
 	adddestdigprefix - an optional parameter.
 	makecopy - an optional parameter.
 	dropaftersri - an optional parameter.
+	percent - an optional parameter.
 	Description of parameters is in the previous chapter.
 
 EXAMPLES
@@ -108,7 +109,7 @@ SYNOPSIS
 	- origination ESME name mask> newnetworkid <new networkId value>
 	newdestton<new destination type of number> newdestnpi <new destination
 	numbering plan indicator> adddestdigprefix <prefix> makecopy <false | true>
-	dropaftersri <false | true>
+	dropaftersri <false | true> percent <percent value>
 
 DESCRIPTION
 
@@ -131,6 +132,7 @@ PARAMETERS
 	adddestdigprefix - an optional parameter.
 	makecopy - an optional parameter.
 	dropaftersri - an optional parameter.
+	percent - an optional parameter.
 
 EXAMPLES
 	smsc mproc modify 1 newnetworkid 13
