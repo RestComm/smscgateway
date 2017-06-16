@@ -281,6 +281,21 @@ public interface MProcRuleDefault extends MProcRule {
     int getNewNetworkIdAfterTempFail();
 
     void setNewNetworkIdAfterTempFail(int newNetworkIdAfterTempFail);
+    
+    /**
+     * @return if true - drops a message on arrival
+     */
+    boolean isDropOnArrival();
+    
+    void setDropOnArrival(boolean dropOnArrival);
+    
+    /**
+     * @return type of reject response to be returned to a message originator. 
+     * if NONE, message will not be rejected
+     */
+    RejectType getRejectOnArrival();
+    
+    void setRejectOnArrival(RejectType rejectOnArrival);
 
     /**
      * @return if true - HR procedure will be bypassed (original IMSI and NNN will be sent as SRI response).

@@ -229,7 +229,9 @@ public class SMSCShellExecutor implements ShellExecutor {
      * esme | sip> networkidmask <networkId value> newnetworkid <new networkId
      * value> newdestton <new destination type of number> newdestnpi <new
      * destination numbering plan indicator> addestdigprefix <prefix> makecopy
-     * <false | true>
+     * <false | true> droponarrival <true | false> 
+     * rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE | 
+     * SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED> 
      * 
      * @param args
      * @return

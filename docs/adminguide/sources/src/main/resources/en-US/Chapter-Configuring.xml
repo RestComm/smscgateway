@@ -453,6 +453,59 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 							A delivery response in this case will contain extra fields (IMSI and NetworkNodeNumber values).</entry>
 							<entry>false</entry>
 						</row>
+						<row>
+							<entry>droponarrival</entry>
+							<entry>&lt;false | true&gt;</entry>
+							<entry>This is an action at the step when message has arrived to SMSC GW. Message will be dropped without 
+							delivery attempt and a success response will be returned to a message originator. </entry>
+							<entry>false</entry>
+						</row>
+						<row>
+							<entry>rejectonarrival</entry>
+							<entry>&lt;NONE | DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED&gt;</entry>
+							<entry><para>This is an action at the step when message has arrived to SMSC GW. Message will be rejected without 
+							delivery attempt. A reject response will be returned to a message originator.</para>
+							<para>
+								<itemizedlist>
+									<listitem>
+										<para>
+											NONE: turn off of this action
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											DEFAULT: a reject response with default error codes will be sent: 
+											34 (systemFailure) for SS7, 0 (Success) for SMPP and 1 for HTTP
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											UNEXPECTED_DATA_VALUE: a reject response with following error codes will be sent: 
+											36 (unexpectedDataValue) for SS7, 0x15 (Invalid service type) for SMPP and 2 for HTTP
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											SYSTEM_FAILURE: a reject response with following error codes will be sent: 
+											34 (systemFailure) for SS7, 0x8 (System error) for SMPP and 3 for HTTP
+										</para>
+									</listitem>		
+									<listitem>
+										<para>
+											THROTTLING: a reject response with following error codes will be sent: 
+											51 (resoureLimitation) for SS7, 0x58 (Throttling error) for SMPP and 4 for HTTP
+										</para>
+									</listitem>		
+									<listitem>
+										<para>
+											FACILITY_NOT_SUPPORTED: a reject response with following error codes will be sent: 
+											21 (facilityNotSupported) for SS7, 0x65 (Permanent application error) for SMPP and 5 for HTTP
+										</para>
+									</listitem>																											
+								</itemizedlist>
+							</para></entry>
+							<entry>NONE : default action is no action</entry>
+						</row>
 					</tbody>
 					</tgroup>
 				</table>
