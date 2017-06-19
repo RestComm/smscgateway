@@ -27,6 +27,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
 
 /**
  * 
@@ -70,7 +71,8 @@ public class CdrGenerator {
             boolean messageIsSplitted, boolean lastSegment, boolean calculateMsgPartsLenCdr, boolean delayParametersInCdr) {
         // Format is
         // SUBMIT_DATE,SOURCE_ADDRESS,SOURCE_TON,SOURCE_NPI,DESTINATION_ADDRESS,DESTINATION_TON,DESTINATION_NPI,STATUS,SYSTEM-ID,MESSAGE-ID,
-	    // VLR, IMSI, CorrelationID, First 20 char of SMS, REASON
+	    // VLR, IMSI, CorrelationID, First 20 char of SMS, REASON, DELIVERY_RECEIPT_MESSAGE_STATUS, DELIVERY_RECEIPT_MESSAGE_STATE_TLV, 
+    	// DELIVERY_RECEIPT_MESSAGE_ERR
 
         if (!generateCdr)
             return;
@@ -160,6 +162,21 @@ public class CdrGenerator {
                 .append("\"")
                 .append(getEscapedString(reason))
                 .append("\"");
+        
+        DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(smsEvent.getShortMessageText(),
+                smsEvent.getTlvSet());
+        if (deliveryReceiptData != null) {
+        	String st = deliveryReceiptData.getStatus();
+        	int tlvMessageState = deliveryReceiptData.getTlvMessageState();
+        	
+        	sb.append(CdrGenerator.CDR_SEPARATOR)
+        	.append(st != null ? st : CdrGenerator.CDR_EMPTY);
+    		sb.append(CdrGenerator.CDR_SEPARATOR)
+    		.append(tlvMessageState != 0 ? tlvMessageState : CdrGenerator.CDR_EMPTY);
+        	sb.append(CdrGenerator.CDR_SEPARATOR)
+        	.append(deliveryReceiptData.getError());
+        }
+        
         CdrGenerator.generateCdr(sb.toString());
     }
 
