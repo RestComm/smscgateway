@@ -76,6 +76,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String TLV_TAG_TO_MATCH = "tlvTagToMatch";
     private static final String TLV_VALUE_TYPE_TO_MATCH = "tlvValueTypeToMatch";
     private static final String TLV_VALUE_TO_MATCH = "tlvValueToMatch";
+    private static final String PERCENT = "percent";
 
     private static final String NEW_NETWORK_ID = "newNetworkId";
     private static final String NEW_DEST_TON = "newDestTon";
@@ -129,6 +130,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private short tlvTagToMatch = -1;
     private TlvValueType tlvValueTypeToMatch = null;
     private String tlvValueToMatch = "-1";
+    private int percent = -1;
 
     private int newNetworkId = -1;
     private int newDestTon = -1;
@@ -419,6 +421,15 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.resetPattern();
     }
 
+	@Override
+    public int getPercent() {
+		return percent;
+	}
+
+    @Override
+	public void setPercent(int percent) {
+		this.percent = percent;
+    }
     /**
      * @return if !=-1: the new networkId will be assigned to a message
      */
@@ -695,7 +706,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     protected void setRuleParameters(int destTonMask, int destNpiMask, String destDigMask, int sourceTonMask,
             int sourceNpiMask, String sourceDigMask, OrigType originatingMask, int networkIdMask, int originNetworkIdMask,
             int receiptNetworkIdMask, String origEsmeNameMask, String originatorSccpAddressMask, String imsiDigitsMask,
-            String nnnDigitsMask, ProcessingType processingType, String errorCode, int newNetworkId, int newDestTon,
+            String nnnDigitsMask, ProcessingType processingType, String errorCode, int percent, int newNetworkId, int newDestTon,
             int newDestNpi, String addDestDigPrefix, String addSourceDigPrefix, int newSourceTon, int newSourceNpi,
             String newSourceAddr, boolean makeCopy, boolean hrByPass, boolean dropAfterSri, boolean dropAfterTempFail, 
             boolean dropOnArrival, RejectType rejectOnArrival,int newNetworkIdAfterSri, int newNetworkIdAfterPermFail, 
@@ -720,6 +731,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.tlvTagToMatch = tlvTagToMatch;
         this.tlvValueTypeToMatch = tlvValueTypeToMatch;
         this.tlvValueToMatch = tlvValueToMatch;
+        this.percent = percent;
 
         this.newNetworkId = newNetworkId;
         this.newDestTon = newDestTon;
@@ -920,6 +932,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             } else {
                 return false;
             }
+        }
+        if (percent != -1) {
+        	return MProcUtility.checkRuleProbability(percent);
         }
         return true;
     }
@@ -1199,6 +1214,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int newNetworkIdAfterPermFail = -1;
         int newNetworkIdAfterTempFail = -1;
         short tlvTagToRemove = -1;
+        int percent = -1;
 
         while (count < args.length) {
             command = args[count++];
@@ -1251,6 +1267,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                         tlvValueToMatch = "";
                     }
 
+                } else if (command.equals("percent")) {
+                    percent = Integer.parseInt(value);
                 } else if (command.equals("newnetworkid")) {
                     newNetworkId = Integer.parseInt(value);
                     success = true;
@@ -1335,7 +1353,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
         this.setRuleParameters(destTonMask, destNpiMask, destDigMask, sourceTonMask, sourceNpiMask, sourceDigMask,
                 originatingMaskVal, networkIdMask, originNetworkIdMask, receiptNetworkIdMask, origEsmeNameMask,
-                originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode, newNetworkId,
+                originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode, percent, newNetworkId,
                 newDestTon, newDestNpi, addDestDigPrefix, addSourceDigPrefix, newSourceTon, newSourceNpi, newSourceAddr,
                 makeCopy, hrByPass, dropAfterSri, dropAfterTempFail, dropOnArrival, rejectOnArrivalVal, newNetworkIdAfterSri, 
                 newNetworkIdAfterPermFail, newNetworkIdAfterTempFail, tlvTagToMatch, tlvValueTypeToMatch, tlvValueToMatch, 
@@ -1436,6 +1454,11 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                         this.tlvValueTypeToMatch = prevTlvValueTypeToMatch;
                         this.tlvValueToMatch = prevTlvValueToMatch;
                     }
+
+                } else if (command.equals("percent")) {
+                    int val = Integer.parseInt(value);
+                    this.setPercent(val);
+                    success = true;
                 } else if (command.equals("newnetworkid")) {
                     int val = Integer.parseInt(value);
                     this.setNewNetworkId(val);
@@ -1596,6 +1619,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
             writeParameter(sb, parNumber++, param.toString(), this.tlvValueToMatch, ", ", "=");
         }
+        if (percent != -1) {
+            writeParameter(sb, parNumber++, "percent", percent, ", ", "=");
+        }
 
         if (newNetworkId != -1) {
             writeParameter(sb, parNumber++, "newNetworkId", newNetworkId, ", ", "=");
@@ -1686,6 +1712,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.originatorSccpAddressMask = xml.getAttribute(ORIGINATOR_SCCP_ADDRESS_MASK, "-1");
             mProcRule.imsiDigitsMask = xml.getAttribute(IMSI_DIGITS_MASK, "-1");
             mProcRule.nnnDigitsMask = xml.getAttribute(NNN_DIGITS_MASK, "-1");
+			mProcRule.percent = xml.getAttribute(PERCENT, -1);
 
             val = xml.getAttribute(PROCESSING_TYPE, "");
             if (val != null) {
@@ -1788,6 +1815,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             if (mProcRule.tlvValueToMatch != null && !mProcRule.tlvValueToMatch.isEmpty()
                     && !mProcRule.tlvValueToMatch.equals("-1"))
                 xml.setAttribute(TLV_VALUE_TO_MATCH, mProcRule.tlvValueToMatch);
+            if (mProcRule.percent != -1)
+                xml.setAttribute(PERCENT, mProcRule.percent);
 
             if (mProcRule.newNetworkId != -1)
                 xml.setAttribute(NEW_NETWORK_ID, mProcRule.newNetworkId);

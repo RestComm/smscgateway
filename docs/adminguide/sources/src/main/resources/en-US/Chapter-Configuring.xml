@@ -385,6 +385,12 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 							<entry>mproc rule will be applied only if message has come to SMSC GW from SMPP connector from ESME with a name that fits "origesmenamemask".</entry>
 							<entry>"-1" : acts as wild card and hence any message will match (never mind if it came from SS7 or SIP).</entry>
 			 			</row>
+			 			<row>
+			 				<entry>percent</entry>
+			 				<entry>&lt;percent value&gt;</entry>
+			 				<entry>Defines probability with which current mproc rule will be applied to a message. For example, if percent is specified as 60, there 60% chance that this rule will be applied. Consequently, in 40% of cases, current rule will be skipped. </entry>
+			 				<entry>"-1". This means that mproc rule will be applied to 100% of messages</entry>
+			 			</row>
 					</tbody>
 					</tgroup>
 				</table>

@@ -292,6 +292,13 @@
 						<input id="tlvvalue" type="text" class="input-mini" style="width: 80px; margin-right: 12px; text-align: center;" placeholder="Tlv value" />
 					</span>
 				</div>
+				
+				<div id="div-percent" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Defines probability with which mproc rule will be applied to a message. Default value -1 means that mproc rule will be applied to 100% of messages.">
+						<span class="add-on">Percent</span>
+						<input id="percent" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Percent value" />
+					</span>				
+				</div>
 
 
 				<div id="div-xxx" class="control-group">
@@ -703,6 +710,7 @@
 										var tlvkey = tlvarray[0];
 										var tlvtype = tlvarray[1];
 										var tlvvalue =tlvarray[2];
+										var percent = processRuleParameters(ruleparameters, "percent");
 
 										var newnetworkid = processRuleParameters(ruleparameters, "newnetworkid");
 										var newdestton = processRuleParameters(ruleparameters, "newdestton");
@@ -1025,6 +1033,22 @@
 																			'<span id="' +id + 'TlvKey-text">' + tlvkey +' '+tlvtype+' '+tlvvalue+ '</span>'+
 																		'</td>'+
 																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"TlvKey"+']\').toggle(); $(\'input[id^='+id+"TlvKey"+']\').focus();"></i>' +
+																		'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Defines probability with which mproc rule will be applied to a message. Default value -1 means that mproc rule will be applied to 100% of messages.">'+
+																		'<td style="font-size: 0.9em;">Percent</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'Percent-input" class="control-group">'+
+																			'<span id="' + id +'Percent-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + percent + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'percent\', \'' + id+"Percent" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"Percent"+']\').toggle(); $(\'input[id^='+id+"Percent"+']\').focus();"></i>' + 
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'Percent-text">' + percent + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"Percent"+']\').toggle(); $(\'input[id^='+id+"Percent"+']\').focus();"></i>' +
 																		'</td>'+
 																		'</tr>'+
 																		
@@ -1642,6 +1666,13 @@
 			tlvvalue = "-1";
 		} else {
 			parametersstring = parametersstring + " tlv_"+tlvtype+"_"+tlvkey+" "+tlvvalue;
+		}
+		
+		var percent = $("#percent").val();
+		if(percent.trim() == "") {
+			percent = "-1";
+		} else {
+			parametersstring = parametersstring + " percent "+percent;
 		}
 		
 		var newnetworkid = $("#newnetworkid").val();

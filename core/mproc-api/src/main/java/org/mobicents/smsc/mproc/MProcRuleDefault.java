@@ -165,6 +165,13 @@ public interface MProcRuleDefault extends MProcRule {
 
     public void setTlvValueToMatch(String tlvValueToMatch);
 
+	/**
+     * @return if != "-1" then MProc rules will be applied in percent% of cases
+     */
+    int getPercent();
+
+    void setPercent(int percent);
+
     // *** actions ***
     
     // *** PostArrivalProcessor ***
