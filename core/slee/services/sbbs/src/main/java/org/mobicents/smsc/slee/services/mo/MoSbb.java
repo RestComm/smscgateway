@@ -92,6 +92,7 @@ import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 
@@ -252,7 +253,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
-
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
@@ -313,7 +314,7 @@ public abstract class MoSbb extends MoCommonSbb {
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info("\nSent ErrorComponent = " + errorMessage);
 				}
-
+				generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -330,6 +331,7 @@ public abstract class MoSbb extends MoCommonSbb {
 								dialog.getApplicationContext().getApplicationContextVersion().getVersion(), null, null,
 								null);
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
+				generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -399,7 +401,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
-
+				generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
@@ -465,7 +467,7 @@ public abstract class MoSbb extends MoCommonSbb {
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info("\nSent ErrorComponent = " + errorMessage);
 				}
-
+				generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -483,6 +485,7 @@ public abstract class MoSbb extends MoCommonSbb {
 								null);
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				dialog.close(false);
+                generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
 				return;
@@ -535,7 +538,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
-
+				generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
@@ -586,7 +589,7 @@ public abstract class MoSbb extends MoCommonSbb {
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info("\nSent ErrorComponent = " + errorMessage);
 				}
-
+				generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -602,6 +605,7 @@ public abstract class MoSbb extends MoCommonSbb {
 								null);
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				dialog.close(false);
+                generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
 				return;
@@ -1206,4 +1210,9 @@ public abstract class MoSbb extends MoCommonSbb {
 		OnlyRequestRecieved, OtherDataRecieved,
 	}
 
+	private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+		CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+				MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+				lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+	}
 }

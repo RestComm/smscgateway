@@ -67,6 +67,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
@@ -273,6 +274,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
                 anSbbUsage.incrementCounterErrorSubmitSm(ONE);
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e.getMessage(), false, true);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -316,6 +318,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
+            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
 
 			SubmitSmResp response = event.createResponse();
 			response.setCommandStatus(e1.getSmppErrorCode());
@@ -353,6 +356,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 			String s = "Exception when processing SubmitSm message: " + e1.getMessage();
 			this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
+            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
 
 			SubmitSmResp response = event.createResponse();
 			response.setCommandStatus(SmppConstants.STATUS_SYSERR);
@@ -476,7 +480,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
-
+            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
+            
 			DataSmResp response = event.createResponse();
 			response.setCommandStatus(e1.getSmppErrorCode());
 			String s = e1.getMessage();
@@ -612,14 +617,14 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         }
 
         SubmitMultiParseResult parseResult;
-        Sms currSms = null; 
+        Sms singleSms = null;
         try {
             parseResult = this.createSmsEventMulti(event, esme, persistence, esme.getNetworkId());
 
             for (Sms sms : parseResult.getParsedMessages()) {
-            	currSms = sms;
-                this.processSms(sms, persistence, esme, null, null, event, IncomingMessageType.submit_multi, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI,
-                		event.getSequenceNumber());
+                singleSms = sms;
+                this.processSms(sms, persistence, esme, null, null, event, IncomingMessageType.submit_multi,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, event.getSequenceNumber());
             }
         } catch (SmscProcessingException e1) {
             anSbbUsage.incrementCounterErrorSubmitMultiSm(ONE);
@@ -632,6 +637,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
+            generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
 
             SubmitMultiResp response = event.createResponse();
             response.setCommandStatus(e1.getSmppErrorCode());
@@ -651,9 +657,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             // Lets send the Response with error here
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
-                if (currSms != null) {
-                	currSms.setTimestampB(System.currentTimeMillis());
-                	generateFailureDetailedCdr(currSms, EventType.IN_SMPP_REJECT_FORBIDDEN, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI,
+                if (singleSms != null) {
+                    singleSms.setTimestampB(System.currentTimeMillis());
+                	generateFailureDetailedCdr(singleSms, EventType.IN_SMPP_REJECT_FORBIDDEN, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI,
                 			e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(), event.getSequenceNumber());
 				}
                 
@@ -668,6 +674,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             String s = "Exception when processing SubmitMulti message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
+            generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
 
             SubmitMultiResp response = event.createResponse();
             response.setCommandStatus(SmppConstants.STATUS_SYSERR);
@@ -684,9 +691,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             // Lets send the Response with error here
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
-                if (currSms != null) {
-                	currSms.setTimestampB(System.currentTimeMillis());
-                	generateFailureDetailedCdr(currSms, EventType.IN_SMPP_ERROR, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI,
+                if (singleSms != null) {
+                    singleSms.setTimestampB(System.currentTimeMillis());
+                	generateFailureDetailedCdr(singleSms, EventType.IN_SMPP_ERROR, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI,
                 			SmppConstants.STATUS_SYSERR, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
 				}
                 anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
@@ -1687,5 +1694,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
     public enum IncomingMessageType {
         submit_sm, data_sm, deliver_sm, submit_multi,
+    }
+
+    private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+        CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 }

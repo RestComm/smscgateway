@@ -48,6 +48,12 @@ public class CdrGenerator {
     public static final String CDR_MPROC_DROPPED = "mproc_dropped";
     public static final String CDR_MPROC_DROP_PRE_DELIVERY = "mproc_drop_pre_delivery";
 
+    public static final String CDR_SUBMIT_FAILED_MO = "submit_failed_mo";
+    public static final String CDR_SUBMIT_FAILED_HR = "submit_failed_hr";
+    public static final String CDR_SUBMIT_FAILED_ESME = "submit_failed_esme";
+    public static final String CDR_SUBMIT_FAILED_SIP = "submit_failed_sip";
+    public static final String CDR_SUBMIT_FAILED_HTTP = "submit_failed_http";
+
     public static final String CDR_SUCCESS_ESME = "success_esme";
     public static final String CDR_PARTIAL_ESME = "partial_esme";
     public static final String CDR_FAILED_ESME = "failed_esme";

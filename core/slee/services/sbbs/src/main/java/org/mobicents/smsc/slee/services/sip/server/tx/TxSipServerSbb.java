@@ -68,6 +68,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 
@@ -204,6 +205,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 					try {
 						res = (this.messageFactory.createResponse(500, serverTransaction.getRequest()));
 						event.getServerTransaction().sendResponse(res);
+						generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_SIP, e.getMessage(), false, true);
 					} catch (Exception e1) {
 						this.logger.severe("Exception while trying to send 500 response to sip", e1);
 					}
@@ -238,6 +240,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 				try {
 					res = (this.messageFactory.createResponse(500, serverTransaction.getRequest()));
 					event.getServerTransaction().sendResponse(res);
+					generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), false, true);
 				} catch (Exception e) {
 					this.logger.severe("Exception while trying to send Ok response to sip", e);
 				}
@@ -600,5 +603,11 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 	private DataCodingSchemeImpl createDataCodingScheme(int dcs) {
 		CharacterSet chs = CharacterSet.getInstance(dcs);
 		return new DataCodingSchemeImpl(DataCodingGroup.GeneralGroup, null, null, null, chs, false);
+	}
+
+	private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+		CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+				MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+				lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
 	}
 }
