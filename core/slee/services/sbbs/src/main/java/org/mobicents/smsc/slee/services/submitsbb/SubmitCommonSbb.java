@@ -42,7 +42,6 @@ import org.mobicents.smsc.domain.StoreAndForwordMode;
 import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.Sms;
-import org.mobicents.smsc.library.SmsRejectionException;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
@@ -253,31 +252,8 @@ public abstract class SubmitCommonSbb implements Sbb {
             }
         }
     }
-    
-    /**
-     * Forwards given SMS message.
-     *
-     * @param anSms the SMS
-     * @param withCharging the with charging
-     * @param smscStatAggregator the SMSC statistics
-     * @throws SmscProcessingException the smsc processing exception
-     */
-    protected void forwardMessage(final Sms anSms, final boolean withCharging, SmscStatAggregator smscStatAggregator)
-            throws SmscProcessingException {
-        try {
-            forwardMessageInternal(anSms, withCharging, smscStatAggregator);
-        } catch (SmsRejectionException e) {
-            if (logger.isFineEnabled()) {
-                logger.fine("SMS Rejection. Message: " + e.getMessage() + ".", e);
-            }
-            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                generateCdr(anSms, e);
-            }
-            throw e;
-        }
-    }
 
-    private void forwardMessageInternal(Sms sms0, boolean withCharging, SmscStatAggregator smscStatAggregator)
+    protected void forwardMessage(Sms sms0, boolean withCharging, SmscStatAggregator smscStatAggregator)
             throws SmscProcessingException {
 
         ChargingMedium chargingMedium = null;
@@ -317,7 +293,7 @@ public abstract class SubmitCommonSbb implements Sbb {
                             try {
                                 this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                             } catch (Exception e) {
-                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+                                throw new SmscProcessingException("Exception when running injectSmsOnFly(): " + e.getMessage(),
                                         SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
                                         SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
                                         SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_NOT_SET);
@@ -331,7 +307,7 @@ public abstract class SubmitCommonSbb implements Sbb {
                                     this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                                 } catch (Exception e) {
                                     throw new SmscProcessingException(
-                                            "Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+                                            "Exception when running injectSmsOnFly(): " + e.getMessage(),
                                             SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
                                             SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
                                             SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_FAST);
@@ -360,23 +336,12 @@ public abstract class SubmitCommonSbb implements Sbb {
 
             if (mProcResult.isMessageRejected()) {
                 sms0.setMessageDeliveryResultResponse(null);
-                final SmscProcessingException e = new SmsRejectionException("Message is rejected by MProc rules.",
-                        getErrorCode(mProcResult.getSmppErrorCode(), SmppConstants.STATUS_SUBMITFAIL),
-                        getErrorCode(mProcResult.getMapErrorCode(), MAPErrorCode.systemFailure),
-                        getErrorCode(mProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET), null);
-                e.setSkipErrorLogging(true);
-                if (logger.isInfoEnabled()) {
-                    logger.info("Incoming message is rejected by mProc rules, message=[" + sms0 + "]");
-                }
-                throw e;
+                rejectSmsByMProc(sms0, "Message is rejected by MProc rules.", mProcResult);
             }
             if (mProcResult.isMessageDropped()) {
                 sms0.setMessageDeliveryResultResponse(null);
                 smscStatAggregator.updateMsgInFailedAll();
-                if (logger.isInfoEnabled()) {
-                    logger.info("Incoming message is dropped by mProc rules, message=[" + sms0 + "]");
-                }
-                return;
+                rejectSmsByMProc(sms0, "Message is dropped by MProc rules.", mProcResult);
             }
 
             smscStatAggregator.updateMsgInReceivedAll();
@@ -410,10 +375,23 @@ public abstract class SubmitCommonSbb implements Sbb {
         return anErrorCode;
     }
 
-    private static final void generateCdr(final Sms anSms, final SmscProcessingException anError) {
-        CdrGenerator.generateCdr(anSms, CdrGenerator.CDR_FAILED, anError.getMessage(),
-                smscPropertiesManagement.getGenerateReceiptCdr(),
-                MessageUtil.isNeedWriteArchiveMessage(anSms, smscPropertiesManagement.getGenerateCdr()), false, true,
-                smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+    private void rejectSmsByMProc(final Sms anSms, final String aReason, final MProcResult anMProcResult) throws SmscProcessingException {
+        final SmscProcessingException e = new SmscProcessingException(aReason,
+                getErrorCode(anMProcResult.getSmppErrorCode(), SmppConstants.STATUS_SUBMITFAIL),
+                getErrorCode(anMProcResult.getMapErrorCode(), MAPErrorCode.systemFailure),
+                getErrorCode(anMProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET), null,
+                SmscProcessingException.INTERNAL_ERROR_MPROC_REJECT);
+        e.setSkipErrorLogging(true);
+        if (logger.isInfoEnabled()) {
+            logger.info("Incoming message is " + (anMProcResult.isMessageRejected() ? "rejected" : "dropped")
+                    + "by mProc rules, message=[" + anSms + "]");
+        }
+        if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+            CdrGenerator.generateCdr(anSms, (anMProcResult.isMessageRejected() ? CdrGenerator.CDR_MPROC_REJECTED : CdrGenerator.CDR_MPROC_DROPPED),
+                    aReason, smscPropertiesManagement.getGenerateReceiptCdr(),
+                    MessageUtil.isNeedWriteArchiveMessage(anSms, smscPropertiesManagement.getGenerateCdr()), false, true,
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+        }
+        throw e;
     }
 }
