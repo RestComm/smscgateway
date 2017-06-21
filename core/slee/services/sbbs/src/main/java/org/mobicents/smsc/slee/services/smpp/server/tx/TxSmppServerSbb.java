@@ -58,13 +58,7 @@ import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
-import org.mobicents.smsc.library.MessageUtil;
-import org.mobicents.smsc.library.OriginationType;
-import org.mobicents.smsc.library.SbbStates;
-import org.mobicents.smsc.library.Sms;
-import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.library.SmscProcessingException;
-import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
@@ -270,6 +264,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
                 anSbbUsage.incrementCounterErrorSubmitSm(ONE);
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e.getMessage(), false, true);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -284,7 +279,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             return;
         }
 
-		Sms sms;
+		Sms sms = null;
 		try {
             TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
 
@@ -297,6 +292,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.logger.severe(e1.getMessage(), e1);
                 smscStatAggregator.updateMsgInFailedAll();
             }
+            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
 
 			SubmitSmResp response = event.createResponse();
 			response.setCommandStatus(e1.getSmppErrorCode());
@@ -328,6 +324,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 			String s = "Exception when processing SubmitSm message: " + e1.getMessage();
 			this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
+            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
 
 			SubmitSmResp response = event.createResponse();
 			response.setCommandStatus(SmppConstants.STATUS_SYSERR);
@@ -416,7 +413,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             return;
         }
 
-		Sms sms;
+		Sms sms = null;
 		try {
             TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
 
@@ -429,7 +426,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.logger.severe(e1.getMessage(), e1);
                 smscStatAggregator.updateMsgInFailedAll();
             }
-
+            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
+            
 			DataSmResp response = event.createResponse();
 			response.setCommandStatus(e1.getSmppErrorCode());
 			String s = e1.getMessage();
@@ -543,11 +541,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         }
 
         SubmitMultiParseResult parseResult;
+        Sms singleSms = null;
         try {
             parseResult = this.createSmsEventMulti(event, esme, persistence, esme.getNetworkId());
 
-            for (Sms sms : parseResult.getParsedMessages()) {
-                this.processSms(sms, persistence, esme, null, null, event, IncomingMessageType.submit_multi);
+            for (Sms sms1 : parseResult.getParsedMessages()) {
+                singleSms = sms1;
+                this.processSms(sms1, persistence, esme, null, null, event, IncomingMessageType.submit_multi);
             }
         } catch (SmscProcessingException e1) {
             anSbbUsage.incrementCounterErrorSubmitMultiSm(ONE);
@@ -556,6 +556,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.logger.severe(e1.getMessage(), e1);
                 smscStatAggregator.updateMsgInFailedAll();
             }
+            generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
 
             SubmitMultiResp response = event.createResponse();
             response.setCommandStatus(e1.getSmppErrorCode());
@@ -586,6 +587,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             String s = "Exception when processing SubmitMulti message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
+            generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
 
             SubmitMultiResp response = event.createResponse();
             response.setCommandStatus(SmppConstants.STATUS_SYSERR);
@@ -1420,6 +1422,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                         sms0.setReceiptOrigMessageId(dlvMessageId);
                     }
                     sms0.setReceiptLocalMessageId(messageId);
+                    sms0.setDeliveryState(deliveryReceiptData.getStatus());
 
                     String messageIdStr = MessageUtil.createMessageIdString(messageId);
                     String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr, deliveryReceiptData
@@ -1570,5 +1573,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
     public enum IncomingMessageType {
         submit_sm, data_sm, deliver_sm, submit_multi,
+    }
+
+    private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+        CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 }

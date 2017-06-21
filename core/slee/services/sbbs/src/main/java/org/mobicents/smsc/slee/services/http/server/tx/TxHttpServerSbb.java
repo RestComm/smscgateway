@@ -29,15 +29,7 @@ import net.java.slee.resource.http.events.HttpServletRequestEvent;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.*;
-import org.mobicents.smsc.library.MessageState;
-import org.mobicents.smsc.library.MessageUtil;
-import org.mobicents.smsc.library.OriginationType;
-import org.mobicents.smsc.library.QuerySmResponse;
-import org.mobicents.smsc.library.SbbStates;
-import org.mobicents.smsc.library.Sms;
-import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.library.SmscProcessingException;
-import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.http.server.tx.data.*;
 import org.mobicents.smsc.slee.services.http.server.tx.enums.RequestParameter;
@@ -129,6 +121,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             if (checkCharging()) {
                 final String message = "The operation is forbidden";
                 HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, false, true);
             } else {
                 String requestURL = request.getRequestURL().toString();
                 String[] tmp = requestURL.split("\\?");
@@ -155,6 +148,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                     logger.warning(e.getMessage() + " UserName:" + e.getUserName() + " Password:" + e.getPassword());
                 }
                 HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), false, true);
             } catch (Exception ex) {
                 logger.severe("Error while sending error response", ex);
             }
@@ -178,6 +172,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             if (checkCharging()) {
                 final String message = "The operation is forbidden";
                 HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, false, true);
             } else {
                 String requestURL = request.getRequestURL().toString();
                 requestURL.endsWith(SEND_SMS);
@@ -204,6 +199,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                     logger.warning(e.getMessage() + " UserName:" + e.getUserName() + " Password:" + e.getPassword());
                 }
                 HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), false, true);
             } catch (Exception ex) {
                 logger.severe("Error while sending error response", ex);
             }
@@ -229,6 +225,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 HttpServletResponse.SC_OK,
                 outgoingData.getMessage(),
                 ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
+        generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), false, true);
     }
 
     private boolean checkCharging() {
@@ -391,6 +388,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                         HttpServletResponse.SC_OK,
                         message,
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, false, true);
             } catch (IOException e) {
                 logger.severe("Error while trying to send HttpErrorResponse", e);
             }
@@ -409,6 +407,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                         HttpServletResponse.SC_OK,
                         message  + " " + e1.getMessage(),
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, false, true);
             } catch (IOException e) {
                 logger.severe("Error while trying to send SubmitMultiResponse=", e);
             }
@@ -472,6 +471,12 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         }
         TargetAddress ta = new TargetAddress(destTon, destNpi, addr, networkId);
         return ta;
+    }
+
+    private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+        CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 
     @Override
@@ -558,6 +563,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 succAddr = true;
             } catch (SmscProcessingException e) {
                 logger.severe("SmscProcessingException while processing message to destination: "+address, e);
+                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), false, true);
             }
 
             if (succAddr) {
