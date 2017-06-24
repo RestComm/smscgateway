@@ -2,6 +2,7 @@
 <heartbeattime value="10000"/>
 <aspFactoryList>
 	<aspFactory name="asp1" assocName="ass1" started="true" maxseqnumber="256" aspid="2" heartbeat="false"/>
+	<aspFactory name="asp2" assocName="ass2" started="true" maxseqnumber="256" aspid="4" heartbeat="false"/>
 </aspFactoryList>
 <asList>
 	<as name="as1" minAspActiveForLb="1" functionality="IPSP" exchangeType="SE" ipspType="SERVER">
@@ -15,8 +16,21 @@
 			<asp name="asp1"/>
 		</asps>
 	</as>
+	<as name="as2" minAspActiveForLb="1" functionality="IPSP" exchangeType="SE" ipspType="SERVER">
+		<routingContext size="1">
+			<rc value="103"/>
+		</routingContext>
+		<networkAppearance value="104"/>
+		<trafficMode mode="2"/>
+		<defTrafficMode mode="2"/>
+		<asps>
+			<asp name="asp2"/>
+		</asps>
+	</as>
 </asList>
 <route>
 	<key value="1:2:3"/>
 	<routeAs trafficModeType="2" as="as1"/>
+	<key value="3:4:3"/>
+	<routeAs trafficModeType="2" as="as2"/>
 </route>

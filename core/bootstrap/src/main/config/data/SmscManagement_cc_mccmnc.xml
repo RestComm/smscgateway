@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CcMccmncCollection>
-	<ccMccmncList/>
+	<ccMccmncList>
+		<ccMccmnc countryCode="111" mccMnc="77702"/>
+		<ccMccmnc countryCode="666" mccMnc="000666"/>
+		<ccMccmnc countryCode="02" mccMnc="8888888" smsc="06060606"/>
+	</ccMccmncList>
 </CcMccmncCollection>

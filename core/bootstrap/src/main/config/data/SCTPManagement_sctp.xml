@@ -6,8 +6,15 @@
 			<string value="ass1"/>
 		</associations>
 	</server>
+	<server name="serv2" started="true" hostAddress="127.0.0.1" hostPort="8014" ipChannelType="0" acceptAnonymousConnections="false" maxConcurrentConnectionsCount="0" extraHostAddresseSize="0">
+		<associations>
+			<string value="ass2"/>
+		</associations>
+	</server>
 </servers>
 <associations>
 	<name value="ass1"/>
 	<association name="ass1" assoctype="SERVER" hostAddress="" hostPort="0" peerAddress="127.0.0.1" peerPort="8011" serverName="serv1" ipChannelType="0" extraHostAddresseSize="0"/>
+	<name value="ass2"/>
+	<association name="ass2" assoctype="SERVER" hostAddress="" hostPort="0" peerAddress="127.0.0.1" peerPort="8013" serverName="serv2" ipChannelType="0" extraHostAddresseSize="0"/>
 </associations>
