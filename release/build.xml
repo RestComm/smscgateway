@@ -670,6 +670,8 @@
 		<!-- jss7 config-->    	
 		<copy file="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/ss7-simulator/main_simulator2.xml" todir="${release.dir}/tools/restcomm-jss7-simulator/data" failonerror="true" />
 		<copy file="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/ss7-simulator/win_simulator2.xml" todir="${release.dir}/tools/restcomm-jss7-simulator/data" failonerror="true" />
+		<copy file="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/ss7-simulator/main_hr_simulator2.xml" todir="${release.dir}/tools/restcomm-jss7-simulator/data" failonerror="true" />
+		<copy file="${checkout.restcomm-smsc.dir}/core/bootstrap/src/main/config/ss7-simulator/win_hr_simulator2.xml" todir="${release.dir}/tools/restcomm-jss7-simulator/data" failonerror="true" />
 
 		<!-- jDiameter - mux & RA's-->    	
 		<copy todir="${release.dir}/jboss-5.1.0.GA/server/default/deploy/restcomm-diameter-mux-${restcomm-diam.version}.sar" failonerror="true">
