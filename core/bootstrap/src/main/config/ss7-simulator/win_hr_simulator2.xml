@@ -3,20 +3,20 @@
 	<instance_L1 value="M3UA"/>
 	<instance_L2 value="SCCP"/>
 	<instance_L3 value="TCAP+MAP"/>
-	<instance_TestTask value="SMS_TEST_CLIENT"/>
-	<m3ua storePcapTrace="true" isSctpServer="false" localPort="8011" localPort2="0" remotePort="8012" remotePort2="0" ipChannelType="SCTP" dpc="2" dpc2="0" opc="1" opc2="0" si="3" routingConext="101" networkAppearance="102" trafficModeType="2" m3uaFunctionality="IPSP" m3uaExchangeType="SE" routingLabelFormat="ITU" m3uaIPSPType="CLIENT">
+	<instance_TestTask value="SMS_TEST_SERVER"/>
+	<m3ua storePcapTrace="true" isSctpServer="false" localPort="8013" localPort2="0" remotePort="8014" remotePort2="0" ipChannelType="TCP" dpc="4" dpc2="0" opc="3" opc2="0" si="3" routingConext="103" networkAppearance="104" trafficModeType="2" m3uaFunctionality="IPSP" m3uaExchangeType="SE" routingLabelFormat="ITU" m3uaIPSPType="CLIENT">
 		<localHost value="127.0.0.1"/>
 		<localHost2 value=""/>
 		<remoteHost value="127.0.0.1"/>
 		<remoteHost2 value=""/>
 	</m3ua>
 	<dialogic SourceModuleId="0" DestinationModuleId="0"/>
-	<sccp routeOnGtMode="true" remoteSpc="2" localSpc="1" ni="2" remoteSsn="8" localSsn="8" localSsn2="6" translationType="0">
+	<sccp routeOnGtMode="true" remoteSpc="4" localSpc="3" ni="2" remoteSsn="8" localSsn="8" localSsn2="6" translationType="0">
 		<globalTitleType value="Translation type, numbering plan, encoding scheme and NOA ind"/>
 		<addressNature value="INTERNATIONAL"/>
 		<numberingPlan value="ISDN_TELEPHONY"/>
 		<sccpProtocolVersion value="ITU"/>
-		<callingPartyAddressDigits value="888800"/>
+		<callingPartyAddressDigits value="888802"/>
 	</sccp>
 	<map>
 		<remoteAddressDigits value=""/>
@@ -32,8 +32,6 @@
 		<msisdnAddress value=""/>
 		<msisdnAddressNature value="international_number"/>
 		<msisdnNumberingPlan value="ISDN"/>
-		<sriResponseImsi value=""/>
-		<sriResponseVlr value=""/>
 		<sriReaction value="Return success"/>
 		<ussdClientAction value="Manual operation"/>
 		<autoRequestString value="???"/>
@@ -47,13 +45,13 @@
 		<processSsRequestAction value="Manual response"/>
 	</testUssdServer>
 	<testSmsClient smscSsn="8" nationalLanguageCode="0" sriScAddressNotIncluded="false" statusReportRequest="false" oneNotificationFor100Dialogs="false" return20PersDeliveryErrors="false" continueDialog="false">
-		<serviceCenterAddress value="22220"/>
-		<sriResponseImsi value="555667"/>
-		<sriResponseVlr value="888801"/>
+		<serviceCenterAddress value=""/>
+		<sriResponseImsi value=""/>
+		<sriResponseVlr value=""/>
 		<addressNature value="international_number"/>
 		<numberingPlan value="ISDN"/>
 		<mapProtocolVersion value="MAP protocol version 3"/>
-		<typeOfNumber value="Unknown"/>
+		<typeOfNumber value="InternationalNumber"/>
 		<numberingPlanIdentification value="ISDNTelephoneNumberingPlan"/>
 		<smsCodingType value="GSM7"/>
 		<sriReaction value="Return success"/>
@@ -62,7 +60,7 @@
 		<mtFSMReaction value="Return success"/>
 	</testSmsClient>
 	<testSmsServer hlrSsn="6" vlrSsn="8" sendSrsmdsIfError="false" gprsSupportIndicator="false">
-		<serviceCenterAddress value=""/>
+		<serviceCenterAddress value="888888"/>
 		<addressNature value="international_number"/>
 		<numberingPlan value="ISDN"/>
 		<mapProtocolVersion value="MAP protocol version 3"/>
