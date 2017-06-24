@@ -31,13 +31,13 @@
 	<property name="restcomm-slee.release" value="2.9.128" />
 
 	<!-- jss7 stack and MAP RA -->
-	<property name="restcomm-jss7.build-number" value="1398" />
-	<property name="restcomm-jss7.version" value="7.3.${restcomm-jss7.build-number}" />
-	<property name="restcomm-jss7.release" value="7.3.1398" />
+	<property name="restcomm-jss7.build-number" value="1399" />
+	<property name="restcomm-jss7.version" value="7.4.${restcomm-jss7.build-number}" />
+	<property name="restcomm-jss7.release" value="7.4.1399" />
 
-	<property name="restcomm-map-ra.build-number" value="72" />
-	<property name="restcomm-map-ra.version" value="7.3.${restcomm-map-ra.build-number}" />
-	<property name="restcomm-map-ra.release" value="7.3.72" />
+	<property name="restcomm-map-ra.build-number" value="74" />
+	<property name="restcomm-map-ra.version" value="7.4.${restcomm-map-ra.build-number}" />
+	<property name="restcomm-map-ra.release" value="7.4.74" />
 
 	<!-- Diameter mux and RAs -->
 	<property name="restcomm-diam.build-number" value="178" />
