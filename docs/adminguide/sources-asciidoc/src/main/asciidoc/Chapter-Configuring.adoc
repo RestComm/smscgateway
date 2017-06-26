@@ -1358,6 +1358,27 @@ There are two possible modes of home routing functionality:
 * non-transparent mode - default mode when SMSC GW returns with successfull responses to incoming MT requests (without waiting till a message is delivered to a destination).
 * transparent mode - SMSC GW waits (after a MT request) till a message is delivered to a destination and responds to the MT request with a result of message delivering (success / failure). To activate this mode you need to configure the option <<_hrdefaultmessagingmode>> to "Transactional".
 
+Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" and listens an extra SSN (usually SSN 6 as additionto SSN 8 for other functionality). These parameters are configured in `jboss-beans.xml` file for TCAP stack. You can find below the example of configuring of two listerning SSNs (8 and 6 in the example). This configuration is a default configuration out of box.
+
+[source,xml]
+----
+	<bean name="TcapStack" class="org.mobicents.protocols.ss7.tcap.TCAPStackImpl">
+		<constructor>
+			<parameter>TcapStack</parameter>
+			<parameter>
+				<inject bean="SccpStack" property="sccpProvider" />
+			</parameter>
+			<parameter>8</parameter>
+		</constructor>
+		<property name="persistDir">${jboss.server.data.dir}</property>
+		<property name="extraSsns">
+			<list class="javolution.util.FastList" elementClass="java.lang.Integer">
+				<value>6</value>
+			</list>
+		</property>
+	</bean>
+----
+
 
 [[_smpp_interface_description]]
 == SMPP interface description
