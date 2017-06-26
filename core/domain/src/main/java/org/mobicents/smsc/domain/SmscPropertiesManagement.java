@@ -87,6 +87,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private static final String REVISE_SECONDS_ON_SMSC_START = "reviseSecondsOnSmscStart";
 	private static final String PROCESSING_SMS_SET_TIMEOUT = "processingSmsSetTimeout";
     private static final String GENERATE_RECEIPT_CDR = "generateReceiptCdr";
+    private static final String GENERATE_DETAILED_CDR = "generateDetailedCdr";
     private static final String GENERATE_TEMP_FAILURE_CDR = "generateTempFailureCdr";
     private static final String CALCULATE_MSG_PARTS_LEN_CDR = "calculateMsgPartsLenCdr";
     private static final String DELAY_PARAMETERS_IN_CDR = "delayParametersInCdr";
@@ -246,6 +247,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	// true: we generate CDR for both receipt and regular messages
 	// false: we generate CDR only for regular messages
     private boolean generateReceiptCdr = false;
+    // true: we generate detailed CDR for messages
+    // false: we do not generate detailed CDR 
+    private boolean generateDetailedCdr = false;
     // true: we generate CDR also for temp failures (along with success and permanent failure cases)
     // false: we generate CDR only for success and permanent failure cases (no CDRs for temp failures)
     private boolean generateTempFailureCdr = true;
@@ -854,6 +858,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
 	public void setGenerateReceiptCdr(boolean generateReceiptCdr) {
 		this.generateReceiptCdr = generateReceiptCdr;
+		this.store();
+	}
+    
+    @Override
+	public boolean getGenerateDetailedCdr() {
+		return this.generateDetailedCdr;
+	}
+
+    @Override
+	public void setGenerateDetailedCdr(boolean generateDetailedCdr) {
+		this.generateDetailedCdr = generateDetailedCdr;
 		this.store();
 	}
 
@@ -1515,6 +1530,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			writer.write(this.reviseSecondsOnSmscStart, REVISE_SECONDS_ON_SMSC_START, Integer.class);
 			writer.write(this.processingSmsSetTimeout, PROCESSING_SMS_SET_TIMEOUT, Integer.class);
             writer.write(this.generateReceiptCdr, GENERATE_RECEIPT_CDR, Boolean.class);
+            writer.write(this.generateDetailedCdr, GENERATE_DETAILED_CDR, Boolean.class);
             writer.write(this.generateTempFailureCdr, GENERATE_TEMP_FAILURE_CDR, Boolean.class);
             writer.write(this.calculateMsgPartsLenCdr, CALCULATE_MSG_PARTS_LEN_CDR, Boolean.class);
             writer.write(this.delayParametersInCdr, DELAY_PARAMETERS_IN_CDR, Boolean.class);
@@ -1741,6 +1757,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             valB = reader.read(GENERATE_RECEIPT_CDR, Boolean.class);
             if (valB != null) {
                 this.generateReceiptCdr = valB.booleanValue();
+            }
+            valB = reader.read(GENERATE_DETAILED_CDR, Boolean.class);
+            if (valB != null) {
+                this.generateDetailedCdr = valB.booleanValue();
             }
             valB = reader.read(GENERATE_TEMP_FAILURE_CDR, Boolean.class);
             if (valB != null) {

@@ -115,7 +115,7 @@ public class Sms implements Serializable {
     private String extraData_2;
     private String extraData_3;
     private String extraData_4;
-
+    
     private MessageDeliveryResultResponseInterface messageDeliveryResultResponse;
 
 	public Sms() {
@@ -821,6 +821,30 @@ public class Sms implements Serializable {
     public void setReceiptLocalMessageId(Long receiptLocalMessageId) {
         this.extraData.setReceiptLocalMessageId(receiptLocalMessageId);
     }
+    
+    public long getTimestampA() {
+		return this.extraData.getTimestampA();
+	}
+
+	public void setTimestampA(long timestampA) {
+		this.extraData.setTimestampA(timestampA);
+	}
+
+	public long getTimestampB() {
+		return this.extraData.getTimestampB();
+	}
+
+	public void setTimestampB(long timestampB) {
+		this.extraData.setTimestampB(timestampB);
+	}
+
+	public long getTimestampC() {
+		return this.extraData.getTimestampC();
+	}
+
+	public void setTimestampC(long timestampC) {
+		this.extraData.setTimestampC(timestampC);
+	}
 
     public String getExtraData() {
         if (this.extraData.isEmpty()) {

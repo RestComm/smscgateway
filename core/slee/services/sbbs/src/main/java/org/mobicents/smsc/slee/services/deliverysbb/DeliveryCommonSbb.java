@@ -47,9 +47,11 @@ import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorAction;
 import org.mobicents.smsc.library.ErrorCode;
+import org.mobicents.smsc.library.EventType;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.Sms;
@@ -62,7 +64,10 @@ import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.restcomm.smpp.Esme;
+import org.restcomm.smpp.EsmeManagement;
 
+import com.cloudhopper.smpp.SmppSession.Type;
 import com.cloudhopper.smpp.pdu.PduRequest;
 
 import javolution.util.FastList;
@@ -664,6 +669,12 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
             // generating CDRs for permanent failure messages
             this.generateCDRs(lstPermFailured, CdrGenerator.CDR_MPROC_DROP_PRE_DELIVERY, reason);
+            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+			String messageType = esme.getSmppSessionType() == Type.CLIENT ? 
+            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
+            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+            this.generateDetailedCDRs(lstPermFailured, EventType.OUT_SMPP_ERROR, smStatus, messageType, esme.getRemoteAddressAndPort(), -1);
 
             // sending of failure delivery receipts
             this.generateFailureReceipts(sms.getSmsSet(), lstPermFailured, null);
@@ -1011,6 +1022,12 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
         // generating CDRs for permanent failure messages
         this.generateCDRs(lstPermFailured, CdrGenerator.CDR_FAILED, reason);
+        EsmeManagement esmeManagement = EsmeManagement.getInstance();
+		Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+		String messageType = esme.getSmppSessionType() == Type.CLIENT ? 
+        		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
+        			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+        this.generateDetailedCDRs(lstPermFailured, EventType.VALIDITY_PERIOD_TIMEOUT, smStatus, messageType, esme.getRemoteAddressAndPort(), -1);
 
         // sending of failure delivery receipts
         this.generateFailureReceipts(smsSet, lstPermFailured, null);
@@ -1444,6 +1461,37 @@ public abstract class DeliveryCommonSbb implements Sbb {
             return;
         }
     }
+    
+    protected void generateTemporaryFailureDetailedCDR(EventType eventType, String messageType, ErrorCode errorCode, 
+    		String destAddrAndPort, int seqNumber) {
+        int sendingPoolMessageCount = this.getSendingPoolMessageCount();
+        for (int i1 = 0; i1 < sendingPoolMessageCount; i1++) {
+            if (!this.isMessageConfirmedInSendingPool(i1)) {
+                Sms sms = this.getMessageInSendingPool(i1);
+                if (sms != null) {
+                	
+                	CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, 
+                			sms.getSmsSet().getSmppCommandStatus(), 0, 
+                    		null, destAddrAndPort, seqNumber, 
+                    		smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
+                    return;
+                }
+            }
+        }
+
+        // if no message was sent in a message pool, let's 
+
+        // ***** no lock ******
+        
+        Sms sms = this.getUnsentMessage(0);
+        if (sms != null) {
+        	CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, 
+        			sms.getSmsSet().getSmppCommandStatus(), 0, 
+            		null, destAddrAndPort, seqNumber, 
+            		smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
+            return;
+        }
+    }
 
     /**
      * Generating CDRs for a message
@@ -1458,6 +1506,11 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
                 lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
+    
+    protected void generateDetailedCDR(Sms sms, EventType eventType, String messageType, int statusCode, String destAddrAndPort, int seqNumber) {
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, 0, null, destAddrAndPort, 
+        		seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
+    }
 
     /**
      * Generating CDRs for a message list
@@ -1470,6 +1523,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
             CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                     MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
                     smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+        }
+    }
+    
+    protected void generateDetailedCDRs(ArrayList<Sms> lstPermFailured, EventType eventType, ErrorCode errorCode, String messageType, 
+    		String destAddrAndPort, int seqNumber) {
+        for (Sms sms : lstPermFailured) {
+        	CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, sms.getSmsSet().getSmppCommandStatus(), 
+        			0, null, destAddrAndPort, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), 
+        			smscPropertiesManagement.getGenerateDetailedCdr());
         }
     }
 

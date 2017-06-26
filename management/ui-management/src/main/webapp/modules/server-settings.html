@@ -606,6 +606,15 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									</select>
 								</span>                         
 							</div>	
+							<div id="div-generateDetailedCdr" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="The SMSC can be configured to generate details CDR logging. By default the SMSC will generate regular CDR only. However if you require the SMSC to generate detailed CDR, you have to set the parameter 'generatedetailedcdr' to true.">
+									<span class="add-on">Generate detailed CDR</span>
+									<select id="generateDetailedCdr" >
+										<option>true</option>
+										<option>false</option>
+									</select>
+								</span>                         
+							</div>	
 							<div id="div-generateTempFailureCdr" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="The SMSC can be configured to generate CDR for a successful delivery case, a permanent failure case and a temporary failure case. This option allow to avoid of generating of CDR records for a temporary failure case.">
 									<span class="add-on">Generate CDR for a temporary failure case</span>
@@ -1081,6 +1090,12 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 											generateReceiptCdr.options[0].selected = true;
 										} else {
 											generateReceiptCdr.options[1].selected = true;
+										}
+										var generateDetailedCdrTmp = response.value.GenerateDetailedCdr
+										if(generateDetailedCdrTmp){
+											generateDetailedCdr.options[0].selected = true;
+										} else {
+											generateDetailedCdr.options[1].selected = true;
 										}
 										var generateTempFailureCdrTmp = response.value.GenerateTempFailureCdr
 										if(generateTempFailureCdrTmp){
@@ -2073,6 +2088,8 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						
 						var e1 = document.getElementById("generateReceiptCdr");
 						var generateReceiptCdr = e1.options[e1.selectedIndex].text;
+						e1 = document.getElementById("generateDetailedCdr");
+						var generateDetailedCdr = e1.options[e1.selectedIndex].text;
 						e1 = document.getElementById("generateTempFailureCdr");
 						var generateTempFailureCdr = e1.options[e1.selectedIndex].text;
 						e1 = document.getElementById("calculateMsgPartsLenCdr");
@@ -2114,6 +2131,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						jolokia.request(
 								[
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateReceiptCdr", value: generateReceiptCdr },
+									{ type: "write", mbean: mbeanSearch, attribute: "GenerateDetailedCdr", value: generateDetailedCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateTempFailureCdr", value: generateTempFailureCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "CalculateMsgPartsLenCdr", value: calculateMsgPartsLenCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "DelayParametersInCdr", value: delayParametersInCdr },

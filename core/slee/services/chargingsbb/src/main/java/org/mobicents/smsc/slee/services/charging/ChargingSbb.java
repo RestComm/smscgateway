@@ -72,8 +72,10 @@ import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorCode;
+import org.mobicents.smsc.library.EventType;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.SbbStates;
@@ -84,8 +86,11 @@ import org.mobicents.smsc.mproc.MProcRuleRaProvider;
 import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.restcomm.smpp.Esme;
+import org.restcomm.smpp.EsmeManagement;
 
 import com.cloudhopper.smpp.SmppConstants;
+import com.cloudhopper.smpp.SmppSession.Type;
 
 /**
  * 
@@ -672,6 +677,23 @@ public abstract class ChargingSbb implements Sbb {
 //            } else {
 
 
+            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+			Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
+			String destAddrAndPort = null;
+			String messageType = CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM;
+			if (esme != null) {
+				
+				destAddrAndPort = esme.getRemoteAddressAndPort();
+				//shouldn't have null value
+				messageType = esme.getSmppSessionType() == Type.CLIENT ? 
+	            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
+	            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+			}
+            
+            CdrDetailedGenerator.generateDetailedCdr(sms, EventType.IN_SMPP_REJECT_DIAMETER, sms.getSmsSet().getStatus(), 
+            		messageType, 0, 0, null, destAddrAndPort, -1, smscPropertiesManagement.getGenerateReceiptCdr(), 
+            		smscPropertiesManagement.getGenerateDetailedCdr());
+            
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
                 persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),
                         smscPropertiesManagement.getIncomeReceiptsProcessing());
@@ -688,6 +710,7 @@ public abstract class ChargingSbb implements Sbb {
                     smscPropertiesManagement.getGenerateReceiptCdr(),
                     MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
                     smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+            
 		} catch (PersistenceException e) {
             throw new SmscProcessingException(
                     "PersistenceException when storing into Archive rejected by OCS message : " + e.getMessage(),
@@ -726,7 +749,23 @@ public abstract class ChargingSbb implements Sbb {
 //            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
 //                persistence.archiveFailuredSms(sms);
 //            } else {
+            
+            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+			Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
+			String destAddrAndPort = null;
+			String messageType = CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM;
+			if (esme != null) {
+				
+				destAddrAndPort = esme.getRemoteAddressAndPort();
+				//shouldn't have null value
+				messageType = esme.getSmppSessionType() == Type.CLIENT ? 
+	            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
+	            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+			}
 
+            CdrDetailedGenerator.generateDetailedCdr(sms, EventType.IN_SMPP_REJECT_MPROC, sms.getSmsSet().getStatus(), 
+            		messageType, 0, 0, null, destAddrAndPort, -1, smscPropertiesManagement.getGenerateReceiptCdr(), 
+            		smscPropertiesManagement.getGenerateDetailedCdr());
 
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
                 persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),

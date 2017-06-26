@@ -2518,6 +2518,44 @@ EXAMPLES
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 
+[[_generatedetailedcdr]]
+=== Generate Detailed CDR for Messages
+
+[[_generatedetailedcdr_cli]]
+==== Using CLI
+
+You can set the 'generatedetailedcdr' value to true/false by issuing the command `smsc set generatedetailedcdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get generatedetailedcdr` which will display the value set for this property. 
+
+----
+Name
+	smsc set generatedetailedcdr
+
+SYNOPSIS
+	smsc set generatedetailedcdr <true | false>
+
+DESCRIPTION
+	The SMSC can be configured to generate both regular and detailed CDR for messages 
+	or to generate just regular CDR. By default the SMSC will only generate regular CDR.
+	However if you want the SMSC to also generate detailed CDR, you have to set the 
+	parameter 'generatedetailedcdr' to true.
+	Default value: false
+
+EXAMPLES
+	smsc set generatedetailedcdr false
+----
+
+[[_generatedetaileddr_gui]]
+==== Using GUI
+
+.Procedure: Set 'generate detailed CDR for messages'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI. 
+. You can specify if the SMSC should generate detailed CDR for messages by choosing the value true for the field 'Generate detailed CDR'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
 [[_generatetempfailurecdr]]
 === Generate CDR for temporary failure case
 
