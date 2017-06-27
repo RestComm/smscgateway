@@ -292,7 +292,13 @@
 						<input id="tlvvalue" type="text" class="input-mini" style="width: 80px; margin-right: 12px; text-align: center;" placeholder="Tlv value" />
 					</span>
 				</div>
-
+				
+				<div id="div-percent" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Defines probability with which mproc rule will be applied to a message. Default value -1 means that mproc rule will be applied to 100% of messages.">
+						<span class="add-on">Percent</span>
+						<input id="percent" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Percent value" />
+					</span>				
+				</div>
 
 
 				<div id="div-xxx" class="control-group">
@@ -461,6 +467,31 @@
 						<span class="add-on">Reroute after temporary failure</span>
 						<input id="newnetworkidaftertempfail" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Reroute after temporary failure" />
 					</span>				
+				</div>	
+				
+				<div id="div-droponarrival" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="This action is performed at the step when message has arrived to the server. Message will be dropped without delivery attempt and success response will be returned to a sender.">
+						<span class="add-on">Drop upon arrival to the server</span>
+						<select id="droponarrival" >
+							<option value="false">False</option>
+							<option value="true">True</option>
+						</select>
+					</span>	
+				</div>
+				
+				<div id="div-rejectonarrival" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="This action is performed at the step when message has arrived to the server. If value is NONE, no action will be performed. Otherwise message will be rejected without delivery attempt and reject response will be returned to a sender.">
+						<span class="add-on">Reject upon arrival to the server</span>
+						<select id="rejectonarrival" >
+							<option value=""></option>
+							<option value="NONE">NONE</option>
+							<option value="DEFAULT">DEFAULT</option>
+							<option value="UNEXPECTED_DATA_VALUE">UNEXPECTED_DATA_VALUE</option>
+							<option value="SYSTEM_FAILURE">SYSTEM_FAILURE</option>
+							<option value="THROTTLING">THROTTLING</option>
+							<option value="FACILITY_NOT_SUPPORTED">FACILITY_NOT_SUPPORTED</option>
+						</select>
+					</span>	
 				</div>	
 
 				<div id="div-remove_tlv" class="control-group">
@@ -679,6 +710,7 @@
 										var tlvkey = tlvarray[0];
 										var tlvtype = tlvarray[1];
 										var tlvvalue =tlvarray[2];
+										var percent = processRuleParameters(ruleparameters, "percent");
 
 										var newnetworkid = processRuleParameters(ruleparameters, "newnetworkid");
 										var newdestton = processRuleParameters(ruleparameters, "newdestton");
@@ -699,6 +731,10 @@
 										var dropaftertempfail = processRuleParameters(ruleparameters, "dropaftertempfail");
 										if(dropaftertempfail=="-1") { dropaftertempfail = "false"; }
 										var newnetworkidaftertempfail = processRuleParameters(ruleparameters, "newnetworkidaftertempfail");
+										var droponarrival = processRuleParameters(ruleparameters, "droponarrival");
+										if(droponarrival=="-1") { droponarrival = "false"; }
+										var rejectonarrival = processRuleParameters(ruleparameters, "rejectonarrival");
+										rejectonarrival = rejectonarrival.toUpperCase();
 										var removetlv = processRuleParameters(ruleparameters, "tlvTagToRemove");
 
 										$('#esmes-table-wrapper').append('<div id="entities-modal'+id+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
@@ -1000,6 +1036,22 @@
 																		'</td>'+
 																		'</tr>'+
 																		
+																		'<tr data-toggle="tooltip" title="Defines probability with which mproc rule will be applied to a message. Default value -1 means that mproc rule will be applied to 100% of messages.">'+
+																		'<td style="font-size: 0.9em;">Percent</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'Percent-input" class="control-group">'+
+																			'<span id="' + id +'Percent-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + percent + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'percent\', \'' + id+"Percent" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"Percent"+']\').toggle(); $(\'input[id^='+id+"Percent"+']\').focus();"></i>' + 
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'Percent-text">' + percent + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"Percent"+']\').toggle(); $(\'input[id^='+id+"Percent"+']\').focus();"></i>' +
+																		'</td>'+
+																		'</tr>'+
+																		
 																		'<tr>'+
 																			'<td style="font-size: 0.9em;">--- Actions ---</td>'+
 																		'</tr>'+
@@ -1242,7 +1294,39 @@
 																			'</td>'+
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewNetworkIdAfterTempFail"+']\').toggle(); $(\'input[id^='+id+"NewNetworkIdAfterTempFail"+']\').focus();"></i>' +
 																			'</td>'+
-																		'</tr>'+																		
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="This action is performed at the step when message has arrived to the server. Message will be dropped without delivery attempt and success response will be returned to a sender.">'+
+																		'<td style="font-size: 0.9em;">Drop upon arrival to the server</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'DropOnArrival-input" class="control-group">'+
+																			'<span id="' + id +'DropOnArrival-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + droponarrival + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'droponarrival\', \'' + id+"DropOnArrival" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropOnArrival"+']\').toggle(); $(\'input[id^='+id+"DropOnArrival"+']\').focus();"></i>' + 
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'DropOnArrival-text">' + dropaftersri + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropOnArrival"+']\').toggle(); $(\'input[id^='+id+"DropOnArrival"+']\').focus();"></i>' +
+																		'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="This action is performed at the step when message has arrived to the server. If value is NONE, no action will be performed. Otherwise message will be rejected without delivery attempt and reject response will be returned to a sender.">'+
+																		'<td style="font-size: 0.9em;">Reject upon arrival to the server</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'RejectOnArrival-input" class="control-group">'+
+																			'<span id="' + id +'RejectOnArrival-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + rejectonarrival + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'rejectonarrival\', \'' + id+"RejectOnArrival" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"RejectOnArrival"+']\').toggle(); $(\'input[id^='+id+"RejectOnArrival"+']\').focus();"></i>' + 
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'RejectOnArrival-text">' + rejectonarrival + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"RejectOnArrival"+']\').toggle(); $(\'input[id^='+id+"RejectOnArrival"+']\').focus();"></i>' +
+																		'</td>'+
+																	'</tr>'+
 
 																		'<tr data-toggle="tooltip" title="Once rule matches, the target SMS\'s optional parameter which matches the one set here will be removed. Set this to -1 to not remove any optional parameter. Default value is -1.">'+
 																			'<td style="font-size: 0.9em;">Remove Tlv</td>'+
@@ -1584,6 +1668,13 @@
 			parametersstring = parametersstring + " tlv_"+tlvtype+"_"+tlvkey+" "+tlvvalue;
 		}
 		
+		var percent = $("#percent").val();
+		if(percent.trim() == "") {
+			percent = "-1";
+		} else {
+			parametersstring = parametersstring + " percent "+percent;
+		}
+		
 		var newnetworkid = $("#newnetworkid").val();
 		if(newnetworkid.trim() == "") {
 			newnetworkid = "-1";
@@ -1674,6 +1765,18 @@
 			parametersstring = parametersstring + " newnetworkidaftertempfail "+newnetworkidaftertempfail;
 		}
 
+		e = document.getElementById("droponarrival");
+		var droponarrival = e.options[e.selectedIndex].value;
+		parametersstring = parametersstring + " droponarrival "+droponarrival;
+		
+		e = document.getElementById("rejectonarrival");
+		var rejectonarrival = e.options[e.selectedIndex].value;
+		if(rejectonarrival == "") {
+			rejectonarrival = null;		
+		} else {
+			parametersstring = parametersstring + " rejectonarrival "+rejectonarrival;
+		}
+		
 		var remove_tlv = $("#remove_tlv").val();
 		if(remove_tlv.trim() == "") {
 			remove_tlv = "-1";

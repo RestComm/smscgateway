@@ -23,6 +23,7 @@
 package org.mobicents.smsc.mproc.impl;
 
 import java.util.Date;
+import java.util.Random;
 import java.util.UUID;
 
 import org.mobicents.smsc.library.OriginationType;
@@ -38,6 +39,8 @@ import org.mobicents.smsc.mproc.MProcRuleException;
 *
 */
 public class MProcUtility {
+	
+	private static final Random random = new Random();
 
     public static final int DataCodingGsm7 = 0;
     public static final int DataCodingGsm8 = 4;
@@ -302,5 +305,10 @@ public class MProcUtility {
 
     public static int setRegisteredDelivery_DeliveryReceiptOnSuccess(int prevValue) {
         return (prevValue & 0xFC) + 3;
+    }
+    
+    public static boolean checkRuleProbability(int percent) {
+    	int r = random.nextInt(100);
+    	return percent >= r;
     }
 }

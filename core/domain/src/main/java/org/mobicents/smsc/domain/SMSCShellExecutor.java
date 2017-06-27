@@ -179,10 +179,12 @@ public class SMSCShellExecutor implements ShellExecutor {
      * Command is mproc add factoryName <id> desttonmask <destination type of number>
      * destnpimask <destination numbering plan indicator> destdigmask <regular
      * expression - destination number digits mask> originatingmask <mo | hr |
-     * esme | sip> networkidmask <networkId value> newnetworkid <new networkId
-     * value> newdestton <new destination type of number> newdestnpi <new
-     * destination numbering plan indicator> addestdigprefix <prefix> makecopy
-     * <false | true>
+     * esme | sip> networkidmask <networkId value> percent <percent value>
+     * newnetworkid <new networkId value> newdestton <new destination type of
+     * number> newdestnpi <new destination numbering plan indicator> addestdigprefix
+     * <prefix> makecopy <false | true> droponarrival <true | false>  rejectonarrival
+     * <NONE | DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING
+     * | FACILITY_NOT_SUPPORTED>
      * 
      * @param args
      * @return
@@ -226,10 +228,12 @@ public class SMSCShellExecutor implements ShellExecutor {
      * Command is mproc modify <id> desttonmask <destination type of number>
      * destnpimask <destination numbering plan indicator> destdigmask <regular
      * expression - destination number digits mask> originatingmask <mo | hr |
-     * esme | sip> networkidmask <networkId value> newnetworkid <new networkId
-     * value> newdestton <new destination type of number> newdestnpi <new
-     * destination numbering plan indicator> addestdigprefix <prefix> makecopy
-     * <false | true>
+     * esme | sip> networkidmask <networkId value> percent <percent value> 
+     * newnetworkid <new networkId value> newdestton <new destination type of
+     * number> newdestnpi <new destination numbering plan indicator>
+     * addestdigprefix <prefix> makecopy <false | true> droponarrival
+     * <true | false> rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE
+     * | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED>
      * 
      * @param args
      * @return

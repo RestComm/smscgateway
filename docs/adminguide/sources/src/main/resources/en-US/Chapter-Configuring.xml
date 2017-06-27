@@ -385,6 +385,12 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 							<entry>mproc rule will be applied only if message has come to SMSC GW from SMPP connector from ESME with a name that fits "origesmenamemask".</entry>
 							<entry>"-1" : acts as wild card and hence any message will match (never mind if it came from SS7 or SIP).</entry>
 			 			</row>
+			 			<row>
+			 				<entry>percent</entry>
+			 				<entry>&lt;percent value&gt;</entry>
+			 				<entry>Defines probability with which current mproc rule will be applied to a message. For example, if percent is specified as 60, there 60% chance that this rule will be applied. Consequently, in 40% of cases, current rule will be skipped. </entry>
+			 				<entry>"-1". This means that mproc rule will be applied to 100% of messages</entry>
+			 			</row>
 					</tbody>
 					</tgroup>
 				</table>
@@ -452,6 +458,59 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 							If a SRI success response has received then the message will be dropped without delivery attempt.
 							A delivery response in this case will contain extra fields (IMSI and NetworkNodeNumber values).</entry>
 							<entry>false</entry>
+						</row>
+						<row>
+							<entry>droponarrival</entry>
+							<entry>&lt;false | true&gt;</entry>
+							<entry>This is an action at the step when message has arrived to SMSC GW. Message will be dropped without 
+							delivery attempt and a success response will be returned to a message originator. </entry>
+							<entry>false</entry>
+						</row>
+						<row>
+							<entry>rejectonarrival</entry>
+							<entry>&lt;NONE | DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED&gt;</entry>
+							<entry><para>This is an action at the step when message has arrived to SMSC GW. Message will be rejected without 
+							delivery attempt. A reject response will be returned to a message originator.</para>
+							<para>
+								<itemizedlist>
+									<listitem>
+										<para>
+											NONE: turn off of this action
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											DEFAULT: a reject response with default error codes will be sent: 
+											34 (systemFailure) for SS7, 0 (Success) for SMPP and 1 for HTTP
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											UNEXPECTED_DATA_VALUE: a reject response with following error codes will be sent: 
+											36 (unexpectedDataValue) for SS7, 0x15 (Invalid service type) for SMPP and 2 for HTTP
+										</para>
+									</listitem>
+									<listitem>
+										<para>
+											SYSTEM_FAILURE: a reject response with following error codes will be sent: 
+											34 (systemFailure) for SS7, 0x8 (System error) for SMPP and 3 for HTTP
+										</para>
+									</listitem>		
+									<listitem>
+										<para>
+											THROTTLING: a reject response with following error codes will be sent: 
+											51 (resoureLimitation) for SS7, 0x58 (Throttling error) for SMPP and 4 for HTTP
+										</para>
+									</listitem>		
+									<listitem>
+										<para>
+											FACILITY_NOT_SUPPORTED: a reject response with following error codes will be sent: 
+											21 (facilityNotSupported) for SS7, 0x65 (Permanent application error) for SMPP and 5 for HTTP
+										</para>
+									</listitem>																											
+								</itemizedlist>
+							</para></entry>
+							<entry>NONE : default action is no action</entry>
 						</row>
 					</tbody>
 					</tgroup>

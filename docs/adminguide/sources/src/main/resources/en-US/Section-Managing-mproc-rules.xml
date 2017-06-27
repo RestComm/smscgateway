@@ -30,10 +30,13 @@ SYNOPSIS
 	expression - destination number digits mask> originatingmask <SS7_MO |
 	SS7_HR | SMPP | SIP> originatorsccpaddressmask <originator SCCP
 	CallingPartyAddress mask> networkidmask <networkId value> origesmenamemask
-	<regualr expression - origination ESME name mask> newnetworkid
-	<new networkId value> newdestton<new destination type of number> newdestnpi
-	<new destination numbering plan indicator> adddestdigprefix <prefix>
-	makecopy <false | true> dropaftersri <false | true>
+	<regualr expression - origination ESME name mask> percent <percent value>
+	newnetworkid <new networkId value> newdestton<new destination type of
+	number> newdestnpi <new destination numbering plan indicator>
+	adddestdigprefix <prefix> makecopy <false | true> dropaftersri
+	<false | true> droponarrival <false | true> rejectonarrival <NONE
+	| DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING
+	| FACILITY_NOT_SUPPORTED> 
 
 DESCRIPTION
 
@@ -58,6 +61,9 @@ PARAMETERS
 	adddestdigprefix - an optional parameter.
 	makecopy - an optional parameter.
 	dropaftersri - an optional parameter.
+	droponarrival - an optional parameter.
+	rejectonarrival - an optional parameter.
+	percent - an optional parameter.
 	Description of parameters is in the previous chapter.
 
 EXAMPLES
@@ -105,10 +111,13 @@ SYNOPSIS
 	destination number digits mask> originatingmask <SS7_MO | SS7_HR | SMPP
 	| SIP> originatorsccpaddressmask <originator SCCP CallingPartyAddress mask>
 	networkidmask <networkId value> origesmenamemask <regualr expression
-	- origination ESME name mask> newnetworkid <new networkId value>
-	newdestton<new destination type of number> newdestnpi <new destination
-	numbering plan indicator> adddestdigprefix <prefix> makecopy <false | true>
-	dropaftersri <false | true>
+	- origination ESME name mask> percent <percent value>
+	newnetworkid <new networkId value> newdestton<new destination type of
+	number> newdestnpi <new destination numbering plan indicator>
+	adddestdigprefix <prefix> makecopy <false | true> dropaftersri
+	<false | true> droponarrival <false | true> rejectonarrival <NONE
+	| DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING
+	| FACILITY_NOT_SUPPORTED> 
 
 DESCRIPTION
 
@@ -131,6 +140,9 @@ PARAMETERS
 	adddestdigprefix - an optional parameter.
 	makecopy - an optional parameter.
 	dropaftersri - an optional parameter.
+	droponarrival - an optional parameter.
+	rejectonarrival - an optional parameter.
+	percent - an optional parameter.
 
 EXAMPLES
 	smsc mproc modify 1 newnetworkid 13
