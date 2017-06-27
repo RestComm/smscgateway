@@ -37,9 +37,9 @@ import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecodingData;
 import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.library.ErrorCode;
+import org.mobicents.smsc.library.MessageState;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.tools.smppsimulator.SmppSimulatorParameters.DeliveryResponseGenerating;
-import org.mobicents.smsc.tools.smppsimulator.SmppSimulatorParameters.TlvMessageStateCode;
 
 import com.cloudhopper.commons.util.windowing.WindowFuture;
 import com.cloudhopper.smpp.PduAsyncResponse;
@@ -212,18 +212,18 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                     msgId2 = msgId2 + "XYZ";
                 msgId3 = null;
             }
-            TlvMessageStateCode msgState = null;
+            MessageState msgState = null;
             
             if (this.testingForm.getSmppSimulatorParameters().isIdResponseTlvMessageState()) {
             	if (this.testingForm.getSmppSimulatorParameters().isRejectIncomingDeliveryMessage())
             		//message will have message_state set to REJECTED (value 8)
-            		msgState = TlvMessageStateCode.REJECTED;
+            		msgState = MessageState.REJECTED;
             	else if (this.testingForm.getSmppSimulatorParameters().getDeliveryResponseGenerating().equals(DeliveryResponseGenerating.Error8)) {
             		//message will have message_state set to UNDELIVERABLE (value 5)
-            		msgState = TlvMessageStateCode.UNDELIVERABLE;
+            		msgState = MessageState.UNDELIVERABLE;
             	} else {
             		//message should have message_state set to DELIVERED (value 2)
-            		msgState = TlvMessageStateCode.DELIVERED;
+            		msgState = MessageState.DELIVERED;
             	}
             } 
 
@@ -318,10 +318,10 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
         private Date submitDate;
         private String messageId;
         private String messageIdTlv;
-        private TlvMessageStateCode messageStateTlv;
+        private MessageState messageStateTlv;
 
         public DeliveryReceiptSender(DeliveryResponseGenerating deliveryResponseGenerating, Date submitDate, String messageId,
-                String messageIdTlv, TlvMessageStateCode messageStateTlv) {
+                String messageIdTlv, MessageState messageStateTlv) {
             this.deliveryResponseGenerating = deliveryResponseGenerating;
             this.submitDate = submitDate;
             this.messageId = messageId;
@@ -390,7 +390,7 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
             
             if (messageStateTlv != null) {
             	byte[] data = new byte[1];
-            	data[0] = messageStateTlv.getValue();
+            	data[0] = (byte)messageStateTlv.getCode();
                 Tlv tlv = new Tlv(SmppConstants.TAG_MSG_STATE, data, "msg_state");
                 pdu.addOptionalParameter(tlv);
             }

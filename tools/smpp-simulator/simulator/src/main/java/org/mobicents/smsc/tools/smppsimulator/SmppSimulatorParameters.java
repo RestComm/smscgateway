@@ -504,28 +504,5 @@ public class SmppSimulatorParameters {
     public enum DeliveryResponseGenerating {
         No, Success, Error8;
     }
-    
-
-    public enum TlvMessageStateCode {
-        ENROUTE((byte)1), 
-        DELIVERED((byte)2),
-    	EXPIRED((byte)3),
-    	DELETED((byte)4),
-    	UNDELIVERABLE((byte)5),
-    	ACCEPTED((byte)6),
-    	UNKNOWN((byte)7),
-    	REJECTED((byte)8);
-    	
-    	private byte value;
-    	
-		private TlvMessageStateCode(byte value) {
-			this.value = value;
-		}
-
-		public byte getValue() {
-			return value;
-		}
-    	
-    }
 }
 
