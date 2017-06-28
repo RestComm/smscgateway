@@ -207,7 +207,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         return sourceTonMask;
     }
 
-    public void setSourceTonMask(int sourceonMask) {
+    public void setSourceTonMask(int sourceTonMask) {
         this.sourceTonMask = sourceTonMask;
     }
 
@@ -1263,7 +1263,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                         success = true;
                     } catch (Exception e) {
                         tlvTagToMatch = -1;
-                        tlvValueTypeToMatch = TlvValueType.STRING;
+                        tlvValueTypeToMatch = null; // TlvValueType.STRING
                         tlvValueToMatch = "";
                     }
 
@@ -1810,7 +1810,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 xml.setAttribute(ERROR_CODE, mProcRule.errorCode);
             if (mProcRule.tlvTagToMatch != -1)
                 xml.setAttribute(TLV_TAG_TO_MATCH, mProcRule.tlvTagToMatch);
-            if (mProcRule.tlvValueTypeToMatch != null )
+            if (mProcRule.tlvValueTypeToMatch != null && !mProcRule.tlvValueToMatch.isEmpty()
+                    && !mProcRule.tlvValueToMatch.equals("-1"))
                 xml.setAttribute(TLV_VALUE_TYPE_TO_MATCH, mProcRule.tlvValueTypeToMatch.toString());
             if (mProcRule.tlvValueToMatch != null && !mProcRule.tlvValueToMatch.isEmpty()
                     && !mProcRule.tlvValueToMatch.equals("-1"))
