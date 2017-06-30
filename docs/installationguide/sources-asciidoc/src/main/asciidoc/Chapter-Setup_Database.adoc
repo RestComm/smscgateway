@@ -3,7 +3,7 @@
 
 {this-platform} {this-application} stores messages using Cassandra database.
 The database is used for storing unsent messages, messages successfully sent and messages that failed to be sent.
-You must have Cassandra database (version 2.0, 2.1 or 3.*) installed. Later versions are better. Vesrion 1.2 is not supported more.
+You must have Cassandra database (versions 2.1 or 3.*) installed. Later versions are better. Vesrions 1.2 and 2.0 are not supported more.
 
 NOTE: Cassandra database version 3.0 demands JAVA 8 but {this-platform} {this-application} {project-version} supports only JAVA 7. If you have both cassandra database and {this-platform} {this-application} installed at the same host then you need to install two JAVA versions and switch between them by usage of JAVA_HOME environmental variables.
 
