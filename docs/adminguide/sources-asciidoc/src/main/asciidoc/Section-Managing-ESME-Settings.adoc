@@ -17,6 +17,8 @@ The current algo for routing is the following. We have two steps:
 * 2 step - selecting of ESME in the cluster:
 **   selecting of ESME in the cluster that is bound (and not stopped) now. If all ESMEs are not bound in the cluster then the message will be dropped (temporary delivery failure)
 
+In order to this algo works properly we need to specify same "routing-ton", "routing-npi" and "routing-range" parameters for all ESMEs in a cluster.
+
 Below diagram explains the load-balancing between SMPP connections  
 
 .SMPP Load Balancing

@@ -130,7 +130,7 @@ Inside each subnetwork there may be several ESME, SAP or SIP configured.
 If we use default routing rules, then for routing SMSC GW makes following steps:
 
 * it checks all ESMEs / ESME clustes that belong to the networkId.
-  It checks if TON, NPI and AddressRange of an ESME / cluster Routing Address fit to a message destination TON, NPI and address digits the the message will be routed to this ESME. Several ESMEs inside a single networkId area can be grouped in a cluster. In this case the load is shared in a round robin fashion between ESME nodes in the cluster.
+  It checks if TON, NPI and AddressRange of an ESME / cluster Routing Address fit to a message destination TON, NPI and address digits the the message will be routed to this ESME. Several ESMEs inside a single networkId area can be grouped in a cluster.
   There is one exception of this rule.
   A message will not be routed in any case to the ESME from which it has come.
 * if no ESME found for routing SMSC GW then checks SIP connector if it's settings (TON, NPI and routing AddressRange) fits to a message destination TON, NPI and address digits.
@@ -138,6 +138,7 @@ If we use default routing rules, then for routing SMSC GW makes following steps:
 * if SIP also does not fit, a message will be routed to SS7 network.
   Then routing rules at SCCP level will be taken into account for further routing.
 
+ESMEs (inside a networkId area) can be grouped in a cluster (by setting of a parameter "cluster-name" to the same for all ESMEs). "routing-range" must be the same for all ESMEs in a cluster. When routing procedure SMSC GW firstly select a cluster (based on "routing-range" value). Then SMSC GW selects an ESME inside a cluster in a round robin fashion (only those ESMEs are taken into account that are connected). This allow make load sharing across ESMEs inside a cluster (and use an ESME cluster for loadsharing between destinations).
 
 For configuring of ESME and SIP routing parameters see <<_esme_settings>> and <<_sip>>.
 
