@@ -273,7 +273,11 @@ public abstract class MoSbb extends MoCommonSbb {
                     originatorSccpAddress, true, evt.getMAPDialog(), evt, evt.getInvokeId());
 		} catch (SmscProcessingException e1) {
             if (!e1.isSkipErrorLogging()) {
-                this.logger.severe(e1.getMessage(), e1);
+                if (e1.isIsWarning()) {
+                    this.logger.warning(e1.getMessage());
+                } else {
+                    this.logger.severe(e1.getMessage(), e1);
+                }
                 smscStatAggregator.updateMsgInFailedAll();
             }
 
@@ -421,7 +425,11 @@ public abstract class MoSbb extends MoCommonSbb {
             }
 		} catch (SmscProcessingException e1) {
             if (!e1.isSkipErrorLogging()) {
-                this.logger.severe(e1.getMessage(), e1);
+                if (e1.isIsWarning()) {
+                    this.logger.warning(e1.getMessage());
+                } else {
+                    this.logger.severe(e1.getMessage(), e1);
+                }
                 smscStatAggregator.updateMsgInFailedAll();
             }
 

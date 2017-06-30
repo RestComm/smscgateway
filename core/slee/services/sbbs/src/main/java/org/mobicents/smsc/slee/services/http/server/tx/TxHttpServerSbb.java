@@ -376,7 +376,11 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             }
         } catch (SmscProcessingException e1) {
             if (!e1.isSkipErrorLogging()) {
-                logger.severe(e1.getMessage(), e1);
+                if (e1.isIsWarning()) {
+                    this.logger.warning(e1.getMessage());
+                } else {
+                    logger.severe(e1.getMessage(), e1);
+                }
                 smscStatAggregator.updateMsgInFailedAll();
             }
             try {
@@ -459,8 +463,10 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
     private TargetAddress createDestTargetAddress(String addr, final int anUserSpecificNetworkId) throws SmscProcessingException {
         if (addr == null || "".equals(addr)) {
-            throw new SmscProcessingException("DestAddress digits are absent", 0, MAPErrorCode.systemFailure,
-                    SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, addr);
+            SmscProcessingException e = new SmscProcessingException("DestAddress digits are absent", 0,
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, addr);
+            e.setIsWarning(true);
+            throw e;
         }
         int destTon, destNpi, networkId;
         destTon = smscPropertiesManagement.getHttpDefaultDestTon();

@@ -294,7 +294,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             anSbbUsage.incrementCounterErrorSubmitSm(ONE);
 		    SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
-                this.logger.severe(e1.getMessage(), e1);
+                if (e1.isIsWarning()) {
+                    this.logger.warning(e1.getMessage());
+                } else {
+                    this.logger.severe(e1.getMessage(), e1);
+                }
                 smscStatAggregator.updateMsgInFailedAll();
             }
 
@@ -426,7 +430,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 		    anSbbUsage.incrementCounterErrorDataSm(ONE);
             SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
-                this.logger.severe(e1.getMessage(), e1);
+                if (e1.isIsWarning()) {
+                    this.logger.warning(e1.getMessage());
+                } else {
+                    this.logger.severe(e1.getMessage(), e1);
+                }
                 smscStatAggregator.updateMsgInFailedAll();
             }
 
@@ -553,7 +561,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             anSbbUsage.incrementCounterErrorSubmitMultiSm(ONE);
             SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
-                this.logger.severe(e1.getMessage(), e1);
+                if (e1.isIsWarning()) {
+                    this.logger.warning(e1.getMessage());
+                } else {
+                    this.logger.severe(e1.getMessage(), e1);
+                }
                 smscStatAggregator.updateMsgInFailedAll();
             }
 
@@ -687,7 +699,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             anSbbUsage.incrementCounterErrorDeliverSm(ONE);
             SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
-                this.logger.severe(e1.getMessage(), e1);
+                if (e1.isIsWarning()) {
+                    this.logger.warning(e1.getMessage());
+                } else {
+                    this.logger.severe(e1.getMessage(), e1);
+                }
                 smscStatAggregator.updateMsgInFailedAll();
             }
 

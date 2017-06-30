@@ -69,6 +69,7 @@ public class SmscProcessingException extends Exception {
 	private int mapErrorCode = 0;
     private Object extraErrorData;
     private boolean skipErrorLogging = false;
+    private boolean isWarning = false;
     private final int itsHttpErrorCode;
     private final Integer itsInternalErrorCode;
 
@@ -133,6 +134,14 @@ public class SmscProcessingException extends Exception {
 
     public void setSkipErrorLogging(boolean skipErrorLogging) {
         this.skipErrorLogging = skipErrorLogging;
+    }
+
+    public boolean isIsWarning() {
+        return isWarning;
+    }
+
+    public void setIsWarning(boolean isWarning) {
+        this.isWarning = isWarning;
     }
 
     /**
