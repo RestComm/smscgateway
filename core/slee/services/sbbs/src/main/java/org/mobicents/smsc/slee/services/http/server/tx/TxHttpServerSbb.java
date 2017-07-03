@@ -23,9 +23,7 @@
 package org.mobicents.smsc.slee.services.http.server.tx;
 
 import com.cloudhopper.smpp.SmppConstants;
-
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
-
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.*;
@@ -59,14 +57,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.slee.*;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by tpalucki on 05.09.16.
@@ -101,16 +95,16 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         if (event instanceof HttpServletRequestEvent) {
             HttpServletRequest request = ((HttpServletRequestEvent) event).getRequest();
             String requestURL = request.getRequestURL().toString();
-            if(request.getMethod().equals(GET) ){
+            if (request.getMethod().equals(GET)) {
                 String[] tmp = requestURL.split("\\?");
-                if(tmp[0].endsWith(SEND_SMS) || tmp[0].endsWith(MSG_QUERY)){
+                if (tmp[0].endsWith(SEND_SMS) || tmp[0].endsWith(MSG_QUERY)) {
                     ies.setInitialEvent(true);
                     return ies;
                 }
-            } else if(request.getMethod().equals(POST) && (requestURL.endsWith(SEND_SMS) || requestURL.endsWith(MSG_QUERY))){
+            } else if (request.getMethod().equals(POST) && (requestURL.endsWith(SEND_SMS) || requestURL.endsWith(MSG_QUERY))) {
                 ies.setInitialEvent(true);
                 return ies;
-            }else{
+            } else {
                 if (logger.isFinestEnabled()) {
                     logger.finest(request.getMethod() + " this method is not supported!");
                 }
@@ -131,7 +125,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             if (checkCharging()) {
                 final String message = "The operation is forbidden";
                 HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
-                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, false, true);
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(request, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
+                }
             } else {
                 String requestURL = request.getRequestURL().toString();
                 String[] tmp = requestURL.split("\\?");
@@ -158,7 +154,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                     logger.warning(e.getMessage() + " UserName:" + e.getUserName() + " Password:" + e.getPassword());
                 }
                 HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), false, true);
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(request, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), true);
+                }
             } catch (Exception ex) {
                 logger.severe("Error while sending error response", ex);
             }
@@ -182,7 +180,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             if (checkCharging()) {
                 final String message = "The operation is forbidden";
                 HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_FORBIDDEN, message);
-                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, false, true);
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(request, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
+                }
             } else {
                 String requestURL = request.getRequestURL().toString();
                 requestURL.endsWith(SEND_SMS);
@@ -209,7 +209,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                     logger.warning(e.getMessage() + " UserName:" + e.getUserName() + " Password:" + e.getPassword());
                 }
                 HttpUtils.sendErrorResponse(logger, event.getResponse(), HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), false, true);
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(request, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), true);
+                }
             } catch (Exception ex) {
                 logger.severe("Error while sending error response", ex);
             }
@@ -235,7 +237,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 HttpServletResponse.SC_OK,
                 outgoingData.getMessage(),
                 ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
-        generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), false, true);
+        if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+            generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), true);
+        }
     }
 
     private boolean checkCharging() {
@@ -262,7 +266,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
     private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request) throws HttpApiException, UnauthorizedException {
         logger.fine("createSendMessageIncomingData");
-        if(GET.equals(request.getMethod())) {
+        if (GET.equals(request.getMethod())) {
             final String userId = request.getParameter(RequestParameter.USER_ID.getName());
             final String password = request.getParameter(RequestParameter.PASSWORD.getName());
             final String encodedMsg = request.getParameter(RequestParameter.MESSAGE_BODY.getName());
@@ -278,7 +282,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding,
                     senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement, udhStr);
 
-        } else if(POST.equals(request.getMethod())) {
+        } else if (POST.equals(request.getMethod())) {
             String userId = request.getParameter(RequestParameter.USER_ID.getName());
             String password = request.getParameter(RequestParameter.PASSWORD.getName());
             String encodedMsg = request.getParameter(RequestParameter.MESSAGE_BODY.getName());
@@ -294,37 +298,37 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
             Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
 
-            if(userId == null || userId.isEmpty()) {
+            if (userId == null || userId.isEmpty()) {
                 userId = getValueFromMap(map, RequestParameter.USER_ID.getName());
             }
-            if(password == null || password.isEmpty()) {
+            if (password == null || password.isEmpty()) {
                 password = getValueFromMap(map, RequestParameter.PASSWORD.getName());
             }
-            if(encodedMsg == null || encodedMsg.isEmpty()) {
+            if (encodedMsg == null || encodedMsg.isEmpty()) {
                 encodedMsg = getValueFromMap(map, RequestParameter.MESSAGE_BODY.getName());
             }
-            if(format == null || format.isEmpty()) {
+            if (format == null || format.isEmpty()) {
                 format = getValueFromMap(map, RequestParameter.FORMAT.getName());
             }
-            if(msgEncoding == null || msgEncoding.isEmpty()) {
+            if (msgEncoding == null || msgEncoding.isEmpty()) {
                 msgEncoding = getValueFromMap(map, RequestParameter.SMSC_ENCODING.getName());
             }
-            if(bodyEncoding == null || bodyEncoding.isEmpty()) {
+            if (bodyEncoding == null || bodyEncoding.isEmpty()) {
                 bodyEncoding = getValueFromMap(map, RequestParameter.MESSAGE_BODY_ENCODING.getName());
             }
-            if(senderId == null || senderId.isEmpty()) {
+            if (senderId == null || senderId.isEmpty()) {
                 senderId = getValueFromMap(map, RequestParameter.SENDER.getName());
             }
-            if(senderTon == null || senderTon.isEmpty()) {
+            if (senderTon == null || senderTon.isEmpty()) {
                 senderTon = getValueFromMap(map, RequestParameter.SENDER_TON.getName());
             }
-            if(senderNpi == null || senderNpi.isEmpty()) {
+            if (senderNpi == null || senderNpi.isEmpty()) {
                 senderNpi = getValueFromMap(map, RequestParameter.SENDER_NPI.getName());
             }
-            if (udhStr == null || udhStr.isEmpty()){
+            if (udhStr == null || udhStr.isEmpty()) {
                 udhStr = getValueFromMap(map, RequestParameter.UDH.getName());
             }
-            if(destAddresses == null || destAddresses.length < 1) {
+            if (destAddresses == null || destAddresses.length < 1) {
                 String[] tmp = map.get(RequestParameter.TO.getName());
                 destAddresses = (tmp == null ? new String[]{""} : tmp);
             }
@@ -336,7 +340,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         }
     }
 
-    private String getValueFromMap(Map<String, String[]> map, String key){
+    private String getValueFromMap(Map<String, String[]> map, String key) {
         String[] tmp = map.get(key);
         String terValue = (tmp == null || tmp.length < 1 ? null : tmp[0]);
         return terValue;
@@ -349,7 +353,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         String msgId = request.getParameter(RequestParameter.MESSAGE_ID.getName());
         String format = request.getParameter(RequestParameter.FORMAT.getName());
 
-        if(userId == null && password == null && msgId == null ) {
+        if (userId == null && password == null && msgId == null) {
             Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
             String[] tmp = map.get(RequestParameter.USER_ID.getName());
             userId = (tmp == null ? new String[]{""} : tmp)[0];
@@ -397,12 +401,14 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 } else {
                     outgoingData.setStatus(e1.getHttpErrorCode());
                 }
-                outgoingData.setMessage(message  + " " + e1.getMessage());
+                outgoingData.setMessage(message + " " + e1.getMessage());
                 HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(),
                         HttpServletResponse.SC_OK,
                         message,
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
-                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, false, true);
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
+                }
             } catch (IOException e) {
                 logger.severe("Error while trying to send HttpErrorResponse", e);
             }
@@ -419,9 +425,11 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 HttpUtils.sendErrorResponseWithContent(logger,
                         event.getResponse(),
                         HttpServletResponse.SC_OK,
-                        message  + " " + e1.getMessage(),
+                        message + " " + e1.getMessage(),
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
-                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, false, true);
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
+                }
             } catch (IOException e) {
                 logger.severe("Error while trying to send SubmitMultiResponse=", e);
             }
@@ -433,7 +441,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         // Lets send the Response with success here
         try {
             outgoingData.setStatus(Status.SUCCESS);
-            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat() );
+            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
         } catch (Throwable e) {
             logger.severe("Error while trying to send SubmitMultiResponse=" + outgoingData, e);
         }
@@ -451,7 +459,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         try {
             final long msgId = messageId.longValue();
             querySmResponse = persistence.c2_getQuerySmResponse(msgId);
-            if(querySmResponse == null){
+            if (querySmResponse == null) {
                 throw new HttpApiException("Cannot retrieve QuerySmResponse from database. Returned object is null.");
             }
 
@@ -464,7 +472,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
         } catch (PersistenceException e) {
             throw new HttpApiException("PersistenceException while obtaining message status from the database for the " +
-                    "message with id: "+incomingData.getMsgId());
+                    "message with id: " + incomingData.getMsgId());
         } catch (IOException e) {
             throw new HttpApiException("IOException while trying to send response ok message with content");
         }
@@ -489,10 +497,26 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         return ta;
     }
 
-    private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
-        CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
-                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
-                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+    private void generateCDR(HttpServletRequest request, String status, String reason, boolean lastSegment) {
+
+        final String senderId = request.getParameter(RequestParameter.SENDER.getName());
+        final String destAddressParam = request.getParameter(RequestParameter.TO.getName());
+        final int senderTon = Integer.parseInt(request.getParameter(RequestParameter.SENDER_TON.getName()));
+        final int senderNpi = Integer.parseInt(request.getParameter(RequestParameter.SENDER_NPI.getName()));
+        final String message = request.getParameter(RequestParameter.MESSAGE_BODY.getName());
+        final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
+
+        CdrGenerator.generateCdr(senderId, senderTon, senderNpi, destAddresses[0], 0, 0, OriginationType.HTTP, null, null, null,
+                0, 0, null, 0, message, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+                smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+    }
+
+    private void generateCDR(HttpSendMessageIncomingData data, String status, String reason, boolean lastSegment) {
+
+        CdrGenerator.generateCdr(data.getSender(), data.getSenderTon().getCode(), data.getSenderNpi().getCode(),
+                data.getDestAddresses().get(0), 0, 0, OriginationType.HTTP, null, null, null,
+                0, 0, null, 0, data.getShortMessage(), status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+                smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 
     @Override
@@ -538,11 +562,11 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         }
 
         String msg = incomingData.getShortMessage();
-        final int dcs ;
+        final int dcs;
         if (incomingData.getSmscEncoding() == null) {
             dcs = smscPropertiesManagement.getHttpDefaultDataCoding();
         } else {
-            switch(incomingData.getSmscEncoding()){
+            switch (incomingData.getSmscEncoding()) {
                 case GSM7:
                     dcs = 0;
                     break;
@@ -578,8 +602,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 ta = createDestTargetAddress(address, incomingData.getNetworkId());
                 succAddr = true;
             } catch (SmscProcessingException e) {
-                logger.severe("SmscProcessingException while processing message to destination: "+address, e);
-                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), false, true);
+                logger.severe("SmscProcessingException while processing message to destination: " + address, e);
+                generateCDR(incomingData, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), true);
             }
 
             if (succAddr) {
@@ -595,8 +619,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 sms.setDataCoding(dcs);
 
                 // Set UDH
-                if (incomingData.getUdh() != null)
-                {
+                if (incomingData.getUdh() != null) {
                     sms.setShortMessageBin(incomingData.getUdh());
                     sms.setEsmClass(smscPropertiesManagement.getHttpDefaultMessagingMode() | SmppConstants.ESM_CLASS_UDHI_MASK);
 
@@ -606,7 +629,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 // TODO: regDlvry - read from smpp documentation
                 int registeredDelivery = smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt();
-                if(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification()!=0) {
+                if (smscPropertiesManagement.getHttpDefaultRDIntermediateNotification() != 0) {
                     registeredDelivery |= 0x10;
                 }
                 sms.setRegisteredDelivery(registeredDelivery);
@@ -615,7 +638,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 sms.setNationalLanguageSingleShift(nationalLanguageSingleShift);
                 sms.setSubmitDate(new Timestamp(System.currentTimeMillis()));
                 sms.setDefaultMsgId(incomingData.getDefaultMsgId());
-                logger.finest("### Msg is: "+msg);
+                logger.finest("### Msg is: " + msg);
                 sms.setShortMessageText(msg);
 
                 MessageUtil.applyValidityPeriod(sms, null, false, smscPropertiesManagement.getMaxValidityPeriodHours(),
@@ -762,7 +785,6 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 //                }
 //            }
 //        }
-
 
 
     }

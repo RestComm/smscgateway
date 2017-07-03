@@ -169,6 +169,90 @@ public class CdrGenerator {
         CdrGenerator.generateCdr(sb.toString());
     }
 
+    public static void generateCdr(String sourceAddr, int sourceAddressTon, int sourceAddrNpi, String destAddr, int destAddrTon,
+                                   int destAddrNpi, OriginationType originationType, String origSystemId, String imsi,
+                                   String originatorSccpAddress, int origNetworkId, int networkId, Date scheduleDeliveryTime,
+                                   int deliveryCount, String message, String status, String reason, boolean generateReceiptCdr,
+                                   boolean generateCdr, boolean lastSegment, boolean calculateMsgPartsLenCdr, boolean delayParametersInCdr) {
+
+        if (!generateCdr || !generateReceiptCdr)
+            return;
+
+        int msgParts = 0, charNumbers = 0;
+        if (calculateMsgPartsLenCdr) {
+            if (lastSegment) {
+                charNumbers = message.length();
+            } else {
+                charNumbers = 0;
+            }
+        }
+        Date submitDate = new Date();
+
+        StringBuffer sb = new StringBuffer();
+        sb.append(DATE_FORMAT.format(submitDate))
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(sourceAddr)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(sourceAddressTon)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(sourceAddrNpi)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(destAddr)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(destAddrTon)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(destAddrNpi)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(status)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(originationType)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append("message")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(origSystemId)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(imsi)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(originatorSccpAddress)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(origNetworkId)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(networkId)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(msgParts)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(charNumbers)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(delayParametersInCdr ? getProcessingTime(submitDate) : CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(delayParametersInCdr ? getScheduleDeliveryDelayMilis(submitDate, scheduleDeliveryTime) : CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(delayParametersInCdr ? deliveryCount : CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append("\"")
+                .append(getEscapedString(getFirst20CharOfSMS(message)))
+                .append("\"")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append("\"")
+                .append(getEscapedString(reason))
+                .append("\"");
+        CdrGenerator.generateCdr(sb.toString());
+    }
+
 //    private static String getFirst20CharOfSMS(byte[] rawSms) {
     private static String getFirst20CharOfSMS(String first20CharOfSms) {
 //        String first20CharOfSms = new String(rawSms);

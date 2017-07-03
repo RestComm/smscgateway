@@ -261,6 +261,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(), 
+                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                }
             }
 
             SubmitSmResp response = event.createResponse();
@@ -274,7 +279,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
                 anSbbUsage.incrementCounterErrorSubmitSm(ONE);
-                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e.getMessage(), false, true);
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e.getMessage(), true);
+                }
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -318,8 +327,15 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
-            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
-
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                if (sms != null) {
+                    generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
+                } else {
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                }
+            }
 			SubmitSmResp response = event.createResponse();
 			response.setCommandStatus(e1.getSmppErrorCode());
 			String s = e1.getMessage();
@@ -356,8 +372,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 			String s = "Exception when processing SubmitSm message: " + e1.getMessage();
 			this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
-            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
-
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                        event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+            }
 			SubmitSmResp response = event.createResponse();
 			response.setCommandStatus(SmppConstants.STATUS_SYSERR);
 			if (s.length() > 255)
@@ -425,6 +444,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                }
             }
 
             DataSmResp response = event.createResponse();
@@ -480,8 +504,15 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
-            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
-            
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                if (sms != null) {
+                    generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
+                } else {
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                }
+            }
 			DataSmResp response = event.createResponse();
 			response.setCommandStatus(e1.getSmppErrorCode());
 			String s = e1.getMessage();
@@ -579,6 +610,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                }
             }
 
             SubmitMultiResp response = event.createResponse();
@@ -637,8 +673,16 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
-            generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
-
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                if (singleSms != null) {
+                    generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
+                } else {
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                    generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
+                }
+            }
             SubmitMultiResp response = event.createResponse();
             response.setCommandStatus(e1.getSmppErrorCode());
             String s = e1.getMessage();
@@ -674,8 +718,16 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             String s = "Exception when processing SubmitMulti message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
-            generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
-
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                if (singleSms != null) {
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                    generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
+                } else {
+                    generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
+                }
+            }
             SubmitMultiResp response = event.createResponse();
             response.setCommandStatus(SmppConstants.STATUS_SYSERR);
             if (s.length() > 255)
@@ -972,39 +1024,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 System.arraycopy(data, 0, udhData, 0, udhLen);
             }
         }
-
-        if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM8) {
-            msg = new String(textPart, isoCharset);
-        } else {
-            SmppEncoding enc;
-            if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7) {
-                enc = smscPropertiesManagement.getSmppEncodingForGsm7();
-            } else {
-                enc = smscPropertiesManagement.getSmppEncodingForUCS2();
-            }
-            switch (enc) {
-                case Utf8:
-                default:
-                    msg = new String(textPart, utf8Charset);
-                    break;
-                case Unicode:
-                    msg = new String(textPart, ucs2Charset);
-                    break;
-                case Gsm7:
-                    GSMCharsetDecoder decoder = (GSMCharsetDecoder) gsm7Charset.newDecoder();
-                    decoder.setGSMCharsetDecodingData(new GSMCharsetDecodingData(Gsm7EncodingStyle.bit8_smpp_style,
-                            Integer.MAX_VALUE, 0));
-                    ByteBuffer bb = ByteBuffer.wrap(textPart);
-                    CharBuffer bf = null;
-                    try {
-                        bf = decoder.decode(bb);
-                    } catch (CharacterCodingException e) {
-                        // this can not be
-                    }
-                    msg = bf.toString();
-                    break;
-            }
-        }
+        msg = parseShortMessageText(event);
 
         sms.setShortMessageText(msg);
         sms.setShortMessageBin(udhData);
@@ -1220,39 +1240,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 System.arraycopy(data, 0, udhData, 0, udhLen);
             }
         }
-
-        if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM8) {
-            msg = new String(textPart, isoCharset);
-        } else {
-            SmppEncoding enc;
-            if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7) {
-                enc = smscPropertiesManagement.getSmppEncodingForGsm7();
-            } else {
-                enc = smscPropertiesManagement.getSmppEncodingForUCS2();
-            }
-            switch (enc) {
-                case Utf8:
-                default:
-                    msg = new String(textPart, utf8Charset);
-                    break;
-                case Unicode:
-                    msg = new String(textPart, ucs2Charset);
-                    break;
-                case Gsm7:
-                    GSMCharsetDecoder decoder = (GSMCharsetDecoder) gsm7Charset.newDecoder();
-                    decoder.setGSMCharsetDecodingData(new GSMCharsetDecodingData(Gsm7EncodingStyle.bit8_smpp_style,
-                            Integer.MAX_VALUE, 0));
-                    ByteBuffer bb = ByteBuffer.wrap(textPart);
-                    CharBuffer bf = null;
-                    try {
-                        bf = decoder.decode(bb);
-                    } catch (CharacterCodingException e) {
-                        // this can not be
-                    }
-                    msg = bf.toString();
-                    break;
-            }
-        }
+        msg = parseShortMessageText(event);
 
         // checking max message length
         int nationalLanguageLockingShift = 0;
@@ -1694,6 +1682,78 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
     public enum IncomingMessageType {
         submit_sm, data_sm, deliver_sm, submit_multi,
+    }
+
+    private String parseShortMessageText(BaseSm event) {
+        byte[] data = event.getShortMessage();
+        if (event.getShortMessageLength() == 0) {
+            // Probably the message_payload Optional Parameter is being used
+            Tlv messagePaylod = event.getOptionalParameter(SmppConstants.TAG_MESSAGE_PAYLOAD);
+            if (messagePaylod != null) {
+                data = messagePaylod.getValue();
+            }
+        }
+        if (data == null) {
+            data = new byte[0];
+        }
+        boolean udhPresent = (event.getEsmClass() & SmppConstants.ESM_CLASS_UDHI_MASK) != 0;
+        byte[] udhData;
+        byte[] textPart;
+        String msg;
+        udhData = null;
+        textPart = data;
+        if (udhPresent && data.length > 2) {
+            // UDH exists
+            int udhLen = (textPart[0] & 0xFF) + 1;
+            if (udhLen <= textPart.length) {
+                textPart = new byte[textPart.length - udhLen];
+                udhData = new byte[udhLen];
+                System.arraycopy(data, udhLen, textPart, 0, textPart.length);
+                System.arraycopy(data, 0, udhData, 0, udhLen);
+            }
+        }
+        DataCodingScheme dataCodingScheme = new DataCodingSchemeImpl(event.getDataCoding());
+        if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM8) {
+            msg = new String(textPart, isoCharset);
+        } else {
+            SmppEncoding enc;
+            if (dataCodingScheme.getCharacterSet() == CharacterSet.GSM7) {
+                enc = smscPropertiesManagement.getSmppEncodingForGsm7();
+            } else {
+                enc = smscPropertiesManagement.getSmppEncodingForUCS2();
+            }
+            switch (enc) {
+                case Utf8:
+                default:
+                    msg = new String(textPart, utf8Charset);
+                    break;
+                case Unicode:
+                    msg = new String(textPart, ucs2Charset);
+                    break;
+                case Gsm7:
+                    GSMCharsetDecoder decoder = (GSMCharsetDecoder) gsm7Charset.newDecoder();
+                    decoder.setGSMCharsetDecodingData(new GSMCharsetDecodingData(Gsm7EncodingStyle.bit8_smpp_style,
+                            Integer.MAX_VALUE, 0));
+                    ByteBuffer bb = ByteBuffer.wrap(textPart);
+                    CharBuffer bf = null;
+                    try {
+                        bf = decoder.decode(bb);
+                    } catch (CharacterCodingException e) {
+                        // this can not be
+                    }
+                    msg = bf.toString();
+                    break;
+            }
+        }
+        return msg;
+    }
+
+    private void generateCDR(String shortMessageText, int sourceNetworkId, String systemId, String fromUser, int sourceAddrTon, int sourceAddrNpi, String toUser,
+                             int destAddrTon, int destAddrNpi, String status, String reason, boolean lastSegment) {
+
+        CdrGenerator.generateCdr(fromUser, sourceAddrTon, sourceAddrNpi, toUser, destAddrTon, destAddrNpi, OriginationType.SMPP, systemId, null, null,
+                sourceNetworkId, 0, null, 0, shortMessageText, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+                smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 
     private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {

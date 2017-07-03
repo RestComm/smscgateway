@@ -205,7 +205,10 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 					try {
 						res = (this.messageFactory.createResponse(500, serverTransaction.getRequest()));
 						event.getServerTransaction().sendResponse(res);
-						generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_SIP, e.getMessage(), false, true);
+						if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+							generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
+									ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e.getMessage(), true);
+						}
 					} catch (Exception e1) {
 						this.logger.severe("Exception while trying to send 500 response to sip", e1);
 					}
@@ -221,7 +224,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 				regDeliveryInt = Integer.parseInt(((SIPHeader) regDeliveryHeader).getValue());
 			}
 
-			Sms sms;
+			Sms sms = null;
 			try {
                 sms = this.createSmsEvent(fromUser, message, ta, persistence, udh, codingSchme, validityPeriod, regDeliveryInt, sip.getNetworkId());
                 this.processSms(sms, persistence);
@@ -240,7 +243,14 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 				try {
 					res = (this.messageFactory.createResponse(500, serverTransaction.getRequest()));
 					event.getServerTransaction().sendResponse(res);
-					generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), false, true);
+					if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+						if (sms != null) {
+							generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), false, true);
+						} else {
+							generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
+									ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), true);
+						}
+					}
 				} catch (Exception e) {
 					this.logger.severe("Exception while trying to send Ok response to sip", e);
 				}
@@ -603,6 +613,14 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 	private DataCodingSchemeImpl createDataCodingScheme(int dcs) {
 		CharacterSet chs = CharacterSet.getInstance(dcs);
 		return new DataCodingSchemeImpl(DataCodingGroup.GeneralGroup, null, null, null, chs, false);
+	}
+
+	private void generateCDR(String message, int networkId, String fromUser, String toUser, int destNetworkId,
+							 int destAddrTon, int destAddrNpi, String status, String reason, boolean lastSegment) {
+
+		CdrGenerator.generateCdr(fromUser, 0, 0, toUser, destAddrTon, destAddrNpi, OriginationType.SIP, null, null, null,
+				networkId, destNetworkId, null, 0, message, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+				smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
 	}
 
 	private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {

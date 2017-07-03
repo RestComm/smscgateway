@@ -253,8 +253,11 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
-                generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
-                dialog.close(false);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), evt.getIMSI().getData(), dialog.getLocalAddress(),
+							CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+				}
+				dialog.close(false);
                 return;
             } catch (Throwable e) {
                 logger.severe("Error while sending Error message", e);
@@ -314,7 +317,10 @@ public abstract class MoSbb extends MoCommonSbb {
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info("\nSent ErrorComponent = " + errorMessage);
 				}
-				generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), evt.getIMSI().getData(), dialog.getLocalAddress(),
+							CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+				}
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -331,7 +337,10 @@ public abstract class MoSbb extends MoCommonSbb {
 								dialog.getApplicationContext().getApplicationContextVersion().getVersion(), null, null,
 								null);
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
-				generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), evt.getIMSI().getData(), dialog.getLocalAddress(),
+							CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+				}
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -401,7 +410,10 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
-				generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(),
+							CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+				}
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
@@ -467,7 +479,10 @@ public abstract class MoSbb extends MoCommonSbb {
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info("\nSent ErrorComponent = " + errorMessage);
 				}
-				generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), CdrGenerator.CDR_SUBMIT_FAILED_MO,
+							errorMessage.toString(), true);
+				}
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -485,7 +500,10 @@ public abstract class MoSbb extends MoCommonSbb {
 								null);
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				dialog.close(false);
-                generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), CdrGenerator.CDR_SUBMIT_FAILED_MO,
+							errorMessage.toString(), true);
+				}
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
 				return;
@@ -538,7 +556,10 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
-				generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), CdrGenerator.CDR_SUBMIT_FAILED_MO,
+							errorMessage.toString(), true);
+				}
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
@@ -589,7 +610,10 @@ public abstract class MoSbb extends MoCommonSbb {
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info("\nSent ErrorComponent = " + errorMessage);
 				}
-				generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), CdrGenerator.CDR_SUBMIT_FAILED_MO,
+							errorMessage.toString(), true);
+				}
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -605,7 +629,10 @@ public abstract class MoSbb extends MoCommonSbb {
 								null);
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				dialog.close(false);
-                generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), false, true);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), CdrGenerator.CDR_SUBMIT_FAILED_MO,
+							errorMessage.toString(), true);
+				}
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
 				return;
@@ -1210,9 +1237,12 @@ public abstract class MoSbb extends MoCommonSbb {
 		OnlyRequestRecieved, OtherDataRecieved,
 	}
 
-	private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
-		CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
-				MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
-				lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+	private void generateCDR(int networkId, String imsi, SccpAddress sccpAddress,  String status,
+							 String reason, boolean lastSegment) {
+
+		CdrGenerator.generateCdr(null, 0, 0, null, 0, 0, OriginationType.SS7_MO, null,
+				imsi, sccpAddress.toString(), networkId, 0, null, 0, null, status, reason,
+				smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+				smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
 	}
 }
