@@ -24,7 +24,6 @@ package org.mobicents.smsc.slee.services.deliverysbb;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.CreateException;
@@ -68,7 +67,6 @@ import org.restcomm.smpp.Esme;
 import org.restcomm.smpp.EsmeManagement;
 
 import com.cloudhopper.smpp.SmppSession.Type;
-import com.cloudhopper.smpp.pdu.PduRequest;
 
 import javolution.util.FastList;
 
@@ -771,6 +769,26 @@ public abstract class DeliveryCommonSbb implements Sbb {
         if (pendingRequestsList != null) {
             pendingRequestsListIsDirty = true;
             res = pendingRequestsList.confirm(sequenceNumber);
+            if (res.sequenceNumberFound)
+                res.sms = getMessageInSendingPool(res.msgNum);
+        } else {
+            res = new ConfirmMessageInSendingPool();
+            res.sequenceNumberFound = true;
+            res.confirmed = true;
+            res.sms = getMessageInSendingPool(0);
+        }
+
+        return res;
+    }
+    
+    //we need to get message by its id without confirming it
+    protected ConfirmMessageInSendingPool getMessageInSendingPoolBySeqNumber(int sequenceNumber) {
+        checkPendingRequestsListLoaded();
+
+        ConfirmMessageInSendingPool res;
+        if (pendingRequestsList != null) {
+            pendingRequestsListIsDirty = true;
+            res = pendingRequestsList.find(sequenceNumber);
             if (res.sequenceNumberFound)
                 res.sms = getMessageInSendingPool(res.msgNum);
         } else {

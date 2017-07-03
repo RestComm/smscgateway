@@ -677,23 +677,38 @@ public abstract class ChargingSbb implements Sbb {
 //            } else {
 
 
-            EsmeManagement esmeManagement = EsmeManagement.getInstance();
-			Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
-			String destAddrAndPort = null;
-			String messageType = CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM;
-			if (esme != null) {
-				
-				destAddrAndPort = esme.getRemoteAddressAndPort();
-				//shouldn't have null value
-				messageType = esme.getSmppSessionType() == Type.CLIENT ? 
-	            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
-	            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
-			}
+            String sourceAddrAndPort = null;
+			String messageType = null;
+			EventType eventType = null;
+			switch (sms.getOriginationType()) {
+            case SMPP:
+            	EsmeManagement esmeManagement = EsmeManagement.getInstance();
+    			Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
+    			eventType = EventType.IN_SMPP_REJECT_DIAMETER;
+    			if (esme != null) {
+    				
+    				sourceAddrAndPort = esme.getRemoteAddressAndPort();
+    				
+    				//shouldn't have null value
+    				messageType = esme.getSmppSessionType() == Type.CLIENT ? 
+    	            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
+    	            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+    			}
+                break;
+            case HTTP:
+            	messageType = CdrDetailedGenerator.CDR_MSG_TYPE_HTTP;
+            	eventType = EventType.IN_HTTP_REJECT_DIAMETER;
+            	break;
+            default:
+            	break;
+            }
             
-            CdrDetailedGenerator.generateDetailedCdr(sms, EventType.IN_SMPP_REJECT_DIAMETER, sms.getSmsSet().getStatus(), 
-            		messageType, 0, 0, null, destAddrAndPort, -1, smscPropertiesManagement.getGenerateReceiptCdr(), 
-            		smscPropertiesManagement.getGenerateDetailedCdr());
             
+            if (eventType != null) {
+	            CdrDetailedGenerator.generateDetailedCdr(sms,eventType, sms.getSmsSet().getStatus(), 
+	            		messageType, 0, 0, sourceAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(), 
+	            		smscPropertiesManagement.getGenerateDetailedCdr());
+            }
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
                 persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),
                         smscPropertiesManagement.getIncomeReceiptsProcessing());
@@ -750,22 +765,38 @@ public abstract class ChargingSbb implements Sbb {
 //                persistence.archiveFailuredSms(sms);
 //            } else {
             
-            EsmeManagement esmeManagement = EsmeManagement.getInstance();
-			Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
-			String destAddrAndPort = null;
-			String messageType = CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM;
-			if (esme != null) {
-				
-				destAddrAndPort = esme.getRemoteAddressAndPort();
-				//shouldn't have null value
-				messageType = esme.getSmppSessionType() == Type.CLIENT ? 
-	            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
-	            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
-			}
-
-            CdrDetailedGenerator.generateDetailedCdr(sms, EventType.IN_SMPP_REJECT_MPROC, sms.getSmsSet().getStatus(), 
-            		messageType, 0, 0, null, destAddrAndPort, -1, smscPropertiesManagement.getGenerateReceiptCdr(), 
-            		smscPropertiesManagement.getGenerateDetailedCdr());
+            String sourceAddrAndPort = null;
+			String messageType = null;
+			EventType eventType = null;
+			switch (sms.getOriginationType()) {
+            case SMPP:
+            	EsmeManagement esmeManagement = EsmeManagement.getInstance();
+    			Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
+    			eventType = EventType.IN_SMPP_REJECT_MPROC;
+    			if (esme != null) {
+    				
+    				sourceAddrAndPort = esme.getRemoteAddressAndPort();
+    				
+    				//shouldn't have null value
+    				messageType = esme.getSmppSessionType() == Type.CLIENT ? 
+    	            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
+    	            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+    			}
+                break;
+            case HTTP:
+            	messageType = CdrDetailedGenerator.CDR_MSG_TYPE_HTTP;
+            	eventType = EventType.IN_HTTP_REJECT_MPROC;
+            	break;
+            default:
+            	break;
+            }
+            
+            
+            if (eventType != null) {
+	            CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), 
+	            		messageType, 0, 0, sourceAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(), 
+	            		smscPropertiesManagement.getGenerateDetailedCdr());
+            }            
 
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
                 persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),

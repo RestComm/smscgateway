@@ -39,6 +39,8 @@ import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
+import org.mobicents.smsc.library.EventType;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSetCache;
@@ -50,6 +52,9 @@ import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.services.charging.ChargingMedium;
 import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
+import org.mobicents.smsc.slee.services.smpp.server.tx.TxSmppServerSbb.IncomingMessageType;
+import org.restcomm.smpp.Esme;
+import org.restcomm.smpp.EsmeManagement;
 
 import com.cloudhopper.smpp.SmppConstants;
 
@@ -252,7 +257,7 @@ public abstract class SubmitCommonSbb implements Sbb {
         }
     }
 
-    protected void forwardMessage(Sms sms0, boolean withCharging, SmscStatAggregator smscStatAggregator)
+    protected void forwardMessage(Sms sms0, boolean withCharging, SmscStatAggregator smscStatAggregator, String messageType, int seqNumber)
             throws SmscProcessingException {
 
         ChargingMedium chargingMedium = null;
@@ -341,6 +346,11 @@ public abstract class SubmitCommonSbb implements Sbb {
                         getErrorCode(mProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET),
                         null, SmscProcessingException.INTERNAL_ERROR_MPROC_REJECT);
                 e.setSkipErrorLogging(true);
+                EsmeManagement esmeManagement = EsmeManagement.getInstance();
+    			Esme esme = esmeManagement.getEsmeByClusterName(sms0.getSmsSet().getDestClusterName());
+    			
+                generateMprocFailureDetailedCdr(sms0, EventType.IN_SMPP_REJECT_MPROC, messageType,
+						mProcResult.getSmppErrorCode(), mProcResult.getMprocRejectingRuleId(), esme.getRemoteAddressAndPort(), seqNumber);                
                 if (logger.isInfoEnabled()) {
                     logger.info("Incoming message is rejected by mProc rules, message=[" + sms0 + "]");
                 }
@@ -384,6 +394,26 @@ public abstract class SubmitCommonSbb implements Sbb {
             return aDefaultErrorCode;
         }
         return anErrorCode;
+    }
+    
+    protected void generateDetailedCDR(Sms sms, EventType eventType, String messageType, int statusCode, int mprocRuleId, 
+    		String sourceAddrAndPort, int seqNumber) {
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, 
+        		mprocRuleId, sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), 
+        		smscPropertiesManagement.getGenerateDetailedCdr());
+    }
+    
+    protected void generateFailureDetailedCdr(Sms sms, EventType eventType, String messageType, int statusCode, String sourceAddrAndPort, int seqNumber) {
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, 
+        		0, sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), 
+        		smscPropertiesManagement.getGenerateDetailedCdr());
+    }
+    
+    protected void generateMprocFailureDetailedCdr(Sms sms, EventType eventType, String messageType, int statusCode, int mprocRuleId, 
+    		String sourceAddrAndPort, int seqNumber) {
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, 
+        		mprocRuleId, sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), 
+        		smscPropertiesManagement.getGenerateDetailedCdr());
     }
 
 }

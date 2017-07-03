@@ -275,6 +275,7 @@ public class MProcManagement implements MProcManagementMBean {
             res.setMessageDropped(true);
         } else if (pap.isNeedRejectMessage()) {
             res.setMessageRejected(true);
+//            res.setMprocRejectingRuleId(pap.);
             res.setMapErrorCode(pap.getMapErrorCode());
             res.setHttpErrorCode(pap.getHttpErrorCode());
             res.setSmppErrorCode(pap.getSmppErrorCode());

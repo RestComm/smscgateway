@@ -90,6 +90,31 @@ public class PendingRequestsList implements Serializable {
         }
         return res;
     }
+    
+    //we have to find message by seq number without confirming it
+    public ConfirmMessageInSendingPool find(int sequenceNumber) {
+        ConfirmMessageInSendingPool res = new ConfirmMessageInSendingPool();
+        for (int i1 = 0; i1 < sequenceNumbers.length; i1++) {
+            if (this.sequenceNumbers[i1] == sequenceNumber && !this.confirmations[i1]) {
+                res.sequenceNumberFound = true;
+                res.msgNum = i1;
+                if (this.sequenceNumbersExtra[i1] != null)
+                    res.splittedMessage = true;
+                return res;
+            }
+            if (this.sequenceNumbersExtra[i1] != null) {
+                for (int i2 = 0; i2 < this.sequenceNumbersExtra[i1].length; i2++) {
+                    if (this.sequenceNumbersExtra[i1][i2] == sequenceNumber && !this.confirmationsExtra[i1][i2]) {
+                        res.sequenceNumberFound = true;
+                        res.msgNum = i1;
+                        res.splittedMessage = true;
+                        return res;                        
+                    }
+                }
+            }
+        }
+        return res;
+    }
 
     public boolean isSent(int number) {
         if (number < 0 || number >= this.confirmations.length)

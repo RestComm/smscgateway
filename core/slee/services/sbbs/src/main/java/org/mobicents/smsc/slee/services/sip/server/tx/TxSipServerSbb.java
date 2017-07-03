@@ -60,6 +60,7 @@ import org.mobicents.smsc.domain.SipXHeaders;
 import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
 import org.mobicents.smsc.library.SbbStates;
@@ -482,7 +483,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 			break;
 		}
 
-        this.forwardMessage(sms0, withCharging, smscStatAggregator);
+        this.forwardMessage(sms0, withCharging, smscStatAggregator, CdrDetailedGenerator.CDR_MSG_TYPE_SIP, -1);
 
         
         

@@ -29,6 +29,8 @@ public class CdrDetailedGenerator {
     public static final String CDR_MSG_TYPE_DELIVERSM = "DeliverSm";
     public static final String CDR_MSG_TYPE_DATASM = "DataSm";
     public static final String CDR_MSG_TYPE_HTTP = "Http";
+    public static final String CDR_MSG_TYPE_SIP = "Sip";
+    public static final String CDR_MSG_TYPE_SS7 = "Ss7";
 
 
     public static final String CDR_SUCCESS_NO_REASON = "";
@@ -99,7 +101,7 @@ public class CdrDetailedGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(dlrStatus == null ? dlrStatus : CdrDetailedGenerator.CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(mprocRuleId)
+                .append(mprocRuleId == 0 ? mprocRuleId : CDR_EMPTY)
                 //check this, maybe it should be smsEvent.getSmsSet().getCorrelationId()
                 .append(smsEvent.getMessageId())
                 .append(CdrGenerator.CDR_SEPARATOR)

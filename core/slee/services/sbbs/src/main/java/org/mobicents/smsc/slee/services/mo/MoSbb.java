@@ -82,6 +82,7 @@ import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
 import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.SmscStatProvider;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
@@ -1058,7 +1059,7 @@ public abstract class MoSbb extends MoCommonSbb {
         if (chargingType == MoChargingType.reject)
             return null;
 
-        this.forwardMessage(sms0, chargingType == MoChargingType.diameter, smscStatAggregator);
+        this.forwardMessage(sms0, chargingType == MoChargingType.diameter, smscStatAggregator, CdrDetailedGenerator.CDR_MSG_TYPE_SS7, -1);
 
         return sms0;
         

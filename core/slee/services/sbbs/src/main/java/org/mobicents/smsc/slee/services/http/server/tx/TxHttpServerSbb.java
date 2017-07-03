@@ -29,6 +29,7 @@ import net.java.slee.resource.http.events.HttpServletRequestEvent;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.*;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.MessageState;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
@@ -671,7 +672,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         // TODO how to check if charging is used for http request? Is it turned on for all requests?
         boolean withCharging = false;
 
-        this.forwardMessage(sms0, withCharging, smscStatAggregator);
+        this.forwardMessage(sms0, withCharging, smscStatAggregator, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP, -1);
 
 
 //        if (withCharging) {
