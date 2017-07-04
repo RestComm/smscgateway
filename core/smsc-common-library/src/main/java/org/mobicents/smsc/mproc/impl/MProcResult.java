@@ -41,6 +41,7 @@ public class MProcResult {
     private boolean messageIsRerouted;
     private boolean hrIsByPassed;
     private int newNetworkId;
+    private int ruleIdDropReject;
     
     private int itsMapErrorCode;
     private int itsHttpErrorCode;
@@ -68,6 +69,14 @@ public class MProcResult {
 
     public void setMessageList(FastList<Sms> val) {
         messageList = val;
+    }
+
+    public int getRuleIdDropReject() {
+        return ruleIdDropReject;
+    }
+
+    public void setRuleIdDropReject(int val) {
+        ruleIdDropReject = val;
     }
 
     public boolean isMessageRejected() {

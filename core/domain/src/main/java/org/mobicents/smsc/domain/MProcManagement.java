@@ -256,6 +256,7 @@ public class MProcManagement implements MProcManagementMBean {
                     if (logger.isDebugEnabled()) {
                         logger.debug("MRule matches at Arrival phase to a message:\nrule: " + rule + "\nmessage: " + sms);
                     }
+                    pap.setRuleIdInProcessing(rule.getId());
                     rule.onPostArrival(anMProcRuleRa, pap, message);
                 }
             }
@@ -267,18 +268,20 @@ public class MProcManagement implements MProcManagementMBean {
             return res;
         }
 
-        MProcResult res = new MProcResult();;
+        MProcResult res = new MProcResult();
         FastList<Sms> res0 = new FastList<Sms>();
         res.setMessageList(res0);
         FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
         if (pap.isNeedDropMessage()) {
             res.setMessageDropped(true);
+            res.setRuleIdDropReject(res.getRuleIdDropReject());
         } else if (pap.isNeedRejectMessage()) {
             res.setMessageRejected(true);
 //            res.setMprocRejectingRuleId(pap.);
             res.setMapErrorCode(pap.getMapErrorCode());
             res.setHttpErrorCode(pap.getHttpErrorCode());
             res.setSmppErrorCode(pap.getSmppErrorCode());
+            res.setRuleIdDropReject(res.getRuleIdDropReject());
         } else {
             res0.add(sms);
         }
