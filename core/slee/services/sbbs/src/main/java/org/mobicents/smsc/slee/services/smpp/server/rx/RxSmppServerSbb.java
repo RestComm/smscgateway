@@ -109,8 +109,6 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private static final String className = RxSmppServerSbb.class.getSimpleName();
 
     private static final long ONE = 1L;
-    
-    private Date timeStampA;
 
     // TODO: default value==100 / 2
 	protected static int MAX_MESSAGES_PER_STEP = 100;

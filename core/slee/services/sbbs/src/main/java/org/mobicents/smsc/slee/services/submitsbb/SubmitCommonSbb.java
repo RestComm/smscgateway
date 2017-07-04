@@ -261,9 +261,13 @@ public abstract class SubmitCommonSbb implements Sbb {
             throws SmscProcessingException {
 
         ChargingMedium chargingMedium = null;
+        EventType eventTypeSuccess = null;
+        EventType eventTypeFailure = null;
         switch (sms0.getOriginationType()) {
             case SMPP:
                 chargingMedium = ChargingMedium.TxSmppOrig;
+                eventTypeSuccess = EventType.IN_SMPP_RECEIVED;
+                eventTypeFailure = EventType.IN_SMPP_REJECT_MPROC;
                 break;
             case SS7_MO:
             case SS7_HR:
@@ -274,6 +278,8 @@ public abstract class SubmitCommonSbb implements Sbb {
                 break;
             case HTTP:
                 chargingMedium = ChargingMedium.HttpOrig;
+                eventTypeSuccess = EventType.IN_HTTP_RECEIVED;
+                eventTypeFailure = EventType.IN_HTTP_REJECT_MPROC;
                 break;
         }
 
@@ -291,8 +297,21 @@ public abstract class SubmitCommonSbb implements Sbb {
                 TargetAddress lock = persistence.obtainSynchroObject(ta);
 
                 try {
+                	sms.setTimestampC(System.currentTimeMillis());
+                	
+                	if (eventTypeSuccess != null) {
+	                	EsmeManagement esmeManagement = EsmeManagement.getInstance();
+	        			Esme esme = esmeManagement.getEsmeByClusterName(sms0.getSmsSet().getDestClusterName());
+	        			
+	                	generateDetailedCDR(sms, eventTypeSuccess, messageType, SmppConstants.STATUS_SYSERR, esme.getRemoteAddressAndPort(), seqNumber);
+                	}
+                	
+                	sms.setTimestampA(0);
+					sms.setTimestampB(0);
+					sms.setTimestampC(0);
+					
                     synchronized (lock) {
-                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);                        
                         if (!storeAndForwMode) {
                             try {
                                 this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
@@ -346,11 +365,15 @@ public abstract class SubmitCommonSbb implements Sbb {
                         getErrorCode(mProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET),
                         null, SmscProcessingException.INTERNAL_ERROR_MPROC_REJECT);
                 e.setSkipErrorLogging(true);
-                EsmeManagement esmeManagement = EsmeManagement.getInstance();
-    			Esme esme = esmeManagement.getEsmeByClusterName(sms0.getSmsSet().getDestClusterName());
     			
-                generateMprocFailureDetailedCdr(sms0, EventType.IN_SMPP_REJECT_MPROC, messageType,
-						mProcResult.getSmppErrorCode(), mProcResult.getMprocRejectingRuleId(), esme.getRemoteAddressAndPort(), seqNumber);                
+    			if (eventTypeFailure != null) {
+                    EsmeManagement esmeManagement = EsmeManagement.getInstance();
+        			Esme esme = esmeManagement.getEsmeByClusterName(sms0.getSmsSet().getDestClusterName());
+        			
+    				generateMprocFailureDetailedCdr(sms0, eventTypeFailure, messageType,
+    						mProcResult.getSmppErrorCode(), mProcResult.getMprocRejectingRuleId(), esme.getRemoteAddressAndPort(), seqNumber); 
+    			}
+                               
                 if (logger.isInfoEnabled()) {
                     logger.info("Incoming message is rejected by mProc rules, message=[" + sms0 + "]");
                 }
@@ -396,16 +419,15 @@ public abstract class SubmitCommonSbb implements Sbb {
         return anErrorCode;
     }
     
-    protected void generateDetailedCDR(Sms sms, EventType eventType, String messageType, int statusCode, int mprocRuleId, 
-    		String sourceAddrAndPort, int seqNumber) {
+    protected void generateDetailedCDR(Sms sms, EventType eventType, String messageType, int statusCode, String sourceAddrAndPort, int seqNumber) {
         CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, 
-        		mprocRuleId, sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), 
+        		-1, sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), 
         		smscPropertiesManagement.getGenerateDetailedCdr());
     }
     
     protected void generateFailureDetailedCdr(Sms sms, EventType eventType, String messageType, int statusCode, String sourceAddrAndPort, int seqNumber) {
         CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, 
-        		0, sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), 
+        		-1, sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), 
         		smscPropertiesManagement.getGenerateDetailedCdr());
     }
     

@@ -101,7 +101,7 @@ public class CdrDetailedGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(dlrStatus == null ? dlrStatus : CdrDetailedGenerator.CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
-                .append(mprocRuleId == 0 ? mprocRuleId : CDR_EMPTY)
+                .append(mprocRuleId == -1 ? mprocRuleId : CDR_EMPTY)
                 //check this, maybe it should be smsEvent.getSmsSet().getCorrelationId()
                 .append(smsEvent.getMessageId())
                 .append(CdrGenerator.CDR_SEPARATOR)
