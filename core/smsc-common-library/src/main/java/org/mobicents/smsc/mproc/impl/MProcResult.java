@@ -46,16 +46,6 @@ public class MProcResult {
     private int itsMapErrorCode;
     private int itsHttpErrorCode;
     private int itsSmppErrorCode;
-    
-    private int mprocRejectingRuleId;
-
-    public int getMprocRejectingRuleId() {
-		return mprocRejectingRuleId;
-	}
-
-	public void setMprocRejectingRuleId(int mprocRejectingRuleId) {
-		this.mprocRejectingRuleId = mprocRejectingRuleId;
-	}
 
 	public MProcResult() {
         itsMapErrorCode = ERROR_CODE_NOT_SET;

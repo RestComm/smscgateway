@@ -58,15 +58,6 @@ import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
-import org.mobicents.smsc.library.CdrDetailedGenerator;
-import org.mobicents.smsc.library.EventType;
-import org.mobicents.smsc.library.MessageUtil;
-import org.mobicents.smsc.library.OriginationType;
-import org.mobicents.smsc.library.SbbStates;
-import org.mobicents.smsc.library.Sms;
-import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.library.SmscProcessingException;
-import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
@@ -107,16 +98,16 @@ import com.cloudhopper.smpp.util.TlvUtil;
  */
 public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     private static final String className = TxSmppServerSbb.class.getSimpleName();
-    
+
     private static final long ONE = 1L;
 
-	private SmppTransactionACIFactory smppServerTransactionACIFactory = null;
-	protected SmppSessions smppServerSessions = null;
-	private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
-	private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
+    private SmppTransactionACIFactory smppServerTransactionACIFactory = null;
+    protected SmppSessions smppServerSessions = null;
+    private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
-	private static Charset utf8Charset = Charset.forName("UTF-8");
-	private static Charset ucs2Charset = Charset.forName("UTF-16BE");
+    private static Charset utf8Charset = Charset.forName("UTF-8");
+    private static Charset ucs2Charset = Charset.forName("UTF-16BE");
     private static Charset isoCharset = Charset.forName("ISO-8859-1");
     private static Charset gsm7Charset = new GSMCharset("GSM", new String[] {});
 
@@ -151,7 +142,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     public void sbbStore() {
         super.sbbStore();
     }
- 
+
     /**
      * Gets the default SBB usage parameter set.
      *
@@ -186,7 +177,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         sbbu.sampleSubmitSm(System.currentTimeMillis() - start);
     }
 
-	public void onDataSm(com.cloudhopper.smpp.pdu.DataSm event, ActivityContextInterface aci) {
+    public void onDataSm(com.cloudhopper.smpp.pdu.DataSm event, ActivityContextInterface aci) {
         final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
         sbbu.incrementCounterDataSm(ONE);
         final long start = System.currentTimeMillis();
@@ -214,17 +205,17 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
         sbbu.incrementCounterErrorPduRequestTimeout(ONE);
         sbbu.samplePduRequestTimeout(0L);
-    	logger.severe(String.format("\nonPduRequestTimeout : PduRequestTimeout=%s", event));
-    	// TODO : Handle this
+        logger.severe(String.format("\nonPduRequestTimeout : PduRequestTimeout=%s", event));
+        // TODO : Handle this
     }
 
     public void onRecoverablePduException(RecoverablePduException event, ActivityContextInterface aci,
-    		EventContext eventContext) {
+            EventContext eventContext) {
         final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
         sbbu.incrementErrorRecoverablePduException(ONE);
         sbbu.sampleRecoverablePduException(0L);
-    	logger.severe(String.format("\nonRecoverablePduException : RecoverablePduException=%s", event));
-    	// TODO : Handle this
+        logger.severe(String.format("\nonRecoverablePduException : RecoverablePduException=%s", event));
+        // TODO : Handle this
     }
 
     public void onSendPduStatus(SendPduStatus event, ActivityContextInterface aci, EventContext eventContext) {
@@ -239,32 +230,33 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     }
 
     private void onSubmitSmLocal(final TxSmppServerSbbUsage anSbbUsage, final com.cloudhopper.smpp.pdu.SubmitSm event,
-	        final ActivityContextInterface aci) {
-		// TODO remove it ...........................
-		// long l2 = Date.parse(event.getServiceType());
-		// Date dt0 = new Date(l2);
-		Date dt0 = new Date();
-		Date dt1 = new Date();
-		// TODO remove it ...........................
+            final ActivityContextInterface aci) {
+        // TODO remove it ...........................
+        // long l2 = Date.parse(event.getServiceType());
+        // Date dt0 = new Date(l2);
+        Date dt0 = new Date();
+        Date dt1 = new Date();
+        // TODO remove it ...........................
 
-		SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
-		Esme esme = smppServerTransaction.getEsme();
-		String esmeName = esme.getName();
+        SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
+        Esme esme = smppServerTransaction.getEsme();
+        String esmeName = esme.getName();
 
-		
-		if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nReceived SUBMIT_SM = " + event + " from Esme name=" + esmeName);
-		}
+        if (this.logger.isFineEnabled()) {
+            this.logger.fine("\nReceived SUBMIT_SM = " + event + " from Esme name=" + esmeName);
+        }
 
-		CheckMessageLimitResult cres = esme.onMessageReceived(1);
+        CheckMessageLimitResult cres = esme.onMessageReceived(1);
         if (cres.getResult() != CheckMessageLimitResult.Result.ok) {
             if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(), 
-                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
                 }
             }
 
@@ -280,9 +272,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             } catch (TlvConvertException e) {
                 anSbbUsage.incrementCounterErrorSubmitSm(ONE);
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
-                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e.getMessage(), true);
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, e.getMessage(), true);
                 }
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
@@ -292,33 +286,34 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
-                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage()
-                    + ".\nResponse: " + response + ".", e);
+                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
+                        + response + ".", e);
             }
-            
+
             try {
                 TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
                 Sms sms = this.createSmsEvent(event, esme, ta, persistence);
                 sms.setTimestampB(System.currentTimeMillis());
-                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM,
-                		SmppConstants.STATUS_THROTTLED, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-                
-    		} catch (SmscProcessingException e1) {
-    			
-    		}
+                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, SmppConstants.STATUS_THROTTLED,
+                        esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+
+            } catch (SmscProcessingException e1) {
+
+            }
             return;
         }
 
-		Sms sms = null;
-		try {
+        Sms sms = null;
+        try {
             TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
 
             sms = this.createSmsEvent(event, esme, ta, persistence);
-            this.processSms(sms, persistence, esme, event, null, null, IncomingMessageType.submit_sm, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM,
-            		event.getSequenceNumber());
-		} catch (SmscProcessingException e1) {
+            this.processSms(sms, persistence, esme, event, null, null, IncomingMessageType.submit_sm,
+                    CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, event.getSequenceNumber());
+        } catch (SmscProcessingException e1) {
             anSbbUsage.incrementCounterErrorSubmitSm(ONE);
-		    SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
+            SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
                 if (e1.isIsWarning()) {
                     this.logger.warning(e1.getMessage());
@@ -331,113 +326,117 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 if (sms != null) {
                     generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
                 } else {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
-                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
                 }
             }
-			SubmitSmResp response = event.createResponse();
-			response.setCommandStatus(e1.getSmppErrorCode());
-			String s = e1.getMessage();
-			if (s != null) {
-				if (s.length() > 255)
-					s = s.substring(0, 255);
-				Tlv tlv;
-				try {
-					tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-					response.addOptionalParameter(tlv);
-				} catch (TlvConvertException e) {
-					this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-				}
-			}
+            SubmitSmResp response = event.createResponse();
+            response.setCommandStatus(e1.getSmppErrorCode());
+            String s = e1.getMessage();
+            if (s != null) {
+                if (s.length() > 255)
+                    s = s.substring(0, 255);
+                Tlv tlv;
+                try {
+                    tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
+                    response.addOptionalParameter(tlv);
+                } catch (TlvConvertException e) {
+                    this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
+                }
+            }
 
-			// Lets send the Response with error here
-			try {
-				this.smppServerSessions.sendResponsePdu(esme, event, response);
-				if (sms != null) {
-					sms.setTimestampB(System.currentTimeMillis());
-					generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM,
-							e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-				}
-			} catch (Exception e) {
-			    anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
-                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage()
-                    + ".\nResponse: " + response + ".", e);
-			}
-			
+            // Lets send the Response with error here
+            try {
+                this.smppServerSessions.sendResponsePdu(esme, event, response);
+                if (sms != null) {
+                    sms.setTimestampB(System.currentTimeMillis());
+                    generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                            CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
+                            event.getSequenceNumber());
+                }
+            } catch (Exception e) {
+                anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
+                        + response + ".", e);
+            }
 
-			return;
-		} catch (Throwable e1) {
-		    anSbbUsage.incrementCounterErrorSubmitSm(ONE);
-			String s = "Exception when processing SubmitSm message: " + e1.getMessage();
-			this.logger.severe(s, e1);
+            return;
+        } catch (Throwable e1) {
+            anSbbUsage.incrementCounterErrorSubmitSm(ONE);
+            String s = "Exception when processing SubmitSm message: " + e1.getMessage();
+            this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                        event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
                         event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
                         event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
             }
-			SubmitSmResp response = event.createResponse();
-			response.setCommandStatus(SmppConstants.STATUS_SYSERR);
-			if (s.length() > 255)
-				s = s.substring(0, 255);
-			Tlv tlv;
-			try {
-				tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-				response.addOptionalParameter(tlv);
-			} catch (TlvConvertException e) {
-				this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-			}
+            SubmitSmResp response = event.createResponse();
+            response.setCommandStatus(SmppConstants.STATUS_SYSERR);
+            if (s.length() > 255)
+                s = s.substring(0, 255);
+            Tlv tlv;
+            try {
+                tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
+                response.addOptionalParameter(tlv);
+            } catch (TlvConvertException e) {
+                this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
+            }
 
-			// Lets send the Response with error here
-			try {
-				this.smppServerSessions.sendResponsePdu(esme, event, response);
-				if (sms != null) {
-					sms.setTimestampB(System.currentTimeMillis());
-					generateFailureDetailedCdr(sms, EventType.IN_SMPP_ERROR, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM,
-							SmppConstants.STATUS_SYSERR, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-				}
-			} catch (Exception e) {
-			    anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
-                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage()
-                    + ".\nResponse: " + response + ".", e);
-			}
+            // Lets send the Response with error here
+            try {
+                this.smppServerSessions.sendResponsePdu(esme, event, response);
+                if (sms != null) {
+                    sms.setTimestampB(System.currentTimeMillis());
+                    generateFailureDetailedCdr(sms, EventType.IN_SMPP_ERROR, ErrorCode.REJECT_INCOMING,
+                            CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, SmppConstants.STATUS_SYSERR,
+                            esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+                }
+            } catch (Exception e) {
+                anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
+                        + response + ".", e);
+            }
 
-			return;
-		}
+            return;
+        }
 
-		SubmitSmResp response = event.createResponse();
-		response.setMessageId(sms.getMessageIdText());
+        SubmitSmResp response = event.createResponse();
+        response.setMessageId(sms.getMessageIdText());
 
-		// Lets send the Response with success here
-		try {
+        // Lets send the Response with success here
+        try {
             if (sms.getMessageDeliveryResultResponse() == null) {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
-				sms.setTimestampB(System.currentTimeMillis());
+                sms.setTimestampB(System.currentTimeMillis());
             }
-		} catch (Throwable e) {
-		    anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
-            this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage()
-                + ".\nResponse: " + response + ".", e);
-		}
+        } catch (Throwable e) {
+            anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+            this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
+                    + response + ".", e);
+        }
 
-		// TODO remove it ...........................
-		Date dt3 = new Date();
-		SmscStatProvider.getInstance().setParam1((int) (dt3.getTime() - dt0.getTime()));
-		SmscStatProvider.getInstance().setParam2((int) (dt3.getTime() - dt1.getTime()));
-		// TODO remove it ...........................
+        // TODO remove it ...........................
+        Date dt3 = new Date();
+        SmscStatProvider.getInstance().setParam1((int) (dt3.getTime() - dt0.getTime()));
+        SmscStatProvider.getInstance().setParam2((int) (dt3.getTime() - dt1.getTime()));
+        // TODO remove it ...........................
 
-	}
+    }
 
     private void onDataSmLocal(final TxSmppServerSbbUsage anSbbUsage, final com.cloudhopper.smpp.pdu.DataSm event,
             ActivityContextInterface aci) {
-		SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
-		Esme esme = smppServerTransaction.getEsme();
-		String esmeName = esme.getName();
+        SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
+        Esme esme = smppServerTransaction.getEsme();
+        String esmeName = esme.getName();
 
-		if (this.logger.isFineEnabled()) {
-			this.logger.fine("Received DATA_SM = " + event + " from Esme name=" + esmeName);
-		}
+        if (this.logger.isFineEnabled()) {
+            this.logger.fine("Received DATA_SM = " + event + " from Esme name=" + esmeName);
+        }
 
         CheckMessageLimitResult cres = esme.onMessageReceived(1);
         if (cres.getResult() != CheckMessageLimitResult.Result.ok) {
@@ -445,9 +444,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
-                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
                 }
             }
 
@@ -472,29 +473,30 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
                 this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
             }
-            
+
             try {
                 TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
                 Sms sms = this.createSmsEvent(event, esme, ta, persistence);
                 sms.setTimestampB(System.currentTimeMillis());
-                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, CdrDetailedGenerator.CDR_MSG_TYPE_DATASM,
-                		SmppConstants.STATUS_THROTTLED, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-                
-    		} catch (SmscProcessingException e1) {
-    			
-    		}
+                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_DATASM, SmppConstants.STATUS_THROTTLED,
+                        esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+
+            } catch (SmscProcessingException e1) {
+
+            }
             return;
         }
 
-		Sms sms = null;
-		try {
+        Sms sms = null;
+        try {
             TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
 
             sms = this.createSmsEvent(event, esme, ta, persistence);
-            this.processSms(sms, persistence, esme, null, event, null, IncomingMessageType.data_sm, CdrDetailedGenerator.CDR_MSG_TYPE_DATASM,
-            		event.getSequenceNumber());
-		} catch (SmscProcessingException e1) {
-		    anSbbUsage.incrementCounterErrorDataSm(ONE);
+            this.processSms(sms, persistence, esme, null, event, null, IncomingMessageType.data_sm,
+                    CdrDetailedGenerator.CDR_MSG_TYPE_DATASM, event.getSequenceNumber());
+        } catch (SmscProcessingException e1) {
+            anSbbUsage.incrementCounterErrorDataSm(ONE);
             SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
                 if (e1.isIsWarning()) {
@@ -508,91 +510,95 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 if (sms != null) {
                     generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
                 } else {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
-                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
                 }
             }
-			DataSmResp response = event.createResponse();
-			response.setCommandStatus(e1.getSmppErrorCode());
-			String s = e1.getMessage();
-			if (s != null) {
-				if (s.length() > 255)
-					s = s.substring(0, 255);
-				Tlv tlv;
-				try {
-					tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-					response.addOptionalParameter(tlv);
-				} catch (TlvConvertException e) {
-					this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-				}
-			}
+            DataSmResp response = event.createResponse();
+            response.setCommandStatus(e1.getSmppErrorCode());
+            String s = e1.getMessage();
+            if (s != null) {
+                if (s.length() > 255)
+                    s = s.substring(0, 255);
+                Tlv tlv;
+                try {
+                    tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
+                    response.addOptionalParameter(tlv);
+                } catch (TlvConvertException e) {
+                    this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
+                }
+            }
 
-			// Lets send the Response with error here
-			try {
-				this.smppServerSessions.sendResponsePdu(esme, event, response);
-				if (sms != null) {
-					sms.setTimestampB(System.currentTimeMillis());
-					generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, CdrDetailedGenerator.CDR_MSG_TYPE_DATASM,
-							e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-				}
-			} catch (Exception e) {
-			    anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
-				this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
-			}
+            // Lets send the Response with error here
+            try {
+                this.smppServerSessions.sendResponsePdu(esme, event, response);
+                if (sms != null) {
+                    sms.setTimestampB(System.currentTimeMillis());
+                    generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                            CdrDetailedGenerator.CDR_MSG_TYPE_DATASM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
+                            event.getSequenceNumber());
+                }
+            } catch (Exception e) {
+                anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
+                this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
+            }
 
-			return;
-		} catch (Throwable e1) {
-		    anSbbUsage.incrementCounterErrorDataSm(ONE);
-			String s = "Exception when processing dataSm message: " + e1.getMessage();
-			this.logger.severe(s, e1);
+            return;
+        } catch (Throwable e1) {
+            anSbbUsage.incrementCounterErrorDataSm(ONE);
+            String s = "Exception when processing dataSm message: " + e1.getMessage();
+            this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
 
-			DataSmResp response = event.createResponse();
-			response.setCommandStatus(SmppConstants.STATUS_SYSERR);
-			if (s.length() > 255)
-				s = s.substring(0, 255);
-			Tlv tlv;
-			try {
-				tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-				response.addOptionalParameter(tlv);
-			} catch (TlvConvertException e) {
-				this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-			}
+            DataSmResp response = event.createResponse();
+            response.setCommandStatus(SmppConstants.STATUS_SYSERR);
+            if (s.length() > 255)
+                s = s.substring(0, 255);
+            Tlv tlv;
+            try {
+                tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
+                response.addOptionalParameter(tlv);
+            } catch (TlvConvertException e) {
+                this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
+            }
 
-			// Lets send the Response with error here
-			try {
-				this.smppServerSessions.sendResponsePdu(esme, event, response);
-				if (sms != null) {
-					sms.setTimestampB(System.currentTimeMillis());
-					generateFailureDetailedCdr(sms, EventType.IN_SMPP_ERROR, CdrDetailedGenerator.CDR_MSG_TYPE_DATASM,
-							SmppConstants.STATUS_SYSERR, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-				}
-			} catch (Exception e) {
-			    anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
-				this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-			}
+            // Lets send the Response with error here
+            try {
+                this.smppServerSessions.sendResponsePdu(esme, event, response);
+                if (sms != null) {
+                    sms.setTimestampB(System.currentTimeMillis());
+                    generateFailureDetailedCdr(sms, EventType.IN_SMPP_ERROR, ErrorCode.REJECT_INCOMING,
+                            CdrDetailedGenerator.CDR_MSG_TYPE_DATASM, SmppConstants.STATUS_SYSERR,
+                            esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+                }
+            } catch (Exception e) {
+                anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
+                this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+            }
 
-			return;
-		}
+            return;
+        }
 
-		DataSmResp response = event.createResponse();
-		response.setMessageId(sms.getMessageIdText());
+        DataSmResp response = event.createResponse();
+        response.setMessageId(sms.getMessageIdText());
 
-		// Lets send the Response with success here
-		try {
+        // Lets send the Response with success here
+        try {
             if (sms.getMessageDeliveryResultResponse() == null) {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
-				sms.setTimestampB(System.currentTimeMillis());
+                sms.setTimestampB(System.currentTimeMillis());
             }
-		} catch (Exception e) {
-		    anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
-			this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
-		}
-	}
+        } catch (Exception e) {
+            anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
+            this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
+        }
+    }
 
-    private void onSubmitMultiLocal(final TxSmppServerSbbUsage anSbbUsage,
-            final com.cloudhopper.smpp.pdu.SubmitMulti event, final ActivityContextInterface aci) {
+    private void onSubmitMultiLocal(final TxSmppServerSbbUsage anSbbUsage, final com.cloudhopper.smpp.pdu.SubmitMulti event,
+            final ActivityContextInterface aci) {
         SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
         Esme esme = smppServerTransaction.getEsme();
         String esmeName = esme.getName();
@@ -611,9 +617,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
-                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
                 }
             }
 
@@ -638,17 +646,18 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
             }
-            
+
             try {
                 TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
                 Sms sms = this.createSmsEvent(event, esme, ta, persistence);
                 sms.setTimestampB(System.currentTimeMillis());
-                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI,
-                		SmppConstants.STATUS_THROTTLED, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-                
-    		} catch (SmscProcessingException e1) {
-    			
-    		}
+                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, SmppConstants.STATUS_THROTTLED,
+                        esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+
+            } catch (SmscProcessingException e1) {
+
+            }
             return;
         }
 
@@ -677,9 +686,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 if (singleSms != null) {
                     generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
                 } else {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
-                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
                     generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
                 }
             }
@@ -703,10 +714,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 if (singleSms != null) {
                     singleSms.setTimestampB(System.currentTimeMillis());
-                	generateFailureDetailedCdr(singleSms, EventType.IN_SMPP_REJECT_FORBIDDEN, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI,
-                			e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-				}
-                
+                    generateFailureDetailedCdr(singleSms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                            CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, e1.getSmppErrorCode(),
+                            esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+                }
+
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
@@ -720,9 +732,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             smscStatAggregator.updateMsgInFailedAll();
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                 if (singleSms != null) {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
-                            event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
                     generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
                 } else {
                     generateCDR(null, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
@@ -745,9 +759,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 if (singleSms != null) {
                     singleSms.setTimestampB(System.currentTimeMillis());
-                	generateFailureDetailedCdr(singleSms, EventType.IN_SMPP_ERROR, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI,
-                			SmppConstants.STATUS_SYSERR, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-				}
+                    generateFailureDetailedCdr(singleSms, EventType.IN_SMPP_ERROR, ErrorCode.REJECT_INCOMING,
+                            CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, SmppConstants.STATUS_SYSERR,
+                            esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+                }
                 anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
             } catch (Exception e) {
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
@@ -784,16 +799,16 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     }
 
     private void onDeliverSmLocal(final TxSmppServerSbbUsage anSbbUsage, final com.cloudhopper.smpp.pdu.DeliverSm event,
-	        final ActivityContextInterface aci) {
-		SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
-		Esme esme = smppServerTransaction.getEsme();
-		String esmeName = esme.getName();
+            final ActivityContextInterface aci) {
+        SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
+        Esme esme = smppServerTransaction.getEsme();
+        String esmeName = esme.getName();
 
-		if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nReceived DELIVER_SM = " + event + " from Esme name=" + esmeName);
-		}
+        if (this.logger.isFineEnabled()) {
+            this.logger.fine("\nReceived DELIVER_SM = " + event + " from Esme name=" + esmeName);
+        }
 
-		CheckMessageLimitResult cres = esme.onMessageReceived(1);
+        CheckMessageLimitResult cres = esme.onMessageReceived(1);
         if (cres.getResult() != CheckMessageLimitResult.Result.ok) {
             if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
                 this.updateOverrateCounters(cres);
@@ -821,28 +836,29 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
                 this.logger.severe("Error while trying to send DeliverSmResponse=" + response, e);
             }
-            
+
             try {
                 TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
                 Sms sms = this.createSmsEvent(event, esme, ta, persistence);
                 sms.setTimestampB(System.currentTimeMillis());
-                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM,
-                		SmppConstants.STATUS_THROTTLED, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-                
-    		} catch (SmscProcessingException e1) {
-    			
-    		}
+                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM, SmppConstants.STATUS_THROTTLED,
+                        esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+
+            } catch (SmscProcessingException e1) {
+
+            }
             return;
         }
 
-		Sms sms = null;
-		try {
+        Sms sms = null;
+        try {
             TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
 
             sms = this.createSmsEvent(event, esme, ta, persistence);
-            this.processSms(sms, persistence, esme, null, null, null, IncomingMessageType.deliver_sm, CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM,
-            		event.getSequenceNumber());
-		} catch (SmscProcessingException e1) {
+            this.processSms(sms, persistence, esme, null, null, null, IncomingMessageType.deliver_sm,
+                    CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM, event.getSequenceNumber());
+        } catch (SmscProcessingException e1) {
             anSbbUsage.incrementCounterErrorDeliverSm(ONE);
             SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
@@ -854,83 +870,83 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 smscStatAggregator.updateMsgInFailedAll();
             }
 
-			DeliverSmResp response = event.createResponse();
-			response.setCommandStatus(e1.getSmppErrorCode());
-			String s = e1.getMessage();
-			if (s != null) {
-				if (s.length() > 255)
-					s = s.substring(0, 255);
-				Tlv tlv;
-				try {
-					tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-					response.addOptionalParameter(tlv);
-				} catch (TlvConvertException e) {
-					this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-				}
-			}
+            DeliverSmResp response = event.createResponse();
+            response.setCommandStatus(e1.getSmppErrorCode());
+            String s = e1.getMessage();
+            if (s != null) {
+                if (s.length() > 255)
+                    s = s.substring(0, 255);
+                Tlv tlv;
+                try {
+                    tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
+                    response.addOptionalParameter(tlv);
+                } catch (TlvConvertException e) {
+                    this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
+                }
+            }
 
-			// Lets send the Response with error here
-			try {
-				this.smppServerSessions.sendResponsePdu(esme, event, response);
-				if (sms != null) {
-					sms.setTimestampB(System.currentTimeMillis());
-					generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM,
-							e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-				}
-			} catch (Exception e) {
+            // Lets send the Response with error here
+            try {
+                this.smppServerSessions.sendResponsePdu(esme, event, response);
+                if (sms != null) {
+                    sms.setTimestampB(System.currentTimeMillis());
+                    generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                            CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
+                            event.getSequenceNumber());
+                }
+            } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
-				this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-			}
+                this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+            }
 
-			return;
-		} catch (Throwable e1) {
+            return;
+        } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorDeliverSm(ONE);
-			String s = "Exception when processing SubmitSm message: " + e1.getMessage();
-			this.logger.severe(s, e1);
+            String s = "Exception when processing SubmitSm message: " + e1.getMessage();
+            this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
 
-			DeliverSmResp response = event.createResponse();
-			response.setCommandStatus(SmppConstants.STATUS_SYSERR);
-			if (s.length() > 255)
-				s = s.substring(0, 255);
-			Tlv tlv;
-			try {
-				tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
-				response.addOptionalParameter(tlv);
-			} catch (TlvConvertException e) {
-				this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
-			}
+            DeliverSmResp response = event.createResponse();
+            response.setCommandStatus(SmppConstants.STATUS_SYSERR);
+            if (s.length() > 255)
+                s = s.substring(0, 255);
+            Tlv tlv;
+            try {
+                tlv = TlvUtil.createNullTerminatedStringTlv(SmppConstants.TAG_ADD_STATUS_INFO, s);
+                response.addOptionalParameter(tlv);
+            } catch (TlvConvertException e) {
+                this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
+            }
 
-			// Lets send the Response with error here
-			try {
-				this.smppServerSessions.sendResponsePdu(esme, event, response);
-				if (sms != null) {
-					sms.setTimestampB(System.currentTimeMillis());
-					generateFailureDetailedCdr(sms, EventType.IN_SMPP_ERROR, CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM,
-							SmppConstants.STATUS_SYSERR, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-				}
-			} catch (Exception e) {
+            // Lets send the Response with error here
+            try {
+                this.smppServerSessions.sendResponsePdu(esme, event, response);
+                if (sms != null) {
+                    sms.setTimestampB(System.currentTimeMillis());
+                    generateFailureDetailedCdr(sms, EventType.IN_SMPP_ERROR, ErrorCode.REJECT_INCOMING,
+                            CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM, SmppConstants.STATUS_SYSERR,
+                            esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+                }
+            } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
-				this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-			}
+                this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+            }
 
-			return;
-		}
+            return;
+        }
 
-		DeliverSmResp response = event.createResponse();
+        DeliverSmResp response = event.createResponse();
         response.setMessageId(sms.getMessageIdText());
 
-		// Lets send the Response with success here
-		try {
-			this.smppServerSessions.sendResponsePdu(esme, event, response);
-			sms.setTimestampB(System.currentTimeMillis());
-		} catch (Throwable e) {
+        // Lets send the Response with success here
+        try {
+            this.smppServerSessions.sendResponsePdu(esme, event, response);
+            sms.setTimestampB(System.currentTimeMillis());
+        } catch (Throwable e) {
             anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
-			this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
-		}
-	}
-
-	
+            this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+        }
+    }
 
     // *********
     // General Sms creating and processing methods
@@ -1058,13 +1074,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 udh = createNationalLanguageUdh(origEsme, dataCodingScheme);
                 if (udh != null && udh.getNationalLanguageLockingShift() != null) {
                     lenSolid -= 3;
-                    sms.setNationalLanguageLockingShift(udh.getNationalLanguageLockingShift().getNationalLanguageIdentifier()
-                            .getCode());
+                    sms.setNationalLanguageLockingShift(
+                            udh.getNationalLanguageLockingShift().getNationalLanguageIdentifier().getCode());
                 }
                 if (udh != null && udh.getNationalLanguageSingleShift() != null) {
                     lenSolid -= 3;
-                    sms.setNationalLanguageSingleShift(udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier()
-                            .getCode());
+                    sms.setNationalLanguageSingleShift(
+                            udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier().getCode());
                 }
             }
             int messageLen = MessageUtil.getMessageLengthInBytes(dataCodingScheme, msg, udh);
@@ -1086,13 +1102,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 if (udh != null) {
                     if (udh.getNationalLanguageLockingShift() != null) {
                         lenSegmented -= 3;
-                        sms.setNationalLanguageLockingShift(udh.getNationalLanguageLockingShift()
-                                .getNationalLanguageIdentifier().getCode());
+                        sms.setNationalLanguageLockingShift(
+                                udh.getNationalLanguageLockingShift().getNationalLanguageIdentifier().getCode());
                     }
                     if (udh.getNationalLanguageSingleShift() != null) {
                         lenSegmented -= 3;
-                        sms.setNationalLanguageSingleShift(udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier()
-                                .getCode());
+                        sms.setNationalLanguageSingleShift(
+                                udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier().getCode());
                     }
                 }
                 if (messageLen > lenSegmented * 255) {
@@ -1105,12 +1121,12 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             } else {
                 if (udh != null) {
                     if (udh.getNationalLanguageLockingShift() != null) {
-                        sms.setNationalLanguageLockingShift(udh.getNationalLanguageLockingShift()
-                                .getNationalLanguageIdentifier().getCode());
+                        sms.setNationalLanguageLockingShift(
+                                udh.getNationalLanguageLockingShift().getNationalLanguageIdentifier().getCode());
                     }
                     if (udh.getNationalLanguageSingleShift() != null) {
-                        sms.setNationalLanguageSingleShift(udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier()
-                                .getCode());
+                        sms.setNationalLanguageSingleShift(
+                                udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier().getCode());
                     }
                 }
             }
@@ -1135,9 +1151,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 validityPeriod = MessageUtil.parseSmppDate(event.getValidityPeriod());
             } catch (ParseException e) {
-                throw new SmscProcessingException(
-                        "ParseException when parsing ValidityPeriod field: " + e.getMessage(), SmppConstants.STATUS_INVEXPIRY,
-                        MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
+                throw new SmscProcessingException("ParseException when parsing ValidityPeriod field: " + e.getMessage(),
+                        SmppConstants.STATUS_INVEXPIRY, MAPErrorCode.systemFailure,
+                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
                         SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_PARSING);
             }
         }
@@ -1161,7 +1177,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         smsSet.setDestAddrNpi(ta.getAddrNpi());
         smsSet.setDestAddrTon(ta.getAddrTon());
         smsSet.setNetworkId(origEsme.getNetworkId());
-        smsSet.addSms(sms);         
+        smsSet.addSms(sms);
         sms.setSmsSet(smsSet);
 
         long messageId = store.c2_getNextMessageId();
@@ -1174,7 +1190,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         return sms;
     }
 
-    protected SubmitMultiParseResult createSmsEventMulti(SubmitMulti event, Esme origEsme, PersistenceRAInterface store, int networkId) throws SmscProcessingException {
+    protected SubmitMultiParseResult createSmsEventMulti(SubmitMulti event, Esme origEsme, PersistenceRAInterface store,
+            int networkId) throws SmscProcessingException {
 
         List<Address> addrList = event.getDestAddresses();
         if (addrList == null || addrList.size() == 0) {
@@ -1407,7 +1424,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 smsSet.setDestAddrNpi(ta.getAddrNpi());
                 smsSet.setDestAddrTon(ta.getAddrTon());
                 smsSet.setNetworkId(origEsme.getNetworkId());
-                smsSet.addSms(sms);                    
+                smsSet.addSms(sms);
 
                 sms.setSmsSet(smsSet);
 
@@ -1424,9 +1441,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     }
 
     private void processSms(Sms sms0, PersistenceRAInterface store, Esme esme, SubmitSm eventSubmit, DataSm eventData,
-            SubmitMulti eventSubmitMulti, IncomingMessageType incomingMessageType, String messageType, int seqNumber) throws SmscProcessingException {
-    	
-    	sms0.setTimestampA(System.currentTimeMillis());
+            SubmitMulti eventSubmitMulti, IncomingMessageType incomingMessageType, String messageType, int seqNumber)
+            throws SmscProcessingException {
+
+        sms0.setTimestampA(System.currentTimeMillis());
         if (logger.isInfoEnabled()) {
             logger.info(String.format("\nReceived %s to ESME: %s, sms=%s", incomingMessageType.toString(), esme.getName(),
                     sms0.toString()));
@@ -1434,51 +1452,52 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
         this.checkSmscState(sms0, smscCongestionControl, SubmitCommonSbb.MaxActivityCountFactor.factor_12);
 
-//        // checking if SMSC is stopped
-//        if (smscPropertiesManagement.isSmscStopped()) {
-//            SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR, 0, null);
-//            e.setSkipErrorLogging(true);
-//            throw e;
-//        }
-//        // checking if SMSC is paused
-//        if (smscPropertiesManagement.isDeliveryPause()
-//                && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
-//            SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR, 0, null);
-//            e.setSkipErrorLogging(true);
-//            throw e;
-//        }
-//        // checking if cassandra database is available
-//        if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
-//            SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR, 0,
-//                    null);
-//            e.setSkipErrorLogging(true);
-//            throw e;
-//        }
-//        if (!MessageUtil.isStoreAndForward(sms0)
-//                || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-//            // checking if delivery query is overloaded
-//            int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
-//            int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
-//            if (activityCount >= fetchMaxRows) {
-//                smscCongestionControl.registerMaxActivityCount1_2Threshold();
-//                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
-//                        0, null);
-//                e.setSkipErrorLogging(true);
-//                throw e;
-//            } else {
-//                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
-//            }
-//        }
+        // // checking if SMSC is stopped
+        // if (smscPropertiesManagement.isSmscStopped()) {
+        // SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR, 0, null);
+        // e.setSkipErrorLogging(true);
+        // throw e;
+        // }
+        // // checking if SMSC is paused
+        // if (smscPropertiesManagement.isDeliveryPause()
+        // && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() ==
+        // StoreAndForwordMode.fast)) {
+        // SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR, 0, null);
+        // e.setSkipErrorLogging(true);
+        // throw e;
+        // }
+        // // checking if cassandra database is available
+        // if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
+        // SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR, 0,
+        // null);
+        // e.setSkipErrorLogging(true);
+        // throw e;
+        // }
+        // if (!MessageUtil.isStoreAndForward(sms0)
+        // || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+        // // checking if delivery query is overloaded
+        // int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
+        // int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
+        // if (activityCount >= fetchMaxRows) {
+        // smscCongestionControl.registerMaxActivityCount1_2Threshold();
+        // SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
+        // 0, null);
+        // e.setSkipErrorLogging(true);
+        // throw e;
+        // } else {
+        // smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
+        // }
+        // }
 
-		boolean withCharging = false;
-		switch (smscPropertiesManagement.getTxSmppChargingType()) {
-		case Selected:
-			withCharging = esme.isChargingEnabled();
-			break;
-		case All:
-			withCharging = true;
-			break;
-		}
+        boolean withCharging = false;
+        switch (smscPropertiesManagement.getTxSmppChargingType()) {
+            case Selected:
+                withCharging = esme.isChargingEnabled();
+                break;
+            case All:
+                withCharging = true;
+                break;
+        }
 
         // transactional mode / or charging request
         boolean isTransactional = (eventSubmit != null || eventData != null) && MessageUtil.isTransactional(sms0);
@@ -1522,8 +1541,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 if (messageId != null) {
                     // we found in local cache / database a reference to an origin
                     logger.info("Remote delivery receipt: clusterName=" + clusterName + ", dlvMessageId=" + dlvMessageId
-                            + ", dlvTlvMessageId=" + dlvTlvMessageId + ", receipt=" + sms0.getShortMessageText()
-                            + ", drFormat=" + drFormat);
+                            + ", dlvTlvMessageId=" + dlvTlvMessageId + ", receipt=" + sms0.getShortMessageText() + ", drFormat="
+                            + drFormat);
 
                     if (dlvTlvMessageId != null) {
                         sms0.setReceiptOrigMessageId(dlvTlvMessageId);
@@ -1534,9 +1553,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     sms0.setReceiptLocalMessageId(messageId);
 
                     String messageIdStr = MessageUtil.createMessageIdString(messageId);
-                    String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr, deliveryReceiptData
-                            .getSubmitDate(), deliveryReceiptData.getDoneDate(), deliveryReceiptData.getError(),
-                            deliveryReceiptData.getText(),
+                    String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr,
+                            deliveryReceiptData.getSubmitDate(), deliveryReceiptData.getDoneDate(),
+                            deliveryReceiptData.getError(), deliveryReceiptData.getText(),
                             deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_DELIVERED), null,
                             deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_ENROUTE));
                     sms0.setShortMessageText(updatedReceiptText);
@@ -1552,82 +1571,83 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         }
 
         this.forwardMessage(sms0, withCharging, smscStatAggregator, messageType, seqNumber);
-        
-//        if (withCharging) {
-//            ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
-//            chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
-//        } else {
-//            // applying of MProc
-//            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
-//
-//            FastList<Sms> smss = mProcResult.getMessageList();
-//            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
-//                Sms sms = n.getValue();
-//                TargetAddress ta = new TargetAddress(sms.getSmsSet());
-//                TargetAddress lock = store.obtainSynchroObject(ta);
-//
-//                try {
-//                    synchronized (lock) {
-//                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-//                        if (!storeAndForwMode) {
-//                            try {
-//                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-//                            } catch (Exception e) {
-//                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(), SmppConstants.STATUS_SYSERR,
-//                                        MAPErrorCode.systemFailure, null, e);
-//                            }
-//                        } else {
-//                            // store and forward
-//                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast && sms.getScheduleDeliveryTime() == null) {
-//                                try {
-//                                    sms.setStoringAfterFailure(true);
-//                                    this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-//                                } catch (Exception e) {
-//                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-//                                            SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
-//                                }
-//                            } else {
-//                                try {
-//                                    sms.setStored(true);
-//                                    this.scheduler.setDestCluster(sms.getSmsSet());
-//                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
-//                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-//                                            false);                                        
-//                                } catch (PersistenceException e) {
-//                                    throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
-//                                            SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
-//                                }
-//                            }
-//                        }
-//                    }
-//                } finally {
-//                    store.releaseSynchroObject(lock);
-//                }
-//            }
-//            
-//            if (mProcResult.isMessageRejected()) {
-//                sms0.setMessageDeliveryResultResponse(null);
-//                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-//                        SmppConstants.STATUS_SUBMITFAIL, 0, null);
-//                e.setSkipErrorLogging(true);
-//                if (logger.isInfoEnabled()) {
-//                    logger.info("Incoming message is rejected by mProc rules, message=[" + sms0 + "]");
-//                }
-//                throw e;
-//            }
-//            if (mProcResult.isMessageDropped()) {
-//                sms0.setMessageDeliveryResultResponse(null);
-//                smscStatAggregator.updateMsgInFailedAll();
-//                if (logger.isInfoEnabled()) {
-//                    logger.info("Incoming message is dropped by mProc rules, message=[" + sms0 + "]");
-//                }
-//                return;
-//            }
-//
-//            smscStatAggregator.updateMsgInReceivedAll();
-//            smscStatAggregator.updateMsgInReceivedSmpp();
-//        }
 
+        // if (withCharging) {
+        // ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
+        // chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
+        // } else {
+        // // applying of MProc
+        // MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
+        //
+        // FastList<Sms> smss = mProcResult.getMessageList();
+        // for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
+        // Sms sms = n.getValue();
+        // TargetAddress ta = new TargetAddress(sms.getSmsSet());
+        // TargetAddress lock = store.obtainSynchroObject(ta);
+        //
+        // try {
+        // synchronized (lock) {
+        // boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+        // if (!storeAndForwMode) {
+        // try {
+        // this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+        // } catch (Exception e) {
+        // throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+        // SmppConstants.STATUS_SYSERR,
+        // MAPErrorCode.systemFailure, null, e);
+        // }
+        // } else {
+        // // store and forward
+        // if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast && sms.getScheduleDeliveryTime() ==
+        // null) {
+        // try {
+        // sms.setStoringAfterFailure(true);
+        // this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+        // } catch (Exception e) {
+        // throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+        // SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
+        // }
+        // } else {
+        // try {
+        // sms.setStored(true);
+        // this.scheduler.setDestCluster(sms.getSmsSet());
+        // store.c2_scheduleMessage_ReschedDueSlot(sms,
+        // smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+        // false);
+        // } catch (PersistenceException e) {
+        // throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
+        // SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
+        // }
+        // }
+        // }
+        // }
+        // } finally {
+        // store.releaseSynchroObject(lock);
+        // }
+        // }
+        //
+        // if (mProcResult.isMessageRejected()) {
+        // sms0.setMessageDeliveryResultResponse(null);
+        // SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
+        // SmppConstants.STATUS_SUBMITFAIL, 0, null);
+        // e.setSkipErrorLogging(true);
+        // if (logger.isInfoEnabled()) {
+        // logger.info("Incoming message is rejected by mProc rules, message=[" + sms0 + "]");
+        // }
+        // throw e;
+        // }
+        // if (mProcResult.isMessageDropped()) {
+        // sms0.setMessageDeliveryResultResponse(null);
+        // smscStatAggregator.updateMsgInFailedAll();
+        // if (logger.isInfoEnabled()) {
+        // logger.info("Incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+        // }
+        // return;
+        // }
+        //
+        // smscStatAggregator.updateMsgInReceivedAll();
+        // smscStatAggregator.updateMsgInReceivedSmpp();
+        // }
 
     }
 
@@ -1636,18 +1656,18 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
     private void updateOverrateCounters(CheckMessageLimitResult cres) {
         switch (cres.getDomain()) {
-        case perSecond:
-            smscStatAggregator.updateSmppSecondRateOverlimitFail();
-            break;
-        case perMinute:
-            smscStatAggregator.updateSmppMinuteRateOverlimitFail();
-            break;
-        case perHour:
-            smscStatAggregator.updateSmppHourRateOverlimitFail();
-            break;
-        case perDay:
-            smscStatAggregator.updateSmppDayRateOverlimitFail();
-            break;
+            case perSecond:
+                smscStatAggregator.updateSmppSecondRateOverlimitFail();
+                break;
+            case perMinute:
+                smscStatAggregator.updateSmppMinuteRateOverlimitFail();
+                break;
+            case perHour:
+                smscStatAggregator.updateSmppHourRateOverlimitFail();
+                break;
+            case perDay:
+                smscStatAggregator.updateSmppDayRateOverlimitFail();
+                break;
         }
     }
 
@@ -1732,8 +1752,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     break;
                 case Gsm7:
                     GSMCharsetDecoder decoder = (GSMCharsetDecoder) gsm7Charset.newDecoder();
-                    decoder.setGSMCharsetDecodingData(new GSMCharsetDecodingData(Gsm7EncodingStyle.bit8_smpp_style,
-                            Integer.MAX_VALUE, 0));
+                    decoder.setGSMCharsetDecodingData(
+                            new GSMCharsetDecodingData(Gsm7EncodingStyle.bit8_smpp_style, Integer.MAX_VALUE, 0));
                     ByteBuffer bb = ByteBuffer.wrap(textPart);
                     CharBuffer bf = null;
                     try {
@@ -1748,17 +1768,20 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         return msg;
     }
 
-    private void generateCDR(String shortMessageText, int sourceNetworkId, String systemId, String fromUser, int sourceAddrTon, int sourceAddrNpi, String toUser,
-                             int destAddrTon, int destAddrNpi, String status, String reason, boolean lastSegment) {
+    private void generateCDR(String shortMessageText, int sourceNetworkId, String systemId, String fromUser, int sourceAddrTon,
+            int sourceAddrNpi, String toUser, int destAddrTon, int destAddrNpi, String status, String reason,
+            boolean lastSegment) {
 
-        CdrGenerator.generateCdr(fromUser, sourceAddrTon, sourceAddrNpi, toUser, destAddrTon, destAddrNpi, OriginationType.SMPP, systemId, null, null,
-                sourceNetworkId, 0, null, 0, shortMessageText, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+        CdrGenerator.generateCdr(fromUser, sourceAddrTon, sourceAddrNpi, toUser, destAddrTon, destAddrNpi, OriginationType.SMPP,
+                systemId, null, null, sourceNetworkId, 0, null, 0, shortMessageText, status, reason,
+                smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
                 smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 
     private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
         CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
-                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
+                smscPropertiesManagement.getDelayParametersInCdr());
     }
 }

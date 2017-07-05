@@ -99,20 +99,19 @@ import com.cloudhopper.smpp.SmppSession.Type;
  */
 public abstract class ChargingSbb implements Sbb {
 
-	public static final String SERVICE_CONTEXT_ID_SMSC = "32274@3gpp.org";
-	public static final int APPLICATION_ID_OF_THE_DIAMETER_CREDIT_CONTROL_APPLICATION = 4;
-	public static final int CCR_TIMEOUT = 15;
+    public static final String SERVICE_CONTEXT_ID_SMSC = "32274@3gpp.org";
+    public static final int APPLICATION_ID_OF_THE_DIAMETER_CREDIT_CONTROL_APPLICATION = 4;
+    public static final int CCR_TIMEOUT = 15;
 
-	protected static SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
+    protected static SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
 
-	private static final ResourceAdaptorTypeID DIAMETER_ID = new ResourceAdaptorTypeID("Diameter Ro", "java.net",
-			"0.8.1");
-	private static final String LINK_DIAM = "DiameterRo";
-	private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID(
-			"PersistenceResourceAdaptorType", "org.mobicents", "1.0");
-	private static final String LINK_PERS = "PersistenceResourceAdaptor";
-    private static final ResourceAdaptorTypeID SCHEDULER_ID = new ResourceAdaptorTypeID(
-            "SchedulerResourceAdaptorType", "org.mobicents", "1.0");
+    private static final ResourceAdaptorTypeID DIAMETER_ID = new ResourceAdaptorTypeID("Diameter Ro", "java.net", "0.8.1");
+    private static final String LINK_DIAM = "DiameterRo";
+    private static final ResourceAdaptorTypeID PERSISTENCE_ID = new ResourceAdaptorTypeID("PersistenceResourceAdaptorType",
+            "org.mobicents", "1.0");
+    private static final String LINK_PERS = "PersistenceResourceAdaptor";
+    private static final ResourceAdaptorTypeID SCHEDULER_ID = new ResourceAdaptorTypeID("SchedulerResourceAdaptorType",
+            "org.mobicents", "1.0");
     private static final String SCHEDULER_LINK = "SchedulerResourceAdaptor";
     public static final ResourceAdaptorTypeID MPROC_RATYPE_ID = new ResourceAdaptorTypeID("MProcResourceAdaptorType",
             "org.mobicents", "1.0");
@@ -120,172 +119,173 @@ public abstract class ChargingSbb implements Sbb {
 
     private static Charset utf8Charset = Charset.forName("UTF-8");
 
-	// private static String originIP = "127.0.0.1";
-	// private static String originPort = "1812";
-	// private static String originRealm = "mobicents.org";
-	//
-	// private static String destinationIP = "127.0.0.1";
-	// private static String destinationPort = "3868";
-	// private static String destinationRealm = "mobicents.org";
+    // private static String originIP = "127.0.0.1";
+    // private static String originPort = "1812";
+    // private static String originRealm = "mobicents.org";
+    //
+    // private static String destinationIP = "127.0.0.1";
+    // private static String destinationPort = "3868";
+    // private static String destinationRealm = "mobicents.org";
 
-	protected Tracer logger;
-	private SbbContextExt sbbContext;
+    protected Tracer logger;
+    private SbbContextExt sbbContext;
 
-	private RoProvider roProvider;
-	private RoMessageFactory roMessageFactory;
-	private RoAvpFactory avpFactory;
-	private RoActivityContextInterfaceFactory acif;
+    private RoProvider roProvider;
+    private RoMessageFactory roMessageFactory;
+    private RoAvpFactory avpFactory;
+    private RoActivityContextInterfaceFactory acif;
 
-	private TimerFacility timerFacility = null;
-	private NullActivityFactory nullActivityFactory;
-	private NullActivityContextInterfaceFactory nullACIFactory;
+    private TimerFacility timerFacility = null;
+    private NullActivityFactory nullActivityFactory;
+    private NullActivityContextInterfaceFactory nullACIFactory;
 
-	private PersistenceRAInterface persistence;
+    private PersistenceRAInterface persistence;
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
     protected SchedulerRaSbbInterface scheduler = null;
     private MProcRuleRaProvider itsMProcRa;
 
-	private static final TimerOptions defaultTimerOptions = createDefaultTimerOptions();
-	private NullActivityContextInterfaceFactory nullActivityContextInterfaceFactory;
+    private static final TimerOptions defaultTimerOptions = createDefaultTimerOptions();
+    private NullActivityContextInterfaceFactory nullActivityContextInterfaceFactory;
 
-	private static TimerOptions createDefaultTimerOptions() {
-		TimerOptions timerOptions = new TimerOptions();
-		timerOptions.setPreserveMissed(TimerPreserveMissed.ALL);
-		return timerOptions;
-	}
+    private static TimerOptions createDefaultTimerOptions() {
+        TimerOptions timerOptions = new TimerOptions();
+        timerOptions.setPreserveMissed(TimerPreserveMissed.ALL);
+        return timerOptions;
+    }
 
-	// public abstract SbbActivityContextInterface
-	// asSbbActivityContextInterface(ActivityContextInterface aci);
+    // public abstract SbbActivityContextInterface
+    // asSbbActivityContextInterface(ActivityContextInterface aci);
 
-	public ChargingSbb() {
-	}
+    public ChargingSbb() {
+    }
 
-	@Override
-	public void sbbActivate() {
-		if (logger.isFineEnabled()) {
-			logger.fine("sbbActivate invoked.");
-		}
-	}
+    @Override
+    public void sbbActivate() {
+        if (logger.isFineEnabled()) {
+            logger.fine("sbbActivate invoked.");
+        }
+    }
 
-	@Override
-	public void sbbCreate() throws CreateException {
-		if (logger.isFineEnabled()) {
-			logger.fine("sbbCreate invoked.");
-		}
-	}
+    @Override
+    public void sbbCreate() throws CreateException {
+        if (logger.isFineEnabled()) {
+            logger.fine("sbbCreate invoked.");
+        }
+    }
 
-	@Override
-	public void sbbExceptionThrown(Exception arg0, Object arg1, ActivityContextInterface arg2) {
-		if (logger.isFineEnabled()) {
-			logger.fine("sbbExceptionThrown invoked.");
-		}
-	}
+    @Override
+    public void sbbExceptionThrown(Exception arg0, Object arg1, ActivityContextInterface arg2) {
+        if (logger.isFineEnabled()) {
+            logger.fine("sbbExceptionThrown invoked.");
+        }
+    }
 
-	@Override
-	public void sbbLoad() {
-		if (logger.isFineEnabled()) {
-			logger.fine("sbbLoad invoked.");
-		}
-	}
+    @Override
+    public void sbbLoad() {
+        if (logger.isFineEnabled()) {
+            logger.fine("sbbLoad invoked.");
+        }
+    }
 
-	@Override
-	public void sbbPassivate() {
-		if (logger.isFineEnabled()) {
-			logger.fine("sbbPassivate invoked.");
-		}
-	}
+    @Override
+    public void sbbPassivate() {
+        if (logger.isFineEnabled()) {
+            logger.fine("sbbPassivate invoked.");
+        }
+    }
 
-	@Override
-	public void sbbPostCreate() throws CreateException {
-		if (logger.isFineEnabled()) {
-			logger.fine("sbbPostCreate invoked.");
-		}
-	}
+    @Override
+    public void sbbPostCreate() throws CreateException {
+        if (logger.isFineEnabled()) {
+            logger.fine("sbbPostCreate invoked.");
+        }
+    }
 
-	@Override
-	public void sbbRemove() {
-		if (logger.isFineEnabled()) {
-			logger.fine("sbbRemove invoked.");
-		}
-	}
+    @Override
+    public void sbbRemove() {
+        if (logger.isFineEnabled()) {
+            logger.fine("sbbRemove invoked.");
+        }
+    }
 
-	@Override
-	public void sbbRolledBack(RolledBackContext arg0) {
-		if (logger.isFineEnabled()) {
-			logger.fine("sbbRolledBack invoked.");
-		}
-	}
+    @Override
+    public void sbbRolledBack(RolledBackContext arg0) {
+        if (logger.isFineEnabled()) {
+            logger.fine("sbbRolledBack invoked.");
+        }
+    }
 
-	@Override
-	public void sbbStore() {
-		if (logger.isFineEnabled()) {
-			logger.fine("sbbStore invoked.");
-		}
-	}
+    @Override
+    public void sbbStore() {
+        if (logger.isFineEnabled()) {
+            logger.fine("sbbStore invoked.");
+        }
+    }
 
-	@Override
-	public void setSbbContext(SbbContext sbbContext) {
-		this.sbbContext = (SbbContextExt) sbbContext;
+    @Override
+    public void setSbbContext(SbbContext sbbContext) {
+        this.sbbContext = (SbbContextExt) sbbContext;
 
-		try {
-			Context ctx = (Context) new InitialContext().lookup("java:comp/env");
+        try {
+            Context ctx = (Context) new InitialContext().lookup("java:comp/env");
 
-			this.logger = this.sbbContext.getTracer(getClass().getSimpleName());
+            this.logger = this.sbbContext.getTracer(getClass().getSimpleName());
 
-			if (logger.isFineEnabled()) {
-				logger.fine("setSbbContext invoked.");
-			}
+            if (logger.isFineEnabled()) {
+                logger.fine("setSbbContext invoked.");
+            }
 
-			this.roProvider = (RoProvider) this.sbbContext.getResourceAdaptorInterface(DIAMETER_ID, LINK_DIAM);
+            this.roProvider = (RoProvider) this.sbbContext.getResourceAdaptorInterface(DIAMETER_ID, LINK_DIAM);
 
-			roMessageFactory = roProvider.getRoMessageFactory();
-			avpFactory = roProvider.getRoAvpFactory();
+            roMessageFactory = roProvider.getRoMessageFactory();
+            avpFactory = roProvider.getRoAvpFactory();
 
-			acif = (RoActivityContextInterfaceFactory) ctx
-					.lookup("slee/resources/JDiameterRoResourceAdaptor/java.net/0.8.1/acif");
+            acif = (RoActivityContextInterfaceFactory) ctx
+                    .lookup("slee/resources/JDiameterRoResourceAdaptor/java.net/0.8.1/acif");
 
-			// SLEE Facilities
-			timerFacility = (TimerFacility) ctx.lookup("slee/facilities/timer");
-			nullActivityFactory = (NullActivityFactory) ctx.lookup("slee/nullactivity/factory");
-			nullACIFactory = (NullActivityContextInterfaceFactory) ctx
-					.lookup("slee/nullactivity/activitycontextinterfacefactory");
+            // SLEE Facilities
+            timerFacility = (TimerFacility) ctx.lookup("slee/facilities/timer");
+            nullActivityFactory = (NullActivityFactory) ctx.lookup("slee/nullactivity/factory");
+            nullACIFactory = (NullActivityContextInterfaceFactory) ctx
+                    .lookup("slee/nullactivity/activitycontextinterfacefactory");
 
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID, LINK_PERS);
-            this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID, SCHEDULER_LINK);
+            this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULER_ID,
+                    SCHEDULER_LINK);
             itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MPROC_RATYPE_ID, MPROC_RA_LINK);
-		} catch (Exception ne) {
-			logger.severe("Could not set SBB context:", ne);
-		}
-	}
+        } catch (Exception ne) {
+            logger.severe("Could not set SBB context:", ne);
+        }
+    }
 
-	@Override
-	public void unsetSbbContext() {
-		if (logger.isFineEnabled()) {
-			logger.fine("unsetSbbContext invoked.");
-		}
-		this.sbbContext = null;
-		itsMProcRa = null;
-	}
+    @Override
+    public void unsetSbbContext() {
+        if (logger.isFineEnabled()) {
+            logger.fine("unsetSbbContext invoked.");
+        }
+        this.sbbContext = null;
+        itsMProcRa = null;
+    }
 
-//	public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci) {
-//		logger.info(" Activity Ended[" + aci.getActivity() + "]");
-//	}
+    // public void onActivityEndEvent(ActivityEndEvent event, ActivityContextInterface aci) {
+    // logger.info(" Activity Ended[" + aci.getActivity() + "]");
+    // }
 
-	// Setup charging request
+    // Setup charging request
 
-	public void setupChargingRequestInterface(ChargingMedium chargingType, Sms sms) {
-		if (logger.isFineEnabled()) {
-			logger.fine("ChargingSbb: received message for process charging process: chargingType=" + chargingType
-					+ ", message=[" + sms + "]");
-		}
+    public void setupChargingRequestInterface(ChargingMedium chargingType, Sms sms) {
+        if (logger.isFineEnabled()) {
+            logger.fine("ChargingSbb: received message for process charging process: chargingType=" + chargingType
+                    + ", message=[" + sms + "]");
+        }
 
-		ChargingData chargingData = new ChargingData();
-		chargingData.setSms(sms);
-		chargingData.setChargingType(chargingType);
-		this.setChargingData(chargingData);
+        ChargingData chargingData = new ChargingData();
+        chargingData.setSms(sms);
+        chargingData.setChargingType(chargingType);
+        this.setChargingData(chargingData);
 
-		String sourceAddress = sms.getSourceAddr();
-		int sourceTon = sms.getSourceAddrTon();
+        String sourceAddress = sms.getSourceAddr();
+        int sourceTon = sms.getSourceAddrTon();
         String originatorSccpAddress = sms.getOriginatorSccpAddress();
         String origMoServiceCentreAddressDA = sms.getOrigMoServiceCentreAddressDA();
         if (origMoServiceCentreAddressDA == null) {
@@ -297,92 +297,92 @@ public abstract class ChargingSbb implements Sbb {
         String interfaceId = Integer.toString(sms.getSmsSet().getNetworkId());
         String interfaceText = sms.getOrigEsmeName();
 
-		try {
+        try {
 
-			DiameterIdentity destHost = null;
-			if (smscPropertiesManagement.getDiameterDestHost() != null
-					&& !smscPropertiesManagement.getDiameterDestHost().equals("")) {
-				// destHost = new DiameterIdentity("aaa://" +
-				// smscPropertiesManagement.getDiameterDestHost() + ":" +
-				// smscPropertiesManagement.getDiameterDestPort());
-				destHost = new DiameterIdentity(smscPropertiesManagement.getDiameterDestHost());
-			}
-			DiameterIdentity destRealm = new DiameterIdentity(smscPropertiesManagement.getDiameterDestRealm());
-			RoClientSessionActivity activity = this.roProvider.createRoClientSessionActivity(destHost, destRealm);
-			ActivityContextInterface roACI = acif.getActivityContextInterface(activity);
-			roACI.attach(getSbbContext().getSbbLocalObject());
+            DiameterIdentity destHost = null;
+            if (smscPropertiesManagement.getDiameterDestHost() != null
+                    && !smscPropertiesManagement.getDiameterDestHost().equals("")) {
+                // destHost = new DiameterIdentity("aaa://" +
+                // smscPropertiesManagement.getDiameterDestHost() + ":" +
+                // smscPropertiesManagement.getDiameterDestPort());
+                destHost = new DiameterIdentity(smscPropertiesManagement.getDiameterDestHost());
+            }
+            DiameterIdentity destRealm = new DiameterIdentity(smscPropertiesManagement.getDiameterDestRealm());
+            RoClientSessionActivity activity = this.roProvider.createRoClientSessionActivity(destHost, destRealm);
+            ActivityContextInterface roACI = acif.getActivityContextInterface(activity);
+            roACI.attach(getSbbContext().getSbbLocalObject());
 
-			RoCreditControlRequest ccr = activity.createRoCreditControlRequest(CcRequestType.EVENT_REQUEST);
+            RoCreditControlRequest ccr = activity.createRoCreditControlRequest(CcRequestType.EVENT_REQUEST);
 
-			// ccr.setDestinationRealm(destRealm);
-			// ccr.setAuthApplicationId(APPLICATION_ID_OF_THE_DIAMETER_CREDIT_CONTROL_APPLICATION);
-			ccr.setServiceContextId(SERVICE_CONTEXT_ID_SMSC);
-			ccr.setCcRequestNumber(0);
+            // ccr.setDestinationRealm(destRealm);
+            // ccr.setAuthApplicationId(APPLICATION_ID_OF_THE_DIAMETER_CREDIT_CONTROL_APPLICATION);
+            ccr.setServiceContextId(SERVICE_CONTEXT_ID_SMSC);
+            ccr.setCcRequestNumber(0);
 
-			// destHost may be null, in this case it will be determined by
-			// destRealm
-			// ccr.setDestinationHost(destHost);
+            // destHost may be null, in this case it will be determined by
+            // destRealm
+            // ccr.setDestinationHost(destHost);
 
-			// Contains the user name determined by the domain:
-			// bearer, sub-system or service as described in middle tier TS.
-			// contains Network Access Identifier (NAI).
-			// for SIP: name =
-			// ((SipUri)fromHeader.getAddress().getURI()).getUser();
-			if (smscPropertiesManagement.getDiameterUserName() != null
-					&& !smscPropertiesManagement.getDiameterUserName().equals("")) {
-				ccr.setUserName(smscPropertiesManagement.getDiameterUserName());
-			}
+            // Contains the user name determined by the domain:
+            // bearer, sub-system or service as described in middle tier TS.
+            // contains Network Access Identifier (NAI).
+            // for SIP: name =
+            // ((SipUri)fromHeader.getAddress().getURI()).getUser();
+            if (smscPropertiesManagement.getDiameterUserName() != null
+                    && !smscPropertiesManagement.getDiameterUserName().equals("")) {
+                ccr.setUserName(smscPropertiesManagement.getDiameterUserName());
+            }
 
-			// This field contains the state associated to the CTF
-			// do not know how to use it
-			// a monotonically increasing value that is advanced whenever a
-			// Diameter
-			// entity restarts with loss of previous state, for example upon
-			// reboot
-			// ccr.setOriginStateId(smscRebootStep);
+            // This field contains the state associated to the CTF
+            // do not know how to use it
+            // a monotonically increasing value that is advanced whenever a
+            // Diameter
+            // entity restarts with loss of previous state, for example upon
+            // reboot
+            // ccr.setOriginStateId(smscRebootStep);
 
-			// do not know if we need it
-			ccr.setEventTimestamp(Calendar.getInstance().getTime());
+            // do not know if we need it
+            ccr.setEventTimestamp(Calendar.getInstance().getTime());
 
-			SubscriptionIdAvp subId = avpFactory.createSubscriptionId(SubscriptionIdType.END_USER_E164, sourceAddress);
-			ccr.setSubscriptionId(subId);
+            SubscriptionIdAvp subId = avpFactory.createSubscriptionId(SubscriptionIdType.END_USER_E164, sourceAddress);
+            ccr.setSubscriptionId(subId);
 
-			ccr.setRequestedAction(RequestedActionType.DIRECT_DEBITING);
+            ccr.setRequestedAction(RequestedActionType.DIRECT_DEBITING);
 
-			// ccr.setMultipleServicesIndicator(MultipleServicesIndicatorType.MULTIPLE_SERVICES_NOT_SUPPORTED);
+            // ccr.setMultipleServicesIndicator(MultipleServicesIndicatorType.MULTIPLE_SERVICES_NOT_SUPPORTED);
 
-			// requested units
-			int messageCount = 1;
-			int serviceIdentifier = 1;
+            // requested units
+            int messageCount = 1;
+            int serviceIdentifier = 1;
 
-			MultipleServicesCreditControlAvp multipleServicesCreditControl = avpFactory
-					.createMultipleServicesCreditControl();
+            MultipleServicesCreditControlAvp multipleServicesCreditControl = avpFactory.createMultipleServicesCreditControl();
 
-			RequestedServiceUnitAvp requestedServiceUnit = avpFactory.createRequestedServiceUnit();
-			requestedServiceUnit.setCreditControlServiceSpecificUnits(messageCount);
-			multipleServicesCreditControl.setRequestedServiceUnit(requestedServiceUnit);
+            RequestedServiceUnitAvp requestedServiceUnit = avpFactory.createRequestedServiceUnit();
+            requestedServiceUnit.setCreditControlServiceSpecificUnits(messageCount);
+            multipleServicesCreditControl.setRequestedServiceUnit(requestedServiceUnit);
 
-			multipleServicesCreditControl.setServiceIdentifier(serviceIdentifier);
+            multipleServicesCreditControl.setServiceIdentifier(serviceIdentifier);
 
-			ccr.setMultipleServicesCreditControl(multipleServicesCreditControl);
+            ccr.setMultipleServicesCreditControl(multipleServicesCreditControl);
 
-			// RequestedServiceUnitAvp RSU =
-			// avpFactory.createRequestedServiceUnit();
-			// RSU.setCreditControlTime(_FIRST_CHARGE_TIME);
-			// ccr.setRequestedServiceUnit(RSU);
+            // RequestedServiceUnitAvp RSU =
+            // avpFactory.createRequestedServiceUnit();
+            // RSU.setCreditControlTime(_FIRST_CHARGE_TIME);
+            // ccr.setRequestedServiceUnit(RSU);
 
-			// ServiceInformation - SMS info 2000
-			ArrayList<DiameterAvp> smsInfoAvpLst = new ArrayList<DiameterAvp>();
-			int vendorID = 10415;
-
+            // ServiceInformation - SMS info 2000
+            ArrayList<DiameterAvp> smsInfoAvpLst = new ArrayList<DiameterAvp>();
+            int vendorID = 10415;
 
             // Originator-SCCP-Address 2008
             if (originatorSccpAddress != null) {
                 byte[] originatorSccpAddressAddrPartByteArr = originatorSccpAddress.getBytes(utf8Charset);
                 byte[] originatorSccpAddressByteArr = new byte[2 + originatorSccpAddressAddrPartByteArr.length];
                 originatorSccpAddressByteArr[1] = 8;
-                System.arraycopy(originatorSccpAddressAddrPartByteArr, 0, originatorSccpAddressByteArr, 2, originatorSccpAddressAddrPartByteArr.length);
-                DiameterAvp avpOriginatorSccpAddress = avpFactory.getBaseFactory().createAvp(vendorID, 2008, originatorSccpAddressByteArr);
+                System.arraycopy(originatorSccpAddressAddrPartByteArr, 0, originatorSccpAddressByteArr, 2,
+                        originatorSccpAddressAddrPartByteArr.length);
+                DiameterAvp avpOriginatorSccpAddress = avpFactory.getBaseFactory().createAvp(vendorID, 2008,
+                        originatorSccpAddressByteArr);
                 smsInfoAvpLst.add(avpOriginatorSccpAddress);
             }
 
@@ -402,11 +402,12 @@ public abstract class ChargingSbb implements Sbb {
             DiameterAvp avpDataCodingScheme = avpFactory.getBaseFactory().createAvp(vendorID, 2001, dataCodingScheme);
             smsInfoAvpLst.add(avpDataCodingScheme);
 
-            //  SM-Message-Type 2007
-            DiameterAvp avpSmMessageType = avpFactory.getBaseFactory().createAvp(vendorID, 2007, SmMessageTypeEnum.SUBMISSION.getValue());
+            // SM-Message-Type 2007
+            DiameterAvp avpSmMessageType = avpFactory.getBaseFactory().createAvp(vendorID, 2007,
+                    SmMessageTypeEnum.SUBMISSION.getValue());
             smsInfoAvpLst.add(avpSmMessageType);
 
-            //  Originator-Interface 2009
+            // Originator-Interface 2009
             ArrayList<DiameterAvp> originatorInterfaceAvpLst = new ArrayList<DiameterAvp>();
             DiameterAvp avpInterfaceId = avpFactory.getBaseFactory().createAvp(vendorID, 2003, interfaceId);
             originatorInterfaceAvpLst.add(avpInterfaceId);
@@ -416,7 +417,8 @@ public abstract class ChargingSbb implements Sbb {
             }
             DiameterAvp[] originatorInterfaceAvpArr = new DiameterAvp[originatorInterfaceAvpLst.size()];
             originatorInterfaceAvpLst.toArray(originatorInterfaceAvpArr);
-            DiameterAvp avpOriginatorInterface = avpFactory.getBaseFactory().createAvp(vendorID, 2009, originatorInterfaceAvpArr);
+            DiameterAvp avpOriginatorInterface = avpFactory.getBaseFactory().createAvp(vendorID, 2009,
+                    originatorInterfaceAvpArr);
             smsInfoAvpLst.add(avpOriginatorInterface);
 
             // Recipient-Address 1201
@@ -454,38 +456,38 @@ public abstract class ChargingSbb implements Sbb {
             DiameterAvp[] originatorReceivedAddressAvpArr = new DiameterAvp[originatorReceivedAddressAvpLst.size()];
             originatorReceivedAddressAvpLst.toArray(originatorReceivedAddressAvpArr);
 
-            DiameterAvp avpOriginatorReceivedAddress = avpFactory.getBaseFactory().createAvp(vendorID, 2027, originatorReceivedAddressAvpArr);
+            DiameterAvp avpOriginatorReceivedAddress = avpFactory.getBaseFactory().createAvp(vendorID, 2027,
+                    originatorReceivedAddressAvpArr);
             smsInfoAvpLst.add(avpOriginatorReceivedAddress);
 
             // final assembling
             DiameterAvp[] smsInfoAvpArr = new DiameterAvp[smsInfoAvpLst.size()];
             smsInfoAvpLst.toArray(smsInfoAvpArr);
 
-			DiameterAvp[] smsInfo = new DiameterAvp[1];
-			smsInfo[0] = avpFactory.getBaseFactory().createAvp(vendorID, 2000, smsInfoAvpArr);
-			ServiceInformation si = avpFactory.createServiceInformation();
-			si.setExtensionAvps(smsInfo);
-			ccr.setServiceInformation(si);
+            DiameterAvp[] smsInfo = new DiameterAvp[1];
+            smsInfo[0] = avpFactory.getBaseFactory().createAvp(vendorID, 2000, smsInfoAvpArr);
+            ServiceInformation si = avpFactory.createServiceInformation();
+            si.setExtensionAvps(smsInfo);
+            ccr.setServiceInformation(si);
 
-			activity.sendEventRoCreditControlRequest(ccr);
-			if (logger.isFineEnabled()) {
-				logger.fine("Sent INITIAL CCR: \n" + ccr);
-			}
+            activity.sendEventRoCreditControlRequest(ccr);
+            if (logger.isFineEnabled()) {
+                logger.fine("Sent INITIAL CCR: \n" + ccr);
+            }
 
-			// set new timer for the case we will not get CCA in time
-			timerFacility.setTimer(roACI, null, System.currentTimeMillis() + (CCR_TIMEOUT * 1000), defaultTimerOptions);
-		} catch (Exception e1) {
-			logger.severe(
-					"setupChargingRequestInterface(): error while sending RoCreditControlRequest: " + e1.getMessage(),
-					e1);
-		}
-	}
+            // set new timer for the case we will not get CCA in time
+            timerFacility.setTimer(roACI, null, System.currentTimeMillis() + (CCR_TIMEOUT * 1000), defaultTimerOptions);
+        } catch (Exception e1) {
+            logger.severe("setupChargingRequestInterface(): error while sending RoCreditControlRequest: " + e1.getMessage(),
+                    e1);
+        }
+    }
 
-	// CMP
+    // CMP
 
-	public abstract void setChargingData(ChargingData chargingData);
+    public abstract void setChargingData(ChargingData chargingData);
 
-	public abstract ChargingData getChargingData();
+    public abstract ChargingData getChargingData();
 
     public void onServiceStartedEvent(ServiceStartedEvent event, ActivityContextInterface aci, EventContext eventContext) {
         ServiceID serviceID = event.getService();
@@ -501,62 +503,62 @@ public abstract class ChargingSbb implements Sbb {
         }
     }
 
-	// Events
+    // Events
 
-	public void onRoCreditControlAnswer(RoCreditControlAnswer cca, ActivityContextInterface aci) {
-		if (logger.isFineEnabled()) {
-			logger.fine("RoCreditControlAnswer received: " + cca);
-		}
+    public void onRoCreditControlAnswer(RoCreditControlAnswer cca, ActivityContextInterface aci) {
+        if (logger.isFineEnabled()) {
+            logger.fine("RoCreditControlAnswer received: " + cca);
+        }
 
-		ChargingData chargingData = getChargingData();
-		if (chargingData == null) {
-			logger.warning("RoCreditControlAnswer is recieved but chargingData is null");
-			return;
-		}
+        ChargingData chargingData = getChargingData();
+        if (chargingData == null) {
+            logger.warning("RoCreditControlAnswer is recieved but chargingData is null");
+            return;
+        }
 
-		try {
-			long resultCode = cca.getResultCode();
+        try {
+            long resultCode = cca.getResultCode();
 
-			if (resultCode == 2001) { // access granted
-				acceptSms(chargingData);
-			} else { // access rejected
-				rejectSmsByDiameter(chargingData, cca);
-			}
-		} catch (Throwable e) {
-			logger.warning("Exception when processing RoCreditControlAnswer response: " + e.getMessage(), e);
-		}
-	}
+            if (resultCode == 2001) { // access granted
+                acceptSms(chargingData);
+            } else { // access rejected
+                rejectSmsByDiameter(chargingData, cca);
+            }
+        } catch (Throwable e) {
+            logger.warning("Exception when processing RoCreditControlAnswer response: " + e.getMessage(), e);
+        }
+    }
 
-	public void onTimerEvent(TimerEvent timer, ActivityContextInterface aci) {
-		ChargingData chargingData = getChargingData();
-		if (chargingData == null) {
-			logger.warning("RoCreditControlAnswer is recieved but chargingData is null");
-			return;
-		}
+    public void onTimerEvent(TimerEvent timer, ActivityContextInterface aci) {
+        ChargingData chargingData = getChargingData();
+        if (chargingData == null) {
+            logger.warning("RoCreditControlAnswer is recieved but chargingData is null");
+            return;
+        }
 
-		if (logger.isInfoEnabled()) {
-			logger.info("Timeout waiting for CCA for: " + chargingData);
-		}
+        if (logger.isInfoEnabled()) {
+            logger.info("Timeout waiting for CCA for: " + chargingData);
+        }
 
-		// detach from this activity, we don't want to handle any other event on
-		// it
-		aci.detach(this.sbbContext.getSbbLocalObject());
+        // detach from this activity, we don't want to handle any other event on
+        // it
+        aci.detach(this.sbbContext.getSbbLocalObject());
 
-		try {
-			rejectSmsByDiameter(chargingData, null);
-		} catch (Throwable e) {
-			logger.warning("Exception when processing onTimerEvent response: " + e.getMessage(), e);
-		}
-	}
+        try {
+            rejectSmsByDiameter(chargingData, null);
+        } catch (Throwable e) {
+            logger.warning("Exception when processing onTimerEvent response: " + e.getMessage(), e);
+        }
+    }
 
     private void acceptSms(ChargingData chargingData) throws SmscProcessingException {
-		Sms sms0 = chargingData.getSms();
-		if (logger.isInfoEnabled()) {
-			logger.info("ChargingSbb: accessGranted for: chargingType=" + chargingData.getChargingType()
-					+ ", message=[" + sms0 + "]");
-		}
+        Sms sms0 = chargingData.getSms();
+        if (logger.isInfoEnabled()) {
+            logger.info("ChargingSbb: accessGranted for: chargingType=" + chargingData.getChargingType() + ", message=[" + sms0
+                    + "]");
+        }
 
-		try {
+        try {
             MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(itsMProcRa, sms0, persistence);
 
             FastList<Sms> smss = mProcResult.getMessageList();
@@ -626,113 +628,109 @@ public abstract class ChargingSbb implements Sbb {
 
             smscStatAggregator.updateMsgInReceivedAll();
             switch (sms0.getOriginationType()) {
-            case SMPP:
-                smscStatAggregator.updateMsgInReceivedSmpp();
-                break;
-            case SS7_MO:
-                smscStatAggregator.updateMsgInReceivedSs7();
-                smscStatAggregator.updateMsgInReceivedSs7Mo();
-                break;
-            case SS7_HR:
-                smscStatAggregator.updateMsgInReceivedSs7();
-                smscStatAggregator.updateMsgInReceivedSs7Hr();
-                break;
-            case SIP:
-                smscStatAggregator.updateMsgInReceivedSip();
-                break;
+                case SMPP:
+                    smscStatAggregator.updateMsgInReceivedSmpp();
+                    break;
+                case SS7_MO:
+                    smscStatAggregator.updateMsgInReceivedSs7();
+                    smscStatAggregator.updateMsgInReceivedSs7Mo();
+                    break;
+                case SS7_HR:
+                    smscStatAggregator.updateMsgInReceivedSs7();
+                    smscStatAggregator.updateMsgInReceivedSs7Hr();
+                    break;
+                case SIP:
+                    smscStatAggregator.updateMsgInReceivedSip();
+                    break;
             }
-            
-		} catch (PersistenceException e) {
+
+        } catch (PersistenceException e) {
             throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
                     SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
                     SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
-		}
-	}
+        }
+    }
 
-	private void rejectSmsByDiameter(ChargingData chargingData, RoCreditControlAnswer evt) throws SmscProcessingException {
-		Sms sms = chargingData.getSms();
-		if (logger.isInfoEnabled()) {
-			logger.info("ChargingSbb: accessRejected for: resultCode ="
-					+ (evt != null ? evt.getResultCode() : "timeout") + ", chargingType="
-					+ chargingData.getChargingType() + ", message=[" + sms + "]");
-		}
+    private void rejectSmsByDiameter(ChargingData chargingData, RoCreditControlAnswer evt) throws SmscProcessingException {
+        Sms sms = chargingData.getSms();
+        if (logger.isInfoEnabled()) {
+            logger.info("ChargingSbb: accessRejected for: resultCode =" + (evt != null ? evt.getResultCode() : "timeout")
+                    + ", chargingType=" + chargingData.getChargingType() + ", message=[" + sms + "]");
+        }
 
-		try {
-	        // sending of a failure response for transactional mode / delaying for charging result
+        try {
+            // sending of a failure response for transactional mode / delaying for charging result
             MessageDeliveryResultResponseInterface.DeliveryFailureReason delReason = MessageDeliveryResultResponseInterface.DeliveryFailureReason.invalidDestinationAddress;
             if (sms.getMessageDeliveryResultResponse() != null) {
                 sms.getMessageDeliveryResultResponse().responseDeliveryFailure(delReason, null);
                 sms.setMessageDeliveryResultResponse(null);
             }
 
-	        sms.getSmsSet().setStatus(ErrorCode.OCS_ACCESS_NOT_GRANTED);
+            sms.getSmsSet().setStatus(ErrorCode.OCS_ACCESS_NOT_GRANTED);
 
             boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
             if (storeAndForwMode) {
                 sms.setStored(true);
             }
 
-//            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                persistence.archiveFailuredSms(sms);
-//            } else {
-
+            // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+            // persistence.archiveFailuredSms(sms);
+            // } else {
 
             String sourceAddrAndPort = null;
-			String messageType = null;
-			EventType eventType = null;
-			switch (sms.getOriginationType()) {
-            case SMPP:
-            	EsmeManagement esmeManagement = EsmeManagement.getInstance();
-    			Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
-    			eventType = EventType.IN_SMPP_REJECT_DIAMETER;
-    			if (esme != null) {
-    				
-    				sourceAddrAndPort = esme.getRemoteAddressAndPort();
-    				
-    				//shouldn't have null value
-    				messageType = esme.getSmppSessionType() == Type.CLIENT ? 
-    	            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
-    	            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
-    			}
-                break;
-            case HTTP:
-            	messageType = CdrDetailedGenerator.CDR_MSG_TYPE_HTTP;
-            	eventType = EventType.IN_HTTP_REJECT_DIAMETER;
-            	break;
-            default:
-            	break;
+            String messageType = null;
+            EventType eventType = null;
+            switch (sms.getOriginationType()) {
+                case SMPP:
+                    EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                    Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
+                    eventType = EventType.IN_SMPP_REJECT_DIAMETER;
+                    if (esme != null) {
+
+                        sourceAddrAndPort = esme.getRemoteAddressAndPort();
+
+                        // shouldn't have null value
+                        messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
+                                : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+                    }
+                    break;
+                case HTTP:
+                    messageType = CdrDetailedGenerator.CDR_MSG_TYPE_HTTP;
+                    eventType = EventType.IN_HTTP_REJECT_DIAMETER;
+                    break;
+                default:
+                    break;
             }
-            
-            
+
             if (eventType != null) {
-	            CdrDetailedGenerator.generateDetailedCdr(sms,eventType, sms.getSmsSet().getStatus(), 
-	            		messageType, 0, 0, sourceAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(), 
-	            		smscPropertiesManagement.getGenerateDetailedCdr());
+                CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, 0, 0,
+                        sourceAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(),
+                        smscPropertiesManagement.getGenerateDetailedCdr());
             }
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
                 persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),
                         smscPropertiesManagement.getIncomeReceiptsProcessing());
-            }                
+            }
 
-//            }
+            // }
 
             smscStatAggregator.updateMsgInRejectedAll();
 
-			// TODO: if CCR gives some response verbal reject reason
-			// we need replace CdrGenerator.CDR_SUCCESS_NO_REASON with this
-			// reason
+            // TODO: if CCR gives some response verbal reject reason
+            // we need replace CdrGenerator.CDR_SUCCESS_NO_REASON with this
+            // reason
             CdrGenerator.generateCdr(sms, CdrGenerator.CDR_OCS_REJECTED, CdrGenerator.CDR_SUCCESS_NO_REASON,
                     smscPropertiesManagement.getGenerateReceiptCdr(),
                     MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
                     smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
-            
-		} catch (PersistenceException e) {
+
+        } catch (PersistenceException e) {
             throw new SmscProcessingException(
                     "PersistenceException when storing into Archive rejected by OCS message : " + e.getMessage(),
                     SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
                     SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
-		}
-	}
+        }
+    }
 
     private void rejectSmsByMproc(ChargingData chargingData, boolean isRejected) throws SmscProcessingException {
         Sms sms = chargingData.getSms();
@@ -761,50 +759,47 @@ public abstract class ChargingSbb implements Sbb {
                 sms.setStored(true);
             }
 
-//            if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
-//                persistence.archiveFailuredSms(sms);
-//            } else {
-            
+            // if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
+            // persistence.archiveFailuredSms(sms);
+            // } else {
+
             String sourceAddrAndPort = null;
-			String messageType = null;
-			EventType eventType = null;
-			switch (sms.getOriginationType()) {
-            case SMPP:
-            	EsmeManagement esmeManagement = EsmeManagement.getInstance();
-    			Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
-    			eventType = EventType.IN_SMPP_REJECT_MPROC;
-    			if (esme != null) {
-    				
-    				sourceAddrAndPort = esme.getRemoteAddressAndPort();
-    				
-    				//shouldn't have null value
-    				messageType = esme.getSmppSessionType() == Type.CLIENT ? 
-    	            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
-    	            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
-    			}
-                break;
-            case HTTP:
-            	messageType = CdrDetailedGenerator.CDR_MSG_TYPE_HTTP;
-            	eventType = EventType.IN_HTTP_REJECT_MPROC;
-            	break;
-            default:
-            	break;
+            String messageType = null;
+            EventType eventType = null;
+            switch (sms.getOriginationType()) {
+                case SMPP:
+                    EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                    Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
+                    eventType = EventType.IN_SMPP_REJECT_MPROC;
+                    if (esme != null) {
+
+                        sourceAddrAndPort = esme.getRemoteAddressAndPort();
+
+                        // shouldn't have null value
+                        messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
+                                : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+                    }
+                    break;
+                case HTTP:
+                    messageType = CdrDetailedGenerator.CDR_MSG_TYPE_HTTP;
+                    eventType = EventType.IN_HTTP_REJECT_MPROC;
+                    break;
+                default:
+                    break;
             }
-            
-            
+
             if (eventType != null) {
-	            CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), 
-	            		messageType, 0, 0, sourceAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(), 
-	            		smscPropertiesManagement.getGenerateDetailedCdr());
-            }            
+                CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, 0, 0,
+                        sourceAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(),
+                        smscPropertiesManagement.getGenerateDetailedCdr());
+            }
 
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
                 persistence.c2_createRecordArchive(sms, null, null, !smscPropertiesManagement.getReceiptsDisabling(),
                         smscPropertiesManagement.getIncomeReceiptsProcessing());
-            }                
+            }
 
-
-//            }
+            // }
 
             smscStatAggregator.updateMsgInRejectedAll();
 
@@ -820,24 +815,24 @@ public abstract class ChargingSbb implements Sbb {
         }
     }
 
-	protected SbbContext getSbbContext() {
-		return sbbContext;
-	}
+    protected SbbContext getSbbContext() {
+        return sbbContext;
+    }
 
-	public enum AddressTypeEnum implements net.java.slee.resource.diameter.base.events.avp.Enumerated {
+    public enum AddressTypeEnum implements net.java.slee.resource.diameter.base.events.avp.Enumerated {
         Msisdn(1), Others(6);
 
-		private int code;
+        private int code;
 
-		private AddressTypeEnum(int code) {
-			this.code = code;
-		}
+        private AddressTypeEnum(int code) {
+            this.code = code;
+        }
 
-		@Override
-		public int getValue() {
-			return code;
-		}
-	}
+        @Override
+        public int getValue() {
+            return code;
+        }
+    }
 
     public enum SmMessageTypeEnum implements net.java.slee.resource.diameter.base.events.avp.Enumerated {
         SUBMISSION(0), DELIVERY_REPORT(1), SMServiceRequest(2);

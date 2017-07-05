@@ -173,8 +173,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID,
                     PERSISTENCE_LINK);
             this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULE_ID, SCHEDULE_LINK);
-            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MPROC_RATYPE_ID,
-                    MPROC_RA_LINK);
+            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MPROC_RATYPE_ID, MPROC_RA_LINK);
         } catch (Exception ne) {
             logger.severe("Could not set SBB context:", ne);
         }
@@ -242,7 +241,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
     public void unsetSbbContext() {
         itsMProcRa = null;
     }
-    
+
     // *********
     // Methods for starting / ending of processing
 
@@ -265,13 +264,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected void addInitialMessageSet(SmsSet smsSet, long currentMsgNum) {
 
-//        if (dlvIsInited) {
-//            checkSmsSetLoaded();
-//            checkPendingRequestsListLoaded();
-//
-//            // TODO: implement adding of messages into delivering process ......................
-//            throw new UnsupportedOperationException("addMessageSet() invoke is not implemented for DeliverSbb initialized step");
-//        } else {
+        // if (dlvIsInited) {
+        // checkSmsSetLoaded();
+        // checkPendingRequestsListLoaded();
+        //
+        // // TODO: implement adding of messages into delivering process ......................
+        // throw new UnsupportedOperationException("addMessageSet() invoke is not implemented for DeliverSbb initialized step");
+        // } else {
 
         this.smsSet = smsSet;
 
@@ -291,7 +290,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         pendingRequestsListIsLoaded = true;
         pendingRequestsListIsDirty = false;
 
-//    }
+        // }
     }
 
     /**
@@ -309,9 +308,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
                 SmsSetCache.getInstance().removeProcessingSmsSet(smsSet.getTargetId());
             }
-            
-            
-            
+
         }
 
         dlvIsEnded = true;
@@ -501,7 +498,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                                     + MessageUtil.stackTraceToString());
                             break;
                         }
-                        if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
+                        if (sms.getValidityPeriod() != null
+                                && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
                             this.endDeliveryAfterValidityPeriod(sms, processingType, null, null);
                         } else {
                             boolean res1 = applyMProcPreDelivery(sms, processingType);
@@ -563,11 +561,12 @@ public abstract class DeliveryCommonSbb implements Sbb {
                         gotMessageCnt++;
                         sms = smsSet.getSms(currentMsgNum + i1);
                         if (sms == null) {
-                            this.logger.severe("RxSmpp obtainNextMessage() error: sms is not found num=" + i1
-                                    + " from " + sendingPoolMsgCount + ", smsSet=" + smsSet);
+                            this.logger.severe("RxSmpp obtainNextMessage() error: sms is not found num=" + i1 + " from "
+                                    + sendingPoolMsgCount + ", smsSet=" + smsSet);
                             break;
                         }
-                        if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
+                        if (sms.getValidityPeriod() != null
+                                && sms.getValidityPeriod().getTime() <= System.currentTimeMillis()) {
                             this.endDeliveryAfterValidityPeriod(sms, processingType, null, null);
                             sms = null;
                         } else {
@@ -667,12 +666,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
             // generating CDRs for permanent failure messages
             this.generateCDRs(lstPermFailured, CdrGenerator.CDR_MPROC_DROP_PRE_DELIVERY, reason);
+            
             EsmeManagement esmeManagement = EsmeManagement.getInstance();
-			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
-			String messageType = esme.getSmppSessionType() == Type.CLIENT ? 
-            		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
-            			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
-            this.generateDetailedCDRs(lstPermFailured, EventType.OUT_SMPP_ERROR, smStatus, messageType, esme.getRemoteAddressAndPort(), -1);
+            Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+            String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
+                    : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+            this.generateDetailedCDRs(lstPermFailured, EventType.OUT_SMPP_ERROR, smStatus, messageType,
+                    esme.getRemoteAddressAndPort(), -1);
 
             // sending of failure delivery receipts
             this.generateFailureReceipts(sms.getSmsSet(), lstPermFailured, null);
@@ -705,13 +705,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
     /**
      * @return return next MessageReferenceNumber for this delivery sequence
      */
-//    protected int getNextMessageReferenceNumber() {
-//        while (messageReferenceNumberAncor > 30000)
-//            messageReferenceNumberAncor -= 30000;
-//        int res = messageReferenceNumberAncor++;
-//        this.setMessageReferenceNumberAncor(messageReferenceNumberAncor);
-//        return res;
-//    }
+    // protected int getNextMessageReferenceNumber() {
+    // while (messageReferenceNumberAncor > 30000)
+    // messageReferenceNumberAncor -= 30000;
+    // int res = messageReferenceNumberAncor++;
+    // this.setMessageReferenceNumberAncor(messageReferenceNumberAncor);
+    // return res;
+    // }
     protected static int getNextMessageReferenceNumber() {
         int res = messageReferenceNumberAncor + 1;
         if (res > 60000)
@@ -741,8 +741,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
     }
 
     /**
-     * Ending of registering of messages in a message sending pool for further confirming of a message receiving
-     * This method must be invoked after a first message has been registered by registerMessageInSendingPool().
+     * Ending of registering of messages in a message sending pool for further confirming of a message receiving This method
+     * must be invoked after a first message has been registered by registerMessageInSendingPool().
      */
     protected void endRegisterMessageInSendingPool() {
         pendingRequestsListIsDirty = true;
@@ -780,8 +780,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
         return res;
     }
-    
-    //we need to get message by its id without confirming it
+
+    // we need to get message by its id without confirming it
     protected ConfirmMessageInSendingPool getMessageInSendingPoolBySeqNumber(int sequenceNumber) {
         checkPendingRequestsListLoaded();
 
@@ -851,8 +851,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
         SmsSet smsSet = getSmsSet();
         if (smsSet != null) {
             // deliver timer is triggered
-            String reason = "Delivery timeout error: sendingPoolMessageCount=" + this.getSendingPoolMessageCount()
-                    + ", smsSet=" + smsSet;
+            String reason = "Delivery timeout error: sendingPoolMessageCount=" + this.getSendingPoolMessageCount() + ", smsSet="
+                    + smsSet;
             this.logger.severe(reason);
 
             onDeliveryTimeout(smsSet, reason);
@@ -866,6 +866,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     /**
      * Sending of responses to message senders for a transactional messaging mode for success case
+     * 
      * @param sms
      */
     protected void sendTransactionalResponseSuccess(Sms sms) {
@@ -877,6 +878,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     /**
      * Sending of responses to message senders for a transactional messaging mode for failure case
+     * 
      * @param lstPermFailured
      * @param lstTempFailured
      * @param errorAction
@@ -953,12 +955,11 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 // for time for now + 2 min)
 
                 // TODO: ValidityPeriod was removed !!!
-//                if (sms.getValidityPeriod() != null
-//                        && sms.getValidityPeriod().getTime() <= System.currentTimeMillis() + 1000 * 120) {
-                if (sms.getValidityPeriod() != null
-                        && sms.getValidityPeriod().getTime() < newDueTime.getTime()
-                        && sms.getValidityPeriod().getTime() < System.currentTimeMillis() + 1000
-                                * smscPropertiesManagement.getVpProlong()) {
+                // if (sms.getValidityPeriod() != null
+                // && sms.getValidityPeriod().getTime() <= System.currentTimeMillis() + 1000 * 120) {
+                if (sms.getValidityPeriod() != null && sms.getValidityPeriod().getTime() < newDueTime.getTime()
+                        && sms.getValidityPeriod().getTime() < System.currentTimeMillis()
+                                + 1000 * smscPropertiesManagement.getVpProlong()) {
                     lstPermFailured.add(sms);
                 } else {
                     lstTempFailured.add(sms);
@@ -978,7 +979,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @param dlvMessageId
      * @param dlvDestId
      */
-    protected void endDeliveryAfterValidityPeriod(Sms sms, ProcessingType processingType, String dlvMessageId, String dlvDestId) {
+    protected void endDeliveryAfterValidityPeriod(Sms sms, ProcessingType processingType, String dlvMessageId,
+            String dlvDestId) {
         // ending of delivery process in this SBB
         ErrorCode smStatus = ErrorCode.VALIDITY_PERIOD_EXPIRED;
         ErrorAction errorAction = ErrorAction.permanentFailure;
@@ -1040,12 +1042,16 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
         // generating CDRs for permanent failure messages
         this.generateCDRs(lstPermFailured, CdrGenerator.CDR_FAILED, reason);
+        
+        
         EsmeManagement esmeManagement = EsmeManagement.getInstance();
-		Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
-		String messageType = esme.getSmppSessionType() == Type.CLIENT ? 
-        		CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : 
-        			CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
-        this.generateDetailedCDRs(lstPermFailured, EventType.VALIDITY_PERIOD_TIMEOUT, smStatus, messageType, esme.getRemoteAddressAndPort(), -1);
+        if (esmeManagement != null) {
+            Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+            String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
+                    : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+            this.generateDetailedCDRs(lstPermFailured, EventType.VALIDITY_PERIOD_TIMEOUT, smStatus, messageType,
+                    esme.getRemoteAddressAndPort(), -1);
+        }
 
         // sending of failure delivery receipts
         this.generateFailureReceipts(smsSet, lstPermFailured, null);
@@ -1102,6 +1108,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     /**
      * Calculating of new due delay for SmsSet
+     * 
      * @param smsSet
      * @param busySubscriber true if a network reported of "busySubscriber" state that means that we need to reschedule of
      *        delivering in a very short time
@@ -1121,6 +1128,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     /**
      * Calculating of new due time for SmsSet
+     * 
      * @param smsSet
      * @param newDueDelay
      * @return
@@ -1201,8 +1209,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
         if (addedMessages != null) {
             for (FastList.Node<Sms> n = addedMessages.head(), end = addedMessages.tail(); (n = n.getNext()) != end;) {
                 Sms smst = n.getValue();
-                TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(), smst
-                        .getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
+                TargetAddress ta = new TargetAddress(smst.getSmsSet().getDestAddrTon(), smst.getSmsSet().getDestAddrNpi(),
+                        smst.getSmsSet().getDestAddr(), smst.getSmsSet().getNetworkId());
                 this.sendNewGeneratedMessage(smst, ta);
 
                 if (this.logger.isInfoEnabled()) {
@@ -1233,7 +1241,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
             ArrayList<Integer> lstNewNetworkId, ProcessingType processingType) {
         // TempFailureProcessor
         for (Sms sms : lstTempFailured) {
-            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDeliveryTempFailure(itsMProcRa, sms, processingType);
+            MProcResult mProcResult = MProcManagement.getInstance().applyMProcDeliveryTempFailure(itsMProcRa, sms,
+                    processingType);
 
             if (mProcResult.isMessageIsRerouted()) {
                 // firstly we check if rerouting attempts was not too many
@@ -1460,16 +1469,17 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     String s1 = reason.replace("\n", "\t");
                     CdrGenerator.generateCdr(sms, status, s1, smscPropertiesManagement.getGenerateReceiptCdr(),
                             MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
-                            smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+                            smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
+                            smscPropertiesManagement.getDelayParametersInCdr());
                     return;
                 }
             }
         }
 
-        // if no message was sent in a message pool, let's 
+        // if no message was sent in a message pool, let's
 
         // ***** no lock ******
-        
+
         Sms sms = this.getUnsentMessage(0);
         if (sms != null) {
             String s1 = reason.replace("\n", "\t");
@@ -1479,40 +1489,40 @@ public abstract class DeliveryCommonSbb implements Sbb {
             return;
         }
     }
-    
-    protected void generateTemporaryFailureDetailedCDR(EventType eventType, String messageType, ErrorCode errorCode, 
-    		String destAddrAndPort, int seqNumber) {
+
+    protected void generateTemporaryFailureDetailedCDR(EventType eventType, String messageType, ErrorCode errorCode,
+            String destAddrAndPort, int seqNumber) {
         int sendingPoolMessageCount = this.getSendingPoolMessageCount();
         for (int i1 = 0; i1 < sendingPoolMessageCount; i1++) {
             if (!this.isMessageConfirmedInSendingPool(i1)) {
                 Sms sms = this.getMessageInSendingPool(i1);
                 if (sms != null) {
-                	
-                	CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, 
-                			sms.getSmsSet().getSmppCommandStatus(), 0, 
-                    		null, destAddrAndPort, seqNumber, 
-                    		smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
+
+                    CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType,
+                            sms.getSmsSet().getSmppCommandStatus(), 0, null, destAddrAndPort, seqNumber,
+                            smscPropertiesManagement.getGenerateReceiptCdr(),
+                            smscPropertiesManagement.getGenerateDetailedCdr());
                     return;
                 }
             }
         }
 
-        // if no message was sent in a message pool, let's 
+        // if no message was sent in a message pool, let's
 
         // ***** no lock ******
-        
+
         Sms sms = this.getUnsentMessage(0);
         if (sms != null) {
-        	CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, 
-        			sms.getSmsSet().getSmppCommandStatus(), 0, 
-            		null, destAddrAndPort, seqNumber, 
-            		smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
+            CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType,
+                    sms.getSmsSet().getSmppCommandStatus(), 0, null, destAddrAndPort, seqNumber,
+                    smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
             return;
         }
     }
 
     /**
      * Generating CDRs for a message
+     * 
      * @param sms
      * @param status
      * @param reason
@@ -1522,16 +1532,19 @@ public abstract class DeliveryCommonSbb implements Sbb {
     protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
         CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
-                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
+                smscPropertiesManagement.getDelayParametersInCdr());
     }
-    
-    protected void generateDetailedCDR(Sms sms, EventType eventType, String messageType, int statusCode, String destAddrAndPort, int seqNumber) {
-        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, 0, null, destAddrAndPort, 
-        		seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
+
+    protected void generateDetailedCDR(Sms sms, EventType eventType, ErrorCode errorCode, String messageType, int statusCode,
+            String destAddrAndPort, int seqNumber) {
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, 0, null, destAddrAndPort,
+                seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
     }
 
     /**
      * Generating CDRs for a message list
+     * 
      * @param lstPermFailured
      * @param status
      * @param reason
@@ -1543,13 +1556,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
         }
     }
-    
-    protected void generateDetailedCDRs(ArrayList<Sms> lstPermFailured, EventType eventType, ErrorCode errorCode, String messageType, 
-    		String destAddrAndPort, int seqNumber) {
+
+    protected void generateDetailedCDRs(ArrayList<Sms> lstPermFailured, EventType eventType, ErrorCode errorCode,
+            String messageType, String destAddrAndPort, int seqNumber) {
         for (Sms sms : lstPermFailured) {
-        	CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, sms.getSmsSet().getSmppCommandStatus(), 
-        			0, null, destAddrAndPort, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), 
-        			smscPropertiesManagement.getGenerateDetailedCdr());
+            CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType,
+                    sms.getSmsSet().getSmppCommandStatus(), 0, null, destAddrAndPort, seqNumber,
+                    smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
         }
     }
 
@@ -1558,6 +1571,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     /**
      * Generating of a success receipt for a delivered message
+     * 
      * @param smsSet
      * @param sms
      */
@@ -1586,6 +1600,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     /**
      * Generating of intermediate receipts for temporary failed messages
+     * 
      * @param smsSet
      * @param lstTempFailured
      */
@@ -1648,7 +1663,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     // *********
     // sending of generated messages (delivery receipts and messages that were generated by mproc rules)
-    
+
     private void sendNewGeneratedMessage(Sms sms, TargetAddress ta) {
         boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
 
@@ -1668,8 +1683,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                             sms.setStoringAfterFailure(true);
                             this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                         } catch (Exception e) {
-                            this.logger.severe(
-                                    "Exception when runnung injectSmsOnFly() for receipt in sendNewGeneratedMessage(): "
+                            this.logger
+                                    .severe("Exception when runnung injectSmsOnFly() for receipt in sendNewGeneratedMessage(): "
                                             + e.getMessage(), e);
                         }
                     } else {
@@ -1679,8 +1694,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                             persistence.c2_scheduleMessage_ReschedDueSlot(sms,
                                     smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, true);
                         } catch (PersistenceException e) {
-                            this.logger.severe(
-                                    "PersistenceException when running c2_scheduleMessage_ReschedDueSlot() in sendNewGeneratedMessage()"
+                            this.logger
+                                    .severe("PersistenceException when running c2_scheduleMessage_ReschedDueSlot() in sendNewGeneratedMessage()"
                                             + e.getMessage(), e);
                         }
                     }
@@ -1706,15 +1721,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
     public abstract void setLastLocalSequenceNumber(int value);
 
     public abstract int getLastLocalSequenceNumber();
-    
+
     public abstract void setSentChunks(SentItemsList value);
 
     public abstract SentItemsList getSentChunks();
-    
+
     public abstract void setPendingChunks(ChunkDataList value);
 
     public abstract ChunkDataList getPendingChunks();
-    
+
     public abstract void setDlvIsInited(boolean deliveringIsInited);
 
     public abstract boolean getDlvIsInited();

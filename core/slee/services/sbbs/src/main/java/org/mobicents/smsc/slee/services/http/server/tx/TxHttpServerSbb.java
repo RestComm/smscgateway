@@ -380,9 +380,12 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         outgoingData.setStatus(Status.ERROR);
 
         SendMessageParseResult parseResult;
+        Sms currSms = null;
         try {
             parseResult = createSmsEventMultiDest(incomingData, persistence);
             for (Sms sms : parseResult.getParsedMessages()) {
+            	currSms = sms;
+            	currSms.setTimestampA(System.currentTimeMillis());
                 processSms(sms, persistence, incomingData);
             }
         } catch (SmscProcessingException e1) {
@@ -406,11 +409,20 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                         HttpServletResponse.SC_OK,
                         message,
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
+                if (currSms != null) {
+                	currSms.setTimestampB(System.currentTimeMillis());
+                	generateFailureDetailedCdr(currSms, EventType.IN_HTTP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
+                			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
+                }
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                     generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
                 }
             } catch (IOException e) {
                 logger.severe("Error while trying to send HttpErrorResponse", e);
+                if (currSms != null) {
+                	generateFailureDetailedCdr(currSms, EventType.IN_HTTP_ERROR, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
+                			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
+                }
             }
             return;
         } catch (Throwable e1) {
@@ -427,11 +439,20 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                         HttpServletResponse.SC_OK,
                         message + " " + e1.getMessage(),
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
+                if (currSms != null) {
+                	currSms.setTimestampB(System.currentTimeMillis());
+                	generateFailureDetailedCdr(currSms, EventType.IN_HTTP_ERROR, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
+                			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
+                }
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                     generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
                 }
             } catch (IOException e) {
                 logger.severe("Error while trying to send SubmitMultiResponse=", e);
+                if (currSms != null) {
+                	generateFailureDetailedCdr(currSms, EventType.IN_HTTP_ERROR, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
+                			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
+                }
             }
             return;
         }
@@ -442,8 +463,16 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         try {
             outgoingData.setStatus(Status.SUCCESS);
             HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
+            for (Sms sms : parseResult.getParsedMessages()) {
+                sms.setTimestampB(System.currentTimeMillis());
+            }
         } catch (Throwable e) {
             logger.severe("Error while trying to send SubmitMultiResponse=" + outgoingData, e);
+            if (currSms != null) {
+                generateFailureDetailedCdr(currSms, EventType.IN_HTTP_ERROR, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
+            			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
+            }
         }
     }
 

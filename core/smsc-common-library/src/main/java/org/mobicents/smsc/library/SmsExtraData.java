@@ -168,10 +168,7 @@ public class SmsExtraData {
             }
 
             extraData.mprocNotes = xml.get(MPROC_NOTES, String.class);
-            extraData.receiptLocalMessageId = xml.get(RECEIPT_LOCAL_MESSAGEID, Long.class);
-            extraData.timestampA = xml.get(TIMESTAMP_A, long.class);
-            extraData.timestampB = xml.get(TIMESTAMP_B, long.class);
-            extraData.timestampC = xml.get(TIMESTAMP_C, long.class);
+            extraData.receiptLocalMessageId = xml.get(RECEIPT_LOCAL_MESSAGEID, Long.class);            
         }
 
         @Override
@@ -185,16 +182,6 @@ public class SmsExtraData {
             }
             if (extraData.receiptLocalMessageId != null) {
                 xml.add(extraData.receiptLocalMessageId, RECEIPT_LOCAL_MESSAGEID, Long.class);
-            }
-
-            if (extraData.timestampA != 0) {
-                xml.add(extraData.timestampA, TIMESTAMP_A, long.class);
-            }
-            if (extraData.timestampB!= 0) {
-                xml.add(extraData.timestampB, TIMESTAMP_B, long.class);
-            }
-            if (extraData.timestampC != 0) {
-                xml.add(extraData.timestampC, TIMESTAMP_C, long.class);
             }
         }
     };
