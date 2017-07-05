@@ -37,6 +37,7 @@ import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecodingData;
 import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.library.ErrorCode;
+import org.mobicents.smsc.library.MessageState;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.tools.smppsimulator.SmppSimulatorParameters.DeliveryResponseGenerating;
 
@@ -211,6 +212,20 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                     msgId2 = msgId2 + "XYZ";
                 msgId3 = null;
             }
+            MessageState msgState = null;
+            
+            if (this.testingForm.getSmppSimulatorParameters().isIdResponseTlvMessageState()) {
+            	if (this.testingForm.getSmppSimulatorParameters().isRejectIncomingDeliveryMessage())
+            		//message will have message_state set to REJECTED (value 8)
+            		msgState = MessageState.REJECTED;
+            	else if (this.testingForm.getSmppSimulatorParameters().getDeliveryResponseGenerating().equals(DeliveryResponseGenerating.Error8)) {
+            		//message will have message_state set to UNDELIVERABLE (value 5)
+            		msgState = MessageState.UNDELIVERABLE;
+            	} else {
+            		//message should have message_state set to DELIVERED (value 2)
+            		msgState = MessageState.DELIVERED;
+            	}
+            } 
 
             ((BaseSmResp) resp).setMessageId(msgId);
 
@@ -222,7 +237,7 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                 this.testingForm.getExecutor().schedule(
                         new DeliveryReceiptSender(
                                 this.testingForm.getSmppSimulatorParameters().getDeliveryResponseGenerating(), new Date(),
-                                msgId2, msgId3), delay, TimeUnit.MILLISECONDS);
+                                msgId2, msgId3, msgState), delay, TimeUnit.MILLISECONDS);
             }
 
             testingForm.addMessage("PduResponseSent: " + resp.getName(), resp.toString());
@@ -303,13 +318,15 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
         private Date submitDate;
         private String messageId;
         private String messageIdTlv;
+        private MessageState messageStateTlv;
 
         public DeliveryReceiptSender(DeliveryResponseGenerating deliveryResponseGenerating, Date submitDate, String messageId,
-                String messageIdTlv) {
+                String messageIdTlv, MessageState messageStateTlv) {
             this.deliveryResponseGenerating = deliveryResponseGenerating;
             this.submitDate = submitDate;
             this.messageId = messageId;
             this.messageIdTlv = messageIdTlv;
+            this.messageStateTlv = messageStateTlv;
         }
 
         @Override
@@ -368,6 +385,13 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
                 byte[] data = new byte[data0.length + 1];
                 System.arraycopy(data0, 0, data, 0, data0.length);
                 Tlv tlv = new Tlv(SmppConstants.TAG_RECEIPTED_MSG_ID, data, "rec_msg_id");
+                pdu.addOptionalParameter(tlv);
+            }
+            
+            if (messageStateTlv != null) {
+            	byte[] data = new byte[1];
+            	data[0] = (byte)messageStateTlv.getCode();
+                Tlv tlv = new Tlv(SmppConstants.TAG_MSG_STATE, data, "msg_state");
                 pdu.addOptionalParameter(tlv);
             }
 
