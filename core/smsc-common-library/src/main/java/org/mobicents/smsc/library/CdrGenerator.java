@@ -105,6 +105,18 @@ public class CdrGenerator {
 
         Long receiptLocalMessageId = smsEvent.getReceiptLocalMessageId();
         
+        DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(smsEvent.getShortMessageText(),
+                smsEvent.getTlvSet());
+        String st = null;
+        int tlvMessageState = -1;
+        int err = -1;
+        
+        if (deliveryReceiptData != null) {
+            st = deliveryReceiptData.getStatus();
+            tlvMessageState = deliveryReceiptData.getTlvMessageState();
+            err = deliveryReceiptData.getError();
+        }
+        
         StringBuffer sb = new StringBuffer();
         sb.append(DATE_FORMAT.format(smsEvent.getSubmitDate()))
                 .append(CdrGenerator.CDR_SEPARATOR)
@@ -167,21 +179,13 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append("\"")
                 .append(getEscapedString(reason))
-                .append("\"");
-        
-        DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(smsEvent.getShortMessageText(),
-                smsEvent.getTlvSet());
-        if (deliveryReceiptData != null) {
-        	String st = deliveryReceiptData.getStatus();
-        	int tlvMessageState = deliveryReceiptData.getTlvMessageState();
-        	
-        	sb.append(CdrGenerator.CDR_SEPARATOR)
-        	.append(st != null ? st : CdrGenerator.CDR_EMPTY);
-    		sb.append(CdrGenerator.CDR_SEPARATOR)
-    		.append(tlvMessageState != 0 ? tlvMessageState : CdrGenerator.CDR_EMPTY);
-        	sb.append(CdrGenerator.CDR_SEPARATOR)
-        	.append(deliveryReceiptData.getError());
-        }
+                .append("\"")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(st != null ? st : CdrGenerator.CDR_EMPTY)
+		        .append(CdrGenerator.CDR_SEPARATOR)
+		        .append(tlvMessageState != -1 ? tlvMessageState : CdrGenerator.CDR_EMPTY)
+    	        .append(CdrGenerator.CDR_SEPARATOR)
+    	        .append(err != -1 ? err : CdrGenerator.CDR_EMPTY);
         
         CdrGenerator.generateCdr(sb.toString());
     }
