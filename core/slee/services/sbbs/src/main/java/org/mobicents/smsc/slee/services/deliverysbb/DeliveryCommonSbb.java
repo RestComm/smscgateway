@@ -1538,7 +1538,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     protected void generateDetailedCDR(Sms sms, EventType eventType, ErrorCode errorCode, String messageType, int statusCode,
             String destAddrAndPort, int seqNumber) {
-        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, 0, null, destAddrAndPort,
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, -1, null, destAddrAndPort,
                 seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
     }
 
@@ -1561,7 +1561,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             String messageType, String destAddrAndPort, int seqNumber) {
         for (Sms sms : lstPermFailured) {
             CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType,
-                    sms.getSmsSet().getSmppCommandStatus(), 0, null, destAddrAndPort, seqNumber,
+                    sms.getSmsSet().getSmppCommandStatus(), -1, null, destAddrAndPort, seqNumber,
                     smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
         }
     }
