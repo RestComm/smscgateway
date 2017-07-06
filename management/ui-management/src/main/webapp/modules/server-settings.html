@@ -614,7 +614,16 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										<option>false</option>
 									</select>
 								</span>                         
-							</div>	
+							</div>
+							<div id="div-generateRejectionCdr" class="control-group">
+                                <span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="The SMSC can be configured to generate CDR for message rejection by MProc rule.">
+                                  <span class="add-on">Generate CDR for message rejection by MProc rule</span>
+                                  <select id="generateRejectionCdr" >
+                                    <option>true</option>
+                                    <option>false</option>
+                                  </select>
+                                </span>
+							</div>
 							<div id="div-calculateMsgPartsLenCdr" class="control-group">
 								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When SMSC GW generates CDR records it can calculate message parts and characters count per a CDR record. Message parts count means a count of parts to that SMSC GW will have to split a long messages when sending messages into SS7 network. This demands some extra calculating and therefore is disabled by default. You can turn it on by this option.">
 									<span class="add-on">Calculating of message parts and characters count per a CDR record</span>
@@ -939,7 +948,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										$("#cassandraclustername").val(response.value.ClusterName);
 										$("#cassandrauser").val(response.value.CassandraUser);
 										$("#cassandrapass").val(response.value.CassandraPass);
-										
+
 										$("#removinglivetablesdays").val(response.value.RemovingLiveTablesDays);
 										$("#removingarchivetabledays").val(response.value.RemovingArchiveTablesDays);										
 									}],
@@ -1088,6 +1097,12 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										} else {
 											generateTempFailureCdr.options[1].selected = true;
 										}
+                                        var generateRejectionCdrTmp = response.value.GenerateRejectionCdr
+                                        if(generateRejectionCdrTmp){
+                                          generateRejectionCdr.options[0].selected = true;
+                                        } else {
+                                          generateRejectionCdr.options[1].selected = true;
+                                        }
 										var calculateMsgPartsLenCdrTmp = response.value.CalculateMsgPartsLenCdr
 										if(calculateMsgPartsLenCdrTmp){
 											calculateMsgPartsLenCdr.options[0].selected = true;
@@ -2075,6 +2090,8 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 						var generateReceiptCdr = e1.options[e1.selectedIndex].text;
 						e1 = document.getElementById("generateTempFailureCdr");
 						var generateTempFailureCdr = e1.options[e1.selectedIndex].text;
+                        e1 = document.getElementById("generateRejectionCdr");
+                        var generateRejectionCdr = e1.options[e1.selectedIndex].text;
 						e1 = document.getElementById("calculateMsgPartsLenCdr");
 						var calculateMsgPartsLenCdr = e1.options[e1.selectedIndex].text;
 						e1 = document.getElementById("delayParametersInCdr");
@@ -2115,6 +2132,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 								[
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateReceiptCdr", value: generateReceiptCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateTempFailureCdr", value: generateTempFailureCdr },
+                                    { type: "write", mbean: mbeanSearch, attribute: "GenerateRejectionCdr", value: generateRejectionCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "CalculateMsgPartsLenCdr", value: calculateMsgPartsLenCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "DelayParametersInCdr", value: delayParametersInCdr },
 									{ type: "write", mbean: mbeanSearch, attribute: "GenerateCdrInt", value: generateCdrTmp },

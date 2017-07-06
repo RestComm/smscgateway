@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  
+ * TeleStax, Open Source Cloud Communications
  * Copyright 2012, Telestax Inc and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -87,6 +87,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private static final String REVISE_SECONDS_ON_SMSC_START = "reviseSecondsOnSmscStart";
 	private static final String PROCESSING_SMS_SET_TIMEOUT = "processingSmsSetTimeout";
     private static final String GENERATE_RECEIPT_CDR = "generateReceiptCdr";
+    private static final String GENERATE_REJECTION_CDR = "generateRejectionCdr";
     private static final String GENERATE_TEMP_FAILURE_CDR = "generateTempFailureCdr";
     private static final String CALCULATE_MSG_PARTS_LEN_CDR = "calculateMsgPartsLenCdr";
     private static final String DELAY_PARAMETERS_IN_CDR = "delayParametersInCdr";
@@ -249,6 +250,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // true: we generate CDR also for temp failures (along with success and permanent failure cases)
     // false: we generate CDR only for success and permanent failure cases (no CDRs for temp failures)
     private boolean generateTempFailureCdr = true;
+    // true: We generate CDR also for SMSC message rejection by mproc rule at forwarding.
+    // false: CDR entries are not generated on the SMSC message rejection by mproc rule at forwarding.
+    private boolean generateRejectionCdr = false;
     // true: when CDR generating SMSC GW will calculate MSG_PARTS and CHAR_NUMBERS fields (that demands extra calculating)
     // false: not calculate
     private boolean calculateMsgPartsLenCdr = false;
@@ -1391,6 +1395,25 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
+    /**
+     * Checks if CDRs are to be generated at the processing errors.
+     *
+     * @return true, if CDRs should be generated
+     */
+    @Override
+    public boolean isGenerateRejectionCdr() {
+        return generateRejectionCdr;
+    }
+
+    /**
+     * Sets the generate processing error CDRs flag.
+     *
+     * @param aGenerateRejectionCdr the new value of generate processing error CDRs flag
+     */
+    @Override
+    public void setGenerateRejectionCdr(final boolean aGenerateRejectionCdr) {
+        generateRejectionCdr = aGenerateRejectionCdr;
+    }
 
     public void start() throws Exception {
 
@@ -1516,6 +1539,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			writer.write(this.processingSmsSetTimeout, PROCESSING_SMS_SET_TIMEOUT, Integer.class);
             writer.write(this.generateReceiptCdr, GENERATE_RECEIPT_CDR, Boolean.class);
             writer.write(this.generateTempFailureCdr, GENERATE_TEMP_FAILURE_CDR, Boolean.class);
+            writer.write(this.generateRejectionCdr, GENERATE_REJECTION_CDR, Boolean.class);
             writer.write(this.calculateMsgPartsLenCdr, CALCULATE_MSG_PARTS_LEN_CDR, Boolean.class);
             writer.write(this.delayParametersInCdr, DELAY_PARAMETERS_IN_CDR, Boolean.class);
 
@@ -1745,6 +1769,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             valB = reader.read(GENERATE_TEMP_FAILURE_CDR, Boolean.class);
             if (valB != null) {
                 this.generateTempFailureCdr = valB.booleanValue();
+            }
+            valB = reader.read(GENERATE_REJECTION_CDR, Boolean.class);
+            if (valB != null) {
+                this.generateRejectionCdr = valB.booleanValue();
             }
             valB = reader.read(CALCULATE_MSG_PARTS_LEN_CDR, Boolean.class);
             if (valB != null) {

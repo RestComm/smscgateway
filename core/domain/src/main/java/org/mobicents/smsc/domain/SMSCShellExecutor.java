@@ -46,7 +46,7 @@ import org.restcomm.smpp.SmppEncoding;
  * @author amit bhayani
  * @author sergey vetyutnev
  * @author tran nhan
- * 
+ *
  */
 public class SMSCShellExecutor implements ShellExecutor {
 
@@ -844,6 +844,8 @@ public class SMSCShellExecutor implements ShellExecutor {
                 smscPropertiesManagement.setGenerateReceiptCdr(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("generatetempfailurecdr")) {
                 smscPropertiesManagement.setGenerateTempFailureCdr(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("generaterejectioncdr")) {
+                smscPropertiesManagement.setGenerateRejectionCdr(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("calculatemsgpartslencdr")) {
                 smscPropertiesManagement.setCalculateMsgPartsLenCdr(Boolean.parseBoolean(options[3]));
             } else if (parName.equals("delayparametersincdr")) {
@@ -1181,6 +1183,8 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getGenerateReceiptCdr());
             } else if (parName.equals("generatetempfailurecdr")) {
                 sb.append(smscPropertiesManagement.getGenerateTempFailureCdr());
+            } else if (parName.equals("generaterejectioncdr")) {
+                sb.append(smscPropertiesManagement.isGenerateRejectionCdr());
             } else if (parName.equals("calculatemsgpartslencdr")) {
                 sb.append(smscPropertiesManagement.getCalculateMsgPartsLenCdr());
             } else if (parName.equals("delayparametersincdr")) {

@@ -2559,6 +2559,45 @@ EXAMPLES
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 
+[[_generateprocessingerrorcdr]]
+=== Generate CDR for Message Processing Errors
+
+[[_generateprocessingerrorcdr_cli]]
+==== Using CLI
+
+You can set the 'generateprocessingerrorcdr' value to true/false by issuing the command `smsc set generateprocessingerrorcdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get generateprocessingerrorcdr` which will display the value set for this property. 
+
+----
+Name
+  smsc set generateprocessingerrorcdr
+
+SYNOPSIS
+  smsc set generateprocessingerrorcdr <true | false>
+
+DESCRIPTION
+  The SMSC can be configured to generate CDR also for unsuccessful message
+  processing. This applies both to a variety of SMSC errors (unexpected
+  internal and/or external) as well as to intentional message rejection by
+  MProc rules.
+  Default value: false
+
+EXAMPLES
+  smsc set generateprocessingerrorcdr false
+----
+
+[[_generateprocessingerrorcdr_gui]]
+==== Using GUI
+
+.Procedure: Set 'generate CDR for message processing error'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI. 
+. You can specify if the SMSC should generate CDR for message processing errors by choosing the value true for the field 'Generate CDR for an SMSC processing error case'. For more details of this parameter, please refer to the description of the CLI command in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
 [[_calculatemsgpartslencdr]]
 === Calculating of message parts and characters count per a CDR record
 
@@ -2606,7 +2645,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'delayparametersincdr' value to true/false by issuing the command `smsc set delayparametersincdr` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get delayparametersincdr` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get delayparametersincdr` which will display the value set for this property.
 
 ----
 Name
@@ -2630,12 +2669,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set 'Adding of delay parameters into a CDR record'  using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'CDR' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI.
 . You can specify if the SMSC should add of delay parameters into a CDR record by choosing the value true for the field 'Delay parameters in CDR'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 

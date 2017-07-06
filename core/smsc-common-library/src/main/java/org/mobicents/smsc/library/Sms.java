@@ -69,6 +69,7 @@ public class Sms implements Serializable {
     private String dlvMessageId;
 	private int moMessageRef;
 
+    private String deliveryState;
     private String receiptOrigMessageId;
 
 	private String origSystemId;
@@ -327,7 +328,15 @@ public class Sms implements Serializable {
 		this.deliveryDate = deliveryDate;
 	}
 
-	/**
+    public String getDeliveryState() {
+        return deliveryState;
+    }
+
+    public void setDeliveryState(String deliveryState) {
+        this.deliveryState = deliveryState;
+    }
+
+    /**
 	 * service_type smpp param for esme originated messages
 	 */
 	public String getServiceType() {
