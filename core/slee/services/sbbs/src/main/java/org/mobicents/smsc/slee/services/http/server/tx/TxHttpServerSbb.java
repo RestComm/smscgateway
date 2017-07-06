@@ -624,7 +624,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 succAddr = true;
             } catch (SmscProcessingException e) {
                 logger.severe("SmscProcessingException while processing message to destination: " + address, e);
-                generateCDR(incomingData, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), true);
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(incomingData, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), true);
+                }
             }
 
             if (succAddr) {
