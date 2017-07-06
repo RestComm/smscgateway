@@ -71,6 +71,7 @@ import org.restcomm.slee.resource.smpp.SmppTransaction;
 import org.restcomm.slee.resource.smpp.SmppTransactionACIFactory;
 import org.restcomm.smpp.CheckMessageLimitResult;
 import org.restcomm.smpp.Esme;
+import org.restcomm.smpp.EsmeManagement;
 import org.restcomm.smpp.SmppEncoding;
 
 import com.cloudhopper.smpp.SmppConstants;
@@ -413,6 +414,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (sms.getMessageDeliveryResultResponse() == null) {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 sms.setTimestampB(System.currentTimeMillis());
+                generateDetailedCDR(sms, EventType.IN_SMPP_RECEIVED, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM,
+                        SmppConstants.STATUS_OK, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
             }
         } catch (Throwable e) {
             anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
@@ -590,6 +593,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (sms.getMessageDeliveryResultResponse() == null) {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 sms.setTimestampB(System.currentTimeMillis());
+                generateDetailedCDR(sms, EventType.IN_SMPP_RECEIVED, CdrDetailedGenerator.CDR_MSG_TYPE_DATASM,
+                        SmppConstants.STATUS_OK, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
             }
         } catch (Exception e) {
             anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
@@ -791,6 +796,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (sms == null || sms.getMessageDeliveryResultResponse() == null) {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 sms.setTimestampB(System.currentTimeMillis());
+                generateDetailedCDR(sms, EventType.IN_SMPP_RECEIVED, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI,
+                        SmppConstants.STATUS_OK, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
             }
         } catch (Throwable e) {
             anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
@@ -942,6 +949,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         try {
             this.smppServerSessions.sendResponsePdu(esme, event, response);
             sms.setTimestampB(System.currentTimeMillis());
+            generateDetailedCDR(sms, EventType.IN_SMPP_RECEIVED, CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM,
+                    SmppConstants.STATUS_OK, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
         } catch (Throwable e) {
             anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
             this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);

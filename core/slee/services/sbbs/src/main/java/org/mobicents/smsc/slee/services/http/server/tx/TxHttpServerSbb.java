@@ -27,16 +27,6 @@ import net.java.slee.resource.http.events.HttpServletRequestEvent;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.*;
-import org.mobicents.smsc.library.CdrDetailedGenerator;
-import org.mobicents.smsc.library.MessageState;
-import org.mobicents.smsc.library.MessageUtil;
-import org.mobicents.smsc.library.OriginationType;
-import org.mobicents.smsc.library.QuerySmResponse;
-import org.mobicents.smsc.library.SbbStates;
-import org.mobicents.smsc.library.Sms;
-import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.library.SmscProcessingException;
-import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.http.server.tx.data.*;
@@ -465,6 +455,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
             for (Sms sms : parseResult.getParsedMessages()) {
                 sms.setTimestampB(System.currentTimeMillis());
+                generateDetailedCDR(sms, EventType.IN_HTTP_RECEIVED, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
+                        0, event.getRequest().getRemoteAddr(), -1);
             }
         } catch (Throwable e) {
             logger.severe("Error while trying to send SubmitMultiResponse=" + outgoingData, e);

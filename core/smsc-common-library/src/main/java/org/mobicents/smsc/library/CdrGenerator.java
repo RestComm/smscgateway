@@ -113,7 +113,7 @@ public class CdrGenerator {
         
         if (deliveryReceiptData != null) {
             st = deliveryReceiptData.getStatus();
-            tlvMessageState = deliveryReceiptData.getTlvMessageState();
+            tlvMessageState = deliveryReceiptData.getTlvMessageState() == null ? -1 : deliveryReceiptData.getTlvMessageState();;
             err = deliveryReceiptData.getError();
         }
         

@@ -61,40 +61,56 @@ public class CdrDetailedGenerator {
         String dlrStatus = null;
         if (deliveryReceiptData != null) {
             dlrStatus = deliveryReceiptData.getStatus();
-            int tlvMessageState = deliveryReceiptData.getTlvMessageState();
-            if (tlvMessageState != 0 && dlrStatus != null)
-                if (!dlrStatus.substring(0, 4).equals(MessageState.fromInt(tlvMessageState).toString().substring(0, 5))) {
+            int tlvMessageState = deliveryReceiptData.getTlvMessageState() == null ? -1
+                    : deliveryReceiptData.getTlvMessageState();
+            if (tlvMessageState != -1 && dlrStatus != null)
+                if (!dlrStatus.substring(0, 4).equals(MessageState.fromInt(tlvMessageState).toString().substring(0, 4))) {
                     dlrStatus = "err";
                 }
         }
 
-        String[] parts = destAddrAndPort.split(":");
-        String destIP = parts[0];
-        int destPort = Integer.parseInt(parts[1]);
-        parts = sourceAddrAndPort.split(":");
-        String sourceIP = parts[0];
-        int sourcePort = Integer.parseInt(parts[1]);
+        String destIP = null;
+        int destPort = -1;
 
-        String timestampA = DATE_FORMAT.format(smsEvent.getTimestampA());
-        String timestampB = DATE_FORMAT.format(smsEvent.getTimestampB());
-        String timestampC = DATE_FORMAT.format(smsEvent.getTimestampC());
+        String sourceIP = null;
+        int sourcePort = -1;
+
+        if (destAddrAndPort != null) {
+            String[] parts = destAddrAndPort.split(":");
+            destIP = parts[0];
+            destPort = Integer.parseInt(parts[1]);
+        }
+
+        if (sourceAddrAndPort != null) {
+            String[] parts = sourceAddrAndPort.split(":");
+            sourceIP = parts[0];
+            sourcePort = Integer.parseInt(parts[1]);
+        }
+
+        String timestampA = smsEvent.getTimestampA() != 0 ? DATE_FORMAT.format(smsEvent.getTimestampA()) : null;
+        String timestampB = smsEvent.getTimestampB() != 0 ? DATE_FORMAT.format(smsEvent.getTimestampB()) : null;
+        String timestampC = smsEvent.getTimestampC() != 0 ? DATE_FORMAT.format(smsEvent.getTimestampC()) : null;
 
         StringBuffer sb = new StringBuffer();
-        sb.append(timestamp).append(CdrGenerator.CDR_SEPARATOR)
-                .append(eventType != null ? eventType : CdrDetailedGenerator.CDR_EMPTY).append(CdrGenerator.CDR_SEPARATOR)
-                .append(errorCode != null ? errorCode : CdrDetailedGenerator.CDR_EMPTY).append(CdrGenerator.CDR_SEPARATOR)
-                .append(messageType).append(CdrGenerator.CDR_SEPARATOR).append(statusCode).append(CdrGenerator.CDR_SEPARATOR)
-                .append(smsEvent.getMessageId()).append(CdrGenerator.CDR_SEPARATOR)
-                .append(receiptLocalMessageId == null ? receiptLocalMessageId : CdrDetailedGenerator.CDR_EMPTY)
-                .append(CdrGenerator.CDR_SEPARATOR).append(dlrStatus == null ? dlrStatus : CdrDetailedGenerator.CDR_EMPTY)
-                .append(CdrGenerator.CDR_SEPARATOR).append(mprocRuleId != -1 ? mprocRuleId : CDR_EMPTY)
-                // check this, maybe it should be smsEvent.getSmsSet().getCorrelationId()
-                .append(smsEvent.getMessageId()).append(CdrGenerator.CDR_SEPARATOR).append(smsEvent.getOrigEsmeName())
-                .append(CdrGenerator.CDR_SEPARATOR).append(timestampA).append(CdrGenerator.CDR_SEPARATOR).append(timestampB)
-                .append(CdrGenerator.CDR_SEPARATOR).append(timestampC).append(CdrGenerator.CDR_SEPARATOR).append(sourceIP)
-                .append(CdrGenerator.CDR_SEPARATOR).append(sourcePort).append(CdrGenerator.CDR_SEPARATOR).append(destIP)
-                .append(CdrGenerator.CDR_SEPARATOR).append(destPort).append(CdrGenerator.CDR_SEPARATOR)
-                .append(seqNumber != -1 ? seqNumber : CDR_EMPTY).append(CdrGenerator.CDR_SEPARATOR);
+        sb.append(timestamp).append(CDR_SEPARATOR)
+        .append(eventType != null ? eventType : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(errorCode != null ? errorCode : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(messageType).append(CDR_SEPARATOR)
+        .append(statusCode).append(CDR_SEPARATOR)
+        // check this, maybe it should be smsEvent.getSmsSet().getCorrelationId()
+        .append(smsEvent.getMessageId()).append(CDR_SEPARATOR)
+        .append(receiptLocalMessageId == null ? receiptLocalMessageId : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(dlrStatus != null ? dlrStatus : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(mprocRuleId != -1 ? mprocRuleId : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(smsEvent.getOrigEsmeName()).append(CDR_SEPARATOR)
+        .append(timestampA != null ? timestampA : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(timestampB != null ? timestampB : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(timestampC != null ? timestampC : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(sourceIP != null ? sourceIP : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(sourcePort != -1 ? sourcePort : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(destIP != null ? destIP : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(destPort != -1 ? destPort : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(seqNumber != -1 ? seqNumber : CDR_EMPTY);
 
         CdrDetailedGenerator.generateDetailedCdr(sb.toString());
     }

@@ -260,12 +260,11 @@ public abstract class SubmitCommonSbb implements Sbb {
             int seqNumber) throws SmscProcessingException {
 
         ChargingMedium chargingMedium = null;
-        EventType eventTypeSuccess = null;
+        
         EventType eventTypeFailure = null;
         switch (sms0.getOriginationType()) {
             case SMPP:
                 chargingMedium = ChargingMedium.TxSmppOrig;
-                eventTypeSuccess = EventType.IN_SMPP_RECEIVED;
                 eventTypeFailure = EventType.IN_SMPP_REJECT_MPROC;
                 break;
             case SS7_MO:
@@ -277,7 +276,6 @@ public abstract class SubmitCommonSbb implements Sbb {
                 break;
             case HTTP:
                 chargingMedium = ChargingMedium.HttpOrig;
-                eventTypeSuccess = EventType.IN_HTTP_RECEIVED;
                 eventTypeFailure = EventType.IN_HTTP_REJECT_MPROC;
                 break;
         }
@@ -298,24 +296,9 @@ public abstract class SubmitCommonSbb implements Sbb {
                 try {
                     sms.setTimestampC(System.currentTimeMillis());
 
-                    if (eventTypeSuccess != null) {
-                        EsmeManagement esmeManagement = EsmeManagement.getInstance();
-                        String sourceAddr = null;
-                        if (esmeManagement != null) {
-                            // for testing there is no EsmeManagement
-                            Esme esme = esmeManagement.getEsmeByClusterName(sms0.getOrigEsmeName());
-                            // null check is for testing
-                            if (esme != null) {
-                                sourceAddr = esme.getRemoteAddressAndPort();
-                            }
-                        }
-                        generateDetailedCDR(sms, eventTypeSuccess, messageType, SmppConstants.STATUS_SYSERR, sourceAddr,
-                                seqNumber);
-                    }
-
-                    sms.setTimestampA(0);
-                    sms.setTimestampB(0);
-                    sms.setTimestampC(0);
+//                    sms.setTimestampA(0);
+//                    sms.setTimestampB(0);
+//                    sms.setTimestampC(0);
 
                     synchronized (lock) {
                         boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
@@ -449,7 +432,7 @@ public abstract class SubmitCommonSbb implements Sbb {
 
     protected void generateDetailedCDR(Sms sms, EventType eventType, String messageType, int statusCode,
             String sourceAddrAndPort, int seqNumber) {
-        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, -1,
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, ErrorCode.SUCCESS, messageType, statusCode, -1,
                 sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(),
                 smscPropertiesManagement.getGenerateDetailedCdr());
     }
