@@ -1499,7 +1499,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 if (sms != null) {
 
                     CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType,
-                            sms.getSmsSet().getSmppCommandStatus(), 0, null, destAddrAndPort, seqNumber,
+                            sms.getSmsSet().getSmppCommandStatus(), -1, null, destAddrAndPort, seqNumber,
                             smscPropertiesManagement.getGenerateReceiptCdr(),
                             smscPropertiesManagement.getGenerateDetailedCdr());
                     return;
@@ -1514,7 +1514,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
         Sms sms = this.getUnsentMessage(0);
         if (sms != null) {
             CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType,
-                    sms.getSmsSet().getSmppCommandStatus(), 0, null, destAddrAndPort, seqNumber,
+                    sms.getSmsSet().getSmppCommandStatus(), -1, null, destAddrAndPort, seqNumber,
                     smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
             return;
         }

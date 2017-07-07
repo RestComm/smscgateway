@@ -379,6 +379,7 @@ public abstract class SubmitCommonSbb implements Sbb {
                 if (eventTypeFailure != null) {
                     String sourceAddrAndPort = null;
                     if (eventTypeFailure == EventType.IN_SMPP_REJECT_MPROC) {
+                        eventTypeFailure = EventType.IN_SMPP_DROP_MPROC;
                         EsmeManagement esmeManagement = EsmeManagement.getInstance();
                         if (esmeManagement != null) {
                             // for testing there is no EsmeManagement
@@ -389,6 +390,7 @@ public abstract class SubmitCommonSbb implements Sbb {
                             }
                         }
                     } else if (eventTypeFailure == EventType.IN_HTTP_REJECT_MPROC) {
+                        eventTypeFailure = EventType.IN_HTTP_DROP_MPROC;
                         sourceAddrAndPort = sms0.getSourceAddr();
                     }
 
