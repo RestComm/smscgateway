@@ -71,7 +71,6 @@ import org.restcomm.slee.resource.smpp.SmppTransaction;
 import org.restcomm.slee.resource.smpp.SmppTransactionACIFactory;
 import org.restcomm.smpp.CheckMessageLimitResult;
 import org.restcomm.smpp.Esme;
-import org.restcomm.smpp.EsmeManagement;
 import org.restcomm.smpp.SmppEncoding;
 
 import com.cloudhopper.smpp.SmppConstants;
@@ -252,13 +251,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
-                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
-                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
-                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
-                }
+            }
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                        event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                        event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
             }
 
             SubmitSmResp response = event.createResponse();
@@ -272,13 +271,6 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
                 anSbbUsage.incrementCounterErrorSubmitSm(ONE);
-                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
-                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
-                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, e.getMessage(), true);
-                }
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -446,13 +438,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
-                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
-                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
-                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
-                }
+            }
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                        event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                        event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
             }
 
             DataSmResp response = event.createResponse();
@@ -555,6 +547,12 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             String s = "Exception when processing dataSm message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress()
+                        .getAddress(), event.getSourceAddress().getTon(), event.getSourceAddress().getNpi(), event
+                        .getDestAddress().getAddress(), event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+            }
 
             DataSmResp response = event.createResponse();
             response.setCommandStatus(SmppConstants.STATUS_SYSERR);
@@ -621,13 +619,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (cres.getResult() == CheckMessageLimitResult.Result.firstFault) {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
-                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
-                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
-                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
-                }
+            }
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                        event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                        event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
             }
 
             SubmitMultiResp response = event.createResponse();
@@ -735,15 +733,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                if (singleSms != null) {
-                    generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
-                } else {
-                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
-                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
-                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
-                }
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress()
+                        .getAddress(), event.getSourceAddress().getTon(), event.getSourceAddress().getNpi(), event
+                        .getDestAddress().getAddress(), event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
             }
             SubmitMultiResp response = event.createResponse();
             response.setCommandStatus(SmppConstants.STATUS_SYSERR);
@@ -819,6 +812,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.updateOverrateCounters(cres);
                 this.logger.info(cres.getMessage());
             }
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                        event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                        event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+            }
 
             DeliverSmResp response = event.createResponse();
             response.setCommandStatus(SmppConstants.STATUS_THROTTLED);
@@ -874,6 +874,17 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                if (sms != null) {
+                    generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
+                } else {
+                    generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                            event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                            event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
+                            event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                            CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                }
+            }
 
             DeliverSmResp response = event.createResponse();
             response.setCommandStatus(e1.getSmppErrorCode());
@@ -910,6 +921,12 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             String s = "Exception when processing SubmitSm message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
+            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress()
+                        .getAddress(), event.getSourceAddress().getTon(), event.getSourceAddress().getNpi(), event
+                        .getDestAddress().getAddress(), event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
+                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+            }
 
             DeliverSmResp response = event.createResponse();
             response.setCommandStatus(SmppConstants.STATUS_SYSERR);
