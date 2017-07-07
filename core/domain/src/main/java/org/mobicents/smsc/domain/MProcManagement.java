@@ -274,14 +274,14 @@ public class MProcManagement implements MProcManagementMBean {
         FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
         if (pap.isNeedDropMessage()) {
             res.setMessageDropped(true);
-            res.setRuleIdDropReject(res.getRuleIdDropReject());
+            res.setRuleIdDropReject(pap.getRuleIdDropReject());
         } else if (pap.isNeedRejectMessage()) {
             res.setMessageRejected(true);
 //            res.setMprocRejectingRuleId(pap.);
             res.setMapErrorCode(pap.getMapErrorCode());
             res.setHttpErrorCode(pap.getHttpErrorCode());
             res.setSmppErrorCode(pap.getSmppErrorCode());
-            res.setRuleIdDropReject(res.getRuleIdDropReject());
+            res.setRuleIdDropReject(pap.getRuleIdDropReject());
         } else {
             res0.add(sms);
         }

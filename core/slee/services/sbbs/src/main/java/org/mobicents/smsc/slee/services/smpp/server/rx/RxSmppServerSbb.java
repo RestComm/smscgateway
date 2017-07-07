@@ -1184,13 +1184,18 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             EsmeManagement esmeManagement = EsmeManagement.getInstance();
             Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
-            String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
-                    : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
-
+            
+            String messageType = CdrDetailedGenerator.CDR_MSG_TYPE_UNKNOWN;
+            String remoteAddr = null;
+            if (esme != null) {
+                messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
+                        : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+                remoteAddr = esme.getRemoteAddressAndPort();
+            }
             // generating of a temporary failure CDR (one record for all unsent messages)
             if (smscPropertiesManagement.getGenerateTempFailureCdr()) {
                 this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED_ESME, reason);
-                this.generateTemporaryFailureDetailedCDR(eventType, messageType, smStatus, esme.getRemoteAddressAndPort(),
+                this.generateTemporaryFailureDetailedCDR(eventType, messageType, smStatus, remoteAddr,
                         seqNumber);
             }
 
@@ -1233,9 +1238,10 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     // generating CDRs for permanent failure messages
                     this.generateCDRs(lstPermFailured2, CdrGenerator.CDR_FAILED_ESME, reason);
 
-                    generateDetailedCDRs(lstPermFailured2, EventType.OUT_SMPP_ERROR, smStatus, messageType,
-                            esme.getRemoteAddressAndPort(), seqNumber);
-
+                    if (!smscPropertiesManagement.getGenerateTempFailureCdr()) {
+                        generateDetailedCDRs(lstPermFailured2, EventType.OUT_SMPP_ERROR, smStatus, messageType,
+                                remoteAddr, seqNumber);
+                    }
                     // sending of intermediate delivery receipts
                     this.generateIntermediateReceipts(smsSet, lstTempFailured2);
 

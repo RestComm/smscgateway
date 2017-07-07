@@ -354,9 +354,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 if (sms != null) {
                     sms.setTimestampB(System.currentTimeMillis());
-                    generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                    generateRejectDetailedCdr(e1.getInternalErrorCode(), sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
                             CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
                             event.getSequenceNumber());
+                    
                 }
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
@@ -540,7 +541,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 if (sms != null) {
                     sms.setTimestampB(System.currentTimeMillis());
-                    generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                    generateRejectDetailedCdr(e1.getInternalErrorCode(), sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
                             CdrDetailedGenerator.CDR_MSG_TYPE_DATASM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
                             event.getSequenceNumber());
                 }
@@ -718,7 +719,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 if (singleSms != null) {
                     singleSms.setTimestampB(System.currentTimeMillis());
-                    generateFailureDetailedCdr(singleSms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                    generateRejectDetailedCdr(e1.getInternalErrorCode(), singleSms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
                             CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, e1.getSmppErrorCode(),
                             esme.getRemoteAddressAndPort(), event.getSequenceNumber());
                 }
@@ -895,7 +896,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 if (sms != null) {
                     sms.setTimestampB(System.currentTimeMillis());
-                    generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                    generateRejectDetailedCdr(e1.getInternalErrorCode(), sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
                             CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
                             event.getSequenceNumber());
                 }
@@ -1277,12 +1278,12 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 udh = new UserDataHeaderImpl(udhData);
             else {
                 udh = createNationalLanguageUdh(origEsme, dataCodingScheme);
-                if (udh.getNationalLanguageLockingShift() != null) {
+                if (udh != null && udh.getNationalLanguageLockingShift() != null) {
                     lenSolid -= 3;
                     nationalLanguageLockingShift = udh.getNationalLanguageLockingShift().getNationalLanguageIdentifier()
                             .getCode();
                 }
-                if (udh.getNationalLanguageSingleShift() != null) {
+                if (udh != null && udh.getNationalLanguageSingleShift() != null) {
                     lenSolid -= 3;
                     nationalLanguageSingleShift = udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier()
                             .getCode();
@@ -1305,12 +1306,12 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (msg.length() * 2 > (lenSegmented - 6) * 255) { // firstly draft length check
                 UserDataHeader udh = createNationalLanguageUdh(origEsme, dataCodingScheme);
                 int messageLen = MessageUtil.getMessageLengthInBytes(dataCodingScheme, msg, udh);
-                if (udh.getNationalLanguageLockingShift() != null) {
+                if (udh != null && udh.getNationalLanguageLockingShift() != null) {
                     lenSegmented -= 3;
                     nationalLanguageLockingShift = udh.getNationalLanguageLockingShift().getNationalLanguageIdentifier()
                             .getCode();
                 }
-                if (udh.getNationalLanguageSingleShift() != null) {
+                if (udh != null && udh.getNationalLanguageSingleShift() != null) {
                     lenSegmented -= 3;
                     nationalLanguageSingleShift = udh.getNationalLanguageSingleShift().getNationalLanguageIdentifier()
                             .getCode();
@@ -1790,5 +1791,24 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
                 lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
                 smscPropertiesManagement.getDelayParametersInCdr());
+    }
+    
+    private void generateRejectDetailedCdr(int smscProcessingExceptionInternalType, Sms sms, EventType eventType, ErrorCode errorCode, String messageType,
+            int statusCode, String sourceAddrAndPort, int seqNumber) {
+        if (smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_DST_ADDR_INVALID
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_SRC_ADDR_INVALID
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_DATA_CODING_INVALID
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_SHORT
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_LONG
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_PARSING
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_PARSING
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_SCHEDULER_DELIVERY_TIME_PARSING
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_STOPPED
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_PAUSED
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_DATABASE_NOT_AVAILABLE
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_OVERLOADED)
+            CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, -1, sourceAddrAndPort,
+                    null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(),
+                    smscPropertiesManagement.getGenerateDetailedCdr());
     }
 }

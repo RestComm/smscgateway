@@ -401,7 +401,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
                 if (currSms != null) {
                 	currSms.setTimestampB(System.currentTimeMillis());
-                	generateFailureDetailedCdr(currSms, EventType.IN_HTTP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
+                	generateRejectDetailedCdr(e1.getInternalErrorCode(), currSms, EventType.IN_HTTP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
                 			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
                 }
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
@@ -810,6 +810,17 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 //        }
 
 
+    }
+    
+    private void generateRejectDetailedCdr(int smscProcessingExceptionInternalType, Sms sms, EventType eventType, ErrorCode errorCode, String messageType,
+            int statusCode, String sourceAddrAndPort, int seqNumber) {
+        if (smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_STOPPED
+                    || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_PAUSED
+                    || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_DATABASE_NOT_AVAILABLE
+                    || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_OVERLOADED)
+            CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, -1, sourceAddrAndPort,
+                    null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(),
+                    smscPropertiesManagement.getGenerateDetailedCdr());
     }
 }
 

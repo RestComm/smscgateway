@@ -26,6 +26,7 @@ public class CdrDetailedGenerator {
     public static final String CDR_MSG_TYPE_DELIVERSM = "DeliverSm";
     public static final String CDR_MSG_TYPE_DATASM = "DataSm";
     public static final String CDR_MSG_TYPE_HTTP = "Http";
+    public static final String CDR_MSG_TYPE_UNKNOWN = "Unknown";
     public static final String CDR_MSG_TYPE_SIP = "Sip";
     public static final String CDR_MSG_TYPE_SS7 = "Ss7";
 
@@ -54,7 +55,7 @@ public class CdrDetailedGenerator {
 
         String timestamp = DATE_FORMAT.format(new Date());
 
-        Long receiptLocalMessageId = smsEvent.getReceiptLocalMessageId();
+        String receiptOrigMessageId = null;
 
         DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(smsEvent.getShortMessageText(),
                 smsEvent.getTlvSet());
@@ -67,6 +68,7 @@ public class CdrDetailedGenerator {
                 if (!dlrStatus.substring(0, 4).equals(MessageState.fromInt(tlvMessageState).toString().substring(0, 4))) {
                     dlrStatus = "err";
                 }
+            receiptOrigMessageId = smsEvent.getReceiptOrigMessageId();
         }
 
         String destIP = null;
@@ -99,7 +101,7 @@ public class CdrDetailedGenerator {
         .append(statusCode).append(CDR_SEPARATOR)
         // check this, maybe it should be smsEvent.getSmsSet().getCorrelationId()
         .append(smsEvent.getMessageId()).append(CDR_SEPARATOR)
-        .append(receiptLocalMessageId == null ? receiptLocalMessageId : CDR_EMPTY).append(CDR_SEPARATOR)
+        .append(receiptOrigMessageId != null ? receiptOrigMessageId : CDR_EMPTY).append(CDR_SEPARATOR)
         .append(dlrStatus != null ? dlrStatus : CDR_EMPTY).append(CDR_SEPARATOR)
         .append(mprocRuleId != -1 ? mprocRuleId : CDR_EMPTY).append(CDR_SEPARATOR)
         .append(smsEvent.getOrigEsmeName()).append(CDR_SEPARATOR)
