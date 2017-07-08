@@ -461,6 +461,7 @@ public abstract class SubmitCommonSbb implements Sbb {
                 getErrorCode(anMProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET), null,
                 SmscProcessingException.INTERNAL_ERROR_MPROC_REJECT);
         e.setSkipErrorLogging(true);
+        e.setMessageRejectCdrCreated(true);
         if (logger.isInfoEnabled()) {
             logger.info("Incoming message is " + (anMProcResult.isMessageRejected() ? "rejected" : "dropped")
                     + "by mProc rules, message=[" + anSms + "]");

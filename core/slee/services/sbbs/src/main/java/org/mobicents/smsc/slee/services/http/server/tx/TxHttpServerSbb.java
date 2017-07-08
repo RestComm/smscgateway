@@ -404,7 +404,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 	generateRejectDetailedCdr(e1.getInternalErrorCode(), currSms, EventType.IN_HTTP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
                 			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
                 }
-                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                     generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
                 }
             } catch (IOException e) {
@@ -624,7 +624,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 succAddr = true;
             } catch (SmscProcessingException e) {
                 logger.severe("SmscProcessingException while processing message to destination: " + address, e);
-                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                if (smscPropertiesManagement.isGenerateRejectionCdr() && !e.isMessageRejectCdrCreated()) {
                     generateCDR(incomingData, CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), true);
                 }
             }

@@ -315,7 +315,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
-            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+            if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                 if (sms != null) {
                     generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
                 } else {
@@ -502,7 +502,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
-            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+            if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                 if (sms != null) {
                     generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
                 } else {
@@ -686,7 +686,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
-            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+            if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                 if (singleSms != null) {
                     generateCDR(singleSms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
                 } else {
@@ -875,7 +875,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
-            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+            if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                 if (sms != null) {
                     generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
                 } else {

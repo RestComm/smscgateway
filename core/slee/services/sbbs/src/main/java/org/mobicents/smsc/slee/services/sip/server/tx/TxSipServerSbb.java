@@ -199,16 +199,16 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 					validityPeriod = MessageUtil.parseDate(((SIPHeader) validityHeader).getValue());
 				} catch (ParseException e) {
 					logger.severe("ParseException when parsing ValidityPeriod field: " + e.getMessage(), e);
+                    if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                        generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
+                                ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e.getMessage(), true);
+                    }
 
 					ServerTransaction serverTransaction = event.getServerTransaction();
 					Response res;
 					try {
 						res = (this.messageFactory.createResponse(500, serverTransaction.getRequest()));
 						event.getServerTransaction().sendResponse(res);
-						if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-							generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
-									ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e.getMessage(), true);
-						}
 					} catch (Exception e1) {
 						this.logger.severe("Exception while trying to send 500 response to sip", e1);
 					}
@@ -237,20 +237,20 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
                     }
                     smscStatAggregator.updateMsgInFailedAll();
                 }
+                if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
+                    if (sms != null) {
+                        generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), false, true);
+                    } else {
+                        generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
+                                ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), true);
+                    }
+                }
 
 				ServerTransaction serverTransaction = event.getServerTransaction();
 				Response res;
 				try {
 					res = (this.messageFactory.createResponse(500, serverTransaction.getRequest()));
 					event.getServerTransaction().sendResponse(res);
-					if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-						if (sms != null) {
-							generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), false, true);
-						} else {
-							generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
-									ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), true);
-						}
-					}
 				} catch (Exception e) {
 					this.logger.severe("Exception while trying to send Ok response to sip", e);
 				}
@@ -259,6 +259,10 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 			} catch (Throwable e1) {
 				this.logger.severe("Exception while processing a message from sip", e1);
 				smscStatAggregator.updateMsgInFailedAll();
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
+                            ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), true);
+                }
 
 				ServerTransaction serverTransaction = event.getServerTransaction();
 				Response res;

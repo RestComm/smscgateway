@@ -480,6 +480,7 @@ public abstract class ChargingSbb implements Sbb {
         } catch (Exception e1) {
             logger.severe("setupChargingRequestInterface(): error while sending RoCreditControlRequest: " + e1.getMessage(),
                     e1);
+            generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_CHARGING, e1.getMessage(), false, true);
         }
     }
 
@@ -645,6 +646,9 @@ public abstract class ChargingSbb implements Sbb {
             }
 
         } catch (PersistenceException e) {
+            if (sms0 != null) {
+                generateCDR(sms0, CdrGenerator.CDR_SUBMIT_FAILED_CHARGING, e.getMessage(), false, true);
+            }
             throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
                     SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
                     SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
@@ -657,6 +661,8 @@ public abstract class ChargingSbb implements Sbb {
             logger.info("ChargingSbb: accessRejected for: resultCode =" + (evt != null ? evt.getResultCode() : "timeout")
                     + ", chargingType=" + chargingData.getChargingType() + ", message=[" + sms + "]");
         }
+        generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_CHARGING, "Rejectrion by diameter serverresultCode ="
+                + (evt != null ? evt.getResultCode() : "timeout"), false, true);
 
         try {
             // sending of a failure response for transactional mode / delaying for charging result
@@ -738,6 +744,10 @@ public abstract class ChargingSbb implements Sbb {
             logger.info("ChargingSbb: incoming message is " + (isRejected ? "rejected" : "dropped")
                     + " by mProc rules, message=[" + sms + "]");
         }
+        CdrGenerator.generateCdr(sms, (isRejected ? CdrGenerator.CDR_MPROC_REJECTED : CdrGenerator.CDR_MPROC_DROPPED),
+                "Message is rejected by MProc rules.", smscPropertiesManagement.getGenerateReceiptCdr(),
+                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), false, true,
+                smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
 
         try {
             // sending of a failure response for transactional mode / delaying for charging result
@@ -817,6 +827,13 @@ public abstract class ChargingSbb implements Sbb {
 
     protected SbbContext getSbbContext() {
         return sbbContext;
+    }
+
+    private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+        CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
+                smscPropertiesManagement.getDelayParametersInCdr());
     }
 
     public enum AddressTypeEnum implements net.java.slee.resource.diameter.base.events.avp.Enumerated {

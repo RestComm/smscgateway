@@ -54,6 +54,7 @@ public class CdrGenerator {
     public static final String CDR_SUBMIT_FAILED_ESME = "submit_failed_esme";
     public static final String CDR_SUBMIT_FAILED_SIP = "submit_failed_sip";
     public static final String CDR_SUBMIT_FAILED_HTTP = "submit_failed_http";
+    public static final String CDR_SUBMIT_FAILED_CHARGING = "submit_failed_charging";
 
     public static final String CDR_SUCCESS_ESME = "success_esme";
     public static final String CDR_PARTIAL_ESME = "partial_esme";
