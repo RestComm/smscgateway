@@ -717,7 +717,7 @@ public class RxSmppServerSbbTest {
         }
 
         @Override
-        public Esme getEsmeByClusterName(String esmeClusterName) {
+        public Esme getEsmeByClusterName(String esmeClusterName, final boolean anIndexUpdate) {
             return esme;
         }
     }

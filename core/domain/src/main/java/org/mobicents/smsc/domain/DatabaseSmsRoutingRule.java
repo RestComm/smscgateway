@@ -103,7 +103,7 @@ public class DatabaseSmsRoutingRule implements DatabaseSmsRoutingRuleMBean {
                 if (smscPropertiesManagement != null) {
                     String dcn = smscPropertiesManagement.getEsmeDefaultClusterName();
                     if (dcn != null) {
-                        if (esmeManagement.getEsmeByClusterName(dcn) != null) {
+                        if (esmeManagement.getEsmeByClusterName(dcn, true) != null) {
                             clusterName = dcn;
                         }
                     }
