@@ -67,10 +67,14 @@ public class MessageDeliveryResultResponseMo implements MessageDeliveryResultRes
 	@Override
 	public void responseDeliverySuccess() {
 		try {
-			if (this.isMoOperation)
-				dialog.addMoForwardShortMessageResponse(this.invokeId, null, null);
-			else
-				dialog.addForwardShortMessageResponse(this.invokeId);
+            if (dialog.getApplicationContext().getApplicationContextVersion().getVersion() >= 3) {
+                if (this.isMoOperation)
+                    dialog.addMoForwardShortMessageResponse(this.invokeId, null, null);
+                else
+                    dialog.addMtForwardShortMessageResponse(this.invokeId, null, null);
+            } else {
+                dialog.addForwardShortMessageResponse(this.invokeId);
+            }
 
 			if (this.logger.isFineEnabled()) {
 				this.logger.fine("\nSent ForwardShortMessageResponse = " + evt);
