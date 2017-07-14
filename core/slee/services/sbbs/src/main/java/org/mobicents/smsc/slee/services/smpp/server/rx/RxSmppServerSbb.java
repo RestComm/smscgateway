@@ -585,7 +585,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             }
 
             EsmeManagement esmeManagement = EsmeManagement.getInstance();
-			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName(), true);
 			if (esme == null) {
 				String s = "\nRxSmppServerSbb.sendDeliverSm(): Received DELIVER_SM SmsEvent but no Esme found for destClusterName: "
 						+ smsSet.getDestClusterName() + ", smsSet=" + smsSet;
@@ -953,7 +953,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             smscStatAggregator.updateMsgOutSentSmpp();
 
             EsmeManagement esmeManagement = EsmeManagement.getInstance();
-			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+			Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName(), false);
 			boolean destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
 			
             int realID=-1;
