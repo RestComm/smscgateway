@@ -100,5 +100,14 @@ public class DefaultSmsRoutingRule implements SmsRoutingRule {
 		}
 		return null;
 	}
+	
+    /**
+     * Gets the ESME management.
+     *
+     * @return the ESME management
+     */
+    protected final EsmeManagement getEsmeManagement() {
+        return esmeManagement;
+    }
 
 }

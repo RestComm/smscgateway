@@ -1396,62 +1396,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         if (smscPropertiesManagement.getIncomeReceiptsProcessing() && MessageUtil.isDeliveryReceipt(sms0)) {
             DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(sms0.getShortMessageText(),
                     sms0.getTlvSet());
-
             if (deliveryReceiptData != null) {
-                String clusterName = esme.getClusterName();
-                String dlvTlvMessageId = deliveryReceiptData.getTlvReceiptedMessageId();
-                String dlvMessageId = deliveryReceiptData.getMessageId();
-                Long messageId = null;
-                String drFormat = null;
-
-                if (dlvTlvMessageId != null) {
-                    try {
-                        messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvTlvMessageId, clusterName);
-                        drFormat = "dlvTlvMessageId";
-                    } catch (PersistenceException e) {
-                        logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 1: " + e.getMessage(), e);
-                    }
-                }
-                if (messageId == null) {
-                    // trying to parse as a hex format
-                    try {
-                        messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvMessageId, clusterName);
-                        drFormat = "dlvMessageId";
-                    } catch (PersistenceException e) {
-                        logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 2: " + e.getMessage(), e);
-                    } catch (NumberFormatException e) {
-                    }
-                }
-
-                if (messageId != null) {
-                    // we found in local cache / database a reference to an origin
-                    logger.info("Remote delivery receipt: clusterName=" + clusterName + ", dlvMessageId=" + dlvMessageId
-                            + ", dlvTlvMessageId=" + dlvTlvMessageId + ", receipt=" + sms0.getShortMessageText()
-                            + ", drFormat=" + drFormat);
-
-                    if (dlvTlvMessageId != null) {
-                        sms0.setReceiptOrigMessageId(dlvTlvMessageId);
-                        sms0.getTlvSet().removeOptionalParameter(SmppConstants.TAG_RECEIPTED_MSG_ID);
-                    } else {
-                        sms0.setReceiptOrigMessageId(dlvMessageId);
-                    }
-                    sms0.setReceiptLocalMessageId(messageId);
-
-                    String messageIdStr = MessageUtil.createMessageIdString(messageId);
-                    String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr, deliveryReceiptData
-                            .getSubmitDate(), deliveryReceiptData.getDoneDate(), deliveryReceiptData.getError(),
-                            deliveryReceiptData.getText(),
-                            deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_DELIVERED), null,
-                            deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_ENROUTE));
-                    sms0.setShortMessageText(updatedReceiptText);
-                } else {
-                    // we have not found a local message - marking as unrecognized receipt
-                    logger.warning("Remote delivery receipt - but no original message is found in local cache: clusterName="
-                            + clusterName + ", dlvMessageId=" + dlvMessageId + ", dlvTlvMessageId=" + dlvTlvMessageId
-                            + ", receipt=" + sms0.getShortMessageText() + ", drFormat=" + drFormat);
-
-                    sms0.setReceiptLocalMessageId(-1L);
-                }
+                handleDeliveryReceipt(deliveryReceiptData, sms0, esme.getClusterName());
             }
         }
 
@@ -1533,6 +1479,74 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 //        }
 
 
+    }
+    
+    private void handleDeliveryReceipt(final DeliveryReceiptData aDeliveryReceiptData, final Sms anSms,
+            final String aClusterName) {
+        for (final String c : aClusterName.split(",")) {
+            if (handleDeliveryReceiptInCluster(aDeliveryReceiptData, anSms, c.trim())) {
+                return;
+            }
+        }
+        // we have not found a local message - marking as unrecognized receipt
+        logger.warning("Remote delivery receipt - but no original message is found in local cache. ClusterName: "
+                + aClusterName + ". DLR: " + aDeliveryReceiptData + ". Short Message: " + anSms.getShortMessageText()
+                + ".");
+        anSms.setReceiptLocalMessageId(-1L);
+    }
+    
+    private boolean handleDeliveryReceiptInCluster(final DeliveryReceiptData aDeliveryReceiptData, final Sms anSms,
+            final String aClusterName) {
+        final String dlvTlvMessageId = aDeliveryReceiptData.getTlvReceiptedMessageId();
+        final String dlvMessageId = aDeliveryReceiptData.getMessageId();
+        Long messageId = null;
+        String drFormat = null;
+
+        if (dlvTlvMessageId != null) {
+            try {
+                messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvTlvMessageId, aClusterName);
+                drFormat = "dlvTlvMessageId";
+            } catch (PersistenceException e) {
+                logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 1: " + e.getMessage(), e);
+            }
+        }
+        if (messageId == null) {
+            // trying to parse as a hex format
+            try {
+                messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvMessageId, aClusterName);
+                drFormat = "dlvMessageId";
+            } catch (PersistenceException e) {
+                logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 2: " + e.getMessage(), e);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        if (messageId == null) {
+            if (logger.isFineEnabled()) {
+                logger.fine("Original message ID not found for cluster: " + aClusterName + ".");
+            }
+            return false;
+        }
+        // we found in local cache / database a reference to an origin
+        logger.info("Remote delivery receipt: clusterName=" + aClusterName + ", dlvMessageId=" + dlvMessageId
+                + ", dlvTlvMessageId=" + dlvTlvMessageId + ", receipt=" + anSms.getShortMessageText() + ", drFormat="
+                + drFormat);
+
+        if (dlvTlvMessageId != null) {
+            anSms.setReceiptOrigMessageId(dlvTlvMessageId);
+            anSms.getTlvSet().removeOptionalParameter(SmppConstants.TAG_RECEIPTED_MSG_ID);
+        } else {
+            anSms.setReceiptOrigMessageId(dlvMessageId);
+        }
+        anSms.setReceiptLocalMessageId(messageId);
+        final String messageIdStr = MessageUtil.createMessageIdString(messageId);
+        final String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr,
+                aDeliveryReceiptData.getSubmitDate(), aDeliveryReceiptData.getDoneDate(),
+                aDeliveryReceiptData.getError(), aDeliveryReceiptData.getText(),
+                aDeliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_DELIVERED), null,
+                aDeliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_ENROUTE));
+        anSms.setShortMessageText(updatedReceiptText);
+        return true;
     }
 
     // *********
