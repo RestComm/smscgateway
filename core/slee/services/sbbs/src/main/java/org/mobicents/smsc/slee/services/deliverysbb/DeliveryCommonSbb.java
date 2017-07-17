@@ -1538,7 +1538,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
     protected void generateDetailedCDR(Sms sms, EventType eventType, ErrorCode errorCode, String messageType, int statusCode,
             String destAddrAndPort, int seqNumber) {
-        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, 0, null, destAddrAndPort,
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, -1, null, destAddrAndPort,
                 seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(), smscPropertiesManagement.getGenerateDetailedCdr());
     }
 

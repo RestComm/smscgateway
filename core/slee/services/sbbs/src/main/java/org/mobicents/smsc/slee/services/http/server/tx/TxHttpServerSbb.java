@@ -23,20 +23,13 @@
 package org.mobicents.smsc.slee.services.http.server.tx;
 
 import com.cloudhopper.smpp.SmppConstants;
+import com.cloudhopper.smpp.pdu.BaseSm;
+import com.cloudhopper.smpp.tlv.Tlv;
+
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.*;
-import org.mobicents.smsc.library.CdrDetailedGenerator;
-import org.mobicents.smsc.library.MessageState;
-import org.mobicents.smsc.library.MessageUtil;
-import org.mobicents.smsc.library.OriginationType;
-import org.mobicents.smsc.library.QuerySmResponse;
-import org.mobicents.smsc.library.SbbStates;
-import org.mobicents.smsc.library.Sms;
-import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.library.SmscProcessingException;
-import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.http.server.tx.data.*;
@@ -49,6 +42,7 @@ import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpUtils;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.ResponseFormatter;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
+import org.restcomm.smpp.parameter.TlvSet;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -191,7 +185,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 } else if (requestURL.endsWith(MSG_QUERY)) {
                     processHttpGetMessageIdStatusEvent(event, aci);
                 } else {
-                    throw new HttpApiException("Unknown operation on the HTTP API. Parameter set from the request does not match any of the HTTP API services.");
+                    throw new HttpApiException(
+                            "Unknown operation on the HTTP API. Parameter set from the request does not match any of the HTTP API services.");
                 }
             }
         } catch (HttpApiException e) {
@@ -232,11 +227,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         outgoingData.setStatus(Status.ERROR);
         outgoingData.setMessage(e.getMessage());
         ResponseFormat responseFormat = BaseIncomingData.getFormat(logger, event.getRequest());
-        HttpUtils.sendErrorResponseWithContent(logger,
-                event.getResponse(),
-                HttpServletResponse.SC_OK,
-                outgoingData.getMessage(),
-                ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
+        HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(), HttpServletResponse.SC_OK,
+                outgoingData.getMessage(), ResponseFormatter.format(outgoingData, responseFormat), responseFormat);
         if (smscPropertiesManagement.isGenerateRejectionCdr()) {
             generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), true);
         }
@@ -246,7 +238,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         return smscPropertiesManagement.getTxHttpCharging() != MoChargingType.accept;
     }
 
-    private void processHttpSendMessageEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException, UnauthorizedException {
+    private void processHttpSendMessageEvent(HttpServletRequestEvent event, ActivityContextInterface aci)
+            throws HttpApiException, UnauthorizedException {
         logger.fine("processHttpSendMessageEvent");
         HttpServletRequest request = event.getRequest();
         HttpSendMessageIncomingData incomingData = null;
@@ -255,7 +248,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         sendMessage(event, incomingData, aci);
     }
 
-    private void processHttpGetMessageIdStatusEvent(HttpServletRequestEvent event, ActivityContextInterface aci) throws HttpApiException, UnauthorizedException {
+    private void processHttpGetMessageIdStatusEvent(HttpServletRequestEvent event, ActivityContextInterface aci)
+            throws HttpApiException, UnauthorizedException {
         logger.fine("processHttpGetMessageIdStatusEvent");
         HttpServletRequest request = event.getRequest();
         HttpGetMessageIdStatusIncomingData incomingData;
@@ -264,7 +258,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         getMessageIdStatus(event, incomingData, aci);
     }
 
-    private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request) throws HttpApiException, UnauthorizedException {
+    private HttpSendMessageIncomingData createSendMessageIncomingData(HttpServletRequest request)
+            throws HttpApiException, UnauthorizedException {
         logger.fine("createSendMessageIncomingData");
         if (GET.equals(request.getMethod())) {
             final String userId = request.getParameter(RequestParameter.USER_ID.getName());
@@ -278,9 +273,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             final String senderTon = request.getParameter(RequestParameter.SENDER_TON.getName());
             final String senderNpi = request.getParameter(RequestParameter.SENDER_NPI.getName());
             final String udhStr = request.getParameter(RequestParameter.UDH.getName());
-            final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
-            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding,
-                    senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement, udhStr);
+            final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[] {};
+            return new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding, senderId,
+                    senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement, udhStr);
 
         } else if (POST.equals(request.getMethod())) {
             String userId = request.getParameter(RequestParameter.USER_ID.getName());
@@ -294,7 +289,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             String senderNpi = request.getParameter(RequestParameter.SENDER_NPI.getName());
             String destAddressParam = request.getParameter(RequestParameter.TO.getName());
             String udhStr = request.getParameter(RequestParameter.UDH.getName());
-            String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
+            String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[] {};
 
             Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
 
@@ -330,10 +325,11 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             }
             if (destAddresses == null || destAddresses.length < 1) {
                 String[] tmp = map.get(RequestParameter.TO.getName());
-                destAddresses = (tmp == null ? new String[]{""} : tmp);
+                destAddresses = (tmp == null ? new String[] { "" } : tmp);
             }
-            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format, msgEncoding, bodyEncoding,
-                    senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement, httpUsersManagement, udhStr);
+            HttpSendMessageIncomingData incomingData = new HttpSendMessageIncomingData(userId, password, encodedMsg, format,
+                    msgEncoding, bodyEncoding, senderId, senderTon, senderNpi, destAddresses, smscPropertiesManagement,
+                    httpUsersManagement, udhStr);
             return incomingData;
         } else {
             throw new HttpApiException("Unsupported method of the Http Request. Method is: " + request.getMethod());
@@ -346,7 +342,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         return terValue;
     }
 
-    private HttpGetMessageIdStatusIncomingData createGetMessageIdStatusIncomingData(HttpServletRequest request) throws HttpApiException, UnauthorizedException {
+    private HttpGetMessageIdStatusIncomingData createGetMessageIdStatusIncomingData(HttpServletRequest request)
+            throws HttpApiException, UnauthorizedException {
         logger.fine("createGetMessageIdStatusIncomingData");
         String userId = request.getParameter(RequestParameter.USER_ID.getName());
         String password = request.getParameter(RequestParameter.PASSWORD.getName());
@@ -356,22 +353,24 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         if (userId == null && password == null && msgId == null) {
             Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
             String[] tmp = map.get(RequestParameter.USER_ID.getName());
-            userId = (tmp == null ? new String[]{""} : tmp)[0];
+            userId = (tmp == null ? new String[] { "" } : tmp)[0];
 
             tmp = map.get(RequestParameter.PASSWORD.getName());
-            password = (tmp == null ? new String[]{""} : tmp)[0];
+            password = (tmp == null ? new String[] { "" } : tmp)[0];
 
             tmp = map.get(RequestParameter.MESSAGE_ID.getName());
-            msgId = (tmp == null ? new String[]{""} : tmp)[0];
+            msgId = (tmp == null ? new String[] { "" } : tmp)[0];
 
             tmp = map.get(RequestParameter.FORMAT.getName());
-            format = (tmp == null ? new String[]{""} : tmp)[0];
+            format = (tmp == null ? new String[] { "" } : tmp)[0];
         }
-        HttpGetMessageIdStatusIncomingData incomingData = new HttpGetMessageIdStatusIncomingData(userId, password, msgId, format, httpUsersManagement);
+        HttpGetMessageIdStatusIncomingData incomingData = new HttpGetMessageIdStatusIncomingData(userId, password, msgId,
+                format, httpUsersManagement);
         return incomingData;
     }
 
-    public void sendMessage(HttpServletRequestEvent event, HttpSendMessageIncomingData incomingData, ActivityContextInterface aci) {
+    public void sendMessage(HttpServletRequestEvent event, HttpSendMessageIncomingData incomingData,
+            ActivityContextInterface aci) {
         logger.fine("sendMessage");
         if (logger.isFineEnabled()) {
             logger.fine("\nReceived sendMessage = " + incomingData);
@@ -381,11 +380,13 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
         SendMessageParseResult parseResult;
         Sms currSms = null;
+        long timestampB = 0L;
+        
         try {
             parseResult = createSmsEventMultiDest(incomingData, persistence);
             for (Sms sms : parseResult.getParsedMessages()) {
-            	currSms = sms;
-            	currSms.setTimestampA(System.currentTimeMillis());
+                currSms = sms;
+                currSms.setTimestampA(System.currentTimeMillis());
                 processSms(sms, persistence, incomingData);
             }
         } catch (SmscProcessingException e1) {
@@ -397,6 +398,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
+
             try {
                 final String message = "Error while trying to send SMS message.";
                 if (e1.getHttpErrorCode() < 0) {
@@ -405,25 +407,39 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                     outgoingData.setStatus(e1.getHttpErrorCode());
                 }
                 outgoingData.setMessage(message + " " + e1.getMessage());
-                HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(),
-                        HttpServletResponse.SC_OK,
-                        message,
+                HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(), HttpServletResponse.SC_OK, message,
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
-                if (currSms != null) {
-                	currSms.setTimestampB(System.currentTimeMillis());
-                	generateFailureDetailedCdr(currSms, EventType.IN_HTTP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
-                			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
-                }
+                timestampB = System.currentTimeMillis();
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                     generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
                 }
             } catch (IOException e) {
                 logger.severe("Error while trying to send HttpErrorResponse", e);
-                if (currSms != null) {
-                	generateFailureDetailedCdr(currSms, EventType.IN_HTTP_ERROR, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
-                			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
-                }
             }
+            EventType eventType = null;
+
+            if (e1.getInternalErrorCode() == SmscProcessingException.INTERNAL_ERROR_STATE_OVERLOADED) {
+                eventType = EventType.IN_HTTP_REJECT_CONG;
+            } else {
+                eventType = EventType.IN_HTTP_REJECT_FORBIDDEN;
+            }
+            if (currSms != null) {
+
+                currSms.setTimestampB(timestampB);
+                HttpServletRequest request = event.getRequest();
+                String remoteAddrAndPort = request.getRemoteAddr() + ":" + request.getRemotePort();
+                generateFailureDetailedCdr(currSms, eventType, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_HTTP, HttpServletResponse.SC_OK, remoteAddrAndPort,
+                        -1);
+            } else {
+                HttpServletRequest request = event.getRequest();
+                String remoteAddrAndPort = request.getRemoteAddr() + ":" + request.getRemotePort();
+                CdrDetailedGenerator.generateDetailedCdr(false, null, null, null, timestampB, null, null, null, eventType,
+                        ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP, HttpServletResponse.SC_OK, -1,
+                        remoteAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(),
+                        smscPropertiesManagement.getGenerateDetailedCdr());
+            }
+
             return;
         } catch (Throwable e1) {
             String s = "Exception when processing SubmitMulti message: " + e1.getMessage();
@@ -434,26 +450,31 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 final String message = "Error while trying to send SubmitMultiResponse";
                 outgoingData.setStatus(Status.ERROR);
                 outgoingData.setMessage(message);
-                HttpUtils.sendErrorResponseWithContent(logger,
-                        event.getResponse(),
-                        HttpServletResponse.SC_OK,
-                        message + " " + e1.getMessage(),
-                        ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
-                if (currSms != null) {
-                	currSms.setTimestampB(System.currentTimeMillis());
-                	generateFailureDetailedCdr(currSms, EventType.IN_HTTP_ERROR, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
-                			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
-                }
+                HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(), HttpServletResponse.SC_OK,
+                        message + " " + e1.getMessage(), ResponseFormatter.format(outgoingData, incomingData.getFormat()),
+                        incomingData.getFormat());
+                timestampB = System.currentTimeMillis();
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                     generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
                 }
             } catch (IOException e) {
                 logger.severe("Error while trying to send SubmitMultiResponse=", e);
-                if (currSms != null) {
-                	generateFailureDetailedCdr(currSms, EventType.IN_HTTP_ERROR, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
-                			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
-                }
             }
+
+            if (currSms != null) {
+                currSms.setTimestampB(System.currentTimeMillis());
+                generateFailureDetailedCdr(currSms, EventType.IN_HTTP_ERROR, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_HTTP, HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(),
+                        -1);
+            } else {
+                HttpServletRequest request = event.getRequest();
+                String remoteAddrAndPort = request.getRemoteAddr() + ":" + request.getRemotePort();
+                CdrDetailedGenerator.generateDetailedCdr(false, null, null, null, timestampB, null, null, null, EventType.IN_HTTP_ERROR,
+                        ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP, HttpServletResponse.SC_OK, -1,
+                        remoteAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(),
+                        smscPropertiesManagement.getGenerateDetailedCdr());
+            }
+            
             return;
         }
         for (Sms sms : parseResult.getParsedMessages()) {
@@ -462,7 +483,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         // Lets send the Response with success here
         try {
             outgoingData.setStatus(Status.SUCCESS);
-            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
+            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(),
+                    ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
             for (Sms sms : parseResult.getParsedMessages()) {
                 sms.setTimestampB(System.currentTimeMillis());
             }
@@ -470,13 +492,14 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             logger.severe("Error while trying to send SubmitMultiResponse=" + outgoingData, e);
             if (currSms != null) {
                 generateFailureDetailedCdr(currSms, EventType.IN_HTTP_ERROR, ErrorCode.REJECT_INCOMING,
-                        CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
-            			HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(), -1);
+                        CdrDetailedGenerator.CDR_MSG_TYPE_HTTP, HttpServletResponse.SC_OK, event.getRequest().getRemoteAddr(),
+                        -1);
             }
         }
     }
 
-    private void getMessageIdStatus(HttpServletRequestEvent event, HttpGetMessageIdStatusIncomingData incomingData, ActivityContextInterface aci) throws HttpApiException {
+    private void getMessageIdStatus(HttpServletRequestEvent event, HttpGetMessageIdStatusIncomingData incomingData,
+            ActivityContextInterface aci) throws HttpApiException {
         if (logger.isFineEnabled()) {
             logger.fine("\nReceived getMessageIdStatus = " + incomingData);
         }
@@ -498,16 +521,18 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             outgoingData.setStatus(Status.SUCCESS);
             outgoingData.setStatusMessage(messageState.toString());
 
-            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(), ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
+            HttpUtils.sendOkResponseWithContent(logger, event.getResponse(),
+                    ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
         } catch (PersistenceException e) {
-            throw new HttpApiException("PersistenceException while obtaining message status from the database for the " +
-                    "message with id: " + incomingData.getMsgId());
+            throw new HttpApiException("PersistenceException while obtaining message status from the database for the "
+                    + "message with id: " + incomingData.getMsgId());
         } catch (IOException e) {
             throw new HttpApiException("IOException while trying to send response ok message with content");
         }
     }
 
-    private TargetAddress createDestTargetAddress(String addr, final int anUserSpecificNetworkId) throws SmscProcessingException {
+    private TargetAddress createDestTargetAddress(String addr, final int anUserSpecificNetworkId)
+            throws SmscProcessingException {
         if (addr == null || "".equals(addr)) {
             SmscProcessingException e = new SmscProcessingException("DestAddress digits are absent", 0,
                     MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, addr);
@@ -533,7 +558,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         final int senderTon = Integer.parseInt(request.getParameter(RequestParameter.SENDER_TON.getName()));
         final int senderNpi = Integer.parseInt(request.getParameter(RequestParameter.SENDER_NPI.getName()));
         final String message = request.getParameter(RequestParameter.MESSAGE_BODY.getName());
-        final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[]{};
+        final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[] {};
 
         CdrGenerator.generateCdr(senderId, senderTon, senderNpi, destAddresses[0], 0, 0, OriginationType.HTTP, null, null, null,
                 0, 0, null, 0, message, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
@@ -543,8 +568,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
     private void generateCDR(HttpSendMessageIncomingData data, String status, String reason, boolean lastSegment) {
 
         CdrGenerator.generateCdr(data.getSender(), data.getSenderTon().getCode(), data.getSenderNpi().getCode(),
-                data.getDestAddresses().get(0), 0, 0, OriginationType.HTTP, null, null, null,
-                0, 0, null, 0, data.getShortMessage(), status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+                data.getDestAddresses().get(0), 0, 0, OriginationType.HTTP, null, null, null, 0, 0, null, 0,
+                data.getShortMessage(), status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
                 smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 
@@ -583,7 +608,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         }
     }
 
-    protected SendMessageParseResult createSmsEventMultiDest(HttpSendMessageIncomingData incomingData, PersistenceRAInterface store) throws SmscProcessingException {
+    protected SendMessageParseResult createSmsEventMultiDest(HttpSendMessageIncomingData incomingData,
+            PersistenceRAInterface store) throws SmscProcessingException {
         List<String> addressList = incomingData.getDestAddresses();
         if (addressList == null || addressList.size() == 0) {
             throw new SmscProcessingException("For received SubmitMessage no DestAddresses found: ", 0,
@@ -695,130 +721,129 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         return new SendMessageParseResult(msgList);
     }
 
-    private void processSms(Sms sms0, PersistenceRAInterface store, HttpSendMessageIncomingData eventSubmitMulti) throws SmscProcessingException {
+    private void processSms(Sms sms0, PersistenceRAInterface store, HttpSendMessageIncomingData eventSubmitMulti)
+            throws SmscProcessingException {
         if (logger.isInfoEnabled()) {
             logger.info(String.format("\nReceived sms=%s", sms0.toString()));
         }
 
         this.checkSmscState(sms0, smscCongestionControl, SubmitCommonSbb.MaxActivityCountFactor.factor_12);
 
-//        // checking if SMSC is stopped
-//        if (smscPropertiesManagement.isSmscStopped()) {
-//            SmscProcessingException e = new SmscProcessingException("SMSC is stopped", 0, 0, null);
-//            e.setSkipErrorLogging(true);
-//            throw e;
-//        }
-//        // checking if SMSC is paused
-//        if (smscPropertiesManagement.isDeliveryPause()
-//                && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
-//            SmscProcessingException e = new SmscProcessingException("SMSC is paused", 0, 0, null);
-//            e.setSkipErrorLogging(true);
-//            throw e;
-//        }
-//        // checking if cassandra database is available
-//        if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
-//            SmscProcessingException e = new SmscProcessingException("Database is unavailable", 0, 0,
-//                    null);
-//            e.setSkipErrorLogging(true);
-//            throw e;
-//        }
-//        if (!MessageUtil.isStoreAndForward(sms0)
-//                || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-//            // checking if delivery query is overloaded
-//            int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
-//            int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
-//            if (activityCount >= fetchMaxRows) {
-//                smscCongestionControl.registerMaxActivityCount1_2Threshold();
-//                SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", 0,
-//                        0, null);
-//                e.setSkipErrorLogging(true);
-//                throw e;
-//            } else {
-//                smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
-//            }
-//        }
+        // // checking if SMSC is stopped
+        // if (smscPropertiesManagement.isSmscStopped()) {
+        // SmscProcessingException e = new SmscProcessingException("SMSC is stopped", 0, 0, null);
+        // e.setSkipErrorLogging(true);
+        // throw e;
+        // }
+        // // checking if SMSC is paused
+        // if (smscPropertiesManagement.isDeliveryPause()
+        // && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() ==
+        // StoreAndForwordMode.fast)) {
+        // SmscProcessingException e = new SmscProcessingException("SMSC is paused", 0, 0, null);
+        // e.setSkipErrorLogging(true);
+        // throw e;
+        // }
+        // // checking if cassandra database is available
+        // if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
+        // SmscProcessingException e = new SmscProcessingException("Database is unavailable", 0, 0,
+        // null);
+        // e.setSkipErrorLogging(true);
+        // throw e;
+        // }
+        // if (!MessageUtil.isStoreAndForward(sms0)
+        // || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
+        // // checking if delivery query is overloaded
+        // int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
+        // int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
+        // if (activityCount >= fetchMaxRows) {
+        // smscCongestionControl.registerMaxActivityCount1_2Threshold();
+        // SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", 0,
+        // 0, null);
+        // e.setSkipErrorLogging(true);
+        // throw e;
+        // } else {
+        // smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
+        // }
+        // }
 
         // TODO how to check if charging is used for http request? Is it turned on for all requests?
         boolean withCharging = false;
 
         this.forwardMessage(sms0, withCharging, smscStatAggregator, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP, -1);
 
-
-//        if (withCharging) {
-//            ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
-//            chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
-//        } else {
-//            // applying of MProc
-//            MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, store);
-//            if (mProcResult.isMessageRejected()) {
-//                sms0.setMessageDeliveryResultResponse(null);
-//                SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-//                        0, 0, null);
-//                e.setSkipErrorLogging(true);
-//                if (logger.isInfoEnabled()) {
-//                    logger.info("TxHttp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
-//                }
-//                throw e;
-//            }
-//            if (mProcResult.isMessageDropped()) {
-//                sms0.setMessageDeliveryResultResponse(null);
-//                smscStatAggregator.updateMsgInFailedAll();
-//                if (logger.isInfoEnabled()) {
-//                    logger.info("TxHttp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
-//                }
-//                return;
-//            }
-//
-//            smscStatAggregator.updateMsgInReceivedAll();
-//
-//            FastList<Sms> smss = mProcResult.getMessageList();
-//            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end; ) {
-//                Sms sms = n.getValue();
-//                TargetAddress ta = new TargetAddress(sms.getSmsSet());
-//                TargetAddress lock = store.obtainSynchroObject(ta);
-//
-//                try {
-//                    synchronized (lock) {
-//                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-//                        if (!storeAndForwMode) {
-//                            try {
-//                                scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-//                            } catch (Exception e) {
-//                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-//                                        0, MAPErrorCode.systemFailure, null, e);
-//                            }
-//                        } else {
-//                            // store and forward
-//                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast && sms.getScheduleDeliveryTime() == null) {
-//                                try {
-//                                    sms.setStoringAfterFailure(true);
-//                                    scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-//                                } catch (Exception e) {
-//                                    throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-//                                            0, MAPErrorCode.systemFailure, null, e);
-//                                }
-//                            } else {
-//                                try {
-//                                    sms.setStored(true);
-//                                    scheduler.setDestCluster(sms.getSmsSet());
-//                                    store.c2_scheduleMessage_ReschedDueSlot(sms,
-//                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-//                                            false);
-//                                } catch (PersistenceException e) {
-//                                    throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
-//                                            0, MAPErrorCode.systemFailure, null, e);
-//                                }
-//                            }
-//                        }
-//                    }
-//                } finally {
-//                    store.releaseSynchroObject(lock);
-//                }
-//            }
-//        }
-
+        // if (withCharging) {
+        // ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
+        // chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
+        // } else {
+        // // applying of MProc
+        // MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, store);
+        // if (mProcResult.isMessageRejected()) {
+        // sms0.setMessageDeliveryResultResponse(null);
+        // SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
+        // 0, 0, null);
+        // e.setSkipErrorLogging(true);
+        // if (logger.isInfoEnabled()) {
+        // logger.info("TxHttp: incoming message is rejected by mProc rules, message=[" + sms0 + "]");
+        // }
+        // throw e;
+        // }
+        // if (mProcResult.isMessageDropped()) {
+        // sms0.setMessageDeliveryResultResponse(null);
+        // smscStatAggregator.updateMsgInFailedAll();
+        // if (logger.isInfoEnabled()) {
+        // logger.info("TxHttp: incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+        // }
+        // return;
+        // }
+        //
+        // smscStatAggregator.updateMsgInReceivedAll();
+        //
+        // FastList<Sms> smss = mProcResult.getMessageList();
+        // for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end; ) {
+        // Sms sms = n.getValue();
+        // TargetAddress ta = new TargetAddress(sms.getSmsSet());
+        // TargetAddress lock = store.obtainSynchroObject(ta);
+        //
+        // try {
+        // synchronized (lock) {
+        // boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+        // if (!storeAndForwMode) {
+        // try {
+        // scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+        // } catch (Exception e) {
+        // throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+        // 0, MAPErrorCode.systemFailure, null, e);
+        // }
+        // } else {
+        // // store and forward
+        // if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast && sms.getScheduleDeliveryTime() ==
+        // null) {
+        // try {
+        // sms.setStoringAfterFailure(true);
+        // scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+        // } catch (Exception e) {
+        // throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
+        // 0, MAPErrorCode.systemFailure, null, e);
+        // }
+        // } else {
+        // try {
+        // sms.setStored(true);
+        // scheduler.setDestCluster(sms.getSmsSet());
+        // store.c2_scheduleMessage_ReschedDueSlot(sms,
+        // smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+        // false);
+        // } catch (PersistenceException e) {
+        // throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
+        // 0, MAPErrorCode.systemFailure, null, e);
+        // }
+        // }
+        // }
+        // }
+        // } finally {
+        // store.releaseSynchroObject(lock);
+        // }
+        // }
+        // }
 
     }
 }
-
-

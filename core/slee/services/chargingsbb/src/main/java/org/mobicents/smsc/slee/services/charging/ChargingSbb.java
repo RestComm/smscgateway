@@ -683,7 +683,9 @@ public abstract class ChargingSbb implements Sbb {
             switch (sms.getOriginationType()) {
                 case SMPP:
                     EsmeManagement esmeManagement = EsmeManagement.getInstance();
-                    Esme esme = esmeManagement.getEsmeByClusterName(sms.getSmsSet().getDestClusterName());
+                    Esme esme = null;
+                    if (esmeManagement != null)
+                        esme = esmeManagement.getEsmeByClusterName(sms.getOrigEsmeName());
                     eventType = EventType.IN_SMPP_REJECT_DIAMETER;
                     if (esme != null) {
 

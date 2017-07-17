@@ -1184,14 +1184,19 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             EsmeManagement esmeManagement = EsmeManagement.getInstance();
             Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
-            String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
-                    : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+            String messageType = null;
+            String remoteAddr = null;
+            if (esme != null) {
+                messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
+                        : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+                remoteAddr = esme.getRemoteAddressAndPort();
+            }
+            System.out.println(smsSet);
 
             // generating of a temporary failure CDR (one record for all unsent messages)
             if (smscPropertiesManagement.getGenerateTempFailureCdr()) {
                 this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED_ESME, reason);
-                this.generateTemporaryFailureDetailedCDR(eventType, messageType, smStatus, esme.getRemoteAddressAndPort(),
-                        seqNumber);
+                this.generateTemporaryFailureDetailedCDR(eventType, messageType, smStatus, remoteAddr, seqNumber);
             }
 
             ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
@@ -1234,7 +1239,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     this.generateCDRs(lstPermFailured2, CdrGenerator.CDR_FAILED_ESME, reason);
 
                     generateDetailedCDRs(lstPermFailured2, EventType.OUT_SMPP_ERROR, smStatus, messageType,
-                            esme.getRemoteAddressAndPort(), seqNumber);
+                            remoteAddr, seqNumber);
 
                     // sending of intermediate delivery receipts
                     this.generateIntermediateReceipts(smsSet, lstTempFailured2);
