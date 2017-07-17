@@ -22,6 +22,8 @@
 
 package org.mobicents.smsc.slee.services.submitsbb;
 
+import java.util.ArrayList;
+
 import javax.slee.ActivityContextInterface;
 import javax.slee.CreateException;
 import javax.slee.RolledBackContext;
@@ -56,8 +58,11 @@ import org.mobicents.smsc.slee.services.charging.ChargingMedium;
 import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
 import org.restcomm.smpp.Esme;
 import org.restcomm.smpp.EsmeManagement;
+import org.restcomm.smpp.parameter.TlvSet;
 
 import com.cloudhopper.smpp.SmppConstants;
+import com.cloudhopper.smpp.pdu.BaseSm;
+import com.cloudhopper.smpp.tlv.Tlv;
 
 import javolution.util.FastList;
 
@@ -260,11 +265,12 @@ public abstract class SubmitCommonSbb implements Sbb {
             int seqNumber) throws SmscProcessingException {
 
         ChargingMedium chargingMedium = null;
-        
+        EventType eventTypeSuccess = null;
         EventType eventTypeFailure = null;
         switch (sms0.getOriginationType()) {
             case SMPP:
                 chargingMedium = ChargingMedium.TxSmppOrig;
+                eventTypeSuccess = EventType.IN_SMPP_RECEIVED;
                 eventTypeFailure = EventType.IN_SMPP_REJECT_MPROC;
                 break;
             case SS7_MO:
@@ -276,6 +282,7 @@ public abstract class SubmitCommonSbb implements Sbb {
                 break;
             case HTTP:
                 chargingMedium = ChargingMedium.HttpOrig;
+                eventTypeSuccess = EventType.IN_HTTP_RECEIVED;
                 eventTypeFailure = EventType.IN_HTTP_REJECT_MPROC;
                 break;
         }
@@ -293,12 +300,29 @@ public abstract class SubmitCommonSbb implements Sbb {
                 TargetAddress ta = new TargetAddress(sms.getSmsSet());
                 TargetAddress lock = persistence.obtainSynchroObject(ta);
 
+                String sourceAddr = null;
+
                 try {
                     sms.setTimestampC(System.currentTimeMillis());
 
-//                    sms.setTimestampA(0);
-//                    sms.setTimestampB(0);
-//                    sms.setTimestampC(0);
+                    if (eventTypeSuccess == EventType.IN_SMPP_RECEIVED) {
+                        EsmeManagement esmeManagement = EsmeManagement.getInstance();
+
+                        if (esmeManagement != null) {
+                            // for testing there is no EsmeManagement
+                            Esme esme = esmeManagement.getEsmeByClusterName(sms0.getOrigEsmeName());
+                            // null check is for testing
+                            if (esme != null) {
+                                sourceAddr = esme.getRemoteAddressAndPort();
+                            }
+                        }
+                    }
+
+                    generateDetailedCDR(sms, eventTypeSuccess, messageType, 0, sourceAddr, seqNumber);
+
+                    sms.setTimestampA(0);
+                    sms.setTimestampB(0);
+                    sms.setTimestampC(0);
 
                     synchronized (lock) {
                         boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
@@ -434,7 +458,7 @@ public abstract class SubmitCommonSbb implements Sbb {
 
     protected void generateDetailedCDR(Sms sms, EventType eventType, String messageType, int statusCode,
             String sourceAddrAndPort, int seqNumber) {
-        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, ErrorCode.SUCCESS, messageType, statusCode, -1,
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, -1,
                 sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(),
                 smscPropertiesManagement.getGenerateDetailedCdr());
     }
@@ -443,6 +467,24 @@ public abstract class SubmitCommonSbb implements Sbb {
             int statusCode, String sourceAddrAndPort, int seqNumber) {
         CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, -1, sourceAddrAndPort,
                 null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(),
+                smscPropertiesManagement.getGenerateDetailedCdr());
+    }
+
+    protected void generateFailureDetailedCdr(BaseSm<?> event, Esme esme, EventType eventType, ErrorCode errorCode,
+            String messageType, int statusCode, String shortMessageText, Long timestampB) {
+        TlvSet tlvSet = new TlvSet();
+        ArrayList<Tlv> optionalParameters = event.getOptionalParameters();
+        if (optionalParameters != null && optionalParameters.size() > 0) {
+            for (Tlv tlv : optionalParameters) {
+                if (tlv.getTag() != SmppConstants.TAG_MESSAGE_PAYLOAD) {
+                    tlvSet.addOptionalParameter(tlv);
+                }
+            }
+        }
+        boolean mcDeliveryReceipt = (event.getEsmClass() & Sms.ESME_DELIVERY_ACK) != 0;
+        CdrDetailedGenerator.generateDetailedCdr(mcDeliveryReceipt, shortMessageText, tlvSet, null, timestampB, null, null,
+                esme.getName(), eventType, errorCode, messageType, statusCode, -1, esme.getRemoteAddressAndPort(), null,
+                event.getSequenceNumber(), smscPropertiesManagement.getGenerateReceiptCdr(),
                 smscPropertiesManagement.getGenerateDetailedCdr());
     }
 

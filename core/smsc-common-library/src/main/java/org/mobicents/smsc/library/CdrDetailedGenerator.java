@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
+import org.restcomm.smpp.parameter.TlvSet;
 
 public class CdrDetailedGenerator {
     private static final Logger logger = Logger.getLogger(CdrDetailedGenerator.class);
@@ -26,7 +27,6 @@ public class CdrDetailedGenerator {
     public static final String CDR_MSG_TYPE_DELIVERSM = "DeliverSm";
     public static final String CDR_MSG_TYPE_DATASM = "DataSm";
     public static final String CDR_MSG_TYPE_HTTP = "Http";
-    public static final String CDR_MSG_TYPE_UNKNOWN = "Unknown";
     public static final String CDR_MSG_TYPE_SIP = "Sip";
     public static final String CDR_MSG_TYPE_SS7 = "Ss7";
 
@@ -38,82 +38,111 @@ public class CdrDetailedGenerator {
         logger.debug(message);
     }
 
-    public static void generateDetailedCdr(Sms smsEvent, EventType eventType, ErrorCode errorCode, String messageType,
+    public static void generateDetailedCdr(Sms sms, EventType eventType, ErrorCode errorCode, String messageType,
             long statusCode, int mprocRuleId, String sourceAddrAndPort, String destAddrAndPort, int seqNumber,
             boolean generateReceiptCdr, boolean generateDetailedCdr) {
+
+        generateDetailedCdr(sms.isMcDeliveryReceipt(), sms.getShortMessageText(), sms.getTlvSet(), sms.getTimestampA(),
+                sms.getTimestampB(), sms.getTimestampC(), sms.getMessageId(), sms.getOrigEsmeName(), eventType, errorCode,
+                messageType, statusCode, mprocRuleId, sourceAddrAndPort, destAddrAndPort, seqNumber, generateReceiptCdr,
+                generateDetailedCdr);
+    }
+
+    public static void generateDetailedCdr(boolean mcDeliveryReceipt, String shortMessageText, TlvSet tlvSet, Long tsA,
+            Long tsB, Long tsC, Long messageId, String origEsmeName, EventType eventType, ErrorCode errorCode,
+            String messageType, long statusCode, int mprocRuleId, String sourceAddrAndPort, String destAddrAndPort,
+            int seqNumber, boolean generateReceiptCdr, boolean generateDetailedCdr) {
         // Format is
         // CDR recording timestamp, Event type, ErrorCode (status), MessageType, Status code, CorrelationId, OrigCorrelationId
         // DlrStatus, mprocRuleId, ESME name, Timestamp A, Timestamp B, Timestamp C, Source IP, Source port, Dest IP, Dest port,
         // SequenceNumber
 
-        if (!generateDetailedCdr)
+        if (!generateDetailedCdr) {
             return;
-
-        if (!generateReceiptCdr && smsEvent.isMcDeliveryReceipt())
-            // we do not generate CDR's for receipt if generateReceiptCdr option is off
-            return;
-
-        String timestamp = DATE_FORMAT.format(new Date());
-
-        String receiptOrigMessageId = null;
-
-        DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(smsEvent.getShortMessageText(),
-                smsEvent.getTlvSet());
-        String dlrStatus = null;
-        if (deliveryReceiptData != null) {
-            dlrStatus = deliveryReceiptData.getStatus();
-            int tlvMessageState = deliveryReceiptData.getTlvMessageState() == null ? -1
-                    : deliveryReceiptData.getTlvMessageState();
-            if (tlvMessageState != -1 && dlrStatus != null)
-                if (!dlrStatus.substring(0, 4).equals(MessageState.fromInt(tlvMessageState).toString().substring(0, 4))) {
-                    dlrStatus = "err";
-                }
-            receiptOrigMessageId = smsEvent.getReceiptOrigMessageId();
         }
 
-        String destIP = null;
-        int destPort = -1;
+        if (!generateReceiptCdr && mcDeliveryReceipt) {
+            // we do not generate CDR's for receipt if generateReceiptCdr option is off
+            return;
+        }
+        String timestamp = DATE_FORMAT.format(new Date());
 
-        String sourceIP = null;
-        int sourcePort = -1;
+        String dlrStatus = null;
+        String origMessageID = null;
 
+        DeliveryReceiptData deliveryReceiptData = null;
+        if (shortMessageText != null && tlvSet != null) {
+            deliveryReceiptData = MessageUtil.parseDeliveryReceipt(shortMessageText, tlvSet);
+            if (deliveryReceiptData != null) {
+                dlrStatus = deliveryReceiptData.getStatus();
+                if (deliveryReceiptData.getTlvMessageState() != null) {
+                    int tlvMessageState = deliveryReceiptData.getTlvMessageState();
+                    if (tlvMessageState != 0 && dlrStatus != null)
+                        if (!dlrStatus.substring(0, 4)
+                                .equals(MessageState.fromInt(tlvMessageState).toString().substring(0, 5))) {
+                            dlrStatus = "err";
+                        }
+                }
+                origMessageID = deliveryReceiptData.getMessageId();
+            }
+        }
+
+        String destIP = null, destPort = null;
         if (destAddrAndPort != null) {
             String[] parts = destAddrAndPort.split(":");
             destIP = parts[0];
-            destPort = Integer.parseInt(parts[1]);
+            destPort = parts[1];
         }
 
+        String sourceIP = null, sourcePort = null;
         if (sourceAddrAndPort != null) {
             String[] parts = sourceAddrAndPort.split(":");
             sourceIP = parts[0];
-            sourcePort = Integer.parseInt(parts[1]);
+            sourcePort = parts[1];
         }
 
-        String timestampA = smsEvent.getTimestampA() != 0 ? DATE_FORMAT.format(smsEvent.getTimestampA()) : null;
-        String timestampB = smsEvent.getTimestampB() != 0 ? DATE_FORMAT.format(smsEvent.getTimestampB()) : null;
-        String timestampC = smsEvent.getTimestampC() != 0 ? DATE_FORMAT.format(smsEvent.getTimestampC()) : null;
+        String timestampA = null, timestampB = null, timestampC = null;
+        if (tsA != null && tsA != 0)
+            timestampA = DATE_FORMAT.format(tsA);
+        if (tsB != null && tsB != 0)
+            timestampB = DATE_FORMAT.format(tsB);
+        if (tsC != null && tsC != 0)
+            timestampC = DATE_FORMAT.format(tsC);
 
-        StringBuffer sb = new StringBuffer();
-        sb.append(timestamp).append(CDR_SEPARATOR)
-        .append(eventType != null ? eventType : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(errorCode != null ? errorCode : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(messageType).append(CDR_SEPARATOR)
-        .append(statusCode).append(CDR_SEPARATOR)
-        // check this, maybe it should be smsEvent.getSmsSet().getCorrelationId()
-        .append(smsEvent.getMessageId()).append(CDR_SEPARATOR)
-        .append(receiptOrigMessageId != null ? receiptOrigMessageId : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(dlrStatus != null ? dlrStatus : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(mprocRuleId != -1 ? mprocRuleId : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(smsEvent.getOrigEsmeName()).append(CDR_SEPARATOR)
-        .append(timestampA != null ? timestampA : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(timestampB != null ? timestampB : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(timestampC != null ? timestampC : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(sourceIP != null ? sourceIP : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(sourcePort != -1 ? sourcePort : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(destIP != null ? destIP : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(destPort != -1 ? destPort : CDR_EMPTY).append(CDR_SEPARATOR)
-        .append(seqNumber != -1 ? seqNumber : CDR_EMPTY);
+        StringBuilder sb = new StringBuilder();
+        appendObject(sb, timestamp);
+        appendObject(sb, eventType);
+        appendObject(sb, errorCode);
+        appendObject(sb, messageType);
+        appendNumber(sb, statusCode);
+        appendNumber(sb, messageId);
+        appendObject(sb, origMessageID);
+        appendObject(sb, dlrStatus);
+        appendNumber(sb, Long.valueOf(mprocRuleId));
+        appendObject(sb, origEsmeName);
+        appendObject(sb, timestampA);
+        appendObject(sb, timestampB);
+        appendObject(sb, timestampC);
+        appendObject(sb, sourceIP);
+        appendObject(sb, sourcePort);
+        appendObject(sb, destIP);
+        appendObject(sb, destPort);
+        appendNumber(sb, Long.valueOf(seqNumber));
 
         CdrDetailedGenerator.generateDetailedCdr(sb.toString());
     }
+
+    // 14:23:08.421,IN_SMPP_REJECT_FORBIDDEN,REJECT_INCOMING,SubmitSm,,,,-1,test,2017-07-15
+    // 14:23:08.415,,,127.0.0.1,null45542,,,2
+
+    private static void appendObject(StringBuilder sb, Object obj) {
+        sb.append(obj != null ? obj : CdrDetailedGenerator.CDR_EMPTY);
+        sb.append(CdrGenerator.CDR_SEPARATOR);
+    }
+
+    private static void appendNumber(StringBuilder sb, Long num) {
+        sb.append(num != null ? num != -1 ? num : CdrDetailedGenerator.CDR_EMPTY : CdrDetailedGenerator.CDR_EMPTY);
+        sb.append(CdrGenerator.CDR_SEPARATOR);
+    }
+
 }

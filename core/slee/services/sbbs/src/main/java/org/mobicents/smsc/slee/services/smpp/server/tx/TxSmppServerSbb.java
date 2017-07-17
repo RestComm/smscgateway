@@ -342,19 +342,25 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
 
             // Lets send the Response with error here
+            long timestampB = 0L;
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
-                if (sms != null) {
-                    sms.setTimestampB(System.currentTimeMillis());
-                    generateRejectDetailedCdr(e1.getInternalErrorCode(), sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
-                            CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
-                            event.getSequenceNumber());
-                    
-                }
+                timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
                         + response + ".", e);
+            }
+
+            if (sms != null) {
+                sms.setTimestampB(timestampB);
+                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
+                        event.getSequenceNumber());
+            } else {
+                generateFailureDetailedCdr(event, esme, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), parseShortMessageText(event),
+                        timestampB);
             }
 
             return;
@@ -529,17 +535,24 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
 
             // Lets send the Response with error here
+            long timestampB = 0L;
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
-                if (sms != null) {
-                    sms.setTimestampB(System.currentTimeMillis());
-                    generateRejectDetailedCdr(e1.getInternalErrorCode(), sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
-                            CdrDetailedGenerator.CDR_MSG_TYPE_DATASM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
-                            event.getSequenceNumber());
-                }
+                timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
                 this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
+            }
+
+            if (sms != null) {
+                sms.setTimestampB(System.currentTimeMillis());
+                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_DATASM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
+                        event.getSequenceNumber());
+            } else {
+                generateFailureDetailedCdr(event, esme, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), parseShortMessageText(event),
+                        timestampB);
             }
 
             return;
@@ -644,8 +657,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
 
             // Lets send the Response with error here
+            long timestampB = 0L;
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
+                timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
@@ -654,7 +669,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
                 Sms sms = this.createSmsEvent(event, esme, ta, persistence);
-                sms.setTimestampB(System.currentTimeMillis());
+                sms.setTimestampB(timestampB);
                 generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, SmppConstants.STATUS_THROTTLED,
                         esme.getRemoteAddressAndPort(), event.getSequenceNumber());
@@ -713,18 +728,24 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
 
             // Lets send the Response with error here
+            long timestampB = 0L;
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
-                if (singleSms != null) {
-                    singleSms.setTimestampB(System.currentTimeMillis());
-                    generateRejectDetailedCdr(e1.getInternalErrorCode(), singleSms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
-                            CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, e1.getSmppErrorCode(),
-                            esme.getRemoteAddressAndPort(), event.getSequenceNumber());
-                }
-
+                timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
+            }
+
+            if (singleSms != null) {
+                singleSms.setTimestampB(timestampB);
+                generateFailureDetailedCdr(singleSms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
+                        event.getSequenceNumber());
+            } else {
+                generateFailureDetailedCdr(event, esme, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, e1.getSmppErrorCode(), parseShortMessageText(event),
+                        timestampB);
             }
 
             return;
@@ -903,17 +924,24 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
 
             // Lets send the Response with error here
+            long timestampB = 0L;
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
-                if (sms != null) {
-                    sms.setTimestampB(System.currentTimeMillis());
-                    generateRejectDetailedCdr(e1.getInternalErrorCode(), sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
-                            CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
-                            event.getSequenceNumber());
-                }
+                timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
+            }
+
+            if (sms != null) {
+                sms.setTimestampB(timestampB);
+                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
+                        event.getSequenceNumber());
+            } else {
+                generateFailureDetailedCdr(event, esme, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                        CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), parseShortMessageText(event),
+                        timestampB);
             }
 
             return;
