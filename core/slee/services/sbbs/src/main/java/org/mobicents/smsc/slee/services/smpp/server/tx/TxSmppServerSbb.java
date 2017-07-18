@@ -1827,7 +1827,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
         CdrGenerator.generateCdr(fromUser, sourceAddrTon, sourceAddrNpi, toUser, destAddrTon, destAddrNpi, OriginationType.SMPP,
                 systemId, null, null, sourceNetworkId, 0, null, 0, shortMessageText, status, reason,
-                smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+                true, true, lastSegment,
                 smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 

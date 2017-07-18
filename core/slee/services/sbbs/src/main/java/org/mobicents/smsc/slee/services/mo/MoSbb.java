@@ -408,9 +408,12 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
+                this.logger.warning("************* 0001");
 				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+	                this.logger.warning("************* 0002");
                     generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), isMt ? CdrGenerator.CDR_SUBMIT_FAILED_HR
                             : CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+                    this.logger.warning("************* 0003");
 				}
                 dialog.close(false);
                 return;
@@ -1267,9 +1270,8 @@ public abstract class MoSbb extends MoCommonSbb {
     private void generateCDR(int networkId, String imsi, SccpAddress sccpAddress, String status, String reason,
             boolean lastSegment) {
 
-		CdrGenerator.generateCdr(null, 0, 0, null, 0, 0, OriginationType.SS7_MO, null,
-				imsi, sccpAddress.toString(), networkId, 0, null, 0, null, status, reason,
-				smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
-				smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+        CdrGenerator.generateCdr(null, 0, 0, null, 0, 0, OriginationType.SS7_MO, null, imsi, sccpAddress.toString(), networkId,
+                0, null, 0, null, status, reason, true, true, lastSegment,
+                smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
 	}
 }

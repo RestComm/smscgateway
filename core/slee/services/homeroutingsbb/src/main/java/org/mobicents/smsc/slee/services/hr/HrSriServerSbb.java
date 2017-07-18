@@ -464,7 +464,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
 
         CdrGenerator.generateCdr(null, 0, 0, null, 0, 0, OriginationType.SS7_HR, null,
                 null, null, networkId, 0, null, 0, null, status, reason,
-                smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+                true, true, lastSegment,
                 smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 }

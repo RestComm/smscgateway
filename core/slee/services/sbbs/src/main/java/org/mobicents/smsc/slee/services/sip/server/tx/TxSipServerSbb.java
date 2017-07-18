@@ -623,7 +623,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 							 int destAddrTon, int destAddrNpi, String status, String reason, boolean lastSegment) {
 
 		CdrGenerator.generateCdr(fromUser, 0, 0, toUser, destAddrTon, destAddrNpi, OriginationType.SIP, null, null, null,
-				networkId, destNetworkId, null, 0, message, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+				networkId, destNetworkId, null, 0, message, status, reason, true, true, lastSegment,
 				smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
 	}
 

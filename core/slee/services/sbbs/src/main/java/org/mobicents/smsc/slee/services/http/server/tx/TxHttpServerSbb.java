@@ -556,13 +556,18 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
         final String senderId = request.getParameter(RequestParameter.SENDER.getName());
         final String destAddressParam = request.getParameter(RequestParameter.TO.getName());
-        final int senderTon = Integer.parseInt(request.getParameter(RequestParameter.SENDER_TON.getName()));
-        final int senderNpi = Integer.parseInt(request.getParameter(RequestParameter.SENDER_NPI.getName()));
+        int senderTon = 0;
+        int senderNpi = 0;
+        try {
+            senderTon = Integer.parseInt(request.getParameter(RequestParameter.SENDER_TON.getName()));
+            senderNpi = Integer.parseInt(request.getParameter(RequestParameter.SENDER_NPI.getName()));
+        } catch (Exception e) {
+        }
         final String message = request.getParameter(RequestParameter.MESSAGE_BODY.getName());
         final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[] {};
 
         CdrGenerator.generateCdr(senderId, senderTon, senderNpi, destAddresses[0], 0, 0, OriginationType.HTTP, null, null, null,
-                0, 0, null, 0, message, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+                0, 0, null, 0, message, status, reason, true, true, lastSegment,
                 smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 
@@ -570,7 +575,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
         CdrGenerator.generateCdr(data.getSender(), data.getSenderTon().getCode(), data.getSenderNpi().getCode(),
                 data.getDestAddresses().get(0), 0, 0, OriginationType.HTTP, null, null, null, 0, 0, null, 0,
-                data.getShortMessage(), status, reason, smscPropertiesManagement.getGenerateReceiptCdr(), true, lastSegment,
+                data.getShortMessage(), status, reason, true, true, lastSegment,
                 smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 

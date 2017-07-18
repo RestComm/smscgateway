@@ -201,7 +201,7 @@ public class CdrGenerator {
             return;
 
         int msgParts = 0, charNumbers = 0;
-        if (calculateMsgPartsLenCdr) {
+        if (calculateMsgPartsLenCdr && message != null) {
             if (lastSegment) {
                 charNumbers = message.length();
             } else {

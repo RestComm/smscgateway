@@ -661,8 +661,8 @@ public abstract class ChargingSbb implements Sbb {
             logger.info("ChargingSbb: accessRejected for: resultCode =" + (evt != null ? evt.getResultCode() : "timeout")
                     + ", chargingType=" + chargingData.getChargingType() + ", message=[" + sms + "]");
         }
-        generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_CHARGING, "Rejectrion by diameter serverresultCode ="
-                + (evt != null ? evt.getResultCode() : "timeout"), false, true);
+//        generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_CHARGING, "Rejectrion by diameter serverresultCode ="
+//                + (evt != null ? evt.getResultCode() : "timeout"), false, true);
 
         try {
             // sending of a failure response for transactional mode / delaying for charging result
