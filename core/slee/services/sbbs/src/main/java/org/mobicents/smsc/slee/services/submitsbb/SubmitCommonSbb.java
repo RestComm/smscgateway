@@ -265,12 +265,11 @@ public abstract class SubmitCommonSbb implements Sbb {
             int seqNumber) throws SmscProcessingException {
 
         ChargingMedium chargingMedium = null;
-        EventType eventTypeSuccess = null;
         EventType eventTypeFailure = null;
+        int statusCode = 0;
         switch (sms0.getOriginationType()) {
             case SMPP:
                 chargingMedium = ChargingMedium.TxSmppOrig;
-                eventTypeSuccess = EventType.IN_SMPP_RECEIVED;
                 eventTypeFailure = EventType.IN_SMPP_REJECT_MPROC;
                 break;
             case SS7_MO:
@@ -282,7 +281,6 @@ public abstract class SubmitCommonSbb implements Sbb {
                 break;
             case HTTP:
                 chargingMedium = ChargingMedium.HttpOrig;
-                eventTypeSuccess = EventType.IN_HTTP_RECEIVED;
                 eventTypeFailure = EventType.IN_HTTP_REJECT_MPROC;
                 break;
         }
@@ -300,29 +298,8 @@ public abstract class SubmitCommonSbb implements Sbb {
                 TargetAddress ta = new TargetAddress(sms.getSmsSet());
                 TargetAddress lock = persistence.obtainSynchroObject(ta);
 
-                String sourceAddr = null;
-
                 try {
                     sms.setTimestampC(System.currentTimeMillis());
-
-                    if (eventTypeSuccess == EventType.IN_SMPP_RECEIVED) {
-                        EsmeManagement esmeManagement = EsmeManagement.getInstance();
-
-                        if (esmeManagement != null) {
-                            // for testing there is no EsmeManagement
-                            Esme esme = esmeManagement.getEsmeByClusterName(sms0.getOrigEsmeName());
-                            // null check is for testing
-                            if (esme != null) {
-                                sourceAddr = esme.getRemoteAddressAndPort();
-                            }
-                        }
-                    }
-
-                    generateDetailedCDR(sms, eventTypeSuccess, messageType, 0, sourceAddr, seqNumber);
-
-                    sms.setTimestampA(0);
-                    sms.setTimestampB(0);
-                    sms.setTimestampC(0);
 
                     synchronized (lock) {
                         boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
@@ -386,12 +363,13 @@ public abstract class SubmitCommonSbb implements Sbb {
                                 sourceAddrAndPort = esme.getRemoteAddressAndPort();
                             }
                         }
+                        statusCode = mProcResult.getSmppErrorCode();
                     } else if (eventTypeFailure == EventType.IN_HTTP_REJECT_MPROC) {
-                        sourceAddrAndPort = sms0.getSourceAddr();
+                        statusCode = mProcResult.getHttpErrorCode();
                     }
 
                     generateMprocFailureDetailedCdr(sms0, eventTypeFailure, ErrorCode.REJECT_INCOMING_MPROC, messageType,
-                            mProcResult.getSmppErrorCode(), mProcResult.getRuleIdDropReject(), sourceAddrAndPort, seqNumber);
+                            statusCode, mProcResult.getRuleIdDropReject(), sourceAddrAndPort, seqNumber);
                 }
 
                 rejectSmsByMProc(sms0, "Message is rejected by MProc rules.", mProcResult);
@@ -413,13 +391,14 @@ public abstract class SubmitCommonSbb implements Sbb {
                                 sourceAddrAndPort = esme.getRemoteAddressAndPort();
                             }
                         }
+                        statusCode = mProcResult.getSmppErrorCode();
                     } else if (eventTypeFailure == EventType.IN_HTTP_REJECT_MPROC) {
                         eventTypeFailure = EventType.IN_HTTP_DROP_MPROC;
-                        sourceAddrAndPort = sms0.getSourceAddr();
+                        statusCode = mProcResult.getHttpErrorCode();
                     }
 
                     generateMprocFailureDetailedCdr(sms0, eventTypeFailure, ErrorCode.REJECT_INCOMING_MPROC, messageType,
-                            mProcResult.getSmppErrorCode(), mProcResult.getRuleIdDropReject(), sourceAddrAndPort, seqNumber);
+                            statusCode, mProcResult.getRuleIdDropReject(), sourceAddrAndPort, seqNumber);
                 }
 
                 rejectSmsByMProc(sms0, "Message is dropped by MProc rules.", mProcResult);

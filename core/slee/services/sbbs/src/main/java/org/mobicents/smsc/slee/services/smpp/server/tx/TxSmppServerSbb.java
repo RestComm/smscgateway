@@ -72,6 +72,7 @@ import org.restcomm.slee.resource.smpp.SmppTransactionACIFactory;
 import org.restcomm.smpp.CheckMessageLimitResult;
 import org.restcomm.smpp.Esme;
 import org.restcomm.smpp.SmppEncoding;
+import org.restcomm.smpp.parameter.TlvSet;
 
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.pdu.BaseSm;
@@ -242,6 +243,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         Esme esme = smppServerTransaction.getEsme();
         String esmeName = esme.getName();
 
+        long timestampB = 0;
+
         if (this.logger.isFineEnabled()) {
             this.logger.fine("\nReceived SUBMIT_SM = " + event + " from Esme name=" + esmeName);
         }
@@ -255,9 +258,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                 generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
                         event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
-                        event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                        event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
             }
 
             SubmitSmResp response = event.createResponse();
@@ -277,6 +279,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             // Lets send the Response with error here
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
+                timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
@@ -286,7 +289,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             try {
                 TargetAddress ta = createDestTargetAddress(event.getDestAddress(), esme.getNetworkId());
                 Sms sms = this.createSmsEvent(event, esme, ta, persistence);
-                sms.setTimestampB(System.currentTimeMillis());
+                sms.setTimestampB(timestampB);
                 generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_CONG, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, SmppConstants.STATUS_THROTTLED,
                         esme.getRemoteAddressAndPort(), event.getSequenceNumber());
@@ -342,7 +345,6 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
 
             // Lets send the Response with error here
-            long timestampB = 0L;
             try {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
                 timestampB = System.currentTimeMillis();
@@ -352,13 +354,21 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                         + response + ".", e);
             }
 
+            EventType eventType = null;
+
+            if (e1.getInternalErrorCode() == SmscProcessingException.INTERNAL_ERROR_STATE_OVERLOADED) {
+                eventType = EventType.IN_SMPP_REJECT_CONG;
+            } else {
+                eventType = EventType.IN_SMPP_REJECT_FORBIDDEN;
+            }
+
             if (sms != null) {
                 sms.setTimestampB(timestampB);
-                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                generateRejectDetailedCdr(e1.getInternalErrorCode(), sms, eventType, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
                         event.getSequenceNumber());
             } else {
-                generateFailureDetailedCdr(event, esme, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                generateRejectDetailedCdr(e1.getInternalErrorCode(), event, esme, eventType, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), parseShortMessageText(event),
                         timestampB);
             }
@@ -449,9 +459,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                 generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
                         event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
-                        event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                        event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
             }
 
             DataSmResp response = event.createResponse();
@@ -543,14 +552,21 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
                 this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
             }
+            EventType eventType = null;
+
+            if (e1.getInternalErrorCode() == SmscProcessingException.INTERNAL_ERROR_STATE_OVERLOADED) {
+                eventType = EventType.IN_SMPP_REJECT_CONG;
+            } else {
+                eventType = EventType.IN_SMPP_REJECT_FORBIDDEN;
+            }
 
             if (sms != null) {
                 sms.setTimestampB(System.currentTimeMillis());
-                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                generateRejectDetailedCdr(e1.getInternalErrorCode(), sms, eventType, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_DATASM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
                         event.getSequenceNumber());
             } else {
-                generateFailureDetailedCdr(event, esme, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                generateRejectDetailedCdr(e1.getInternalErrorCode(), event, esme, eventType, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), parseShortMessageText(event),
                         timestampB);
             }
@@ -562,10 +578,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress()
-                        .getAddress(), event.getSourceAddress().getTon(), event.getSourceAddress().getNpi(), event
-                        .getDestAddress().getAddress(), event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                        event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                        event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
             }
 
             DataSmResp response = event.createResponse();
@@ -637,9 +653,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                 generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
                         event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
-                        event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                        event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
             }
 
             SubmitMultiResp response = event.createResponse();
@@ -736,14 +751,21 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
             }
+            EventType eventType = null;
+
+            if (e1.getInternalErrorCode() == SmscProcessingException.INTERNAL_ERROR_STATE_OVERLOADED) {
+                eventType = EventType.IN_SMPP_REJECT_CONG;
+            } else {
+                eventType = EventType.IN_SMPP_REJECT_FORBIDDEN;
+            }
 
             if (singleSms != null) {
                 singleSms.setTimestampB(timestampB);
-                generateFailureDetailedCdr(singleSms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                generateRejectDetailedCdr(e1.getInternalErrorCode(), singleSms, eventType, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
                         event.getSequenceNumber());
             } else {
-                generateFailureDetailedCdr(event, esme, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                generateRejectDetailedCdr(e1.getInternalErrorCode(), event, esme, eventType, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITMULTI, e1.getSmppErrorCode(), parseShortMessageText(event),
                         timestampB);
             }
@@ -755,10 +777,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress()
-                        .getAddress(), event.getSourceAddress().getTon(), event.getSourceAddress().getNpi(), event
-                        .getDestAddress().getAddress(), event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                        event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                        event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
             }
             SubmitMultiResp response = event.createResponse();
             response.setCommandStatus(SmppConstants.STATUS_SYSERR);
@@ -837,9 +859,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                 generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
                         event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
-                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(),
-                        event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                        event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, cres.getMessage(), true);
             }
 
             DeliverSmResp response = event.createResponse();
@@ -932,14 +953,21 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
                 this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
             }
+            EventType eventType = null;
+
+            if (e1.getInternalErrorCode() == SmscProcessingException.INTERNAL_ERROR_STATE_OVERLOADED) {
+                eventType = EventType.IN_SMPP_REJECT_CONG;
+            } else {
+                eventType = EventType.IN_SMPP_REJECT_FORBIDDEN;
+            }
 
             if (sms != null) {
                 sms.setTimestampB(timestampB);
-                generateFailureDetailedCdr(sms, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                generateRejectDetailedCdr(e1.getInternalErrorCode(), sms, eventType, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM, e1.getSmppErrorCode(), esme.getRemoteAddressAndPort(),
                         event.getSequenceNumber());
             } else {
-                generateFailureDetailedCdr(event, esme, EventType.IN_SMPP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING,
+                generateRejectDetailedCdr(e1.getInternalErrorCode(), event, esme, eventType, ErrorCode.REJECT_INCOMING,
                         CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, e1.getSmppErrorCode(), parseShortMessageText(event),
                         timestampB);
             }
@@ -951,10 +979,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
             if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(), event.getSourceAddress()
-                        .getAddress(), event.getSourceAddress().getTon(), event.getSourceAddress().getNpi(), event
-                        .getDestAddress().getAddress(), event.getDestAddress().getTon(), event.getDestAddress().getNpi(),
-                        CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
+                generateCDR(parseShortMessageText(event), esme.getNetworkId(), esme.getSystemId(),
+                        event.getSourceAddress().getAddress(), event.getSourceAddress().getTon(),
+                        event.getSourceAddress().getNpi(), event.getDestAddress().getAddress(), event.getDestAddress().getTon(),
+                        event.getDestAddress().getNpi(), CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), true);
             }
 
             DeliverSmResp response = event.createResponse();
@@ -1837,9 +1865,9 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
                 smscPropertiesManagement.getDelayParametersInCdr());
     }
-    
-    private void generateRejectDetailedCdr(int smscProcessingExceptionInternalType, Sms sms, EventType eventType, ErrorCode errorCode, String messageType,
-            int statusCode, String sourceAddrAndPort, int seqNumber) {
+
+    private void generateRejectDetailedCdr(int smscProcessingExceptionInternalType, Sms sms, EventType eventType,
+            ErrorCode errorCode, String messageType, int statusCode, String sourceAddrAndPort, int seqNumber) {
         if (smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_DST_ADDR_INVALID
                 || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_SRC_ADDR_INVALID
                 || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_DATA_CODING_INVALID
@@ -1854,6 +1882,37 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_OVERLOADED)
             CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, -1, sourceAddrAndPort,
                     null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(),
+                    smscPropertiesManagement.getGenerateDetailedCdr());
+    }
+
+    protected void generateRejectDetailedCdr(int smscProcessingExceptionInternalType, BaseSm<?> event, Esme esme,
+            EventType eventType, ErrorCode errorCode, String messageType, int statusCode, String shortMessageText,
+            Long timestampB) {
+        TlvSet tlvSet = new TlvSet();
+        ArrayList<Tlv> optionalParameters = event.getOptionalParameters();
+        if (optionalParameters != null && optionalParameters.size() > 0) {
+            for (Tlv tlv : optionalParameters) {
+                if (tlv.getTag() != SmppConstants.TAG_MESSAGE_PAYLOAD) {
+                    tlvSet.addOptionalParameter(tlv);
+                }
+            }
+        }
+        boolean mcDeliveryReceipt = (event.getEsmClass() & Sms.ESME_DELIVERY_ACK) != 0;
+        if (smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_DST_ADDR_INVALID
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_SRC_ADDR_INVALID
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_DATA_CODING_INVALID
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_SHORT
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_MSG_TOO_LONG
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_PARSING
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_VALIDITY_PERIOD_PARSING
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_MISC_SCHEDULER_DELIVERY_TIME_PARSING
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_STOPPED
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_PAUSED
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_DATABASE_NOT_AVAILABLE
+                || smscProcessingExceptionInternalType == SmscProcessingException.INTERNAL_ERROR_STATE_OVERLOADED)
+            CdrDetailedGenerator.generateDetailedCdr(mcDeliveryReceipt, shortMessageText, tlvSet, null, timestampB, null, null,
+                    esme.getName(), eventType, errorCode, messageType, statusCode, -1, esme.getRemoteAddressAndPort(), null,
+                    event.getSequenceNumber(), smscPropertiesManagement.getGenerateReceiptCdr(),
                     smscPropertiesManagement.getGenerateDetailedCdr());
     }
 }
