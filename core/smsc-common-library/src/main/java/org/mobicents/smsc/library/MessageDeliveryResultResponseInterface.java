@@ -50,5 +50,9 @@ public interface MessageDeliveryResultResponseInterface {
             return code;
         }
     }
+    
+    public String getMessageType();
+    
+    public int getSeqNumber();
 
 }

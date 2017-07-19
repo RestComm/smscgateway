@@ -568,6 +568,7 @@ public abstract class ChargingSbb implements Sbb {
                 TargetAddress ta = new TargetAddress(sms.getSmsSet());
                 TargetAddress lock = persistence.obtainSynchroObject(ta);
 
+                sms.setTimestampC(System.currentTimeMillis());
                 try {
                     synchronized (lock) {
                         boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
@@ -620,10 +621,48 @@ public abstract class ChargingSbb implements Sbb {
                 return;
             }
 
-            // sending of a failure response for delaying for charging result (nontransactional mode)
+            // sending success response for charging result
             if (sms0.getMessageDeliveryResultResponse() != null
                     && sms0.getMessageDeliveryResultResponse().isOnlyChargingRequest()) {
                 sms0.getMessageDeliveryResultResponse().responseDeliverySuccess();
+                sms0.setTimestampB(System.currentTimeMillis());
+
+                EventType eventTypeSuccess = null;
+                String messageType = null;
+                String sourceAddr = null;
+                int seqNum = -1;
+                switch (sms0.getOriginationType()) {
+                    case SMPP:
+                        eventTypeSuccess = EventType.IN_SMPP_RECEIVED;
+                        MessageDeliveryResultResponseInterface resp = sms0.getMessageDeliveryResultResponse();
+                        messageType = resp.getMessageType();
+                        seqNum = resp.getSeqNumber();
+                        break;
+                    case HTTP:
+                        eventTypeSuccess = EventType.IN_HTTP_RECEIVED;
+                        messageType = CdrDetailedGenerator.CDR_MSG_TYPE_HTTP;
+                        break;
+                    default:
+                        break;
+                }
+
+                if (eventTypeSuccess != null) {
+                    EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                    if (esmeManagement != null) {
+                        // for testing there is no EsmeManagement
+                        Esme esme = esmeManagement.getEsmeByClusterName(sms0.getOrigEsmeName());
+                        // null check is for testing
+                        if (esme != null) {
+                            sourceAddr = esme.getRemoteAddressAndPort();
+                        }
+                    }
+                    CdrDetailedGenerator.generateDetailedCdr(sms0, eventTypeSuccess, sms0.getSmsSet().getStatus(), messageType,
+                            SmppConstants.STATUS_OK, -1, sourceAddr, null, seqNum,
+                            smscPropertiesManagement.getGenerateReceiptCdr(),
+                            smscPropertiesManagement.getGenerateDetailedCdr());
+
+                }
+
                 sms0.setMessageDeliveryResultResponse(null);
             }
 
@@ -643,6 +682,8 @@ public abstract class ChargingSbb implements Sbb {
                 case SIP:
                     smscStatAggregator.updateMsgInReceivedSip();
                     break;
+                default:
+                    break;
             }
 
         } catch (PersistenceException e) {
@@ -661,8 +702,8 @@ public abstract class ChargingSbb implements Sbb {
             logger.info("ChargingSbb: accessRejected for: resultCode =" + (evt != null ? evt.getResultCode() : "timeout")
                     + ", chargingType=" + chargingData.getChargingType() + ", message=[" + sms + "]");
         }
-//        generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_CHARGING, "Rejectrion by diameter serverresultCode ="
-//                + (evt != null ? evt.getResultCode() : "timeout"), false, true);
+        // generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_CHARGING, "Rejectrion by diameter serverresultCode ="
+        // + (evt != null ? evt.getResultCode() : "timeout"), false, true);
 
         try {
             // sending of a failure response for transactional mode / delaying for charging result
@@ -711,7 +752,7 @@ public abstract class ChargingSbb implements Sbb {
             }
 
             if (eventType != null) {
-                CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, 0, 0,
+                CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, 0, -1,
                         sourceAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(),
                         smscPropertiesManagement.getGenerateDetailedCdr());
             }
@@ -801,7 +842,7 @@ public abstract class ChargingSbb implements Sbb {
             }
 
             if (eventType != null) {
-                CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, 0, 0,
+                CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, 0, -1,
                         sourceAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(),
                         smscPropertiesManagement.getGenerateDetailedCdr());
             }
