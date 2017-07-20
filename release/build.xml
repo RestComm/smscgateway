@@ -48,7 +48,7 @@
 	<!-- SMPP extentions and and RAs -->
 	<property name="restcomm-smpp-extensions.build-number" value="39" />
 	<property name="restcomm-smpp-extensions.version" value="7.1" />
-	<property name="restcomm-smpp-ra.build-number" value="58" />
+	<property name="restcomm-smpp-ra.build-number" value="60" />
 	<property name="restcomm-smpp-ra.version" value="7.1" />
 
 	<!-- Cassandra community version -->
