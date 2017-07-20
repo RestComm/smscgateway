@@ -31,7 +31,10 @@ import org.mobicents.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCau
 import org.mobicents.protocols.ss7.map.api.primitives.NetworkResource;
 import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
 import org.mobicents.protocols.ss7.map.api.service.sms.SmsMessage;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
+
+import com.cloudhopper.smpp.pdu.BaseSm;
 
 /**
  *
@@ -135,5 +138,13 @@ public class MessageDeliveryResultResponseMo implements MessageDeliveryResultRes
 			return;
 		}
 	}
+	
+	public String getMessageType() {
+	    return null;
+	}
+    
+    public int getSeqNumber() {
+        return -1;
+    }
 
 }

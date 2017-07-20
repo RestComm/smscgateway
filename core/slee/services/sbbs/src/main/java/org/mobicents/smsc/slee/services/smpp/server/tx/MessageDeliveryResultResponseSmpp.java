@@ -23,6 +23,7 @@
 package org.mobicents.smsc.slee.services.smpp.server.tx;
 
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 import org.restcomm.slee.resource.smpp.SmppSessions;
 import org.restcomm.smpp.Esme;
@@ -129,6 +130,21 @@ public class MessageDeliveryResultResponseSmpp implements MessageDeliveryResultR
         } catch (Throwable e) {
             this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
         }
+    }
+    
+    public String getMessageType() {
+        return eventSubmit != null ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM : eventData != null ? CdrDetailedGenerator.CDR_MSG_TYPE_DATASM : null;
+    }
+    
+    public int getSeqNumber() {
+        BaseSm event = null;
+        if (eventSubmit != null) {
+            event = eventSubmit;
+        }
+        if (eventData != null) {
+            event = eventData;
+        }
+        return event.getSequenceNumber();
     }
 
 }
