@@ -1544,9 +1544,13 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         }
         if (withCharging && (eventSubmit == null && eventData == null)) {
             // we do not support of charging of submit_multi
-            throw new SmscProcessingException("SMSC GW does not support charging for sumbit_multi, a message is rejected",
-                    SmppConstants.STATUS_PROHIBITED, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
-                    null, SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_FAST);
+            String msg = "SMSC GW does not support charging for sumbit_multi and deliver_sm, a message is rejected";
+            logger.warning(msg);
+            SmscProcessingException e = new SmscProcessingException(msg, SmppConstants.STATUS_PROHIBITED,
+                    MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
+                    SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_FAST);
+            e.setSkipErrorLogging(true);
+            throw e;
         }
 
         // transactional mode / or charging request

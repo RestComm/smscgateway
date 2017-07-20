@@ -1543,7 +1543,7 @@ error:4,message ID not exists
 
 SMSC GW can interoperate with an OCS server via Diameter protocol connection.
 
-For this case SMSC GW can be configured so any incoming SMPP, MO SS7 and Home Routing SS7 originated messages before next processing will be sent to OCS server.
+For this case SMSC GW can be configured so any incoming SMPP (only submit_sm and data_sm are supported), MO SS7 and Home Routing SS7 originated messages before next processing will be sent to OCS server.
 Then OCS server can check if SMSC GW must accept the message or not.
 If yes, SMSC GW will process the message, if not, the message will be dropped.
 OCS server can also make any charging operations as needed.
