@@ -1533,43 +1533,6 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
         this.checkSmscState(sms0, smscCongestionControl, SubmitCommonSbb.MaxActivityCountFactor.factor_12);
 
-        // // checking if SMSC is stopped
-        // if (smscPropertiesManagement.isSmscStopped()) {
-        // SmscProcessingException e = new SmscProcessingException("SMSC is stopped", SmppConstants.STATUS_SYSERR, 0, null);
-        // e.setSkipErrorLogging(true);
-        // throw e;
-        // }
-        // // checking if SMSC is paused
-        // if (smscPropertiesManagement.isDeliveryPause()
-        // && (!MessageUtil.isStoreAndForward(sms0) || smscPropertiesManagement.getStoreAndForwordMode() ==
-        // StoreAndForwordMode.fast)) {
-        // SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR, 0, null);
-        // e.setSkipErrorLogging(true);
-        // throw e;
-        // }
-        // // checking if cassandra database is available
-        // if (!store.isDatabaseAvailable() && MessageUtil.isStoreAndForward(sms0)) {
-        // SmscProcessingException e = new SmscProcessingException("Database is unavailable", SmppConstants.STATUS_SYSERR, 0,
-        // null);
-        // e.setSkipErrorLogging(true);
-        // throw e;
-        // }
-        // if (!MessageUtil.isStoreAndForward(sms0)
-        // || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast) {
-        // // checking if delivery query is overloaded
-        // int fetchMaxRows = (int) (smscPropertiesManagement.getMaxActivityCount() * 1.2);
-        // int activityCount = SmsSetCache.getInstance().getProcessingSmsSetSize();
-        // if (activityCount >= fetchMaxRows) {
-        // smscCongestionControl.registerMaxActivityCount1_2Threshold();
-        // SmscProcessingException e = new SmscProcessingException("SMSC is overloaded", SmppConstants.STATUS_THROTTLED,
-        // 0, null);
-        // e.setSkipErrorLogging(true);
-        // throw e;
-        // } else {
-        // smscCongestionControl.registerMaxActivityCount1_2BackToNormal();
-        // }
-        // }
-
         boolean withCharging = false;
         switch (smscPropertiesManagement.getTxSmppChargingType()) {
             case Selected:
@@ -1578,6 +1541,12 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             case All:
                 withCharging = true;
                 break;
+        }
+        if (withCharging && (eventSubmit == null && eventData == null)) {
+            // we do not support of charging of submit_multi
+            throw new SmscProcessingException("SMSC GW does not support charging for sumbit_multi, a message is rejected",
+                    SmppConstants.STATUS_PROHIBITED, MAPErrorCode.systemFailure, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET,
+                    null, SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_FAST);
         }
 
         // transactional mode / or charging request
@@ -1652,84 +1621,6 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         }
 
         this.forwardMessage(sms0, withCharging, smscStatAggregator, messageType, seqNumber);
-
-        // if (withCharging) {
-        // ChargingSbbLocalObject chargingSbb = getChargingSbbObject();
-        // chargingSbb.setupChargingRequestInterface(ChargingMedium.TxSmppOrig, sms0);
-        // } else {
-        // // applying of MProc
-        // MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(sms0, persistence);
-        //
-        // FastList<Sms> smss = mProcResult.getMessageList();
-        // for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
-        // Sms sms = n.getValue();
-        // TargetAddress ta = new TargetAddress(sms.getSmsSet());
-        // TargetAddress lock = store.obtainSynchroObject(ta);
-        //
-        // try {
-        // synchronized (lock) {
-        // boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-        // if (!storeAndForwMode) {
-        // try {
-        // this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-        // } catch (Exception e) {
-        // throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-        // SmppConstants.STATUS_SYSERR,
-        // MAPErrorCode.systemFailure, null, e);
-        // }
-        // } else {
-        // // store and forward
-        // if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast && sms.getScheduleDeliveryTime() ==
-        // null) {
-        // try {
-        // sms.setStoringAfterFailure(true);
-        // this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-        // } catch (Exception e) {
-        // throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-        // SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, null, e);
-        // }
-        // } else {
-        // try {
-        // sms.setStored(true);
-        // this.scheduler.setDestCluster(sms.getSmsSet());
-        // store.c2_scheduleMessage_ReschedDueSlot(sms,
-        // smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-        // false);
-        // } catch (PersistenceException e) {
-        // throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : " + e.getMessage(),
-        // SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure, null, e);
-        // }
-        // }
-        // }
-        // }
-        // } finally {
-        // store.releaseSynchroObject(lock);
-        // }
-        // }
-        //
-        // if (mProcResult.isMessageRejected()) {
-        // sms0.setMessageDeliveryResultResponse(null);
-        // SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules",
-        // SmppConstants.STATUS_SUBMITFAIL, 0, null);
-        // e.setSkipErrorLogging(true);
-        // if (logger.isInfoEnabled()) {
-        // logger.info("Incoming message is rejected by mProc rules, message=[" + sms0 + "]");
-        // }
-        // throw e;
-        // }
-        // if (mProcResult.isMessageDropped()) {
-        // sms0.setMessageDeliveryResultResponse(null);
-        // smscStatAggregator.updateMsgInFailedAll();
-        // if (logger.isInfoEnabled()) {
-        // logger.info("Incoming message is dropped by mProc rules, message=[" + sms0 + "]");
-        // }
-        // return;
-        // }
-        //
-        // smscStatAggregator.updateMsgInReceivedAll();
-        // smscStatAggregator.updateMsgInReceivedSmpp();
-        // }
-
     }
 
     // *********

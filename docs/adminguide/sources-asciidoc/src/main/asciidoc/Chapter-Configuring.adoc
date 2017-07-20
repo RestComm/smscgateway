@@ -1519,16 +1519,15 @@ error:4,message ID not exists
 [[_diameter_ocs_server_general]]
 === General information
 
-SMSC GW can interoperate with an OCS server via Diameter protocol connection. 
+SMSC GW can interoperate with an OCS server via Diameter protocol connection.
 
-For this case SMSC GW can be configured so any incoming SMPP, MO SS7, Home Routing SS7 and SIP originated messages before next processing will be sent to OCS server.
+For this case SMSC GW can be configured so any incoming SMPP, MO SS7 and Home Routing SS7 originated messages before next processing will be sent to OCS server.
 Then OCS server can check if SMSC GW must accept the message or not.
 If yes, SMSC GW will process the message, if not, the message will be dropped.
-OCS server can also make any charging operations as needed. 
+OCS server can also make any charging operations as needed.
 
-For SMPP and MO SS7 originated messages SMSC GW will return error (reject) in the response back to the orgiginated message submit message.
-So MO and SMPP part will be informed if the message is rejected.
-(This functionality is not implemented now for Home Routing SS7 and SIP originated messages). 
+For SMPP and MO and HR SS7 originated messages SMSC GW will return error (reject) in the response back to the originated submit message.
+So MO SS7, HR SS7 and SMPP part will be informed if the message is rejected.
 
 For interconnecting with OCS Server SMSC GW uses diameter CCR (Credit-Control Request) with following filled AVPs (all of them are located in AVP Service-Information (873)): 
 
