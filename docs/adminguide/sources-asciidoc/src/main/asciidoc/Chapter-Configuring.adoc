@@ -1614,7 +1614,15 @@ You need to specify an address of message sender (source address). OCS Server id
 . SMSC GW is configured
 
 
+== Security issues
 
+When you configure SMSC GW for the first usage you need to care for security to avoid of unauthorized usage. Here you can find some tips for this.
+
+If we do not accept messages from SS7 connection (and any other connection) - disable of all messages from all concrete type of connections. Find extra in <<_dest_mocharging>>, <<_dest_txsmppcharging>>, <<_dest_txsipcharging>>, <<_dest_hrcharging>>, <<_dest_txhttpcharging>>. 
+
+if we accept MO messages from our subscribers we need to specify (via mproc rules) that we will reject incoming messages with "sourcedigmask" value is out of our subscriber's range (a mproc rule)
+
+To be safe a good way to use diameter server requests for messages where we can implement logic of spam avoiding. 
 
 
 == CDR Logging Settings
@@ -1628,3 +1636,4 @@ For more details refer to Sections <<_generatecdr>>, <<_generatearchivetable>> a
 
 The CDR generated in a text file is of a specific format.
 The details of the format and the possible values for the fields recorded in the CDR log file are explained in <<_monitoring_smsc_cdr_log>>. 
+
