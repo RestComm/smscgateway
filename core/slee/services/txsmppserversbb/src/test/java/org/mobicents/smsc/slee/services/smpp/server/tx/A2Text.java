@@ -2,7 +2,13 @@ package org.mobicents.smsc.slee.services.smpp.server.tx;
 
 import java.nio.charset.Charset;
 
+import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
 import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
+import org.mobicents.protocols.ss7.map.smstpdu.ConcatenatedShortMessagesIdentifierImpl;
+import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.mobicents.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
+import org.mobicents.smsc.library.MessageUtil;
 import org.testng.annotations.Test;
 
 public class A2Text {
@@ -46,5 +52,17 @@ public class A2Text {
         long mId = Long.parseLong(s1);
         String digDlvMessageId = String.format("%08X", mId);
 //        String digDlvMessageId = Long.toHexString(mId).toUpperCase();
+    }
+
+    @Test
+    public void testA3() throws Exception {
+        DataCodingScheme dcs = new DataCodingSchemeImpl(0xF1);
+        String msg = "Welcome to [thiopien\nPrices in EUR\n\nLocal calls from 2.19/min\nIncoming calls 1.29/min\nCalls home from 1.99/min\n\nSMS from 1.29\nData from 19.99/mb\n\n--Lufth";
+        UserDataHeader udh = new UserDataHeaderImpl();
+        ConcatenatedShortMessagesIdentifierImpl udhe = new ConcatenatedShortMessagesIdentifierImpl(false, 227, 2, 1);
+        udh.addInformationElement(udhe);
+        int messageLen = MessageUtil.getMessageLengthInBytes(dcs, msg, udh);
+        int i1 = 0;
+        i1++;
     }
 }
