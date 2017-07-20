@@ -102,8 +102,8 @@ For each networkId we can configure a separate SS7 GlobalTitle and for an extern
 
 NetworkId for a generated inside SMSC receipts and SMS-STATUS-REPORTs is assigned by two algoritms:
 
-* if the option "Delivery receipts will be routed to the origination networkId" is set to true - networkId from ESME/SIP/SAP via what an original message has left SMSC GW will be assigned
-* if the option "Delivery receipts will be routed to the origination networkId" is set to false - networkId from ESME/SIP/SAP via what an original message has come to SMSC GW will be assigned
+* if the option "Delivery receipts will be routed to the origination networkId" is set to true - networkId from ESME/SIP/SAP via what an original message has come SMSC GW will be assigned
+* if the option "Delivery receipts will be routed to the origination networkId" is set to false - networkId from ESME/SIP/SAP via what an original message has left to SMSC GW will be assigned
 
 Please take into account that mproc rules in `Arrival` trigger (actions like `newnetworkid`) do not affect receipts and SMS-STATUS-REPORTs. This may be used for do not pay attention for receipt routing and concentrate for routing of original messages.
 
