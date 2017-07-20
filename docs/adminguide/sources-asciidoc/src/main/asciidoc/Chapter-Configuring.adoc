@@ -247,6 +247,28 @@ We can add mproc rules like
 This rule will reroute a message to networkId==22 area for further delivering if IMSI from a SRI response matches the mask. You can use also other conditions here for proper filtering (networkidmask, destdigmask, nnndigitsmask, etc). If in the new networkId area a message will be delivered again to SS7 network then a new SRI will be performed.
 
 
+[[_failure_reasons]]
+=== Temporary and permanent failure reasons.
+
+* Permanent error reasons:
+** Internal System failures
+** Bad destination address
+** MT: ProviderDialogAbort, UserDialogAbort
+** MT: RejectComponent / Dialog
+** MT: Failure of MAP protocol ACN / version negotiation
+** MT: SMDeliveryFailure MAP error message with causes except of "memoryCapacityExceeded" and "equipmentProtocolError"
+** MT: MAP error messages of SubscriberBusyForMtSms, AbsentSubscriber, AbsentSubscriberSM, SMDeliveryFailure, SystemFailure 
+** SMPP: SMPP response error with error codes except of STATUS_THROTTLED (0x58), STATUS_X_T_APPN (0x64), STATUS_SYSERR (0x08), STATUS_INVBNDSTS (0x00000004), STATUS_MSGQFUL (0x14)
+
+* Temporary error reasons:
+** DeliveryTimeout
+** MT: MAP dialog timeout
+** MT: SMDeliveryFailure MAP error message with causes "memoryCapacityExceeded" and "equipmentProtocolError"
+** MT: MAP error messages SubscriberBusyForMtSms, AbsentSubscriber, AbsentSubscriberSM, SMDeliveryFailure, SystemFailure
+** SMPP: SMPP response error with error codes STATUS_THROTTLED (0x58), STATUS_X_T_APPN (0x64), STATUS_SYSERR (0x08), STATUS_INVBNDSTS (0x00000004), STATUS_MSGQFUL (0x14)
+** SMPP: PduRequestTimeout and other sending error
+
+
 [[_mproc_rules_fundamentals]]
 == Message processing rules (mproc rules)
 
