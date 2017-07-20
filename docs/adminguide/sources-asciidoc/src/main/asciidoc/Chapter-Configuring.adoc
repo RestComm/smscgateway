@@ -102,8 +102,8 @@ For each networkId we can configure a separate SS7 GlobalTitle and for an extern
 
 NetworkId for a generated inside SMSC receipts and SMS-STATUS-REPORTs is assigned by two algoritms:
 
-* if the option "Delivery receipts will be routed to the origination networkId" is set to true - networkId from ESME/SIP/SAP via what an original message has left SMSC GW will be assigned
-* if the option "Delivery receipts will be routed to the origination networkId" is set to false - networkId from ESME/SIP/SAP via what an original message has come to SMSC GW will be assigned
+* if the option "Delivery receipts will be routed to the origination networkId" is set to true - networkId from ESME/SIP/SAP via what an original message has come SMSC GW will be assigned
+* if the option "Delivery receipts will be routed to the origination networkId" is set to false - networkId from ESME/SIP/SAP via what an original message has left to SMSC GW will be assigned
 
 Please take into account that mproc rules in `Arrival` trigger (actions like `newnetworkid`) do not affect receipts and SMS-STATUS-REPORTs. This may be used for do not pay attention for receipt routing and concentrate for routing of original messages.
 
@@ -245,6 +245,28 @@ We can add mproc rules like
 `smsc mproc add 1 imsidigitsmask <regular expression> newnetworkidaftersri 22`
 
 This rule will reroute a message to networkId==22 area for further delivering if IMSI from a SRI response matches the mask. You can use also other conditions here for proper filtering (networkidmask, destdigmask, nnndigitsmask, etc). If in the new networkId area a message will be delivered again to SS7 network then a new SRI will be performed.
+
+
+[[_failure_reasons]]
+=== Temporary and permanent failure reasons.
+
+* Permanent error reasons:
+** Internal System failures
+** Bad destination address
+** MT: ProviderDialogAbort, UserDialogAbort
+** MT: RejectComponent / Dialog
+** MT: Failure of MAP protocol ACN / version negotiation
+** MT: SMDeliveryFailure MAP error message with causes except of "memoryCapacityExceeded" and "equipmentProtocolError"
+** MT: MAP error messages of SubscriberBusyForMtSms, AbsentSubscriber, AbsentSubscriberSM, SMDeliveryFailure, SystemFailure 
+** SMPP: SMPP response error with error codes except of STATUS_THROTTLED (0x58), STATUS_X_T_APPN (0x64), STATUS_SYSERR (0x08), STATUS_INVBNDSTS (0x00000004), STATUS_MSGQFUL (0x14)
+
+* Temporary error reasons:
+** DeliveryTimeout
+** MT: MAP dialog timeout
+** MT: SMDeliveryFailure MAP error message with causes "memoryCapacityExceeded" and "equipmentProtocolError"
+** MT: MAP error messages SubscriberBusyForMtSms, AbsentSubscriber, AbsentSubscriberSM, SMDeliveryFailure, SystemFailure
+** SMPP: SMPP response error with error codes STATUS_THROTTLED (0x58), STATUS_X_T_APPN (0x64), STATUS_SYSERR (0x08), STATUS_INVBNDSTS (0x00000004), STATUS_MSGQFUL (0x14)
+** SMPP: PduRequestTimeout and other sending error
 
 
 [[_mproc_rules_fundamentals]]
@@ -1613,7 +1635,15 @@ You need to specify an address of message sender (source address). OCS Server id
 . SMSC GW is configured
 
 
+== Security issues
 
+When you configure SMSC GW for the first usage you need to care for security to avoid of unauthorized usage. Here you can find some tips for this.
+
+If we do not accept messages from SS7 connection (and any other connection) - disable of all messages from all concrete type of connections. Find extra in <<_dest_mocharging>>, <<_dest_txsmppcharging>>, <<_dest_txsipcharging>>, <<_dest_hrcharging>>, <<_dest_txhttpcharging>>. 
+
+if we accept MO messages from our subscribers we need to specify (via mproc rules) that we will reject incoming messages with "sourcedigmask" value is out of our subscriber's range (a mproc rule)
+
+To be safe a good way to use diameter server requests for messages where we can implement logic of spam avoiding. 
 
 
 == CDR Logging Settings
@@ -1627,3 +1657,4 @@ For more details refer to Sections <<_generatecdr>>, <<_generatearchivetable>> a
 
 The CDR generated in a text file is of a specific format.
 The details of the format and the possible values for the fields recorded in the CDR log file are explained in <<_monitoring_smsc_cdr_log>>. 
+
