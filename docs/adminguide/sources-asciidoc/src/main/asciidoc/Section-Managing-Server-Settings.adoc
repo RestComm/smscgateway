@@ -2518,6 +2518,81 @@ EXAMPLES
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 
+[[_generaterejectioncdr]]
+=== Generate CDR for Rejected Messages as a message sumbission step
+
+[[_generaterejectioncdr_cli]]
+==== Using CLI
+
+You can set the 'generaterejectioncdr' value to true/false by issuing the command `smsc set generaterejectioncdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get generaterejectioncdr` which will display the value set for this property. 
+
+----
+Name
+	smsc set generaterejectioncdr
+
+SYNOPSIS
+	smsc set generaterejectioncdr <true | false>
+
+DESCRIPTION
+	The SMSC can be configured to generate CDRs for rejections at submission step,
+	you must set the parameter 'generaterejectioncdr' to true.
+	Default value: false
+
+EXAMPLES
+	smsc set generaterejectioncdr false
+----
+
+[[_generaterejectioncdr_gui]]
+==== Using GUI
+
+.Procedure: Set 'generate CDR for Rejected Messages as a message sumbission step'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI. 
+. You can specify if the SMSC should generate CDR for receipt messages by choosing the value true for the field 'Generate CDR for message rejection'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
+[[_generatedetailedcdr]]
+=== Generate Detailed CDR for Messages
+
+[[_generatedetailedcdr_cli]]
+==== Using CLI
+
+You can set the 'generatedetailedcdr' value to true/false by issuing the command `smsc set generatedetailedcdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get generatedetailedcdr` which will display the value set for this property. 
+
+----
+Name
+	smsc set generatedetailedcdr
+
+SYNOPSIS
+	smsc set generatedetailedcdr <true | false>
+
+DESCRIPTION
+	The SMSC can be configured to generate both regular and detailed CDR for messages 
+	or to generate just regular CDR. By default the SMSC will only generate regular CDR.
+	However if you want the SMSC to also generate detailed CDR, you have to set the 
+	parameter 'generatedetailedcdr' to true.
+	Default value: false
+
+EXAMPLES
+	smsc set generatedetailedcdr false
+----
+
+[[_generatedetaileddr_gui]]
+==== Using GUI
+
+.Procedure: Set 'generate detailed CDR for messages'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI. 
+. You can specify if the SMSC should generate detailed CDR for messages by choosing the value true for the field 'Generate detailed CDR'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
 [[_generatetempfailurecdr]]
 === Generate CDR for temporary failure case
 
@@ -2555,6 +2630,45 @@ EXAMPLES
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'CDR' tab in the GUI. 
 . You can specify if the SMSC should generate CDR for for a temporary failure case by choosing the value true for the field 'Generate CDR for a temporary failure case'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+
+
+[[_generateprocessingerrorcdr]]
+=== Generate CDR for Message Processing Errors
+
+[[_generateprocessingerrorcdr_cli]]
+==== Using CLI
+
+You can set the 'generateprocessingerrorcdr' value to true/false by issuing the command `smsc set generateprocessingerrorcdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get generateprocessingerrorcdr` which will display the value set for this property. 
+
+----
+Name
+  smsc set generateprocessingerrorcdr
+
+SYNOPSIS
+  smsc set generateprocessingerrorcdr <true | false>
+
+DESCRIPTION
+  The SMSC can be configured to generate CDR also for unsuccessful message
+  processing. This applies both to a variety of SMSC errors (unexpected
+  internal and/or external) as well as to intentional message rejection by
+  MProc rules.
+  Default value: false
+
+EXAMPLES
+  smsc set generateprocessingerrorcdr false
+----
+
+[[_generateprocessingerrorcdr_gui]]
+==== Using GUI
+
+.Procedure: Set 'generate CDR for message processing error'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI. 
+. You can specify if the SMSC should generate CDR for message processing errors by choosing the value true for the field 'Generate CDR for an SMSC processing error case'. For more details of this parameter, please refer to the description of the CLI command in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
@@ -2606,7 +2720,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'delayparametersincdr' value to true/false by issuing the command `smsc set delayparametersincdr` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get delayparametersincdr` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get delayparametersincdr` which will display the value set for this property.
 
 ----
 Name
@@ -2630,12 +2744,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set 'Adding of delay parameters into a CDR record'  using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'CDR' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI.
 . You can specify if the SMSC should add of delay parameters into a CDR record by choosing the value true for the field 'Delay parameters in CDR'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 

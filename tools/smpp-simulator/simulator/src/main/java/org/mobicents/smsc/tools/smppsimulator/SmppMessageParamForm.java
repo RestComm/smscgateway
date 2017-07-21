@@ -100,6 +100,7 @@ public class SmppMessageParamForm extends JDialog {
     private JRadioButton rbDR_Error8;
     private JCheckBox cbDRAfter2Min;
     private JCheckBox cbIdResponseTlv;
+    private JCheckBox cbIdResponseTlvMessageState;
     private JCheckBox cbWrongMessageIdInDlr;
     private final ButtonGroup buttonGroup_2 = new ButtonGroup();
 
@@ -359,7 +360,7 @@ public class SmppMessageParamForm extends JDialog {
 						panel_resp.setLayout(null);
 						
 						cbRejectIncomingDeliveryMessage = new JCheckBox("Rejecting of incoming SMPP delivery messages");
-						cbRejectIncomingDeliveryMessage.setBounds(6, 7, 320, 23);
+						cbRejectIncomingDeliveryMessage.setBounds(6, 7, 400, 23);
 						panel_resp.add(cbRejectIncomingDeliveryMessage);
 						
 						rbDR_Success = new JRadioButton("Success receipt");
@@ -388,9 +389,13 @@ public class SmppMessageParamForm extends JDialog {
 						cbIdResponseTlv = new JCheckBox("Tlv fields usage in delivery receipt");
 						cbIdResponseTlv.setBounds(6, 125, 364, 23);
 						panel_resp.add(cbIdResponseTlv);
+
+						cbIdResponseTlvMessageState = new JCheckBox("Tlv \"Message State\" in delivery receipt");
+						cbIdResponseTlvMessageState.setBounds(6, 151, 364, 23);
+						panel_resp.add(cbIdResponseTlvMessageState);
 						
 						cbWrongMessageIdInDlr = new JCheckBox("Wrong messageId in delivery receipt");
-						cbWrongMessageIdInDlr.setBounds(6, 151, 364, 23);
+						cbWrongMessageIdInDlr.setBounds(6, 177, 364, 23);
 						panel_resp.add(cbWrongMessageIdInDlr);
 						
 						JPanel panel_bulk = new JPanel();
@@ -608,6 +613,7 @@ public class SmppMessageParamForm extends JDialog {
         this.cbRejectIncomingDeliveryMessage.setSelected(this.data.isRejectIncomingDeliveryMessage());
         this.cbDRAfter2Min.setSelected(this.data.isDeliveryResponseAfter2Min());
         this.cbIdResponseTlv.setSelected(this.data.isIdResponseTlv());
+        this.cbIdResponseTlvMessageState.setSelected(this.data.isIdResponseTlvMessageState());
         this.cbWrongMessageIdInDlr.setSelected(this.data.isWrongMessageIdInDlr());
         switch (this.data.getDeliveryResponseGenerating()) {
             case No:
@@ -726,6 +732,7 @@ public class SmppMessageParamForm extends JDialog {
         this.data.setRejectIncomingDeliveryMessage(this.cbRejectIncomingDeliveryMessage.isSelected());
         this.data.setDeliveryResponseAfter2Min(this.cbDRAfter2Min.isSelected());
         this.data.setIdResponseTlv(this.cbIdResponseTlv.isSelected());
+        this.data.setIdResponseTlvMessageState(this.cbIdResponseTlvMessageState.isSelected());
         this.data.setWrongMessageIdInDlr(this.cbWrongMessageIdInDlr.isSelected());
 
         if (rbDR_No.isSelected())

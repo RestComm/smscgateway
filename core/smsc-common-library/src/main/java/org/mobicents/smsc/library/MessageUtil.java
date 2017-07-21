@@ -850,10 +850,10 @@ public class MessageUtil {
         }
         tlv = tlvSet.getOptionalParameter(SmppConstants.TAG_MSG_STATE);
         if (tlv != null) {
-            byte[] data = tlv.getValue();
-            if (data.length > 0) {
-                int val = data[0] & 0xFF;
-                deliveryReceiptData.setTlvMessageState(val);
+        	try {
+                byte val = tlv.getValueAsByte();
+                deliveryReceiptData.setTlvMessageState(new Integer(val));
+            } catch (TlvConvertException e) {
             }
         }
 

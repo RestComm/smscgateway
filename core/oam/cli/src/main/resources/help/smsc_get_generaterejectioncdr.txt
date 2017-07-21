@@ -1,0 +1,17 @@
+Name
+	smsc get generaterejectioncdr
+
+SYNOPSIS
+	smsc get generaterejectioncdr
+
+DESCRIPTION
+	The SMSC can be configured to generate CDRs for rejections at submission step,
+	you must set the parameter 'generaterejectioncdr' to true.
+
+EXAMPLES
+	smsc get generaterejectioncdr
+
+SEE ALSO
+	smsc set generaterejectioncdr, smsc set generatereceiptcdr,
+	smsc set generatetempfailurecdr, smsc set calculatemsgpartslencdr,
+	smsc set generatecdr, smsc set delayparametersincdr

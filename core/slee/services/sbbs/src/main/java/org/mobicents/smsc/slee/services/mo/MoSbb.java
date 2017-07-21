@@ -82,15 +82,7 @@ import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
 import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.SmscStatProvider;
-import org.mobicents.smsc.library.CorrelationIdValue;
-import org.mobicents.smsc.library.MessageUtil;
-import org.mobicents.smsc.library.OriginationType;
-import org.mobicents.smsc.library.SbbStates;
-import org.mobicents.smsc.library.Sms;
-import org.mobicents.smsc.library.SmsSet;
-import org.mobicents.smsc.library.SmsSetCache;
-import org.mobicents.smsc.library.SmscProcessingException;
-import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 
@@ -251,8 +243,11 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
-
-                dialog.close(false);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), evt.getIMSI().getData(), dialog.getLocalAddress(),
+							CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+				}
+				dialog.close(false);
                 return;
             } catch (Throwable e) {
                 logger.severe("Error while sending Error message", e);
@@ -271,6 +266,10 @@ public abstract class MoSbb extends MoCommonSbb {
             }
             sms = this.processMoMessage(evt.getSM_RP_OA(), evt.getSM_RP_DA(), evt.getSM_RP_UI(), dialog.getNetworkId(),
                     originatorSccpAddress, true, evt.getMAPDialog(), evt, evt.getInvokeId());
+            if (sms != null) {
+                this.processSms(sms, persistence, smscPropertiesManagement.getMoCharging(), true, dialog, evt,
+                        evt.getInvokeId());
+            }
 		} catch (SmscProcessingException e1) {
             if (!e1.isSkipErrorLogging()) {
                 if (e1.isIsWarning()) {
@@ -312,7 +311,14 @@ public abstract class MoSbb extends MoCommonSbb {
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info("\nSent ErrorComponent = " + errorMessage);
 				}
-
+				if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
+                    if (sms != null) {
+                        generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_MO, e1.getMessage(), false, true);
+                    } else {
+                        generateCDR(dialog.getNetworkId(), evt.getIMSI().getData(), dialog.getLocalAddress(),
+                                CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+                    }
+				}
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -329,6 +335,10 @@ public abstract class MoSbb extends MoCommonSbb {
 								dialog.getApplicationContext().getApplicationContextVersion().getVersion(), null, null,
 								null);
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), evt.getIMSI().getData(), dialog.getLocalAddress(),
+							CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+				}
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -398,7 +408,13 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
-
+                this.logger.warning("************* 0001");
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+	                this.logger.warning("************* 0002");
+                    generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), isMt ? CdrGenerator.CDR_SUBMIT_FAILED_HR
+                            : CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+                    this.logger.warning("************* 0003");
+				}
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
@@ -422,6 +438,10 @@ public abstract class MoSbb extends MoCommonSbb {
             } else {
                 sms = this.processMoMessage(evt.getSM_RP_OA(), evt.getSM_RP_DA(), evt.getSM_RP_UI(), dialog.getNetworkId(),
                         originatorSccpAddress, false, evt.getMAPDialog(), evt, evt.getInvokeId());
+            }
+            if (sms != null) {
+                this.processSms(sms, persistence, smscPropertiesManagement.getMoCharging(), !isMt, dialog, evt,
+                        evt.getInvokeId());
             }
 		} catch (SmscProcessingException e1) {
             if (!e1.isSkipErrorLogging()) {
@@ -460,11 +480,21 @@ public abstract class MoSbb extends MoCommonSbb {
 									null, null);
 					break;
 				}
-				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
+                if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
+                    if (sms != null) {
+                        generateCDR(sms, isMt ? CdrGenerator.CDR_SUBMIT_FAILED_HR
+                                : CdrGenerator.CDR_SUBMIT_FAILED_MO, e1.getMessage(), false, true);
+                    } else {
+                        generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(),
+                                isMt ? CdrGenerator.CDR_SUBMIT_FAILED_HR : CdrGenerator.CDR_SUBMIT_FAILED_MO,
+                                errorMessage.toString(), true);
+                    }
+                }
+
+                dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info("\nSent ErrorComponent = " + errorMessage);
 				}
-
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -480,7 +510,12 @@ public abstract class MoSbb extends MoCommonSbb {
 						.createMAPErrorMessageSystemFailure(
 								dialog.getApplicationContext().getApplicationContextVersion().getVersion(), null, null,
 								null);
-				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
+	            if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+	                generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), isMt ? CdrGenerator.CDR_SUBMIT_FAILED_HR
+	                        : CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
+	            }
+
+	            dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -534,7 +569,10 @@ public abstract class MoSbb extends MoCommonSbb {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
-
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), CdrGenerator.CDR_SUBMIT_FAILED_HR,
+							errorMessage.toString(), true);
+				}
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
@@ -554,6 +592,10 @@ public abstract class MoSbb extends MoCommonSbb {
             }
             sms = this.processMtMessage(evt.getSM_RP_OA(), evt.getSM_RP_DA(), evt.getSM_RP_UI(), dialog.getNetworkId(),
                     originatorSccpAddress, false, evt.getMAPDialog(), evt, evt.getInvokeId());
+            if (sms != null) {
+                this.processSms(sms, persistence, smscPropertiesManagement.getMoCharging(), false, dialog, evt,
+                        evt.getInvokeId());
+            }
 		} catch (SmscProcessingException e1) {
 			this.logger.severe(e1.getMessage(), e1);
 			try {
@@ -585,7 +627,14 @@ public abstract class MoSbb extends MoCommonSbb {
 				if (this.logger.isInfoEnabled()) {
 					this.logger.info("\nSent ErrorComponent = " + errorMessage);
 				}
-
+				if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
+                    if (sms != null) {
+                        generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_HR, e1.getMessage(), false, true);
+                    } else {
+                        generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), CdrGenerator.CDR_SUBMIT_FAILED_HR,
+                                errorMessage.toString(), true);
+                    }
+				}
 				dialog.close(false);
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
@@ -601,6 +650,10 @@ public abstract class MoSbb extends MoCommonSbb {
 								null);
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				dialog.close(false);
+				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+					generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), CdrGenerator.CDR_SUBMIT_FAILED_HR,
+							errorMessage.toString(), true);
+				}
 			} catch (Throwable e) {
 				logger.severe("Error while sending Error message", e);
 				return;
@@ -771,7 +824,8 @@ public abstract class MoSbb extends MoCommonSbb {
 
         Sms sms = this.createSmsEvent(smsSubmitTpdu, ta, persistence, callingPartyAddress, networkId, originatorSccpAddress);
         sms.setOrigMoServiceCentreAddressDA(origMoServiceCentreAddressDA);
-        return this.processSms(sms, persistence, smscPropertiesManagement.getMoCharging(), isMoOperation, dialog, evt, invokeId);
+        return sms;
+//        return this.processSms(sms, persistence, smscPropertiesManagement.getMoCharging(), isMoOperation, dialog, evt, invokeId);
     }
 
     private Sms handleSmsDeliverTpdu(SmsDeliverTpdu smsDeliverTpdu, CorrelationIdValue civ, int networkId,
@@ -780,7 +834,8 @@ public abstract class MoSbb extends MoCommonSbb {
         TargetAddress ta = createDestTargetAddress(civ.getMsisdn(), networkId);
 
         Sms sms = this.createSmsEvent(smsDeliverTpdu, ta, persistence, civ, networkId, originatorSccpAddress);
-        return this.processSms(sms, persistence, smscPropertiesManagement.getHrCharging(), isMoOperation, dialog, evt, invokeId);
+        return sms;
+//        return this.processSms(sms, persistence, smscPropertiesManagement.getHrCharging(), isMoOperation, dialog, evt, invokeId);
 	}
 
     private Sms createSmsEvent(SmsSubmitTpdu smsSubmitTpdu, TargetAddress ta, PersistenceRAInterface store, AddressString callingPartyAddress, int networkId,
@@ -1058,7 +1113,7 @@ public abstract class MoSbb extends MoCommonSbb {
         if (chargingType == MoChargingType.reject)
             return null;
 
-        this.forwardMessage(sms0, chargingType == MoChargingType.diameter, smscStatAggregator);
+        this.forwardMessage(sms0, chargingType == MoChargingType.diameter, smscStatAggregator, CdrDetailedGenerator.CDR_MSG_TYPE_SS7, -1);
 
         return sms0;
         
@@ -1205,4 +1260,18 @@ public abstract class MoSbb extends MoCommonSbb {
 		OnlyRequestRecieved, OtherDataRecieved,
 	}
 
+    private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+        CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
+                smscPropertiesManagement.getDelayParametersInCdr());
+    }
+
+    private void generateCDR(int networkId, String imsi, SccpAddress sccpAddress, String status, String reason,
+            boolean lastSegment) {
+
+        CdrGenerator.generateCdr(null, 0, 0, null, 0, 0, OriginationType.SS7_MO, null, imsi, sccpAddress.toString(), networkId,
+                0, null, 0, null, status, reason, true, true, lastSegment,
+                smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+	}
 }

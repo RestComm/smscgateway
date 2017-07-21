@@ -40,7 +40,7 @@
 				<include>org.restcomm.smpp:smpp-extensions</include>
 
 				<include>joda-time:joda-time</include>
-				<include>org.slf4j:slf4j-api</include>
+				<!-- <include>org.slf4j:slf4j-api</include> -->
 
 				<!-- Not strictly SS7, But needed by SS7 -->
 				<include>javolution:javolution</include>

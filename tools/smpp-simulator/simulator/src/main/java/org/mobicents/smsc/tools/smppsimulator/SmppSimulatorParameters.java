@@ -51,6 +51,7 @@ public class SmppSimulatorParameters {
     private DeliveryResponseGenerating deliveryResponseGenerating = DeliveryResponseGenerating.No;
     private boolean deliveryResponseAfter2Min = false;
     private boolean idResponseTlv = false;
+    private boolean idResponseTlvMessageState = false;
     private boolean wrongMessageIdInDlr = false;
 
 	private TON sourceTon = TON.International;
@@ -386,6 +387,14 @@ public class SmppSimulatorParameters {
 
     public void setIdResponseTlv(boolean hexMessageIdResponse) {
         this.idResponseTlv = hexMessageIdResponse;
+    }
+    
+    public boolean isIdResponseTlvMessageState() {
+        return idResponseTlvMessageState;
+    }
+
+    public void setIdResponseTlvMessageState(boolean hexMessageIdResponseMessageState) {
+        this.idResponseTlvMessageState = hexMessageIdResponseMessageState;
     }
 
     public boolean isWrongMessageIdInDlr() {

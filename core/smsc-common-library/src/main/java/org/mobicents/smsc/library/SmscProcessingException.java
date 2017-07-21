@@ -69,6 +69,7 @@ public class SmscProcessingException extends Exception {
 	private int mapErrorCode = 0;
     private Object extraErrorData;
     private boolean skipErrorLogging = false;
+    private boolean messageRejectCdrCreated = false;
     private boolean isWarning = false;
     private final int itsHttpErrorCode;
     private final Integer itsInternalErrorCode;
@@ -134,6 +135,14 @@ public class SmscProcessingException extends Exception {
 
     public void setSkipErrorLogging(boolean skipErrorLogging) {
         this.skipErrorLogging = skipErrorLogging;
+    }
+
+    public boolean isMessageRejectCdrCreated() {
+        return messageRejectCdrCreated;
+    }
+
+    public void setMessageRejectCdrCreated(boolean messageRejectCdrCreated) {
+        this.messageRejectCdrCreated = messageRejectCdrCreated;
     }
 
     public boolean isIsWarning() {
