@@ -250,13 +250,13 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private boolean generateReceiptCdr = false;
     // true: we generate detailed CDR for messages
     // false: we do not generate detailed CDR 
-    private boolean generateDetailedCdr = true;
+    private boolean generateDetailedCdr = false;
     // true: we generate CDR also for temp failures (along with success and permanent failure cases)
     // false: we generate CDR only for success and permanent failure cases (no CDRs for temp failures)
     private boolean generateTempFailureCdr = true;
     // true: We generate CDR also for SMSC message rejection by mproc rule at forwarding.
     // false: CDR entries are not generated on the SMSC message rejection by mproc rule at forwarding.
-    private boolean generateRejectionCdr = true;
+    private boolean generateRejectionCdr = false;
     // true: when CDR generating SMSC GW will calculate MSG_PARTS and CHAR_NUMBERS fields (that demands extra calculating)
     // false: not calculate
     private boolean calculateMsgPartsLenCdr = false;

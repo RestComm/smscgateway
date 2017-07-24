@@ -38,6 +38,8 @@
 <processingSmsSetTimeout value="600"/>
 <generateReceiptCdr value="false"/>
 <generateTempFailureCdr value="true"/>
+<generateDetailedCdr value="true"/>
+<generateRejectionCdr value="true"/>
 <calculateMsgPartsLenCdr value="false"/>
 <delayParametersInCdr value="false"/>
 <receiptsDisabling value="false"/>
