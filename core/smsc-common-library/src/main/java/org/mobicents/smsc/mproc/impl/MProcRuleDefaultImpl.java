@@ -1509,8 +1509,15 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 	this.setDropOnArrival(val);
                 	success = true;
                 } else if (command.equals("rejectonarrival")) {
-                    RejectType rejectOnArrival = RejectType.parse(value);
-                    this.setRejectOnArrival(rejectOnArrival);
+                    if (value != null && value.equals("-1")) {
+                        this.setRejectOnArrival(null);
+                    } else {
+                        RejectType rejectOnArrival = RejectType.parse(value);
+                        if (rejectOnArrival.equals(RejectType.NONE))
+                                this.setRejectOnArrival(null);
+                        else 
+                            this.setRejectOnArrival(rejectOnArrival);
+                    }
                 	success = true;
                 } else if (command.equals("newnetworkidaftersri")) {
                     int val = Integer.parseInt(value);

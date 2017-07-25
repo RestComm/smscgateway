@@ -37,7 +37,9 @@
 <reviseSecondsOnSmscStart value="60"/>
 <processingSmsSetTimeout value="600"/>
 <generateReceiptCdr value="false"/>
+<generateDetailedCdr value="true"/>
 <generateTempFailureCdr value="true"/>
+<generateRejectionCdr value="true"/>
 <calculateMsgPartsLenCdr value="false"/>
 <delayParametersInCdr value="false"/>
 <receiptsDisabling value="false"/>

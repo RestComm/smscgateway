@@ -283,3 +283,99 @@ Error condition when invoking `sendMtSms()` from `onDialogReject()`::
 
 Other::
   Any other message that usually indicates some internal failure.		
+
+  [[_monitoring_smsc_cdr_detailed_log]]
+== Detailed CDR Log
+
+{this-platform} {this-application} is configured to generate detailed CDR logs in a plain text file located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr_detailed.log_.
+Detailed CDR generated in the text file is of the below format:
+----
+
+CDR recording timestamp,Event type,ErrorCode (status),MessageType,Status code,CorrelationId,OrigCorrelationId,DlrStatus,mprocRuleId,ESME name,Timestamp A,Timestamp B,Timestamp C,Source IP,Source port,Dest IP,Dest port,Sequence Number,
+----
+
+NOTE: Detailed CDR once turned on, will only be generated for SMPP (IN and OUT) and HTTP (OUT only) messages.
+
+.CDR recording timestamp
+Time when CDR is created
+
+.Event type
+Event types can be of two categories - `IN` and `OUT`:
+`IN` event types (a result of message receiving). Only SMPP and HTTP events of this type will be recorded in detailed log.
+
+`IN_SMPP_RECEIVED`:: a message is accepted from SMPP connector and is processed without error.
+`IN_SMPP_REJECT_FORBIDDEN`:: SMPP message is rejected for administrative reasons. For example, SMSC is stopped or paused, Cassandra database is not available, all messages from SMPP connector or specific ESME are forbidden.
+`IN_SMPP_REJECT_CONG`:: SMPP message is rejected for a following reason: congestion at SMSC GW level or customer's limitation.
+`IN_SMPP_REJECT_DIAMETER`:: SMPP message is rejected for a reason: rejection by a diameter server.
+`IN_SMPP_REJECT_MPROC`:: SMPP message is rejected for a reason: rejection by mproc rules.
+`IN_SMPP_DROP_MPROC`:: SMPP message is dropped (OK result was sent to a sender but message was dropped) for a reason: drop by mproc rules
+`IN_SMPP_ERROR`:: SMPP message processing failed for other reasons.
+
+`IN_HTTP_RECEIVED`:: a message is accepted from HTTP connector and is processed without error.
+`IN_HTTP_REJECT_FORBIDDEN`:: HTTP message is rejected for administrative reasons, such as SMSC is stopped or paused, Cassandra database is not available, all messages from HTTP connector are forbidden.
+`IN_HTTP_REJECT_CONG`:: HTTP message is rejected for a reason: congestion at SMSC GW level or due to a customer's limitation.
+`IN_HTTP_REJECT_DIAMETER`:: HTTP message is rejected for a reason: rejection by a diameter server.
+`IN_HTTP_REJECT_MPROC`:: HTTP message is rejected for a reason: rejection by mproc rules.
+`IN_HTTP_DROP_MPROC`:: HTTP message is dropped (OK result was sent to a sender but a message is dropped) for a reason: rejection by mproc rules.
+`IN_HTTP_ERROR`:: HTTP message processing failed for other reasons.
+
+b. `OUT` event types (a result of message sending). Only SMPP events of this type will be recorded in detailed log.
+
+`OUT_SMPP_SENT`:: SMPP message has been successfully sent.
+`OUT_SMPP_REJECTED`:: received non zero SMPP response code after message was sent.
+`OUT_SMPP_ERROR`:: error while sending SMPP message, for example, a channel error.
+`OUT_SMPP_TIMEOUT`:: no response from a peer within time specified by SMSC GW settings. Possible reason might be because connection problems or peer malfunction, delivery timeout case included.
+`VALIDITY_PERIOD_TIMEOUT`:: SMPP message has not been sent due to a validity period timeout.
+
+.ErrorCode (status)
+Internal SMSC GW delivery error code value.
+
+.MessageType
+Either `SubmitSm`, `SubmitMulti`, `DeliverSm` or `DataSm` for SMPP message and `Http` for HTTP message
+
+.Status code:
+a. For `OUT_SMPP_REJECTED` case: received non zero smpp response code when message sending, 0 for other cases)
+b. In SMPP response value (for in_smpp_reject_* cases - sent non zero smpp response code when message receiving, 0 for other cases)
+c. In HTTP response code (for in_http_reject_* cases - sent non zero http response code when a http response sending (code in the message body), 0 for other cases)
+
+.CorrelationId
+messageId of a message.
+
+.OrigCorrelationId
+messageId of an original message if this a recognized delivery response and an original message is found, otherwise -- empty value
+
+.DlrStatus
+If a message is recognized delivery response (DLR), then this field contains value of `stat` field of DLR, if it's not a delivery response otherwise empty if it is not a DLR. If a message is recognized DLR, but the field is not parsed or have different values in text and TLV parts, then this field is `"err"`.
+
+.mprocRuleId
+Id of an mproc rule which led to a message drop/reject in `IN_SMPP_REJECT_MPROC`, `IN_SMPP_DROP_MPROC`, `IN_HTTP_REJECT_MPROC` or `IN_HTTP_DROP_MPROC` cases, otherwise -- empty value.
+
+.ESME name
+Name of ESME through which a message has come to SMSC for an `IN` case or to which a message was sent from SMSC GW for an `OUT` case. This field will contain an empty value for other cases.
+
+.Timestamp A
+- `IN`: The time the message is successfully decoded
+- `OUT`: The time the message is received for sending
+
+.Timestamp B
+- `IN`: timestamp taken immediately after sending response
+- `OUT`: timestamp taken immediately after sending request
+
+.Timestamp C
+- `IN`: timestamp taken immediately after submission for further processing
+- `OUT`: timestamp when message response is successfully decoded
+
+.Source IP
+IP of a source peer, if a value is available for a channel connection.
+
+.Source port
+Port from which message has come to SMSC GW if a value is available for a channel connection.
+
+.Dest IP
+IP of a destination peer, if a value is available for a channel connection.
+
+.Dest port
+Port to which message has been sent from SMSC GW if a value is available for a channel connection.
+
+.Sequence Number
+This value will be recorded for SMPP messages in both sending and receiving cases.
