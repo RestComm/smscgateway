@@ -483,7 +483,6 @@
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="This action is performed at the step when message has arrived to the server. If value is NONE, no action will be performed. Otherwise message will be rejected without delivery attempt and reject response will be returned to a sender.">
 						<span class="add-on">Reject upon arrival to the server</span>
 						<select id="rejectonarrival" >
-							<option value=""></option>
 							<option value="NONE">NONE</option>
 							<option value="DEFAULT">DEFAULT</option>
 							<option value="UNEXPECTED_DATA_VALUE">UNEXPECTED_DATA_VALUE</option>
@@ -1297,36 +1296,36 @@
 																		'</tr>'+
 																		
 																		'<tr data-toggle="tooltip" title="This action is performed at the step when message has arrived to the server. Message will be dropped without delivery attempt and success response will be returned to a sender.">'+
-																		'<td style="font-size: 0.9em;">Drop upon arrival to the server</td>'+
-																		'<td style="font-size: 0.9em; padding: 0;">'+
-																			'<div id="div-' + id +'DropOnArrival-input" class="control-group">'+
-																			'<span id="' + id +'DropOnArrival-input" style="display: none;">'+
-																				'<input type="text" class="input-small" value="' + droponarrival + '" /> ' +
-																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'droponarrival\', \'' + id+"DropOnArrival" + '\', \'true\')"></i> ' +
-																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropOnArrival"+']\').toggle(); $(\'input[id^='+id+"DropOnArrival"+']\').focus();"></i>' + 
-																			'</span>'+
-																			'</div>' +
-																			'<span id="' +id + 'DropOnArrival-text">' + dropaftersri + '</span>'+
-																		'</td>'+
-																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropOnArrival"+']\').toggle(); $(\'input[id^='+id+"DropOnArrival"+']\').focus();"></i>' +
-																		'</td>'+
+																			'<td style="font-size: 0.9em;">Drop upon arrival to the server</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'DropOnArrival-input" class="control-group">'+
+																				'<span id="' + id +'DropOnArrival-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + droponarrival + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'droponarrival\', \'' + id+"DropOnArrival" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropOnArrival"+']\').toggle(); $(\'input[id^='+id+"DropOnArrival"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'DropOnArrival-text">' + dropaftersri + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropOnArrival"+']\').toggle(); $(\'input[id^='+id+"DropOnArrival"+']\').focus();"></i>' +
+																			'</td>'+
 																		'</tr>'+
 																		
-																		'<tr data-toggle="tooltip" title="This action is performed at the step when message has arrived to the server. If value is NONE, no action will be performed. Otherwise message will be rejected without delivery attempt and reject response will be returned to a sender.">'+
-																		'<td style="font-size: 0.9em;">Reject upon arrival to the server</td>'+
-																		'<td style="font-size: 0.9em; padding: 0;">'+
-																			'<div id="div-' + id +'RejectOnArrival-input" class="control-group">'+
-																			'<span id="' + id +'RejectOnArrival-input" style="display: none;">'+
-																				'<input type="text" class="input-small" value="' + rejectonarrival + '" /> ' +
-																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'rejectonarrival\', \'' + id+"RejectOnArrival" + '\', \'true\')"></i> ' +
-																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"RejectOnArrival"+']\').toggle(); $(\'input[id^='+id+"RejectOnArrival"+']\').focus();"></i>' + 
-																			'</span>'+
-																			'</div>' +
-																			'<span id="' +id + 'RejectOnArrival-text">' + rejectonarrival + '</span>'+
-																		'</td>'+
-																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"RejectOnArrival"+']\').toggle(); $(\'input[id^='+id+"RejectOnArrival"+']\').focus();"></i>' +
-																		'</td>'+
-																	'</tr>'+
+																		'<tr data-toggle="tooltip" title="This action is performed at the step when message has arrived to the server. Set this to -1 or leave blank to remove the action. If value is NONE, no action will be performed. Otherwise message will be rejected without delivery attempt and reject response will be returned to a sender. Valid values for rejectOnArrival are: &#13;NONE, &#13;DEFAULT, &#13;UNEXPECTED_DATA_VALUE, &#13;SYSTEM_FAILURE, &#13;THROTTLING, &#13;FACILITY_NOT_SUPPORTED">'+
+																			'<td style="font-size: 0.9em;">Reject upon arrival to the server</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'RejectOnArrival-input" class="control-group">'+
+																				'<span id="' + id +'RejectOnArrival-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + rejectonarrival + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'rejectonarrival\', \'' + id+"RejectOnArrival" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"RejectOnArrival"+']\').toggle(); $(\'input[id^='+id+"RejectOnArrival"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'RejectOnArrival-text">' + rejectonarrival + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"RejectOnArrival"+']\').toggle(); $(\'input[id^='+id+"RejectOnArrival"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
 
 																		'<tr data-toggle="tooltip" title="Once rule matches, the target SMS\'s optional parameter which matches the one set here will be removed. Set this to -1 to not remove any optional parameter. Default value is -1.">'+
 																			'<td style="font-size: 0.9em;">Remove Tlv</td>'+
@@ -1771,7 +1770,7 @@
 		
 		e = document.getElementById("rejectonarrival");
 		var rejectonarrival = e.options[e.selectedIndex].value;
-		if(rejectonarrival == "") {
+		if (rejectonarrival == "" || rejectonarrival == "NONE") {
 			rejectonarrival = null;		
 		} else {
 			parametersstring = parametersstring + " rejectonarrival "+rejectonarrival;
