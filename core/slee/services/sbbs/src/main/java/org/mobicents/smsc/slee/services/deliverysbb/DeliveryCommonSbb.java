@@ -1536,10 +1536,18 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @param lastSegment
      */
     protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+//        CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+//                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+//                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
+//                smscPropertiesManagement.getDelayParametersInCdr());
+        this.generateCDR(sms, status, reason, messageIsSplitted, lastSegment, -1);
+    }
+    
+    protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment, int seqNumber) {
         CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
                 lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
-                smscPropertiesManagement.getDelayParametersInCdr());
+                smscPropertiesManagement.getDelayParametersInCdr(), seqNumber);
     }
 
     protected void generateDetailedCDR(Sms sms, EventType eventType, ErrorCode errorCode, String messageType, int statusCode,

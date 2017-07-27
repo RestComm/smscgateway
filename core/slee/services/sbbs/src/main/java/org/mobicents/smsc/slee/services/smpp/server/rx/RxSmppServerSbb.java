@@ -771,7 +771,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             pendingMessages.add(currData);
                         } else {
                             SentItem sentItem = sendNextChunk(currData, smsSet, esme);
+                            long t = System.currentTimeMillis();
                             sentSequenceNumber = sentItem.getRemoteSequenceNumber();
+                            sms.putMsgPartDeliveryTime(sentSequenceNumber, t);
                         }
 
                         if (logger.isInfoEnabled()) {
@@ -837,7 +839,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             pendingMessages.add(currData);
                         } else {
                             SentItem sentItem = sendNextChunk(currData, smsSet, esme);
+                            long t = System.currentTimeMillis();
                             sentSequenceNumber = sentItem.getRemoteSequenceNumber();
+                            sms.putMsgPartDeliveryTime(sentSequenceNumber, t);
                         }
 
                         if (logger.isInfoEnabled()) {
@@ -1073,7 +1077,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             Sms sms = confirmMessageInSendingPool.sms;
             if (!confirmMessageInSendingPool.confirmed) {
-                this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false);
+                this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false, event.getSequenceNumber());
 
                 String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
                         : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
@@ -1107,7 +1111,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             // success CDR generating
             boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
             this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL_ESME : CdrGenerator.CDR_SUCCESS_ESME,
-                    CdrGenerator.CDR_SUCCESS_NO_REASON, confirmMessageInSendingPool.splittedMessage, true);
+                    CdrGenerator.CDR_SUCCESS_NO_REASON, confirmMessageInSendingPool.splittedMessage, true, event.getSequenceNumber());
 
             String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
                     : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
