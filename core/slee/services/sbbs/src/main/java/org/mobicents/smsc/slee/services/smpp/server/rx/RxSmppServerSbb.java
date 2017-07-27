@@ -587,10 +587,6 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     if (realID != -1)
                         confirmMessageInSendingPool = getMessageInSendingPoolBySeqNumber(realID);
 
-                    if (realID != -1 && confirmMessageInSendingPool.sequenceNumberFound) {
-                        confirmMessageInSendingPool.sms.setTimestampB(System.currentTimeMillis());
-                    }
-
                     fireSendPduStatusChild(event2, act, null);
                 } catch (IllegalStateException e) {
                     if (logger.isInfoEnabled())
@@ -771,6 +767,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             pendingMessages.add(currData);
                         } else {
                             SentItem sentItem = sendNextChunk(currData, smsSet, esme);
+                            sms.setTimestampB(System.currentTimeMillis());
                             sentSequenceNumber = sentItem.getRemoteSequenceNumber();
                         }
 
@@ -837,6 +834,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             pendingMessages.add(currData);
                         } else {
                             SentItem sentItem = sendNextChunk(currData, smsSet, esme);
+                            sms.setTimestampB(System.currentTimeMillis());
                             sentSequenceNumber = sentItem.getRemoteSequenceNumber();
                         }
 
