@@ -24,11 +24,15 @@ package org.mobicents.smsc.library;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 import javolution.util.FastMap;
 
 /**
@@ -71,6 +75,9 @@ public class SmsSetCache {
     private FastMap<String, Long> deliveredRemoteMsgIdCache1 = new FastMap<String, Long>();
     private FastMap<String, Long> deliveredRemoteMsgIdCache2 = new FastMap<String, Long>();
     private Object deliveredRemoteMsgIdCacheSync = new Object();
+    
+    private ConcurrentHashMap<Long, AtomicLong> storedMessagesCounters = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Long, AtomicLong> sentMessagesCounters = new ConcurrentHashMap<>();
 
     private ScheduledExecutorService executor;
 
@@ -431,6 +438,46 @@ public class SmsSetCache {
                 }
             }
         }
+    }
+    
+    public void incrementStoredMessagesCounter(long date) {
+        if (storedMessagesCounters.putIfAbsent(date, new AtomicLong(1l)) != null)
+            storedMessagesCounters.get(date).incrementAndGet();
+    }
+    
+    public void incrementSentMessagesCounter(long date) {
+        if (sentMessagesCounters.putIfAbsent(date, new AtomicLong(1l)) != null)
+            sentMessagesCounters.get(date).incrementAndGet();
+    }
+    
+    public long getMessagesPendingInDatabase(long date) {
+        long sumStored = 0;
+        Iterator<Map.Entry<Long, AtomicLong>> i1 = storedMessagesCounters.entrySet().iterator();
+        while (i1.hasNext()) {
+            Map.Entry<Long, AtomicLong> pair = i1.next();
+            if (pair.getKey() >= date) {
+                sumStored += pair.getValue().get();
+            }
+            i1.remove();
+        }
+        
+        long sumSent = 0;
+        Iterator<Map.Entry<Long, AtomicLong>> i2 = sentMessagesCounters.entrySet().iterator();
+        while (i2.hasNext()) {
+            Map.Entry<Long, AtomicLong> pair = i2.next();
+            if (pair.getKey() >= date) {
+                sumSent += pair.getValue().get();
+            }
+            i2.remove();
+        }
+        
+        return sumStored - sumSent;
+    }
+    
+    public void loadMessagesCountersFromDatabase(ConcurrentHashMap<Long, AtomicLong> storedMessages, 
+            ConcurrentHashMap<Long, AtomicLong> sentMessages) {
+        storedMessagesCounters = storedMessages;
+        sentMessagesCounters = sentMessages;
     }
 
 }
