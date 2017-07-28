@@ -78,7 +78,7 @@ public class MessageDeliveryResultResponseSmpp implements MessageDeliveryResultR
             event = eventSubmit;
             SubmitSmResp responseSubmit = eventSubmit.createResponse();
             response = responseSubmit;
-            responseSubmit.setMessageId(((Long) messageId).toString());
+            responseSubmit.setMessageId(null);
         }
         if (eventData != null) {
             event = eventData;
@@ -105,7 +105,7 @@ public class MessageDeliveryResultResponseSmpp implements MessageDeliveryResultR
             event = eventSubmit;
             SubmitSmResp responseSubmit = eventSubmit.createResponse();
             response = responseSubmit;
-            responseSubmit.setMessageId(((Long) messageId).toString());
+            responseSubmit.setMessageId(null);
         }
         if (eventData != null) {
             event = eventData;

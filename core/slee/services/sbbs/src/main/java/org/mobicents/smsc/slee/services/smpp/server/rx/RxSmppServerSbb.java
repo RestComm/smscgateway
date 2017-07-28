@@ -1046,7 +1046,10 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 return;
             }
 
-            confirmMessageInSendingPool.sms.setTimestampC(System.currentTimeMillis());
+            Sms sms = confirmMessageInSendingPool.sms;
+            if (sms != null) {
+                sms.setTimestampC(System.currentTimeMillis());
+            }
             if (destAddressLimitationEnabled) {
                 ChunkDataList dataList = retreivePendingChunks();
                 if (dataList != null && !dataList.getPendingList().isEmpty()) {
@@ -1069,7 +1072,6 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             if (sentListChanged)
                 setSentChunks(list);
 
-            Sms sms = confirmMessageInSendingPool.sms;
             if (!confirmMessageInSendingPool.confirmed) {
                 this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false);
 
