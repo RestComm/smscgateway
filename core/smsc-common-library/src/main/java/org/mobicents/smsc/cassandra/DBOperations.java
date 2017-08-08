@@ -853,15 +853,16 @@ public class DBOperations {
                     psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
 			ResultSet res = session.execute(boundStatement);
 			try {
-			  //TODO: fix this stub:
-                if (sms.getScheduleDeliveryTime() == null) {
+			    Date scheduledDeliveryDate = c2_getTimeForDueSlot(sms.getDueSlot());
+			  //TODO: remove this:
+                if (scheduledDeliveryDate == null) {
                     logger.warn("======updating stored message: delivery time wasn't scheduled yet");
-                    sms.setScheduleDeliveryTime(new Date());
+                    scheduledDeliveryDate = new Date();
                 } else {
-                    logger.info("======updating stored message: delivery is scheduled for " + DATE_FORMAT2.format(sms.getScheduleDeliveryTime()));
+                    logger.info("======updating stored message: delivery is scheduled for " + DATE_FORMAT2.format(scheduledDeliveryDate));
                 }
 			    Calendar calendar = GregorianCalendar.getInstance(); 
-			    calendar.setTime(sms.getScheduleDeliveryTime());
+			    calendar.setTime(scheduledDeliveryDate);
 			    calendar.set(Calendar.HOUR_OF_DAY, 0);
 			    calendar.set(Calendar.MINUTE, 0);
 			    calendar.set(Calendar.SECOND, 0);
@@ -869,7 +870,7 @@ public class DBOperations {
 			    
 	            ps = psc.updateStoredMessagesCount;
 	            boundStatement = new BoundStatement(ps);
-	            boundStatement.bind(DATE_FORMAT.format(sms.getScheduleDeliveryTime()));
+	            boundStatement.bind(DATE_FORMAT.format(scheduledDeliveryDate));
 	            res = session.execute(boundStatement);
 	            SmsSetCache.getInstance().incrementStoredMessagesCounter(calendar.getTimeInMillis());
 	        } catch (Exception e1) {
@@ -1625,16 +1626,17 @@ public class DBOperations {
             if (isSystemStatus == DBOperations.IN_SYSTEM_SENT) {
                 //increment sent_messages
                 try {
+                    Date scheduledDeliveryDate = c2_getTimeForDueSlot(sms.getDueSlot());
                   //TODO: fix this stub:
-                    if (sms.getScheduleDeliveryTime() == null) {
+                    if (scheduledDeliveryDate == null) {
                         logger.warn("======updating sent message: delivery time wasn't scheduled yet");
-                        sms.setScheduleDeliveryTime(new Date());
+                        scheduledDeliveryDate = new Date();
                     } else {
                         logger.info("======updating sent message: delivery is scheduled for " 
-                                + DATE_FORMAT2.format(sms.getScheduleDeliveryTime()));
+                                + DATE_FORMAT2.format(scheduledDeliveryDate));
                     }
                     Calendar calendar = GregorianCalendar.getInstance(); 
-                    calendar.setTime(sms.getScheduleDeliveryTime());
+                    calendar.setTime(scheduledDeliveryDate);
                     calendar.set(Calendar.HOUR_OF_DAY, 0);
                     calendar.set(Calendar.MINUTE, 0);
                     calendar.set(Calendar.SECOND, 0);
@@ -1642,7 +1644,7 @@ public class DBOperations {
                     
                     PreparedStatement ps = psc.updateSentMessagesCount;
                     BoundStatement boundStatement = new BoundStatement(ps);
-                    boundStatement.bind(DATE_FORMAT.format(sms.getScheduleDeliveryTime()));
+                    boundStatement.bind(DATE_FORMAT.format(scheduledDeliveryDate));
                     ResultSet res = session.execute(boundStatement);
                     SmsSetCache.getInstance().incrementSentMessagesCounter(calendar.getTimeInMillis());
                 } catch (Exception e1) {

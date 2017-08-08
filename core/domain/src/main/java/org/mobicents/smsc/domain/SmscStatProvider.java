@@ -79,13 +79,7 @@ public class SmscStatProvider implements SmscStatProviderMBean {
     }
     
     public long getMessagesPendingInDatabase() {
-        Calendar calendar = GregorianCalendar.getInstance(); 
-        calendar.setTime(new Date());
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return smsSetCashe.getMessagesPendingInDatabase(calendar.getTimeInMillis());
+        return smsSetCashe.getMessagesStoredInDatabase() - smsSetCashe.getMessagesSentInDatabase();
     }
 
 	public int getParam1() {
