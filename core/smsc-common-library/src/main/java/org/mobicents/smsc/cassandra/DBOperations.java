@@ -854,13 +854,7 @@ public class DBOperations {
 			ResultSet res = session.execute(boundStatement);
 			try {
 			    Date scheduledDeliveryDate = c2_getTimeForDueSlot(sms.getDueSlot());
-			  //TODO: remove this:
-                if (scheduledDeliveryDate == null) {
-                    logger.warn("======updating stored message: delivery time wasn't scheduled yet");
-                    scheduledDeliveryDate = new Date();
-                } else {
-                    logger.info("======updating stored message: delivery is scheduled for " + DATE_FORMAT2.format(scheduledDeliveryDate));
-                }
+
 			    Calendar calendar = GregorianCalendar.getInstance(); 
 			    calendar.setTime(scheduledDeliveryDate);
 			    calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -1627,14 +1621,7 @@ public class DBOperations {
                 //increment sent_messages
                 try {
                     Date scheduledDeliveryDate = c2_getTimeForDueSlot(sms.getDueSlot());
-                  //TODO: fix this stub:
-                    if (scheduledDeliveryDate == null) {
-                        logger.warn("======updating sent message: delivery time wasn't scheduled yet");
-                        scheduledDeliveryDate = new Date();
-                    } else {
-                        logger.info("======updating sent message: delivery is scheduled for " 
-                                + DATE_FORMAT2.format(scheduledDeliveryDate));
-                    }
+
                     Calendar calendar = GregorianCalendar.getInstance(); 
                     calendar.setTime(scheduledDeliveryDate);
                     calendar.set(Calendar.HOUR_OF_DAY, 0);
