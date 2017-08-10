@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -343,6 +345,12 @@ public class SmscManagement implements SmscManagementMBean {
         this.smscDatabaseManagement = SmscDatabaseManagement.getInstance(this.name);
         this.smscDatabaseManagement.start();
 
+        // Step 14. Load counters from database into SmsSetCache
+        Date date = new Date();
+        ConcurrentHashMap<Long, AtomicLong> storedMessages = DBOperations.getInstance().c2_getStoredMessagesCounter(date); 
+        ConcurrentHashMap<Long, AtomicLong> sentMessages = DBOperations.getInstance().c2_getSentMessagesCounter(date);
+        SmsSetCache.getInstance().loadMessagesCountersFromDatabase(storedMessages, sentMessages);
+        
         ObjectName smscDatabaseManagementObjName = new ObjectName(SmscManagement.JMX_DOMAIN + ":layer="
                 + JMX_LAYER_SMSC_DATABASE_MANAGEMENT + ",name=" + this.getName());
         this.registerMBean(this.smscDatabaseManagement, SmscDatabaseManagement.class, true, smscDatabaseManagementObjName);

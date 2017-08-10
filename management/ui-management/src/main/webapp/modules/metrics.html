@@ -47,6 +47,7 @@
 					<div id="chart_div_msginreceive" style="width: 900px; height: 500px;"></div>				
 					<div id="chart_div_msgouttry" style="width: 900px; height: 500px;"></div>
 					<div id="chart_div_msgoutsent" style="width: 900px; height: 500px;"></div>
+					<div id="chart_div_msgpendingindb" style="width: 900px; height: 500px;"></div>
 					
 				</span>
 				
@@ -116,10 +117,30 @@
 				 
 			        var msgOutSentChart = new google.visualization.LineChart(document.getElementById('chart_div_msgoutsent'));			        
 				        
+				    //MsgPendingInDb
+					var msgPendingInDb = new google.visualization.DataTable();
+					msgPendingInDb.addColumn('datetime', 'Time');
+					msgPendingInDb.addColumn('number', 'MsgPendingInDb');
+					msgPendingInDb.addColumn('number', 'MsgStoredInDb');
+					msgPendingInDb.addColumn('number', 'MsgScheduledSent');
+					
+					 var msgPendingInDbOptions = {
+					          title: 'Message Pending In Database',
+					          curveType: 'function',
+					          pointSize: 5,
+					          width: 1200,
+					      	  height: 400,
+					      	  hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}},
+					          vAxis: {minValue: 0},					      	  
+					 };
+				 
+			        var msgPendingInDbChart = new google.visualization.LineChart(document.getElementById('chart_div_msgpendingindb'));
+			        
 					function drawCharts() {
 						msgInReceivedChart.draw(msgInReceived, msgInReceivedOptions);
 				        msgOutTryChart.draw(msgOutTry, msgOutTryOptions);
 				        msgOutSentChart.draw(msgOutSent, msgOutSentOptions);
+				        msgPendingInDbChart.draw(msgPendingInDb, msgPendingInDbOptions);
 					}
 					
 					function refreshCampaignsList(){
@@ -184,6 +205,11 @@
 						msgOutSent.removeRows(0, numRowsmsgOutSent)
 					}
 					
+					var numRowsmsgPendingInDb = msgPendingInDb.getNumberOfRows();
+					if(numRowsmsgPendingInDb != 0){
+						msgPendingInDb.removeRows(0, numRowsmsgPendingInDb)
+					}
+					
 					updateGraphs();
 					var timerIdValue = document.getElementById("timerIdValue").value;
 					
@@ -233,6 +259,10 @@
 								var msgInRejectedAll = 0;
 								var msgInFailedAll = 0;
 								
+								var msgPendingInDbRes = 0;
+								var msgStoredInDb = 0;
+								var msgScheduledSent = 0;
+								
 								jQuery.each(counterValues, function() {
 									if(this.counterDef.counterName == "MsgOutTryAll"){
 										msgOutTryAll = this.longValue;
@@ -264,6 +294,12 @@
 										msgOutSentSip = this.longValue;
 									} else if(this.counterDef.counterName == "MsgOutFailedAll"){
 										msgOutFailedAll = this.longValue;
+									} else if(this.counterDef.counterName == "MsgPendingInDb"){
+										msgPendingInDbRes = this.longValue;
+									} else if(this.counterDef.counterName == "MsgStoredInDb"){
+										msgStoredInDb = this.longValue;
+									} else if(this.counterDef.counterName == "MsgScheduledSent"){
+										msgScheduledSent = this.longValue;
 									}
 								});
 								
@@ -271,6 +307,7 @@
 								msgInReceived.addRow([(dateNow), msgInReceivedAll, msgInReceivedSs7, msgInReceivedSmpp, msgInReceivedSip, msgInRejectedAll, msgInFailedAll]);
 								msgOutTry.addRow([(dateNow), msgOutTryAll, msgOutTrySs7, msgOutTrySmpp, msgOutTrySip]);
 								msgOutSent.addRow([(dateNow), msgOutSentAll, msgOutSentSs7, msgOutSentSmpp, msgOutSentSip, msgOutFailedAll]);
+								msgPendingInDb.addRow([(dateNow), msgPendingInDbRes, msgStoredInDb, msgScheduledSent]);
 								
 								drawCharts();
 							}

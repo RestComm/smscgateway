@@ -27,12 +27,18 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javolution.util.FastList;
 import javolution.util.FastMap;
@@ -92,6 +98,9 @@ public class DBOperations {
 //	public static final long MAX_MESSAGE_ID = 10000000000L;
     public static final long MESSAGE_ID_LAG = 1000;
     public static final long DUE_SLOT_WRITING_POSSIBILITY_DELAY = 10;
+    
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy_MM_dd");
+    private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy_MM_dd HH:mm:ss.SSS");
 
 	private static final DBOperations instance = new DBOperations();
 
@@ -159,6 +168,9 @@ public class DBOperations {
 
 	private PreparedStatement getSipSmsRoutingRulesRange;
 	private PreparedStatement getSipSmsRoutingRulesRange2;
+	
+	private PreparedStatement getStoredMessagesCounter;
+	private PreparedStatement getSentMessagesCounter;
 	
 //	private PreparedStatement getTableList;
 
@@ -315,6 +327,11 @@ public class DBOperations {
 				+ "\" where token(\"" + Schema.COLUMN_ADDRESS + "\") >= token(?) LIMIT " + row_count + ";");
 		getSipSmsRoutingRulesRange2 = session.prepare("select * from \"" + Schema.FAMILY_SIP_SMS_ROUTING_RULE
 				+ "\"  LIMIT " + row_count + ";");
+		
+		getStoredMessagesCounter = session.prepare("SELECT \"" + Schema.COLUMN_DAY + "\", \"" + Schema.COLUMN_STORED_MESSAGES 
+		        + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" >= ? ALLOW FILTERING;");
+		getSentMessagesCounter = session.prepare("SELECT \"" + Schema.COLUMN_DAY + "\", \"" + Schema.COLUMN_SENT_MESSAGES 
+		        + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" >= ? ALLOW FILTERING;");
 
 		try {
 			currentDueSlot = c2_getCurrentSlotTable(CURRENT_DUE_SLOT);
@@ -333,7 +350,7 @@ public class DBOperations {
 			String msg = "Failed reading a currentDueSlot !";
 			throw new PersistenceException(msg, e1);
 		}
-
+		
 		this.started = true;
 	}
 
@@ -834,8 +851,27 @@ public class DBOperations {
 
             setSmsFields(sms, dueSlot, boundStatement, false, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
                     psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1());
-
 			ResultSet res = session.execute(boundStatement);
+			try {
+			    Date scheduledDeliveryDate = c2_getTimeForDueSlot(sms.getDueSlot());
+
+			    Calendar calendar = GregorianCalendar.getInstance(); 
+			    calendar.setTime(scheduledDeliveryDate);
+			    calendar.set(Calendar.HOUR_OF_DAY, 0);
+			    calendar.set(Calendar.MINUTE, 0);
+			    calendar.set(Calendar.SECOND, 0);
+			    calendar.set(Calendar.MILLISECOND, 0);
+			    
+	            ps = psc.updateStoredMessagesCount;
+	            boundStatement = new BoundStatement(ps);
+	            boundStatement.bind(DATE_FORMAT.format(scheduledDeliveryDate));
+	            res = session.execute(boundStatement);
+	            SmsSetCache.getInstance().incrementStoredMessagesCounter(calendar.getTimeInMillis());
+	        } catch (Exception e1) {
+	            String msg = "Failed updateStoredMessagesCount !" + e1.getMessage();
+
+	            throw new PersistenceException(msg, e1);
+	        }
 		} catch (Exception e1) {
 			String msg = "Failed createRecordCurrent !" + e1.getMessage();
 
@@ -1580,6 +1616,29 @@ public class DBOperations {
             } else {
                 targetId = sms.getSmsSet().getTargetId();
             }
+            
+            if (isSystemStatus == DBOperations.IN_SYSTEM_SENT) {
+                //increment sent_messages
+                try {
+                    Date scheduledDeliveryDate = c2_getTimeForDueSlot(sms.getDueSlot());
+
+                    Calendar calendar = GregorianCalendar.getInstance(); 
+                    calendar.setTime(scheduledDeliveryDate);
+                    calendar.set(Calendar.HOUR_OF_DAY, 0);
+                    calendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
+                    
+                    PreparedStatement ps = psc.updateSentMessagesCount;
+                    BoundStatement boundStatement = new BoundStatement(ps);
+                    boundStatement.bind(DATE_FORMAT.format(scheduledDeliveryDate));
+                    ResultSet res = session.execute(boundStatement);
+                    SmsSetCache.getInstance().incrementSentMessagesCounter(calendar.getTimeInMillis());
+                } catch (Exception e1) {
+                    String msg = "Failed to execute updatePendingMessagesCount() !";
+                    throw new PersistenceException(msg, e1);
+                }
+            }
 
             try {
                 PreparedStatement ps = psc.updateInSystem;
@@ -1621,7 +1680,7 @@ public class DBOperations {
 		return doGetStatementCollection(tName);
 	}
 
-	protected PreparedStatementCollection getStatementCollection(long deuSlot) throws PersistenceException {
+    protected PreparedStatementCollection getStatementCollection(long deuSlot) throws PersistenceException {
 		String tName = this.getTableName(deuSlot);
 		PreparedStatementCollection psc = dataTableRead.get(tName);
 		if (psc != null)
@@ -1876,6 +1935,37 @@ public class DBOperations {
             }
         } catch (Exception e1) {
             String msg = "Failed to access or create table " + Schema.FAMILY_CURRENT_SLOT_TABLE + "!";
+            throw new PersistenceException(msg, e1);
+        }
+        
+        try {
+            try {
+                // checking if PENDING_MESSAGES table exists
+                String sa = "SELECT \"" + Schema.COLUMN_STORED_MESSAGES + "\", \"" + Schema.COLUMN_SENT_MESSAGES + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES
+                        + "\" WHERE \"" + Schema.COLUMN_DAY + "\"='0';";
+                PreparedStatement ps = session.prepare(sa);
+            } catch (InvalidQueryException e) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("CREATE TABLE \"");
+                sb.append(Schema.FAMILY_PENDING_MESSAGES);
+                sb.append("\" (");
+
+                appendField(sb, Schema.COLUMN_DAY, "ascii");
+                appendField(sb, Schema.COLUMN_STORED_MESSAGES, "counter");
+                appendField(sb, Schema.COLUMN_SENT_MESSAGES, "counter");
+
+                sb.append("PRIMARY KEY (\"");
+                sb.append(Schema.COLUMN_DAY);
+                sb.append("\"");
+                sb.append("));");
+
+                String s2 = sb.toString();
+                PreparedStatement ps = session.prepare(s2);
+                BoundStatement boundStatement = new BoundStatement(ps);
+                ResultSet res = session.execute(boundStatement);
+            }
+        } catch (Exception e1) {
+            String msg = "Failed to access or create table " + Schema.FAMILY_PENDING_MESSAGES + "!";
             throw new PersistenceException(msg, e1);
         }
 
@@ -2514,6 +2604,65 @@ public class DBOperations {
         Arrays.sort(sss);
 
         return sss;
+    }
+    
+    /**
+     * Returns HashMap which holds counters of stored messages per day starting from Date date
+     * 
+     * @param date
+     * @return ConcurrentHashMap<Long, AtomicLong>
+     * @throws PersistenceException
+     */
+    public ConcurrentHashMap<Long, AtomicLong> c2_getStoredMessagesCounter(Date date) throws PersistenceException {
+
+        ConcurrentHashMap<Long, AtomicLong> storedMessagesCounters = new ConcurrentHashMap<>();
+        try {
+            BoundStatement boundStatement = new BoundStatement(getStoredMessagesCounter);
+            boundStatement.bind(DATE_FORMAT.format(date));
+            ResultSet res = session.execute(boundStatement);
+            Iterator<Row> it = res.iterator();
+            while (it.hasNext()) {
+                Row row = res.one();
+                String dateStr = row.getString(Schema.COLUMN_DAY);
+                long dt = DATE_FORMAT.parse(dateStr).getTime();
+                long cnt = row.getLong(Schema.COLUMN_STORED_MESSAGES);
+                storedMessagesCounters.put(dt, new AtomicLong(cnt));
+            }
+            return storedMessagesCounters;
+        } catch (Exception e) {
+            String msg = "Failed to execute getStoredMessagesCounter !";
+            throw new PersistenceException(msg, e);
+        }
+    }
+    
+    
+    /**
+     * Returns HashMap which holds counters of sent messages per day
+     * 
+     * @param date
+     * @return ConcurrentHashMap<Long, AtomicLong>
+     * @throws PersistenceException
+     */
+    public ConcurrentHashMap<Long, AtomicLong> c2_getSentMessagesCounter(Date date) throws PersistenceException {
+
+        ConcurrentHashMap<Long, AtomicLong> storedMessagesCounters = new ConcurrentHashMap<>();
+        try {
+            BoundStatement boundStatement = new BoundStatement(getSentMessagesCounter);
+            boundStatement.bind(DATE_FORMAT.format(date));
+            ResultSet res = session.execute(boundStatement);
+            Iterator<Row> it = res.iterator();
+            while (it.hasNext()) {
+                Row row = res.one();
+                String dateStr = row.getString(Schema.COLUMN_DAY);
+                long dt = DATE_FORMAT.parse(dateStr).getTime();
+                long cnt = row.getLong(Schema.COLUMN_SENT_MESSAGES);
+                storedMessagesCounters.put(dt, new AtomicLong(cnt));
+            }
+            return storedMessagesCounters;
+        } catch (Exception e) {
+            String msg = "Failed to execute getSentMessagesCounter !";
+            throw new PersistenceException(msg, e);
+        }
     }
 
 	private class DueSlotWritingElement {

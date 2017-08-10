@@ -22,7 +22,9 @@
 
 package org.mobicents.smsc.domain;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
 import org.mobicents.smsc.cassandra.DBOperations;
@@ -37,6 +39,7 @@ public class SmscStatProvider implements SmscStatProviderMBean {
 	private static final Logger logger = Logger.getLogger(SmscStatProvider.class);
 
 	private long messageScheduledTotal = 0;
+	private long messagesPendingInDatabase = 0;
 	private int param1 = 0;
 	private int param2 = 0;
 	private long currentMessageId = 0;
@@ -66,14 +69,18 @@ public class SmscStatProvider implements SmscStatProviderMBean {
         Date currentDate = dbOperations_C2.c2_getTimeForDueSlot(current);
         return currentDate;
     }
-
+	
 	public long getMessageScheduledTotal() {
-		return messageScheduledTotal;
-	}
+        return messageScheduledTotal;
+    }
 
-	public void setMessageScheduledTotal(long messageScheduledTotal) {
-		this.messageScheduledTotal = messageScheduledTotal;
-	}
+    public void setMessageScheduledTotal(long messageScheduledTotal) {
+        this.messageScheduledTotal = messageScheduledTotal;
+    }
+    
+    public long getMessagesPendingInDatabase() {
+        return smsSetCashe.getMessagesStoredInDatabase() - smsSetCashe.getMessagesSentInDatabase();
+    }
 
 	public int getParam1() {
 		return param1;

@@ -198,6 +198,13 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
 
         cd = new CounterDefImpl(CounterType.Summary_Cumulative, "SmscDeliveringLag", "Lag of delivering messages by Smsc (in seconds)");
         cds.addCounterDef(cd);
+        
+        cd = new CounterDefImpl(CounterType.Minimal, "MsgPendingInDb", "Messages stored in database which are to be delivered yet");
+        cds.addCounterDef(cd);
+        cd = new CounterDefImpl(CounterType.Minimal, "MsgStoredInDb", "Total stored records in database");
+        cds.addCounterDef(cd);
+        cd = new CounterDefImpl(CounterType.Minimal, "MsgScheduledSent", "Total attempts to send messages from database");
+        cds.addCounterDef(cd);
 
         lstCounters = lst;
     }
@@ -327,6 +334,12 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                         svo = new SourceValueObjectImpl(this.getName(), res);
                 } else if (cd.getCounterName().equals("SmscDeliveringLag")) {
                     svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmscDeliveringLag());
+                } else if (cd.getCounterName().equals("MsgPendingInDb")) {
+                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgPendingInDbRes());
+                } else if (cd.getCounterName().equals("MsgStoredInDb")) {
+                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgStoredInDb());
+                } else if (cd.getCounterName().equals("MsgScheduledSent")) {
+                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgSheduledSent());
                 }
                 if (svo != null)
                     scs.addObject(svo);

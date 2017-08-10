@@ -17,6 +17,8 @@ public interface SmscStatProviderMBean {
 	
 	long getMessageScheduledTotal();
 	
+	long getMessagesPendingInDatabase();
+	
 	long getCurrentMessageId();
 	
 	Date getSmscStartTime();

@@ -1051,12 +1051,14 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
             } 
             String messageType = null;
+            String remoteAddr = null;
             if (esme != null) {
                 messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
                         : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+                remoteAddr = esme.getRemoteAddressAndPort();
             }
             this.generateDetailedCDRs(lstPermFailured, EventType.VALIDITY_PERIOD_TIMEOUT, smStatus, messageType,
-                    esme.getRemoteAddressAndPort(), -1);
+                    remoteAddr, -1);
         }
 
         // sending of failure delivery receipts

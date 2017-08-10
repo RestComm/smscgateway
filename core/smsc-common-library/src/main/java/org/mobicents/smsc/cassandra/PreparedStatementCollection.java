@@ -40,6 +40,8 @@ public class PreparedStatementCollection {
     protected PreparedStatement getRecordData;
     protected PreparedStatement getRecordData2;
     protected PreparedStatement updateInSystem;
+    protected PreparedStatement updateStoredMessagesCount;
+    protected PreparedStatement updateSentMessagesCount;
     protected PreparedStatement updateAlertingSupport;
     protected PreparedStatement createRecordArchive;
     protected PreparedStatement createRecordArchiveMesId;
@@ -129,6 +131,12 @@ public class PreparedStatementCollection {
                     + Schema.COLUMN_SMSC_UUID + "\"=? where \"" + Schema.COLUMN_DUE_SLOT + "\"=? and \"" + Schema.COLUMN_TARGET_ID + "\"=? and \""
                     + Schema.COLUMN_ID + "\"=?;";
             updateInSystem = dbOperation.session.prepare(sa);
+            sa = "UPDATE \"" + Schema.FAMILY_PENDING_MESSAGES + "\" SET \"" + Schema.COLUMN_STORED_MESSAGES + "\" = \"" + Schema.COLUMN_STORED_MESSAGES
+                    + "\" + 1 WHERE \"" + Schema.COLUMN_DAY + "\" = ?";
+            updateStoredMessagesCount = dbOperation.session.prepare(sa);
+            sa = "UPDATE \"" + Schema.FAMILY_PENDING_MESSAGES + "\" SET \"" + Schema.COLUMN_SENT_MESSAGES + "\" = \"" + Schema.COLUMN_SENT_MESSAGES
+                    + "\" + 1 WHERE \"" + Schema.COLUMN_DAY + "\" = ?;";
+            updateSentMessagesCount = dbOperation.session.prepare(sa);
             sa = "UPDATE \"" + Schema.FAMILY_SLOT_MESSAGES_TABLE + tName + "\" " + s3a + " SET \"" + Schema.COLUMN_ALERTING_SUPPORTED + "\"=? where \""
                     + Schema.COLUMN_DUE_SLOT + "\"=? and \"" + Schema.COLUMN_TARGET_ID + "\"=? and \"" + Schema.COLUMN_ID + "\"=?;";
             updateAlertingSupport = dbOperation.session.prepare(sa);
