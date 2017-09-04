@@ -21,13 +21,18 @@
  */
 package org.mobicents.smsc.library;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import com.cloudhopper.smpp.SmppConstants;
+import com.cloudhopper.smpp.tlv.Tlv;
+import com.cloudhopper.smpp.tlv.TlvConvertException;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
+import org.mobicents.smsc.utils.SplitMessageCache;
+
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * 
@@ -74,6 +79,8 @@ public class CdrGenerator {
 		logger.debug(message);
 	}
 
+    private static SplitMessageCache splitMessageCache = null;
+
     public static void generateCdr(Sms smsEvent, String status, String reason, boolean generateReceiptCdr, boolean generateCdr,
             boolean messageIsSplitted, boolean lastSegment, boolean calculateMsgPartsLenCdr, boolean delayParametersInCdr) {
         // Format is
@@ -116,6 +123,59 @@ public class CdrGenerator {
             st = deliveryReceiptData.getStatus();
             tlvMessageState = deliveryReceiptData.getTlvMessageState() == null ? -1 : deliveryReceiptData.getTlvMessageState();
             err = deliveryReceiptData.getError();
+        }
+
+        splitMessageCache = splitMessageCache.getInstance();
+        splitMessageCache.removeOldReferenceNumbers();
+
+        int splitedMessageReferenceNumber = 0;
+        int splitedMessageParts = 0;
+        int splitedMessagePartNumber = 0;
+        long splitedMessageID = 0;
+        boolean msgSplitInUse = false;
+
+
+        if(((smsEvent.getEsmClass() >> 6) & 1)== 1
+                ){
+            msgSplitInUse = true;
+            switch (smsEvent.getShortMessageBin()[0]) {
+                case 5://6 fields 8bit
+                    splitedMessageReferenceNumber = Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[3]),16);
+                    splitedMessageParts = Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[4]),16);
+                    splitedMessagePartNumber = Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[5]),16);
+                    break;
+                case 6://7 fields 16bit
+                    int octet1 = Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[3]),16);
+                    int octet2 = Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[4]),16);
+                    splitedMessageReferenceNumber = (octet1 << 8) | octet2;
+                    splitedMessageParts = Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[5]),16);
+                    splitedMessagePartNumber = smsEvent.getShortMessageBin()[6];
+                    break;
+                default:logger.error("________________--ERROR UDH--");
+                    break;
+            }
+        }else if(((smsEvent.getEsmClass()) & 1)==1  && ((smsEvent.getEsmClass() >> 1) & 1) ==1){
+            msgSplitInUse = true;
+            try {
+                Tlv splitedMessageIDtemp = smsEvent.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_MSG_REF_NUM);
+                byte[] tmpByte = splitedMessageIDtemp.getValue();
+                ByteBuffer buffer = ByteBuffer.wrap(tmpByte);
+                splitedMessageReferenceNumber = buffer.getShort();
+                Tlv splitedMessagePartstemp = smsEvent.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_TOTAL_SEGMENTS);
+                splitedMessageParts = splitedMessagePartstemp.getValueAsUnsignedByte();
+                Tlv splitedMessagePartNumbertmp = smsEvent.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_SEGMENT_SEQNUM);
+                splitedMessagePartNumber = splitedMessagePartNumbertmp.getValueAsUnsignedByte();
+            } catch (TlvConvertException e) {
+                e.printStackTrace();
+            }
+        }
+        if(msgSplitInUse == true){
+            if(splitMessageCache.checkExistenceOfReferenceNumberInCache(splitedMessageReferenceNumber,smsEvent)){
+                splitedMessageID = splitMessageCache.getMessageIdByReferenceNumber(splitedMessageReferenceNumber,smsEvent);
+            }else{
+                splitMessageCache.addReferenceNumber(splitedMessageReferenceNumber, smsEvent,smsEvent.getMessageId());
+                splitedMessageID = smsEvent.getMessageId();
+            }
         }
         
         StringBuffer sb = new StringBuffer();
@@ -186,7 +246,13 @@ public class CdrGenerator {
 		        .append(CdrGenerator.CDR_SEPARATOR)
 		        .append(tlvMessageState != -1 ? tlvMessageState : CdrGenerator.CDR_EMPTY)
     	        .append(CdrGenerator.CDR_SEPARATOR)
-    	        .append(err != -1 ? err : CdrGenerator.CDR_EMPTY);
+    	        .append(err != -1 ? err : CdrGenerator.CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(msgSplitInUse ? splitedMessageID: "")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(msgSplitInUse ? splitedMessageParts : "")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(msgSplitInUse ? splitedMessagePartNumber: "");
         
         CdrGenerator.generateCdr(sb.toString());
     }
