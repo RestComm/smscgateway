@@ -10,7 +10,6 @@ import java.util.*;
 public class SplitMessageCache implements SplitMessageCacheMBean {
 
     private static SplitMessageCache instance = null;
-    //private static Queue<SplitMessageCacheStruct> cacheQueue;
     private static Queue<Object> cacheQueue;
     private static int removeOlderThanXSeconds;
     private static Map<String,Long> referenceNumberMessageId;
@@ -20,7 +19,7 @@ public class SplitMessageCache implements SplitMessageCacheMBean {
         cacheQueue = new LinkedList<Object>();
         referenceNumberMessageId = new HashMap<String, Long>();
         totalReferenceNumberCached = 0;
-        removeOlderThanXSeconds = 2;//*60//REMOVE_OLDER_THAN_X_SECONDS
+        removeOlderThanXSeconds = 300;
     }
 
     public static SplitMessageCache getInstance() {
