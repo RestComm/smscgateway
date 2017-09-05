@@ -22,6 +22,30 @@
 
 package org.mobicents.smsc.library;
 
+import com.cloudhopper.smpp.SmppConstants;
+import com.cloudhopper.smpp.tlv.Tlv;
+import com.cloudhopper.smpp.tlv.TlvConvertException;
+import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
+import org.mobicents.protocols.ss7.indicator.NatureOfAddress;
+import org.mobicents.protocols.ss7.indicator.NumberingPlan;
+import org.mobicents.protocols.ss7.indicator.RoutingIndicator;
+import org.mobicents.protocols.ss7.map.api.datacoding.NationalLanguageIdentifier;
+import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
+import org.mobicents.protocols.ss7.map.api.smstpdu.*;
+import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
+import org.mobicents.protocols.ss7.map.smstpdu.*;
+import org.mobicents.protocols.ss7.sccp.parameter.GlobalTitle;
+import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
+import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
+import org.mobicents.smsc.mproc.impl.DeliveryReceiptDataImpl;
+import org.mobicents.smsc.utils.SplitMessageCache;
+import org.mobicents.smsc.utils.SplitMessageData;
+import org.mobicents.smsc.utils.SplitMessageDataImpl;
+import org.restcomm.smpp.GenerateType;
+import org.restcomm.smpp.parameter.TlvSet;
+
+import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,38 +53,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
-
-import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
-import org.mobicents.protocols.ss7.indicator.NatureOfAddress;
-import org.mobicents.protocols.ss7.indicator.NumberingPlan;
-import org.mobicents.protocols.ss7.indicator.RoutingIndicator;
-import org.mobicents.protocols.ss7.map.api.datacoding.NationalLanguageIdentifier;
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
-import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
-import org.mobicents.protocols.ss7.map.api.smstpdu.ConcatenatedShortMessagesIdentifier;
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.api.smstpdu.NationalLanguageLockingShiftIdentifier;
-import org.mobicents.protocols.ss7.map.api.smstpdu.NationalLanguageSingleShiftIdentifier;
-import org.mobicents.protocols.ss7.map.api.smstpdu.Status;
-import org.mobicents.protocols.ss7.map.api.smstpdu.StatusReportQualifier;
-import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.NationalLanguageLockingShiftIdentifierImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.NationalLanguageSingleShiftIdentifierImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.UserDataImpl;
-import org.mobicents.protocols.ss7.sccp.parameter.GlobalTitle;
-import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
-import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
-import org.mobicents.smsc.mproc.DeliveryReceiptData;
-import org.mobicents.smsc.mproc.impl.DeliveryReceiptDataImpl;
-import org.restcomm.smpp.GenerateType;
-import org.restcomm.smpp.parameter.TlvSet;
-
-import com.cloudhopper.smpp.SmppConstants;
-import com.cloudhopper.smpp.tlv.Tlv;
-import com.cloudhopper.smpp.tlv.TlvConvertException;
 
 /**
  * 
@@ -858,6 +850,53 @@ public class MessageUtil {
         }
 
         return deliveryReceiptData;
+    }
+
+    public static SplitMessageData parseSplitMessageData(Sms smsEvent) {
+        SplitMessageDataImpl splitMessageData = new SplitMessageDataImpl();
+        splitMessageData.getSplitMessageCache().removeOldReferenceNumbers();
+
+        if(((smsEvent.getEsmClass() >> 6) & 1)== 1
+                ){
+            splitMessageData.setMsgSplitInUse(true);
+            switch (smsEvent.getShortMessageBin()[0]) {
+                case 5://6 fields 8bit
+                    splitMessageData.setSplitedMessageReferenceNumber(Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[3]),16));
+                    splitMessageData.setSplitedMessageParts(Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[4]),16));
+                    splitMessageData.setSplitedMessagePartNumber(Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[5]),16));
+                    break;
+                case 6://7 fields 16bit
+                    int octet1 = Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[3]),16);
+                    int octet2 = Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[4]),16);
+                    splitMessageData.setSplitedMessageReferenceNumber((octet1 << 8) | octet2);
+                    splitMessageData.setSplitedMessageParts(Integer.parseInt(String.valueOf(smsEvent.getShortMessageBin()[5]),16));
+                    splitMessageData.setSplitedMessagePartNumber(smsEvent.getShortMessageBin()[6]);
+                    break;
+            }
+        }else if(((smsEvent.getEsmClass()) & 1)==1  && ((smsEvent.getEsmClass() >> 1) & 1) ==1){
+            splitMessageData.setMsgSplitInUse(true);
+            try {
+                Tlv splitedMessageIDtemp = smsEvent.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_MSG_REF_NUM);
+                byte[] tmpByte = splitedMessageIDtemp.getValue();
+                ByteBuffer buffer = ByteBuffer.wrap(tmpByte);
+                splitMessageData.setSplitedMessageReferenceNumber(buffer.getShort());
+                Tlv splitedMessagePartstemp = smsEvent.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_TOTAL_SEGMENTS);
+                splitMessageData.setSplitedMessageParts(splitedMessagePartstemp.getValueAsUnsignedByte());
+                Tlv splitedMessagePartNumbertmp = smsEvent.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_SEGMENT_SEQNUM);
+                splitMessageData.setSplitedMessagePartNumber(splitedMessagePartNumbertmp.getValueAsUnsignedByte());
+            } catch (TlvConvertException e) {
+            }
+        }
+        if(splitMessageData.isMsgSplitInUse() == true){
+            if(splitMessageData.getSplitMessageCache().checkExistenceOfReferenceNumberInCache(splitMessageData.getSplitedMessageReferenceNumber(),smsEvent)){
+                splitMessageData.setSplitedMessageID(splitMessageData.getSplitMessageCache().getMessageIdByReferenceNumber(splitMessageData.getSplitedMessageReferenceNumber(),smsEvent));
+            }else{
+                splitMessageData.getSplitMessageCache().addReferenceNumber(splitMessageData.getSplitedMessageReferenceNumber(), smsEvent,smsEvent.getMessageId());
+                splitMessageData.setSplitedMessageID(smsEvent.getMessageId());
+            }
+        }
+
+        return splitMessageData;
     }
 
     public static Sms createSmsStatusReport(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts) {

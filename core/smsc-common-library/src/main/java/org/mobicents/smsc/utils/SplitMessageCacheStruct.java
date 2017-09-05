@@ -9,7 +9,6 @@ public class SplitMessageCacheStruct {
     private Timestamp additionTimestamp;
     private String reference_number;
 
-
     public SplitMessageCacheStruct(String reference_number){
         setAdditionTimestamp();
         setReference_number(reference_number);
