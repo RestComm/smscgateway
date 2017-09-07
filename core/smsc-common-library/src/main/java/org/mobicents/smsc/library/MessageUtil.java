@@ -873,7 +873,7 @@ public class MessageUtil {
                     splitMessageData.setSplitedMessagePartNumber(smsEvent.getShortMessageBin()[6]);
                     break;
             }
-        }else if(((smsEvent.getEsmClass()) & 1)==1  && ((smsEvent.getEsmClass() >> 1) & 1) ==1){
+        }else if(smsEvent.getTlvSet().hasOptionalParameter(SmppConstants.TAG_SAR_MSG_REF_NUM)){
             splitMessageData.setMsgSplitInUse(true);
             try {
                 Tlv splitedMessageIDtemp = smsEvent.getTlvSet().getOptionalParameter(SmppConstants.TAG_SAR_MSG_REF_NUM);
