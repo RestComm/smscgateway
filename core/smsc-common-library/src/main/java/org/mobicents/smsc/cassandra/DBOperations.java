@@ -329,9 +329,9 @@ public class DBOperations {
 				+ "\"  LIMIT " + row_count + ";");
 		
 		getStoredMessagesCounter = session.prepare("SELECT \"" + Schema.COLUMN_DAY + "\", \"" + Schema.COLUMN_STORED_MESSAGES 
-		        + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" >= ? ALLOW FILTERING;");
+		        + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" = ?");
 		getSentMessagesCounter = session.prepare("SELECT \"" + Schema.COLUMN_DAY + "\", \"" + Schema.COLUMN_SENT_MESSAGES 
-		        + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" >= ? ALLOW FILTERING;");
+		        + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" = ?");
 
 		try {
 			currentDueSlot = c2_getCurrentSlotTable(CURRENT_DUE_SLOT);
@@ -2616,23 +2616,33 @@ public class DBOperations {
     public ConcurrentHashMap<Long, AtomicLong> c2_getStoredMessagesCounter(Date date) throws PersistenceException {
 
         ConcurrentHashMap<Long, AtomicLong> storedMessagesCounters = new ConcurrentHashMap<>();
-        try {
-            BoundStatement boundStatement = new BoundStatement(getStoredMessagesCounter);
-            boundStatement.bind(DATE_FORMAT.format(date));
-            ResultSet res = session.execute(boundStatement);
-            Iterator<Row> it = res.iterator();
-            while (it.hasNext()) {
+        Date currDate = new Date(date.getTime());
+        Boolean hasValue = true;
+        int index = 3; //we need data for at least 3 days
+        while(hasValue || index > 0) {
+            try {
+                BoundStatement boundStatement = new BoundStatement(getStoredMessagesCounter);
+                boundStatement.bind(DATE_FORMAT.format(currDate));
+                ResultSet res = session.execute(boundStatement);
                 Row row = res.one();
-                String dateStr = row.getString(Schema.COLUMN_DAY);
-                long dt = DATE_FORMAT.parse(dateStr).getTime();
-                long cnt = row.getLong(Schema.COLUMN_STORED_MESSAGES);
-                storedMessagesCounters.put(dt, new AtomicLong(cnt));
+                if (row == null) {
+                    hasValue = false;
+                } else {
+                    String dateStr = row.getString(Schema.COLUMN_DAY);
+                    long dt = DATE_FORMAT.parse(dateStr).getTime();
+                    if (!row.isNull(Schema.COLUMN_STORED_MESSAGES)) {
+                        long cnt = row.getLong(Schema.COLUMN_STORED_MESSAGES);
+                        storedMessagesCounters.put(dt, new AtomicLong(cnt));
+                    }
+                }
+                currDate.setTime(currDate.getTime() + 60*60*24*1000L);
+                index--;
+            } catch (Exception e) {
+                String msg = "Failed to execute getStoredMessagesCounter !";
+                throw new PersistenceException(msg, e);
             }
-            return storedMessagesCounters;
-        } catch (Exception e) {
-            String msg = "Failed to execute getStoredMessagesCounter !";
-            throw new PersistenceException(msg, e);
         }
+        return storedMessagesCounters;
     }
     
     
@@ -2645,24 +2655,34 @@ public class DBOperations {
      */
     public ConcurrentHashMap<Long, AtomicLong> c2_getSentMessagesCounter(Date date) throws PersistenceException {
 
-        ConcurrentHashMap<Long, AtomicLong> storedMessagesCounters = new ConcurrentHashMap<>();
-        try {
-            BoundStatement boundStatement = new BoundStatement(getSentMessagesCounter);
-            boundStatement.bind(DATE_FORMAT.format(date));
-            ResultSet res = session.execute(boundStatement);
-            Iterator<Row> it = res.iterator();
-            while (it.hasNext()) {
+        ConcurrentHashMap<Long, AtomicLong> sentMessagesCounters = new ConcurrentHashMap<>();
+        Date currDate = new Date(date.getTime());
+        Boolean hasValue = true;
+        int index = 3; //we need data for at least 3 days
+        while(hasValue || index > 0) {
+            try {
+                BoundStatement boundStatement = new BoundStatement(getSentMessagesCounter);
+                boundStatement.bind(DATE_FORMAT.format(currDate));
+                ResultSet res = session.execute(boundStatement);
                 Row row = res.one();
-                String dateStr = row.getString(Schema.COLUMN_DAY);
-                long dt = DATE_FORMAT.parse(dateStr).getTime();
-                long cnt = row.getLong(Schema.COLUMN_SENT_MESSAGES);
-                storedMessagesCounters.put(dt, new AtomicLong(cnt));
+                if (row == null) {
+                    hasValue = false;
+                } else {
+                    String dateStr = row.getString(Schema.COLUMN_DAY);
+                    long dt = DATE_FORMAT.parse(dateStr).getTime();
+                    if (!row.isNull(Schema.COLUMN_SENT_MESSAGES)) {
+                        long cnt = row.getLong(Schema.COLUMN_SENT_MESSAGES);
+                        sentMessagesCounters.put(dt, new AtomicLong(cnt));
+                    }
+                }
+                currDate.setTime(currDate.getTime() + 60*60*24*1000L);
+                index--;
+            } catch (Exception e) {
+                String msg = "Failed to execute getSentMessagesCounter !";
+                throw new PersistenceException(msg, e);
             }
-            return storedMessagesCounters;
-        } catch (Exception e) {
-            String msg = "Failed to execute getSentMessagesCounter !";
-            throw new PersistenceException(msg, e);
         }
+        return sentMessagesCounters;
     }
 
 	private class DueSlotWritingElement {

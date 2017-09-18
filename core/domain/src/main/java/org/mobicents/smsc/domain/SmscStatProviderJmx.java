@@ -199,7 +199,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
         cd = new CounterDefImpl(CounterType.Summary_Cumulative, "SmscDeliveringLag", "Lag of delivering messages by Smsc (in seconds)");
         cds.addCounterDef(cd);
         
-        cd = new CounterDefImpl(CounterType.Minimal, "MsgPendingInDb", "Messages stored in database which are to be delivered yet");
+        cd = new CounterDefImpl(CounterType.Maximal, "MsgPendingInDb", "Messages stored in database which are to be delivered yet");
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Minimal, "MsgStoredInDb", "Total stored records in database");
         cds.addCounterDef(cd);

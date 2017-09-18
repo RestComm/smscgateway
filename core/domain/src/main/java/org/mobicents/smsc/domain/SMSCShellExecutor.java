@@ -1860,10 +1860,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 
 	public String getStat(String[] args) {
 		StringBuilder sb = new StringBuilder();
-
-		long currTime = new Date().getTime();
-		long startOfTheDay = currTime - currTime%(24*60*60*1000); 
 		SmscStatProvider smscStatProvider = SmscStatProvider.getInstance();
+		
 		sb.append("Stat: ");
 		sb.append("Time: ");
 		sb.append(new Date());

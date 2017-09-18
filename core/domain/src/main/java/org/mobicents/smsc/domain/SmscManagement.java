@@ -355,6 +355,7 @@ public class SmscManagement implements SmscManagementMBean {
                 + JMX_LAYER_SMSC_DATABASE_MANAGEMENT + ",name=" + this.getName());
         this.registerMBean(this.smscDatabaseManagement, SmscDatabaseManagement.class, true, smscDatabaseManagementObjName);
 
+        logger.warn("Started SmscManagemet " + name);
 	}
 
 	public void stop() throws Exception {
