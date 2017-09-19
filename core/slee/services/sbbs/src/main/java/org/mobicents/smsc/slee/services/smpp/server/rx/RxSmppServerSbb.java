@@ -1042,7 +1042,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             if (realID == -1 || !confirmMessageInSendingPool.sequenceNumberFound) {
                 this.logger.severe("RxSmppServerSbb.handleResponse(): no sms in MessageInSendingPool: UnconfirmedCnt="
-                        + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber());
+                        + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber() 
+                        + ", realID=" + realID + ", confirmMessageInSendingPool=" + confirmMessageInSendingPool);
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
                         "Received undefined SequenceNumber: " + event.getSequenceNumber() + ", SmsSet=" + smsSet,
                         EventType.OUT_SMPP_ERROR, realID);
