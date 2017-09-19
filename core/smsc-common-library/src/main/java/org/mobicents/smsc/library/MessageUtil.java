@@ -754,11 +754,12 @@ public class MessageUtil {
         String[] namesList = new String[] { DELIVERY_ACK_ID, DELIVERY_ACK_SUB, DELIVERY_ACK_DLVRD, DELIVERY_ACK_SUBMIT_DATE,
                 DELIVERY_ACK_DONE_DATE, DELIVERY_ACK_STAT, DELIVERY_ACK_ERR, DELIVERY_ACK_TEXT, };
 
+        String lcMessage=msg.toLowerCase();
         int pos = 0;
         ArrayList<String> values = new ArrayList<String>(8);
         for (int i1 = 0; i1 < namesList.length; i1++) {
             String fieldName = namesList[i1];
-            int newPos = msg.indexOf(fieldName, pos);
+            int newPos = lcMessage.indexOf(fieldName, pos);
             if (newPos < 0) {
                 if (fieldName.equals(DELIVERY_ACK_TEXT))
                     break;
