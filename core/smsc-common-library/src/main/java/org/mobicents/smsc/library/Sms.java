@@ -28,6 +28,8 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 
 import javolution.xml.XMLObjectReader;
@@ -76,6 +78,7 @@ public class Sms implements Serializable {
 
 	private Date submitDate;
 	private Date deliveryDate;
+	private HashMap<Integer, Long> msgPartsDeliveryTime = new HashMap<>();
 
 	private String serviceType;
 	private int esmClass;
@@ -326,6 +329,18 @@ public class Sms implements Serializable {
 	public void setDeliveryDate(Date deliveryDate) {
 		this.deliveryDate = deliveryDate;
 	}
+
+    public long getMsgPartDelTime(int seqNum) {
+        return msgPartsDeliveryTime.get(seqNum);
+    }
+    
+    public Set<Integer> getMsgPartsSeqNumbers() {
+        return msgPartsDeliveryTime.keySet();
+    }
+
+    public void putMsgPartDeliveryTime(int seqNum, long msgPartsDeliveryTime) {
+        this.msgPartsDeliveryTime.put(seqNum, msgPartsDeliveryTime);
+    }
 
 	/**
 	 * service_type smpp param for esme originated messages

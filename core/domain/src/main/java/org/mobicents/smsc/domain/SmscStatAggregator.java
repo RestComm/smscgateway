@@ -328,6 +328,18 @@ public class SmscStatAggregator implements UpdateMessagesInProcessListener {
     public void updateSmscDeliveringLag(int val) {
         statCollector.smscDeliveringLag = val;
     }
+    
+    public long getMsgPendingInDbRes() {
+        return smsSetCashe.getMessagesStoredInDatabase() - smsSetCashe.getMessagesSentInDatabase();
+    }
+    
+    public long getMsgStoredInDb() {
+        return smsSetCashe.getMessagesStoredInDatabase();
+    }
+    
+    public long getMsgSheduledSent() {
+        return smsSetCashe.getMessagesSentInDatabase();
+    }
 
     private class StatCollector {
         private StatDataCollection statDataCollection = new StatDataCollectionImpl();

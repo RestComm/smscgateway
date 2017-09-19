@@ -416,7 +416,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         }
 
         SubmitSmResp response = event.createResponse();
-        response.setMessageId(sms.getMessageIdText());
+        response.setMessageId(null);
 
         // Lets send the Response with success here
         try {

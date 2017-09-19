@@ -110,6 +110,10 @@ public class Schema {
     public static final String COLUMN_TYPE = "TYPE";
 
     public static final String COLUMN_NEXT_SLOT = "NEXT_SLOT";
+    
+    public static final String COLUMN_DAY = "DAY";
+    public static final String COLUMN_STORED_MESSAGES = "STORED_MESSAGES";
+    public static final String COLUMN_SENT_MESSAGES = "SENT_MESSAGES";
 
     public static final String FAMILY_LIVE_SMS = "LIVE_SMS";
     public static final String FAMILY_ARCHIVE = "ARCHIVE";
@@ -122,6 +126,7 @@ public class Schema {
     public static final String FAMILY_DESTS = "DESTS";
 
     public static final String FAMILY_CURRENT_SLOT_TABLE = "CURRENT_SLOT_TABLE";
+    public static final String FAMILY_PENDING_MESSAGES = "PENDING_MESSAGES";
     public static final String FAMILY_DST_SLOT_TABLE = "DST_SLOT_TABLE";
     public static final String FAMILY_SLOT_MESSAGES_TABLE = "SLOT_MESSAGES_TABLE";
     public static final String FAMILY_MESSAGES = "MESSAGES";

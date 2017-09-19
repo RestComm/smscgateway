@@ -1860,8 +1860,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 
 	public String getStat(String[] args) {
 		StringBuilder sb = new StringBuilder();
-
 		SmscStatProvider smscStatProvider = SmscStatProvider.getInstance();
+		
 		sb.append("Stat: ");
 		sb.append("Time: ");
 		sb.append(new Date());
@@ -1871,6 +1871,8 @@ public class SMSCShellExecutor implements ShellExecutor {
 		sb.append(smscStatProvider.getCurrentMessageId());
 		sb.append(", MessageScheduledTotal: ");
 		sb.append(smscStatProvider.getMessageScheduledTotal());
+		sb.append(", MessagesPendingInDatabase: ");
+        sb.append(smscStatProvider.getMessagesPendingInDatabase());
         sb.append(", DueSlotProcessingLag: ");
         sb.append(smscStatProvider.getDueSlotProcessingLag());
         sb.append(", DueSlotProcessingTime: ");

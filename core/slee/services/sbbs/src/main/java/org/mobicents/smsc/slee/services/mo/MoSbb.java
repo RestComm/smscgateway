@@ -244,7 +244,11 @@ public abstract class MoSbb extends MoCommonSbb {
                     this.logger.info("\nSent ErrorComponent = " + errorMessage);
                 }
 				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
-					generateCDR(dialog.getNetworkId(), evt.getIMSI().getData(), dialog.getLocalAddress(),
+				    String imsiData = null;
+				    if (evt.getIMSI() != null) {
+				        imsiData = evt.getIMSI().getData();
+				    }
+					generateCDR(dialog.getNetworkId(), imsiData, dialog.getLocalAddress(),
 							CdrGenerator.CDR_SUBMIT_FAILED_MO, errorMessage.toString(), true);
 				}
 				dialog.close(false);

@@ -1051,12 +1051,14 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
             } 
             String messageType = null;
+            String remoteAddr = null;
             if (esme != null) {
                 messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
                         : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+                remoteAddr = esme.getRemoteAddressAndPort();
             }
             this.generateDetailedCDRs(lstPermFailured, EventType.VALIDITY_PERIOD_TIMEOUT, smStatus, messageType,
-                    esme.getRemoteAddressAndPort(), -1);
+                    remoteAddr, -1);
         }
 
         // sending of failure delivery receipts
@@ -1075,9 +1077,10 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected void postProcessSucceeded(Sms sms, String dlvMessageId, String dlvDestId) {
         try {
+            sms.setDeliveryDate(new Date());
             persistence.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT,
                     smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
-            sms.setDeliveryDate(new Date());
+            
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
                 persistence.c2_createRecordArchive(sms, dlvMessageId, dlvDestId,
                         !smscPropertiesManagement.getReceiptsDisabling(),
@@ -1536,10 +1539,18 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @param lastSegment
      */
     protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+//        CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+//                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+//                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
+//                smscPropertiesManagement.getDelayParametersInCdr());
+        this.generateCDR(sms, status, reason, messageIsSplitted, lastSegment, -1);
+    }
+    
+    protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment, int seqNumber) {
         CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
                 lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
-                smscPropertiesManagement.getDelayParametersInCdr());
+                smscPropertiesManagement.getDelayParametersInCdr(), seqNumber);
     }
 
     protected void generateDetailedCDR(Sms sms, EventType eventType, ErrorCode errorCode, String messageType, int statusCode,

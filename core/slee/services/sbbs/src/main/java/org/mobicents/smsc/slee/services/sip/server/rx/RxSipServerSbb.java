@@ -264,7 +264,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
             // success CDR generating
             boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
             this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL_SIP : CdrGenerator.CDR_SUCCESS_SIP,
-                    CdrGenerator.CDR_SUCCESS_NO_REASON, false, true);
+                    CdrGenerator.CDR_SUCCESS_NO_REASON, false, true, -1);
 
             // adding a success receipt if it is needed
             this.generateSuccessReceipt(smsSet, sms);

@@ -120,7 +120,7 @@ You can reset a counter for a single parameter by selecting the reset option in 
 The CDR generated in the text file is of the below format: 
 ----
 
-DELIVERY_DATE,SUBMIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,Message_Delivery_Status,ORIGINATION_TYPE,MESSAGE_TYPE,ORIG_SYSTEM_ID,MESSAGE_ID,DVL_MESSAGE_ID,RECEIPT_LOCAL_MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,ORIGINATOR_SCCP_ADDRESS,MtServiceCenterAddress,ORIG_NETWORK_ID,NETWORK_ID,MPROC_NOTES,MSG_PARTS,CHAR_NUMBERS,PROCESSING_TIME,SCHEDULE_DELIVERY_DELAY,DELIVERY_COUNT,First 20 characters of SMS,Reason_For_Failure
+DELIVERY_DATE,SUBMIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,MESSAGE_DELIVERY_STATUS,ORIGINATION_TYPE,MESSAGE_TYPE,ORIG_SYSTEM_ID,MESSAGE_ID,DVL_MESSAGE_ID,RECEIPT_LOCAL_MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,ORIGINATOR_SCCP_ADDRESS,MtServiceCenterAddress,ORIG_NETWORK_ID,NETWORK_ID,MPROC_NOTES,MSG_PARTS,CHAR_NUMBERS,PROCESSING_TIME,SCHEDULE_DELIVERY_DELAY,DELIVERY_COUNT,MESSAGE_PART_PROCESSING_TIME,FIRST_20_CHARACTERS_OF_SMS,_SMS,REASON_FOR_FAILURE,DELIVERY_RECEIPT_MESSAGE_STATUS,DELIVERY_RECEIPT_MESSAGE_STATE_TLV,DELIVERY_RECEIPT_MESSAGE_ERR
 ----
 where `ADDR_SRC_DIGITS, ADDR_SRC_TON, ADDR_SRC_NPI, ADDR_DST_DIGITS, ADDR_DST_TON, ADDR_DST_NPI, ORIG_SYSTEM_ID, MESSAGE_ID, NNN_DIGITS, IMSI, ORIG_NETWORK_ID, NETWORK_ID, DELIVERY_COUNT` and `CORR_ID` are as explained in <<_slot_messages_table_yyyy_mm_dd>> and other values are described below in this section.
 
@@ -225,6 +225,10 @@ A processing time between a CDR generation time and a message submit time in mil
 .SCHEDULE_DELIVERY_DELAY
 A processing time between a time for which a message is scheduled and a message submit time in milliseconds (this field is empty if a message has not be scheduled to a database but was delivered immediately).
 
+.MESSAGE_PART_PROCESSING_TIME
+For messages that are split by SMSC GW at the sending time this field shows processing time of a message part: it is difference in milliseconds between a previous message part delivery timestamp and current message part delivery timestamp.
+For messages that are not split by SMSC GW and for a first part of a split message this counter will show time between message (or message part) delivery timestamp and time when message has been received by SMSC GW.
+
 .Reason_For_Failure
 The last field in the CDR generated is `Reason_For_Failure`, which records the reason for delivery failure and is empty if the delivery is successful.
 The possible delivery failure cases are explained below. 
@@ -284,7 +288,16 @@ Error condition when invoking `sendMtSms()` from `onDialogReject()`::
 Other::
   Any other message that usually indicates some internal failure.		
 
-  [[_monitoring_smsc_cdr_detailed_log]]
+.DELIVERY_RECEIPT_MESSAGE_STATUS
+If a message received is a recognized delivery receipt, this field will contain value of the "Stat" field of a message body. 
+
+.DELIVERY_RECEIPT_MESSAGE_STATE_TLV
+If a message received is a recognized delivery receipt and it contains "message_state" TLV (tag 0x0427), this field will contain value of this TLV.
+
+.DELIVERY_RECEIPT_MESSAGE_ERR
+If a message received is a recognized delivery receipt, this field will contain value of the field "Err" of a message body.
+
+[[_monitoring_smsc_cdr_detailed_log]]
 == Detailed CDR Log
 
 {this-platform} {this-application} is configured to generate detailed CDR logs in a plain text file located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr_detailed.log_.

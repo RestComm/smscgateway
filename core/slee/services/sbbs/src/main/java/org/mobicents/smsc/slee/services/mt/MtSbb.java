@@ -842,7 +842,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         int messageSegmentNumber = this.getMessageSegmentNumber();
         SmsSignalInfo[] segments = this.getSegments();
         if (segments != null && messageSegmentNumber < segments.length - 1) {
-            this.generateCDR(sms, CdrGenerator.CDR_PARTIAL, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false);
+            this.generateCDR(sms, CdrGenerator.CDR_PARTIAL, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false, messageSegmentNumber);
 
             // we have more message parts to be sent yet
             messageSegmentNumber++;
@@ -878,7 +878,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         // success CDR generating
         boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
         this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL : CdrGenerator.CDR_SUCCESS,
-                CdrGenerator.CDR_SUCCESS_NO_REASON, segments != null, true);
+                CdrGenerator.CDR_SUCCESS_NO_REASON, segments != null, true, messageSegmentNumber);
 
         // adding a success receipt if it is needed
         this.generateSuccessReceipt(smsSet, sms);
@@ -1197,6 +1197,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			}
 
 			mapDialogSms.send();
+			sms.putMsgPartDeliveryTime(getMessageSegmentNumber(), System.currentTimeMillis());
 
 		} catch (MAPException e) {
 			if (mapDialogSms != null)
