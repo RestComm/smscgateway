@@ -1077,9 +1077,10 @@ public abstract class DeliveryCommonSbb implements Sbb {
      */
     protected void postProcessSucceeded(Sms sms, String dlvMessageId, String dlvDestId) {
         try {
+            sms.setDeliveryDate(new Date());
             persistence.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT,
                     smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
-            sms.setDeliveryDate(new Date());
+            
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
                 persistence.c2_createRecordArchive(sms, dlvMessageId, dlvDestId,
                         !smscPropertiesManagement.getReceiptsDisabling(),

@@ -25,6 +25,7 @@ package org.mobicents.smsc.library;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.Map;
@@ -445,11 +446,21 @@ public class SmsSetCache {
     public void incrementStoredMessagesCounter(long date) {
         if (storedMessagesCounters.putIfAbsent(date, new AtomicLong(1l)) != null)
             storedMessagesCounters.get(date).incrementAndGet();
+        else {
+            //inserted new date
+            //lets clear the garbage
+            clearStoredMessageCounters();
+        }
     }
-    
+
     public void incrementSentMessagesCounter(long date) {
         if (sentMessagesCounters.putIfAbsent(date, new AtomicLong(1l)) != null)
             sentMessagesCounters.get(date).incrementAndGet();
+        else {
+            //inserted new date
+            //lets clear the garbage
+            clearSentMessageCounters();
+        }
     }
     
 //    public long getMessagesPendingInDatabase(long date) {
@@ -513,6 +524,40 @@ public class SmsSetCache {
                 }
             }
             return sumSent;
+    }
+    
+    private void clearStoredMessageCounters() {
+        Calendar calendar = GregorianCalendar.getInstance(); 
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        long date = calendar.getTimeInMillis();
+        Enumeration<Long> i1 = storedMessagesCounters.keys();
+        while (i1.hasMoreElements()) {
+            long key = i1.nextElement();
+            if (key < date) {
+                storedMessagesCounters.remove(key);
+            }
+        }
+    }
+    
+    private void clearSentMessageCounters() {
+        Calendar calendar = GregorianCalendar.getInstance(); 
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        long date = calendar.getTimeInMillis();
+        Enumeration<Long> i1 = sentMessagesCounters.keys();
+        while (i1.hasMoreElements()) {
+            long key = i1.nextElement();
+            if (key < date) {
+                sentMessagesCounters.remove(key);
+            }
+        }
     }
  
     public void loadMessagesCountersFromDatabase(ConcurrentHashMap<Long, AtomicLong> storedMessages, 
