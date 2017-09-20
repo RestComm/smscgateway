@@ -407,6 +407,20 @@
 					</span>				
 				</div>
 				
+				<div id="div-newmtgt" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule matches, the target SMS's destination global title (GT) will be changed to one set with this command. Set this to -1 to keep original GT. Default value is -1.">
+						<span class="add-on">New MT GT</span>
+						<input id="newmtgt" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Global Title for MT message" />
+					</span>				
+				</div>
+				
+				<div id="div-newmttt" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule matches, the target SMS's destination translation type (TT) will be changed to one set with this command. Set this to -1 to keep original TT. Default value is -1.">
+						<span class="add-on">New MT TT</span>
+						<input id="newmttt" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Translation Type for MT message" />
+					</span>				
+				</div>
+				
 				<div id="div-makecopy" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule match's, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix, newsourceton, newsourcenpi, newsourceaddr will be applied to new SMS">
 						<span class="add-on">Make Copy</span>
@@ -720,6 +734,8 @@
 										var newsourcenpi = processRuleParameters(ruleparameters, "newsourcenpi");
 										var newsourceaddr = processRuleParameters(ruleparameters, "newsourceaddr");
 										var makecopy = processRuleParameters(ruleparameters, "makecopy");
+										var newmtgt = processRuleParameters(ruleparameters, "newmtgt");
+										var newmttt = processRuleParameters(ruleparameters, "newmttt");
 										if(makecopy=="-1") { makecopy = "false"; }
 										var hrbypass = processRuleParameters(ruleparameters, "hrbypass");
 										if(hrbypass=="-1") { hrbypass = "false"; }
@@ -1181,7 +1197,39 @@
 																			'</td>'+
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewSourceAddr"+']\').toggle(); $(\'input[id^='+id+"NewSourceAddr"+']\').focus();"></i>' +
 																			'</td>'+
-																		'</tr>'+	
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Once rule matches, the target SMS\'s destination global title (GT) will be changed to one set with this command. Set this to -1 to keep original GT. Default value is -1.">'+
+																			'<td style="font-size: 0.9em;">New MT GT</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewMtGt-input" class="control-group">'+
+																				'<span id="' + id +'NewMtGt-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newmtgt + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newmtgt\', \'' + id+"NewMtGt" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewMtGt"+']\').toggle(); $(\'input[id^='+id+"NewMtGt"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewMtGt-text">' + newmtgt + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewMtGt"+']\').toggle(); $(\'input[id^='+id+"NewMtGt"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
+																		
+																		'<tr data-toggle="tooltip" title="Once rule matches, the target SMS\'s destination translation type (TT) will be changed to one set with this command. Set this to -1 to keep original TT. Default value is -1.">'+
+																			'<td style="font-size: 0.9em;">New MT TT</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'NewMtTt-input" class="control-group">'+
+																				'<span id="' + id +'NewMtTt-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + newmttt + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newmttt\', \'' + id+"NewMtTt" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewMtTt"+']\').toggle(); $(\'input[id^='+id+"NewMtTt"+']\').focus();"></i>' + 
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'NewMtTt-text">' + newmttt + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewMtTt"+']\').toggle(); $(\'input[id^='+id+"NewMtTt"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
 																		
 																		'<tr data-toggle="tooltip" title="Once rule match\'s, and makecopy is set to true, a new copy of SMS is created. If new SMS is created all above parameters like networkidmask, newnetworkid, newdestton, newdestnpi, adddestdigprefix, newsourceton, newsourcenpi, newsourceaddr will be applied to new SMS">'+
 																			'<td style="font-size: 0.9em;">Make Copy</td>'+
@@ -1724,6 +1772,20 @@
 			newsourceaddr = null;
 		} else {
 			parametersstring = parametersstring + " newsourceaddr "+newsourceaddr;
+		}
+		
+		var newmtgt = $("#newmtgt").val();
+		if(newmtgt.trim() == "") {
+			newmtgt = "-1";
+		} else {
+			parametersstring = parametersstring + " newmtgt " + newmtgt;
+		}
+		
+		var newmttt = $("#newmttt").val();
+		if(newmttt.trim() == "") {
+			newmttt = "-1";
+		} else {
+			parametersstring = parametersstring + " newmttt " + newmttt;
 		}
 
 		e = document.getElementById("makecopy");
