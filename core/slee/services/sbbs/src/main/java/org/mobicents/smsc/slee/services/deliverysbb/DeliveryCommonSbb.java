@@ -133,8 +133,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
             if (dlvIsInited && !dlvIsEnded) {
                 targetId = this.getTargetId();
                 if (targetId == null) {
-                    this.logger.warning("targetId is null for DeliveryCommonSbb in dlvIsInited state: " + ", targetId"
-                            + this.getTargetId() + "\n" + MessageUtil.stackTraceToString());
+                    this.logger.warning("targetId is null for DeliveryCommonSbb in dlvIsInited state: " + ", targetId: "
+                            + this.getTargetId(), new Throwable());
                     return;
                 }
 
@@ -142,8 +142,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
                 smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
                 if (smsSet == null) {
-                    this.logger.warning("smsSet is null for DeliveryCommonSbb in dlvIsInited state: " + ", targetId"
-                            + this.getTargetId() + "\n" + MessageUtil.stackTraceToString());
+                    this.logger.warning("smsSet is null for DeliveryCommonSbb in dlvIsInited state: " + ", targetId: "
+                            + this.getTargetId(), new Throwable());
                     return;
                 }
             }
@@ -494,8 +494,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                         Sms sms = smsSet.getSms(currentMsgNum + i1);
                         if (sms == null) {
                             this.logger.severe("RxSmpp obtainNextMessagesSendingPool() error: sms is not found num=" + i1
-                                    + " from " + sendingPoolMsgCount + ", smsSet=" + smsSet + "\n"
-                                    + MessageUtil.stackTraceToString());
+                                    + " from " + sendingPoolMsgCount + ", smsSet=" + smsSet, new Throwable());
                             break;
                         }
                         if (sms.getValidityPeriod() != null

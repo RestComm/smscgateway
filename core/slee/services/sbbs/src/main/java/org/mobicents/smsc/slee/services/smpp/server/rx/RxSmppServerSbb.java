@@ -411,7 +411,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             }
 
             logger.severe(
-                    String.format("\nonPduRequestTimeout : targetId=" + smsSet.getTargetId() + ", PduRequestTimeout=" + event));
+                    String.format("onPduRequestTimeout : targetId=" + smsSet.getTargetId() + ", PduRequestTimeout=" + event));
 
             this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, "PduRequestTimeout: ",
                     EventType.OUT_SMPP_ERROR, event.getPduRequest().getSequenceNumber());

@@ -206,7 +206,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
         sbbu.incrementCounterErrorPduRequestTimeout(ONE);
         sbbu.samplePduRequestTimeout(0L);
-        logger.severe(String.format("\nonPduRequestTimeout : PduRequestTimeout=%s", event));
+        logger.severe(String.format("onPduRequestTimeout : PduRequestTimeout=%s", event));
         // TODO : Handle this
     }
 
