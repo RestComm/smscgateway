@@ -258,7 +258,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 else if (event.getResponse() != null)
                     seqNumber = event.getResponse().getSequenceNumber();
 
-                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, "SendPduStatus: " + event,
+                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, "SendPduStatus: " + event.getException().getMessage(),
                         EventType.OUT_SMPP_ERROR, seqNumber);
             } catch (Throwable e1) {
                 logger.severe("Exception in RxSmppServerSbb.onSendPduStatus(): " + e1.getMessage(), e1);
