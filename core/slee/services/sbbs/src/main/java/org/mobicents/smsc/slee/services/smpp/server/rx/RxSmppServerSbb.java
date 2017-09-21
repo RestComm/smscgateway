@@ -1121,11 +1121,23 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL_ESME : CdrGenerator.CDR_SUCCESS_ESME,
                     CdrGenerator.CDR_SUCCESS_NO_REASON, confirmMessageInSendingPool.splittedMessage, true, event.getSequenceNumber());
 
-            String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
-                    : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+            String messageType = null;
+            String remoteAddr = null;
+            if (esme != null) {
+                messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
+                        : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+                remoteAddr = esme.getRemoteAddressAndPort();
+            }
+            if (messageType == null) {
+                if (event.getCommandId() == SmppConstants.CMD_ID_DELIVER_SM_RESP) {
+                    messageType = CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
+                } else {
+                    messageType = CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM;
+                }
+            }
 
             this.generateDetailedCDR(sms, EventType.OUT_SMPP_SENT, sms.getSmsSet().getStatus(), messageType, status,
-                    esme.getRemoteAddressAndPort(), event.getSequenceNumber());
+                    remoteAddr, event.getSequenceNumber());
 
             // adding a success receipt if it is needed
             this.generateSuccessReceipt(smsSet, sms);
