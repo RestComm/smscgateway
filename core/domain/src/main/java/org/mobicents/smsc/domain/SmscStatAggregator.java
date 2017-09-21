@@ -333,14 +333,6 @@ public class SmscStatAggregator implements UpdateMessagesInProcessListener {
         return smsSetCashe.getMessagesStoredInDatabase() - smsSetCashe.getMessagesSentInDatabase();
     }
     
-    public long getMsgStoredInDb() {
-        return smsSetCashe.getMessagesStoredInDatabase();
-    }
-    
-    public long getMsgSheduledSent() {
-        return smsSetCashe.getMessagesSentInDatabase();
-    }
-
     private class StatCollector {
         private StatDataCollection statDataCollection = new StatDataCollectionImpl();
 

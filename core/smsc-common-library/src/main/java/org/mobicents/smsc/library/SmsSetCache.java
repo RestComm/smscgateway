@@ -463,30 +463,6 @@ public class SmsSetCache {
         }
     }
     
-//    public long getMessagesPendingInDatabase(long date) {
-//        long sumStored = 0;
-//        Iterator<Map.Entry<Long, AtomicLong>> i1 = storedMessagesCounters.entrySet().iterator();
-//        while (i1.hasNext()) {
-//            Map.Entry<Long, AtomicLong> pair = i1.next();
-//            if (pair.getKey() >= date) {
-//                sumStored += pair.getValue().get();
-//            }
-//            i1.remove();
-//        }
-//        
-//        long sumSent = 0;
-//        Iterator<Map.Entry<Long, AtomicLong>> i2 = sentMessagesCounters.entrySet().iterator();
-//        while (i2.hasNext()) {
-//            Map.Entry<Long, AtomicLong> pair = i2.next();
-//            if (pair.getKey() >= date) {
-//                sumSent += pair.getValue().get();
-//            }
-//            i2.remove();
-//        }
-//        
-//        return sumStored - sumSent;
-//    }
-    
     public long getMessagesStoredInDatabase() {
         Calendar calendar = GregorianCalendar.getInstance(); 
         calendar.setTime(new Date());
