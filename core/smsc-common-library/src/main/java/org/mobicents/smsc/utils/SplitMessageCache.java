@@ -46,7 +46,11 @@ public class SplitMessageCache implements SplitMessageCacheMBean {
     }
 
     private String createStringReferenceNumber(int reference_number, Sms smsEvent){
-        return reference_number + ";" + smsEvent.getSourceAddr();
+        StringBuilder sb = new StringBuilder();
+        sb.append(reference_number);
+        sb.append(";");
+        sb.append(smsEvent.getSourceAddr());
+        return sb.toString();
     }
 
     private int getReferenceNumber(String reference_number){
@@ -93,5 +97,4 @@ public class SplitMessageCache implements SplitMessageCacheMBean {
     public int getRemoveOlderThanXSeconds(){
         return this.removeOlderThanXSeconds;
     }
-
 }

@@ -888,12 +888,14 @@ public class MessageUtil {
             }
         }
         if(splitMessageData.isMsgSplitInUse() == true){
-            int queueFlag =splitMessageData.getSplitMessageCache().checkExistenceOfReferenceNumberInCache(splitMessageData.getSplitedMessageReferenceNumber(),smsEvent);
-            if(queueFlag != 0){
-                splitMessageData.setSplitedMessageID(splitMessageData.getSplitMessageCache().getMessageIdByReferenceNumber(splitMessageData.getSplitedMessageReferenceNumber(),smsEvent,(queueFlag > 1 ? true : false)));
-            }else{
-                splitMessageData.getSplitMessageCache().addReferenceNumber(splitMessageData.getSplitedMessageReferenceNumber(), smsEvent,smsEvent.getMessageId());
-                splitMessageData.setSplitedMessageID(smsEvent.getMessageId());
+            synchronized (splitMessageData){
+                int queueFlag =splitMessageData.getSplitMessageCache().checkExistenceOfReferenceNumberInCache(splitMessageData.getSplitedMessageReferenceNumber(),smsEvent);
+                if(queueFlag != 0){
+                    splitMessageData.setSplitedMessageID(splitMessageData.getSplitMessageCache().getMessageIdByReferenceNumber(splitMessageData.getSplitedMessageReferenceNumber(),smsEvent,(queueFlag > 1 ? true : false)));
+                }else{
+                    splitMessageData.getSplitMessageCache().addReferenceNumber(splitMessageData.getSplitedMessageReferenceNumber(), smsEvent,smsEvent.getMessageId());
+                    splitMessageData.setSplitedMessageID(smsEvent.getMessageId());
+                }
             }
         }
 
