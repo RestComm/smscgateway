@@ -9,13 +9,11 @@ public interface SplitMessageCacheMBean {
 
     public void addReferenceNumber(int reference_number, Sms smsEvent,long message_id);
 
-    public boolean checkExistenceOfReferenceNumberInCache(int reference_number, Sms smsEvent);
+    public int checkExistenceOfReferenceNumberInCache(int reference_number, Sms smsEvent);
 
-    public long getMessageIdByReferenceNumber(int reference_number, Sms smsEvent);
+    public long getMessageIdByReferenceNumber(int reference_number, Sms smsEvent,boolean queueFlag);
 
     public void removeOldReferenceNumbers();
-
-    public int getTotalReferenceNumberCached();
 
     public void setRemoveOlderThanXSeconds(int numberOfSeconds);
 
