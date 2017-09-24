@@ -10,8 +10,6 @@ import java.util.*;
 public class SplitMessageCache implements SplitMessageCacheMBean {
 
     private static SplitMessageCache instance = null;
-    private static Queue<Object> cacheQueueA;
-    private static Queue<Object> cacheQueueB;
     private static int removeOlderThanXSeconds;
     private static Map<String,Long> referenceNumberMessageIdA;
     private static Map<String,Long> referenceNumberMessageIdB;
@@ -19,9 +17,7 @@ public class SplitMessageCache implements SplitMessageCacheMBean {
     private static long lastChangeOfBalanceFlag;
 
     public SplitMessageCache(){
-        cacheQueueA = new LinkedList<Object>();
         referenceNumberMessageIdA = new HashMap<String, Long>();
-        cacheQueueB = new LinkedList<Object>();
         referenceNumberMessageIdB = new HashMap<String, Long>();
         removeOlderThanXSeconds = 60;
         balanceFlag = false;
@@ -37,10 +33,8 @@ public class SplitMessageCache implements SplitMessageCacheMBean {
 
     public void addReferenceNumber(int reference_number, Sms smsEvent, long message_id){
         if(balanceFlag){
-            cacheQueueA.add(new SplitMessageCacheStruct(createStringReferenceNumber(reference_number,smsEvent)));
             referenceNumberMessageIdA.put(createStringReferenceNumber(reference_number,smsEvent),message_id);
         }else{
-            cacheQueueB.add(new SplitMessageCacheStruct(createStringReferenceNumber(reference_number,smsEvent)));
             referenceNumberMessageIdB.put(createStringReferenceNumber(reference_number,smsEvent),message_id);
         }
     }
@@ -63,15 +57,13 @@ public class SplitMessageCache implements SplitMessageCacheMBean {
         return split[1];
     }
 
-    public void removeOldReferenceNumbers(){
+    public synchronized void removeOldReferenceNumbers(){
         if ((System.currentTimeMillis() -lastChangeOfBalanceFlag) > removeOlderThanXSeconds/2*1000){
-            balanceFlag = !balanceFlag;
             lastChangeOfBalanceFlag = System.currentTimeMillis();
+            balanceFlag = !balanceFlag;
             if(balanceFlag == true){
-                cacheQueueA.clear();
                 referenceNumberMessageIdA.clear();
             } else{
-                cacheQueueB.clear();
                 referenceNumberMessageIdB.clear();
             }
         }
