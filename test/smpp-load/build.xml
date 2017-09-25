@@ -13,14 +13,14 @@
 
 	<property name="assemble.dir" value="${ant.file.mobicents.release}/../target/load" />
 	<path id="project.class.path">
-		<pathelement location="${assemble.dir}/smpp-load-7.3.0-SNAPSHOT.jar" />
-		<pathelement location="${assemble.dir}/ch-smpp-5.0.5.jar" />
+		<pathelement location="${assemble.dir}/smpp-load-7.4.0-20.jar" />
+		<pathelement location="${assemble.dir}/ch-smpp-5.1.0-9.jar" />
 		<pathelement location="${assemble.dir}/netty-3.9.0.Final.jar" />
 		<pathelement location="${assemble.dir}/slf4j-api-1.5.6.jar" />
 		<pathelement location="${assemble.dir}/slf4j-log4j12-1.5.6.jar" />
 
-		<pathelement location="${assemble.dir}/ch-commons-charset-.jar" />
-		<pathelement location="${assemble.dir}/ch-commons-util-.jar" />
+		<pathelement location="${assemble.dir}/ch-commons-charset-3.0.2.jar" />
+		<pathelement location="${assemble.dir}/ch-commons-util-6.0.1.jar" />
 		<pathelement location="${assemble.dir}/joda-time-2.6.jar" />
 
 		<pathelement location="${assemble.dir}/log4j-1.2.14.jar" />
