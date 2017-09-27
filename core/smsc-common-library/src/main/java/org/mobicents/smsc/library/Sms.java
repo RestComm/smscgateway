@@ -62,10 +62,6 @@ public class Sms implements Serializable {
 	private int sourceAddrTon;
 	private int sourceAddrNpi;
 	private String sourceAddr;
-	
-    // global title and translation type for MT message
-    private String MtGt;
-    private int MtTt;
     
     private int origNetworkId;
 
@@ -244,22 +240,22 @@ public class Sms implements Serializable {
      * Global Title for MT message
      */
     public String getMtGt() {
-        return MtGt;
+        return extraData.getMtGt();
     }
 
     public void setMtGt(String mtGt) {
-        MtGt = mtGt;
+        extraData.setMtGt(mtGt);
     }
     
     /**
      * Translation Type MT message
      */
     public int getMtTt() {
-        return MtTt;
+        return extraData.getMtTt();
     }
 
     public void setMtTt(int mtTt) {
-        MtTt = mtTt;
+        extraData.setMtTt(mtTt);
     }
 
     /**
