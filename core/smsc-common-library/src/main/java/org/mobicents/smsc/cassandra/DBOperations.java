@@ -328,10 +328,8 @@ public class DBOperations {
 		getSipSmsRoutingRulesRange2 = session.prepare("select * from \"" + Schema.FAMILY_SIP_SMS_ROUTING_RULE
 				+ "\"  LIMIT " + row_count + ";");
 		
-		getStoredMessagesCounter = session.prepare("SELECT \"" + Schema.COLUMN_DAY + "\", \"" + Schema.COLUMN_STORED_MESSAGES 
-		        + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" = ?");
-		getSentMessagesCounter = session.prepare("SELECT \"" + Schema.COLUMN_DAY + "\", \"" + Schema.COLUMN_SENT_MESSAGES 
-		        + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" = ?");
+		getStoredMessagesCounter = session.prepare("SELECT * FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" = ?");
+		getSentMessagesCounter = session.prepare("SELECT * FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" = ?");
 
 		try {
 			currentDueSlot = c2_getCurrentSlotTable(CURRENT_DUE_SLOT);
@@ -1941,8 +1939,7 @@ public class DBOperations {
         try {
             try {
                 // checking if PENDING_MESSAGES table exists
-                String sa = "SELECT \"" + Schema.COLUMN_STORED_MESSAGES + "\", \"" + Schema.COLUMN_SENT_MESSAGES + "\" FROM \"" + Schema.FAMILY_PENDING_MESSAGES
-                        + "\" WHERE \"" + Schema.COLUMN_DAY + "\"='0';";
+                String sa = "SELECT * FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\"='0';";
                 PreparedStatement ps = session.prepare(sa);
             } catch (InvalidQueryException e) {
                 StringBuilder sb = new StringBuilder();
