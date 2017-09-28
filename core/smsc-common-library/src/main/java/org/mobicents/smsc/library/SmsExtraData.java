@@ -210,7 +210,11 @@ public class SmsExtraData {
             extraData.receiptLocalMessageId = xml.get(RECEIPT_LOCAL_MESSAGEID, Long.class);      
             
             extraData.mtGt = xml.get(MT_GT, String.class);
-            extraData.mtTt = xml.get(MT_TT, Integer.class);
+            Integer val = xml.get(MT_TT, Integer.class);
+            if (val != null) {
+                extraData.mtTt = val.intValue();
+            } else 
+                extraData.mtTt = 0;
         }
 
         @Override
