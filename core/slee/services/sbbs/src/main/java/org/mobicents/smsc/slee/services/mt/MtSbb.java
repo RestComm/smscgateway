@@ -1060,8 +1060,20 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			boolean newDialog = false;
 			if (mapDialogSms == null) {
 				newDialog = true;
+				
+				String mtGt = sms.getMtGt();
+	            int mtTt = sms.getMtTt();
+	            
+	            SccpAddress sccpAddress;
+	            
+	            if (mtGt != null || mtTt != 0) {
+	                sccpAddress = this.getServiceCenterSccpAddress(mtGt, mtTt, networkId);
+	            } else {
+	                sccpAddress = this.getServiceCenterSccpAddress(networkId);
+	            }
+	           
 				mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext,
-						this.getServiceCenterSccpAddress(networkId), null, this.getNetworkNode(), null);
+						sccpAddress, null, this.getNetworkNode(), null);
                 mapDialogSms.setNetworkId(networkId);
 
 				ActivityContextInterface mtFOSmsDialogACI = this.mapAcif.getActivityContextInterface(mapDialogSms);

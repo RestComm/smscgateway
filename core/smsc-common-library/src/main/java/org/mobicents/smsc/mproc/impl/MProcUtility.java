@@ -227,6 +227,16 @@ public class MProcUtility {
         if (val.length() == 0 || val.length() > 21)
             throw new MProcRuleException("SourceAddr must have length 1-21, found=" + val.length());
     }
+    
+    public static void checkMtGt(String val) throws MProcRuleException {
+        if (val == null)
+            throw new MProcRuleException("MtGt must not be null");
+    }
+    
+    public static void checkMtTt(int val) throws MProcRuleException {
+        if (val < 0 || val > 254)
+            throw new MProcRuleException("MtTt must be in 0-254 range, received=" + val);
+        }
 
     public static void checkShortMessageText(String val) throws MProcRuleException {
         if (val == null)

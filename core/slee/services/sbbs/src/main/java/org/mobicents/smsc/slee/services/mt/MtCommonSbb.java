@@ -580,6 +580,21 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     smscPropertiesManagement.getTranslationType());
         }
     }
+    
+    protected SccpAddress getServiceCenterSccpAddress(String mtGt, int mtTt, int networkId) {
+        if (mtGt == null) {
+            if (networkId == 0) {
+                mtGt = smscPropertiesManagement.getServiceCenterGt();
+            } else {
+                mtGt = smscPropertiesManagement.getServiceCenterGt(networkId);
+            }
+        }
+        if (mtTt == 0) {
+            mtTt = smscPropertiesManagement.getTranslationType();
+        }
+        return MessageUtil.getSccpAddress(sccpParameterFact, mtGt, AddressNature.international_number.getIndicator(), NumberingPlan.ISDN.getIndicator(),
+                smscPropertiesManagement.getServiceCenterSsn(), smscPropertiesManagement.getGlobalTitleIndicator(), mtTt);
+    }
 
     protected ISDNAddressString getCalledPartyISDNAddressString(String destinationAddress, int ton, int npi) {
         return this.mapParameterFactory.createISDNAddressString(AddressNature.getInstance(ton),

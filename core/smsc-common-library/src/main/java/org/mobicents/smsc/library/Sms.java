@@ -62,6 +62,7 @@ public class Sms implements Serializable {
 	private int sourceAddrTon;
 	private int sourceAddrNpi;
 	private String sourceAddr;
+    
     private int origNetworkId;
 
     private String originatorSccpAddress;
@@ -234,6 +235,28 @@ public class Sms implements Serializable {
 	public void setSourceAddr(String sourceAddr) {
 		this.sourceAddr = sourceAddr;
 	}
+	
+	/**
+     * Global Title for MT message
+     */
+    public String getMtGt() {
+        return extraData.getMtGt();
+    }
+
+    public void setMtGt(String mtGt) {
+        extraData.setMtGt(mtGt);
+    }
+    
+    /**
+     * Translation Type MT message
+     */
+    public int getMtTt() {
+        return extraData.getMtTt();
+    }
+
+    public void setMtTt(int mtTt) {
+        extraData.setMtTt(mtTt);
+    }
 
     /**
      * original networkId
