@@ -53,6 +53,7 @@ public class SmppSimulatorParameters {
     private boolean idResponseTlv = false;
     private boolean idResponseTlvMessageState = false;
     private boolean wrongMessageIdInDlr = false;
+    private boolean addMessageIdIntoDeliverySmResp = false;
 
 	private TON sourceTon = TON.International;
 	private NPI sourceNpi = NPI.ISDN;
@@ -429,7 +430,15 @@ public class SmppSimulatorParameters {
 		this.responseDelay = responseDelay;
 	}
 
-	public enum EncodingType {
+	public boolean isAddMessageIdIntoDeliverySmResp() {
+        return addMessageIdIntoDeliverySmResp;
+    }
+
+    public void setAddMessageIdIntoDeliverySmResp(boolean addMessageIdIntoDeliverySmResp) {
+        this.addMessageIdIntoDeliverySmResp = addMessageIdIntoDeliverySmResp;
+    }
+
+    public enum EncodingType {
     	GSM7_DCS_0, GSM8_DCS_4, UCS2_DCS_8,
     }
 

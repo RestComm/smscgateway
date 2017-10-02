@@ -102,6 +102,7 @@ public class SmppMessageParamForm extends JDialog {
     private JCheckBox cbIdResponseTlv;
     private JCheckBox cbIdResponseTlvMessageState;
     private JCheckBox cbWrongMessageIdInDlr;
+    private JCheckBox cbAddMessageIdIntoDeliverySmResp;
     private final ButtonGroup buttonGroup_2 = new ButtonGroup();
 
     private JCheckBox cbSendOptionalParameter;
@@ -397,6 +398,10 @@ public class SmppMessageParamForm extends JDialog {
 						cbWrongMessageIdInDlr = new JCheckBox("Wrong messageId in delivery receipt");
 						cbWrongMessageIdInDlr.setBounds(6, 177, 364, 23);
 						panel_resp.add(cbWrongMessageIdInDlr);
+
+						cbAddMessageIdIntoDeliverySmResp = new JCheckBox("Addinng of MessageId into DeliverySmResp");
+						cbAddMessageIdIntoDeliverySmResp.setBounds(6, 203, 364, 23);
+						panel_resp.add(cbAddMessageIdIntoDeliverySmResp);
 						
 						JPanel panel_bulk = new JPanel();
 						tabbedPane.addTab("Bulk", null, panel_bulk, null);
@@ -615,6 +620,7 @@ public class SmppMessageParamForm extends JDialog {
         this.cbIdResponseTlv.setSelected(this.data.isIdResponseTlv());
         this.cbIdResponseTlvMessageState.setSelected(this.data.isIdResponseTlvMessageState());
         this.cbWrongMessageIdInDlr.setSelected(this.data.isWrongMessageIdInDlr());
+        this.cbAddMessageIdIntoDeliverySmResp.setSelected(this.data.isAddMessageIdIntoDeliverySmResp());
         switch (this.data.getDeliveryResponseGenerating()) {
             case No:
                 this.rbDR_No.setSelected(true);
@@ -734,6 +740,7 @@ public class SmppMessageParamForm extends JDialog {
         this.data.setIdResponseTlv(this.cbIdResponseTlv.isSelected());
         this.data.setIdResponseTlvMessageState(this.cbIdResponseTlvMessageState.isSelected());
         this.data.setWrongMessageIdInDlr(this.cbWrongMessageIdInDlr.isSelected());
+        this.data.setAddMessageIdIntoDeliverySmResp(this.cbAddMessageIdIntoDeliverySmResp.isSelected());
 
         if (rbDR_No.isSelected())
             this.data.setDeliveryResponseGenerating(SmppSimulatorParameters.DeliveryResponseGenerating.No);

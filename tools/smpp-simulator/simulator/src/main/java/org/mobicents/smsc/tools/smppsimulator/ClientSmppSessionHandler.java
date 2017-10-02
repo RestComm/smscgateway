@@ -227,7 +227,10 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
             	}
             } 
 
-            ((BaseSmResp) resp).setMessageId(msgId);
+            if (!(pduRequest instanceof DeliverSm)
+                    || this.testingForm.getSmppSimulatorParameters().isAddMessageIdIntoDeliverySmResp()) {
+                ((BaseSmResp) resp).setMessageId(msgId);
+            }
 
             // scheduling of delivery receipt if needed
             if (this.testingForm.getSmppSimulatorParameters().getDeliveryResponseGenerating() != DeliveryResponseGenerating.No) {
@@ -360,8 +363,10 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
             pdu.setSourceAddress(new Address((byte) param.getSourceTON().getCode(), (byte) param.getSourceNPI().getCode(),
                     param.getSourceAddress()));
 
-            pdu.setDestAddress(new Address(pdu.getSourceAddress().getTon(), pdu.getSourceAddress().getNpi(), pdu
-                    .getSourceAddress().getAddress()));
+            pdu.setDestAddress(new Address((byte) param.getDestTON().getCode(), (byte) param.getDestNPI().getCode(),
+                    param.getDestAddress()));
+//            pdu.setDestAddress(new Address(pdu.getSourceAddress().getTon(), pdu.getSourceAddress().getNpi(), pdu
+//                    .getSourceAddress().getAddress()));
 
             pdu.setEsmClass((byte) (0x04 + 1)); // delivery receipt + datagramm mode
 
