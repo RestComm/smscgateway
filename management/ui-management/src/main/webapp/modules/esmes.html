@@ -13,7 +13,7 @@
 		<tr>
 			<td>
 				<div class="alert alert-info fade in">
-					<strong>No ESME's defined yet!</strong> 
+					<strong>No ESME's defined yet!</strong>
 				</div>
 			</td>
 		</tr>
@@ -35,7 +35,7 @@
 	</table>
 	<p>
 		<a href="#entities-modal" role="button" class="btn btn-info btn-small" data-toggle="modal" ><i class="icon-external-link"></i> Create ESME</a>
-	</p>	
+	</p>
 </span>
 
 <div id="entities-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -54,44 +54,44 @@
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="unique name for this ESME">
 						<span class="add-on">ESME Name</span>
 						<input id="esmeName" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="ESME Name" />
-					</span>				
+					</span>
 				</div>
-				
+
 				<div id="div-systemId" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="is used to identify an ESME or an SMSC at bind time. An ESME system_id identifies the ESME or ESME agent to the SMSC. The SMSC system_id provides an identification of the SMSC to the ESME.">
 						<span class="add-on">System Id</span>
 						<input id="systemId" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="System Id" />
-					</span>								
+					</span>
 				</div>
-				
+
 				<div id="div-password" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="is used by the SMSC to authenticate the identity of the binding ESME. The Service Provider may require ESME’s to provide a password when binding to the SMSC">
 						<span class="add-on">Password</span>
 						<input id="password" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Password" />
-					</span>					
+					</span>
 				</div>
 
 				<div id="div-networkId" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="is used by the SMSC to associate this SMPP connection with given network for multi tenancy. SMS can be routed in same network only, default network id is 0.">
 						<span class="add-on">Network Id</span>
 						<input id="networkId" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Network Id" value="0" />
-					</span>					
-				</div>				
+					</span>
+				</div>
 
 				<div id="div-ipAddress" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if SMSC is acting as ESME, the BIND request will be sent to configured ip and port. If SMSC is acting as Server, it will accept incoming BIND request from specified IP and Port. If port is unknown, pass -1 as willd character">
 						<span class="add-on">IP Address</span>
 						<input id="ipAddress" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="IP Address" />
-					</span>					
+					</span>
 				</div>
-				
+
 				<div id="div-ipPort" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if SMSC is acting as ESME, the BIND request will be sent to configured ip and port. If SMSC is acting as Server, it will accept incoming BIND request from specified IP and Port. If port is unknown, pass -1 as willd character">
 						<span class="add-on">Port</span>
 						<input id="ipPort" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Port" />
-					</span>	
+					</span>
 				</div>
-				
+
 				<div id="div-smppBindTypeBtnGrp" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if SMSC is acting as ESME, it will initiate corresponding bind else if its server it will accept corresponding bind from remote ESME">
 						<span class="add-on">Smpp Bind Type</span>
@@ -112,7 +112,7 @@
 						</select>
 					</span>
 				</div>
-				
+
 				<div id="div-chargingEnabledBtnGrp" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="if charging is enabled for this ESME. The 'ESME Originated SMS Charged' property should be 'Selected' for this setting to take effect">
 						<span class="add-on">Charging Enabled</span>
@@ -121,17 +121,17 @@
 							<option>True</option>
 						</select>
 					</span>
-				</div>				
+				</div>
 
 				<div id="div-systemType" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="is used to categorize the type of ESME that is binding to the SMSC">
 						<span class="add-on">System Type</span>
 						<input id="systemType" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="System Type" />
-					</span>	
+					</span>
 				</div>
-				
-				<div id="div-version" class="control-group">		
-				
+
+				<div id="div-version" class="control-group">
+
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="indicate the version of the SMPP protocol">
 						<span class="add-on">Version</span>
 						<select id="version" >
@@ -141,7 +141,7 @@
 						</select>
 					</span>
 				</div>
-				
+
 				<div id="div-esmeTon" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="defines ESME TON. if SMPP Session Type is CLIENT this TON will be used in BIND request, if SMPP Session Type is SERVER, incoming BIND request should have same TON as configured here. If configured is null(-1), SMSC will ignore in both the cases">
 						<span class="add-on">ESME Type of number (TON)</span>
@@ -156,9 +156,9 @@
 							<option value="6">Abbreviated</option>
 							<option value="7">Reserved</option>
 						</select>
-					</span>	
+					</span>
 				</div>
-								
+
 				<div id="div-esmeNpi" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="defines ESME NPI. if SMPP Session Type is CLIENT this NPI will be used in BIND request, if SMPP Session Type is SERVER, incoming BIND request should have same NPI as configured here. If configured is null(-1), SMSC will ignore in both the cases">
 						<span class="add-on">ESME Number plan indicator (NPI)</span>
@@ -175,17 +175,17 @@
 							<option value="14">Internet (IP)</option>
 							<option value="18">WAP Client Id</option>
 						</select>
-					</span>	
-				</div>				
-				
+					</span>
+				</div>
+
 				<div id="div-esmeRange" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="defines ESME Address Range. if SMPP Session Type is CLIENT this address range will be used in BIND request, if SMPP Session Type is SERVER, incoming BIND request should have same address range as configured here. If configured is null, SMSC will ignore in both the cases">
 						<span class="add-on">ESME Range</span>
 						<input id="esmeRange" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="ESME Range" value="^[0-9a-zA-Z]*"/>
-					</span>	
+					</span>
 				</div>
-				
-				
+
+
 				<div id="div-sourceTon" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="every SMS coming into SMSC via this ESME should have same source_addr_ton as configured here. If the value here is null(-1) or it's not null and match's, SMSC will compare source_addr_npi and source_addr as mentioned below. If it doesn't match SMSC will reject this SMS with error code 0x0000000A - Invalid Source Address.">
 						<span class="add-on">Source Type of number (TON)</span>
@@ -200,9 +200,9 @@
 							<option value="6">Abbreviated</option>
 							<option value="7">Reserved</option>
 						</select>
-					</span>	
+					</span>
 				</div>
-								
+
 				<div id="div-sourceNpi" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="every SMS coming into SMSC via this ESME should have same source_addr_npi as configured here. If the value here is null(-1)or it's not null and match's, SMSC will compare source_addr as mentioned below. If it doesn't match SMSC will reject this SMS with error code 0x0000000A - Invalid Source Address.">
 						<span class="add-on">Source Number plan indicator (NPI)</span>
@@ -219,16 +219,16 @@
 							<option value="14">Internet (IP)</option>
 							<option value="18">WAP Client Id</option>
 						</select>
-					</span>	
-				</div>				
-				
+					</span>
+				</div>
+
 				<div id="div-sourceRange" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="every SMS coming into SMSC via this ESME should have same source_addr as mentioned here. This is regular java expression. Default value is ^[0-9a-zA-Z]* If it match's, SMSC will accept incoming SMS and process further. If it doesn't match SMSC will reject this SMS with error code 0x0000000A - Invalid Source Address.">
 						<span class="add-on">Source Range</span>
 						<input id="sourceRange" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Source Range" value="^[0-9a-zA-Z]*"/>
-					</span>	
-				</div>	
-				
+					</span>
+				</div>
+
 				<div id="div-routingTon" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="DefaultSmsRoutingRule will try to match the dest_addr_ton of outgoing SMS with one configured here. If configured value is null(-1) or it's not null and match's, SMSC will compare dest_addr_npi and destination_addr as below. It it doesn't match, SMSC will select next ESME in list for matching routing rule">
 						<span class="add-on">Routing Type of number (TON)</span>
@@ -243,9 +243,9 @@
 							<option value="6">Abbreviated</option>
 							<option value="7">Reserved</option>
 						</select>
-					</span>	
+					</span>
 				</div>
-								
+
 				<div id="div-routingNpi" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="DefaultSmsRoutingRule will try to match the dest_addr_npi with one configured here. If configured value is null(-1)or it's not null and match's, SMSC will compare destination_addr as below. It it doesn't match, SMSC will select next ESME in list for matching routing rule">
 						<span class="add-on">Routing Number plan indicator (NPI)</span>
@@ -262,64 +262,64 @@
 							<option value="14">Internet (IP)</option>
 							<option value="18">WAP Client Id</option>
 						</select>
-					</span>	
-				</div>				
-				
+					</span>
+				</div>
+
 				<div id="div-routingRange" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="DefaultSmsRoutingRule will try to match destination_addr here. This is regular java expression. Default value is ^[0-9a-zA-Z]*. If it match's, SMSC will send the SMS out over this SMPP connection. If it doesn't match, SMSC will select next ESME in list for matching routing rule">
 						<span class="add-on">Routing Range</span>
 						<input id="routingRange" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Routing Range" value="^[0-9a-zA-Z]*"/>
-					</span>	
-				</div>							
-				
-	
+					</span>
+				</div>
+
+
 				<div id="div-clusterName" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="its possible to group different SMPP connections together by specifying same cluster-name. All the SMPP connection 's that are capable of sending out SMS are candidates for grouping ">
 						<span class="add-on">Cluster Name</span>
 						<input id="clusterName" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Cluster Name" />
-					</span>	
+					</span>
 				</div>
-					
+
 				<div id="div-windowSize" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="window size is the amount of unacknowledged requests that are permitted to be outstanding/unacknowledged at any given time. If more requests are added, underlying stack will throw exception. This value is set only when ESME is defined as Client side. For Server side this value is taken from SMPP Server Setting">
 						<span class="add-on">Windows Size</span>
 						<input id="windowSize" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Windows Size" value="1"/>
-					</span>	
+					</span>
 				</div>
-													
+
 				<div id="div-connectTimeout" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Time within which the connection to remote SMSCR server should be established. This is useful only when ESME is defined as Client Side. For Server side this value is taken from SMPP Server Setting.">
 						<span class="add-on">Connect Timeout</span>
 						<input id="connectTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Connect Timeout" value="10000"/>
-					</span>	
+					</span>
 				</div>
-												
+
 				<div id="div-reqExpTimeout" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Amount of time to wait in milli seconds for an endpoint to respond to before it expires. -1 is disabled. This is useful only when ESME is defined as Client Side. For Server side this value is taken from SMPP Server Setting.">
 						<span class="add-on">Request Expiry Timeout</span>
 						<input id="reqExpTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Request Expiry Timeout" value="-1"/>
-					</span>	
+					</span>
 				</div>
 
 				<div id="div-clientBindTimeout" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="This is useful only when ESME is defined as Client Side. This parameter is used to specify the length of time to wait for a bind response when the client connecting.">
 						<span class="add-on">Client Bind Timeout</span>
 						<input id="clientBindTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Client Bind Timeout" value="5000"/>
-					</span>	
+					</span>
 				</div>
 
 				<div id="div-windowMonitorInterval" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Amount of time between executions of monitoring the window for requests that expire. It's recommended that this generally either matches or is half the value of request-expiry-timeout. Therefore, at worst a request would could take up 1.5X the requestExpiryTimeout to clear out. -1 is disabled. This is useful only when ESME is defined as Client Side. For Server side this value is taken from SMPP Server Setting.">
 						<span class="add-on">Windows Monitor Interval</span>
 						<input id="windowMonitorInterval" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Windows Monitor Interval" value="-1"/>
-					</span>	
+					</span>
 				</div>
-											
+
 				<div id="div-windowWaitTimeout" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Amount of time to wait until a slot opens up in the sendWindow. This is useful only when ESME is defined as Client Side. For Server side this value is taken from SMPP Server Setting.">
 						<span class="add-on">Windows Wait Timeout</span>
 						<input id="windowWaitTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Windows Wait Timeout" value="60000"/>
-					</span>	
+					</span>
 				</div>
 
 				<div id="div-countersEnabled" class="control-group">
@@ -332,69 +332,102 @@
 					</span>
 				</div>
 
+				<div id="div-esmeErrorCountersEnabled" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When this property is set to true, statistic of errors occurred in SMSC related to this ESME will be gathered. This property overrides global SMSC property which enables stats generating for every esme. The new value takes effect when SMPP is restarted.">
+						<span class="add-on">ESME Error Counters Enabled</span>
+						<select id="esmeErrorCountersEnabled" >
+							<option value="null">----</option>
+							<option value="true">True</option>
+							<option value="false">False</option>
+						</select>
+					</span>
+				</div>
+
+				<div id="div-esmeMaintenanceCountersEnabled" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When this property is set to true, SMSC will expose Request and Response queue sizes for this ESME. This property overrides global SMSC property which enables queue size exposure for every esme. The new value takes effect when SMPP is restarted.">
+						<span class="add-on">ESME Maintenance Counters Enabled</span>
+						<select id="esmeMaintenanceCountersEnabled" >
+							<option value="null">----</option>
+							<option value="true">True</option>
+							<option value="false">False</option>
+						</select>
+					</span>
+				</div>
+
+				<div id="div-sessionErrorCountersEnabled" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When this property is set to true, statistic of errors occurred in SMSC per every session establised with this ESME will be gathered. This property overrides global SMSC property which enables stats generating for every session. The new value takes effect when SMPP is restarted.">
+						<span class="add-on">Session Error Counters Enabled</span>
+						<select id="sessionErrorCountersEnabled" >
+							<option value="null">----</option>
+							<option value="true">True</option>
+							<option value="false">False</option>
+						</select>
+					</span>
+				</div>
+
 				<div id="div-enqLinkDelay" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When SMSC connects to remote server as CLIENT, it sends ENQUIRE_LINK every configured enquire-link-delay">
 						<span class="add-on">Enquire Link Delay</span>
 						<input id="enqLinkDelay" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Enquire Link Delay" value="30000"/>
-					</span>	
+					</span>
 				</div>
 
 				<div id="div-enqLinkDelayServer" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When SMSC connects to remote client as SERVER, it sends ENQUIRE_LINK every configured enquire-link-delay">
 						<span class="add-on">Enquire Link Delay Server</span>
 						<input id="enqLinkDelayServer" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Enquire Link Delay Server" value="0"/>
-					</span>	
+					</span>
 				</div>
 
 				<div id="div-lnkDropServer" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="When SMSC connects to a remote client as SERVER, if it isn't received any data in configured link-drop-server, this esme session will drop.">
 						<span class="add-on">Link Drop Server</span>
 						<input id="lnkDropServer" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Link Drop Server" value="0"/>
-					</span>	
+					</span>
 				</div>
 
 				<div id="div-ratelimitSec" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="throttling of SMS per second for this connection. 0 means no limit">
 						<span class="add-on">Rate Limit Per Seconds</span>
 						<input id="rateLimitPerSecond" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Rate Limit Per Second" value="0"/>
-					</span>	
-				</div>				
-				
+					</span>
+				</div>
+
 				<div id="div-ratelimitMin" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="throttling of SMS per minute for this connection. 0 means no limit">
 						<span class="add-on">Rate Limit Per Minute</span>
 						<input id="rateLimitPerMinute" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Rate Limit Per Minute" value="0"/>
-					</span>	
+					</span>
 				</div>
-				
+
 				<div id="div-ratelimitHr" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="throttling of SMS per hour for this connection. 0 means no limit">
 						<span class="add-on">Rate Limit Per Hour</span>
 						<input id="rateLimitPerHour" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Rate Limit Per Hour" value="0"/>
-					</span>	
-				</div>	
-				
+					</span>
+				</div>
+
 				<div id="div-ratelimitDay" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="throttling of SMS per day for this connection. 0 means no limit">
 						<span class="add-on">Rate Limit Per Day</span>
 						<input id="rateLimitPerDay" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Rate Limit Per Day" value="0"/>
-					</span>	
+					</span>
 				</div>
-				
+
 				<div id="div-nationalLanguageSingleShift" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="National language single shift table can be configured for messages that have come via SMPP (this ESME), do not have UDHs inside and have GSM7 encoding (DCS==0). The default GSM data coding table is mostly used. Possible values: = 0: default GSM data coding table; = 13: urdu (arabic) national language single table; =1: the national language locking shift value must be obtained from the option national-language-locking-single that is defined at SMSC GW general level.">
 						<span class="add-on">National Language Single Shift</span>
 						<input id="nationalLanguageSingleShift" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="National Language Single Shift" value="-1"/>
-					</span>	
+					</span>
 				</div>
-				
+
 				<div id="div-nationalLanguageLockingShift" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="National language locking shift table can be configured for messages that have come via SMPP (ESME) that do not have UDHs inside and have GSM7 encoding (DCS==0). The default GSM data coding table is mostly used. Possible values: = 0: default GSM data coding table; = 13: urdu (arabic) national language shift table; =1: the national language locking shift value must be obtained from the option national-language-locking-shift that is defined at SMSC GW general level.">
 						<span class="add-on">National Language Locking Shift</span>
 						<input id="nationalLanguageLockingShift" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="National Language Locking Shift" value="-1"/>
-					</span>	
+					</span>
 				</div>
-				
+
 				<div id="div-destAddrSendLimit" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="destination address sending limit will be used to limit the sent unconfirmed messages for a  destination address per an ESME. This is SMSC Gw level and can be overwritten for each ESME created. Possible values:  = 0  : no limitations">
 						<span class="add-on">Destination Address Send Limit</span>
@@ -406,15 +439,15 @@
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="minimum message length (in characters) acceptable to the SMSC GW, for messages coming from this ESME. If an incoming message length is less than the min-message-length it will be rejected by SMSC GW. The default value for this parameter is -1 and it implies no limitations. Any other negative value also implies no limitations.">
 						<span class="add-on">Min Message Length</span>
 						<input id="minMessageLength" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Min Message Length" value="-1"/>
-					</span>	
+					</span>
 				</div>
 
 				<div id="div-maxMessageLength" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="maximum message length (in characters) acceptable to the SMSC GW, for messages coming from this ESME. If an incoming message length is more than the max-message-length it will be rejected by SMSC GW. The default value for this parameter is 1 and it implies no limitations. Any other negative value also implies no limitations.">
 						<span class="add-on">Max Message Length</span>
 						<input id="maxMessageLength" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Max Message Length" value="-1"/>
-					</span>	
-				</div>																															
+					</span>
+				</div>
 
 				<div id="div-splitLongMessages" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If true long messages will be split before sending to this destination">
@@ -440,10 +473,10 @@
 
 <script type="text/javascript">
 	function clientServerFunction(){
-		
+
 		var e1 = document.getElementById("smppSessionType");
-		var smppSessionType = e1.options[e1.selectedIndex].text;		
-		
+		var smppSessionType = e1.options[e1.selectedIndex].text;
+
 		if(smppSessionType == "SERVER"){
 			document.getElementById("windowSize").disabled = true;
 			document.getElementById("connectTimeout").disabled = true;
@@ -454,8 +487,8 @@
 			document.getElementById("countersEnabled").disabled = true;
 			document.getElementById("enqLinkDelay").disabled = true;
 			document.getElementById("enqLinkDelayServer").disabled = false;
-			document.getElementById("lnkDropServer").disabled = false;			
-			
+			document.getElementById("lnkDropServer").disabled = false;
+
 		} else {
 			document.getElementById("windowSize").disabled = false;
 			document.getElementById("connectTimeout").disabled = false;
@@ -468,7 +501,7 @@
 			document.getElementById("lnkDropServer").disabled = true;
 
 		}
-		
+
 	}
 
 	function updateEsmes() {
@@ -482,7 +515,7 @@
 			if (html.error) {
 				logToConsole("ERROR", html.error);
 			}
-			else {		
+			else {
 
 				$('.service-row').remove();
 				$('.text-info').remove();
@@ -498,7 +531,7 @@
 				jQuery.each(html.value, function() {
 					mbeanVar = this;
 					noOfEsmes = noOfEsmes +1;
-					
+
 					jolokia.request(
 							[
 								{ type: "read", mbean: mbeanVar },
@@ -511,10 +544,10 @@
 									logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
 								}
 							}
-						); 
+						);
 
 				});
-				
+
 				if(noOfEsmes == 0){
 					$('#no-esmes-table').show();
 					$('#esmes-table').hide();
@@ -558,31 +591,31 @@
 		var isSmppServerStarted = response.value.Started;
 
 		var clusterName = response.value.ClusterName;
-		
+
 		var chargingenabled = response.value.ChargingEnabled;
-		
+
 		var esmeTon = response.value.EsmeTon;
 		var esmeNpi = response.value.EsmeNpi;
 		var esmeAddressRange = response.value.EsmeAddressRange;
-		
+
 		var sourceTon = response.value.SourceTon;
 		var sourceNpi = response.value.SourceNpi;
 		var sourceAddressRange = response.value.SourceAddressRange;
-		
+
 		var routingTon = response.value.RoutingTon;
 		var routingNpi = response.value.RoutingNpi;
 		var routingAddressRange = response.value.RoutingAddressRange;
-		
-		
+
+
 		var systemId = response.value.SystemId;
 		var localType = response.value.LocalTypeName;
 		var state = response.value.StateName;
-		
+
 		var systemType = response.value.SystemType;
 		var bindType = response.value.BindTypeName;
 		var interfaceVersion = response.value.InterfaceVersionName;
 		var password = response.value.Password;
-		
+
 		var windowSize = response.value.WindowSize;
 		var connectTimeout = response.value.ConnectTimeout;
 		var requestExpiryTimeout = response.value.RequestExpiryTimeout;
@@ -592,6 +625,9 @@
 		var maxWindowSize = response.value.MaxWindowSize;
 		var windowMonitorEnabled = response.value.WindowMonitorEnabled;
 		var countersEnabled = response.value.CountersEnabled;
+		var esmeErrorCountersEnabled = response.value.EsmeErrorCountersEnabled;
+		var esmeMaintenanceCountersEnabled = response.value.EsmeMaintenanceCountersEnabled;
+		var sessionErrorCountersEnabled = response.value.SessionErrorCountersEnabled;
 		var enquireLinkDelay = response.value.EnquireLinkDelay;
 		var enquireLinkDelayServer = response.value.EnquireLinkDelayServer;
 		var linkDropServer =  response.value.LinkDropServer;
@@ -605,16 +641,16 @@
 		var txDeliverSMCounter = response.value.TxDeliverSMCounter;
 		var txEnquireLinkCounter = response.value.TxEnquireLinkCounter;
 		var txSubmitSMCounter = response.value.TxSubmitSMCounter;
-		
+
 		var localAddressAndPort = response.value.LocalAddressAndPort;
 		var remoteAddressAndPort = response.value.RemoteAddressAndPort;
 		var remoteTypeName = response.value.RemoteTypeName;
-		
+
 		var bound = response.value.Bound;
 		var closed = response.value.Closed;
 		var binding = response.value.Binding;
-		var unbinding = response.value.Unbinding;	
-		
+		var unbinding = response.value.Unbinding;
+
 		var useSsl = response.value.UseSsl;
 		var certAlias = response.value.CertAlias;
 		var crlPath = response.value.CrlPath;
@@ -644,32 +680,32 @@
 		var sessionCachingEnabled = response.value.SessionCachingEnabled;
 		var trustAll = response.value.TrustAll;
 		var validateCerts = response.value.ValidateCerts;
-		var validatePeerCerts = response.value.ValidatePeerCerts;	
-		
+		var validatePeerCerts = response.value.ValidatePeerCerts;
+
 		var rateLimitPerSecond = response.value.RateLimitPerSecond;
 		var rateLimitPerMinute = response.value.RateLimitPerMinute;
 		var rateLimitPerHour = response.value.RateLimitPerHour;
 		var rateLimitPerDay = response.value.RateLimitPerDay;
-		
+
 		var nationalLanguageSingleShift = response.value.NationalLanguageSingleShift;
 		var nationalLanguageLockingShift = response.value.NationalLanguageLockingShift;
 		var destAddrSendLimit = response.value.DestAddrSendLimit;
 		var minMessageLength = response.value.MinMessageLength;
 		var maxMessageLength = response.value.MaxMessageLength;
-		
-		
+
+
 		if(systemType == null || systemType==""){
 			systemType = "null";
 		}
-		
+
 		serviceClass = isSmppServerStarted ? 'active-service' : 'inactive-service';
-		
+
 		$('#esmes-table').children('tbody').append('<tr class="service-row"><td style="vertical-align: middle; text-align: center;"><i style="color: ' + (isSmppServerStarted ? '#51A351' : '#BD362F') + ';" class="' + (isSmppServerStarted ? 'icon-play-circle' : 'icon-remove-circle') + '"></i></td>'+
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + name + '</td>' +
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + systemId + '</td>' +
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + localType + '</td>' +
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + state + '</td>' +
-				'<td style="font-size: 16px; vertical-align: middle; text-align: center; width: 150px;">' + 
+				'<td style="font-size: 16px; vertical-align: middle; text-align: center; width: 150px;">' +
 					'<button class="btn btn-small btn-success"' + (isSmppServerStarted ? 'disabled' : '') + ' data-toggle="tooltip" title="Start ESME" data-placement="bottom" onclick="esmeOperation(\'startEsme\', \'' + name + '\')"><i class="icon-play"> </i></button> ' +
 					'<button class="btn btn-small btn-danger"' + (!isSmppServerStarted ? 'disabled' : '') + ' data-toggle="tooltip" title="Stop ESME" data-placement="bottom" onclick="esmeOperation(\'stopEsme\', \'' + name +  '\')"><i class="icon-stop"> </i></button> ' +
 					'<button class="btn btn-small btn-danger"' + (isSmppServerStarted ? 'disabled' : '') + ' data-toggle="tooltip" title="Remove ESME" data-placement="bottom" onclick="esmeOperation(\'destroyEsme\', \'' + name +  '\')"><i class="icon-remove"> </i></button> ' +
@@ -682,24 +718,24 @@
 		        '    <div id="div-' + name +'smpp-props">'+
 		        '      <p class="muted">SMPP Properties</p>'+
 						'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
-						    '<dt>NetworkId</dt> <dd>' + networkId + ' </dd>' + 
-							'<dt>ClusterName</dt> <dd>' + clusterName + ' </dd>' + 
-							'<dt>SystemType</dt> <dd>' + systemType + ' </dd>' + 
-							'<dt>BindType</dt> <dd>' + bindType + ' </dd>' + 
-							'<dt>InterfaceVersion</dt> <dd>' + interfaceVersion + ' </dd>' + 
-							'<dt>Password</dt> <dd>' + password + ' </dd>' + 
+						    '<dt>NetworkId</dt> <dd>' + networkId + ' </dd>' +
+							'<dt>ClusterName</dt> <dd>' + clusterName + ' </dd>' +
+							'<dt>SystemType</dt> <dd>' + systemType + ' </dd>' +
+							'<dt>BindType</dt> <dd>' + bindType + ' </dd>' +
+							'<dt>InterfaceVersion</dt> <dd>' + interfaceVersion + ' </dd>' +
+							'<dt>Password</dt> <dd>' + password + ' </dd>' +
 						'</dl>'+
 		        '    </div>'+
-		        
+
         		'<hr style="margin: 5px 0;"/>' +
 		        '    <div id="div-' + name +'charging">'+
 		        '      <p class="muted">Charging</p>'+
 						'<dl class="dl-horizontal" style="font-size: 0.8em;">' +
 							'<dt>ChargingEnabled</dt> <dd>' + chargingenabled + ' </dd>' +
 						'</dl>'+
-		        '    </div>'+				        		
-		        
-		        
+		        '    </div>'+
+
+
 	        		'<hr style="margin: 5px 0;"/>' +
 			        '    <div id="div-' + name +'esme-address">'+
 			        '      <p class="muted">ESME Address</p>'+
@@ -708,7 +744,7 @@
 								'<dt>NumberPlanIndicator</dt> <dd>' + esmeNpi + ' </dd>' +
 								'<dt>AddressRange</dt> <dd>' + esmeAddressRange + ' </dd>' +
 							'</dl>'+
-			        '    </div>'+	
+			        '    </div>'+
 
 	        		'<hr style="margin: 5px 0;"/>' +
 			        '    <div id="div-' + name +'source-address">'+
@@ -719,7 +755,7 @@
 								'<dt>AddressRange</dt> <dd>' + sourceAddressRange + ' </dd>' +
 							'</dl>'+
 			        '    </div>'+
-			        
+
 	        		'<hr style="margin: 5px 0;"/>' +
 			        '    <div id="div-' + name +'routing-address">'+
 			        '      <p class="muted">Routing Address</p>'+
@@ -728,8 +764,8 @@
 								'<dt>NumberPlanIndicator</dt> <dd>' + routingNpi + ' </dd>' +
 								'<dt>AddressRange</dt> <dd>' + routingAddressRange + ' </dd>' +
 							'</dl>'+
-			        '    </div>'+											        
-			        
+			        '    </div>'+
+
 		        	'<hr style="margin: 5px 0;"/>' +
 		        '    <div id="div-' + name +'config">'+
 		        '      <p class="muted">Configuration</p>'+
@@ -743,11 +779,14 @@
 							'<dt>MaxWindowSize</dt> <dd>' + maxWindowSize + ' </dd>' +
 							'<dt>WindowMonitorEnabled</dt> <dd>' + windowMonitorEnabled + ' </dd>' +
 							'<dt>CountersEnabled</dt> <dd>' + countersEnabled + ' </dd>' +
+							'<dt>EsmeErrorCountersEnabled</dt> <dd>' + esmeErrorCountersEnabled + ' </dd>' +
+							'<dt>EsmeMaintenanceCountersEnabled</dt> <dd>' + esmeMaintenanceCountersEnabled + ' </dd>' +
+							'<dt>SessionErrorCountersEnabled</dt> <dd>' + sessionErrorCountersEnabled + ' </dd>' +
 							'<dt>EnquireLinkDelay</dt> <dd>' + enquireLinkDelay + ' </dd>' +
 							'<dt>EnquireLinkDelayServer</dt> <dd>' + enquireLinkDelayServer + ' </dd>' +
 							'<dt>LinkDropServer</dt> <dd>' + linkDropServer + ' </dd>' +
 						'</dl>'+
-		        '    </div>'+	
+		        '    </div>'+
 		        '<hr style="margin: 5px 0;"/>' +
 		        '    <div id="div-' + name +'stats">'+
 		        '      <p class="muted">Statistics</p>'+
@@ -776,9 +815,9 @@
 						'<dt>DestAddrSendLimit</dt> <dd>' + destAddrSendLimit + ' </dd>' +
 						'<dt>MinMessageLength</dt> <dd>' + minMessageLength + ' </dd>' +
 						'<dt>MaxMessageLength</dt> <dd>' + maxMessageLength + ' </dd>' +
-					    '<dt>SplitLongMessages</dt> <dd>' + splitLongMessages + ' </dd>' + 
+					    '<dt>SplitLongMessages</dt> <dd>' + splitLongMessages + ' </dd>' +
 						'</dl>'+
-		        '    </div>'+	
+		        '    </div>'+
 		        '<hr style="margin: 5px 0;"/>' +
 		        '    <div id="div-' + name +'state">'+
 		        '      <p class="muted">State</p>'+
@@ -788,7 +827,7 @@
 						'<dt>Binding</dt> <dd>' + binding + ' </dd>' +
 						'<dt>Unbinding</dt> <dd>' + unbinding + ' </dd>' +
 						'</dl>'+
-		        '    </div>'+	
+		        '    </div>'+
 		        '<hr style="margin: 5px 0;"/>' +
 		        '    <div id="div-' + name +'Throttling">'+
 		        '      <p class="muted">Throttling</p>'+
@@ -798,7 +837,7 @@
 						'<dt>RateLimitPerHour</dt> <dd>' + rateLimitPerHour + ' </dd>' +
 						'<dt>RateLimitPerDay</dt> <dd>' + rateLimitPerDay + ' </dd>' +
 						'</dl>'+
-		        '    </div>'+										        
+		        '    </div>'+
 		        '<hr style="margin: 5px 0;"/>' +
 		        '<div id="div-' + name +'button-set" class="btn-group">'+
 		        '              <button type="button" class="btn" onclick="disableLogBytes(\'' + name +  '\')"><i class="icon-ban-circle"></i> DisableLogBytes</button>'+
@@ -809,12 +848,12 @@
 		        '              <button type="button" class="btn" onclick="resetCounters(\'' + name +  '\')"><i class="icon-spinner"></i> ResetCounters</button>'+
 		        '            </div>'+
 		 		'</div>'+
-		 		
+
 				'</td></tr>'
-		);	
-		
+		);
+
 		if(localType == "CLIENT"){
-			
+
 			$('#div-'+name+'state').after('<hr style="margin: 5px 0;"/>' +
 			        '    <div id="div-' + name +'ssl">'+
 			        '      <p class="muted">SSL Properties</p>'+
@@ -849,29 +888,29 @@
 							'<dt>ValidateCerts</dt> <dd>' + validateCerts + ' </dd>' +
 							'<dt>ValidatePeerCerts</dt> <dd>' + validatePeerCerts + ' </dd>' +
 							'</dl>'+
-			        '    </div>'													
+			        '    </div>'
 					);
 		}
-		
+
 		$('#esmes-table-wrapper').append('<div id="entities-modal'+name+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
 				'<div class="modal-header">'+
 					'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
 					'<h3>ESME '+name+' properties</h3>'+
-				'</div>'+	
+				'</div>'+
 				'<div id="entities-modal-body" class="modal-body">'+
 						'<div class="accordion-group">' +
-							'<div class="accordion-heading">' +name+ 										
+							'<div class="accordion-heading">' +name+
 							'</div>'+
 							'<div id="' + name + '" class="accordion-body">' +
 								'<div class="accordion-inner">' +
 									'<strong><i class="icon-list"></i> ESME Configuration Properties</strong>' +
-									
+
 									'<div class="alert alert-error" id="login-settings-error" style="display:none;">'+
 									  '<button type="button" class="close">&times;</button>'+
 									  'Some Fields are not correctly filled out, please double check the settings below !'+
-									'</div>'+																			
-									
-									'<table id="'+name+'-ESME" class="table table-condensed table-striped">' + 
+									'</div>'+
+
+									'<table id="'+name+'-ESME" class="table table-condensed table-striped">' +
 										'<thead><tr><th style="width: 40%;">Name</th><th style="width: 55%;">Value</th><th>&nbsp;</th></tr></thead>' +
 										'<tbody>'+
 
@@ -882,15 +921,15 @@
 													'<span id="' + name +'NetworkId-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + networkId + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'NetworkId\', \'' + name+"NetworkId" + '\', \'true\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NetworkId"+']\').toggle(); $(\'input[id^='+name+"NetworkId"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NetworkId"+']\').toggle(); $(\'input[id^='+name+"NetworkId"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'NetworkId-text">' + networkId + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"NetworkId"+']\').toggle(); $(\'input[id^='+name+"NetworkId"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+																	
-										
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="is used by the SMSC to authenticate the identity of the binding ESME. The Service Provider may require ESME’s to provide a password when binding to the SMSC">'+
 												'<td style="font-size: 0.9em;">Password</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -898,15 +937,15 @@
 													'<span id="' + name +'Password-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + password + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'Password\', \'' + name+"Password" + '\', \'true\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Password"+']\').toggle(); $(\'input[id^='+name+"Password"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Password"+']\').toggle(); $(\'input[id^='+name+"Password"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'Password-text">' + password + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"Password"+']\').toggle(); $(\'input[id^='+name+"Password"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+																	
-										
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="Defines ESME TON. if SMPP Session Type is CLIENT this TON will be used in BIND request, if SMPP Session Type is SERVER, incoming BIND request should have same TON as configured here. If configured is null(-1), SMSC will ignore in both the cases. Value will take effect after SMPP is restarted.">'+
 												'<td style="font-size: 0.9em;">ESME Ton</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -914,7 +953,7 @@
 													'<span id="' + name +'SystemId-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + esmeTon + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EsmeTon\', \'' + name+"SystemId" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SystemId"+']\').toggle(); $(\'input[id^='+name+"SystemId"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SystemId"+']\').toggle(); $(\'input[id^='+name+"SystemId"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'SystemId-text">' + esmeTon + '</span>'+
@@ -930,15 +969,15 @@
 													'<span id="' + name +'EsmeNpi-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + esmeNpi + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EsmeNpi\', \'' + name+"EsmeNpi" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeNpi"+']\').toggle(); $(\'input[id^='+name+"EsmeNpi"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeNpi"+']\').toggle(); $(\'input[id^='+name+"EsmeNpi"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'EsmeNpi-text">' + esmeNpi + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeNpi"+']\').toggle(); $(\'input[id^='+name+"EsmeNpi"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="Defines ESME Address Range. If SMPP Session Type is CLIENT this address range will be used in BIND request, if SMPP Session Type is SERVER, incoming BIND request should have same address range as configured here. If configured is null, SMSC will ignore in both the cases. Value will take effect after SMPP is restarted.">'+
 												'<td style="font-size: 0.9em;">ESME Address Range</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -946,15 +985,15 @@
 													'<span id="' + name +'EsmeAddressRange-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + esmeAddressRange + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EsmeAddressRange\', \'' + name+"EsmeAddressRange" + '\', \'true\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeAddressRange"+']\').toggle(); $(\'input[id^='+name+"EsmeAddressRange"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeAddressRange"+']\').toggle(); $(\'input[id^='+name+"EsmeAddressRange"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'EsmeAddressRange-text">' + esmeAddressRange + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeAddressRange"+']\').toggle(); $(\'input[id^='+name+"EsmeAddressRange"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="Sets the default window size. Value takes effect only when ESME is restarted. The window size is the amount of unacknowledged requests that are permitted to be outstanding/unacknowledged at any given time. If more requests are added, the underlying stack will throw an exception. This value is set only when ESME is defined as Client side. For Server side this value is taken from the SMPP Server Settings. Value will take effect after SMPP is restarted.">'+
 												'<td style="font-size: 0.9em;">Window Size</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -962,15 +1001,15 @@
 													'<span id="' + name +'WindowSize-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + windowSize + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'WindowSize\', \'' + name+"WindowSize" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WindowSize"+']\').toggle(); $(\'input[id^='+name+"WindowSize"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WindowSize"+']\').toggle(); $(\'input[id^='+name+"WindowSize"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'WindowSize-text">' + windowSize + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"WindowSize"+']\').toggle(); $(\'input[id^='+name+"WindowSize"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="Value takes effect only when ESME is restarted. Default value is 10000 milli seconds. This parameter is used to specify the time within which the connection to a remote SMSC server should be established. This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the SMPP Server Settings">'+
 												'<td style="font-size: 0.9em;">Connect Timeout</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -978,15 +1017,15 @@
 													'<span id="' + name +'ConnectTimeout-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + connectTimeout + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'ConnectTimeout\', \'' + name+"ConnectTimeout" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ConnectTimeout"+']\').toggle(); $(\'input[id^='+name+"ConnectTimeout"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ConnectTimeout"+']\').toggle(); $(\'input[id^='+name+"ConnectTimeout"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'ConnectTimeout-text">' + connectTimeout + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"ConnectTimeout"+']\').toggle(); $(\'input[id^='+name+"ConnectTimeout"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+																		
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="Value takes effect only when ESME is restarted. Default value is -1 (disabled). This parameter is used to specify the time to wait in milli seconds for an endpoint to respond to before it expires. This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the SMPP Server Settings">'+
 												'<td style="font-size: 0.9em;">Request Expiry Timeout</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -994,14 +1033,14 @@
 													'<span id="' + name +'RequestExpiryTimeout-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + requestExpiryTimeout + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'RequestExpiryTimeout\', \'' + name+"RequestExpiryTimeout" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RequestExpiryTimeout"+']\').toggle(); $(\'input[id^='+name+"RequestExpiryTimeout"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RequestExpiryTimeout"+']\').toggle(); $(\'input[id^='+name+"RequestExpiryTimeout"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'RequestExpiryTimeout-text">' + requestExpiryTimeout + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"RequestExpiryTimeout"+']\').toggle(); $(\'input[id^='+name+"RequestExpiryTimeout"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
+											'</tr>'+
 
 											'<tr data-toggle="tooltip" title="Value takes effect only when ESME is restarted. Default value is 5000. This parameter is used to specify the time to wait in milli seconds for an SMPP Server to respond to before it expires. This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the SMPP Server Settings">'+
 												'<td style="font-size: 0.9em;">Client Bind Timeout</td>'+
@@ -1010,14 +1049,14 @@
 													'<span id="' + name +'ClientBindTimeout-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + clientBindTimeout + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'ClientBindTimeout\', \'' + name+"ClientBindTimeout" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ClientBindTimeout"+']\').toggle(); $(\'input[id^='+name+"ClientBindTimeout"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ClientBindTimeout"+']\').toggle(); $(\'input[id^='+name+"ClientBindTimeout"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'ClientBindTimeout-text">' + requestExpiryTimeout + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"ClientBindTimeout"+']\').toggle(); $(\'input[id^='+name+"ClientBindTimeout"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
+											'</tr>'+
 
 											'<tr data-toggle="tooltip" title="Value takes effect only when ESME is restarted. Default value is -1 (disabled). This parameter is used to specify the time between executions of monitoring the window for requests that expire. It is recommended that this value, generally, either matches or is half the value of request-expiry-timeout. Therefore, in the worst case scenario, a request could take upto 1.5 times the requestExpiryTimeout to clear out. This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the SMPP Server Settings.">'+
 												'<td style="font-size: 0.9em;">Window Monitor Interval</td>'+
@@ -1026,15 +1065,15 @@
 													'<span id="' + name +'WindowMonitorInterval-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + windowMonitorInterval + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'WindowMonitorInterval\', \'' + name+"WindowMonitorInterval" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WindowMonitorInterval"+']\').toggle(); $(\'input[id^='+name+"WindowMonitorInterval"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WindowMonitorInterval"+']\').toggle(); $(\'input[id^='+name+"WindowMonitorInterval"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'WindowMonitorInterval-text">' + windowMonitorInterval + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"WindowMonitorInterval"+']\').toggle(); $(\'input[id^='+name+"WindowMonitorInterval"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="Value takes effect only when ESME is restarted. Default value is 60000 milli seconds. This parameter is used to specify the time to wait until a slot opens up in the sendWindow. This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the SMPP Server Settings">'+
 												'<td style="font-size: 0.9em;">Window Wait Timeout</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1042,7 +1081,7 @@
 													'<span id="' + name +'WindowWaitTimeout-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + windowWaitTimeout + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'WindowWaitTimeout\', \'' + name+"WindowWaitTimeout" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WindowWaitTimeout"+']\').toggle(); $(\'input[id^='+name+"WindowWaitTimeout"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WindowWaitTimeout"+']\').toggle(); $(\'input[id^='+name+"WindowWaitTimeout"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'WindowWaitTimeout-text">' + windowWaitTimeout + '</span>'+
@@ -1050,7 +1089,7 @@
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"WindowWaitTimeout"+']\').toggle(); $(\'input[id^='+name+"WindowWaitTimeout"+']\').focus();"></i>' +
 												'</td>'+
 											'</tr>'+
-											
+
 											'<tr data-toggle="tooltip" title="Set to true if counters is to be enabled. Value takes effect only when ESME is restarted">'+
 												'<td style="font-size: 0.9em;">Counters Enabled</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1058,7 +1097,7 @@
 													'<span id="' + name +'CountersEnabled-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + countersEnabled + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'CountersEnabled\', \'' + name+"CountersEnabled" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"CountersEnabled"+']\').toggle(); $(\'input[id^='+name+"CountersEnabled"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"CountersEnabled"+']\').toggle(); $(\'input[id^='+name+"CountersEnabled"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'CountersEnabled-text">' + countersEnabled + '</span>'+
@@ -1066,7 +1105,55 @@
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"CountersEnabled"+']\').toggle(); $(\'input[id^='+name+"CountersEnabled"+']\').focus();"></i>' +
 												'</td>'+
 											'</tr>'+
-											
+
+											'<tr data-toggle="tooltip" title="Set to true if counters is to be enabled. Value takes effect only when ESME is restarted">'+
+												'<td style="font-size: 0.9em;">ESME Error Counters Enabled</td>'+
+												'<td style="font-size: 0.9em; padding: 0;">'+
+													'<div id="div-' + name +'EsmeErrorCountersEnabled-input" class="control-group">'+
+													'<span id="' + name +'EsmeErrorCountersEnabled-input" style="display: none;">'+
+														'<input type="text" class="input-small" value="' + esmeErrorCountersEnabled + '" /> ' +
+														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EsmeErrorCountersEnabled\', \'' + name+"EsmeErrorCountersEnabled" + '\')"></i> ' +
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeErrorCountersEnabled"+']\').toggle(); $(\'input[id^='+name+"EsmeErrorCountersEnabled"+']\').focus();"></i>' +
+													'</span>'+
+													'</div>' +
+													'<span id="' +name + 'EsmeErrorCountersEnabled-text">' + esmeErrorCountersEnabled + '</span>'+
+												'</td>'+
+												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeErrorCountersEnabled"+']\').toggle(); $(\'input[id^='+name+"EsmeErrorCountersEnabled"+']\').focus();"></i>' +
+												'</td>'+
+											'</tr>'+
+
+											'<tr data-toggle="tooltip" title="Set to true if counters is to be enabled. Value takes effect only when ESME is restarted">'+
+												'<td style="font-size: 0.9em;">ESME Maintenance Counters Enabled</td>'+
+												'<td style="font-size: 0.9em; padding: 0;">'+
+													'<div id="div-' + name +'EsmeMaintenanceCountersEnabled-input" class="control-group">'+
+													'<span id="' + name +'EsmeMaintenanceCountersEnabled-input" style="display: none;">'+
+														'<input type="text" class="input-small" value="' + esmeMaintenanceCountersEnabled + '" /> ' +
+														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EsmeMaintenanceCountersEnabled\', \'' + name+"EsmeMaintenanceCountersEnabled" + '\')"></i> ' +
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeMaintenanceCountersEnabled"+']\').toggle(); $(\'input[id^='+name+"EsmeMaintenanceCountersEnabled"+']\').focus();"></i>' +
+													'</span>'+
+													'</div>' +
+													'<span id="' +name + 'EsmeMaintenanceCountersEnabled-text">' + esmeMaintenanceCountersEnabled + '</span>'+
+												'</td>'+
+												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EsmeMaintenanceCountersEnabled"+']\').toggle(); $(\'input[id^='+name+"EsmeMaintenanceCountersEnabled"+']\').focus();"></i>' +
+												'</td>'+
+											'</tr>'+
+
+											'<tr data-toggle="tooltip" title="Set to true if counters is to be enabled. Value takes effect only when ESME is restarted">'+
+												'<td style="font-size: 0.9em;">Session Error Counters Enabled</td>'+
+												'<td style="font-size: 0.9em; padding: 0;">'+
+													'<div id="div-' + name +'SessionErrorCountersEnabled-input" class="control-group">'+
+													'<span id="' + name +'SessionErrorCountersEnabled-input" style="display: none;">'+
+														'<input type="text" class="input-small" value="' + sessionErrorCountersEnabled + '" /> ' +
+														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SessionErrorCountersEnabled\', \'' + name+"SessionErrorCountersEnabled" + '\')"></i> ' +
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SessionErrorCountersEnabled"+']\').toggle(); $(\'input[id^='+name+"SessionErrorCountersEnabled"+']\').focus();"></i>' +
+													'</span>'+
+													'</div>' +
+													'<span id="' +name + 'SessionErrorCountersEnabled-text">' + sessionErrorCountersEnabled + '</span>'+
+												'</td>'+
+												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SessionErrorCountersEnabled"+']\').toggle(); $(\'input[id^='+name+"SessionErrorCountersEnabled"+']\').focus();"></i>' +
+												'</td>'+
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="When SMSC connects to a remote server as CLIENT, it sends an ENQUIRE_LINK after every configured enquire-link-delay.">'+
 												'<td style="font-size: 0.9em;">Enquire Link Delay</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1074,7 +1161,7 @@
 													'<span id="' + name +'EnquireLinkDelay-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + enquireLinkDelay + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EnquireLinkDelay\', \'' + name+"EnquireLinkDelay" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnquireLinkDelay"+']\').toggle(); $(\'input[id^='+name+"EnquireLinkDelay"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnquireLinkDelay"+']\').toggle(); $(\'input[id^='+name+"EnquireLinkDelay"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'EnquireLinkDelay-text">' + enquireLinkDelay + '</span>'+
@@ -1090,7 +1177,7 @@
 													'<span id="' + name +'EnquireLinkDelayServer-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + enquireLinkDelayServer + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EnquireLinkDelayServer\', \'' + name+"EnquireLinkDelayServer" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnquireLinkDelayServer"+']\').toggle(); $(\'input[id^='+name+"EnquireLinkDelayServer"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnquireLinkDelayServer"+']\').toggle(); $(\'input[id^='+name+"EnquireLinkDelayServer"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'EnquireLinkDelayServer-text">' + enquireLinkDelayServer + '</span>'+
@@ -1122,15 +1209,15 @@
 													'<span id="' + name +'ChargingEnabled-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + chargingenabled + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'ChargingEnabled\', \'' + name+"ChargingEnabled" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ChargingEnabled"+']\').toggle(); $(\'input[id^='+name+"ChargingEnabled"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ChargingEnabled"+']\').toggle(); $(\'input[id^='+name+"ChargingEnabled"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'ChargingEnabled-text">' + chargingenabled + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"ChargingEnabled"+']\').toggle(); $(\'input[id^='+name+"ChargingEnabled"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="every SMS coming into SMSC via this ESME should have same source_addr_ton as configured here. If the value here is null(-1) or its not null and matchs, SMSC will compare source_addr_npi and source_addr as mentioned below. If it doesnt match SMSC will reject this SMS with error code 0x0000000A - Invalid Source Address">'+
 												'<td style="font-size: 0.9em;">Source Ton</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1138,15 +1225,15 @@
 													'<span id="' + name +'SourceTon-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + sourceTon + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SourceTon\', \'' + name+"SourceTon" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SourceTon"+']\').toggle(); $(\'input[id^='+name+"SourceTon"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SourceTon"+']\').toggle(); $(\'input[id^='+name+"SourceTon"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'SourceTon-text">' + sourceTon + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SourceTon"+']\').toggle(); $(\'input[id^='+name+"SourceTon"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="every SMS coming into SMSC via this ESME should have same source_addr_npi as configured here. If the value here is null(-1)or its not null and matchs, SMSC will compare source_addr as mentioned below. If it doesnt match SMSC will reject this SMS with error code 0x0000000A - Invalid Source Address.">'+
 												'<td style="font-size: 0.9em;">Source Npi</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1154,15 +1241,15 @@
 													'<span id="' + name +'SourceNpi-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + sourceNpi + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SourceNpi\', \'' + name+"SourceNpi" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SourceNpi"+']\').toggle(); $(\'input[id^='+name+"SourceNpi"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SourceNpi"+']\').toggle(); $(\'input[id^='+name+"SourceNpi"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'SourceNpi-text">' + sourceNpi + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SourceNpi"+']\').toggle(); $(\'input[id^='+name+"SourceNpi"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="every SMS coming into SMSC via this ESME should have same source_addr as mentioned here. This is regular java expression. Default value is ^[0-9a-zA-Z] If it matchs, SMSC will accept incoming SMS and process further. If it doesnt match SMSC will reject this SMS with error code 0x0000000A - Invalid Source Address">'+
 												'<td style="font-size: 0.9em;">Source Address Range</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1170,15 +1257,15 @@
 													'<span id="' + name +'SourceAddressRange-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + sourceAddressRange + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SourceAddressRange\', \'' + name+"SourceAddressRange" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SourceAddressRange"+']\').toggle(); $(\'input[id^='+name+"SourceAddressRange"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SourceAddressRange"+']\').toggle(); $(\'input[id^='+name+"SourceAddressRange"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'SourceAddressRange-text">' + sourceAddressRange + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SourceAddressRange"+']\').toggle(); $(\'input[id^='+name+"SourceAddressRange"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="The DefaultSmsRoutingRule} will try to match the dest_addr_ton of outgoing SMS with one configured here. If configured value is null(-1) or its not null and matchs, SMSC will compare dest_addr_npi and destination_addr as below. It it doesnt match, SMSC will select next ESME in list for matching routing rule">'+
 												'<td style="font-size: 0.9em;">Routing Ton</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1186,15 +1273,15 @@
 													'<span id="' + name +'RoutingTon-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + routingTon + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'RoutingTon\', \'' + name+"RoutingTon" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RoutingTon"+']\').toggle(); $(\'input[id^='+name+"RoutingTon"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RoutingTon"+']\').toggle(); $(\'input[id^='+name+"RoutingTon"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'RoutingTon-text">' + routingTon + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"RoutingTon"+']\').toggle(); $(\'input[id^='+name+"RoutingTon"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+	
-											
+											'</tr>'+
+
 											'<tr data-toggle="tooltip" title="The DefaultSmsRoutingRule will try to match the dest_addr_npi with one configured here. If configured value is null(-1)or its not null and matchs, SMSC will compare destination_addr as below. It it doesnt match, SMSC will select next ESME in list for matching routing rule">'+
 												'<td style="font-size: 0.9em;">Routing Npi</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1202,7 +1289,7 @@
 													'<span id="' + name +'RoutingNpi-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + routingNpi + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'RoutingNpi\', \'' + name+"RoutingNpi" + '\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RoutingNpi"+']\').toggle(); $(\'input[id^='+name+"RoutingNpi"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RoutingNpi"+']\').toggle(); $(\'input[id^='+name+"RoutingNpi"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'RoutingNpi-text">' + routingNpi + '</span>'+
@@ -1210,7 +1297,7 @@
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"RoutingNpi"+']\').toggle(); $(\'input[id^='+name+"RoutingNpi"+']\').focus();"></i>' +
 												'</td>'+
 											'</tr>'+
-											
+
 											'<tr data-toggle="tooltip" title="The DefaultSmsRoutingRule will try to match destination_addr here. This is regular java expression. Default value is ^[0-9a-zA-Z]. If it matchs, SMSC will send the SMS out over this SMPP connection. If it doesnt match, SMSC will select next ESME in list for matching routing rule">'+
 												'<td style="font-size: 0.9em;">Routing Address Range</td>'+
 												'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1218,7 +1305,7 @@
 													'<span id="' + name +'RoutingAddressRange-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + routingAddressRange + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'RoutingAddressRange\', \'' + name+"RoutingAddressRange" + '\', \'true\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RoutingAddressRange"+']\').toggle(); $(\'input[id^='+name+"RoutingAddressRange"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RoutingAddressRange"+']\').toggle(); $(\'input[id^='+name+"RoutingAddressRange"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'RoutingAddressRange-text">' + routingAddressRange + '</span>'+
@@ -1226,7 +1313,7 @@
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"RoutingAddressRange"+']\').toggle(); $(\'input[id^='+name+"RoutingAddressRange"+']\').focus();"></i>' +
 												'</td>'+
 											'</tr>'+
-											
+
 											'<tr data-toggle="tooltip" title="throttling of SMS per second for this connection. 0 means no limit">'+
 											'<td style="font-size: 0.9em;">Rate Limit Per Second</td>'+
 											'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1234,7 +1321,7 @@
 												'<span id="' + name +'RateLimitPerSecond-input" style="display: none;">'+
 													'<input type="text" class="input-small" value="' + rateLimitPerSecond + '" /> ' +
 													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'RateLimitPerSecond\', \'' + name+"RateLimitPerSecond" + '\', \'false\')"></i> ' +
-													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerSecond"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerSecond"+']\').focus();"></i>' + 
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerSecond"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerSecond"+']\').focus();"></i>' +
 												'</span>'+
 												'</div>' +
 												'<span id="' +name + 'RateLimitPerSecond-text">' + rateLimitPerSecond + '</span>'+
@@ -1242,7 +1329,7 @@
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerSecond"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerSecond"+']\').focus();"></i>' +
 											'</td>'+
 										'</tr>'+
-										
+
 											'<tr data-toggle="tooltip" title="throttling of SMS per minute for this connection. 0 means no limit">'+
 											'<td style="font-size: 0.9em;">Rate Limit Per Minute</td>'+
 											'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1250,7 +1337,7 @@
 												'<span id="' + name +'RateLimitPerMinute-input" style="display: none;">'+
 													'<input type="text" class="input-small" value="' + rateLimitPerMinute + '" /> ' +
 													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'RateLimitPerMinute\', \'' + name+"RateLimitPerMinute" + '\', \'false\')"></i> ' +
-													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerMinute"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerMinute"+']\').focus();"></i>' + 
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerMinute"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerMinute"+']\').focus();"></i>' +
 												'</span>'+
 												'</div>' +
 												'<span id="' +name + 'RateLimitPerMinute-text">' + rateLimitPerMinute + '</span>'+
@@ -1258,7 +1345,7 @@
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerMinute"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerMinute"+']\').focus();"></i>' +
 											'</td>'+
 										'</tr>'+
-									
+
 											'<tr data-toggle="tooltip" title="throttling of SMS per hour for this connection. 0 means no limit">'+
 											'<td style="font-size: 0.9em;">Rate Limit Per Hour</td>'+
 											'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1266,7 +1353,7 @@
 												'<span id="' + name +'RateLimitPerHour-input" style="display: none;">'+
 													'<input type="text" class="input-small" value="' + rateLimitPerHour + '" /> ' +
 													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'RateLimitPerHour\', \'' + name+"RateLimitPerHour" + '\', \'false\')"></i> ' +
-													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerHour"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerHour"+']\').focus();"></i>' + 
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerHour"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerHour"+']\').focus();"></i>' +
 												'</span>'+
 												'</div>' +
 												'<span id="' +name + 'RateLimitPerHour-text">' + rateLimitPerHour + '</span>'+
@@ -1274,7 +1361,7 @@
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerHour"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerHour"+']\').focus();"></i>' +
 											'</td>'+
 										'</tr>'+
-								
+
 											'<tr data-toggle="tooltip" title="throttling of SMS per day for this connection. 0 means no limit">'+
 											'<td style="font-size: 0.9em;">Rate Limit Per Day</td>'+
 											'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1282,7 +1369,7 @@
 												'<span id="' + name +'RateLimitPerDay-input" style="display: none;">'+
 													'<input type="text" class="input-small" value="' + rateLimitPerDay + '" /> ' +
 													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'RateLimitPerDay\', \'' + name+"RateLimitPerDay" + '\', \'false\')"></i> ' +
-													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerDay"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerDay"+']\').focus();"></i>' + 
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerDay"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerDay"+']\').focus();"></i>' +
 												'</span>'+
 												'</div>' +
 												'<span id="' +name + 'RateLimitPerDay-text">' + rateLimitPerDay + '</span>'+
@@ -1290,7 +1377,7 @@
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"RateLimitPerDay"+']\').toggle(); $(\'input[id^='+name+"RateLimitPerDay"+']\').focus();"></i>' +
 											'</td>'+
 										'</tr>'+
-										
+
 										'<tr data-toggle="tooltip" title="National language single shift table can be configured for messages that have come via SMPP (this ESME), do not have UDHs inside and have GSM7 encoding (DCS==0). The default GSM data coding table is mostly used. Possible values: = 0: default GSM data coding table; = 13: urdu (arabic) national language single table; =1: the national language locking shift value must be obtained from the option national-language-locking-single that is defined at SMSC GW general level.">'+
 											'<td style="font-size: 0.9em;">National Language Single Shift</td>'+
 											'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1298,7 +1385,7 @@
 												'<span id="' + name +'NationalLanguageSingleShift-input" style="display: none;">'+
 													'<input type="text" class="input-small" value="' + nationalLanguageSingleShift + '" /> ' +
 													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'NationalLanguageSingleShift\', \'' + name+"NationalLanguageSingleShift" + '\', \'false\')"></i> ' +
-													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NationalLanguageSingleShift"+']\').toggle(); $(\'input[id^='+name+"NationalLanguageSingleShift"+']\').focus();"></i>' + 
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NationalLanguageSingleShift"+']\').toggle(); $(\'input[id^='+name+"NationalLanguageSingleShift"+']\').focus();"></i>' +
 												'</span>'+
 												'</div>' +
 												'<span id="' +name + 'NationalLanguageSingleShift-text">' + nationalLanguageSingleShift + '</span>'+
@@ -1306,7 +1393,7 @@
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"NationalLanguageSingleShift"+']\').toggle(); $(\'input[id^='+name+"NationalLanguageSingleShift"+']\').focus();"></i>' +
 											'</td>'+
 										'</tr>'+
-										
+
 										'<tr data-toggle="tooltip" title="National language locking shift table can be configured for messages that have come via SMPP (ESME) that do not have UDHs inside and have GSM7 encoding (DCS==0). The default GSM data coding table is mostly used. Possible values: = 0: default GSM data coding table; = 13: urdu (arabic) national language shift table; =1: the national language locking shift value must be obtained from the option national-language-locking-shift that is defined at SMSC GW general level.">'+
 											'<td style="font-size: 0.9em;">National Language Locking Shift</td>'+
 											'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1314,7 +1401,7 @@
 												'<span id="' + name +'NationalLanguageLockingShift-input" style="display: none;">'+
 													'<input type="text" class="input-small" value="' + nationalLanguageLockingShift + '" /> ' +
 													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'NationalLanguageLockingShift\', \'' + name+"NationalLanguageLockingShift" + '\', \'false\')"></i> ' +
-													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NationalLanguageLockingShift"+']\').toggle(); $(\'input[id^='+name+"NationalLanguageLockingShift"+']\').focus();"></i>' + 
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NationalLanguageLockingShift"+']\').toggle(); $(\'input[id^='+name+"NationalLanguageLockingShift"+']\').focus();"></i>' +
 												'</span>'+
 												'</div>' +
 												'<span id="' +name + 'NationalLanguageLockingShift-text">' + nationalLanguageLockingShift + '</span>'+
@@ -1337,8 +1424,8 @@
 											'</td>' +
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^=' + name + "DestAddrSendLimit" + ']\').toggle(); $(\'input[id^=' + name + "DestAddrSendLimit" + ']\').focus();"></i>' +
 											'</td>' +
-										'</tr>' +	
-										
+										'</tr>' +
+
 										'<tr data-toggle="tooltip" title="minimum message length (in characters) acceptable to the SMSC GW, for messages coming from this ESME. If an incoming message length is less than the min-message-length it will be rejected by SMSC GW. The default value for this parameter is -1 and it implies no limitations. Any other negative value also implies no limitations.">'+
 											'<td style="font-size: 0.9em;">Min Message Length</td>'+
 											'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1346,7 +1433,7 @@
 												'<span id="' + name +'MinMessageLength-input" style="display: none;">'+
 													'<input type="text" class="input-small" value="' + minMessageLength + '" /> ' +
 													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'MinMessageLength\', \'' + name+"MinMessageLength" + '\', \'false\')"></i> ' +
-													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"MinMessageLength"+']\').toggle(); $(\'input[id^='+name+"MinMessageLength"+']\').focus();"></i>' + 
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"MinMessageLength"+']\').toggle(); $(\'input[id^='+name+"MinMessageLength"+']\').focus();"></i>' +
 												'</span>'+
 												'</div>' +
 												'<span id="' +name + 'MinMessageLength-text">' + minMessageLength + '</span>'+
@@ -1354,7 +1441,7 @@
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"MinMessageLength"+']\').toggle(); $(\'input[id^='+name+"MinMessageLength"+']\').focus();"></i>' +
 											'</td>'+
 										'</tr>'+
-										
+
 										'<tr data-toggle="tooltip" title="maximum message length (in characters) acceptable to the SMSC GW, for messages coming from this ESME. If an incoming message length is more than the max-message-length it will be rejected by SMSC GW. The default value for this parameter is 1 and it implies no limitations. Any other negative value also implies no limitations.">'+
 											'<td style="font-size: 0.9em;">Max Message Length</td>'+
 											'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1362,14 +1449,14 @@
 												'<span id="' + name +'MaxMessageLength-input" style="display: none;">'+
 													'<input type="text" class="input-small" value="' + maxMessageLength + '" /> ' +
 													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'MaxMessageLength\', \'' + name+"MaxMessageLength" + '\', \'false\')"></i> ' +
-													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxMessageLength"+']\').toggle(); $(\'input[id^='+name+"MaxMessageLength"+']\').focus();"></i>' + 
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxMessageLength"+']\').toggle(); $(\'input[id^='+name+"MaxMessageLength"+']\').focus();"></i>' +
 												'</span>'+
 												'</div>' +
 												'<span id="' +name + 'MaxMessageLength-text">' + maxMessageLength + '</span>'+
 											'</td>'+
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxMessageLength"+']\').toggle(); $(\'input[id^='+name+"MaxMessageLength"+']\').focus();"></i>' +
 											'</td>'+
-										'</tr>'+																	
+										'</tr>'+
 
 											'<tr data-toggle="tooltip" title="If true long messages will be split before sending to this destination">'+
 												'<td style="font-size: 0.9em;">Long message splitting</td>'+
@@ -1378,30 +1465,30 @@
 													'<span id="' + name +'SplitLongMessages-input" style="display: none;">'+
 														'<input type="text" class="input-small" value="' + splitLongMessages + '" /> ' +
 														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SplitLongMessages\', \'' + name+"SplitLongMessages" + '\', \'true\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' + 
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' +
 													'</span>'+
 													'</div>' +
 													'<span id="' +name + 'SplitLongMessages-text">' + splitLongMessages + '</span>'+
 												'</td>'+
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' +
 												'</td>'+
-											'</tr>'+																	
-											
+											'</tr>'+
+
 										'</tbody>' +
-									'</table>' +															
+									'</table>' +
 								'</div>'+
 							'</div>'+
 						'</div>'+
 				'</div>'+
 				'<div class="modal-footer">'+
 					'<a href="#" onclick="$(\'#entities-modal'+name+'\').modal(\'hide\'); return false;" class="btn">Close</a>'+
-				'</div>'+										
-			'</div>');	
-		
+				'</div>'+
+			'</div>');
+
 		if(localType == "CLIENT"){
-			
+
 			$('#'+name+'-ESME tr:last').after(
-			
+
 			'<tr data-toggle="tooltip" title="tracks if SMPP connections should always be over SSL">'+
 			'<td style="font-size: 0.9em;">UseSSL</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1409,7 +1496,7 @@
 			'<span id="' + name + 'UseSsl-input" style="display: none;">'+
 				'<input type="text" class="input-small" value="' + useSsl + '" /> ' +
 				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'UseSsl\', \'' + name+"UseSsl" + '\')"></i> ' +
-				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"UseSsl"+']\').toggle(); $(\'input[id^='+name+"UseSsl"+']\').focus();"></i>' + 
+				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"UseSsl"+']\').toggle(); $(\'input[id^='+name+"UseSsl"+']\').focus();"></i>' +
 			'</span>'+
 			'</div>' +
 			'<span id="' +name+ 'UseSsl-text">' + useSsl + '</span>'+
@@ -1417,7 +1504,7 @@
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"UseSsl"+']\').toggle(); $(\'input[id^='+name+"UseSsl"+']\').focus();"></i>' +
 			'</td>'+
 		'</tr>'+
-	
+
 		'<tr data-toggle="tooltip" title="certificate Alias">'+
 			'<td style="font-size: 0.9em;">CertAlias</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1425,7 +1512,7 @@
 				'<span id="' + name + 'CertAlias-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + certAlias + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'CertAlias\', \'' + name+"CertAlias" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"CertAlias"+']\').toggle(); $(\'input[id^='+name+"CertAlias"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"CertAlias"+']\').toggle(); $(\'input[id^='+name+"CertAlias"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'CertAlias-text">' + certAlias + '</span>'+
@@ -1441,14 +1528,14 @@
 				'<span id="' + name + 'CrlPath-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + crlPath + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'CrlPath\', \'' + name+"CrlPath" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"CrlPath"+']\').toggle(); $(\'input[id^='+name+"CrlPath"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"CrlPath"+']\').toggle(); $(\'input[id^='+name+"CrlPath"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'CrlPath-text">' + crlPath + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"CrlPath"+']\').toggle(); $(\'input[id^='+name+"CrlPath"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+	
+		'</tr>'+
 
 		'<tr data-toggle="tooltip" title="Key manager factory algorithm">'+
 			'<td style="font-size: 0.9em;">KeyManagerFactoryAlgorithm</td>'+
@@ -1457,14 +1544,14 @@
 				'<span id="' + name + 'KeyManagerFactoryAlgorithm-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + keyManagerFactoryAlgorithm + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'KeyManagerFactoryAlgorithm\', \'' + name+"KeyManagerFactoryAlgorithm" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"KeyManagerFactoryAlgorithm"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"KeyManagerFactoryAlgorithm"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'KeyManagerFactoryAlgorithm-text">' + keyManagerFactoryAlgorithm + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"KeyManagerFactoryAlgorithm"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+											
+		'</tr>'+
 
 		'<tr data-toggle="tooltip" title="Key manager password">'+
 			'<td style="font-size: 0.9em;">KeyManagerPassword</td>'+
@@ -1473,7 +1560,7 @@
 				'<span id="' + name + 'KeyManagerPassword-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + keyManagerPassword + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'KeyManagerPassword\', \'' + name+"KeyManagerPassword" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyManagerPassword"+']\').toggle(); $(\'input[id^='+name+"KeyManagerPassword"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyManagerPassword"+']\').toggle(); $(\'input[id^='+name+"KeyManagerPassword"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'KeyManagerPassword-text">' + keyManagerPassword + '</span>'+
@@ -1489,7 +1576,7 @@
 				'<span id="' + name + 'KeyStorePassword-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + keyStorePassword + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'KeyStorePassword\', \'' + name+"KeyStorePassword" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStorePassword"+']\').toggle(); $(\'input[id^='+name+"KeyStorePassword"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStorePassword"+']\').toggle(); $(\'input[id^='+name+"KeyStorePassword"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'KeyStorePassword-text">' + keyStorePassword + '</span>'+
@@ -1505,14 +1592,14 @@
 				'<span id="' + name + 'KeyStorePath-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + keyStorePath + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'KeyStorePath\', \'' + name+"KeyStorePath" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStorePath"+']\').toggle(); $(\'input[id^='+name+"KeyStorePath"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStorePath"+']\').toggle(); $(\'input[id^='+name+"KeyStorePath"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'KeyStorePath-text">' + keyStorePath + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStorePath"+']\').toggle(); $(\'input[id^='+name+"KeyStorePath"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+	
+		'</tr>'+
 
 		'<tr data-toggle="tooltip" title="Key store provider">'+
 			'<td style="font-size: 0.9em;">KeyStoreProvider</td>'+
@@ -1521,14 +1608,14 @@
 				'<span id="' + name + 'KeyStoreProvider-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + keyStoreProvider + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'KeyStoreProvider\', \'' + name+"KeyStoreProvider" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStoreProvider"+']\').toggle(); $(\'input[id^='+name+"KeyStoreProvider"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStoreProvider"+']\').toggle(); $(\'input[id^='+name+"KeyStoreProvider"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'KeyStoreProvider-text">' + keyStoreProvider + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStoreProvider"+']\').toggle(); $(\'input[id^='+name+"KeyStoreProvider"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+														
+		'</tr>'+
 
 		'<tr data-toggle="tooltip" title="Key store type">'+
 			'<td style="font-size: 0.9em;">KeyStoreType</td>'+
@@ -1537,7 +1624,7 @@
 				'<span id="' + name + 'KeyStoreType-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + keyStoreType + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'KeyStoreType\', \'' + name+"KeyStoreType" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStoreType"+']\').toggle(); $(\'input[id^='+name+"KeyStoreType"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"KeyStoreType"+']\').toggle(); $(\'input[id^='+name+"KeyStoreType"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'KeyStoreType-text">' + keyStoreType + '</span>'+
@@ -1553,7 +1640,7 @@
 				'<span id="' + name + 'MaxCertPathLength-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + maxCertPathLength + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'MaxCertPathLength\', \'' + name+"MaxCertPathLength" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxCertPathLength"+']\').toggle(); $(\'input[id^='+name+"MaxCertPathLength"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxCertPathLength"+']\').toggle(); $(\'input[id^='+name+"MaxCertPathLength"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'MaxCertPathLength-text">' + maxCertPathLength + '</span>'+
@@ -1569,7 +1656,7 @@
 				'<span id="' + name + 'NeedClientAuth-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + needClientAuth + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'NeedClientAuth\', \'' + name+"NeedClientAuth" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NeedClientAuth"+']\').toggle(); $(\'input[id^='+name+"NeedClientAuth"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NeedClientAuth"+']\').toggle(); $(\'input[id^='+name+"NeedClientAuth"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'NeedClientAuth-text">' + needClientAuth + '</span>'+
@@ -1585,14 +1672,14 @@
 				'<span id="' + name + 'OcspResponderURL-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + ocspResponderURL + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'OcspResponderURL\', \'' + name+"OcspResponderURL" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"OcspResponderURL"+']\').toggle(); $(\'input[id^='+name+"OcspResponderURL"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"OcspResponderURL"+']\').toggle(); $(\'input[id^='+name+"OcspResponderURL"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'OcspResponderURL-text">' + ocspResponderURL + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"OcspResponderURL"+']\').toggle(); $(\'input[id^='+name+"OcspResponderURL"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+	
+		'</tr>'+
 
 		'<tr data-toggle="tooltip" title="Protocol">'+
 			'<td style="font-size: 0.9em;">Protocol</td>'+
@@ -1601,14 +1688,14 @@
 				'<span id="' + name + 'Protocol-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + protocol + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'Protocol\', \'' + name+"Protocol" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Protocol"+']\').toggle(); $(\'input[id^='+name+"Protocol"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Protocol"+']\').toggle(); $(\'input[id^='+name+"Protocol"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'Protocol-text">' + protocol + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"Protocol"+']\').toggle(); $(\'input[id^='+name+"Protocol"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+	
+		'</tr>'+
 
 		'<tr data-toggle="tooltip" title="Provider">'+
 			'<td style="font-size: 0.9em;">Provider</td>'+
@@ -1617,14 +1704,14 @@
 				'<span id="' + name + 'Provider-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + provider + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'Provider\', \'' + name+"Provider" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Provider"+']\').toggle(); $(\'input[id^='+name+"Provider"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"Provider"+']\').toggle(); $(\'input[id^='+name+"Provider"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'Provider-text">' + provider + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"Provider"+']\').toggle(); $(\'input[id^='+name+"Provider"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+	
+		'</tr>'+
 
 		'<tr data-toggle="tooltip" title="Secure random algorithm">'+
 			'<td style="font-size: 0.9em;">SecureRandomAlgorithm</td>'+
@@ -1633,14 +1720,14 @@
 				'<span id="' + name + 'SecureRandomAlgorithm-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + secureRandomAlgorithm + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SecureRandomAlgorithm\', \'' + name+"SecureRandomAlgorithm" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SecureRandomAlgorithm"+']\').toggle(); $(\'input[id^='+name+"SecureRandomAlgorithm"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SecureRandomAlgorithm"+']\').toggle(); $(\'input[id^='+name+"SecureRandomAlgorithm"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'SecureRandomAlgorithm-text">' + secureRandomAlgorithm + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SecureRandomAlgorithm"+']\').toggle(); $(\'input[id^='+name+"SecureRandomAlgorithm"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+	
+		'</tr>'+
 
 		'<tr data-toggle="tooltip" title="SSL session cache size">'+
 			'<td style="font-size: 0.9em;">SslSessionCacheSize</td>'+
@@ -1649,15 +1736,15 @@
 				'<span id="' + name + 'SslSessionCacheSize-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + sslSessionCacheSize + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SslSessionCacheSize\', \'' + name+"SslSessionCacheSize" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SslSessionCacheSize"+']\').toggle(); $(\'input[id^='+name+"SslSessionCacheSize"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SslSessionCacheSize"+']\').toggle(); $(\'input[id^='+name+"SslSessionCacheSize"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'SslSessionCacheSize-text">' + sslSessionCacheSize + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SslSessionCacheSize"+']\').toggle(); $(\'input[id^='+name+"SslSessionCacheSize"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+	
-	
+		'</tr>'+
+
 		'<tr data-toggle="tooltip" title="SSL session timeout">'+
 			'<td style="font-size: 0.9em;">SslSessionTimeout</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1665,7 +1752,7 @@
 				'<span id="' + name + 'SslSessionTimeout-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + sslSessionTimeout + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SslSessionTimeout\', \'' + name+"SslSessionTimeout" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SslSessionTimeout"+']\').toggle(); $(\'input[id^='+name+"SslSessionTimeout"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SslSessionTimeout"+']\').toggle(); $(\'input[id^='+name+"SslSessionTimeout"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'SslSessionTimeout-text">' + sslSessionTimeout + '</span>'+
@@ -1681,7 +1768,7 @@
 				'<span id="' + name + 'TrustManagerFactoryAlgorithm-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + trustManagerFactoryAlgorithm + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'TrustManagerFactoryAlgorithm\', \'' + name+"TrustManagerFactoryAlgorithm" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'TrustManagerFactoryAlgorithm-text">' + trustManagerFactoryAlgorithm + '</span>'+
@@ -1689,7 +1776,7 @@
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' +
 			'</td>'+
 		'</tr>'+
-	
+
 		'<tr data-toggle="tooltip" title="Trust manager factory algorithm">'+
 			'<td style="font-size: 0.9em;">TrustManagerFactoryAlgorithm</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1697,14 +1784,14 @@
 				'<span id="' + name + 'TrustManagerFactoryAlgorithm-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + trustManagerFactoryAlgorithm + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'TrustManagerFactoryAlgorithm\', \'' + name+"TrustManagerFactoryAlgorithm" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'TrustManagerFactoryAlgorithm-text">' + trustManagerFactoryAlgorithm + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustManagerFactoryAlgorithm"+']\').toggle(); $(\'input[id^='+name+"TrustManagerFactoryAlgorithm"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+			
+		'</tr>'+
 
 		'<tr data-toggle="tooltip" title="Trust store password">'+
 			'<td style="font-size: 0.9em;">TrustStorePassword</td>'+
@@ -1713,7 +1800,7 @@
 				'<span id="' + name + 'TrustStorePassword-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + trustStorePassword + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'TrustStorePassword\', \'' + name+"TrustStorePassword" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePassword"+']\').toggle(); $(\'input[id^='+name+"TrustStorePassword"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePassword"+']\').toggle(); $(\'input[id^='+name+"TrustStorePassword"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'TrustStorePassword-text">' + trustStorePassword + '</span>'+
@@ -1721,7 +1808,7 @@
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePassword"+']\').toggle(); $(\'input[id^='+name+"TrustStorePassword"+']\').focus();"></i>' +
 			'</td>'+
 		'</tr>'+
-		
+
 		'<tr data-toggle="tooltip" title="Trust store path">'+
 			'<td style="font-size: 0.9em;">TrustStorePath</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1729,15 +1816,15 @@
 				'<span id="' + name + 'TrustStorePath-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + trustStorePath + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'TrustStorePath\', \'' + name+"TrustStorePath" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePath"+']\').toggle(); $(\'input[id^='+name+"TrustStorePath"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePath"+']\').toggle(); $(\'input[id^='+name+"TrustStorePath"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'TrustStorePath-text">' + trustStorePath + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStorePath"+']\').toggle(); $(\'input[id^='+name+"TrustStorePath"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+		
-		
+		'</tr>'+
+
 		'<tr data-toggle="tooltip" title="Trust store provider">'+
 			'<td style="font-size: 0.9em;">TrustStoreProvider</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1745,7 +1832,7 @@
 				'<span id="' + name + 'TrustStoreProvider-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + trustStoreProvider + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'TrustStoreProvider\', \'' + name+"TrustStoreProvider" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreProvider"+']\').toggle(); $(\'input[id^='+name+"TrustStoreProvider"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreProvider"+']\').toggle(); $(\'input[id^='+name+"TrustStoreProvider"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'TrustStoreProvider-text">' + trustStoreProvider + '</span>'+
@@ -1753,7 +1840,7 @@
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreProvider"+']\').toggle(); $(\'input[id^='+name+"TrustStoreProvider"+']\').focus();"></i>' +
 			'</td>'+
 		'</tr>'+
-		
+
 		'<tr data-toggle="tooltip" title="Trust store type">'+
 			'<td style="font-size: 0.9em;">TrustStoreType</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1761,7 +1848,7 @@
 				'<span id="' + name + 'TrustStoreType-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + trustStoreType + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'TrustStoreType\', \'' + name+"TrustStoreType" + '\', \'true\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreType"+']\').toggle(); $(\'input[id^='+name+"TrustStoreType"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreType"+']\').toggle(); $(\'input[id^='+name+"TrustStoreType"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'TrustStoreType-text">' + trustStoreType + '</span>'+
@@ -1769,7 +1856,7 @@
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustStoreType"+']\').toggle(); $(\'input[id^='+name+"TrustStoreType"+']\').focus();"></i>' +
 			'</td>'+
 		'</tr>'+
-		
+
 		'<tr data-toggle="tooltip" title="should client be authenticated">'+
 			'<td style="font-size: 0.9em;">WantClientAuth</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1777,15 +1864,15 @@
 				'<span id="' + name + 'WantClientAuth-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + wantClientAuth + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'WantClientAuth\', \'' + name+"WantClientAuth" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WantClientAuth"+']\').toggle(); $(\'input[id^='+name+"WantClientAuth"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WantClientAuth"+']\').toggle(); $(\'input[id^='+name+"WantClientAuth"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'WantClientAuth-text">' + wantClientAuth + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"WantClientAuth"+']\').toggle(); $(\'input[id^='+name+"WantClientAuth"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+	
-		
+		'</tr>'+
+
 		'<tr data-toggle="tooltip" title="Allow renegotiate">'+
 			'<td style="font-size: 0.9em;">AllowRenegotiate</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1793,15 +1880,15 @@
 				'<span id="' + name + 'AllowRenegotiate-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + allowRenegotiate + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'AllowRenegotiate\', \'' + name+"AllowRenegotiate" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"AllowRenegotiate"+']\').toggle(); $(\'input[id^='+name+"AllowRenegotiate"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"AllowRenegotiate"+']\').toggle(); $(\'input[id^='+name+"AllowRenegotiate"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'AllowRenegotiate-text">' + allowRenegotiate + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"AllowRenegotiate"+']\').toggle(); $(\'input[id^='+name+"AllowRenegotiate"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+																					
-		
+		'</tr>'+
+
 		'<tr data-toggle="tooltip" title="Enable CRLDP">'+
 			'<td style="font-size: 0.9em;">EnableCRLDP</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1809,7 +1896,7 @@
 				'<span id="' + name + 'EnableCRLDP-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + enableCRLDP + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EnableCRLDP\', \'' + name+"EnableCRLDP" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableCRLDP"+']\').toggle(); $(\'input[id^='+name+"EnableCRLDP"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableCRLDP"+']\').toggle(); $(\'input[id^='+name+"EnableCRLDP"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'EnableCRLDP-text">' + enableCRLDP + '</span>'+
@@ -1817,7 +1904,7 @@
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableCRLDP"+']\').toggle(); $(\'input[id^='+name+"EnableCRLDP"+']\').focus();"></i>' +
 			'</td>'+
 		'</tr>'+
-		
+
 		'<tr data-toggle="tooltip" title="Enable OCSP">'+
 			'<td style="font-size: 0.9em;">EnableOCSP</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1825,7 +1912,7 @@
 				'<span id="' + name + 'EnableOCSP-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + enableOCSP + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'EnableOCSP\', \'' + name+"EnableOCSP" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableOCSP"+']\').toggle(); $(\'input[id^='+name+"EnableOCSP"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableOCSP"+']\').toggle(); $(\'input[id^='+name+"EnableOCSP"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'EnableOCSP-text">' + enableOCSP + '</span>'+
@@ -1833,7 +1920,7 @@
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"EnableOCSP"+']\').toggle(); $(\'input[id^='+name+"EnableOCSP"+']\').focus();"></i>' +
 			'</td>'+
 		'</tr>'+
-		
+
 		'<tr data-toggle="tooltip" title="Session caching enabled">'+
 			'<td style="font-size: 0.9em;">SessionCachingEnabled</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1841,7 +1928,7 @@
 				'<span id="' + name + 'SessionCachingEnabled-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + sessionCachingEnabled + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SessionCachingEnabled\', \'' + name+"SessionCachingEnabled" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SessionCachingEnabled"+']\').toggle(); $(\'input[id^='+name+"SessionCachingEnabled"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SessionCachingEnabled"+']\').toggle(); $(\'input[id^='+name+"SessionCachingEnabled"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'SessionCachingEnabled-text">' + sessionCachingEnabled + '</span>'+
@@ -1849,7 +1936,7 @@
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SessionCachingEnabled"+']\').toggle(); $(\'input[id^='+name+"SessionCachingEnabled"+']\').focus();"></i>' +
 			'</td>'+
 		'</tr>'+
-		
+
 		'<tr data-toggle="tooltip" title="Trust all certificates">'+
 			'<td style="font-size: 0.9em;">TrustAll</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1857,15 +1944,15 @@
 				'<span id="' + name + 'TrustAll-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + trustAll + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'TrustAll\', \'' + name+"TrustAll" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustAll"+']\').toggle(); $(\'input[id^='+name+"TrustAll"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustAll"+']\').toggle(); $(\'input[id^='+name+"TrustAll"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'TrustAll-text">' + trustAll + '</span>'+
 			'</td>'+
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"TrustAll"+']\').toggle(); $(\'input[id^='+name+"TrustAll"+']\').focus();"></i>' +
 			'</td>'+
-		'</tr>'+		
-		
+		'</tr>'+
+
 		'<tr data-toggle="tooltip" title="if certificate should be validated">'+
 			'<td style="font-size: 0.9em;">ValidateCerts</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1873,7 +1960,7 @@
 				'<span id="' + name + 'ValidateCerts-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + validateCerts + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'ValidateCerts\', \'' + name+"ValidateCerts" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ValidateCerts"+']\').toggle(); $(\'input[id^='+name+"ValidateCerts"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ValidateCerts"+']\').toggle(); $(\'input[id^='+name+"ValidateCerts"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'ValidateCerts-text">' + validateCerts + '</span>'+
@@ -1881,7 +1968,7 @@
 			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"ValidateCerts"+']\').toggle(); $(\'input[id^='+name+"ValidateCerts"+']\').focus();"></i>' +
 			'</td>'+
 		'</tr>'+
-		
+
 		'<tr data-toggle="tooltip" title="if peer certificate should be validated">'+
 			'<td style="font-size: 0.9em;">ValidatePeerCerts</td>'+
 			'<td style="font-size: 0.9em; padding: 0;">'+
@@ -1889,7 +1976,7 @@
 				'<span id="' + name + 'ValidatePeerCerts-input" style="display: none;">'+
 					'<input type="text" class="input-small" value="' + validatePeerCerts + '" /> ' +
 					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'ValidatePeerCerts\', \'' + name+"ValidatePeerCerts" + '\', \'false\')"></i> ' +
-					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ValidatePeerCerts"+']\').toggle(); $(\'input[id^='+name+"ValidatePeerCerts"+']\').focus();"></i>' + 
+					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ValidatePeerCerts"+']\').toggle(); $(\'input[id^='+name+"ValidatePeerCerts"+']\').focus();"></i>' +
 				'</span>'+
 				'</div>' +
 				'<span id="' +name+ 'ValidatePeerCerts-text">' + validatePeerCerts + '</span>'+
@@ -1901,7 +1988,7 @@
 
 				}
 			}
-		}									
+		}
 	}
 
 	function disableLogBytes(esmeName){
@@ -1916,7 +2003,7 @@
 						createStackTrace(errorUID, value.stacktrace);
 						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
 					}
-				});	
+				});
 	}
 	function disableLogPdu(esmeName){
 		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
@@ -1930,8 +2017,8 @@
 						createStackTrace(errorUID, value.stacktrace);
 						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
 					}
-				});	
-	}	
+				});
+	}
 	function dumpWindow(esmeName){
 		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
 		jolokia.execute(mbeanSearch,"dumpWindow",
@@ -1944,7 +2031,7 @@
 						createStackTrace(errorUID, value.stacktrace);
 						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
 					}
-				});	
+				});
 	}
 	function enableLogBytes(esmeName){
 		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
@@ -1958,8 +2045,8 @@
 						createStackTrace(errorUID, value.stacktrace);
 						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
 					}
-				});	
-	}	
+				});
+	}
 	function enableLogPdu(esmeName){
 		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
 		jolokia.execute(mbeanSearch,"enableLogPdu",
@@ -1972,8 +2059,8 @@
 						createStackTrace(errorUID, value.stacktrace);
 						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
 					}
-				});	
-	}	
+				});
+	}
 	function resetCounters(esmeName){
 		mbeanSearch="org.mobicents.smpp:layer=Esme,name="+esmeName;
 		jolokia.execute(mbeanSearch,"resetCounters",
@@ -1986,8 +2073,8 @@
 						createStackTrace(errorUID, value.stacktrace);
 						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
 					}
-				});	
-	}	
+				});
+	}
 	function esmeOperation(operation, name) {
 		mbeanSearch="org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement";
 		jolokia.execute(mbeanSearch,operation,name,
@@ -2001,13 +2088,13 @@
 						createStackTrace(errorUID, value.stacktrace);
 						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
 					}
-				});	
-		
+				});
+
 	}
 	function createEsme(){
 		var formInvalid = false;
 		var focusNotSet = true;
-		
+
 		var esmeName = $("#esmeName").val();
 		if(esmeName.trim() == "") {
 			$("#div-esmeName").addClass("error");
@@ -2017,9 +2104,9 @@
 			}
 			formInvalid = true;
 		} else if($("#div-esmeName").hasClass("error")) {
-			$("#div-esmeName").removeClass("error");		
+			$("#div-esmeName").removeClass("error");
 		}
-		
+
 		var systemId = $("#systemId").val();
 		if(systemId.trim() == "") {
 			$("#div-systemId").addClass("error");
@@ -2029,9 +2116,9 @@
 			}
 			formInvalid = true;
 		} else if($("#div-systemId").hasClass("error")) {
-			$("#div-systemId").removeClass("error");		
+			$("#div-systemId").removeClass("error");
 		}
-		
+
 		var password = $("#password").val();
 		if(password == "") {
 			password = null;
@@ -2047,74 +2134,74 @@
 
 		var ipAddress = $("#ipAddress").val();
 		if(ipAddress.trim() == "") {
-			$("#div-ipAddress").addClass("error");		
+			$("#div-ipAddress").addClass("error");
 			if(focusNotSet){
 				$("#ipAddress").focus();
 				focusNotSet = false;
 			}
 			formInvalid = true;
 		} else if($("#div-ipAddress").hasClass("error")) {
-			$("#div-ipAddress").removeClass("error");		
+			$("#div-ipAddress").removeClass("error");
 		}
-		
+
 		var ipPort = $("#ipPort").val();
 		if(ipPort.trim() == "") {
-			$("#div-ipPort").addClass("error");		
+			$("#div-ipPort").addClass("error");
 			if(focusNotSet){
 				$("#ipPort").focus();
 				focusNotSet = false;
 			}
 			formInvalid = true;
 		} else if($("#div-ipPort").hasClass("error")) {
-			$("#div-ipPort").removeClass("error");		
+			$("#div-ipPort").removeClass("error");
 		}
 
 		var e = document.getElementById("smppBindType");
 		var smppBindType = e.options[e.selectedIndex].text;
-		
+
 		var e1 = document.getElementById("smppSessionType");
-		var smppSessionType = e1.options[e1.selectedIndex].text;		
-		
+		var smppSessionType = e1.options[e1.selectedIndex].text;
+
 		var systemType = $("#systemType").val();
-		
-		
+
+
 		var e2 = document.getElementById("version");
-		var smppVersion = e2.options[e2.selectedIndex].text;	
-		
+		var smppVersion = e2.options[e2.selectedIndex].text;
+
 		var e3 = document.getElementById("esmeTon");
-		var esmeTon = e3.options[e3.selectedIndex].value;	
-		
+		var esmeTon = e3.options[e3.selectedIndex].value;
+
 		var e4 = document.getElementById("esmeNpi");
 		var esmeNpi = e4.options[e4.selectedIndex].value;
-		
+
 		var esmeRange = $("#esmeRange").val();
-		
+
 		var e7 = document.getElementById("sourceTon");
-		var sourceTon = e7.options[e7.selectedIndex].value;	
-		
+		var sourceTon = e7.options[e7.selectedIndex].value;
+
 		var e8 = document.getElementById("sourceNpi");
 		var sourceNpi = e8.options[e8.selectedIndex].value;
-		
+
 		var sourceRange = $("#sourceRange").val();
-		
-		
+
+
 		var e9 = document.getElementById("routingTon");
-		var routingTon = e9.options[e9.selectedIndex].value;	
-		
+		var routingTon = e9.options[e9.selectedIndex].value;
+
 		var e10 = document.getElementById("routingNpi");
 		var routingNpi = e10.options[e10.selectedIndex].value;
-		
-		var routingRange = $("#routingRange").val();		
-		
-		
+
+		var routingRange = $("#routingRange").val();
+
+
 		var clusterName = $("#clusterName").val();
-		
+
 		if(clusterName.trim() == ""){
 			clusterName = esmeName;
 		}
-		
+
 		var windowSize = $("#windowSize").val();
-		
+
 		if(windowSize == null){
 			windowSize = "1";//SmppConstants.DEFAULT_WINDOW_SIZE
 		}
@@ -2123,7 +2210,7 @@
 		if(connectTimeout == null){
 			connectTimeout = "10000";
 		}
-		
+
 		var reqExpTimeout = $("#reqExpTimeout").val();
 		if(reqExpTimeout == null){
 			reqExpTimeout = "-1";
@@ -2138,15 +2225,24 @@
 		if(windowMonitorInterval == null){
 			windowMonitorInterval = "-1";
 		}
-		
+
 		var windowWaitTimeout = $("#windowWaitTimeout").val();
 		if(windowWaitTimeout == null){
 			windowWaitTimeout = "60000";
 		}
-		
+
 		var e5 = document.getElementById("countersEnabled");
-		var countersEnabled = e5.options[e5.selectedIndex].text;	
-		
+		var countersEnabled = e5.options[e5.selectedIndex].value;
+
+		var e51 = document.getElementById("esmeErrorCountersEnabled");
+		var esmeErrorCountersEnabled = e51.options[e51.selectedIndex].value;
+
+		var e52 = document.getElementById("esmeMaintenanceCountersEnabled");
+		var esmeMaintenanceCountersEnabled = e52.options[e52.selectedIndex].value;
+
+		var e53 = document.getElementById("sessionErrorCountersEnabled");
+		var sessionErrorCountersEnabled = e53.options[e53.selectedIndex].text;
+
 		var enqLinkDelay = $("#enqLinkDelay").val();
 		if(enqLinkDelay == null){
 			enqLinkDelay = "30000";
@@ -2164,37 +2260,37 @@
 
 		var e6 = document.getElementById("chargingEnabled");
 		var chargingEnabled = e6.options[e5.selectedIndex].text;
-		
+
 		var rateLimitPerSecond = $("#rateLimitPerSecond").val();
 		if(rateLimitPerSecond == "") {
 			rateLimitPerSecond = "0";
 		}
-		
+
 		var rateLimitPerMinute = $("#rateLimitPerMinute").val();
 		if(rateLimitPerMinute == "") {
 			rateLimitPerMinute = "0";
 		}
-		
+
 		var rateLimitPerHour = $("#rateLimitPerHour").val();
 		if(rateLimitPerHour == "") {
 			rateLimitPerHour = "0";
 		}
-		
+
 		var rateLimitPerDay = $("#rateLimitPerDay").val();
 		if(rateLimitPerDay == "") {
 			rateLimitPerDay = "0";
 		}
-		
+
 		var nationalLanguageSingleShift = $("#nationalLanguageSingleShift").val();
 		if(nationalLanguageSingleShift == "") {
 			nationalLanguageSingleShift = "-1";
 		}
-		
+
 		var nationalLanguageLockingShift = $("#nationalLanguageLockingShift").val();
 		if(nationalLanguageLockingShift == "") {
 			nationalLanguageLockingShift = "-1";
 		}
-		
+
 		var destAddrSendLimit = $("#destAddrSendLimit").val();
 		if (destAddrSendLimit == "") {
 			destAddrSendLimit = "-1";
@@ -2203,13 +2299,13 @@
 		var minMessageLength = $("#minMessageLength").val();
 		if(minMessageLength == "") {
 			minMessageLength = "-1";
-		}	
-		
+		}
+
 		var maxMessageLength = $("#maxMessageLength").val();
 		if(maxMessageLength == "") {
 			maxMessageLength = "-1";
-		}			
-		
+		}
+
 		if(formInvalid) {
 			$("#login-settings-error").show();
 			logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
@@ -2217,8 +2313,8 @@
 		} else {
 			$("#login-settings-error").hide();
 		}
-		
-		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength, 
+
+		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,esmeErrorCountersEnabled,esmeMaintenanceCountersEnabled,sessionErrorCountersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength,
 				{
 					success: function(value) {
 						updateEsmes();
@@ -2229,34 +2325,34 @@
 						errorUID = ("st" + new Date().getTime()).hashCode();
 						createStackTrace(errorUID, value.stacktrace);
 						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
-					}					
-				});		
-		
+					}
+				});
+
 	}
-	
+
 	function onModifyEsmeOk(mbeanName, propertyName, spanId){
 		var skipCheck = false;
 		onModifyEsmeOk(mbeanName, propertyName, spanId, skipCheck)
 	}
-	
+
 	function onModifyEsmeOk(mbeanName, propertyName, spanId, skipCheck){
 		var formInvalid = false;
-		
+
 		var spanElement = document.getElementById(spanId + "-input");
 		var eleChild = spanElement.childNodes;
 		var inputTextEle = eleChild[0];
 		var spanElementTxt = document.getElementById(spanId + "-text");
-		
+
 		var propvalue = inputTextEle.value;
-		
+
 		if(!skipCheck){
 			if(propvalue.trim() == "") {
-				$("#div-"+spanId + "-input").addClass("error");					    			
+				$("#div-"+spanId + "-input").addClass("error");
 				formInvalid = true;
 			} else if($("#div-"+spanId + "-input").hasClass("error")) {
-				$("#div-"+spanId + "-input").removeClass("error");		
-			}	
-			
+				$("#div-"+spanId + "-input").removeClass("error");
+			}
+
 			if(formInvalid) {
 				$("#login-settings-error").show();
 				logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
@@ -2265,12 +2361,12 @@
 				$("#login-settings-error").hide();
 			}
 		}
-		
+
 		var propValue = inputTextEle.value;
 		if(propValue == ""){
 			propValue = null;
 		}
-		
+
 		var mbeanSearch="org.mobicents.smpp:layer=Esme,name="+mbeanName;
 		jolokia.request(
 				[
@@ -2278,24 +2374,24 @@
 				],
 				{
 					success: function(response) {
-						
+
 						logToConsole("INFO", "ESME property "+ propertyName +"  successfully updated.");
-						
+
 						spanElementTxt.innerHTML= inputTextEle.value;
 					},
 					error: function(value) {
 						errorUID = ("st" + new Date().getTime()).hashCode();
 						createStackTrace(errorUID, value.stacktrace);
 						logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
-					} 
+					}
 				}
-			);		
-		
+			);
+
 		spanElement.style.display = 'none';
 		spanElementTxt.style.display = '';
-		
-		
-	}	
+
+
+	}
 	$(document).ready(function () {
 		updateEsmes();
 	});

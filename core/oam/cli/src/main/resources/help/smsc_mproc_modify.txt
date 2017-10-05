@@ -26,7 +26,7 @@ SYNOPSIS
 	<networkId value> dropaftertempfail <false | true> newnetworkidaftertempfail <networkId
 	value> droponarrival <false | true> rejectonarrival <NONE | DEFAULT |
 	UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED>
-	remove_tlv <tlv tag key>
+	remove_tlv <tlv tag key> mprocerrorcountersenabled <null | true | false>
 
 DESCRIPTION
 	This command is used to modify existing Message Processing Rule. 
@@ -284,6 +284,10 @@ PARAMETERS
 	remove_tlv 		- Once rule match's, the target SMS's optional parameter which matches the one set here
 					will be removed. Set this to -1 not to remove any optional parameter. Default value is -1.
 					This action is for Arrival trigger.
+					
+	mprocerrorcountersenabled - Overrides global setting for counters to be calculated per every MProc rule. If set to true, counter 
+					will be calculated for this partcular mproc rule. If not set - global mprocErrorCountersEnabled setting applies.
+					Default value is null.				
 	
 SEE ALSO
 	smsc mproc add, smsc mproc remove, smsc mproc show

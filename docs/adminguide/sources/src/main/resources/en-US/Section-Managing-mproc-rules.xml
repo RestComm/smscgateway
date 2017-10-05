@@ -36,7 +36,7 @@ SYNOPSIS
 	adddestdigprefix <prefix> makecopy <false | true> dropaftersri
 	<false | true> droponarrival <false | true> rejectonarrival <NONE
 	| DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING
-	| FACILITY_NOT_SUPPORTED> 
+	| FACILITY_NOT_SUPPORTED> mprocerrorcountersenabled <null | true | false>
 
 DESCRIPTION
 
@@ -64,6 +64,7 @@ PARAMETERS
 	droponarrival - an optional parameter.
 	rejectonarrival - an optional parameter.
 	percent - an optional parameter.
+	mprocerrorcounterenabled - an optional parameter.
 	Description of parameters is in the previous chapter.
 
 EXAMPLES
@@ -117,7 +118,7 @@ SYNOPSIS
 	adddestdigprefix <prefix> makecopy <false | true> dropaftersri
 	<false | true> droponarrival <false | true> rejectonarrival <NONE
 	| DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING
-	| FACILITY_NOT_SUPPORTED> 
+	| FACILITY_NOT_SUPPORTED> mprocerrorcountersenabled <null | true | false>
 
 DESCRIPTION
 
@@ -143,6 +144,7 @@ PARAMETERS
 	droponarrival - an optional parameter.
 	rejectonarrival - an optional parameter.
 	percent - an optional parameter.
+	mprocerrorcounterenabled - an optional parameter.
 
 EXAMPLES
 	smsc mproc modify 1 newnetworkid 13

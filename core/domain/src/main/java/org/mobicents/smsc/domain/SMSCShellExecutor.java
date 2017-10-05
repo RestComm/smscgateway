@@ -1020,6 +1020,22 @@ public class SMSCShellExecutor implements ShellExecutor {
             } else if (parName.equals("cassandrapass")) {
                 String val = String.valueOf(options[3]);
                 smscPropertiesManagement.setCassandraPass(val);
+            } else if (parName.equals("globalerrorcountersenabled")) {
+                smscPropertiesManagement.setGlobalErrorCountersEnabled(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("clustererrorcountersenabled")) {
+                smscPropertiesManagement.setClusterErrorCountersEnabled(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("esmeerrorcountersenabled")) {
+                smscPropertiesManagement.setEsmeErrorCountersEnabled(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("sessionerrorcountersenabled")) {
+                smscPropertiesManagement.setSessionErrorCountersEnabled(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("mprocerrorcountersenabled")) {
+                smscPropertiesManagement.setMprocErrorCountersEnabled(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("globalmaintenancecountersenabled")) {
+                smscPropertiesManagement.setGlobalMaintenanceCountersEnabled(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("clustermaintenancecountersenabled")) {
+                smscPropertiesManagement.setClusterMaintenanceCountersEnabled(Boolean.parseBoolean(options[3]));
+            } else if (parName.equals("esmemaintenancecountersenabled")) {
+                smscPropertiesManagement.setEsmeMaintenanceCountersEnabled(Boolean.parseBoolean(options[3]));
             } else {
 				return SMSCOAMMessages.INVALID_COMMAND;
 			}
@@ -1291,8 +1307,19 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getCassandraUser());
             } else if (parName.equals("cassandrapass")) {
                 sb.append(smscPropertiesManagement.getCassandraPass());
-            }
-            else {
+            } else if (parName.equals("globalerrorcountersenabled")) {
+                sb.append(smscPropertiesManagement.isGlobalErrorCountersEnabled());
+            } else if (parName.equals("clustererrorcountersenabled")) {
+                sb.append(smscPropertiesManagement.isClusterErrorCountersEnabled());
+            } else if (parName.equals("esmeerrorcountersenabled")) {
+                sb.append(smscPropertiesManagement.isEsmeErrorCountersEnabled());
+            } else if (parName.equals("globalmaintenancecountersenabled")) {
+                sb.append(smscPropertiesManagement.isGlobalMaintenanceCountersEnabled());
+            } else if (parName.equals("clustermaintenancecountersenabled")) {
+                sb.append(smscPropertiesManagement.isClusterMaintenanceCountersEnabled());
+            } else if (parName.equals("esmemaintenancecountersenabled")) {
+                sb.append(smscPropertiesManagement.isEsmeMaintenanceCountersEnabled());
+            } else {
 				return SMSCOAMMessages.INVALID_COMMAND;
 			}
 
@@ -1662,6 +1689,31 @@ public class SMSCShellExecutor implements ShellExecutor {
             sb.append("cassandrapass = ");
             sb.append(smscPropertiesManagement.getCassandraPass());
             sb.append("\n");
+            
+            sb.append("globalerrorcountersenabled");
+            sb.append(smscPropertiesManagement.isGlobalErrorCountersEnabled());
+            sb.append("\n");
+            
+            sb.append("clustererrorcountersenabled");
+            sb.append(smscPropertiesManagement.isClusterErrorCountersEnabled());
+            sb.append("\n");
+            
+            sb.append("esmeerrorcountersenabled");
+            sb.append(smscPropertiesManagement.isEsmeErrorCountersEnabled());
+            sb.append("\n");
+            
+            sb.append("globalmaintenancecountersenabled");
+            sb.append(smscPropertiesManagement.isGlobalMaintenanceCountersEnabled());
+            sb.append("\n");
+            
+            sb.append("clustermaintenancecountersenabled");
+            sb.append(smscPropertiesManagement.isClusterMaintenanceCountersEnabled());
+            sb.append("\n");
+            
+            sb.append("esmemaintenancecountersenabled");
+            sb.append(smscPropertiesManagement.isEsmeMaintenanceCountersEnabled());
+            sb.append("\n");
+            
 
             return sb.toString();
 		}

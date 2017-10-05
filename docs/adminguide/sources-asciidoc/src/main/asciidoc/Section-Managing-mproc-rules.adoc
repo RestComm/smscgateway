@@ -44,6 +44,7 @@ SYNOPSIS
 	dropaftertempfail <false | true> newnetworkidaftertempfail <networkId value>
 	droponarrival <false | true> rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE
 	| SYSTEM_FAILURE |	THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key>
+	mprocerrorcountersenabled <null | true | false> 
 
 DESCRIPTION
 
@@ -93,6 +94,7 @@ PARAMETERS
 	droponarrival - an optional parameter.
 	rejectonarrival - an optional parameter.
 	remove_tlv - an optional parameter.
+	mprocerrorcounterenabled - an optional parameter.
 
 EXAMPLES
 	smsc mproc add mproc 1 networkidmask 11 newnetworkid 12
@@ -153,6 +155,7 @@ SYNOPSIS
 	dropaftertempfail <false | true> newnetworkidaftertempfail <networkId value>
 	droponarrival <false | true> rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE
 	| SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key>
+	mprocerrorcountersenabled <null | true | false>
 
 DESCRIPTION
 
@@ -200,6 +203,7 @@ PARAMETERS
 	droponarrival - an optional parameter.
 	rejectonarrival - an optional parameter.
 	remove_tlv - an optional parameter.
+	mprocerrorcounterenabled - an optional parameter.
 
 EXAMPLES
 	smsc mproc modify 1 newnetworkid 13

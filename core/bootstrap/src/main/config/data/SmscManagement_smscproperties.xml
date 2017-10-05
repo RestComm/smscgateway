@@ -78,3 +78,11 @@
 <diameterDestHost value="127.0.0.1"/>
 <diameterDestPort value="3868"/>
 <diameterUserName value=""/>
+<globalErrorCountersEnabled value="false"/>
+<clusterErrorCountersEnabled value="false"/>
+<esmeErrorCountersEnabled value="false"/>
+<sessionErrorCountersEnabled value="false"/>
+<mprocErrorCountersEnabled value="false"/>
+<globalMaintenanceCountersEnabled value="false"/>
+<clusterMaintenanceCountersEnabled value="false"/>
+<esmeMaintenanceCountersEnabled value="false"/>

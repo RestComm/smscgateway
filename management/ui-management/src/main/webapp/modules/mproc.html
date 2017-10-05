@@ -499,6 +499,17 @@
 						<input id="remove_tlv" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Remove tlv" />
 					</span>
 				</div>
+				
+				<div id="div-mprocErrorCountersEnabled" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Overrides global setting for counters to be calculated per every MProc rule. If set to true, counter will be calculated for this partcular mproc rule. If not set - global mprocErrorCountersEnabled setting applies.">
+						<span class="add-on">MProc Error Counters Enabled</span>
+						<select id="mprocErrorCountersEnabled" >
+							<option value="null"></option> 
+							<option value="true">True</option>
+							<option value="false">False</option>
+						</select>
+					</span>	
+				</div>
 
 				<button id="add-entity-button" class="btn btn btn-primary" onclick="createMProc()">Create</button>
 			</span>
@@ -735,6 +746,8 @@
 										var rejectonarrival = processRuleParameters(ruleparameters, "rejectonarrival");
 										rejectonarrival = rejectonarrival.toUpperCase();
 										var removetlv = processRuleParameters(ruleparameters, "tlvTagToRemove");
+										var mprocErrorCountersEnabled = processRuleParameters(ruleparameters, "mprocErrorCountersEnabled");
+										if(mprocErrorCountersEnabled=="-1") { mprocErrorCountersEnabled = ""; }
 
 										$('#esmes-table-wrapper').append('<div id="entities-modal'+id+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
 												'<div class="modal-header">'+
@@ -1305,7 +1318,7 @@
 																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropOnArrival"+']\').toggle(); $(\'input[id^='+id+"DropOnArrival"+']\').focus();"></i>' + 
 																				'</span>'+
 																				'</div>' +
-																				'<span id="' +id + 'DropOnArrival-text">' + dropaftersri + '</span>'+
+																				'<span id="' +id + 'DropOnArrival-text">' + droponarrival + '</span>'+
 																			'</td>'+
 																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"DropOnArrival"+']\').toggle(); $(\'input[id^='+id+"DropOnArrival"+']\').focus();"></i>' +
 																			'</td>'+
@@ -1343,7 +1356,21 @@
 																			'</td>'+
 																		'</tr>'+
 
-
+																		'<tr data-toggle="tooltip" title="Overrides global setting for counters to be calculated per every MProc rule. If set to true, counter will be calculated for this partcular mproc rule. If not set - global mprocErrorCountersEnabled setting applies.">'+
+																		'<td style="font-size: 0.9em;">MProc Error Counters Enabled</td>'+
+																		'<td style="font-size: 0.9em; padding: 0;">'+
+																			'<div id="div-' + id +'MprocErrorCountersEnabled-input" class="control-group">'+
+																			'<span id="' + id +'MprocErrorCountersEnabled-input" style="display: none;">'+
+																				'<input type="text" class="input-small" value="' + mprocErrorCountersEnabled + '" /> ' +
+																				'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'mprocErrorCountersEnabled\', \'' + id+"MprocErrorCountersEnabled" + '\', \'true\')"></i> ' +
+																				'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"MprocErrorCountersEnabled"+']\').toggle(); $(\'input[id^='+id+"MprocErrorCountersEnabled"+']\').focus();"></i>' +
+																			'</span>'+
+																			'</div>' +
+																			'<span id="' +id + 'MprocErrorCountersEnabled-text">' + mprocErrorCountersEnabled + '</span>'+
+																		'</td>'+
+																		'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"MprocErrorCountersEnabled"+']\').toggle(); $(\'input[id^='+id+"MprocErrorCountersEnabled"+']\').focus();"></i>' +
+																		'</td>'+
+																	'</tr>'+
 
 
 
@@ -1782,6 +1809,10 @@
 		} else {
 			parametersstring = parametersstring + " remove_tlv "+remove_tlv;
 		}
+		
+		e = document.getElementById("mprocErrorCountersEnabled");
+		var mprocErrorCountersEnabled = e.options[e.selectedIndex].value;
+		parametersstring = parametersstring + " mprocErrorCountersEnabled " + mprocErrorCountersEnabled;
 
 		parametersstring = parametersstring.trim();
 		

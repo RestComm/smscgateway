@@ -46,6 +46,8 @@ SYNOPSIS
 	connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> 
 	window-monitor-interval <windowMonitorInterval> 
 	window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> 
+	esme-error-counters-enabled <null | true | false> esme-maintenance-counters-enabled 
+	<null | true | false> session-error-counters-enabled <null | true | false>  
 	enquire-link-delay <30000> enquire-link-delay-server <0> charging-enabled <true | false> 
 	source-ton <source address ton> source-npi <source address npi>
 	source-range <source address range> routing-ton <routing address ton>
@@ -212,6 +214,31 @@ PARAMETERS
 				  This is useful only when ESME is defined as Client Side. 
 				  For Server side this value is taken from the
 				  the 'SMPP Server Settings'.
+				  
+	esme-error-counters-enabled - Default value is null.
+		          When this property is unset (set to null), the corresponding
+		          global setting will be applied to this esme.
+		          Otherwise, if it is set to true, statistic of errors
+		          occurred in SMSC related to this ESME will be gathered.
+		          This property overrides global SMSC property which enables
+		          stats generating for every esme.
+
+  	esme-maintenance-counters-enabled - Default value is null.
+		          When this property is unset (set to null), the corresponding
+		          global setting will be applied to this esme.
+		          Otherwise, if it is set to true, SMSC will expose Request
+		          and Response queue sizes for this ESME.
+		          This property overrides global SMSC property which enables
+		          queue size exposure for every esme.
+
+  	session-error-counters-enabled - Default value is null.
+		          When this property is unset (set to null), the corresponding
+		          global setting will be applied to this esme.
+		          Otherwise, if it is set to true, statistic of errors
+		          occurred in SMSC per every session establised with this
+		          ESME will be gathered.
+		          This property overrides global SMSC property which enables
+		          stats generating for every session.			  
 
 	enquire-link-delay	- Default value is 30000 milli seconds. 
 				  When SMSC connects to a remote server as CLIENT, it 
@@ -454,7 +481,9 @@ SYNOPSIS
 	esme-range <esme address range> window-size <windowSize> 
 	connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> 
 	window-monitor-interval <windowMonitorInterval> 
-	window-wait-timeout <windowWaitTimeout> counters-enabled <true | false> 
+	window-wait-timeout <windowWaitTimeout> counters-enabled <true | false>
+	esme-error-counters-enabled <null | true | false> esme-maintenance-counters-enabled 
+	<null | true | false> session-error-counters-enabled <null | true | false>  
 	enquire-link-delay <30000> enquire-link-delay-server <0> charging-enabled <true | false> 
 	source-ton <source address ton> source-npi <source address npi>
 	source-range <source address range> routing-ton <routing address ton>
@@ -589,6 +618,38 @@ PARAMETERS
 
 				  The new value takes effect when SMPP is restarted.
 
+	esme-error-counters-enabled - Default value is null.
+		          When this property is unset (set to null), the corresponding
+		          global setting will be applied to this esme.
+		          Otherwise, if it is set to true, statistic of errors
+		          occurred in SMSC related to this ESME will be gathered.
+		          This property overrides global SMSC property which enables
+		          stats generating for every esme.
+		          
+		          The new value takes effect when SMPP is restarted.
+	
+	  esme-maintenance-counters-enabled - Default value is null.
+		          When this property is unset (set to null), the corresponding
+		          global setting will be applied to this esme.
+		          Otherwise, if it is set to true, SMSC will expose Request
+		          and Response queue sizes for this ESME.
+		          This property overrides global SMSC property which enables
+		          queue size exposure for every esme.
+		          
+		          The new value takes effect when SMPP is restarted.
+	
+	  session-error-counters-enabled - Default value is null.
+		          When this property is unset (set to null), the corresponding
+		          global setting will be applied to this esme.
+		          Otherwise, if it is set to true, statistic of errors
+		          occurred in SMSC per every session establised with this
+		          ESME will be gathered.
+		          
+		          This property overrides global SMSC property which enables
+		          stats generating for every session.
+
+		          The new value takes effect when SMPP is restarted.
+		          
 	enquire-link-delay	- Default value is 30000 milli seconds. 
 				  When SMSC connects to a remote server as CLIENT, it 
 				  sends an 'ENQUIRE_LINK' after every configured 

@@ -512,6 +512,13 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 							</para></entry>
 							<entry>NONE : default action is no action</entry>
 						</row>
+						<row>
+							<entry>mprocerrorcountersenabled</entry>
+							<entry>&lt;null | true | false&gt;</entry>
+							<entry>Overrides global setting for counters to be calculated per every MProc rule. If set to true, counter 
+							will be calculated for this partcular mproc rule. If not set - global mprocErrorCountersEnabled setting applies.</entry>
+							<entry>null</entry>
+						</row>
 					</tbody>
 					</tgroup>
 				</table>

@@ -392,5 +392,36 @@ public interface SmscPropertiesManagementMBean {
     public void setCassandraPass(String pass) throws  IllegalArgumentException;
 
     public String getCassandraPass();
+    
+    public boolean isGlobalErrorCountersEnabled();
 
+    public void setGlobalErrorCountersEnabled(boolean globalErrorCountersEnabled);
+
+    public boolean isClusterErrorCountersEnabled();
+
+    public void setClusterErrorCountersEnabled(boolean clusterErrorCountersEnabled);
+
+    public boolean isEsmeErrorCountersEnabled();
+
+    public void setEsmeErrorCountersEnabled(boolean esmeErrorCountersEnabled);
+    
+    public boolean isSessionErrorCountersEnabled();
+    
+    public void setSessionErrorCountersEnabled(boolean sessionErrorCountersEnabled);
+    
+    public boolean isMprocErrorCountersEnabled();
+    
+    public void setMprocErrorCountersEnabled(boolean mprocErrorCountersEnabled);
+
+    public boolean isGlobalMaintenanceCountersEnabled();
+
+    public void setGlobalMaintenanceCountersEnabled(boolean globalMaintenanceCountersEnabled);
+
+    public boolean isClusterMaintenanceCountersEnabled();
+
+    public void setClusterMaintenanceCountersEnabled(boolean clusterMaintenanceCountersEnabled);
+
+    public boolean isEsmeMaintenanceCountersEnabled();
+    
+    public void setEsmeMaintenanceCountersEnabled(boolean esmeMaintenanceCountersEnabled);
 }

@@ -96,6 +96,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String NEW_NETWORK_ID_AFTER_TEMP_FAIL = "newNetworkIdAfterTempFail";
     private static final String HR_BY_PASS = "hrByPass";
     private static final String TLV_TAG_TO_REMOVE = "tlvTagToRemove";
+    
+    private static final String MPROC_ERROR_COUNTERS_ENABLED = "mprocErrorCountersEnabled";
 
     // TODO: we need proper implementing
 //    // test magic mproc rules - we need to remove then later after proper implementing
@@ -150,6 +152,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private int newNetworkIdAfterTempFail = -1;
     private boolean hrByPass = false;
     private short tlvTagToRemove = -1;
+    
+    private Boolean mprocErrorCountersEnabled = null;
 
     private Pattern destDigMaskPattern;
     private Pattern sourceDigMaskPattern;
@@ -649,6 +653,21 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     public void setRejectOnArrival(RejectType rejectOnArrival) {
         this.rejectOnArrival = rejectOnArrival;
     }
+    
+    /**
+     * @return if true - errors are calculated per this particular mrpoc rule
+     * false: errors will not be generated per this particular mproc rule
+     * null: not set, errors will be generated based on global mprocErrorCountersEnabled setting 
+     */
+    @Override
+    public Boolean getMprocErrorCountersEnabled() {
+        return this.mprocErrorCountersEnabled;
+    }
+
+    @Override
+    public void setMprocErrorCountersEnabled(Boolean mprocErrorCountersEnabled) {
+        this.mprocErrorCountersEnabled = mprocErrorCountersEnabled;
+    }
 
     private void resetPattern() {
         if (this.destDigMask != null && !this.destDigMask.equals("") && !this.destDigMask.equals("-1")) {
@@ -711,7 +730,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             String newSourceAddr, boolean makeCopy, boolean hrByPass, boolean dropAfterSri, boolean dropAfterTempFail, 
             boolean dropOnArrival, RejectType rejectOnArrival,int newNetworkIdAfterSri, int newNetworkIdAfterPermFail, 
             int newNetworkIdAfterTempFail, short tlvTagToMatch, TlvValueType tlvValueTypeToMatch, String tlvValueToMatch, 
-            short tlvTagToRemove) {
+            short tlvTagToRemove, Boolean mprocErrorCountersEnabled) {
         this.destTonMask = destTonMask;
         this.destNpiMask = destNpiMask;
         this.destDigMask = destDigMask;
@@ -751,6 +770,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.newNetworkIdAfterPermFail = newNetworkIdAfterPermFail;
         this.newNetworkIdAfterTempFail = newNetworkIdAfterTempFail;
         this.tlvTagToRemove = tlvTagToRemove;
+        
+        this.mprocErrorCountersEnabled = mprocErrorCountersEnabled;
+        
         this.resetPattern();
     }
 
@@ -1214,6 +1236,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int newNetworkIdAfterPermFail = -1;
         int newNetworkIdAfterTempFail = -1;
         short tlvTagToRemove = -1;
+        
+        Boolean mprocErrorCountersEnabled = null;
+        
         int percent = -1;
 
         while (count < args.length) {
@@ -1327,6 +1352,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     } catch (Exception e) {
                         // dont have to do anything
                     }
+                } else if (command.equals("mprocerrorcountersenabled")) {
+                    if (!value.equals("null") && !value.equals(""))
+                        mprocErrorCountersEnabled = Boolean.parseBoolean(value);
+                    success = true;
                 }
             }
         }// while
@@ -1357,7 +1386,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 newDestTon, newDestNpi, addDestDigPrefix, addSourceDigPrefix, newSourceTon, newSourceNpi, newSourceAddr,
                 makeCopy, hrByPass, dropAfterSri, dropAfterTempFail, dropOnArrival, rejectOnArrivalVal, newNetworkIdAfterSri, 
                 newNetworkIdAfterPermFail, newNetworkIdAfterTempFail, tlvTagToMatch, tlvValueTypeToMatch, tlvValueToMatch, 
-                tlvTagToRemove);
+                tlvTagToRemove, mprocErrorCountersEnabled);
     }
 
     @Override
@@ -1538,6 +1567,13 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     } catch (Exception e) {
                         // dont have to do anything
                     }
+                } else if (command.equals("mprocerrorcountersenabled")) {
+                    if (!value.equals("null") && !value.equals("")) {
+                        boolean val = Boolean.parseBoolean(value);
+                        this.setMprocErrorCountersEnabled(val);
+                    } else 
+                        this.setMprocErrorCountersEnabled(null);
+                    success = true;
                 }
             }
         }// while
@@ -1684,6 +1720,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (tlvTagToRemove != -1) {
             writeParameter(sb, parNumber++, "tlvTagToRemove", this.tlvTagToRemove, ", ", "=");
         }
+        if (mprocErrorCountersEnabled != null) {
+            writeParameter(sb, parNumber++, "mprocErrorCountersEnabled", this.mprocErrorCountersEnabled, ", ", "=");
+        }
         return sb.toString();
     }
 
@@ -1766,6 +1805,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.newNetworkIdAfterPermFail = xml.getAttribute(NEW_NETWORK_ID_AFTER_PERM_FAIL, -1);
             mProcRule.newNetworkIdAfterTempFail = xml.getAttribute(NEW_NETWORK_ID_AFTER_TEMP_FAIL, -1);
             mProcRule.tlvTagToRemove = xml.getAttribute(TLV_TAG_TO_REMOVE , (short)-1);
+            
+            if (xml.getAttribute(MPROC_ERROR_COUNTERS_ENABLED) != null)
+                mProcRule.mprocErrorCountersEnabled = xml.getAttribute(MPROC_ERROR_COUNTERS_ENABLED, false);;
 
             mProcRule.resetPattern();
         }
@@ -1871,6 +1913,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
             if (mProcRule.tlvTagToRemove != -1)
                 xml.setAttribute(TLV_TAG_TO_REMOVE, mProcRule.tlvTagToRemove);
+            
+            if (mProcRule.mprocErrorCountersEnabled != null)
+                xml.setAttribute(MPROC_ERROR_COUNTERS_ENABLED, mProcRule.mprocErrorCountersEnabled);
         }
     };
 

@@ -310,5 +310,9 @@ public interface MProcRuleDefault extends MProcRule {
     boolean isHrByPass();
 
     void setHrByPass(boolean hrByPass);
+    
+    public Boolean getMprocErrorCountersEnabled();
+    
+    public void setMprocErrorCountersEnabled(Boolean mprocErrorCountersEnabled);
 
 }
