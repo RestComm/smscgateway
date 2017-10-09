@@ -799,7 +799,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 
     <div id="div-globalMaintenanceCountersEnabled" class="control-group">
       <span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="The SMSC can be configured to calculate sizes of various SMSC queues and other maintenance indicators, namely: Total of all Request Queues sizes, Total of all Response Queue sizes, size of queue of schedule connects to client-type ESMEs, size of queue of enquire_link packets to be sent to client-type ESMEs, total, successful and failed number of reconnects to ESMEs, total number of ESMEs in Started state which are disconnected and SLEE event queue size. If we set globalmaintenancecountersenabled to true then SMSC will calculate counters for above mentioned queues and numbers. If globalmaintenancecountersenabled is set to false then those counters won't be calculated.">
-        <span class="add-on">Global Error Counters Enabled</span>
+        <span class="add-on">Global Maintenance Counters Enabled</span>
         <select id="globalMaintenanceCountersEnabled" >
           <option>true</option>
           <option>false</option>
@@ -809,7 +809,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 
     <div id="div-clusterMaintenanceCountersEnabled" class="control-group">
       <span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="The SMSC can be configured to calculate sizes of various SMSC queues and other maintenance indicators per cluster, namely: Total of Request Queues sizes for all ESMEs in a cluster, Total of Response Queue sizes for all ESMEs in a cluster, size of queue of schedule connects to client-type ESMEs in a cluster, size of queue of enquire_link packets to be sent to client-type ESMEs in a cluster, total, successful and failed number of reconnects to ESMEs in a cluster and total number of ESMEs in a cluster that are in Started state but disconnected. If we set clustermaintenancecountersenabled to true then SMSC will calculate counters for above mentioned queues and numbers for every cluster. If clustermaintenancecountersenabled is set to false then those counters won't be calculated.">
-        <span class="add-on">Cluster Error Counters Enabled</span>
+        <span class="add-on">Cluster Maintenance Counters Enabled</span>
         <select id="clusterMaintenanceCountersEnabled" >
           <option>true</option>
           <option>false</option>
@@ -819,7 +819,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 
     <div id="div-esmeMaintenanceCountersEnabled" class="control-group">
       <span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="The SMSC can be configured to maintain sizes of two SMSC queues for every ESME, namely: Request Queues size and Response Queue size. If we set esmermaintenancecountersenabled to true then SMSC will calculate counters for above mentioned queues for every ESME. This value can be overridden on an ESME level for particular ESMEs. Hence, if esmemaintenancecountersenabled is set to true, but ESME 'testEsme' has this setting as false, this counter will be turned off for this ESME. If esmermaintenancecountersenabled is set to false then those counters won't be calculated.">
-        <span class="add-on">ESME Error Counters Enabled</span>
+        <span class="add-on">ESME Maintenance Counters Enabled</span>
         <select id="esmeMaintenanceCountersEnabled" >
           <option>true</option>
           <option>false</option>
@@ -2376,7 +2376,7 @@ function applyCounters() {
   mbeanSearch="org.mobicents.smsc:layer=SmscPropertiesManagement,name=SmscManagement";
   jolokia.request(
       [
-        { type: "write", mbean: mbeanSearch, attribute: "GglobalErrorCountersEnabled", value: globalErrorCountersEnabled },
+        { type: "write", mbean: mbeanSearch, attribute: "GlobalErrorCountersEnabled", value: globalErrorCountersEnabled },
         { type: "write", mbean: mbeanSearch, attribute: "ClusterErrorCountersEnabled", value: clusterErrorCountersEnabled },
         { type: "write", mbean: mbeanSearch, attribute: "EsmeErrorCountersEnabled", value: esmeErrorCountersEnabled },
         { type: "write", mbean: mbeanSearch, attribute: "SessionErrorCountersEnabled", value: sessionErrorCountersEnabled },

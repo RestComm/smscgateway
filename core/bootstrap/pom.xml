@@ -218,7 +218,6 @@
 		<dependency>
 			<artifactId>map-api</artifactId>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
-			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>map-impl</artifactId>

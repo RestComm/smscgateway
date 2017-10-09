@@ -252,6 +252,7 @@
         <constructor factoryClass="org.mobicents.smsc.domain.SmscManagement"
             factoryMethod="getInstance">
             <parameter>SmscManagement</parameter>
+            <parameter><inject bean="SmscStatProviderJmx" /></parameter>
         </constructor>
         <property name="persistDir">${jboss.server.data.dir}</property>
         <property name="smppManagement">

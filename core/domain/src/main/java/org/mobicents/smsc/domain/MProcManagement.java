@@ -95,6 +95,7 @@ public class MProcManagement implements MProcManagementMBean {
     private MBeanServer mbeanServer = null;
 
     private static MProcManagement instance = null;
+    private MProcStateListener mProcStateListener = null;
 
     private SmscManagement smscManagement = null;
     private SmscPropertiesManagement smscPropertiesManagement = null;
@@ -196,6 +197,7 @@ public class MProcManagement implements MProcManagementMBean {
 
         this.registerMProcRuleMbean(mProcRule);
 
+        smscManagement.mprocCreated(id);
         return mProcRule;
     }
 
@@ -209,6 +211,7 @@ public class MProcManagement implements MProcManagementMBean {
         }
 
         mProcRule.updateRuleParameters(parametersString);
+        smscManagement.mprocModified(mProcRuleId);
         this.store();
 
         return mProcRule;
@@ -230,6 +233,7 @@ public class MProcManagement implements MProcManagementMBean {
 
         this.unregisterMProcRuleMbean(mProcRule.getId());
 
+        smscManagement.mprocDestroyed(mProcRuleId);
         return mProcRule;
     }
 
@@ -505,6 +509,11 @@ public class MProcManagement implements MProcManagementMBean {
         }
 
         return res;
+    }
+    
+    public void start(MProcStateListener mProcStateListener) throws Exception {
+        this.mProcStateListener = mProcStateListener;
+        start();
     }
 
     public void start() throws Exception {

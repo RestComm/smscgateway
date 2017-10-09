@@ -15,19 +15,16 @@
 		<dependency>
 			<artifactId>map-api</artifactId>
 			<groupId>org.mobicents.protocols.ss7.map</groupId>
-			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.servers.jainslee.api</groupId>
 			<artifactId>jain-slee-11-ext</artifactId>
-			<version>${jslee.ext.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.resources</groupId>
 			<artifactId>restcomm-slee-ra-map-ratype</artifactId>
-			<version>${restcomm.resources.map.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

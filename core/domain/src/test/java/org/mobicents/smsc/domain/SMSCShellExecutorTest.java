@@ -54,7 +54,7 @@ public class SMSCShellExecutorTest {
         if (!cassandraDbInited)
             return;
 
-        SmscManagement smscManagement = SmscManagement.getInstance("Test");
+        SmscManagement smscManagement = SmscManagement.getInstance("Test", null);
         smscManagement.setSmsRoutingRuleClass("org.mobicents.smsc.domain.DatabaseSmsRoutingRule");
         SmppManagement smppManagement = SmppManagement.getInstance("Test");
         smscManagement.setSmppManagement(smppManagement);
@@ -107,7 +107,7 @@ public class SMSCShellExecutorTest {
             return;
 
         MProcManagement mProcManagement = MProcManagement.getInstance();
-        SmscManagement smscManagement = SmscManagement.getInstance("Test");
+        SmscManagement smscManagement = SmscManagement.getInstance("Test", null);
         SmppManagement smppManagement = SmppManagement.getInstance("Test");
         smscManagement.setSmppManagement(smppManagement);
         mProcManagement.setSmscManagement(smscManagement);

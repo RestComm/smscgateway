@@ -201,6 +201,12 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
         
         cd = new CounterDefImpl(CounterType.Maximal, "MsgPendingInDb", "Messages stored in database which are to be delivered yet");
         cds.addCounterDef(cd);
+        
+        CounterDefSetImpl cdErrors = new CounterDefSetImpl(this.getCounterMediatorName() + "-Errors");
+        lst.put(cdErrors.getName(), cdErrors);
+        
+        CounterDefSetImpl cdMaintenance = new CounterDefSetImpl(this.getCounterMediatorName() + "-Maintenance");
+        lst.put(cdMaintenance.getName(), cdMaintenance);
 
         lstCounters = lst;
     }

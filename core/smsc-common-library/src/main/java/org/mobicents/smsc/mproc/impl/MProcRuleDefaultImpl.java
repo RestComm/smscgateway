@@ -1571,8 +1571,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     if (!value.equals("null") && !value.equals("")) {
                         boolean val = Boolean.parseBoolean(value);
                         this.setMprocErrorCountersEnabled(val);
-                    } else 
+                    } else {
                         this.setMprocErrorCountersEnabled(null);
+                    }
                     success = true;
                 }
             }
