@@ -220,19 +220,19 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     }
     
     @Override
-    public void updateMessageMtGt(MProcMessage message, String newMtGt) throws MProcRuleException {
-        MProcUtility.checkMtGt(newMtGt);
+    public void updateMessageMtLocalSccpGt(MProcMessage message, String newMtLocalSccpGt) throws MProcRuleException {
+        MProcUtility.checkMtLocalSccpGt(newMtLocalSccpGt);
         MProcMessageImpl msg = (MProcMessageImpl) message;
         Sms sms = msg.getSmsContent();
-        sms.setMtGt(newMtGt);
+        sms.setMtLocalSccpGt(newMtLocalSccpGt);
     }
     
     @Override
-    public void updateMessageMtTt(MProcMessage message, int newMtTt) throws MProcRuleException {
-        MProcUtility.checkMtTt(newMtTt);
+    public void updateMessageMtRemoteSccpTt(MProcMessage message, Integer newMtRemoteSccpTt) throws MProcRuleException {
+        MProcUtility.checkMtRemoteSccpTt(newMtRemoteSccpTt);
         MProcMessageImpl msg = (MProcMessageImpl) message;
         Sms sms = msg.getSmsContent();
-        sms.setMtTt(newMtTt);
+        sms.setMtRemoteSccpTt(newMtRemoteSccpTt);
     }
 
     @Override

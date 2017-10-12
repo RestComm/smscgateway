@@ -39,12 +39,13 @@ SYNOPSIS
 	newdestnpi <new destination numbering plan indicator>
 	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
 	newsourceton <new source type of number> newsourcenpi
-	<new source numbering plan indicator> newsourceaddr <new source address value> newmtgt 
-	<new gt for mt message> newmttt <new tt for mt message> hrbypass
-	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value>
-	dropaftertempfail <false | true> newnetworkidaftertempfail <networkId value>
-	droponarrival <false | true> rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE
-	| SYSTEM_FAILURE |	THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key>
+	<new source numbering plan indicator> newsourceaddr <new source address value> mtlocalsccpgt 
+	<new gt of a local sccp address of an mt message> mtremotesccptt 
+	<new tt for remote sccp address for mt message> hrbypass <false | true> dropaftersri 
+	<false | true> newnetworkidaftersri <networkId value> dropaftertempfail <false | true> 
+	newnetworkidaftertempfail <networkId value> droponarrival <false | true> rejectonarrival 
+	<NONE | DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE |	THROTTLING | FACILITY_NOT_SUPPORTED>
+	remove_tlv <tlv tag key>
 
 DESCRIPTION
 
@@ -84,8 +85,8 @@ PARAMETERS
 	newsourceton - an optional parameter.
 	newsourcenpi - an optional parameter.
 	newsourceaddr - an optional parameter.
-	newmtgt - an optional parameter.
-	newmttt - an optional parameter.
+	mtlocalsccpgt - an optional parameter.
+	mtremotesccptt - an optional parameter.
 	makecopy - an optional parameter.
 	hrbypass - an optional parameter.
 	dropaftersri - an optional parameter.
@@ -152,11 +153,12 @@ SYNOPSIS
 	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
 	newsourceton <new source type of number> newsourcenpi
 	<new source numbering plan indicator> newsourceaddr <new source address value> 
-	newmtgt <new gt for mt message> newmttt <new tt for mt message> hrbypass
-	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value>
-	dropaftertempfail <false | true> newnetworkidaftertempfail <networkId value>
-	droponarrival <false | true> rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE
-	| SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key>
+	mtlocalsccpgt <new gt of a local sccp address of an mt message> mtremotesccptt 
+	<new tt for remote sccp address for mt message> hrbypass <false | true> dropaftersri 
+	<false | true> newnetworkidaftersri <networkId value> dropaftertempfail <false | true> 
+	newnetworkidaftertempfail <networkId value> droponarrival <false | true> rejectonarrival 
+	<NONE | DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED> 
+	remove_tlv <tlv tag key>
 
 DESCRIPTION
 
@@ -194,8 +196,8 @@ PARAMETERS
 	newsourceton - an optional parameter.
 	newsourcenpi - an optional parameter.
 	newsourceaddr - an optional parameter.
-	newmtgt - an optional parameter.
-	newmttt - an optional parameter.
+	mtlocalsccpgt - an optional parameter.
+	mtremotesccptt - an optional parameter.
 	makecopy - an optional parameter.
 	hrbypass - an optional parameter.
 	dropaftersri - an optional parameter.
