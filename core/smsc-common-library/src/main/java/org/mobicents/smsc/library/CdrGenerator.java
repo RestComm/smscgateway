@@ -282,13 +282,21 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(delayParametersInCdr ? deliveryCount : CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
                 .append("\"")
                 .append(getEscapedString(getFirst20CharOfSMS(message)))
                 .append("\"")
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append("\"")
                 .append(getEscapedString(reason))
-                .append("\"");
+                .append("\"")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY);
         CdrGenerator.generateCdr(sb.toString());
     }
 
