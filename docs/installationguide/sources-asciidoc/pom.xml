@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>restcomm-smsc-installguide</artifactId>
 		<groupId>org.mobicents.smsc.docs.installguide</groupId>
-		<version>7.4.0-SNAPSHOT</version>
+		<version>7.4.0-49</version>
 	</parent>
 
 	<artifactId>restcomm-smsc-installguide-sources-asciidoc</artifactId>
