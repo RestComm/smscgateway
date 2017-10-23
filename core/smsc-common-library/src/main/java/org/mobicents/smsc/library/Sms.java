@@ -237,25 +237,25 @@ public class Sms implements Serializable {
 	}
 	
 	/**
-     * Global Title for MT message
+     * Global Title for local SCCP address for an MT message
      */
-    public String getMtGt() {
-        return extraData.getMtGt();
+    public String getMtLocalSccpGt() {
+        return extraData.getMtLocalSccpGt();
     }
 
-    public void setMtGt(String mtGt) {
-        extraData.setMtGt(mtGt);
+    public void setMtLocalSccpGt(String mtLocalSccpGt) {
+        extraData.setMtLocalSccpGt(mtLocalSccpGt);
     }
     
     /**
-     * Translation Type MT message
+     * Translation Type of remote SCCP address of an MT message
      */
-    public int getMtTt() {
-        return extraData.getMtTt();
+    public Integer getMtRemoteSccpTt() {
+        return extraData.getMtRemoteSccpTt();
     }
 
-    public void setMtTt(int mtTt) {
-        extraData.setMtTt(mtTt);
+    public void setMtRemoteSccpTt(Integer mtRemoteSccpTt) {
+        extraData.setMtRemoteSccpTt(mtRemoteSccpTt);
     }
 
     /**
@@ -749,6 +749,14 @@ public class Sms implements Serializable {
 			sb.append(", tlvSet=");
 			sb.append(this.tlvSet.toString());
 		}
+        if (this.extraData.getMtLocalSccpGt() != null) {
+            sb.append(", mtLocalSccpGt=");
+            sb.append(this.extraData.getMtLocalSccpGt());
+        }
+        if (this.extraData.getMtRemoteSccpTt() != null) {
+            sb.append(", mtRemoteSccpTt=");
+            sb.append(this.extraData.getMtRemoteSccpTt());
+        }
 
 		sb.append("]");
 

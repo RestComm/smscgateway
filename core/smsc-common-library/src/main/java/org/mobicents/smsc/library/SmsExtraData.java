@@ -42,8 +42,8 @@ public class SmsExtraData {
     
 
     // global title and translation type for MT message
-    public static final String MT_GT = "mtGt";
-    public static final String MT_TT = "mtTt";
+    public static final String MT_LOCAL_SCCP_GT = "mtLocalSccpGt";
+    public static final String MT_REMOTE_SCCP_TT = "mtRemoteSccpTt";
 
     public static final String ZERO_STRING = null;
 
@@ -55,12 +55,12 @@ public class SmsExtraData {
     private long timestampB;
     private long timestampC;
 
-    private String mtGt;
-    private int mtTt;
+    private String mtLocalSccpGt;
+    private Integer mtRemoteSccpTt;
 
     	public boolean isEmpty() {
         if (this.mprocNotes != null || this.originationType != null || this.receiptLocalMessageId != null 
-        		|| this.timestampA != 0 || this.timestampB != 0 || this.timestampC != 0 || this.mtGt != null || this.mtTt != 0)
+        		|| this.timestampA != 0 || this.timestampB != 0 || this.timestampC != 0 || this.mtLocalSccpGt != null || this.mtRemoteSccpTt != null)
             return false;
         else
             return true;
@@ -73,8 +73,8 @@ public class SmsExtraData {
         timestampA = 0;
         timestampB = 0;
         timestampC = 0;
-        mtGt = null;
-        mtTt = 0;
+        mtLocalSccpGt = null;
+        mtRemoteSccpTt = null;
     }
 
     public String getMprocNotes() {
@@ -125,20 +125,20 @@ public class SmsExtraData {
         this.timestampC = timestampC;
     }
     
-    public void setMtGt(String mtGt) {
-        this.mtGt = mtGt;
+    public void setMtLocalSccpGt(String mtLocalSccpGt) {
+        this.mtLocalSccpGt = mtLocalSccpGt;
     }
     
-    public String getMtGt() {
-        return mtGt;
+    public String getMtLocalSccpGt() {
+        return mtLocalSccpGt;
     }
     
-    public void setMtTt(int mtTt) {
-        this.mtTt = mtTt;
+    public void setMtRemoteSccpTt(Integer mtRemoteSccpTt) {
+        this.mtRemoteSccpTt = mtRemoteSccpTt;
     }
     
-    public int getMtTt() {
-        return mtTt;
+    public Integer getMtRemoteSccpTt() {
+        return mtRemoteSccpTt;
     }
 
     @Override
@@ -176,15 +176,15 @@ public class SmsExtraData {
         	sb.append(timestampC);
         	sb.append(", ");
         }
-        if (mtGt != null) {
-            sb.append("mtGt=");
-            sb.append(mtGt);
+        if (mtLocalSccpGt != null) {
+            sb.append("mtLocalSccpGt=");
+            sb.append(mtLocalSccpGt);
             sb.append(", ");
         }
 
-        if (mtTt != 0) {
-            sb.append("mtTt");
-            sb.append(mtTt);
+        if (mtRemoteSccpTt != null) {
+            sb.append("mtRemoteSccpTt");
+            sb.append(mtRemoteSccpTt);
             sb.append(", ");
         }
         sb.append("]");
@@ -209,12 +209,9 @@ public class SmsExtraData {
             extraData.mprocNotes = xml.get(MPROC_NOTES, String.class);
             extraData.receiptLocalMessageId = xml.get(RECEIPT_LOCAL_MESSAGEID, Long.class);      
             
-            extraData.mtGt = xml.get(MT_GT, String.class);
-            Integer val = xml.get(MT_TT, Integer.class);
-            if (val != null) {
-                extraData.mtTt = val.intValue();
-            } else 
-                extraData.mtTt = 0;
+            extraData.mtLocalSccpGt = xml.get(MT_LOCAL_SCCP_GT, String.class);
+            extraData.mtRemoteSccpTt = xml.get(MT_REMOTE_SCCP_TT, Integer.class);
+            
         }
 
         @Override
@@ -229,11 +226,11 @@ public class SmsExtraData {
             if (extraData.receiptLocalMessageId != null) {
                 xml.add(extraData.receiptLocalMessageId, RECEIPT_LOCAL_MESSAGEID, Long.class);
             }
-            if (extraData.mtGt != null) {
-                xml.add(extraData.mtGt, MT_GT, String.class);
+            if (extraData.mtLocalSccpGt != null) {
+                xml.add(extraData.mtLocalSccpGt, MT_LOCAL_SCCP_GT, String.class);
             }
-            if (extraData.mtTt != 0) {
-                xml.add(extraData.mtTt, MT_TT, Integer.class);
+            if (extraData.mtRemoteSccpTt != null) {
+                xml.add(extraData.mtRemoteSccpTt, MT_REMOTE_SCCP_TT, Integer.class);
             }
         }
     };

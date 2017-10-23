@@ -120,23 +120,23 @@ public interface PostArrivalProcessor {
     void updateMessageSourceAddr(MProcMessage message, String newDigits) throws MProcRuleException;
 
     /**
-     * Updating GT that MT message will be sent to. In case of bad value MProcRuleException will be thrown
+     * Updating GT of a local SCCP address that MT message will be sent to. In case of bad value MProcRuleException will be thrown
      * 
      * @param message
-     * @param newMtGt
+     * @param newMtLocalSccpGt
      * @throws MProcRuleException
      */
-    void updateMessageMtGt(MProcMessage message, String newMtGt) throws MProcRuleException;
+    void updateMessageMtLocalSccpGt(MProcMessage message, String newMtLocalSccpGt) throws MProcRuleException;
 
     /**
-     * Updating TT for MT message to specified value different from what SMSC has for this networkId. In case of bad value 
-     * MProcRuleException will be thrown
+     * Updating TT of a remote SCCP address of an MT message to specified value different from what SMSC has for this networkId. 
+     * In case of bad value MProcRuleException will be thrown.
      * 
      * @param message
-     * @param newMtTt
+     * @param newMtRemoteSccpTt
      * @throws MProcRuleException
      */
-    void updateMessageMtTt(MProcMessage message, int newMtTt) throws MProcRuleException;
+    void updateMessageMtRemoteSccpTt(MProcMessage message, Integer newMtRemoteSccpTt) throws MProcRuleException;
     
     /**
      * Updating of message text. Value must not be null and must have length 0-4300. In case of bad value MProcRuleException

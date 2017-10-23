@@ -37,10 +37,11 @@ SYNOPSIS
 	<regualr expression - origination ESME name mask> percent <percent value>
 	newnetworkid <new networkId value> newdestton<new destination type of
 	number> newdestnpi <new destination numbering plan indicator>
-	adddestdigprefix <prefix> newmtgt <new gt for mt message> newmttt 
-	<new tt for mt message> makecopy <false | true> dropaftersri
-	<false | true> droponarrival <false | true> rejectonarrival <NONE
-	| DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING
+	adddestdigprefix <prefix> mtlocalsccpgt 
+	<new gt of a local sccp address of an mt message> mtremotesccptt 
+	<new tt for remote sccp address for mt message> makecopy <false | true> 
+	dropaftersri <false | true> droponarrival <false | true> rejectonarrival 
+	<NONE | DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING
 	| FACILITY_NOT_SUPPORTED> 
 
 DESCRIPTION
@@ -64,8 +65,8 @@ PARAMETERS
 	newdestton - an optional parameter.
 	newdestnpi - an optional parameter.
 	adddestdigprefix - an optional parameter.
-	newmtgt - an optional parameter.
-	newmttt - an optional parameter.
+	mtlocalsccpgt - an optional parameter.
+	mtremotesccptt - an optional parameter.
 	makecopy - an optional parameter.
 	dropaftersri - an optional parameter.
 	droponarrival - an optional parameter.
@@ -158,10 +159,11 @@ SYNOPSIS
 	- origination ESME name mask> percent <percent value>
 	newnetworkid <new networkId value> newdestton<new destination type of
 	number> newdestnpi <new destination numbering plan indicator>
-	adddestdigprefix <prefix> newmtgt <new gt for mt message> newmttt 
-	<new tt for mt message> makecopy <false | true> dropaftersri
-	<false | true> droponarrival <false | true> rejectonarrival <NONE
-	| DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING
+	adddestdigprefix <prefix> mtlocalsccpgt 
+	<new gt of a local sccp address of an mt message> mtremotesccptt 
+	<new tt for remote sccp address for mt message> makecopy <false | true> 
+	dropaftersri <false | true> droponarrival <false | true> rejectonarrival 
+	<NONE | DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING
 	| FACILITY_NOT_SUPPORTED> 
 
 DESCRIPTION
@@ -183,8 +185,8 @@ PARAMETERS
 	newdestton - an optional parameter.
 	newdestnpi - an optional parameter.
 	adddestdigprefix - an optional parameter.
-	newmtgt - an optional parameter.
-	newmttt - an optional parameter.
+	mtlocalsccpgt - an optional parameter.
+	mtremotesccptt - an optional parameter.
 	makecopy - an optional parameter.
 	dropaftersri - an optional parameter.
 	droponarrival - an optional parameter.

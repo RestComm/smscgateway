@@ -22,7 +22,8 @@ SYNOPSIS
 	number> newdestnpi <new destination numbering plan indicator> adddestdigprefix <prefix 
 	value> addsourcedigprefix <prefix value> newsourceton <new source type of number> 
 	newsourcenpi <new source numbering plan indicator> newsourceaddr <new source address value>
-	newmtgt <new gt for mt message> newmttt <new tt for mt message> makecopy <false | true>
+	mtlocalsccpgt <new gt of a local sccp address of an mt message> mtremotesccptt 
+	<new tt for remote sccp address for mt message> makecopy <false | true>
 	hrbypass <false | true> dropaftersri <false | true> newnetworkidaftersri 
 	<networkId value> dropaftertempfail <false | true> newnetworkidaftertempfail <networkId
 	value> droponarrival <false | true> rejectonarrival <NONE | DEFAULT |
@@ -227,12 +228,13 @@ PARAMETERS
 					Default value is -1.
 					This action is for Arrival trigger.
 						
-	newmtgt			- Once rule matches, the target SMS's destination global title (GT) will be changed 
-					to one set with this command. Set this to -1 to keep original GT. Default value is "-1".
+	mtlocalsccpgt 	- Once rule matches, the global title (GT) of local SCCP address will be changed for target 
+					SMS to one set with this command. Set this to -1 to keep original GT. Default value is "-1".
 					This action is for Arrival trigger.
 					
-	newmttt			- Once rule matches, the target SMS's destination translation type (TT) will be changed
-					to one set with this command. Set this to -1 to keep original TT. Default value is -1.
+	mtremotesccptt	- Once rule matches, the translation type (TT) of remote SCCP address will be changed
+					for target SMS to one set with this command. Set this to -1 to keep original TT. 
+					Default value is -1.
 					This action is for Arrival trigger.
 					
 	makecopy		- Once rule match's, and makecopy is set to true, a new copy of SMS is created. If new 

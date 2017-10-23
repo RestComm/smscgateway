@@ -407,17 +407,17 @@
 					</span>				
 				</div>
 				
-				<div id="div-newmtgt" class="control-group">
+				<div id="div-mtlocalsccp]gt" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule matches, the target SMS's destination global title (GT) will be changed to one set with this command. Set this to -1 to keep original GT. Default value is -1.">
-						<span class="add-on">New MT GT</span>
-						<input id="newmtgt" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Global Title for MT message" />
+						<span class="add-on">New GT for local SCCP address of MT  message</span>
+						<input id="mtlocalsccpgt" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Global Title for MT message" />
 					</span>				
 				</div>
 				
-				<div id="div-newmttt" class="control-group">
+				<div id="div-mtremotesccptt" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="Once rule matches, the target SMS's destination translation type (TT) will be changed to one set with this command. Set this to -1 to keep original TT. Default value is -1.">
-						<span class="add-on">New MT TT</span>
-						<input id="newmttt" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Translation Type for MT message" />
+						<span class="add-on">New TT for remote SCCP address of MT message</span>
+						<input id="mtremotesccptt" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Translation Type for MT message" />
 					</span>				
 				</div>
 				
@@ -734,8 +734,8 @@
 										var newsourcenpi = processRuleParameters(ruleparameters, "newsourcenpi");
 										var newsourceaddr = processRuleParameters(ruleparameters, "newsourceaddr");
 										var makecopy = processRuleParameters(ruleparameters, "makecopy");
-										var newmtgt = processRuleParameters(ruleparameters, "newmtgt");
-										var newmttt = processRuleParameters(ruleparameters, "newmttt");
+										var mtlocalsccpgt = processRuleParameters(ruleparameters, "mtlocalsccpgt");
+										var mtremotesccptt = processRuleParameters(ruleparameters, "mtremotesccptt");
 										if(makecopy=="-1") { makecopy = "false"; }
 										var hrbypass = processRuleParameters(ruleparameters, "hrbypass");
 										if(hrbypass=="-1") { hrbypass = "false"; }
@@ -1200,34 +1200,34 @@
 																		'</tr>'+
 																		
 																		'<tr data-toggle="tooltip" title="Once rule matches, the target SMS\'s destination global title (GT) will be changed to one set with this command. Set this to -1 to keep original GT. Default value is -1.">'+
-																			'<td style="font-size: 0.9em;">New MT GT</td>'+
+																			'<td style="font-size: 0.9em;">New GT for local SCCP address of MT message</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
-																				'<div id="div-' + id +'NewMtGt-input" class="control-group">'+
-																				'<span id="' + id +'NewMtGt-input" style="display: none;">'+
-																					'<input type="text" class="input-small" value="' + newmtgt + '" /> ' +
-																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newmtgt\', \'' + id+"NewMtGt" + '\', \'true\')"></i> ' +
-																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewMtGt"+']\').toggle(); $(\'input[id^='+id+"NewMtGt"+']\').focus();"></i>' + 
+																				'<div id="div-' + id +'mtlocalsccpgt-input" class="control-group">'+
+																				'<span id="' + id +'mtlocalsccpgt-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + mtlocalsccpgt + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'mtlocalsccpgt\', \'' + id+"mtlocalsccpgt" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"mtlocalsccpgt"+']\').toggle(); $(\'input[id^='+id+"mtlocalsccpgt"+']\').focus();"></i>' + 
 																				'</span>'+
 																				'</div>' +
-																				'<span id="' +id + 'NewMtGt-text">' + newmtgt + '</span>'+
+																				'<span id="' +id + 'mtlocalsccpgt-text">' + mtlocalsccpgt + '</span>'+
 																			'</td>'+
-																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewMtGt"+']\').toggle(); $(\'input[id^='+id+"NewMtGt"+']\').focus();"></i>' +
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"mtlocalsccpgt"+']\').toggle(); $(\'input[id^='+id+"mtlocalsccpgt"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+
 																		
 																		'<tr data-toggle="tooltip" title="Once rule matches, the target SMS\'s destination translation type (TT) will be changed to one set with this command. Set this to -1 to keep original TT. Default value is -1.">'+
-																			'<td style="font-size: 0.9em;">New MT TT</td>'+
+																			'<td style="font-size: 0.9em;">New TT for remote SCCP address of MT message</td>'+
 																			'<td style="font-size: 0.9em; padding: 0;">'+
-																				'<div id="div-' + id +'NewMtTt-input" class="control-group">'+
-																				'<span id="' + id +'NewMtTt-input" style="display: none;">'+
-																					'<input type="text" class="input-small" value="' + newmttt + '" /> ' +
-																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'newmttt\', \'' + id+"NewMtTt" + '\', \'true\')"></i> ' +
-																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewMtTt"+']\').toggle(); $(\'input[id^='+id+"NewMtTt"+']\').focus();"></i>' + 
+																				'<div id="div-' + id +'mtremotesccptt-input" class="control-group">'+
+																				'<span id="' + id +'mtremotesccptt-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + mtremotesccptt + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'mtremotesccptt\', \'' + id+"mtremotesccptt" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"mtremotesccptt"+']\').toggle(); $(\'input[id^='+id+"mtremotesccptt"+']\').focus();"></i>' + 
 																				'</span>'+
 																				'</div>' +
-																				'<span id="' +id + 'NewMtTt-text">' + newmttt + '</span>'+
+																				'<span id="' +id + 'mtremotesccptt-text">' + mtremotesccptt + '</span>'+
 																			'</td>'+
-																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"NewMtTt"+']\').toggle(); $(\'input[id^='+id+"NewMtTt"+']\').focus();"></i>' +
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"mtremotesccptt"+']\').toggle(); $(\'input[id^='+id+"mtremotesccptt"+']\').focus();"></i>' +
 																			'</td>'+
 																		'</tr>'+
 																		
@@ -1774,18 +1774,18 @@
 			parametersstring = parametersstring + " newsourceaddr "+newsourceaddr;
 		}
 		
-		var newmtgt = $("#newmtgt").val();
-		if(newmtgt.trim() == "") {
-			newmtgt = "-1";
+		var mtlocalsccpgt = $("#mtlocalsccpgt").val();
+		if(mtlocalsccpgt.trim() == "") {
+			mtlocalsccpgt = "-1";
 		} else {
-			parametersstring = parametersstring + " newmtgt " + newmtgt;
+			parametersstring = parametersstring + " mtlocalsccpgt " + mtlocalsccpgt;
 		}
 		
-		var newmttt = $("#newmttt").val();
-		if(newmttt.trim() == "") {
-			newmttt = "-1";
+		var mtremotesccptt = $("#mtremotesccptt").val();
+		if(mtremotesccptt.trim() == "") {
+			mtremotesccptt = "-1";
 		} else {
-			parametersstring = parametersstring + " newmttt " + newmttt;
+			parametersstring = parametersstring + " mtremotesccptt " + mtremotesccptt;
 		}
 
 		e = document.getElementById("makecopy");

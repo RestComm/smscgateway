@@ -441,16 +441,16 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 							<entry>"-1". This means that destination address digits of the message will not be changed.</entry>
 						</row>
 						<row>
-							<entry>newmtgt</entry>
-							<entry>&lt;new global title for an MT message&gt;</entry>
-							<entry>global title to which MT message should be sent to will be changed to new value. </entry>
-							<entry>"-1". This means that GT of the message will not be changed.</entry>
+							<entry>mtLocalSccpGt</entry>
+							<entry>&lt;new global title of local SCCP address of an MT message&gt;</entry>
+							<entry>global title of an originating SCCP address of an MT message will be changed to new value. </entry>
+							<entry>"-1". This means that GT of the local address will not be changed.</entry>
 			 			</row>
 			 			<row>
-							<entry>newmttt</entry>
-							<entry>&lt;new translation type of an MT message&gt;</entry>
-							<entry>new translation type will be set to MT message. </entry>
-							<entry>-1. This means that TT of the message will not be changed.</entry>
+							<entry>mtRemoteSccpTt</entry>
+							<entry>&lt;new translation type for a remote SCCP address for an MT message&gt;</entry>
+							<entry>new translation type will be set for remote SCCP address for an MT message. </entry>
+							<entry>-1. This means that TT of the remote address will not be changed.</entry>
 			 			</row>
 						<row>
 							<entry>makecopy</entry>
@@ -1071,23 +1071,23 @@ public interface PostArrivalProcessor {
     void updateMessageSourceAddr(MProcMessage message, String newDigits) throws MProcRuleException;
     
     /**
-     * Updating GT that MT message will be sent to. In case of bad value MProcRuleException will be thrown
+     * Updating GT of local SCCP address of MT message. In case of bad value MProcRuleException will be thrown
      * 
      * @param message
-     * @param newMtGt
+     * @param newMtLocalSccpGt
      * @throws MProcRuleException
      */
-    void updateMessageMtGt(MProcMessage message, String newMtGt) throws MProcRuleException;
+    void updateMessageMtLocalSccpGt(MProcMessage message, String newMtLocalSccpGt) throws MProcRuleException;
 
     /**
-     * Updating TT for MT message to specified value different from what SMSC has for this networkId. In case of bad value 
-     * MProcRuleException will be thrown
+     * Updating TT for remote SCCP address for MT message to specified value different from what SMSC has for this networkId. 
+     * In case of bad value MProcRuleException will be thrown
      * 
      * @param message
-     * @param newMtTt
+     * @param newMtRemoteSccpTt
      * @throws MProcRuleException
      */
-    void updateMessageMtTt(MProcMessage message, int newMtTt) throws MProcRuleException;
+    void updateMessageMtRemoteSccpTt(MProcMessage message, int newMtRemoteSccpTt) throws MProcRuleException;
 
     /**
      * Updating of message text. Value must not be null and must have length 0-4300. In case

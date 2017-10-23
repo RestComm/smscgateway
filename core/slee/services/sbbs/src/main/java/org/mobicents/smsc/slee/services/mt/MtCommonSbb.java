@@ -581,19 +581,17 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         }
     }
     
-    protected SccpAddress getServiceCenterSccpAddress(String mtGt, int mtTt, int networkId) {
-        if (mtGt == null) {
+    protected SccpAddress getServiceCenterSccpAddress(String mtLocalSccpGt, int networkId) {
+        if (mtLocalSccpGt == null) {
             if (networkId == 0) {
-                mtGt = smscPropertiesManagement.getServiceCenterGt();
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt();
             } else {
-                mtGt = smscPropertiesManagement.getServiceCenterGt(networkId);
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt(networkId);
             }
         }
-        if (mtTt == 0) {
-            mtTt = smscPropertiesManagement.getTranslationType();
-        }
-        return MessageUtil.getSccpAddress(sccpParameterFact, mtGt, AddressNature.international_number.getIndicator(), NumberingPlan.ISDN.getIndicator(),
-                smscPropertiesManagement.getServiceCenterSsn(), smscPropertiesManagement.getGlobalTitleIndicator(), mtTt);
+        
+        return MessageUtil.getSccpAddress(sccpParameterFact, mtLocalSccpGt, AddressNature.international_number.getIndicator(), NumberingPlan.ISDN.getIndicator(),
+                smscPropertiesManagement.getServiceCenterSsn(), smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
     }
 
     protected ISDNAddressString getCalledPartyISDNAddressString(String destinationAddress, int ton, int npi) {
@@ -602,8 +600,13 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
     }
 
     protected SccpAddress convertAddressFieldToSCCPAddress(String address, int ton, int npi) {
+        return convertAddressFieldToSCCPAddress(address, ton, npi, null);
+    }
+    
+    protected SccpAddress convertAddressFieldToSCCPAddress(String address, int ton, int npi, Integer mtRemoteSccpTt) {
         return MessageUtil.getSccpAddress(sccpParameterFact, address, ton, npi, smscPropertiesManagement.getHlrSsn(),
-                smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
+                smscPropertiesManagement.getGlobalTitleIndicator(), mtRemoteSccpTt != null ? mtRemoteSccpTt 
+                        : smscPropertiesManagement.getTranslationType());
     }
 
     protected MAPApplicationContext getSRIMAPApplicationContext(MAPApplicationContextVersion applicationContextVersion) {
