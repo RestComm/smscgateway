@@ -441,7 +441,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 HttpUtils.sendErrorResponseWithContent(logger, event.getResponse(), HttpServletResponse.SC_OK, message,
                         ResponseFormatter.format(outgoingData, incomingData.getFormat()), incomingData.getFormat());
                 timestampB = System.currentTimeMillis();
-                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                     generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, message, true);
                 }
             } catch (IOException e) {
