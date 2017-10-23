@@ -304,13 +304,16 @@ public class CdrGenerator {
     }
 
     private static String getEscapedString(final String aValue) {
+	    if (aValue == null) {
+	        return CDR_EMPTY;
+        }
 	    return aValue.replaceAll("\n", "n").replaceAll(",", " ").replace("\"", "'").replace('\u0000', '?').replace('\u0006', '?');
     }
 
     private static String getProcessingTime(final Date aSubmitDate) {
         if (aSubmitDate == null) {
             return CDR_EMPTY;
-}
+        }
         return String.valueOf(System.currentTimeMillis() - aSubmitDate.getTime());
     }
 
