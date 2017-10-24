@@ -372,7 +372,7 @@ public abstract class SubmitCommonSbb implements Sbb {
                             statusCode, mProcResult.getRuleIdDropReject(), sourceAddrAndPort, seqNumber);
                 }
 
-                rejectSmsByMProc(sms0, "Message is rejected by MProc rules.", mProcResult);
+                rejectSmsByMProc(sms0, mProcResult);
             }
             if (mProcResult.isMessageDropped()) {
                 sms0.setMessageDeliveryResultResponse(null);
@@ -400,8 +400,16 @@ public abstract class SubmitCommonSbb implements Sbb {
                     generateMprocFailureDetailedCdr(sms0, eventTypeFailure, ErrorCode.REJECT_INCOMING_MPROC, messageType,
                             statusCode, mProcResult.getRuleIdDropReject(), sourceAddrAndPort, seqNumber);
                 }
-
-                rejectSmsByMProc(sms0, "Message is dropped by MProc rules.", mProcResult);
+                if (logger.isInfoEnabled()) {
+                    logger.info("Incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+                }
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    CdrGenerator.generateCdr(sms0,
+                            CdrGenerator.CDR_MPROC_DROPPED,"Message is dropped by MProc rules.", smscPropertiesManagement.getGenerateReceiptCdr(),
+                            MessageUtil.isNeedWriteArchiveMessage(sms0, smscPropertiesManagement.getGenerateCdr()), false, true,
+                            smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+                }
+                return;
             }
 
             smscStatAggregator.updateMsgInReceivedAll();
@@ -474,9 +482,10 @@ public abstract class SubmitCommonSbb implements Sbb {
                 smscPropertiesManagement.getGenerateDetailedCdr());
     }
 
-    private void rejectSmsByMProc(final Sms anSms, final String aReason, final MProcResult anMProcResult)
+    private void rejectSmsByMProc(final Sms anSms, final MProcResult anMProcResult)
             throws SmscProcessingException {
-        final SmscProcessingException e = new SmscProcessingException(aReason,
+        final String reason = "Message is rejected by MProc rules.";
+        final SmscProcessingException e = new SmscProcessingException(reason,
                 getErrorCode(anMProcResult.getSmppErrorCode(), SmppConstants.STATUS_SUBMITFAIL),
                 getErrorCode(anMProcResult.getMapErrorCode(), MAPErrorCode.systemFailure),
                 getErrorCode(anMProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET), null,
@@ -484,13 +493,11 @@ public abstract class SubmitCommonSbb implements Sbb {
         e.setSkipErrorLogging(true);
         e.setMessageRejectCdrCreated(true);
         if (logger.isInfoEnabled()) {
-            logger.info("Incoming message is " + (anMProcResult.isMessageRejected() ? "rejected" : "dropped")
-                    + "by mProc rules, message=[" + anSms + "]");
+            logger.info("Incoming message is rejected by mProc rules, message=[" + anSms + "]");
         }
         if (smscPropertiesManagement.isGenerateRejectionCdr()) {
             CdrGenerator.generateCdr(anSms,
-                    (anMProcResult.isMessageRejected() ? CdrGenerator.CDR_MPROC_REJECTED : CdrGenerator.CDR_MPROC_DROPPED),
-                    aReason, smscPropertiesManagement.getGenerateReceiptCdr(),
+                    CdrGenerator.CDR_MPROC_REJECTED, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                     MessageUtil.isNeedWriteArchiveMessage(anSms, smscPropertiesManagement.getGenerateCdr()), false, true,
                     smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
         }
