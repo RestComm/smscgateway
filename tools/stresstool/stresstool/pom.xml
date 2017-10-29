@@ -2,7 +2,7 @@
 	<parent>
 		<artifactId>stresstool-parent</artifactId>
 		<groupId>org.mobicents.smsc</groupId>
-		<version>7.4.0-SNAPSHOT</version>
+		<version>7.4.0-56</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
