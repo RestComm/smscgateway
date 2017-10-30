@@ -517,13 +517,15 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 		MAPDialogSms mapDialogSms = null;
 		try {
 		    Sms sms0 = smsSet.getSms(0); 
+		    String mtLocalSccpGt = null;
 		    Integer mtRemoteSccpTt = null;
 		    if (sms0 != null) {
+		        mtLocalSccpGt = sms0.getMtLocalSccpGt();
 		        mtRemoteSccpTt = sms0.getMtRemoteSccpTt();
 		    }
 			// 1. Create Dialog first and add the SRI request to it
 			mapDialogSms = this.setupRoutingInfoForSMRequestIndication(destinationAddress, ton, npi,
-					mapApplicationContext, smsSet.getNetworkId(), mtRemoteSccpTt);
+					mapApplicationContext, smsSet.getNetworkId(), mtLocalSccpGt, mtRemoteSccpTt);
 
 			// 2. Create the ACI and attach this SBB
 			ActivityContextInterface sriDialogACI = this.mapAcif.getActivityContextInterface(mapDialogSms);
@@ -545,7 +547,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 	}
 
 	private MAPDialogSms setupRoutingInfoForSMRequestIndication(String destinationAddress, int ton, int npi,
-			MAPApplicationContext mapApplicationContext, int networkId, Integer newMtRemoteSccpTt) throws MAPException {
+			MAPApplicationContext mapApplicationContext, int networkId, String newMtLocalSccpGt, Integer newMtRemoteSccpTt) throws MAPException {
 		// this.mapParameterFactory.creat
 
         String hlrAddress = destinationAddress;
@@ -560,7 +562,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 		mapDialogSms.setNetworkId(networkId);
 
 		ISDNAddressString isdn = this.getCalledPartyISDNAddressString(destinationAddress, ton, npi);
-		AddressString serviceCenterAddress = this.getServiceCenterAddressString(networkId);
+		AddressString serviceCenterAddress = this.getServiceCenterAddressString(newMtLocalSccpGt, networkId);
 		boolean sm_RP_PRI = true;
 		mapDialogSms.addSendRoutingInfoForSMRequest(isdn, sm_RP_PRI, serviceCenterAddress, null, false, null, null,
 				null);

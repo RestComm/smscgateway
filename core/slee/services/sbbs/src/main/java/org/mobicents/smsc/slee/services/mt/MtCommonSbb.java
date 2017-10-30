@@ -556,6 +556,35 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, smscPropertiesManagement.getServiceCenterGt(networkId));
         }
     }
+    
+    /**
+     * TODO : This is repetitive in each Sbb. Find way to make it static
+     * probably?
+     * 
+     * This is our own number. We are Service Center.
+     * 
+     * @return
+     */
+    protected AddressString getServiceCenterAddressString(String mtLocalSccpGt, int networkId) {
+        if (mtLocalSccpGt == null) {
+            if (networkId == 0) {
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt();
+            } else {
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt(networkId);
+            }
+        }
+        
+        if (networkId == 0) {
+            if (this.serviceCenterAddress == null) {
+                this.serviceCenterAddress = this.mapParameterFactory.createAddressString(AddressNature.international_number,
+                        org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, mtLocalSccpGt);
+            }
+            return this.serviceCenterAddress;
+        } else {
+            return this.mapParameterFactory.createAddressString(AddressNature.international_number,
+                    org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, mtLocalSccpGt);
+        }
+    }
 
     /**
      * TODO: This should be configurable and static as well
