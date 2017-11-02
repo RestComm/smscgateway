@@ -667,7 +667,12 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				this.setResponseReceived(0);
 				this.handleSmsResponse((MAPDialogSms) evt.getMAPDialog(), false);
 			} else {
-	            SmsSet smsSet = getSmsSet();
+                if (this.getDlvIsEnded()) {
+                    // we have already processes an error
+                    return;
+                }
+
+                SmsSet smsSet = getSmsSet();
                 if (smsSet == null) {
 	                logger.severe("MtSbb.onDialogClose(): CMP smsSet is missed");
 	                markDeliveringIsEnded(true);
