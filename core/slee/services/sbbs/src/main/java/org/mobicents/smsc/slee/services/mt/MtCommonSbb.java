@@ -164,7 +164,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
     }
 
     protected void setupReportSMDeliveryStatusRequest(String destinationAddress, int ton, int npi,
-            SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId) {
+            SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId, String mtLocalSccpGt, Integer mtRemoteSccpTt) {
         RsdsSbbLocalObject rsdsSbbLocalObject = this.getRsdsSbbObject();
 
         if (rsdsSbbLocalObject != null) {
@@ -175,10 +175,12 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
             event.setMsisdn(this.getCalledPartyISDNAddressString(destinationAddress, ton, npi));
             event.setServiceCentreAddress(getServiceCenterAddressString(networkId));
             event.setSMDeliveryOutcome(sMDeliveryOutcome);
-            event.setDestAddress(this.convertAddressFieldToSCCPAddress(destinationAddress, ton, npi));
+            SccpAddress destinationAddr = this.convertAddressFieldToSCCPAddress(destinationAddress, ton, npi, mtRemoteSccpTt);
+            event.setDestAddress(destinationAddr);
             event.setMapApplicationContext(this.getSRIMAPApplicationContext(MAPApplicationContextVersion.getInstance(this.getSriMapVersion())));
             event.setTargetId(targetId);
             event.setNetworkId(networkId);
+            event.setMtLocalSccpGt(mtLocalSccpGt);
 
             this.fireSendRsdsEvent(event, schedulerActivityContextInterface, null);
         }
@@ -456,8 +458,17 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                             break;
                     }
                     if (smDeliveryOutcome != null && lstTempFailured2.size() > 0) {
-                        this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(),
-                                smDeliveryOutcome, smsSet.getTargetId(), smsSet.getNetworkId());
+                        Sms sms0 = smsSet.getSms(0);
+                        String mtLocalSccpGt = null;
+                        Integer mtRemoteSccpTt = null;
+                        if (sms0 != null) {
+                            mtLocalSccpGt = sms0.getMtLocalSccpGt();
+                            mtRemoteSccpTt = sms0.getMtRemoteSccpTt();
+                        }
+
+                        this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(),
+                                smsSet.getDestAddrNpi(), smDeliveryOutcome, smsSet.getTargetId(), smsSet.getNetworkId(),
+                                mtLocalSccpGt, mtRemoteSccpTt);
                     }
 
                     this.markDeliveringIsEnded(removeSmsSet);
@@ -609,7 +620,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     smscPropertiesManagement.getTranslationType());
         }
     }
-    
+
     protected SccpAddress getServiceCenterSccpAddress(String mtLocalSccpGt, int networkId) {
         if (mtLocalSccpGt == null) {
             if (networkId == 0) {

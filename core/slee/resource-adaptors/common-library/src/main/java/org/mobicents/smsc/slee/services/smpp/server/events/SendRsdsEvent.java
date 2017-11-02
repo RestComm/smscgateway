@@ -46,6 +46,7 @@ public class SendRsdsEvent implements Serializable {
     private MAPApplicationContext mapApplicationContext;
     private String targetId;
     private int networkId;
+    private String mtLocalSccpGt;
 
     public ISDNAddressString getMsisdn() {
         return msisdn;
@@ -103,6 +104,14 @@ public class SendRsdsEvent implements Serializable {
         this.networkId = networkId;
     }
 
+    public String getMtLocalSccpGt() {
+        return mtLocalSccpGt;
+    }
+
+    public void setMtLocalSccpGt(String mtLocalSccpGt) {
+        this.mtLocalSccpGt = mtLocalSccpGt;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -139,6 +148,11 @@ public class SendRsdsEvent implements Serializable {
         if (this.targetId != null) {
             sb.append("targetId=");
             sb.append(this.targetId);
+            sb.append(", ");
+        }
+        if (this.mtLocalSccpGt != null) {
+            sb.append("mtLocalSccpGt=");
+            sb.append(this.mtLocalSccpGt);
             sb.append(", ");
         }
 

@@ -25,6 +25,7 @@ package org.mobicents.smsc.slee.services.mt;
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.tlv.Tlv;
 import com.cloudhopper.smpp.tlv.TlvConvertException;
+
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
@@ -94,6 +95,7 @@ import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.EventContext;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -666,7 +668,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				this.handleSmsResponse((MAPDialogSms) evt.getMAPDialog(), false);
 			} else {
 	            SmsSet smsSet = getSmsSet();
-	            if (smsSet == null) {
+                if (smsSet == null) {
 	                logger.severe("MtSbb.onDialogClose(): CMP smsSet is missed");
 	                markDeliveringIsEnded(true);
 	                return;
@@ -953,8 +955,17 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         if (informServiceCenterContainer != null && informServiceCenterContainer.getMwStatus() != null
                 && informServiceCenterContainer.getMwStatus().getScAddressNotIncluded() == false && versionMore1) {
             // sending a report to HLR of a success delivery
+            Sms sms0 = smsSet.getSms(0);
+            String mtLocalSccpGt = null;
+            Integer mtRemoteSccpTt = null;
+            if (sms0 != null) {
+                mtLocalSccpGt = sms0.getMtLocalSccpGt();
+                mtRemoteSccpTt = sms0.getMtRemoteSccpTt();
+            }
+
             this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(),
-                    SMDeliveryOutcome.successfulTransfer, smsSet.getTargetId(), smsSet.getNetworkId());
+                    SMDeliveryOutcome.successfulTransfer, smsSet.getTargetId(), smsSet.getNetworkId(), mtLocalSccpGt,
+                    mtRemoteSccpTt);
         }
     }
 

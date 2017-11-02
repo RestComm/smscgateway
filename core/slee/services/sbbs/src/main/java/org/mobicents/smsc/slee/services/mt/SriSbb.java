@@ -557,12 +557,19 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
         }
         SccpAddress destinationAddr = this.convertAddressFieldToSCCPAddress(hlrAddress, ton, npi, newMtRemoteSccpTt);
 
-		MAPDialogSms mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext,
-				this.getServiceCenterSccpAddress(networkId), null, destinationAddr, null);
+        SccpAddress originSccpAddress;
+        if (newMtLocalSccpGt != null) {
+            originSccpAddress = this.getServiceCenterSccpAddress(newMtLocalSccpGt, networkId);
+        } else {
+            originSccpAddress = this.getServiceCenterSccpAddress(networkId);
+        }
+
+        MAPDialogSms mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext,
+                originSccpAddress, null, destinationAddr, null);
 		mapDialogSms.setNetworkId(networkId);
 
 		ISDNAddressString isdn = this.getCalledPartyISDNAddressString(destinationAddress, ton, npi);
-		AddressString serviceCenterAddress = this.getServiceCenterAddressString(newMtLocalSccpGt, networkId);
+		AddressString serviceCenterAddress = this.getServiceCenterAddressString(networkId);
 		boolean sm_RP_PRI = true;
 		mapDialogSms.addSendRoutingInfoForSMRequest(isdn, sm_RP_PRI, serviceCenterAddress, null, false, null, null,
 				null);
