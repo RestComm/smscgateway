@@ -19,6 +19,7 @@
 		<module>domain</module>
 		<module>slee</module>
 		<module>bootstrap</module>
+		<module>bootstrap-wildfly</module>
 	</modules>
     <dependencyManagement>
         <dependencies>

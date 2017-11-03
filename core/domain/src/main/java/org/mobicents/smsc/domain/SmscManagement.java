@@ -24,6 +24,7 @@ package org.mobicents.smsc.domain;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.management.ManagementFactory;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +41,6 @@ import javolution.text.TextBuilder;
 import javolution.util.FastList;
 
 import org.apache.log4j.Logger;
-import org.jboss.mx.util.MBeanServerLocator;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.mproc.MProcRuleFactory;
@@ -223,7 +223,8 @@ public class SmscManagement implements SmscManagementMBean {
 
 		// Step 1 Get the MBeanServer
         try {
-            this.mbeanServer = MBeanServerLocator.locateJBoss();
+            //this.mbeanServer = MBeanServerLocator.locateJBoss();
+            this.mbeanServer = ManagementFactory.getPlatformMBeanServer();
         } catch (Exception e) {
             this.logger.error("Exception when obtaining of MBeanServer: " + e.getMessage(), e);
         }

@@ -22,12 +22,15 @@
 
 package org.mobicents.smsc.domain;
 
+import static org.junit.Assert.*;
 import static org.testng.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.util.Map;
 
+import javolution.xml.XMLBinding;
 import javolution.xml.XMLObjectReader;
 import javolution.xml.XMLObjectWriter;
 
@@ -61,6 +64,28 @@ public class HomeRoutingManagementTest {
         assertEquals(s5.getMccMnc(), "555");
     }
 
+    @org.junit.Test
+    public void testXMLParse() throws Exception {
+
+        try {
+
+            XMLBinding binding = new XMLBinding();
+            binding.setClassAttribute("type");
+            
+            String fileLocation = "/home/anatolysatanovskiy/telestax/smsc-compatibility/restcomm-smsc-7.4.0-SNAPSHOT/wildfly-10.1.0.Final/standalone/data/SmscManagement_cc_mccmnc.xml";
+            XMLObjectReader reader = XMLObjectReader.newInstance(new FileInputStream(fileLocation));
+            reader.setBinding(binding);
+            
+            CcMccmncCollection actual = reader.read("CcMccmncCollection", CcMccmncCollection.class);
+            org.junit.Assert.assertNotNull(actual);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            org.junit.Assert.fail();
+        }
+
+    }
+
     @Test(groups = { "HomeRoutingManagement" })
     public void testSerialition() throws Exception {
 
@@ -90,17 +115,17 @@ public class HomeRoutingManagementTest {
         int i1 = 0;
         for (CcMccmncImpl el : arr.values()) {
             switch (i1) {
-            case 0:
-                assertEquals(el.getCountryCode(), "11111");
-                assertEquals(el.getMccMnc(), "222");
-                assertEquals(el.getSmsc(), "00001");
-                break;
-            case 1:
-                assertNull(el.getSmsc());
-                break;
-            case 2:
-                assertEquals(el.getSmsc(), "");
-                break;
+                case 0:
+                    assertEquals(el.getCountryCode(), "11111");
+                    assertEquals(el.getMccMnc(), "222");
+                    assertEquals(el.getSmsc(), "00001");
+                    break;
+                case 1:
+                    assertNull(el.getSmsc());
+                    break;
+                case 2:
+                    assertEquals(el.getSmsc(), "");
+                    break;
             }
 
             i1++;

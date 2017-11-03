@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.management.ManagementFactory;
 import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -191,7 +192,8 @@ public class SipManagement implements SipManagementMBean {
 	public void start() throws Exception {
 
         try {
-            this.mbeanServer = MBeanServerLocator.locateJBoss();
+            //this.mbeanServer = MBeanServerLocator.locateJBoss();
+            this.mbeanServer = ManagementFactory.getPlatformMBeanServer();
         } catch (Exception e) {
             this.logger.error("Exception when obtaining of MBeanServer: " + e.getMessage(), e);
         }

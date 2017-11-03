@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.management.ManagementFactory;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -518,7 +519,8 @@ public class MProcManagement implements MProcManagementMBean {
         }
 
         try {
-            this.mbeanServer = MBeanServerLocator.locateJBoss();
+            //this.mbeanServer = MBeanServerLocator.locateJBoss();
+            this.mbeanServer = ManagementFactory.getPlatformMBeanServer();
         } catch (Exception e) {
         }
 

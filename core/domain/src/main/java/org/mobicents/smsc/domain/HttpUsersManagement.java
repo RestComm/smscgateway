@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.management.ManagementFactory;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -170,7 +171,8 @@ public class HttpUsersManagement implements HttpUsersManagementMBean {
         logger.info("Starting of HttpUsersManagement");
 
         try {
-            this.mbeanServer = MBeanServerLocator.locateJBoss();
+            //this.mbeanServer = MBeanServerLocator.locateJBoss();
+            this.mbeanServer = ManagementFactory.getPlatformMBeanServer();
         } catch (Exception e) {
         }
 
