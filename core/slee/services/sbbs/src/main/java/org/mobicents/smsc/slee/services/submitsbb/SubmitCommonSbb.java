@@ -293,58 +293,58 @@ public abstract class SubmitCommonSbb implements Sbb {
             MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(itsMProcRa, sms0, persistence);
 
             FastList<Sms> smss = mProcResult.getMessageList();
-            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
-                Sms sms = n.getValue();
-                TargetAddress ta = new TargetAddress(sms.getSmsSet());
-                TargetAddress lock = persistence.obtainSynchroObject(ta);
+            if (smss != null) {
+                for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
+                    Sms sms = n.getValue();
+                    TargetAddress ta = new TargetAddress(sms.getSmsSet());
+                    TargetAddress lock = persistence.obtainSynchroObject(ta);
 
-                try {
-                    sms.setTimestampC(System.currentTimeMillis());
+                    try {
+                        sms.setTimestampC(System.currentTimeMillis());
 
-                    synchronized (lock) {
-                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-                        if (!storeAndForwMode) {
-                            try {
-                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                            } catch (Exception e) {
-                                throw new SmscProcessingException("Exception when running injectSmsOnFly(): " + e.getMessage(),
-                                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
-                                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
-                                        SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_NOT_SET);
-                            }
-                        } else {
-                            // store and forward
-                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast
-                                    && sms.getScheduleDeliveryTime() == null) {
+                        synchronized (lock) {
+                            boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+                            if (!storeAndForwMode) {
                                 try {
-                                    sms.setStoringAfterFailure(true);
                                     this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                                 } catch (Exception e) {
-                                    throw new SmscProcessingException(
-                                            "Exception when running injectSmsOnFly(): " + e.getMessage(),
-                                            SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+                                    throw new SmscProcessingException("Exception when running injectSmsOnFly(): "
+                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
                                             SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
-                                            SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_FAST);
+                                            SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_NOT_SET);
                                 }
                             } else {
-                                try {
-                                    sms.setStored(true);
-                                    this.scheduler.setDestCluster(sms.getSmsSet());
-                                    persistence.c2_scheduleMessage_ReschedDueSlot(sms,
-                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-                                            false);
-                                } catch (PersistenceException e) {
-                                    throw new SmscProcessingException(
-                                            "PersistenceException when storing LIVE_SMS : " + e.getMessage(),
-                                            SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
-                                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
-                                            SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_NORMAL);
+                                // store and forward
+                                if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast
+                                        && sms.getScheduleDeliveryTime() == null) {
+                                    try {
+                                        sms.setStoringAfterFailure(true);
+                                        this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+                                    } catch (Exception e) {
+                                        throw new SmscProcessingException("Exception when running injectSmsOnFly(): "
+                                                + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+                                                SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
+                                                SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_FAST);
+                                    }
+                                } else {
+                                    try {
+                                        sms.setStored(true);
+                                        this.scheduler.setDestCluster(sms.getSmsSet());
+                                        persistence.c2_scheduleMessage_ReschedDueSlot(sms,
+                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+                                                false);
+                                    } catch (PersistenceException e) {
+                                        throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : "
+                                                + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+                                                SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
+                                                SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_NORMAL);
+                                    }
                                 }
                             }
                         }
+                    } finally {
+                        persistence.releaseSynchroObject(lock);
                     }
-                } finally {
-                    persistence.releaseSynchroObject(lock);
                 }
             }
 
