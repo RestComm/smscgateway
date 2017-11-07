@@ -111,7 +111,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private static final long ONE = 1L;
 
     // TODO: default value==100 / 2
-    protected static int MAX_MESSAGES_PER_STEP = 100;
+//    protected static int MAX_MESSAGES_PER_STEP = 100;
 
     protected SmppTransactionACIFactory smppServerTransactionACIFactory = null;
     protected SmppSessions smppServerSessions = null;
@@ -123,6 +123,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private static Charset ucs2Charset = Charset.forName("UTF-16BE");
     private static Charset isoCharset = Charset.forName("ISO-8859-1");
     private static Charset gsm7Charset = new GSMCharset("GSM", new String[] {});
+    
+    private Integer maxMessagesPerStep;
 
     public RxSmppServerSbb() {
         super(className);
@@ -137,6 +139,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
         try {
             Context ctx = (Context) new InitialContext().lookup("java:comp/env");
+            maxMessagesPerStep = ((Integer)ctx.lookup("maxMessagesPerStep"));
 
             this.smppServerTransactionACIFactory = (SmppTransactionACIFactory) ctx
                     .lookup("slee/resources/smppp/server/1.0/acifactory");
@@ -633,7 +636,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         // if not - skip sending and set temporary error
 
         try {
-            int deliveryMsgCnt = this.obtainNextMessagesSendingPool(MAX_MESSAGES_PER_STEP, ProcessingType.SMPP);
+            int deliveryMsgCnt = this.obtainNextMessagesSendingPool(maxMessagesPerStep, ProcessingType.SMPP);
             if (deliveryMsgCnt == 0) {
                 this.markDeliveringIsEnded(true);
                 return;
@@ -986,7 +989,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     
     @Override
     protected Integer getMaxMessagesPerStep() {
-        return MAX_MESSAGES_PER_STEP;
+        return maxMessagesPerStep;
     }
 
     /**
