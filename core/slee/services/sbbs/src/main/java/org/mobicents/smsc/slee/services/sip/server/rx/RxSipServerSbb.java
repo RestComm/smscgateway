@@ -510,6 +510,11 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
     protected void onDeliveryTimeout(SmsSet smsSet, String reason) {
         this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason);
     }
+    
+    @Override
+    protected Integer getMaxMessagesPerStep() {
+        return null;
+    }
 
 	/**
      * Processing a case when an error in message sending process. This stops of message sending, reschedule or drop messages

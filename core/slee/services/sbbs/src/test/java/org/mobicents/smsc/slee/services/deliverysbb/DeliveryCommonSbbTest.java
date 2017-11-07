@@ -797,6 +797,12 @@ public class DeliveryCommonSbbTest {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+        @Override
+        protected Integer getMaxMessagesPerStep() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 
     public class TracerImpl implements Tracer {

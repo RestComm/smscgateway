@@ -816,6 +816,9 @@ public class SMSCShellExecutor implements ShellExecutor {
             } else if (parName.equals("deliverytimeout")) {
                 int val = Integer.parseInt(options[3]);
                 smscPropertiesManagement.setDeliveryTimeout(val);
+            } else if (parName.equals("deliverytimeoutdeltapermessage")) {
+                int val = Integer.parseInt(options[3]);
+                smscPropertiesManagement.setDeliveryTimeoutDeltaPerMessage(val);
             } else if (parName.equals("vpprolong")) {
                 int val = Integer.parseInt(options[3]);
                 smscPropertiesManagement.setVpProlong(val);
@@ -1159,6 +1162,8 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getMaxActivityCount());
             } else if (parName.equals("deliverytimeout")) {
                 sb.append(smscPropertiesManagement.getDeliveryTimeout());
+            } else if (parName.equals("deliverytimeoutdeltapermessage")) {
+                sb.append(smscPropertiesManagement.getDeliveryTimeoutDeltaPerMessage());
             } else if (parName.equals("vpprolong")) {
                 sb.append(smscPropertiesManagement.getVpProlong());
             } else if (parName.equals("esmedefaultcluster")) {
@@ -1422,6 +1427,10 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("deliverytimeout = ");
             sb.append(smscPropertiesManagement.getDeliveryTimeout());
+            sb.append("\n");
+            
+            sb.append("deliverytimeoutdeltapermessage = ");
+            sb.append(smscPropertiesManagement.getDeliveryTimeoutDeltaPerMessage());
             sb.append("\n");
 
             sb.append("vpprolong = ");

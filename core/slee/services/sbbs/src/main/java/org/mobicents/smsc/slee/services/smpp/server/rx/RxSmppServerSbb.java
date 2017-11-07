@@ -983,6 +983,11 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason,
                 EventType.OUT_SMPP_TIMEOUT, -1);
     }
+    
+    @Override
+    protected Integer getMaxMessagesPerStep() {
+        return MAX_MESSAGES_PER_STEP;
+    }
 
     /**
      * Processing of a positive delivery response to smpp destination.

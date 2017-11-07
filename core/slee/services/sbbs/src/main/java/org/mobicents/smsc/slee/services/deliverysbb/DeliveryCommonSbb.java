@@ -519,7 +519,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                         this.setCurrentMsgNum(currentMsgNum);
                     }
 
-                    this.rescheduleDeliveryTimer();
+                    this.rescheduleDeliveryTimer(sendingPoolMsgCount);
 
                 }
             } finally {
@@ -534,8 +534,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
     /**
      * Arrange a new message sending pool with only one message in it. If no pending message then no message will be arranged to
      * a message sending pool. Previous arranging pool will be removed by this operation and pending messages in it will be
-     * marked as already processed. If you need to arrange more then one message in message sending pool you can use
-     * obtainNextMessagesSendingPool() method. Messages wit expired ValidityPeriod are not added to a sendingPoolMsg but are
+     * marked as already processed. If you need to arrange more than one message in message sending pool you can use
+     * obtainNextMessagesSendingPool() method. Messages with expired ValidityPeriod are not added to a sendingPoolMsg but are
      * processed as perm failed.
      *
      * @param processingType
@@ -589,7 +589,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     sequenceNumbers = null;
                     sequenceNumbersExtra = null;
 
-                    this.rescheduleDeliveryTimer();
+                    this.rescheduleDeliveryTimer(sendingPoolMsgCount);
 
                 }
             } finally {
@@ -826,11 +826,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
     // *********
     // Methods for managing of delivery timeout
 
-    protected void rescheduleDeliveryTimer() {
+    protected void rescheduleDeliveryTimer(int smsSetSize) {
         this.cancelDeliveryTimer();
 
         if (this.timerFacility != null) {
-            long startTime = System.currentTimeMillis() + 1000 * smscPropertiesManagement.getDeliveryTimeout();
+            int multiplier = getMaxMessagesPerStep() != null ? Math.min(smsSetSize, getMaxMessagesPerStep()) : smsSetSize; 
+            int adaptedDeliveryTimeout = smscPropertiesManagement.getDeliveryTimeout() + 
+                    smscPropertiesManagement.getDeliveryTimeoutDeltaPerMessage() * multiplier;
+            
+            long startTime = System.currentTimeMillis() + 1000 * adaptedDeliveryTimeout;
             TimerOptions options = new TimerOptions();
 
             ActivityContextInterface activity = getSchedulerActivityContextInterface();
@@ -859,6 +863,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
     }
 
     protected abstract void onDeliveryTimeout(SmsSet smsSet, String reason);
+    
+    protected abstract Integer getMaxMessagesPerStep();
 
     // *********
     // sending of responses to a message sender for the transactional messaging mode
