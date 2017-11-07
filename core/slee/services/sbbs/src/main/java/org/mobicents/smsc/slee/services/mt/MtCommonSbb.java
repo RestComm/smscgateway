@@ -362,6 +362,11 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason, true, null, false,
                 ProcessingType.SS7_MT);
     }
+	
+	@Override
+    protected Integer getMaxMessagesPerStep() {
+        return null;
+    }
 
     /**
      * Processing a case when an error in message sending process. This stops of message sending, reschedule or drop messages

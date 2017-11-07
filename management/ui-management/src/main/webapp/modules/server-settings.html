@@ -378,6 +378,12 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									<input id="deliveryTimeout" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
 								</span> 
 							</div>
+							<div id="div-deliveryTimeoutDeltaPerMessage" class="control-group">
+								<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to increase a length of delivery process timeout based on number of messages being currently delivered in a set. Time unit is seconds. Default value: 1 second.">
+									<span class="add-on">Delivery timeout delta per message (sec)</span>
+									<input id="deliveryTimeoutDeltaPerMessage" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" value="0" />
+								</span> 
+							</div>
 							<div class="control-group">
 								<span class="span12" style="text-align: left;">
 									&nbsp;<button class="btn btn-danger" onclick="updateScheduler();"><i class="icon-undo"></i> Revert</button>
@@ -985,6 +991,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 										$("#reviseSecondsOnSmscStart").val(response.value.ReviseSecondsOnSmscStart);
 										$("#processingSmsSetTimeout").val(response.value.ProcessingSmsSetTimeout);
 										$("#deliveryTimeout").val(response.value.DeliveryTimeout);
+										$("#deliveryTimeoutDeltaPerMessage").val(response.value.DeliveryTimeoutDeltaPerMessage);
 									}],
 									error: function(value) {
 										errorUID = ("st" + new Date().getTime()).hashCode();
@@ -1915,7 +1922,15 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 			    			formInvalid = true;
 			    		} else if($("#div-deliveryTimeout").hasClass("error")) {
 			    			$("#div-deliveryTimeout").removeClass("error");		
-			    		}	
+			    		}
+						
+						var deliveryTimeoutDeltaPerMessage = $("#deliveryTimeoutDeltaPerMessage").val();
+						if(deliveryTimeout.trim() == "") {
+			    			$("#div-deliveryTimeoutDeltaPerMessage").addClass("error");					    			
+			    			formInvalid = true;
+			    		} else if($("#div-deliveryTimeoutDeltaPerMessage").hasClass("error")) {
+			    			$("#div-deliveryTimeoutDeltaPerMessage").removeClass("error");		
+			    		}
 						
 						if(formInvalid) {
 							$("#login-settings-error").show();
@@ -1935,6 +1950,7 @@ day. If the Cassandra Database keeps tables for older days, then the administrat
 									{ type: "write", mbean: mbeanSearch, attribute: "ReviseSecondsOnSmscStart", value: reviseSecondsOnSmscStart },
 									{ type: "write", mbean: mbeanSearch, attribute: "ProcessingSmsSetTimeout", value: processingSmsSetTimeout },
 									{ type: "write", mbean: mbeanSearch, attribute: "DeliveryTimeout", value: deliveryTimeout },
+									{ type: "write", mbean: mbeanSearch, attribute: "DeliveryTimeoutDeltaPerMessage", value: deliveryTimeoutDeltaPerMessage },
 								],
 								{
 									success: function(response) {

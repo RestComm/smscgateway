@@ -1,0 +1,16 @@
+Name
+	smsc get deliverytimeoutdeltapermessage
+
+SYNOPSIS
+	smsc get deliverytimeoutdeltapermessage
+
+DESCRIPTION
+	This command is used to increase a length of delivery process timeout based on 
+	number of messages being currently delivered in a set. Time unit is seconds. 
+	Default value: 1 second.
+
+EXAMPLES
+	smsc get deliverytimeoutdeltapermessage
+
+SEE ALSO
+	smsc get deliverytimeout, smsc set deliverytimeout, smsc set maxactivitycount

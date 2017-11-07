@@ -77,6 +77,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	private static final String FETCH_MAX_ROWS = "fetchMaxRows";
     private static final String MAX_ACTIVITY_COUNT = "maxActivityCount";
     private static final String DELIVERY_TIMEOUT = "deliveryTimeout";
+    private static final String DELIVERY_TIMEOUT_DELTA_PER_MESSAGE = "deliveryTimeoutDeltaPerMessage";
     private static final String VP_PROLONG = "vpProlong";
     private static final String SMPP_ENCODING_FOR_UCS2 = "smppEncodingForUCS2";
     private static final String SMPP_ENCODING_FOR_GSM7 = "smppEncodingForGsm7";
@@ -218,6 +219,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // delivery process timeout in seconds (timeout occurs if no actions for delivering (delivery confirmation or deliver a new
     // item) for long time)
     private int deliveryTimeout = 120;
+    // delivery process timeout delta per message in seconds
+    private int deliveryTimeoutDeltaPerMessage = 1;
     // Validity period scheduling prolongation.
     // Conditions when a message with validity period will be scheduled after delivery failure:
     // a) validity period end time >= the time for next schedule time
@@ -807,6 +810,15 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setDeliveryTimeout(int deliveryTimeout) {
         this.deliveryTimeout = deliveryTimeout;
+        this.store();
+    }
+
+    public int getDeliveryTimeoutDeltaPerMessage() {
+        return deliveryTimeoutDeltaPerMessage;
+    }
+
+    public void setDeliveryTimeoutDeltaPerMessage(int deliveryTimeoutDeltaPerMessage) {
+        this.deliveryTimeoutDeltaPerMessage = deliveryTimeoutDeltaPerMessage;
         this.store();
     }
 
@@ -1543,6 +1555,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 			writer.write(this.esmeDefaultClusterName, ESME_DEFAULT_CLUSTER_NAME, String.class);
             writer.write(this.maxActivityCount, MAX_ACTIVITY_COUNT, Integer.class);
             writer.write(this.deliveryTimeout, DELIVERY_TIMEOUT, Integer.class);
+            writer.write(this.deliveryTimeoutDeltaPerMessage, DELIVERY_TIMEOUT_DELTA_PER_MESSAGE, Integer.class);
             writer.write(this.vpProlong, VP_PROLONG, Integer.class);
 //			writer.write(this.isSMSHomeRouting, SMS_HOME_ROUTING, Boolean.class);
             writer.write(this.smppEncodingForGsm7.toString(), SMPP_ENCODING_FOR_GSM7, String.class);
@@ -1744,6 +1757,11 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             val = reader.read(DELIVERY_TIMEOUT, Integer.class);
             if (val != null)
                 this.deliveryTimeout = val;
+            
+            val = reader.read(DELIVERY_TIMEOUT_DELTA_PER_MESSAGE, Integer.class);
+            if (val != null)
+                this.deliveryTimeoutDeltaPerMessage = val;
+            
             val = reader.read(VP_PROLONG, Integer.class);
             if (val != null)
                 this.vpProlong = val;

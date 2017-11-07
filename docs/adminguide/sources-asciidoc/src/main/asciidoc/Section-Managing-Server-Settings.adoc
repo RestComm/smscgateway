@@ -1644,8 +1644,44 @@ EXAMPLES
 . You must click on the button 'Save' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
+[[_deliverytimeoutdeltapermessage]]
+=== Delivery timeout delta per message
 
+[[_deliverytimeoutdeltapermessage_cli]]
+==== Using CLI
 
+You can set the 'Delivery timeout delta per message' value by issuing the command `smsc set deliverytimeoutdeltapermessage` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get deliverytimeoutdeltapermessage` which will display the value set for this property.
+If unspecified, the default value for this parameter is 1 second.
+Generally, you may not have to modify this value. 
+
+----
+
+Name
+	smsc set deliverytimeoutdeltapermessage
+
+SYNOPSIS
+	smsc set deliverytimeoutdeltapermessage <delivery-timeout-delta-per-message>
+
+DESCRIPTION
+	This command is used to increase a length of delivery process timeout based on 
+	number of messages being currently delivered in a set. Time unit is seconds. 
+	Default value: 1 second.
+
+EXAMPLES
+	smsc set deliverytimeoutdeltapermessage 120
+----
+
+[[_deliverytimeoutdeltapermessage_gui]]
+==== Using GUI
+
+.Procedure: Set Delivery timeout delta per message using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Scheduler' tab in the GUI. 
+. You can specify the Delivery timeout delta per message in seconds by entering the value in the text field 'Delivery timeout delta per message (sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
 
 
 

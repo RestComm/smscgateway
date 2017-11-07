@@ -29,6 +29,7 @@
 <nationalLanguageLockingShift value="0"/>
 <maxActivityCount value="500"/>
 <deliveryTimeout value="120"/>
+<deliveryTimeoutDeltaPerMessage value="1"/>
 <vpProlong value="120"/>
 <smppEncodingForGsm7 value="Utf8"/>
 <smppEncodingForUCS2 value="Utf8"/>
