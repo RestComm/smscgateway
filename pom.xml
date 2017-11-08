@@ -61,7 +61,6 @@
 		
 		<!-- restcomm properties -->
 		<jss7.restcomm.version>7.4.0-SNAPSHOT</jss7.restcomm.version>
-		<jss7.version>7.4.0-SNAPSHOT</jss7.version>
 		<dialogic.version>6.7.1</dialogic.version>
 		<ts.slee.version>2.8.10</ts.slee.version>
 		<jslee.ext.version>${ts.slee.version}</jslee.ext.version>
