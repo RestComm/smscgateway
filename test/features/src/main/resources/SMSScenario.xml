@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<steppedScenario>
+    <steps>
+        <cmdArguments>com.cloudhopper.smpp.pdu.SubmitSm</cmdArguments>
+        <cmdArguments>sourceAddress=6666</cmdArguments>
+        <cmdArguments>destAddress=7777</cmdArguments>
+        <cmdArguments>shortMessage=sample message longer than usual with more than 160 characters, sample message longer than usual with more than 160 characters, sample message longer than usual with more than 160 characters.</cmdArguments>
+        <cmdArguments>esmClass=3</cmdArguments>
+        <timeout>30000</timeout>
+        <type>send</type>
+        <startRTD>1</startRTD>
+    </steps>
+    <steps>
+        <cmdArguments>fireExpectedPduResponseReceived</cmdArguments>
+        <timeout>5000</timeout>
+        <type>receive</type>
+        <stopRTD>1</stopRTD>
+    </steps>          
+</steppedScenario>

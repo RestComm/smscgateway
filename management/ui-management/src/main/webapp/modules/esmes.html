@@ -414,7 +414,21 @@
 						<span class="add-on">Max Message Length</span>
 						<input id="maxMessageLength" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Max Message Length" value="-1"/>
 					</span>	
-				</div>																															
+				</div>		
+				
+				<div id="div-overloadThreshold" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If queue of messages which SMSC hasn't received responses for builds up to this value, the Overload Threshold will be triggered.">
+						<span class="add-on">Overload Threshold</span>
+						<input id="overloadThreshold" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Overload Threshold" value="-1"/>
+					</span>	
+				</div>		
+				
+				<div id="div-normalThreshold" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If queue of messages which SMSC hasn't received responses for goes down to this value, the Normal Threshold will be triggered.">
+						<span class="add-on">Normal Threshold</span>
+						<input id="normalThreshold" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Normal Threshold" value="-1"/>
+					</span>	
+				</div>																													
 
 				<div id="div-splitLongMessages" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If true long messages will be split before sending to this destination">
@@ -657,7 +671,9 @@
 		var minMessageLength = response.value.MinMessageLength;
 		var maxMessageLength = response.value.MaxMessageLength;
 		
-		
+		var overloadThreshold = response.value.OverloadThreshold;
+		var normalThreshold = response.value.NormalThreshold;
+				
 		if(systemType == null || systemType==""){
 			systemType = "null";
 		}
@@ -776,6 +792,8 @@
 						'<dt>DestAddrSendLimit</dt> <dd>' + destAddrSendLimit + ' </dd>' +
 						'<dt>MinMessageLength</dt> <dd>' + minMessageLength + ' </dd>' +
 						'<dt>MaxMessageLength</dt> <dd>' + maxMessageLength + ' </dd>' +
+						'<dt>OverloadThreshold</dt> <dd>' + overloadThreshold + ' </dd>' +
+						'<dt>NormalThreshold</dt> <dd>' + normalThreshold + ' </dd>' +
 					    '<dt>SplitLongMessages</dt> <dd>' + splitLongMessages + ' </dd>' + 
 						'</dl>'+
 		        '    </div>'+	
@@ -1369,23 +1387,55 @@
 											'</td>'+
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxMessageLength"+']\').toggle(); $(\'input[id^='+name+"MaxMessageLength"+']\').focus();"></i>' +
 											'</td>'+
-										'</tr>'+																	
+										'</tr>'+	
+										
+										'<tr data-toggle="tooltip" title="If queue of messages which SMSC hasn\'t received responses for builds up to this value, the Overload Threshold will be triggered.">'+
+											'<td style="font-size: 0.9em;">Overload Threshold</td>'+
+											'<td style="font-size: 0.9em; padding: 0;">'+
+												'<div id="div-' + name +'OverloadThreshold-input" class="control-group">'+
+												'<span id="' + name +'OverloadThreshold-input" style="display: none;">'+
+													'<input type="text" class="input-small" value="' + overloadThreshold + '" /> ' +
+													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'OverloadThreshold\', \'' + name+"OverloadThreshold" + '\', \'false\')"></i> ' +
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"OverloadThreshold"+']\').toggle(); $(\'input[id^='+name+"OverloadThreshold"+']\').focus();"></i>' + 
+												'</span>'+
+												'</div>' +
+												'<span id="' +name + 'OverloadThreshold-text">' + overloadThreshold + '</span>'+
+											'</td>'+
+											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"OverloadThreshold"+']\').toggle(); $(\'input[id^='+name+"OverloadThreshold"+']\').focus();"></i>' +
+											'</td>'+
+										'</tr>'+
+										
+										'<tr data-toggle="tooltip" title="If queue of messages which SMSC hasn\'t received responses for goes down to this value, the Normal Threshold will be triggered.">'+
+											'<td style="font-size: 0.9em;">Normal Threshold</td>'+
+											'<td style="font-size: 0.9em; padding: 0;">'+
+												'<div id="div-' + name +'NormalThreshold-input" class="control-group">'+
+												'<span id="' + name +'NormalThreshold-input" style="display: none;">'+
+													'<input type="text" class="input-small" value="' + normalThreshold + '" /> ' +
+													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'NormalThreshold\', \'' + name+"NormalThreshold" + '\', \'false\')"></i> ' +
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NormalThreshold"+']\').toggle(); $(\'input[id^='+name+"NormalThreshold"+']\').focus();"></i>' + 
+												'</span>'+
+												'</div>' +
+												'<span id="' +name + 'NormalThreshold-text">' + normalThreshold + '</span>'+
+											'</td>'+
+											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"NormalThreshold"+']\').toggle(); $(\'input[id^='+name+"NormalThreshold"+']\').focus();"></i>' +
+											'</td>'+
+										'</tr>'+
 
-											'<tr data-toggle="tooltip" title="If true long messages will be split before sending to this destination">'+
-												'<td style="font-size: 0.9em;">Long message splitting</td>'+
-												'<td style="font-size: 0.9em; padding: 0;">'+
-													'<div id="div-' + name +'SplitLongMessages-input" class="control-group">'+
-													'<span id="' + name +'SplitLongMessages-input" style="display: none;">'+
-														'<input type="text" class="input-small" value="' + splitLongMessages + '" /> ' +
-														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SplitLongMessages\', \'' + name+"SplitLongMessages" + '\', \'true\')"></i> ' +
-														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' + 
-													'</span>'+
-													'</div>' +
-													'<span id="' +name + 'SplitLongMessages-text">' + splitLongMessages + '</span>'+
-												'</td>'+
-												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' +
-												'</td>'+
-											'</tr>'+																	
+										'<tr data-toggle="tooltip" title="If true long messages will be split before sending to this destination">'+
+											'<td style="font-size: 0.9em;">Long message splitting</td>'+
+											'<td style="font-size: 0.9em; padding: 0;">'+
+												'<div id="div-' + name +'SplitLongMessages-input" class="control-group">'+
+												'<span id="' + name +'SplitLongMessages-input" style="display: none;">'+
+													'<input type="text" class="input-small" value="' + splitLongMessages + '" /> ' +
+													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SplitLongMessages\', \'' + name+"SplitLongMessages" + '\', \'true\')"></i> ' +
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' + 
+												'</span>'+
+												'</div>' +
+												'<span id="' +name + 'SplitLongMessages-text">' + splitLongMessages + '</span>'+
+											'</td>'+
+											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' +
+											'</td>'+
+										'</tr>'+																	
 											
 										'</tbody>' +
 									'</table>' +															
@@ -2208,7 +2258,17 @@
 		var maxMessageLength = $("#maxMessageLength").val();
 		if(maxMessageLength == "") {
 			maxMessageLength = "-1";
-		}			
+		}
+		
+		var overloadThreshold = $("#overloadThreshold").val();
+		if(overloadThreshold == "") {
+			overloadThreshold = "-1";
+		}
+		
+		var normalThreshold = $("#normalThreshold").val();
+		if(normalThreshold == "") {
+			normalThreshold = "-1";
+		}
 		
 		if(formInvalid) {
 			$("#login-settings-error").show();
@@ -2218,7 +2278,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength, 
+		jolokia.execute("org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength,overloadThreshold,normalThreshold, 
 				{
 					success: function(value) {
 						updateEsmes();

@@ -124,7 +124,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private static Charset isoCharset = Charset.forName("ISO-8859-1");
     private static Charset gsm7Charset = new GSMCharset("GSM", new String[] {});
     
-    private Integer maxMessagesPerStep;
+    protected Integer maxMessagesPerStep;
 
     public RxSmppServerSbb() {
         super(className);
@@ -573,7 +573,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         pduEvent = event.getResponse();
 
                     EsmeManagement esmeManagement = EsmeManagement.getInstance();
-                    Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+                    Esme esme = esmeManagement.getEsmeByName(smsSet.getDestEsmeName());
                     boolean destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
 
                     int realID = -1;
