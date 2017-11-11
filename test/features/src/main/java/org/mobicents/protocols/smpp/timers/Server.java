@@ -64,7 +64,7 @@ public class Server {
     
     private DefaultSmppSessionHandler sessionHandler;
     private DefaultSmppServerHandler serverHandler;
-    DefaultSmppServer smppServer;
+    public DefaultSmppServer smppServer;
 
     public Server(DefaultSmppSessionHandler handler) {
         this.sessionHandler = handler;
@@ -115,7 +115,7 @@ public class Server {
 
         logger.info("Starting SMPP server...");
         smppServer.start();
-        logger.info("SMPP server started");
+        logger.info("SMPP server started.");
         
     }
     
@@ -133,9 +133,8 @@ public class Server {
             deliver.setEsmClass((byte) esmClass);
             
             SmppServerSession smppServerSession = serverHandler.getSession();
-            
             smppServerSession.sendRequestPdu(deliver, 30000, false);
-
+            
         } catch (Exception e) {
             logger.error("", e);
         }

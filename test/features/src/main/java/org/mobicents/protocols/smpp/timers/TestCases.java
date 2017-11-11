@@ -21,6 +21,7 @@ import javax.management.ObjectName;
 import javax.management.remote.*;
 
 import org.apache.log4j.Logger;
+import org.mobicents.protocols.smpp.HelperClass;
 import org.restcomm.smpp.Esme;
 
 public class TestCases {
@@ -49,31 +50,10 @@ public class TestCases {
     private int localPort = 56789;
 
     private String message = "Hi======";
-    
+
     private AtomicInteger reqReceived;
 
     private ScheduledThreadPoolExecutor monitorExecutor;
-
-    public Esme createEsme(String type, String esmeName, String systemId, String password, String localAddress, int localPort,
-            String srcAdressRange) throws Exception {
-        String[] signature = new String[] { String.class.getName(), String.class.getName(), String.class.getName(),
-                String.class.getName(), int.class.getName(), boolean.class.getName(), String.class.getName(),
-                String.class.getName(), String.class.getName(), byte.class.getName(), byte.class.getName(),
-                String.class.getName(), String.class.getName(), int.class.getName(), long.class.getName(), long.class.getName(),
-                long.class.getName(), long.class.getName(), long.class.getName(), String.class.getName(),
-                boolean.class.getName(), Boolean.class.getName(), Boolean.class.getName(), Boolean.class.getName(),
-                int.class.getName(), int.class.getName(), long.class.getName(), int.class.getName(), int.class.getName(),
-                String.class.getName(), int.class.getName(), int.class.getName(), String.class.getName(), int.class.getName(),
-                boolean.class.getName(), long.class.getName(), long.class.getName(), long.class.getName(), long.class.getName(),
-                int.class.getName(), int.class.getName(), int.class.getName(), int.class.getName(), int.class.getName() };
-
-        Object[] params = new Object[] { esmeName, systemId, password, localAddress, localPort, false, "TRANSCEIVER", "", "3.4",
-                (byte) 0xFF, (byte) 0xFF, srcAdressRange, type, 7, 10000L, -1L, 5000L, -1L, 60000L, type + esmeName, true,
-                new Boolean(false), new Boolean(false), new Boolean(false), 30000, 0, 0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1,
-                srcAdressRange, 122, false, 0L, 0L, 0L, 0L, -1, -1, 1, -1, -1 };
-
-        return (Esme) mbsc.invoke(esmeManagementName, "createEsme", params, signature);
-    }
 
     @BeforeClass
     public void setUpClass() throws Exception {
@@ -100,20 +80,22 @@ public class TestCases {
         clientEsmes = new Esme[numClientEsmes];
         serverEsmes = new Esme[numServerEsmes];
 
+        String type = "";
+        String esmeName = "";
         for (int i = 0; i < numClientEsmes; i++) {
-            clientEsmes[i] = createEsme("SERVER", esmeNamePref + i, systemId, password, localAddress, -1,
-                    String.valueOf(3333 + i));
-            String[] signature = new String[] { String.class.getName() };
-            Object[] params = new Object[] { esmeNamePref + i };
-            mbsc.invoke(esmeManagementName, "startEsme", params, signature);
+            type = "SERVER";
+            esmeName = esmeNamePref + i;
+            clientEsmes[i] = HelperClass.createEsme(mbsc, esmeManagementName, type, esmeName, type + esmeName, systemId, password,
+                    localAddress, -1, String.valueOf(3333 + i));
+            HelperClass.startEsme(mbsc, esmeManagementName, esmeNamePref + i);
         }
 
         for (int i = 0; i < numServerEsmes; i++) {
-            serverEsmes[i] = createEsme("CLIENT", esmeNamePref + "_" + i, systemId, password, localAddress, localPort - i - 1,
-                    String.valueOf(3333 - i - 1));
-            String[] signature = new String[] { String.class.getName() };
-            Object[] params = new Object[] { esmeNamePref + "_" + i };
-            mbsc.invoke(esmeManagementName, "startEsme", params, signature);
+            type = "CLIENT";
+            esmeName = esmeNamePref + "_" + i;
+            serverEsmes[i] = HelperClass.createEsme(mbsc, esmeManagementName, type, esmeName, type + esmeName, systemId,
+                    password, localAddress, localPort - i - 1, String.valueOf(3333 - i - 1));
+            HelperClass.startEsme(mbsc, esmeManagementName, esmeNamePref + "_" + i);
         }
 
         // to enable automatic expiration of requests, a second scheduled
@@ -136,18 +118,15 @@ public class TestCases {
     @AfterClass
     public void tearDownClass() throws Exception {
         logger.info("tearDownClass");
-        String[] signature = new String[] { String.class.getName() };
 
         for (Esme esme : clientEsmes) {
-            Object[] params = new Object[] { esme.getName() };
-            mbsc.invoke(esmeManagementName, "stopEsme", params, signature);
-            mbsc.invoke(esmeManagementName, "destroyEsme", params, signature);
+            HelperClass.stopEsme(mbsc, esmeManagementName, esme.getName());
+            HelperClass.destroyEsme(mbsc, esmeManagementName, esme.getName());
         }
 
         for (Esme esme : serverEsmes) {
-            Object[] params = new Object[] { esme.getName() };
-            mbsc.invoke(esmeManagementName, "stopEsme", params, signature);
-            mbsc.invoke(esmeManagementName, "destroyEsme", params, signature);
+            HelperClass.stopEsme(mbsc, esmeManagementName, esme.getName());
+            HelperClass.destroyEsme(mbsc, esmeManagementName, esme.getName());
         }
 
         monitorExecutor.shutdownNow();
@@ -267,60 +246,58 @@ public class TestCases {
 
         Thread.sleep(150000);
     }
-    
+
     @Test
     public void test3_client_server() throws Exception {
         System.out.println("Starting test3_client_server");
-        
+
         reqReceived = new AtomicInteger(0);
-        
+
         ActivityTimeoutSmppSessionHandler handler = new ActivityTimeoutSmppSessionHandler(monitorExecutor, 22, reqReceived);
         startEsmes(handler);
         handler.setSession(servers[0].getServerHandler().getSession());
 
         for (int i = 0; i < 5; i++)
             clients[0].sendRequestPdu(message + i + "======", "3333", "3332");
-        
+
         Thread.sleep(60000);
         for (int i = 5; i < 10; i++)
             clients[0].sendRequestPdu(message + i + "======", "3333", "3332");
-      
-//        monitorExecutor.schedule(new Runnable() {
-//            
-//            @Override
-//            public void run() {
-//                for (int i = 10; i < 20; i++)
-//                    clients[0].sendRequestPdu(message + i + "======", "3333", "3332");
-//            }
-//        }, 60, TimeUnit.SECONDS);
+
+        // monitorExecutor.schedule(new Runnable() {
+        //
+        // @Override
+        // public void run() {
+        // for (int i = 10; i < 20; i++)
+        // clients[0].sendRequestPdu(message + i + "======", "3333", "3332");
+        // }
+        // }, 60, TimeUnit.SECONDS);
 
         logger.info("Waiting for response to be sent");
 
-        
         Thread.sleep(200000);
         assertEquals(reqReceived.get(), 10);
     }
-    
+
     @Test
     public void test4_client_server() throws Exception {
         System.out.println("Starting test_client_server");
-        
+
         reqReceived = new AtomicInteger(0);
-        
+
         ActivityTimeoutSmppSessionHandler handler = new ActivityTimeoutSmppSessionHandler(monitorExecutor, 14, reqReceived);
         startEsmes(handler);
         handler.setSession(servers[0].getServerHandler().getSession());
 
         for (int i = 0; i < 10; i++)
             clients[0].sendRequestPdu(message + i + "======", "3333", "3332");
-        
+
         Thread.sleep(60000);
         for (int i = 10; i < 20; i++)
             clients[0].sendRequestPdu(message + i + "======", "3333", "3332");
 
         logger.info("Waiting for response to be sent");
 
-        
         Thread.sleep(500000);
         assertEquals(reqReceived.get(), 18);
     }
