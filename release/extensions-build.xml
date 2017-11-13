@@ -30,6 +30,7 @@
 
 	<target name="deploy">
 
+		<!-- Reference to smsc module from SLEE -->
 		<xmltask source="${jboss.modules.path}/org/restcomm/slee/container/lib/main/module.xml" dest="${jboss.modules.path}/org/restcomm/slee/container/lib/main/module.xml">
 			<remove path="/:module/:dependencies/:module[@name='org.mobicents.smsc.bootstrap']" />
 			<insert path="/:module/:dependencies/:module[last()]" position="after">
@@ -40,23 +41,36 @@
 		<xmlproperty file="${jboss.standalone.path}/configuration/standalone.xml" keeproot="true" />
 		<property name="serverXmlns" value="${server(xmlns)}" />
 
+		<!-- Adding of smsc extension -->
 		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
 			<insert path="/:server/:extensions/:extension[last()]" position="after">
 				<![CDATA[<extension xmlns="${serverXmlns}" module="org.mobicents.smsc.bootstrap"/>]]>
 			</insert>
 		</xmltask>
 
+		<!-- Updating of subsystem smpp-extensions - removing of ShellExecutor bean -->
 		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
 			<remove path="/:server/:profile/*[local-name()='subsystem'][namespace-uri()='urn:org.restcomm:smpp-extensions:1.0']/*[local-name()='mbean'][@name='ShellExecutor']" />
 		</xmltask>
-		
+
+		<!-- Updating of subsystem ss7-wildfly with needed by SMSC stack set -->
 		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
-			<remove path="/:server/:profile/*[local-name()='subsystem'][namespace-uri()='urn:org.restcomm:ss7-wildfly:1.0']/*[local-name()='mbean'][@name='ShellExecutor']" />
+			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.restcomm:ss7-wildfly:1.0'][@reflection]]" />
+			<insert path="/:server/:profile/*[local-name()='subsystem'][last()]" position="after" file="wildfly-jss7-subsystem.txt">
+			</insert>
 		</xmltask>
 
+		<!-- Adding of subsystem smsc-extensions -->
 		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
 			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.mobicents:smsc-extensions:1.0'][@reflection]]" />
 			<insert path="/:server/:profile/*[local-name()='subsystem'][last()]" position="after" file="wildfly-smsc-subsystem.txt">
+			</insert>
+		</xmltask>
+
+		<!-- Updating of domain:logging for SMSC settings -->
+		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
+			<remove path="/:server/:profile/*[local-name()='subsystem'][*[namespace-uri()='urn:jboss:domain:logging:3.0']]" />
+			<insert path="/:server/:profile/*[local-name()='subsystem'][last()]" position="after" file="smsc-logging.txt">
 			</insert>
 		</xmltask>
 
@@ -79,8 +93,6 @@
 	</target>
 
 	<target name="undeploy">
-		
-		<delete dir="${restcomm-smsc.path}" />
 
 		<xmltask source="${jboss.modules.path}/org/restcomm/slee/container/lib/main/module.xml" dest="${jboss.modules.path}/org/restcomm/slee/container/lib/main/module.xml">
 			<remove path="/:module/:dependencies/:module[@name='org.mobicents.smsc.bootstrap']" />
@@ -91,9 +103,21 @@
 		</xmltask>
 
 		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
+			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.restcomm:ss7-wildfly:1.0'][@reflection]]" />
+		</xmltask>
+
+		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
 			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.mobicents:smsc-extensions:1.0']]" />
 		</xmltask>
 
+		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
+			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.mobicents:smsc-extensions:1.0'][@reflection]]" />
+		</xmltask>
+
+		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
+			<remove path="/:server/:profile/*[local-name()='subsystem'][*[namespace-uri()='urn:jboss:domain:logging:3.0']]" />
+		</xmltask>
+		
 		<delete dir="${restcomm-smsc.path}" />
 	</target>
 	

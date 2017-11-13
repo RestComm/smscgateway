@@ -1,7 +1,9 @@
 <subsystem xmlns="urn:org.mobicents:smsc-extensions:1.0">
             <mbean name="SS7Clock" type="SS7Clock"/>
             <mbean name="SS7Scheduler" type="SS7Scheduler"/>
-            <mbean name="SmscManagement" type="SmscManagement"/>
+            <mbean name="SmscManagement" type="SmscManagement">
+                <property name="MProcRuleFactories" type="String" value="org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault"/>
+            </mbean>
             <mbean name="SMSCShellExecutor" type="SMSCShellExecutor"/>
             <mbean name="ShellExecutor" type="ShellExecutor">
                 <property name="address" type="String" value="127.0.0.1"/>

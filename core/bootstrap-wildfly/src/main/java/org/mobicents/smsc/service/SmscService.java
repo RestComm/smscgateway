@@ -1,5 +1,7 @@
 package org.mobicents.smsc.service;
 
+import java.util.ArrayList;
+
 import javolution.util.FastList;
 
 import org.jboss.as.controller.services.path.PathManager;
@@ -12,6 +14,7 @@ import org.mobicents.protocols.ss7.scheduler.Scheduler;
 import org.mobicents.smsc.domain.SMSCShellExecutor;
 import org.mobicents.smsc.domain.SmscManagement;
 import org.mobicents.smsc.domain.SmscStatProviderJmx;
+import org.mobicents.smsc.mproc.MProcRuleFactory;
 import org.mobicents.ss7.management.console.ShellExecutor;
 import org.mobicents.ss7.management.console.ShellServer;
 import org.mobicents.ss7.management.console.ShellServerWildFly;
@@ -91,6 +94,26 @@ public class SmscService implements Service<SmscService> {
         }
         return (result == null) ? defaultValue : result;
     }
+
+//    private ArrayList<String> getPropertyMProcRuleFactory() {
+//        ModelNode propertyNode = peek(fullModel, "mbean", "SmscManagement", "property", "MProcRuleFactory");
+//        ArrayList<String> res = new ArrayList<String>();
+//        if (propertyNode != null && propertyNode.isDefined()) {
+//            int i1 = 0;
+//            while (propertyNode.hasDefined(i1)) {
+//                i1++;
+//                ModelNode node = propertyNode.get(i1);
+//                if (node.isDefined()) {
+//                    String s = propertyNode.get("name").asString();
+//                    if (s != null) {
+//                        res.add(s);
+//                    }
+//                }
+//            }
+//        }
+//
+//        return res;
+//    }
 
     private int getPropertyInt(String mbeanName, String propertyName, int defaultValue) {
         int result = defaultValue;
@@ -186,6 +209,25 @@ public class SmscService implements Service<SmscService> {
         SmscManagement smscManagementMBean = SmscManagement.getInstance("SmscManagement");
         smscManagementMBean.setPersistDir(dataDir);
         smscManagementMBean.setSmppManagement(smppManagement);
+
+        ArrayList<MProcRuleFactory> ruleFactories = new ArrayList<MProcRuleFactory>();
+        String factoryNames = getPropertyString("SmscManagement", "MProcRuleFactories",
+                "org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault");
+        String[] mProcRuleFactories = factoryNames.split(",");
+        ClassLoader parent = SmscService.class.getClassLoader();
+        for (String s : mProcRuleFactories) {
+            try {
+                log.info("Loading mproc Factory class: " + s);
+                Class<MProcRuleFactory> c = (Class<MProcRuleFactory>) parent.loadClass(s);
+                MProcRuleFactory fact = c.newInstance();
+                ruleFactories.add(fact);
+                log.info("Loaded mproc Factory class: " + s + ", object: " + fact);
+            } catch (Throwable e) {
+                log.error("Error of loading mproc Factory class: " + s, e);
+            }
+        }
+        smscManagementMBean.setMProcRuleFactories(ruleFactories);
+
         try {
             smscManagementMBean.start();
         } catch (Exception e) {

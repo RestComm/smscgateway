@@ -1,4 +1,19 @@
-<periodic-rotating-file-handler name="CDR" autoflush="true">
+<subsystem xmlns="urn:jboss:domain:logging:3.0">
+            <console-handler name="CONSOLE">
+                <level name="INFO"/>
+                <formatter>
+                    <named-formatter name="COLOR-PATTERN"/>
+                </formatter>
+            </console-handler>
+            <periodic-rotating-file-handler autoflush="true" name="FILE">
+                <formatter>
+                    <named-formatter name="PATTERN"/>
+                </formatter>
+                <file path="server.log" relative-to="jboss.server.log.dir"/>
+                <suffix value=".yyyy-MM-dd"/>
+                <append value="true"/>
+            </periodic-rotating-file-handler>
+            <periodic-rotating-file-handler name="CDR" autoflush="true">
                 <formatter>
                     <named-formatter name="PATTERN"/>
                 </formatter>
@@ -6,7 +21,7 @@
                 <suffix value=".yyyy-MM-dd"/>
                 <append value="true"/>
             </periodic-rotating-file-handler>
-	    <periodic-rotating-file-handler name="CDR_DETAILED" autoflush="true">
+            <periodic-rotating-file-handler name="CDR_DETAILED" autoflush="true">
                 <formatter>
                     <named-formatter name="PATTERN"/>
                 </formatter>
@@ -14,7 +29,7 @@
                 <suffix value=".yyyy-MM-dd"/>
                 <append value="true"/>
             </periodic-rotating-file-handler>
-	    <periodic-rotating-file-handler name="STATS" autoflush="true">
+            <periodic-rotating-file-handler name="STATS" autoflush="true">
                 <formatter>
                     <named-formatter name="PATTERN"/>
                 </formatter>
@@ -22,7 +37,7 @@
                 <suffix value=".yyyy-MM-dd"/>
                 <append value="true"/>
             </periodic-rotating-file-handler>
-	    <periodic-rotating-file-handler name="CSVSTATS" autoflush="true">
+            <periodic-rotating-file-handler name="CSVSTATS" autoflush="true">
                 <formatter>
                     <named-formatter name="PATTERN"/>
                 </formatter>
@@ -31,27 +46,50 @@
                 <append value="true"/>
             </periodic-rotating-file-handler>
 
-	    <logger category="org.mobicents.smsc.library.CdrGenerator">
+            <logger category="org.mobicents.smsc.library.CdrGenerator" use-parent-handlers="false">
                 <level name="DEBUG"/>
-		<handlers>
+                <handlers>
                     <handler name="CDR"/>
                 </handlers>
             </logger>
-	    <logger category="org.mobicents.smsc.library.CdrDetailedGenerator">
+            <logger category="org.mobicents.smsc.library.CdrDetailedGenerator" use-parent-handlers="false">
                 <level name="DEBUG"/>
-		<handlers>
+		        <handlers>
                     <handler name="CDR_DETAILED"/>
                 </handlers>
             </logger>
-	    <logger category="org.mobicents.protocols.ss7.oam.common.statistics.StatsPrinter">
+            <logger category="org.mobicents.protocols.ss7.oam.common.statistics.StatsPrinter" use-parent-handlers="false">
                 <level name="DEBUG"/>
-		<handlers>
+                <handlers>
                     <handler name="STATS"/>
                 </handlers>
             </logger>
-	    <logger category="org.mobicents.protocols.ss7.oam.common.statistics.CsvStatsPrinter">
+            <logger category="org.mobicents.protocols.ss7.oam.common.statistics.CsvStatsPrinter" use-parent-handlers="false">
                 <level name="DEBUG"/>
-		<handlers>
-                    <handler name="CSVSTATS"/>
-                </handlers>
+                    <handlers>
+                        <handler name="CSVSTATS"/>
+                    </handlers>
             </logger>
+            <logger category="com.arjuna">
+                <level name="WARN"/>
+            </logger>
+            <logger category="org.jboss.as.config">
+                <level name="DEBUG"/>
+            </logger>
+            <logger category="sun.rmi">
+                <level name="WARN"/>
+            </logger>
+            <root-logger>
+                <level name="INFO"/>
+                <handlers>
+                    <handler name="CONSOLE"/>
+                    <handler name="FILE"/>
+                </handlers>
+            </root-logger>
+            <formatter name="PATTERN">
+                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+            </formatter>
+            <formatter name="COLOR-PATTERN">
+                <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n"/>
+            </formatter>
+        </subsystem>
