@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.mobicents.smsc</groupId>
         <artifactId>mproc-ra-parent</artifactId>
-        <version>7.4.0-SNAPSHOT</version>
+        <version>7.4.0-81</version>
     </parent>
     <artifactId>mproc-ratype</artifactId>
     <name>Core : SLEE : MProc RA Type</name>
