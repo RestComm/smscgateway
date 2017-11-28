@@ -444,8 +444,7 @@ public abstract class MoSbb extends MoCommonSbb {
                         originatorSccpAddress, false, evt.getMAPDialog(), evt, evt.getInvokeId());
             }
             if (sms != null) {
-                this.processSms(sms, persistence, smscPropertiesManagement.getMoCharging(), !isMt, dialog, evt,
-                        evt.getInvokeId());
+                this.processSms(sms, persistence, charging, !isMt, dialog, evt, evt.getInvokeId());
             }
 		} catch (SmscProcessingException e1) {
             if (!e1.isSkipErrorLogging()) {
@@ -597,7 +596,7 @@ public abstract class MoSbb extends MoCommonSbb {
             sms = this.processMtMessage(evt.getSM_RP_OA(), evt.getSM_RP_DA(), evt.getSM_RP_UI(), dialog.getNetworkId(),
                     originatorSccpAddress, false, evt.getMAPDialog(), evt, evt.getInvokeId());
             if (sms != null) {
-                this.processSms(sms, persistence, smscPropertiesManagement.getMoCharging(), false, dialog, evt,
+                this.processSms(sms, persistence, smscPropertiesManagement.getHrCharging(), false, dialog, evt,
                         evt.getInvokeId());
             }
 		} catch (SmscProcessingException e1) {
