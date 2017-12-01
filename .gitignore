@@ -176,6 +176,7 @@ buildNumber.properties
 
 # Package Files #
 *.jar
+!xmltask.jar
 *.war
 *.ear
 
