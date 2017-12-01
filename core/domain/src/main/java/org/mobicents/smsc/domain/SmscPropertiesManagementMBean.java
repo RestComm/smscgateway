@@ -393,4 +393,21 @@ public interface SmscPropertiesManagementMBean {
 
     public String getCassandraPass();
 
-}
+    public void setSmDeliveryFailure(int causeCode, String status) throws IllegalArgumentException;
+
+    public String getSmDeliveryFailure(int causeCode);
+
+    public void setSmDeliveryFailureTpCause(int causeCode, String status) throws IllegalArgumentException;
+
+    public String getSmDeliveryFailureTpCause(int causeCode);
+
+    public void setSmDeliveryFailureDlrWithTpdu(String status) throws IllegalArgumentException;
+
+    public String getSmDeliveryFailureDlrWithTpdu();
+
+    public Map<Integer, String>  getSmDeliveryFailure();
+
+    public Map<Integer, String> getSmDeliveryFailureTpCause();
+
+
+    }

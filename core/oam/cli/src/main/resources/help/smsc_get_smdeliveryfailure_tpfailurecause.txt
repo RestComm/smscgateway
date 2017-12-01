@@ -1,0 +1,15 @@
+Name
+	smsc get smdeliveryfailure_tpfailurecause
+
+SYNOPSIS
+	smsc get smdeliveryfailure_tpfailurecause
+
+DESCRIPTION
+	This command is used to get a list of action for MAPErrorMessageSMDeliveryFailure
+	based on SMS-DELIVERY-REPORT
+
+EXAMPLES
+	smsc get smdeliveryfailure_tpfailurecause
+
+SEE ALSO
+    smsc set smdeliveryfailure_tpfailurecause

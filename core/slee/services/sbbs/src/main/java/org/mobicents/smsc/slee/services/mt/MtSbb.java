@@ -56,17 +56,7 @@ import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
 import org.mobicents.protocols.ss7.map.api.service.sms.SM_RP_DA;
 import org.mobicents.protocols.ss7.map.api.service.sms.SM_RP_OA;
 import org.mobicents.protocols.ss7.map.api.service.sms.SmsSignalInfo;
-import org.mobicents.protocols.ss7.map.api.smstpdu.AbsoluteTimeStamp;
-import org.mobicents.protocols.ss7.map.api.smstpdu.AddressField;
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
-import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverTpdu;
-import org.mobicents.protocols.ss7.map.api.smstpdu.SmsStatusReportTpdu;
-import org.mobicents.protocols.ss7.map.api.smstpdu.Status;
-import org.mobicents.protocols.ss7.map.api.smstpdu.TypeOfNumber;
-import org.mobicents.protocols.ss7.map.api.smstpdu.UserData;
-import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
-import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeaderElement;
+import org.mobicents.protocols.ss7.map.api.smstpdu.*;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
 import org.mobicents.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.mobicents.slee.resource.map.events.DialogAccept;
@@ -208,6 +198,36 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         setupMtForwardShortMessageRequest(event.getNetworkNode(), event.getImsiData(), event.getLmsi(), smsSet.getNetworkId());
     }
 
+    private ErrorAction getErrorCodeForDlrFailure(int causeCode) {
+        String smDlrStatus = SmscPropertiesManagement.getInstance().getSmDeliveryFailure(causeCode);
+        if (smDlrStatus.equals("permanent")) {
+            return ErrorAction.permanentFailure;
+        } else if (smDlrStatus.equals("temporary")) {
+            return ErrorAction.temporaryFailure;
+        } else { // clear
+            if (causeCode == SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded.getCode()) {
+                return ErrorAction.memoryCapacityExceededFlag;
+            } else if (causeCode == SMEnumeratedDeliveryFailureCause.equipmentProtocolError.getCode()) {
+                return ErrorAction.permanentFailure;
+            } else { // cause code = 2..6
+                return ErrorAction.permanentFailure;
+            }
+        }
+
+    }
+
+    private ErrorAction getErrorCodeForDlrTpFailureCause(String tpFailureCauseStatus) {
+        if (tpFailureCauseStatus.equals("permanent")) {
+            return ErrorAction.permanentFailure;
+        } else if (tpFailureCauseStatus.equals("temporary")) {
+            return ErrorAction.temporaryFailure;
+        }
+
+        //clear
+        return null;
+    }
+
+
     // *********
     // MAP Component events
 
@@ -240,16 +260,35 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                         mapErrorMessage, false, ProcessingType.SS7_MT);
             } else if (mapErrorMessage.isEmSMDeliveryFailure()) {
                 MAPErrorMessageSMDeliveryFailure smDeliveryFailure = mapErrorMessage.getEmSMDeliveryFailure();
+                SmsDeliverReportTpdu tpdu = smDeliveryFailure.getSmsDeliverReportTpdu();
+
+                String tpFailureCauseStatus = "clear";
+                int tpduCauseCode = -1;
+                if (tpdu != null) {
+                    tpduCauseCode = tpdu.getFailureCause().getCode();
+                    tpFailureCauseStatus = SmscPropertiesManagement.getInstance().getSmDeliveryFailureTpCause(tpduCauseCode);
+                }
+
+                ErrorAction errAction = this.getErrorCodeForDlrTpFailureCause(tpFailureCauseStatus);
+
                 if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded) {
-                    this.onDeliveryError(smsSet, ErrorAction.memoryCapacityExceededFlag, ErrorCode.MESSAGE_QUEUE_FULL,
+                    if (errAction == null) {
+                        errAction = this.getErrorCodeForDlrFailure(SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded.getCode());
+                    }
+
+                    this.onDeliveryError(smsSet, errAction, ErrorCode.MESSAGE_QUEUE_FULL,
                             "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
                             mapErrorMessage, false, ProcessingType.SS7_MT);
                 } else if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.equipmentProtocolError) {
-                    this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.MS_NOT_EQUIPPED,
+                    if (errAction == null) {
+                        errAction = this.getErrorCodeForDlrFailure(SMEnumeratedDeliveryFailureCause.equipmentProtocolError.getCode());
+                    }
+
+                    this.onDeliveryError(smsSet, errAction, ErrorCode.MS_NOT_EQUIPPED,
                             "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
                             mapErrorMessage, false, ProcessingType.SS7_MT);
                 } else {
-                    this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SENDING_SM_FAILED,
+                        this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SENDING_SM_FAILED,
                             "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
                             mapErrorMessage, false, ProcessingType.SS7_MT);
                 }
