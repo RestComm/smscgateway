@@ -1,0 +1,19 @@
+Name
+	smsc set smdeliveryfailure
+
+SYNOPSIS
+	smsc set smdeliveryfailure <code> <permanent|temporary|clear>
+
+DESCRIPTION
+	This command is used to set the code of MAPErrorMessageSMDeliveryFailure to
+	needed values.
+	- If it set to 'permanent' then SMSC will treat the error with <code> as permanent
+	- If it set to 'temporary' then SMSC will treat the error with <code> as temporary
+	- This value is set to 'clear' by default.
+
+EXAMPLES
+	smsc set smdeliveryfailure <code> permanent
+
+SEE ALSO
+	smsc set smdeliveryfailure permanent
+	smsc get smdeliveryfailure

@@ -1,0 +1,19 @@
+Name
+	smsc set smdeliveryfailure_dlr_withtpuserdata
+
+SYNOPSIS
+	smsc set smdeliveryfailure_dlr_withtpuserdata <false|short|full>
+
+DESCRIPTION
+	This command is used to set the value of smdeliveryfailure_dlr_withtpuserdata
+	When SMSC received errorReturn with SMS-DELIVERY-REPORT:
+	    - If it set to 'false' then Delivery Receipts will be generated as normal
+	    - If it set to 'short' then Delivery Receipts will carry 20 first characters of TP-User-Data
+	    - If it set to 'full' then Delivery Receipts will carry full text of TP-User-Data
+	This value is set to 'false' by default.
+
+EXAMPLES
+	smsc set smdeliveryfailure_dlr_withtpuserdata full
+
+SEE ALSO
+	smsc get smdeliveryfailure_dlr_withtpuserdata

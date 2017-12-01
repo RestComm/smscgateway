@@ -144,6 +144,11 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String CASSANDRA_USER = "cassandraUser";
     private static final String CASSANDRA_PASS = "cassandraPass";
 
+    private static final String SM_DELIVERY_FAILURE_LIST = "smDeliveryFailureList";
+    private static final String SM_DELIVERY_FAILURE_TP_FAILURE_CAUSE_LIST = "smDeliveryFailureTpFailureCauseList";
+	private static final String SM_DELIVERY_FAILURE_WITH_TPDU = "smDeliveryFailureWithTpdu";
+
+
 	private static final String TAB_INDENT = "\t";
 	private static final String CLASS_ATTRIBUTE = "type";
 	private static final XMLBinding binding = new XMLBinding();
@@ -208,6 +213,13 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // credential for cassandra
     private String cassandraUser = "cassandra";
     private String cassandraPass = "cassandra";
+
+    // default value for smdeliveryfailure
+    private FastMap<Integer, String> smDeliveryFailure = new FastMap<Integer,String>();
+    private FastMap<Integer, String> smDeliveryFailureTpFailureCause = new FastMap<Integer,String>();
+
+    private String smDeliveryFailureDlrWithTpdu = "false";
+
 
 	// period of fetching messages from a database for delivering
 	// private long fetchPeriod = 5000; // that was C1
@@ -418,7 +430,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // before actual time.
     private int skipUnsentMessages = -1;
 
-    private SmscPropertiesManagement(String name) {
+	private ArrayList<String> smDDeliveryFailure = new ArrayList<String>();
+
+
+	private SmscPropertiesManagement(String name) {
 		this.name = name;
 		binding.setClassAttribute(CLASS_ATTRIBUTE);
 	}
@@ -1442,6 +1457,71 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         generateRejectionCdr = aGenerateRejectionCdr;
     }
 
+    @Override
+    public void setSmDeliveryFailure(int causeCode, String status) throws IllegalArgumentException {
+        if (!status.equals("permanent") && !status.equals("temporary") && !status.equals("clear"))
+            throw new IllegalArgumentException("Status accept only: permanent/temporary/clear");
+
+        if (status.equals("clear"))
+            this.smDeliveryFailure.remove(causeCode);
+        else
+            this.smDeliveryFailure.put(causeCode, status);
+    }
+
+    @Override
+    public String getSmDeliveryFailure(int causeCode){
+        String status = smDeliveryFailure.get(causeCode);
+        if(status != null)
+            return status;
+        else
+            return "clear";
+    }
+
+    @Override
+    public Map<Integer, String>  getSmDeliveryFailure(){
+        return this.smDeliveryFailure;
+    }
+
+    @Override
+    public void setSmDeliveryFailureTpCause(int causeCode, String status) throws IllegalArgumentException {
+        if (!status.equals("permanent") && !status.equals("temporary") && !status.equals("clear"))
+            throw new IllegalArgumentException("Status accept only: permanent/temporary/clear");
+
+        if (status.equals("clear"))
+            this.smDeliveryFailureTpFailureCause.remove(causeCode);
+        else
+            this.smDeliveryFailureTpFailureCause.put(causeCode, status);
+    }
+
+    @Override
+    public String getSmDeliveryFailureTpCause(int causeCode){
+        String status = this.smDeliveryFailureTpFailureCause.get(causeCode);
+        if(status != null)
+            return status;
+        else
+            return "clear";
+    }
+
+    @Override
+    public Map<Integer, String> getSmDeliveryFailureTpCause(){
+        return this.smDeliveryFailureTpFailureCause;
+    }
+
+
+    @Override
+    public void setSmDeliveryFailureDlrWithTpdu(String status) throws IllegalArgumentException{
+        if (!status.equals("false") && !status.equals("short") && !status.equals("full"))
+            throw new IllegalArgumentException("Status accept only: false/short/full");
+
+        this.smDeliveryFailureDlrWithTpdu = status;
+    }
+
+    @Override
+    public String getSmDeliveryFailureDlrWithTpdu(){
+        return this.smDeliveryFailureDlrWithTpdu;
+    }
+
+
     public void start() throws Exception {
 
 		this.persistFile.clear();
@@ -1613,7 +1693,35 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.cassandraUser, CASSANDRA_USER, String.class);
             writer.write(this.cassandraPass, CASSANDRA_PASS, String.class);
 
-            writer.write(this.diameterDestRealm, DIAMETER_DEST_REALM, String.class);
+
+            if (smDeliveryFailure.size() > 0) {
+                ArrayList<SmDeliveryFailureListElement> al = new ArrayList<SmDeliveryFailureListElement>();
+                for (Entry<Integer, String> val : smDeliveryFailure.entrySet()) {
+                    SmDeliveryFailureListElement el = new SmDeliveryFailureListElement();
+                    el.causeCode = val.getKey();
+                    el.status = val.getValue();
+                    al.add(el);
+                }
+                SmscPropertiesManagement_smDeliveryFailure al2 = new SmscPropertiesManagement_smDeliveryFailure(al);
+                writer.write(al2, SM_DELIVERY_FAILURE_LIST, SmscPropertiesManagement_smDeliveryFailure.class);
+            }
+
+            if (smDeliveryFailureTpFailureCause.size() > 0) {
+                ArrayList<SmDeliveryFailureTpFailureCauseListElement> al = new ArrayList<SmDeliveryFailureTpFailureCauseListElement>();
+                for (Entry<Integer, String> val : smDeliveryFailureTpFailureCause.entrySet()) {
+                    SmDeliveryFailureTpFailureCauseListElement el = new SmDeliveryFailureTpFailureCauseListElement();
+                    el.causeCode = val.getKey();
+                    el.status = val.getValue();
+                    al.add(el);
+                }
+                SmscPropertiesManagement_smDeliveryFailureTpFailureCause al2 = new SmscPropertiesManagement_smDeliveryFailureTpFailureCause(al);
+                writer.write(al2, SM_DELIVERY_FAILURE_TP_FAILURE_CAUSE_LIST, SmscPropertiesManagement_smDeliveryFailureTpFailureCause.class);
+            }
+
+            writer.write(this.smDeliveryFailureDlrWithTpdu, SM_DELIVERY_FAILURE_WITH_TPDU,String.class);
+
+
+			writer.write(this.diameterDestRealm, DIAMETER_DEST_REALM, String.class);
 			writer.write(this.diameterDestHost, DIAMETER_DEST_HOST, String.class);
 			writer.write(this.diameterDestPort, DIAMETER_DEST_PORT, Integer.class);
 			writer.write(this.diameterUserName, DIAMETER_USER_NAME, String.class);
@@ -1958,6 +2066,28 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             if (vals != null)
                 this.cassandraPass = vals;
 
+            SmscPropertiesManagement_smDeliveryFailure al4 = reader.read(SM_DELIVERY_FAILURE_LIST,
+                    SmscPropertiesManagement_smDeliveryFailure.class);
+            smDeliveryFailure.clear();
+            if (al4 != null) {
+                for (SmDeliveryFailureListElement elem : al4.getData()) {
+                    smDeliveryFailure.put(elem.causeCode, elem.status);
+                }
+            }
+
+            SmscPropertiesManagement_smDeliveryFailureTpFailureCause al5 = reader.read(SM_DELIVERY_FAILURE_TP_FAILURE_CAUSE_LIST,
+                    SmscPropertiesManagement_smDeliveryFailureTpFailureCause.class);
+            smDeliveryFailureTpFailureCause.clear();
+            if (al5 != null) {
+                for (SmDeliveryFailureTpFailureCauseListElement elem : al5.getData()) {
+                    smDeliveryFailureTpFailureCause.put(elem.causeCode, elem.status);
+                }
+            }
+
+            vals = reader.read(SM_DELIVERY_FAILURE_WITH_TPDU, String.class);
+			if (vals!= null)
+				this.smDeliveryFailureDlrWithTpdu = vals;
+
             this.diameterDestRealm = reader.read(DIAMETER_DEST_REALM, String.class);
 
 			this.diameterDestHost = reader.read(DIAMETER_DEST_HOST, String.class);
@@ -2007,4 +2137,26 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         }
     }
 
+    public static class SmscPropertiesManagement_smDeliveryFailure extends
+            ArrayListSerializingBase<SmDeliveryFailureListElement> {
+        public SmscPropertiesManagement_smDeliveryFailure() {
+            super(SM_DELIVERY_FAILURE_LIST, SmDeliveryFailureListElement.class);
+        }
+
+        public SmscPropertiesManagement_smDeliveryFailure(ArrayList<SmDeliveryFailureListElement> data) {
+            super(SM_DELIVERY_FAILURE_LIST, SmDeliveryFailureListElement.class, data);
+        }
+    }
+
+
+    public static class SmscPropertiesManagement_smDeliveryFailureTpFailureCause extends
+            ArrayListSerializingBase<SmDeliveryFailureTpFailureCauseListElement> {
+        public SmscPropertiesManagement_smDeliveryFailureTpFailureCause() {
+            super(SM_DELIVERY_FAILURE_TP_FAILURE_CAUSE_LIST, SmDeliveryFailureTpFailureCauseListElement.class);
+        }
+
+        public SmscPropertiesManagement_smDeliveryFailureTpFailureCause(ArrayList<SmDeliveryFailureTpFailureCauseListElement> data) {
+            super(SM_DELIVERY_FAILURE_TP_FAILURE_CAUSE_LIST, SmDeliveryFailureTpFailureCauseListElement.class, data);
+        }
+    }
 }

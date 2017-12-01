@@ -34,6 +34,7 @@ import javolution.util.FastMap;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.mobicents.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCause;
 import org.mobicents.smsc.cassandra.SmsRoutingRuleType;
 import org.mobicents.smsc.library.DbSmsRoutingRule;
 import org.mobicents.smsc.library.SmsSetCache;
@@ -1016,6 +1017,23 @@ public class SMSCShellExecutor implements ShellExecutor {
             } else if (parName.equals("cassandrapass")) {
                 String val = String.valueOf(options[3]);
                 smscPropertiesManagement.setCassandraPass(val);
+            } else if (parName.equals("smdeliveryfailure")) {
+                int val = Integer.valueOf(options[3]);
+                if (options.length == 5 && !(val < 0 || val > 6)) {
+                    String s1 = options[4].toLowerCase();
+                    smscPropertiesManagement.setSmDeliveryFailure(val, s1);
+                }
+            } else if (parName.equals("smdeliveryfailure_tpfailurecause")) {
+                int val = Integer.valueOf(options[3]);
+                if (options.length == 5) {
+                    String s1 = options[4].toLowerCase();
+                    smscPropertiesManagement.setSmDeliveryFailureTpCause(val, s1);
+                }
+            } else if (parName.equals("smdeliveryfailure_dlr_withtpuserdata")) {
+                String s1 = options[3].toLowerCase();
+                if (options.length == 4) {
+                        smscPropertiesManagement.setSmDeliveryFailureDlrWithTpdu(s1);
+                    }
             } else {
                 return SMSCOAMMessages.INVALID_COMMAND;
             }
@@ -1288,6 +1306,22 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append(smscPropertiesManagement.getCassandraUser());
             } else if (parName.equals("cassandrapass")) {
                 sb.append(smscPropertiesManagement.getCassandraPass());
+            } else if (parName.equals("smdeliveryfailure")) {
+                for (Integer key : smscPropertiesManagement.getSmDeliveryFailure().keySet()) {
+                    sb.append(" \n causeCode = ");
+                    sb.append(key);
+                    sb.append(" - status = ");
+                    sb.append(smscPropertiesManagement.getSmDeliveryFailure().get(key));
+                }
+            } else if (parName.equals("smdeliveryfailure_tpfailurecause")) {
+                for (Integer key : smscPropertiesManagement.getSmDeliveryFailureTpCause().keySet()) {
+                    sb.append("\n causeCode = ");
+                    sb.append(key);
+                    sb.append(" - status = ");
+                    sb.append(smscPropertiesManagement.getSmDeliveryFailureTpCause().get(key));
+                }
+            } else if (parName.equals("smdeliveryfailure_dlr_withtpuserdata")) {
+                sb.append(smscPropertiesManagement.getSmDeliveryFailureDlrWithTpdu());
             } else {
                 return SMSCOAMMessages.INVALID_COMMAND;
             }
@@ -1661,6 +1695,26 @@ public class SMSCShellExecutor implements ShellExecutor {
 
             sb.append("cassandrapass = ");
             sb.append(smscPropertiesManagement.getCassandraPass());
+            sb.append("\n");
+
+            for (Integer key : smscPropertiesManagement.getSmDeliveryFailure().keySet()) {
+                sb.append("smdeliveryfailure - causeCode = ");
+                sb.append(key);
+                sb.append(" - status = ");
+                sb.append(smscPropertiesManagement.getSmDeliveryFailure().get(key));
+                sb.append("\n");
+            }
+
+            for (Integer key : smscPropertiesManagement.getSmDeliveryFailureTpCause().keySet()) {
+                sb.append("smdeliveryfailure_tpfailurecause - causeCode = ");
+                sb.append(key);
+                sb.append(" - status = ");
+                sb.append(smscPropertiesManagement.getSmDeliveryFailureTpCause().get(key));
+                sb.append("\n");
+            }
+
+            sb.append("smdeliveryfailure_dlr_withtpuserdata = ");
+            sb.append(smscPropertiesManagement.getSmDeliveryFailureDlrWithTpdu());
             sb.append("\n");
 
             return sb.toString();
