@@ -1,5 +1,5 @@
 
-= SMSC Gateway Server Settings (JBOSS 5)
+= SMSC Gateway Server Settings (Wildfly 10)
 
 [[_smsc_gateway_server_properties]]
 == SMSC Server Properties
@@ -811,8 +811,7 @@ DESCRIPTION
         This command is used to set the value of SMSC Sub System Number (SSN). Issuing 
         this command in CLI will set the SSN value but you must ensure that the SSN number
         is properly configured in the TCAP Stack in the xml descriptor file
-        "mobicents-smscgateway-version/jboss-5.1.0.GA/server/default/deploy/
-        mobicents-smsc-server/META-INF/jboss-beans.xml".
+        "mobicents-smscgateway-version/wildfly-10.1.0.Final/standalone/configuration/standalone.xml".
 ----
 
 [[_set_scssn_gui]]
@@ -2083,7 +2082,7 @@ For home routing mode we may need to fill a special table for correlation betwee
 CorrelationId value will be returned as IMSI in SRI response to an upper SMSC GW.
 As an extra field "smsc" field can be specified for each entry of this table.
 If this field is specified and not empty then this value will be returned as a LocationInfo in SRI response to an upper SMSC GW, else SMSC GW address will be returned.
-Correlation table is stored into "jboss-5.1.0.GA/server/<server instanse, for example 'default'>"/data" and has name "SmscManagement_cc_mccmnc.xml". The content of this should follow the following template: 
+Correlation table is stored into "wildfly-10.1.0.Final/standalone/data" and has name "SmscManagement_cc_mccmnc.xml". The content of this should follow the following template: 
 
 
 ----

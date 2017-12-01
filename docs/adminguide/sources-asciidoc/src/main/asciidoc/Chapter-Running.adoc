@@ -1,4 +1,4 @@
-= Running
+= Running (JBOSS 5)
 
 == Running the Gateway
 
