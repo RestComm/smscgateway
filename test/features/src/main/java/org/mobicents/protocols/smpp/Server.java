@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  */
-package org.mobicents.protocols.smpp.timers;
+package org.mobicents.protocols.smpp;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
+import org.mobicents.protocols.smpp.timers.DefaultSmppServerHandler;
 
 import com.cloudhopper.commons.charset.CharsetUtil;
 import com.cloudhopper.smpp.SmppConstants;
@@ -36,7 +37,6 @@ import com.cloudhopper.smpp.SmppServerSession;
 import com.cloudhopper.smpp.impl.DefaultSmppServer;
 import com.cloudhopper.smpp.impl.DefaultSmppSessionHandler;
 import com.cloudhopper.smpp.pdu.DeliverSm;
-import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.type.Address;
 
 /**
@@ -46,7 +46,7 @@ import com.cloudhopper.smpp.type.Address;
 public class Server {
 
     private static Logger logger = Logger.getLogger(Server.class);
-    
+
     // 0 - Default MC Mode (e.g. Store and Forward)
     // 1 - Datagram mode
     // 2 - Forward (i.e. Transaction) mode
@@ -61,7 +61,7 @@ public class Server {
     private int defaultWindowSize = 5;
     private long defaultWindowWaitTimeout = SmppConstants.DEFAULT_WINDOW_MONITOR_INTERVAL;
     private boolean defaultSessionCountersEnabled = true;
-    
+
     private DefaultSmppSessionHandler sessionHandler;
     private DefaultSmppServerHandler serverHandler;
     public DefaultSmppServer smppServer;
@@ -78,7 +78,7 @@ public class Server {
     public DefaultSmppServerHandler getServerHandler() {
         return this.serverHandler;
     }
-    
+
     public void init() throws Exception {
 
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -110,15 +110,14 @@ public class Server {
 
         // create a server, start it up
         serverHandler = new DefaultSmppServerHandler(sessionHandler);
-        smppServer = new DefaultSmppServer(configuration, serverHandler, executor,
-                monitorExecutor);
+        smppServer = new DefaultSmppServer(configuration, serverHandler, executor, monitorExecutor);
 
         logger.info("Starting SMPP server...");
         smppServer.start();
         logger.info("SMPP server started.");
-        
+
     }
-    
+
     public void sendRequestPdu(String message, String srcAddr, String destAddr) {
         String text160 = message;
         byte[] textBytes = CharsetUtil.encode(text160, CharsetUtil.CHARSET_GSM);
@@ -131,15 +130,15 @@ public class Server {
         try {
             deliver.setShortMessage(textBytes);
             deliver.setEsmClass((byte) esmClass);
-            
+
             SmppServerSession smppServerSession = serverHandler.getSession();
             smppServerSession.sendRequestPdu(deliver, 30000, false);
-            
+
         } catch (Exception e) {
             logger.error("", e);
         }
     }
-    
+
     public void stop() {
         smppServer.stop();
         logger.info("SMPP server stopped");

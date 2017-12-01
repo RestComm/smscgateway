@@ -10,35 +10,27 @@ import com.cloudhopper.smpp.impl.DefaultSmppSessionHandler;
 
 import static org.testng.Assert.assertEquals;
 
-import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.*;
-
 import org.apache.log4j.Logger;
-import org.mobicents.protocols.smpp.HelperClass;
+import org.mobicents.protocols.smpp.Client;
+import org.mobicents.protocols.smpp.Server;
+import org.mobicents.protocols.smpp.SmppManagementProxy;
 import org.restcomm.smpp.Esme;
 
 public class TestCases {
     private static Logger logger = Logger.getLogger(TestCases.class);
 
-    public static final String JMX_DOMAIN = "org.restcomm.smpp";
-    public static final String JMX_LAYER_ESME_MANAGEMENT = "EsmeManagement";
-    public static final String JMX_LAYER_SMPP_SERVER_MANAGEMENT = "SmppServerManagement";
+    SmppManagementProxy smppManagementProxy;
 
-    private static final int numClientEsmes = 2;
-    private static final int numServerEsmes = 2;
+    private static final int NUM_CLIENT_ESMES = 2;
+    private static final int NUM_SERVER_ESMES = 2;
 
     private Server[] servers;
     private Client[] clients;
-
-    private MBeanServerConnection mbsc;
-    private ObjectName esmeManagementName;
 
     private Esme[] clientEsmes;
     private Esme[] serverEsmes;
@@ -59,43 +51,27 @@ public class TestCases {
     public void setUpClass() throws Exception {
         logger.info("setUpClass");
 
-        // Provide credentials required by server for user authentication
-        HashMap environment = new HashMap();
-        // String[] credentials = new String[] {"admin", "admin"};
-        // environment.put (JMXConnector.CREDENTIALS, credentials);
+        smppManagementProxy = new SmppManagementProxy();
 
-        // Create JMXServiceURL of JMX Connector (must be known in advance)
-        JMXServiceURL url;
-
-        url = new JMXServiceURL("service:jmx:rmi://127.0.0.1/jndi/rmi://127.0.0.1:1190/jmxconnector");
-
-        // Get JMX connector
-        JMXConnector jmxc = JMXConnectorFactory.connect(url, environment);
-
-        esmeManagementName = new ObjectName(JMX_DOMAIN + ":layer=" + JMX_LAYER_ESME_MANAGEMENT + ",name=SmppManagement");
-
-        // Get MBean server connection
-        mbsc = jmxc.getMBeanServerConnection();
-
-        clientEsmes = new Esme[numClientEsmes];
-        serverEsmes = new Esme[numServerEsmes];
+        clientEsmes = new Esme[NUM_CLIENT_ESMES];
+        serverEsmes = new Esme[NUM_SERVER_ESMES];
 
         String type = "";
         String esmeName = "";
-        for (int i = 0; i < numClientEsmes; i++) {
+        for (int i = 0; i < NUM_CLIENT_ESMES; i++) {
             type = "SERVER";
             esmeName = esmeNamePref + i;
-            clientEsmes[i] = HelperClass.createEsme(mbsc, esmeManagementName, type, esmeName, type + esmeName, systemId, password,
-                    localAddress, -1, String.valueOf(3333 + i));
-            HelperClass.startEsme(mbsc, esmeManagementName, esmeNamePref + i);
+            clientEsmes[i] = smppManagementProxy.createEsme(type, esmeName, type + esmeName, systemId, password, localAddress,
+                    -1, String.valueOf(3333 + i));
+            smppManagementProxy.startEsme(esmeNamePref + i);
         }
 
-        for (int i = 0; i < numServerEsmes; i++) {
+        for (int i = 0; i < NUM_SERVER_ESMES; i++) {
             type = "CLIENT";
             esmeName = esmeNamePref + "_" + i;
-            serverEsmes[i] = HelperClass.createEsme(mbsc, esmeManagementName, type, esmeName, type + esmeName, systemId,
-                    password, localAddress, localPort - i - 1, String.valueOf(3333 - i - 1));
-            HelperClass.startEsme(mbsc, esmeManagementName, esmeNamePref + "_" + i);
+            serverEsmes[i] = smppManagementProxy.createEsme(type, esmeName, type + esmeName, systemId, password, localAddress,
+                    localPort - i - 1, String.valueOf(3333 - i - 1));
+            smppManagementProxy.startEsme(esmeNamePref + "_" + i);
         }
 
         // to enable automatic expiration of requests, a second scheduled
@@ -120,13 +96,13 @@ public class TestCases {
         logger.info("tearDownClass");
 
         for (Esme esme : clientEsmes) {
-            HelperClass.stopEsme(mbsc, esmeManagementName, esme.getName());
-            HelperClass.destroyEsme(mbsc, esmeManagementName, esme.getName());
+            smppManagementProxy.stopEsme(esme.getName());
+            smppManagementProxy.destroyEsme(esme.getName());
         }
 
         for (Esme esme : serverEsmes) {
-            HelperClass.stopEsme(mbsc, esmeManagementName, esme.getName());
-            HelperClass.destroyEsme(mbsc, esmeManagementName, esme.getName());
+            smppManagementProxy.stopEsme(esme.getName());
+            smppManagementProxy.destroyEsme(esme.getName());
         }
 
         monitorExecutor.shutdownNow();
@@ -140,7 +116,7 @@ public class TestCases {
     @AfterMethod
     public void afterTest() throws Exception {
         if (servers != null) {
-            for (int i = 0; i < numServerEsmes; i++) {
+            for (int i = 0; i < NUM_SERVER_ESMES; i++) {
                 if (servers[i] != null && servers[i].smppServer.isStarted()) {
                     servers[i].stop();
                 }
@@ -148,7 +124,7 @@ public class TestCases {
         }
 
         if (clients != null) {
-            for (int i = 0; i < numClientEsmes; i++) {
+            for (int i = 0; i < NUM_CLIENT_ESMES; i++) {
                 if (clients[i] != null && clients[i].isStarted()) {
                     clients[i].stop();
                 }
@@ -158,15 +134,15 @@ public class TestCases {
 
     private void startEsmes(DefaultSmppSessionHandler handler) throws Exception {
 
-        servers = new Server[numServerEsmes];
-        clients = new Client[numClientEsmes];
+        servers = new Server[NUM_SERVER_ESMES];
+        clients = new Client[NUM_CLIENT_ESMES];
 
-        for (int i = 0; i < numServerEsmes; i++) {
+        for (int i = 0; i < NUM_SERVER_ESMES; i++) {
             servers[i] = new Server(handler, localPort - i - 1);
             servers[i].init();
         }
 
-        for (int i = 0; i < numClientEsmes; i++) {
+        for (int i = 0; i < NUM_CLIENT_ESMES; i++) {
             clients[i] = new Client(handler, monitorExecutor, systemId, password, localAddress, localPort + i,
                     String.valueOf(3333 + i));
             clients[i].init();

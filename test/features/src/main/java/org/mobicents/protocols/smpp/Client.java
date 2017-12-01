@@ -19,33 +19,22 @@
  * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  */
-package org.mobicents.protocols.smpp.timers;
+package org.mobicents.protocols.smpp;
 
-import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
 import com.cloudhopper.commons.charset.CharsetUtil;
-import com.cloudhopper.commons.util.DecimalUtil;
-import com.cloudhopper.smpp.PduAsyncResponse;
 import com.cloudhopper.smpp.SmppBindType;
-import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.SmppSessionConfiguration;
-import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.cloudhopper.smpp.impl.DefaultSmppSessionHandler;
 import com.cloudhopper.smpp.impl.TestSmppClient;
 import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.type.Address;
-import com.google.common.util.concurrent.RateLimiter;
 
 /**
  * @author amit bhayani
@@ -71,11 +60,6 @@ public class Client {
     private String password = "test";
     private String localAddress = "127.0.0.1";
     private int localPort = 56789;
-    private static String message = "Hello world!";
-    // pause delay after last throttled message in milliseconds
-    // private static int throttledPause = 1000;
-
-    private RateLimiter rateLimiterObj = null;
 
     // 0 - Default MC Mode (e.g. Store and Forward)
     // 1 - Datagram mode
@@ -83,8 +67,6 @@ public class Client {
     // 3 - Store and Forward mode
     private static int esmClass = 3;
 
-    // private static Date lastThrottledMessageTime;
-    private static AtomicInteger throttledMessageCount = new AtomicInteger(0);
 
     // total number of submit sent
     static public final AtomicInteger SUBMIT_SENT = new AtomicInteger(0);
