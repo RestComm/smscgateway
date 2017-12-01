@@ -111,7 +111,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private static final long ONE = 1L;
 
     // TODO: default value==100 / 2
-//    protected static int MAX_MESSAGES_PER_STEP = 100;
+    // protected static int MAX_MESSAGES_PER_STEP = 100;
 
     protected SmppTransactionACIFactory smppServerTransactionACIFactory = null;
     protected SmppSessions smppServerSessions = null;
@@ -123,7 +123,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private static Charset ucs2Charset = Charset.forName("UTF-16BE");
     private static Charset isoCharset = Charset.forName("ISO-8859-1");
     private static Charset gsm7Charset = new GSMCharset("GSM", new String[] {});
-    
+
     protected Integer maxMessagesPerStep;
 
     public RxSmppServerSbb() {
@@ -139,7 +139,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
         try {
             Context ctx = (Context) new InitialContext().lookup("java:comp/env");
-            maxMessagesPerStep = ((Integer)ctx.lookup("maxMessagesPerStep"));
+            maxMessagesPerStep = ((Integer) ctx.lookup("maxMessagesPerStep"));
 
             this.smppServerTransactionACIFactory = (SmppTransactionACIFactory) ctx
                     .lookup("slee/resources/smppp/server/1.0/acifactory");
@@ -265,8 +265,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 if (event.getException() != null) {
                     exceptionMessage = event.getException().getMessage();
                 }
-                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, "SendPduStatus: " + exceptionMessage,
-                        EventType.OUT_SMPP_ERROR, seqNumber);
+                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
+                        "SendPduStatus: " + exceptionMessage, EventType.OUT_SMPP_ERROR, seqNumber);
             } catch (Throwable e1) {
                 logger.severe("Exception in RxSmppServerSbb.onSendPduStatus(): " + e1.getMessage(), e1);
                 markDeliveringIsEnded(true);
@@ -573,8 +573,14 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         pduEvent = event.getResponse();
 
                     EsmeManagement esmeManagement = EsmeManagement.getInstance();
-                    Esme esme = esmeManagement.getEsmeByName(smsSet.getDestEsmeName());
-                    boolean destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
+                    Boolean destAddressLimitationEnabled = false;
+
+                    if (esmeManagement != null && smsSet != null) {
+                        Esme esme = esmeManagement.getEsmeByName(smsSet.getDestEsmeName());
+                        if (esme != null) {
+                            destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
+                        }
+                    }
 
                     int realID = -1;
                     SentItemsList list = null;
@@ -986,7 +992,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason,
                 EventType.OUT_SMPP_TIMEOUT, -1);
     }
-    
+
     @Override
     protected Integer getMaxMessagesPerStep() {
         return maxMessagesPerStep;
@@ -1054,7 +1060,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             if (realID == -1 || !confirmMessageInSendingPool.sequenceNumberFound) {
                 this.logger.severe("RxSmppServerSbb.handleResponse(): no sms in MessageInSendingPool: UnconfirmedCnt="
-                        + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber() 
+                        + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber()
                         + ", realID=" + realID + ", confirmMessageInSendingPool=" + confirmMessageInSendingPool);
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
                         "Received undefined SequenceNumber: " + event.getSequenceNumber() + ", SmsSet=" + smsSet,
@@ -1093,7 +1099,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 setSentChunks(list);
 
             if (!confirmMessageInSendingPool.confirmed) {
-                this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false, event.getSequenceNumber());
+                this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false,
+                        event.getSequenceNumber());
 
                 String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
                         : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
@@ -1127,7 +1134,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             // success CDR generating
             boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
             this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL_ESME : CdrGenerator.CDR_SUCCESS_ESME,
-                    CdrGenerator.CDR_SUCCESS_NO_REASON, confirmMessageInSendingPool.splittedMessage, true, event.getSequenceNumber());
+                    CdrGenerator.CDR_SUCCESS_NO_REASON, confirmMessageInSendingPool.splittedMessage, true,
+                    event.getSequenceNumber());
 
             String messageType = null;
             String remoteAddr = null;
@@ -1144,8 +1152,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 }
             }
 
-            this.generateDetailedCDR(sms, EventType.OUT_SMPP_SENT, sms.getSmsSet().getStatus(), messageType, status,
-                    remoteAddr, event.getSequenceNumber());
+            this.generateDetailedCDR(sms, EventType.OUT_SMPP_SENT, sms.getSmsSet().getStatus(), messageType, status, remoteAddr,
+                    event.getSequenceNumber());
 
             // adding a success receipt if it is needed
             this.generateSuccessReceipt(smsSet, sms);
@@ -1228,8 +1236,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             // generating of a temporary failure CDR (one record for all unsent messages)
             if (smscPropertiesManagement.getGenerateTempFailureCdr()) {
                 this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED_ESME, reason);
-                this.generateTemporaryFailureDetailedCDR(eventType, messageType, smStatus, remoteAddr,
-                        seqNumber);
+                this.generateTemporaryFailureDetailedCDR(eventType, messageType, smStatus, remoteAddr, seqNumber);
             }
 
             ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
@@ -1272,10 +1279,10 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     this.generateCDRs(lstPermFailured2, CdrGenerator.CDR_FAILED_ESME, reason);
 
                     if (!smscPropertiesManagement.getGenerateTempFailureCdr()) {
-                        generateDetailedCDRs(lstPermFailured2, EventType.OUT_SMPP_ERROR, smStatus, messageType,
-                                remoteAddr, seqNumber);
+                        generateDetailedCDRs(lstPermFailured2, EventType.OUT_SMPP_ERROR, smStatus, messageType, remoteAddr,
+                                seqNumber);
                     }
-                    
+
                     // sending of intermediate delivery receipts
                     this.generateIntermediateReceipts(smsSet, lstTempFailured2);
 
