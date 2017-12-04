@@ -144,6 +144,9 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         set.addChild("orignetworkidforreceipts");
         set.addChild("cassandrauser");
         set.addChild("cassandrapass");
+        set.addChild("smdeliveryfailure");
+        set.addChild("smdeliveryfailure_tpfailurecause");
+        set.addChild("smdeliveryfailure_dlr_withtpuserdata");
 
 		Node get = parent.addChild("get");
 		get.addChild("scgt");
@@ -217,6 +220,9 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
         get.addChild("orignetworkidforreceipts");
         get.addChild("cassandrauser");
         get.addChild("cassandrapass");
+        get.addChild("smdeliveryfailure");
+        get.addChild("smdeliveryfailure_tpfailurecause");
+        get.addChild("smdeliveryfailure_dlr_withtpuserdata");
 
         Node remove = parent.addChild("remove");
         remove.addChild("esmedefaultcluster");

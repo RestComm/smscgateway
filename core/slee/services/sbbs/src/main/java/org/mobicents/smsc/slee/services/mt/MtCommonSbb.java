@@ -46,6 +46,7 @@ import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan;
 import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
+import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverReportTpdu;
 import org.mobicents.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
 import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
@@ -65,6 +66,7 @@ import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorAction;
@@ -411,6 +413,18 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
             ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
             ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
 
+            // generate text for Delivery receipts
+            SmsDeliverReportTpdu tpdu = errMessage.getEmSMDeliveryFailure().getSmsDeliverReportTpdu();
+            String dlrText = null; //false
+            if (tpdu != null) {
+                String smDlrWithTpdu = SmscPropertiesManagement.getInstance().getSmDeliveryFailureDlrWithTpdu();
+                if (smDlrWithTpdu.equals("short")){
+                    dlrText = tpdu.getUserData().toString().substring(0, 20);
+                } else if (smDlrWithTpdu.equals("full")) {
+                    dlrText = tpdu.getUserData().toString();
+                }
+            }
+
             TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
             synchronized (lock) {
                 try {
@@ -445,7 +459,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     this.generateIntermediateReceipts(smsSet, lstTempFailured2);
 
                     // sending of failure delivery receipts
-                    this.generateFailureReceipts(smsSet, lstPermFailured2, null);
+                    this.generateFailureReceipts(smsSet, lstPermFailured2, dlrText);
 
                     // sending of ReportSMDeliveryStatusRequest if needed
                     SMDeliveryOutcome smDeliveryOutcome = null;

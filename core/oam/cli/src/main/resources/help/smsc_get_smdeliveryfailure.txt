@@ -1,0 +1,14 @@
+Name
+	smsc get smdeliveryfailure
+
+SYNOPSIS
+	smsc get smdeliveryfailure
+
+DESCRIPTION
+	This command is used to get a list of action for MAPErrorMessageSMDeliveryFailure
+
+EXAMPLES
+	smsc get smdeliveryfailure
+
+SEE ALSO
+	smsc get smdeliveryfailure, smsc set smdeliveryfailure
