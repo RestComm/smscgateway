@@ -30,10 +30,12 @@ import javax.naming.InitialContext;
 import javax.slee.ActivityContextInterface;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
+import javax.xml.bind.DatatypeConverter;
 
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.mobicents.protocols.ss7.map.api.MAPException;
 import org.mobicents.protocols.ss7.map.api.MAPParameterFactory;
 import org.mobicents.protocols.ss7.map.api.MAPProvider;
 import org.mobicents.protocols.ss7.map.api.MAPSmsTpduParameterFactory;
@@ -41,12 +43,14 @@ import org.mobicents.protocols.ss7.map.api.dialog.MAPUserAbortChoice;
 import org.mobicents.protocols.ss7.map.api.dialog.ProcedureCancellationReason;
 import org.mobicents.protocols.ss7.map.api.dialog.ResourceUnavailableReason;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageSMDeliveryFailure;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan;
 import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
 import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverReportTpdu;
+import org.mobicents.protocols.ss7.map.api.smstpdu.UserData;
 import org.mobicents.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
 import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
@@ -414,14 +418,32 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
             ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
 
             // generate text for Delivery receipts
-            SmsDeliverReportTpdu tpdu = errMessage.getEmSMDeliveryFailure().getSmsDeliverReportTpdu();
-            String dlrText = null; //false
-            if (tpdu != null) {
-                String smDlrWithTpdu = SmscPropertiesManagement.getInstance().getSmDeliveryFailureDlrWithTpdu();
-                if (smDlrWithTpdu.equals("short")){
-                    dlrText = tpdu.getUserData().toString().substring(0, 20);
-                } else if (smDlrWithTpdu.equals("full")) {
-                    dlrText = tpdu.getUserData().toString();
+            MAPErrorMessageSMDeliveryFailure smDeliveryFailure = errMessage.getEmSMDeliveryFailure();
+            String dlrText = null; // false
+            if (smDeliveryFailure != null) {
+                SmsDeliverReportTpdu tpdu = null;
+                try {
+                    tpdu = errMessage.getEmSMDeliveryFailure().getSmsDeliverReportTpdu();
+                } catch (MAPException e) {
+                    // we ignore Exception here
+                }
+                if (tpdu != null) {
+                    UserData userData = tpdu.getUserData();
+                    if (userData != null) {
+                        byte[] data = userData.getEncodedData();
+                        if (data != null) {
+                            String text = DatatypeConverter.printHexBinary(data);
+                            String smDlrWithTpdu = SmscPropertiesManagement.getInstance().getSmDeliveryFailureDlrWithTpdu();
+                            if (smDlrWithTpdu.equals("short")) {
+                                if (text.length() > 20)
+                                    dlrText = text.substring(0, 20);
+                                else
+                                    dlrText = text;
+                            } else if (smDlrWithTpdu.equals("full")) {
+                                dlrText = text;
+                            }
+                        }
+                    }
                 }
             }
 

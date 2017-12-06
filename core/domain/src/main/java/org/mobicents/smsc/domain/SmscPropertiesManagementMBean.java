@@ -25,6 +25,7 @@ package org.mobicents.smsc.domain;
 import java.util.Map;
 
 import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
+import org.mobicents.smsc.library.PermanentTemporaryFailure;
 import org.restcomm.smpp.GenerateType;
 import org.restcomm.smpp.SmppEncoding;
 
@@ -393,21 +394,21 @@ public interface SmscPropertiesManagementMBean {
 
     public String getCassandraPass();
 
-    public void setSmDeliveryFailure(int causeCode, String status) throws IllegalArgumentException;
+    public void setSmDeliveryFailure(int causeCode, PermanentTemporaryFailure status) throws IllegalArgumentException;
 
-    public String getSmDeliveryFailure(int causeCode);
+    public PermanentTemporaryFailure getSmDeliveryFailure(int causeCode);
 
-    public void setSmDeliveryFailureTpCause(int causeCode, String status) throws IllegalArgumentException;
+    public void setSmDeliveryFailureTpCause(int causeCode, PermanentTemporaryFailure status) throws IllegalArgumentException;
 
-    public String getSmDeliveryFailureTpCause(int causeCode);
+    public PermanentTemporaryFailure getSmDeliveryFailureTpCause(int causeCode);
 
     public void setSmDeliveryFailureDlrWithTpdu(String status) throws IllegalArgumentException;
 
     public String getSmDeliveryFailureDlrWithTpdu();
 
-    public Map<Integer, String>  getSmDeliveryFailure();
+    public Map<Integer, PermanentTemporaryFailure>  getSmDeliveryFailure();
 
-    public Map<Integer, String> getSmDeliveryFailureTpCause();
+    public Map<Integer, PermanentTemporaryFailure> getSmDeliveryFailureTpCause();
 
 
     }

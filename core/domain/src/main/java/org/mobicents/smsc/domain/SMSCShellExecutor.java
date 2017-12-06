@@ -37,6 +37,7 @@ import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
 import org.mobicents.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCause;
 import org.mobicents.smsc.cassandra.SmsRoutingRuleType;
 import org.mobicents.smsc.library.DbSmsRoutingRule;
+import org.mobicents.smsc.library.PermanentTemporaryFailure;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.mproc.MProcRule;
 import org.mobicents.smsc.mproc.impl.MProcRuleOamMessages;
@@ -1021,13 +1022,15 @@ public class SMSCShellExecutor implements ShellExecutor {
                 int val = Integer.valueOf(options[3]);
                 if (options.length == 5 && !(val < 0 || val > 6)) {
                     String s1 = options[4].toLowerCase();
-                    smscPropertiesManagement.setSmDeliveryFailure(val, s1);
+                    PermanentTemporaryFailure vale = Enum.valueOf(PermanentTemporaryFailure.class, s1);
+                    smscPropertiesManagement.setSmDeliveryFailure(val, vale);
                 }
             } else if (parName.equals("smdeliveryfailure_tpfailurecause")) {
                 int val = Integer.valueOf(options[3]);
                 if (options.length == 5) {
                     String s1 = options[4].toLowerCase();
-                    smscPropertiesManagement.setSmDeliveryFailureTpCause(val, s1);
+                    PermanentTemporaryFailure vale = Enum.valueOf(PermanentTemporaryFailure.class, s1);
+                    smscPropertiesManagement.setSmDeliveryFailureTpCause(val, vale);
                 }
             } else if (parName.equals("smdeliveryfailure_dlr_withtpuserdata")) {
                 String s1 = options[3].toLowerCase();

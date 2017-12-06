@@ -3184,11 +3184,18 @@ SYNOPSIS
 	smsc set smdeliveryfailure <cause-code> <permanent | temporary | clear>
 
 DESCRIPTION
-	This command is used to set the code of MAPErrorMessageSMDeliveryFailure to
-	needed values.
-	- If it set to 'permanent' then SMSC will treat the error with <code> as permanent
-	- If it set to 'temporary' then SMSC will treat the error with <code> as temporary
-	- default value is 'clear'.
+	When SMSC GW gets a SMDeliveryFailure MAP error message
+	and this message does not contain SMS-DELIVER Report tpdu with
+	TP-Failure-Cause on board then SMSC GW will decide of if this failure is
+	temporary or permanent depending of a value of DeliveryFailureCause of
+	MAP error message. By default value 0 (memoryCapacityExceeded) is treated
+	as temporary and all other values are threated as permanent. We can set by this
+	option a need behavior for any type of DeliveryFailureCause as needed.
+	- If it set to 'permanent' for a received DeliveryFailureCause then SMSC will treat
+	  the error with code as permanent (with no more delivery attempts)
+	- If it set to 'temporary' for a received DeliveryFailureCause then SMSC will treat
+	  the error with code as temporary (with more delivery attempts)
+	Value 'clear' drops a setting and SMSC GW will treat it as default.
 ----
 
 
@@ -3209,11 +3216,17 @@ SYNOPSIS
 	smsc set smdeliveryfailure_tpfailurecause <cause-code> <permanent | temporary | clear>
 
 DESCRIPTION
-	This command is used to set the code of MAPErrorMessageSMDeliveryFailure
-	with SMS-DELIVERY-REPORT to	needed values.
-	- If it set to 'permanent' then SMSC will treat the error with <code> as permanent
-	- If it set to 'temporary' then SMSC will treat the error with <code> as temporary
-	- This value is set to 'clear' by default.
+	This command is used to set the code of smdeliveryfailure_tpfailurecause
+	with SMS-DELIVERY-REPORT to	needed values. When SMSC GW gets a SMDeliveryFailure
+	MAP error message and this message contains SMS-DELIVER Report tpdu with
+	TP-Failure-Cause on board then SMSC GW will treat this delivery failure as
+	temporary or permanent depending of parameters set by this CLI option.
+	- If it set to 'permanent' for a received TP-Failure-Cause then SMSC will treat
+	  the error with code as permanent (with no more delivery attempts)
+	- If it set to 'temporary' for a received TP-Failure-Cause then SMSC will treat
+	  the error with code as temporary (with more delivery attempts)
+	Value 'clear' drops a setting and SMSC GW will treat it as default as permanent
+	Default value is 'clear' (no special value is set).
 ----
 
 
@@ -3235,10 +3248,16 @@ SYNOPSIS
 
 DESCRIPTION
 	This command is used to set the value of smdeliveryfailure_dlr_withtpuserdata
+	When SMSC GW gets a SMDeliveryFailure MAP error message and this message contains
+	SMS-DELIVER Report tpdu with TP-User-Data on board then SMSC GW may put into
+	a generated DLR text field a value a hex encoded context of TP-User-Data depending
+	of parameters set by this CLI option.
 	When SMSC received errorReturn with SMS-DELIVERY-REPORT:
-	    - If it set to 'false' then Delivery Receipts will be generated as normal
-	    - If it set to 'short' then Delivery Receipts will carry 20 first characters of TP-User-Data
-	    - If it set to 'full' then Delivery Receipts will carry full text of TP-User-Data
+	    - If it set to 'false' then Delivery Receipts will be generated as usual
+	    - If it set to 'short' then Delivery Receipts will carry 20 first characters
+	      of hex encoded TP-User-Data
+	    - If it set to 'full' then Delivery Receipts will carry full text
+	      of hex encoded TP-User-Data
 	This value is set to 'false' by default.
 ----
 

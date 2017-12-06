@@ -22,6 +22,8 @@
 
 package org.mobicents.smsc.domain;
 
+import org.mobicents.smsc.library.PermanentTemporaryFailure;
+
 import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
 
@@ -34,7 +36,7 @@ public class SmDeliveryFailureListElement {
     private static final String STATUS = "status";
 
     public int causeCode;
-    public String status;
+    public PermanentTemporaryFailure status;
 
     /**
      * XML Serialization/Deserialization
@@ -45,7 +47,12 @@ public class SmDeliveryFailureListElement {
         @Override
         public void read(InputElement xml, SmDeliveryFailureListElement elem) throws XMLStreamException {
             elem.causeCode = xml.getAttribute(CAUSE_CODE, 0);
-            elem.status = xml.getAttribute(STATUS, "clear");
+            String val = xml.getAttribute(STATUS, "permanent");
+            if (val != null && val.equals("permanent")) {
+                elem.status = PermanentTemporaryFailure.permanent;
+            } else {
+                elem.status = PermanentTemporaryFailure.temporary;
+            }
         }
 
         @Override

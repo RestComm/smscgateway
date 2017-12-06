@@ -74,6 +74,7 @@ import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorAction;
 import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageUtil;
+import org.mobicents.smsc.library.PermanentTemporaryFailure;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsDeliveryReportData;
 import org.mobicents.smsc.library.SmsSet;
@@ -198,35 +199,6 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         setupMtForwardShortMessageRequest(event.getNetworkNode(), event.getImsiData(), event.getLmsi(), smsSet.getNetworkId());
     }
 
-    private ErrorAction getErrorCodeForDlrFailure(int causeCode) {
-        String smDlrStatus = SmscPropertiesManagement.getInstance().getSmDeliveryFailure(causeCode);
-        if (smDlrStatus.equals("permanent")) {
-            return ErrorAction.permanentFailure;
-        } else if (smDlrStatus.equals("temporary")) {
-            return ErrorAction.temporaryFailure;
-        } else { // clear
-            if (causeCode == SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded.getCode()) {
-                return ErrorAction.memoryCapacityExceededFlag;
-            } else if (causeCode == SMEnumeratedDeliveryFailureCause.equipmentProtocolError.getCode()) {
-                return ErrorAction.permanentFailure;
-            } else { // cause code = 2..6
-                return ErrorAction.permanentFailure;
-            }
-        }
-
-    }
-
-    private ErrorAction getErrorCodeForDlrTpFailureCause(String tpFailureCauseStatus) {
-        if (tpFailureCauseStatus.equals("permanent")) {
-            return ErrorAction.permanentFailure;
-        } else if (tpFailureCauseStatus.equals("temporary")) {
-            return ErrorAction.temporaryFailure;
-        }
-
-        //clear
-        return null;
-    }
-
 
     // *********
     // MAP Component events
@@ -260,37 +232,48 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                         mapErrorMessage, false, ProcessingType.SS7_MT);
             } else if (mapErrorMessage.isEmSMDeliveryFailure()) {
                 MAPErrorMessageSMDeliveryFailure smDeliveryFailure = mapErrorMessage.getEmSMDeliveryFailure();
-                SmsDeliverReportTpdu tpdu = smDeliveryFailure.getSmsDeliverReportTpdu();
-
-                String tpFailureCauseStatus = "clear";
-                int tpduCauseCode = -1;
-                if (tpdu != null) {
-                    tpduCauseCode = tpdu.getFailureCause().getCode();
-                    tpFailureCauseStatus = SmscPropertiesManagement.getInstance().getSmDeliveryFailureTpCause(tpduCauseCode);
+                SmsDeliverReportTpdu tpdu = null;
+                try {
+                    tpdu = smDeliveryFailure.getSmsDeliverReportTpdu();
+                } catch (MAPException e) {
+                    // we skip any possible Exception here
                 }
 
-                ErrorAction errAction = this.getErrorCodeForDlrTpFailureCause(tpFailureCauseStatus);
-
-                if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded) {
-                    if (errAction == null) {
-                        errAction = this.getErrorCodeForDlrFailure(SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded.getCode());
+                ErrorAction errAction;
+                // checking firstly a case of FailureCause existence in tpdu
+                if (tpdu != null && tpdu.getFailureCause() != null) {
+                    int tpduCauseCode = tpdu.getFailureCause().getCode();
+                    PermanentTemporaryFailure tpFailureCauseStatus = SmscPropertiesManagement.getInstance()
+                            .getSmDeliveryFailureTpCause(tpduCauseCode);
+                    if (tpFailureCauseStatus == PermanentTemporaryFailure.temporary) {
+                        errAction = ErrorAction.temporaryFailure;
+                    } else {
+                        errAction = ErrorAction.permanentFailure;
                     }
-
-                    this.onDeliveryError(smsSet, errAction, ErrorCode.MESSAGE_QUEUE_FULL,
-                            "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
-                            mapErrorMessage, false, ProcessingType.SS7_MT);
-                } else if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.equipmentProtocolError) {
-                    if (errAction == null) {
-                        errAction = this.getErrorCodeForDlrFailure(SMEnumeratedDeliveryFailureCause.equipmentProtocolError.getCode());
-                    }
-
-                    this.onDeliveryError(smsSet, errAction, ErrorCode.MS_NOT_EQUIPPED,
+                    this.onDeliveryError(smsSet, errAction, ErrorCode.SENDING_SM_FAILED,
                             "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
                             mapErrorMessage, false, ProcessingType.SS7_MT);
                 } else {
-                        this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SENDING_SM_FAILED,
-                            "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
-                            mapErrorMessage, false, ProcessingType.SS7_MT);
+                    // no FailureCause existence in tpdu - then checking DeliveryFailureCause code
+                    PermanentTemporaryFailure smDlrStatus = SmscPropertiesManagement.getInstance().getSmDeliveryFailure(
+                            smDeliveryFailure.getSMEnumeratedDeliveryFailureCause().getCode());
+                    if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded) {
+                        if (smDlrStatus == PermanentTemporaryFailure.permanent)
+                            errAction = ErrorAction.permanentFailure;
+                        else
+                            errAction = ErrorAction.memoryCapacityExceededFlag;
+                        this.onDeliveryError(smsSet, errAction, ErrorCode.MESSAGE_QUEUE_FULL,
+                                "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
+                                mapErrorMessage, false, ProcessingType.SS7_MT);
+                    } else {
+                        if (smDlrStatus == PermanentTemporaryFailure.temporary)
+                            errAction = ErrorAction.temporaryFailure;
+                        else
+                            errAction = ErrorAction.permanentFailure;
+                        this.onDeliveryError(smsSet, errAction, ErrorCode.SENDING_SM_FAILED,
+                                "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
+                                mapErrorMessage, false, ProcessingType.SS7_MT);
+                    }
                 }
             } else if (mapErrorMessage.isEmSystemFailure()) {
                 // TODO: may be it is not a permanent case ???

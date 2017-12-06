@@ -6,14 +6,21 @@ SYNOPSIS
 
 DESCRIPTION
 	This command is used to set the value of smdeliveryfailure_dlr_withtpuserdata
+	When SMSC GW gets a SMDeliveryFailure MAP error message and this message contains
+	SMS-DELIVER Report tpdu with TP-User-Data on board then SMSC GW may put into
+	a generated DLR text field a value a hex encoded context of TP-User-Data depending
+	of parameters set by this CLI option.
 	When SMSC received errorReturn with SMS-DELIVERY-REPORT:
-	    - If it set to 'false' then Delivery Receipts will be generated as normal
-	    - If it set to 'short' then Delivery Receipts will carry 20 first characters of TP-User-Data
-	    - If it set to 'full' then Delivery Receipts will carry full text of TP-User-Data
+	    - If it set to 'false' then Delivery Receipts will be generated as usual
+	    - If it set to 'short' then Delivery Receipts will carry 20 first characters
+	      of hex encoded TP-User-Data
+	    - If it set to 'full' then Delivery Receipts will carry full text
+	      of hex encoded TP-User-Data
 	This value is set to 'false' by default.
 
 EXAMPLES
 	smsc set smdeliveryfailure_dlr_withtpuserdata full
 
 SEE ALSO
-	smsc get smdeliveryfailure_dlr_withtpuserdata
+	smsc get smdeliveryfailure_dlr_withtpuserdata, smsc set smdeliveryfailure_tpfailurecause,
+	smsc set smdeliveryfailure

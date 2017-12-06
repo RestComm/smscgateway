@@ -40,6 +40,7 @@ import javolution.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.mobicents.protocols.ss7.map.primitives.ArrayListSerializingBase;
+import org.mobicents.smsc.library.PermanentTemporaryFailure;
 import org.restcomm.smpp.GenerateType;
 import org.restcomm.smpp.SmppEncoding;
 
@@ -214,9 +215,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private String cassandraUser = "cassandra";
     private String cassandraPass = "cassandra";
 
-    // default value for smdeliveryfailure
-    private FastMap<Integer, String> smDeliveryFailure = new FastMap<Integer,String>();
-    private FastMap<Integer, String> smDeliveryFailureTpFailureCause = new FastMap<Integer,String>();
+    // temporary/permanent delivery failure for SMDeliveryFailure per a SM-DeliveryFailureCause
+    private FastMap<Integer, PermanentTemporaryFailure> smDeliveryFailure = new FastMap<Integer,PermanentTemporaryFailure>();
+    // temporary/permanent delivery failure for SMDeliveryFailure per a TP-Failure-Cause code
+    private FastMap<Integer, PermanentTemporaryFailure> smDeliveryFailureTpFailureCause = new FastMap<Integer,PermanentTemporaryFailure>();
 
     private String smDeliveryFailureDlrWithTpdu = "false";
 
@@ -1458,52 +1460,38 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     }
 
     @Override
-    public void setSmDeliveryFailure(int causeCode, String status) throws IllegalArgumentException {
-        if (!status.equals("permanent") && !status.equals("temporary") && !status.equals("clear"))
-            throw new IllegalArgumentException("Status accept only: permanent/temporary/clear");
-
-        if (status.equals("clear"))
+    public void setSmDeliveryFailure(int causeCode, PermanentTemporaryFailure status) throws IllegalArgumentException {
+        if (status == null)
             this.smDeliveryFailure.remove(causeCode);
         else
             this.smDeliveryFailure.put(causeCode, status);
     }
 
     @Override
-    public String getSmDeliveryFailure(int causeCode){
-        String status = smDeliveryFailure.get(causeCode);
-        if(status != null)
-            return status;
-        else
-            return "clear";
+    public PermanentTemporaryFailure getSmDeliveryFailure(int causeCode){
+        return smDeliveryFailure.get(causeCode);
     }
 
     @Override
-    public Map<Integer, String>  getSmDeliveryFailure(){
+    public Map<Integer, PermanentTemporaryFailure>  getSmDeliveryFailure(){
         return this.smDeliveryFailure;
     }
 
     @Override
-    public void setSmDeliveryFailureTpCause(int causeCode, String status) throws IllegalArgumentException {
-        if (!status.equals("permanent") && !status.equals("temporary") && !status.equals("clear"))
-            throw new IllegalArgumentException("Status accept only: permanent/temporary/clear");
-
-        if (status.equals("clear"))
+    public void setSmDeliveryFailureTpCause(int causeCode, PermanentTemporaryFailure status) throws IllegalArgumentException {
+        if (status == null)
             this.smDeliveryFailureTpFailureCause.remove(causeCode);
         else
             this.smDeliveryFailureTpFailureCause.put(causeCode, status);
     }
 
     @Override
-    public String getSmDeliveryFailureTpCause(int causeCode){
-        String status = this.smDeliveryFailureTpFailureCause.get(causeCode);
-        if(status != null)
-            return status;
-        else
-            return "clear";
+    public PermanentTemporaryFailure getSmDeliveryFailureTpCause(int causeCode){
+        return this.smDeliveryFailureTpFailureCause.get(causeCode);
     }
 
     @Override
-    public Map<Integer, String> getSmDeliveryFailureTpCause(){
+    public Map<Integer, PermanentTemporaryFailure> getSmDeliveryFailureTpCause(){
         return this.smDeliveryFailureTpFailureCause;
     }
 
@@ -1696,7 +1684,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
             if (smDeliveryFailure.size() > 0) {
                 ArrayList<SmDeliveryFailureListElement> al = new ArrayList<SmDeliveryFailureListElement>();
-                for (Entry<Integer, String> val : smDeliveryFailure.entrySet()) {
+                for (Entry<Integer, PermanentTemporaryFailure> val : smDeliveryFailure.entrySet()) {
                     SmDeliveryFailureListElement el = new SmDeliveryFailureListElement();
                     el.causeCode = val.getKey();
                     el.status = val.getValue();
@@ -1708,7 +1696,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
             if (smDeliveryFailureTpFailureCause.size() > 0) {
                 ArrayList<SmDeliveryFailureTpFailureCauseListElement> al = new ArrayList<SmDeliveryFailureTpFailureCauseListElement>();
-                for (Entry<Integer, String> val : smDeliveryFailureTpFailureCause.entrySet()) {
+                for (Entry<Integer, PermanentTemporaryFailure> val : smDeliveryFailureTpFailureCause.entrySet()) {
                     SmDeliveryFailureTpFailureCauseListElement el = new SmDeliveryFailureTpFailureCauseListElement();
                     el.causeCode = val.getKey();
                     el.status = val.getValue();
