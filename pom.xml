@@ -58,7 +58,7 @@
 		<jackson.version>1.9.2</jackson.version>
 		
 		<!-- restcomm properties -->
-		<jss7.restcomm.version>7.4.0-65</jss7.restcomm.version>
+		<jss7.restcomm.version>7.4.0-102</jss7.restcomm.version>
 		<dialogic.version>6.7.1</dialogic.version>
 		<ts.slee.version>2.8.10</ts.slee.version>
 		<jslee.ext.version>${ts.slee.version}</jslee.ext.version>
