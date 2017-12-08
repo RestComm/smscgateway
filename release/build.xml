@@ -31,7 +31,7 @@
 	<property name="restcomm-slee.release" value="2.9.128" />
 
 	<!-- jss7 stack and MAP RA -->
-	<property name="restcomm-jss7.build-number" value="65" />
+	<property name="restcomm-jss7.build-number" value="102" />
 	<property name="restcomm-jss7.version" value="7.4.0-${restcomm-jss7.build-number}" />
 	<!-- <property name="restcomm-jss7.release" value="7.4.0-9" /> -->
 
