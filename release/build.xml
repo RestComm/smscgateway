@@ -35,7 +35,7 @@
 	<property name="restcomm-jss7.version" value="7.4.0-${restcomm-jss7.build-number}" />
 	<!-- <property name="restcomm-jss7.release" value="7.4.0-9" /> -->
 
-	<property name="restcomm-map-ra.build-number" value="71" />
+	<property name="restcomm-map-ra.build-number" value="97" />
 	<property name="restcomm-map-ra.version" value="7.4.0-${restcomm-map-ra.build-number}" />
 	<!-- <property name="restcomm-map-ra.release" value="7.4.0-17" /> -->
 
@@ -46,9 +46,9 @@
 	<property name="restcomm-diam.resources.version" value="7.1.18" />
 
 	<!-- SMPP extentions and and RAs -->
-	<property name="restcomm-smpp-extensions.build-number" value="73" />
+	<property name="restcomm-smpp-extensions.build-number" value="95" />
 	<property name="restcomm-smpp-extensions.version" value="7.1.0" />
-	<property name="restcomm-smpp-ra.build-number" value="68" />
+	<property name="restcomm-smpp-ra.build-number" value="91" />
 	<property name="restcomm-smpp-ra.version" value="7.1.0" />
 
 	<!-- Cassandra community version -->
