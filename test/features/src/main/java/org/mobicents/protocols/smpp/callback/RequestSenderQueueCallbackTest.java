@@ -201,11 +201,11 @@ public class RequestSenderQueueCallbackTest {
         for (int i = 0; i < esmes.length; i++) {
             esmes[i] = HelperClass.getEsmeByName(mbsc, esmeManagementName, esmes[i].getName());
         }
-        logger.info("ESME 0 OVERLOADED:" + esmes[0].isOverloaded());
-        logger.info("ESME 1 OVERLOADED:" + esmes[1].isOverloaded());
-        logger.info("ESME 2 OVERLOADED:" + esmes[2].isOverloaded());
+        logger.info("ESME 0 OVERLOADED:" + esmes[0].getOverloaded());
+        logger.info("ESME 1 OVERLOADED:" + esmes[1].getOverloaded());
+        logger.info("ESME 2 OVERLOADED:" + esmes[2].getOverloaded());
 
-        Boolean overloaded = esmes[1].isOverloaded() ^ esmes[2].isOverloaded() ^ esmes[0].isOverloaded();
+        Boolean overloaded = esmes[1].getOverloaded() ^ esmes[2].getOverloaded() ^ esmes[0].getOverloaded();
         assertTrue(overloaded);
         logger.info("Waiting for response to be sent");
         Thread.sleep(20 * 1000);
@@ -242,11 +242,11 @@ public class RequestSenderQueueCallbackTest {
         for (int i = 0; i < esmes.length; i++) {
             esmes[i] = HelperClass.getEsmeByName(mbsc, esmeManagementName, esmes[i].getName());
         }
-        logger.info("ESME 0 OVERLOADED:" + esmes[0].isOverloaded());
-        logger.info("ESME 1 OVERLOADED:" + esmes[1].isOverloaded());
-        logger.info("ESME 2 OVERLOADED:" + esmes[2].isOverloaded());
+        logger.info("ESME 0 OVERLOADED:" + esmes[0].getOverloaded());
+        logger.info("ESME 1 OVERLOADED:" + esmes[1].getOverloaded());
+        logger.info("ESME 2 OVERLOADED:" + esmes[2].getOverloaded());
 
-        Boolean overloaded = esmes[1].isOverloaded() && esmes[2].isOverloaded();
+        Boolean overloaded = esmes[1].getOverloaded() && esmes[2].getOverloaded();
         assertTrue(overloaded);
         Thread.sleep(40 * 1000);
         assertEquals(32, reqReceived.get());
