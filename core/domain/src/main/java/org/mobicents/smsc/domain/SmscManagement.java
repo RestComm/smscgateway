@@ -256,7 +256,7 @@ public class SmscManagement implements SmscManagementMBean {
                 this.smscPropertiesManagement.getCassandraUser(), this.smscPropertiesManagement.getCassandraPass(),
                 this.smscPropertiesManagement.getFirstDueDelay(), this.smscPropertiesManagement.getReviseSecondsOnSmscStart(),
                 this.smscPropertiesManagement.getProcessingSmsSetTimeout(), this.smscPropertiesManagement.getMinMessageId(),
-                this.smscPropertiesManagement.getMaxMessageId());
+                this.smscPropertiesManagement.getMaxMessageId(), this.smscPropertiesManagement.getCassandraCurrentDueSlotBase());
 
         // Step 3 SmsSetCashe.start()
         SmsSetCache.start(this.smscPropertiesManagement.getCorrelationIdLiveTime(),

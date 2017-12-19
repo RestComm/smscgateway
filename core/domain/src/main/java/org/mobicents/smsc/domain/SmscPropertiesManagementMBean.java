@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  
+ * Telestax, Open Source Cloud Communications Copyright 2011-2017,
  * Copyright 2012, Telestax Inc and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -384,5 +384,20 @@ public interface SmscPropertiesManagementMBean {
     public void setCassandraPass(String pass) throws  IllegalArgumentException;
 
     public String getCassandraPass();
+    
+    /**
+     * Sets the cassandra current due slot base.
+     *
+     * @param aBase the new cassandra current due slot base
+     * @throws IllegalArgumentException the illegal argument exception
+     */
+    void setCassandraCurrentDueSlotBase(int aBase) throws  IllegalArgumentException;
+    
+    /**
+     * Gets the cassandra current due slot base.
+     *
+     * @return the cassandra current due slot base
+     */
+    int getCassandraCurrentDueSlotBase() ;
 
 }

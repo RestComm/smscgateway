@@ -140,6 +140,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
     private static final String CASSANDRA_USER = "cassandraUser";
     private static final String CASSANDRA_PASS = "cassandraPass";
+    private static final String CASSANDRA_CURRENT_DUE_SLOT_BASE = "cassandraCurrentDueSlotBase";
 
 	private static final String TAB_INDENT = "\t";
 	private static final String CLASS_ATTRIBUTE = "type";
@@ -205,6 +206,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // credential for cassandra
     private String cassandraUser = "cassandra";
     private String cassandraPass = "cassandra";
+    
+    private int cassandraCurrentDueSlotBase;
 
 	// period of fetching messages from a database for delivering
 	// private long fetchPeriod = 5000; // that was C1
@@ -616,6 +619,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
     public String getCassandraPass() {
         return this.cassandraPass;
+    }
+    
+    @Override
+    public void setCassandraCurrentDueSlotBase(final int aBase) throws IllegalArgumentException {
+        cassandraCurrentDueSlotBase = aBase;
+        store();
+    }
+
+    @Override
+    public int getCassandraCurrentDueSlotBase() {
+        return cassandraCurrentDueSlotBase;
     }
 
 	@Override
@@ -1559,6 +1573,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
             writer.write(this.cassandraUser, CASSANDRA_USER, String.class);
             writer.write(this.cassandraPass, CASSANDRA_PASS, String.class);
+            writer.write(this.cassandraCurrentDueSlotBase, CASSANDRA_CURRENT_DUE_SLOT_BASE, Integer.class);
 
             writer.write(this.diameterDestRealm, DIAMETER_DEST_REALM, String.class);
 			writer.write(this.diameterDestHost, DIAMETER_DEST_HOST, String.class);
@@ -1891,6 +1906,11 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             vals = reader.read(CASSANDRA_PASS, String.class);
             if (vals != null)
                 this.cassandraPass = vals;
+            
+            val = reader.read(CASSANDRA_CURRENT_DUE_SLOT_BASE, Integer.class);
+            if (val != null) {
+                cassandraCurrentDueSlotBase = val;
+            }
 
             this.diameterDestRealm = reader.read(DIAMETER_DEST_REALM, String.class);
 
