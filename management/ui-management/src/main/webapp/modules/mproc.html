@@ -513,6 +513,13 @@
 						<input id="remove_tlv" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Remove tlv" />
 					</span>
 				</div>
+				
+				<div id="div-removedestdigprefix" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="This action will remove first digits count from a destination address. The action will leave at least one (last) digit if value is too long. Default value is 0. 0 or negative values will make no action.">
+						<span class="add-on">Remove destination address prefix</span>
+						<input id="removedestdigprefix" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Remove destination address prefix" />
+					</span>
+				</div>
 
 				<button id="add-entity-button" class="btn btn btn-primary" onclick="createMProc()">Create</button>
 			</span>
@@ -751,6 +758,7 @@
 										var rejectonarrival = processRuleParameters(ruleparameters, "rejectonarrival");
 										rejectonarrival = rejectonarrival.toUpperCase();
 										var removetlv = processRuleParameters(ruleparameters, "tlvTagToRemove");
+										var removedestdigprefix = processRuleParameters(ruleparameters, "removedestdigprefix");
 
 										$('#esmes-table-wrapper').append('<div id="entities-modal'+id+'" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'+
 												'<div class="modal-header">'+
@@ -1391,7 +1399,21 @@
 																			'</td>'+
 																		'</tr>'+
 
-
+																		'<tr data-toggle="tooltip" title="This action will remove first digits from a destination address. The action will leave at least one (last) digit if value is too long. Default value is 0. 0 or negative values will make no action.">'+
+																			'<td style="font-size: 0.9em;">Remove destination address prefix</td>'+
+																			'<td style="font-size: 0.9em; padding: 0;">'+
+																				'<div id="div-' + id +'RemoveDestDigPrefix-input" class="control-group">'+
+																				'<span id="' + id +'RemoveDestDigPrefix-input" style="display: none;">'+
+																					'<input type="text" class="input-small" value="' + removedestdigprefix + '" /> ' +
+																					'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + id+ '\', \'removedestdigprefix\', \'' + id+"RemoveDestDigPrefix" + '\', \'true\')"></i> ' +
+																					'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+id+"RemoveDestDigPrefix"+']\').toggle(); $(\'input[id^='+id+"RemoveDestDigPrefix"+']\').focus();"></i>' +
+																				'</span>'+
+																				'</div>' +
+																				'<span id="' +id + 'RemoveDestDigPrefix-text">' + removedestdigprefix + '</span>'+
+																			'</td>'+
+																			'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+id+"RemoveDestDigPrefix"+']\').toggle(); $(\'input[id^='+id+"RemoveDestDigPrefix"+']\').focus();"></i>' +
+																			'</td>'+
+																		'</tr>'+
 
 
 
@@ -1843,6 +1865,13 @@
 			remove_tlv = "-1";
 		} else {
 			parametersstring = parametersstring + " remove_tlv "+remove_tlv;
+		}
+		
+		var removedestdigprefix = $("#removedestdigprefix").val();
+		if(removedestdigprefix.trim() == "") {
+			removedestdigprefix = "0";
+		} else {
+			parametersstring = parametersstring + " removedestdigprefix "+removedestdigprefix;
 		}
 
 		parametersstring = parametersstring.trim();

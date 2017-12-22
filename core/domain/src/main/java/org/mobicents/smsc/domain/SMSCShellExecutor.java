@@ -182,7 +182,7 @@ public class SMSCShellExecutor implements ShellExecutor {
      * type of number> newdestnpi <new destination numbering plan indicator> addestdigprefix <prefix> mtlocalsccpgt 
      * <new gt of a local sccp address of an mt message> mtremotesccptt <new tt for remote sccp address for mt message> 
      * makecopy <false | true> droponarrival <true | false> rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE 
-     * | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED>
+     * | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key> removedestdigprefix <value>
      * 
      * @param args
      * @return
@@ -229,7 +229,8 @@ public class SMSCShellExecutor implements ShellExecutor {
      * newdestnpi <new destination numbering plan indicator> addestdigprefix <prefix> mtlocalsccpgt 
      * <new gt of a local sccp address of an mt message> mtremotesccptt <new tt for remote sccp address for mt message> 
      * makecopy <false | true> droponarrival <true | false> rejectonarrival <NONE | DEFAULT |
-     * UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED>
+     * UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key> 
+     * removedestdigprefix <value>
      * 
      * @param args
      * @return

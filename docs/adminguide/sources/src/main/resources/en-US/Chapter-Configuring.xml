@@ -524,6 +524,15 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 							</para></entry>
 							<entry>NONE : default action is no action</entry>
 						</row>
+<row>
+							<entry>removedestdigprefix</entry>
+							<entry>&lt;value&gt;</entry>
+							<entry>first &lt;value&gt; digits will be removed from message destination address. 
+							For example if removedestdigprefix is "22" and destination address digits are "3456789", then the new value of 
+							destination address digits will be "56789". The action will leave at least one (last) digit if value is too long. 
+							Negative value will be ignored.</entry>
+							<entry>"0". This means that destination address of the message will not be changed.</entry>
+						</row>
 					</tbody>
 					</tgroup>
 				</table>

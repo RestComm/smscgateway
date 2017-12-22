@@ -321,4 +321,13 @@ public class MProcUtility {
     	int r = random.nextInt(100);
     	return percent >= r;
     }
+
+    public static String removeDestDigPrefix(String destAddr, int removeDestDigPrefix) {
+        int destAddrLength = destAddr.length();
+        if (removeDestDigPrefix <= 0)
+            return destAddr;
+        if (removeDestDigPrefix >= destAddrLength)
+            return destAddr.substring(destAddrLength - 1);
+        return destAddr.substring(removeDestDigPrefix);
+    }
 }

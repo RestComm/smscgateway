@@ -167,7 +167,7 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
         sms.getSmsSet().setNetworkId(newNetworkId);
         sms.getSmsSet().setCorrelationId(null);
     }
-
+    
     @Override
     public void updateMessageDestAddrTon(MProcMessage message, int newDestTon) throws MProcRuleException {
         MProcUtility.checkDestAddrTon(newDestTon);

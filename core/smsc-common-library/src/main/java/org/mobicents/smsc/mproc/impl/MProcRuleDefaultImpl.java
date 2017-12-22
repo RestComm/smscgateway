@@ -98,6 +98,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String NEW_NETWORK_ID_AFTER_TEMP_FAIL = "newNetworkIdAfterTempFail";
     private static final String HR_BY_PASS = "hrByPass";
     private static final String TLV_TAG_TO_REMOVE = "tlvTagToRemove";
+    private static final String REMOVE_DEST_DIG_PREFIX = "removeDestDigPrefix";
 
     // TODO: we need proper implementing
     // // test magic mproc rules - we need to remove then later after proper implementing
@@ -155,6 +156,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private int newNetworkIdAfterTempFail = -1;
     private boolean hrByPass = false;
     private short tlvTagToRemove = -1;
+    private int removeDestDigPrefix = -1;
 
     private Pattern destDigMaskPattern;
     private Pattern sourceDigMaskPattern;
@@ -675,6 +677,20 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.rejectOnArrival = rejectOnArrival;
     }
 
+    /**
+     * @return if 0 or negative value - do nothing positive value means number of first digits (prefix) that will be removed
+     *         from destination address
+     */
+    @Override
+    public int getRemoveDestDigPrefix() {
+        return removeDestDigPrefix;
+    }
+
+    @Override
+    public void setRemoveDestDigPrefix(int removeDestDigPrefix) {
+        this.removeDestDigPrefix = removeDestDigPrefix;
+    }
+
     private void resetPattern() {
         if (this.destDigMask != null && !this.destDigMask.equals("") && !this.destDigMask.equals("-1")) {
             this.destDigMaskPattern = Pattern.compile(this.destDigMask);
@@ -737,7 +753,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             int newSourceNpi, String newSourceAddr, String mtLocalSccpGt, int mtRemoteSccpTt, boolean makeCopy,
             boolean hrByPass, boolean dropAfterSri, boolean dropAfterTempFail, boolean dropOnArrival,
             RejectType rejectOnArrival, int newNetworkIdAfterSri, int newNetworkIdAfterPermFail, int newNetworkIdAfterTempFail,
-            short tlvTagToMatch, TlvValueType tlvValueTypeToMatch, String tlvValueToMatch, short tlvTagToRemove) {
+            short tlvTagToMatch, TlvValueType tlvValueTypeToMatch, String tlvValueToMatch, short tlvTagToRemove,
+            int removeDestDigPrefix) {
         this.destTonMask = destTonMask;
         this.destNpiMask = destNpiMask;
         this.destDigMask = destDigMask;
@@ -779,6 +796,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.newNetworkIdAfterPermFail = newNetworkIdAfterPermFail;
         this.newNetworkIdAfterTempFail = newNetworkIdAfterTempFail;
         this.tlvTagToRemove = tlvTagToRemove;
+        this.removeDestDigPrefix = removeDestDigPrefix;
         this.resetPattern();
     }
 
@@ -794,7 +812,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 || this.mtRemoteSccpTt != -1
                 || (this.tlvTagToMatch != -1 && tlvValueTypeToMatch != null && tlvValueToMatch != null
                         && !tlvValueToMatch.isEmpty())
-                || this.tlvTagToRemove != -1 || this.dropOnArrival || this.rejectOnArrival != null) {
+                || this.tlvTagToRemove != -1 || this.dropOnArrival || this.rejectOnArrival != null
+                || this.removeDestDigPrefix > 0) {
             return true;
         } else
             return false;
@@ -1132,6 +1151,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (this.tlvTagToRemove != -1) {
             factory.removeTlvParameter(message, this.tlvTagToRemove);
         }
+        if (this.removeDestDigPrefix > 0) {
+            String newAddr = MProcUtility.removeDestDigPrefix(message.getDestAddr(), removeDestDigPrefix);
+            factory.updateMessageDestAddr(message, newAddr);
+        }
     }
 
     @Override
@@ -1255,6 +1278,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int newNetworkIdAfterTempFail = -1;
         short tlvTagToRemove = -1;
         int percent = -1;
+        int removeDestDigPrefix = -1;
 
         while (count < args.length) {
             command = args[count++];
@@ -1373,6 +1397,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     } catch (Exception e) {
                         // dont have to do anything
                     }
+                } else if (command.equals("removedestdigprefix")) {
+                    removeDestDigPrefix = Integer.parseInt(value);
+                    success = true;
                 }
             }
         } // while
@@ -1401,9 +1428,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 originatingMaskVal, networkIdMask, originNetworkIdMask, receiptNetworkIdMask, origEsmeNameMask,
                 originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode, percent, newNetworkId,
                 newDestTon, newDestNpi, addDestDigPrefix, addSourceDigPrefix, newSourceTon, newSourceNpi, newSourceAddr,
-                mtLocalSccpGt, mtRemoteSccpTt, makeCopy, hrByPass, dropAfterSri, dropAfterTempFail, dropOnArrival, rejectOnArrivalVal,
-                newNetworkIdAfterSri, newNetworkIdAfterPermFail, newNetworkIdAfterTempFail, tlvTagToMatch, tlvValueTypeToMatch,
-                tlvValueToMatch, tlvTagToRemove);
+                mtLocalSccpGt, mtRemoteSccpTt, makeCopy, hrByPass, dropAfterSri, dropAfterTempFail, dropOnArrival,
+                rejectOnArrivalVal, newNetworkIdAfterSri, newNetworkIdAfterPermFail, newNetworkIdAfterTempFail, tlvTagToMatch,
+                tlvValueTypeToMatch, tlvValueToMatch, tlvTagToRemove, removeDestDigPrefix);
     }
 
     @Override
@@ -1591,6 +1618,10 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     } catch (Exception e) {
                         // dont have to do anything
                     }
+                } else if (command.equals("removedestdigprefix")) {
+                    int val = Integer.parseInt(value);
+                    this.setRemoveDestDigPrefix(val);
+                    success = true;
                 }
             }
         } // while
@@ -1740,6 +1771,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (tlvTagToRemove != -1) {
             writeParameter(sb, parNumber++, "tlvTagToRemove", this.tlvTagToRemove, ", ", "=");
         }
+        if (removeDestDigPrefix != -1) {
+            writeParameter(sb, parNumber++, "removeDestDigPrefix", removeDestDigPrefix, ", ", "=");
+        }
         return sb.toString();
     }
 
@@ -1825,6 +1859,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.newNetworkIdAfterPermFail = xml.getAttribute(NEW_NETWORK_ID_AFTER_PERM_FAIL, -1);
             mProcRule.newNetworkIdAfterTempFail = xml.getAttribute(NEW_NETWORK_ID_AFTER_TEMP_FAIL, -1);
             mProcRule.tlvTagToRemove = xml.getAttribute(TLV_TAG_TO_REMOVE, (short) -1);
+            mProcRule.removeDestDigPrefix = xml.getAttribute(REMOVE_DEST_DIG_PREFIX, -1);
 
             mProcRule.resetPattern();
         }
@@ -1936,6 +1971,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
             if (mProcRule.tlvTagToRemove != -1)
                 xml.setAttribute(TLV_TAG_TO_REMOVE, mProcRule.tlvTagToRemove);
+            if (mProcRule.removeDestDigPrefix > 0)
+                xml.setAttribute(REMOVE_DEST_DIG_PREFIX, mProcRule.removeDestDigPrefix);
         }
     };
 

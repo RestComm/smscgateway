@@ -310,5 +310,13 @@ public interface MProcRuleDefault extends MProcRule {
     boolean isHrByPass();
 
     void setHrByPass(boolean hrByPass);
+    
+    /**
+     * @return if 0 or negative value - do nothing
+     * positive value means number of first digits (prefix) that will be removed from destination address 
+     */
+    int getRemoveDestDigPrefix();
+
+    void setRemoveDestDigPrefix(int removeDestDigPrefix);
 
 }
