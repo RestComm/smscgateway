@@ -55,10 +55,18 @@ import com.codahale.metrics.MetricRegistry;
 */
 public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMediator {
 
+    public static final String NAME = "SMSC";
+    public static final String MEDIATOR_NAME = "SMSC GW-" + NAME;
+    public static final String DEF_SET_MAIN = MEDIATOR_NAME + "-Main";
+    public static final String DEF_SET_ERRORS = MEDIATOR_NAME + "-Errors";
+    public static final String DEF_SET_MAINTENANCE = MEDIATOR_NAME + "-Maintenance";
+    
     protected final Logger logger;
 
     private final MBeanHost ss7Management;
     private final SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private final ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
+    private final MaintenanceStatAggregator maintenanceStatAggregator = MaintenanceStatAggregator.getInstance();
 
     private FastMap<String, CounterDefSet> lstCounters = new FastMap<String, CounterDefSet>();
 
@@ -116,13 +124,13 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
     }
 
     public String getName() {
-        return "SMSC";
+        return NAME;
     }
 
     private void setupCounterList() {
         FastMap<String, CounterDefSet> lst = new FastMap<String, CounterDefSet>();
 
-        CounterDefSetImpl cds = new CounterDefSetImpl(this.getCounterMediatorName() + "-Main");
+        CounterDefSetImpl cds = new CounterDefSetImpl(DEF_SET_MAIN);
         lst.put(cds.getName(), cds);
 
         CounterDef cd = new CounterDefImpl(CounterType.Minimal, "MinMessagesInProcess", "A min count of messages that are in progress during a period");
@@ -202,10 +210,10 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
         cd = new CounterDefImpl(CounterType.Maximal, "MsgPendingInDb", "Messages stored in database which are to be delivered yet");
         cds.addCounterDef(cd);
         
-        CounterDefSetImpl cdErrors = new CounterDefSetImpl(this.getCounterMediatorName() + "-Errors");
+        CounterDefSetImpl cdErrors = new CounterDefSetImpl(DEF_SET_ERRORS);
         lst.put(cdErrors.getName(), cdErrors);
         
-        CounterDefSetImpl cdMaintenance = new CounterDefSetImpl(this.getCounterMediatorName() + "-Maintenance");
+        CounterDefSetImpl cdMaintenance = new CounterDefSetImpl(DEF_SET_MAINTENANCE);
         lst.put(cdMaintenance.getName(), cdMaintenance);
 
         lstCounters = lst;
@@ -225,7 +233,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
 
     @Override
     public String getCounterMediatorName() {
-        return "SMSC GW-" + this.getName();
+        return MEDIATOR_NAME;
     }
 
     @Override
@@ -247,103 +255,125 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
             svs = new SourceValueSetImpl(smscStatAggregator.getSessionId());
 
             CounterDefSet cds = getCounterDefSet(counterDefSetName);
-            for (CounterDef cd : cds.getCounterDefs()) {
-                SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
-
-                SourceValueObjectImpl svo = null;
-                if (cd.getCounterName().equals("MsgInReceivedAll")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedAll());
-                } else if (cd.getCounterName().equals("MsgInRejectedAll")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInRejectedAll());
-                } else if (cd.getCounterName().equals("MsgInFailedAll")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInFailedAll());
-
-                } else if (cd.getCounterName().equals("MsgInReceivedSs7")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSs7());
-                } else if (cd.getCounterName().equals("MsgInReceivedSs7Mo")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSs7Mo());
-                } else if (cd.getCounterName().equals("MsgInReceivedSs7Hr")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSs7Hr());
-                } else if (cd.getCounterName().equals("HomeRoutingCorrIdFail")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getHomeRoutingCorrIdFail());
-                } else if (cd.getCounterName().equals("SmppSecondRateOverlimitFail")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppSecondRateOverlimitFail());
-                } else if (cd.getCounterName().equals("SmppMinuteRateOverlimitFail")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppMinuteRateOverlimitFail());
-                } else if (cd.getCounterName().equals("SmppHourRateOverlimitFail")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppHourRateOverlimitFail());
-                } else if (cd.getCounterName().equals("SmppDayRateOverlimitFail")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppDayRateOverlimitFail());
-
-                } else if (cd.getCounterName().equals("MsgInReceivedSmpp")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSmpp());
-                } else if (cd.getCounterName().equals("MsgInReceivedSip")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSip());
-                } else if (cd.getCounterName().equals("MsgInReceivedAllCumulative")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedAllCumulative());
-
-                } else if (cd.getCounterName().equals("MsgInHrSriReq")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriReq());
-                } else if (cd.getCounterName().equals("MsgInHrSriPosReq")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriPosReq());
-                } else if (cd.getCounterName().equals("MsgInHrSriHrByPass")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriHrByPass());
-                } else if (cd.getCounterName().equals("MsgInHrSriNegReq")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriNegReq());
-
-                } else if (cd.getCounterName().equals("MsgOutTryAll")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTryAll());
-                } else if (cd.getCounterName().equals("MsgOutSentAll")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentAll());
-                } else if (cd.getCounterName().equals("MsgOutTryAllCumulative")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTryAllCumulative());
-                } else if (cd.getCounterName().equals("MsgOutSentAllCumulative")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentAllCumulative());
-                } else if (cd.getCounterName().equals("MsgOutFailedAll")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutFailedAll());
-
-                } else if (cd.getCounterName().equals("MsgOutTryAllPerSec")) {
-                    long cnt = smscStatAggregator.getMsgOutTryAll();
-                    svo = new SourceValueObjectImpl(this.getName(), 0);
-                    svo.setValueA(cnt);
-                    svo.setValueB(curTimeSeconds);
-                } else if (cd.getCounterName().equals("MsgOutSentAllPerSec")) {
-                    long cnt = smscStatAggregator.getMsgOutSentAll();
-                    svo = new SourceValueObjectImpl(this.getName(), 0);
-                    svo.setValueA(cnt);
-                    svo.setValueB(curTimeSeconds);
-
-                } else if (cd.getCounterName().equals("MsgOutTrySs7")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTrySs7());
-                } else if (cd.getCounterName().equals("MsgOutSentSs7")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentSs7());
-                } else if (cd.getCounterName().equals("MsgOutTrySmpp")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTrySmpp());
-                } else if (cd.getCounterName().equals("MsgOutSentSmpp")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentSmpp());
-                } else if (cd.getCounterName().equals("MsgOutTrySip")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTrySip());
-                } else if (cd.getCounterName().equals("MsgOutSentSip")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentSip());
-
-                } else if (cd.getCounterName().equals("MinMessagesInProcess")) {
-                    Long res = smscStatAggregator.getMinMessagesInProcess(campaignName);
-                    if (res != null)
-                        svo = new SourceValueObjectImpl(this.getName(), res);
-                } else if (cd.getCounterName().equals("MaxMessagesInProcess")) {
-                    Long res = smscStatAggregator.getMaxMessagesInProcess(campaignName);
-                    if (res != null)
-                        svo = new SourceValueObjectImpl(this.getName(), res);
-                } else if (cd.getCounterName().equals("SmscDeliveringLag")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmscDeliveringLag());
-                } else if (cd.getCounterName().equals("MsgPendingInDb")) {
-                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgPendingInDbRes());
+            if(counterDefSetName.equals(DEF_SET_MAIN)) {
+                for (CounterDef cd : cds.getCounterDefs()) {
+                    SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
+    
+                    SourceValueObjectImpl svo = null;
+                    if (cd.getCounterName().equals("MsgInReceivedAll")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedAll());
+                    } else if (cd.getCounterName().equals("MsgInRejectedAll")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInRejectedAll());
+                    } else if (cd.getCounterName().equals("MsgInFailedAll")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInFailedAll());
+    
+                    } else if (cd.getCounterName().equals("MsgInReceivedSs7")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSs7());
+                    } else if (cd.getCounterName().equals("MsgInReceivedSs7Mo")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSs7Mo());
+                    } else if (cd.getCounterName().equals("MsgInReceivedSs7Hr")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSs7Hr());
+                    } else if (cd.getCounterName().equals("HomeRoutingCorrIdFail")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getHomeRoutingCorrIdFail());
+                    } else if (cd.getCounterName().equals("SmppSecondRateOverlimitFail")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppSecondRateOverlimitFail());
+                    } else if (cd.getCounterName().equals("SmppMinuteRateOverlimitFail")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppMinuteRateOverlimitFail());
+                    } else if (cd.getCounterName().equals("SmppHourRateOverlimitFail")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppHourRateOverlimitFail());
+                    } else if (cd.getCounterName().equals("SmppDayRateOverlimitFail")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppDayRateOverlimitFail());
+    
+                    } else if (cd.getCounterName().equals("MsgInReceivedSmpp")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSmpp());
+                    } else if (cd.getCounterName().equals("MsgInReceivedSip")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSip());
+                    } else if (cd.getCounterName().equals("MsgInReceivedAllCumulative")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedAllCumulative());
+    
+                    } else if (cd.getCounterName().equals("MsgInHrSriReq")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriReq());
+                    } else if (cd.getCounterName().equals("MsgInHrSriPosReq")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriPosReq());
+                    } else if (cd.getCounterName().equals("MsgInHrSriHrByPass")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriHrByPass());
+                    } else if (cd.getCounterName().equals("MsgInHrSriNegReq")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriNegReq());
+    
+                    } else if (cd.getCounterName().equals("MsgOutTryAll")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTryAll());
+                    } else if (cd.getCounterName().equals("MsgOutSentAll")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentAll());
+                    } else if (cd.getCounterName().equals("MsgOutTryAllCumulative")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTryAllCumulative());
+                    } else if (cd.getCounterName().equals("MsgOutSentAllCumulative")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentAllCumulative());
+                    } else if (cd.getCounterName().equals("MsgOutFailedAll")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutFailedAll());
+    
+                    } else if (cd.getCounterName().equals("MsgOutTryAllPerSec")) {
+                        long cnt = smscStatAggregator.getMsgOutTryAll();
+                        svo = new SourceValueObjectImpl(this.getName(), 0);
+                        svo.setValueA(cnt);
+                        svo.setValueB(curTimeSeconds);
+                    } else if (cd.getCounterName().equals("MsgOutSentAllPerSec")) {
+                        long cnt = smscStatAggregator.getMsgOutSentAll();
+                        svo = new SourceValueObjectImpl(this.getName(), 0);
+                        svo.setValueA(cnt);
+                        svo.setValueB(curTimeSeconds);
+    
+                    } else if (cd.getCounterName().equals("MsgOutTrySs7")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTrySs7());
+                    } else if (cd.getCounterName().equals("MsgOutSentSs7")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentSs7());
+                    } else if (cd.getCounterName().equals("MsgOutTrySmpp")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTrySmpp());
+                    } else if (cd.getCounterName().equals("MsgOutSentSmpp")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentSmpp());
+                    } else if (cd.getCounterName().equals("MsgOutTrySip")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTrySip());
+                    } else if (cd.getCounterName().equals("MsgOutSentSip")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentSip());
+    
+                    } else if (cd.getCounterName().equals("MinMessagesInProcess")) {
+                        Long res = smscStatAggregator.getMinMessagesInProcess(campaignName);
+                        if (res != null)
+                            svo = new SourceValueObjectImpl(this.getName(), res);
+                    } else if (cd.getCounterName().equals("MaxMessagesInProcess")) {
+                        Long res = smscStatAggregator.getMaxMessagesInProcess(campaignName);
+                        if (res != null)
+                            svo = new SourceValueObjectImpl(this.getName(), res);
+                    } else if (cd.getCounterName().equals("SmscDeliveringLag")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmscDeliveringLag());
+                    } else if (cd.getCounterName().equals("MsgPendingInDb")) {
+                        svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgPendingInDbRes());
+                    }
+                    
+                    if (svo != null)
+                        scs.addObject(svo);
+    
+                    svs.addCounter(scs);
                 }
-                
-                if (svo != null)
+            } else if (counterDefSetName.equals(DEF_SET_ERRORS)) {
+                svs = new SourceValueSetImpl(errorsStatAggregator.getSessionId());
+                for (CounterDef cd : cds.getCounterDefs()) {
+                    SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
+    
+                    SourceValueObjectImpl svo = new SourceValueObjectImpl(this.getName(), 
+                            errorsStatAggregator.getByCounterName(cd.getGroupName(), cd.getObjectName()).get());
                     scs.addObject(svo);
-
-                svs.addCounter(scs);
+                    svs.addCounter(scs);
+                }
+            } else if (counterDefSetName.equals(DEF_SET_MAINTENANCE)) {
+                svs = new SourceValueSetImpl(maintenanceStatAggregator.getSessionId());
+                for (CounterDef cd : cds.getCounterDefs()) {
+                    SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
+    
+                    SourceValueObjectImpl svo = new SourceValueObjectImpl(this.getName(), 
+                            maintenanceStatAggregator.getByCounterName(cd.getGroupName(), cd.getObjectName()).get());
+                    scs.addObject(svo);
+                    svs.addCounter(scs);
+                }
             }
         } catch (Throwable e) {
             logger.info("Exception when getSourceValueSet() - campaignName=" + campaignName + " - " + e.getMessage(), e);

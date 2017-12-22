@@ -595,12 +595,12 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
 	}
 	
 	private String getErrorsCounterDefSetName() {
-	    String errorsDefSetName = smscStatProviderJmx.getCounterMediatorName() + "-Errors";
+	    String errorsDefSetName = SmscStatProviderJmx.DEF_SET_ERRORS;
         return errorsDefSetName;
 	}
 	
 	private String getMaintenanceCounterDefSetName() {
-	    String maintenanceDefSetName = smscStatProviderJmx.getCounterMediatorName() + "-Maintenance";
+	    String maintenanceDefSetName = SmscStatProviderJmx.DEF_SET_MAINTENANCE;
         return maintenanceDefSetName;
     }
 	
