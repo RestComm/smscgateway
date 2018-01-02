@@ -95,6 +95,8 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     private SmppManagement smppManagement;
 
     private SmscStatProviderJmx smscStatProviderJmx;
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
+    private MaintenanceStatAggregator maintenanceStatAggregator = MaintenanceStatAggregator.getInstance();
 
     private SipManagement sipManagement = null;
     private MProcManagement mProcManagement = null;
@@ -115,7 +117,13 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
 
     private static SmscStatProvider smscStatProvider = null;
 
+    /**
+     * Keeps information 'clusterName' - 'number of esmes for which counters are enabled'
+     */
     private ConcurrentHashMap<String, AtomicInteger> clusterCountersEnabledMap = new ConcurrentHashMap<>();
+    /**
+     * Keeps information 'esmeName' - 'boolean' whether error counter is enabled for esme
+     */
     private ConcurrentHashMap<String, Boolean> esmeErrorCountersEnabledMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<SessionKey, Boolean> sessionErrorCountersEnabledMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, Boolean> mprocErrorCountersEnabledMap = new ConcurrentHashMap<>();
@@ -409,7 +417,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
                 }
 
                 if (enableCounter) {
-                    String mprocCounterGroup = CounterGroup.MProc.toString();
+                    String mprocCounterGroup = CounterGroup.MProc + "_";
                     CounterDef cd = new CounterDefImpl(CounterType.Average, mprocCounterGroup + CounterCategory.MProc,
                             String.valueOf(mProcRule.getId()), "Mproc Errors per Mproc rule = " + mProcRule.getId());
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
@@ -609,59 +617,68 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
         Esme esme = smppManagement.getEsmeManagement().getEsmeByName(esmeName);
         boolean globalClusterErrorCountersEnabled = smscPropertiesManagement.isClusterErrorCountersEnabled();
         boolean globalClusterMaintenanceCountersEnabled = smscPropertiesManagement.isClusterMaintenanceCountersEnabled();
-        String clusterGroup = CounterGroup.Cluster.toString();
+        String clusterGroup = CounterGroup.Cluster + "_";
+        CounterGroup group = CounterGroup.Cluster;
 
-        // if local map doesn't contain clustername yet - add counters if needed AND put value in local map,
+        // if local map doesn't contain clusterName yet - add counters if needed AND put value in local map,
         // else - increment num of esmes in this cluster
         if (clusterCountersEnabledMap.putIfAbsent(clusterName, new AtomicInteger(1)) == null) {
             if (globalClusterErrorCountersEnabled) {
                 CounterDef cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.Scheduler, clusterName,
                         "Scheduler Errors per Cluster");
                 smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                errorsStatAggregator.addCounter(group, CounterCategory.Scheduler, clusterName);
 
                 cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppIn, clusterName,
                         "SMPP IN Errors per Cluster");
                 smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                errorsStatAggregator.addCounter(group, CounterCategory.SmppIn, clusterName);
 
                 cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppOut, clusterName,
                         "SMPP OUT Errors per Cluster");
                 smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                errorsStatAggregator.addCounter(group, CounterCategory.SmppOut, clusterName);
             }
             if (globalClusterMaintenanceCountersEnabled) {
-                CounterDef cd = new CounterDefImpl(CounterType.Average,
-                        clusterGroup + CounterCategory.RequestQueueSize.toString(), clusterName,
-                        "Request Queue Size per Cluster");
+                CounterDef cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.RequestQueueSize,
+                        clusterName, "Request Queue Size per Cluster");
                 smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                maintenanceStatAggregator.addCounter(group, CounterCategory.RequestQueueSize, clusterName);
 
-                cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.ResponseQueueSize.toString(),
-                        clusterName, "Response Queue Size per Cluster");
+                cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.ResponseQueueSize, clusterName,
+                        "Response Queue Size per Cluster");
                 smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                maintenanceStatAggregator.addCounter(group, CounterCategory.ResponseQueueSize, clusterName);
 
-                cd = new CounterDefImpl(CounterType.Average,
-                        clusterGroup + CounterCategory.ClientEsmeConnectQueueSize.toString(), clusterName,
-                        "Connecting to CLIENT ESME Queue size per Cluster");
+                cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.ClientEsmeConnectQueueSize,
+                        clusterName, "Connecting to CLIENT ESME Queue size per Cluster");
                 smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                maintenanceStatAggregator.addCounter(group, CounterCategory.ClientEsmeConnectQueueSize, clusterName);
 
-                cd = new CounterDefImpl(CounterType.Average,
-                        clusterGroup + CounterCategory.ClientEsmeEnquireLinkQueueSize.toString(), clusterName,
-                        "Enquire_link to CLIENT ESME Queue size per Cluster");
+                cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.ClientEsmeEnquireLinkQueueSize,
+                        clusterName, "Enquire_link to CLIENT ESME Queue size per Cluster");
                 smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                maintenanceStatAggregator.addCounter(group, CounterCategory.ClientEsmeEnquireLinkQueueSize, clusterName);
 
-                cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsTotal.toString(),
-                        clusterName, "Total number of reconnects to ESME per Cluster");
+                cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsTotal, clusterName,
+                        "Total number of reconnects to ESME per Cluster");
                 smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                maintenanceStatAggregator.addCounter(group, CounterCategory.EsmeReconnectsTotal, clusterName);
 
-                cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsSuccessful.toString(),
+                cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsSuccessful,
                         clusterName, "Successful number of reconnects to ESMEs per Cluster");
                 smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                maintenanceStatAggregator.addCounter(group, CounterCategory.EsmeReconnectsSuccessful, clusterName);
 
-                cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsFailed.toString(),
-                        clusterName, "Number of failed of reconnects to ESMEs per Cluster");
+                cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsFailed, clusterName,
+                        "Number of failed of reconnects to ESMEs per Cluster");
                 smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                maintenanceStatAggregator.addCounter(group, CounterCategory.EsmeReconnectsFailed, clusterName);
 
-                cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.EsmesStartedTotal.toString(),
-                        clusterName, "Total number of ESMEs in Started state which are disconnected per Cluster");
+                cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.EsmesStartedTotal, clusterName,
+                        "Total number of ESMEs in Started state which are disconnected per Cluster");
                 smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                maintenanceStatAggregator.addCounter(group, CounterCategory.EsmesStartedTotal, clusterName);
             }
         } else {
             clusterCountersEnabledMap.get(clusterName).incrementAndGet();
@@ -672,19 +689,24 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
         enableEsmeErrorCounter = esmeErrorCountersEnabled == null ? smscPropertiesManagement.isEsmeErrorCountersEnabled()
                 : esmeErrorCountersEnabled;
 
-        String esmeGroup = CounterGroup.ESME.toString();
+        String esmeGroup = CounterGroup.ESME + "_";
+        group = CounterGroup.ESME;
         if (enableEsmeErrorCounter) {
             CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.Scheduler, esmeName,
                     "Scheduler Errors per Esme");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(group, CounterCategory.Scheduler, esmeName);
 
             cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.SmppIn, esmeName,
                     "SMPP IN Errors per Esme");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(group, CounterCategory.SmppIn, esmeName);
 
             cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.SmppOut, esmeName,
                     "SMPP OUT Errors per Esme");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(group, CounterCategory.SmppOut, esmeName);
+
             esmeErrorCountersEnabledMap.put(esmeName, true);
         }
 
@@ -694,13 +716,16 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
                 ? smscPropertiesManagement.isEsmeMaintenanceCountersEnabled() : esmeMaintenanceCountersEnabled;
 
         if (enableEsmeMaintenanceCounter) {
-            CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.RequestQueueSize.toString(),
-                    esmeName, "Request Queue Size per ESME");
+            CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.RequestQueueSize, esmeName,
+                    "Request Queue Size per ESME");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(group, CounterCategory.RequestQueueSize, esmeName);
 
-            cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.ResponseQueueSize.toString(), esmeName,
+            cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.ResponseQueueSize, esmeName,
                     "Response Queue Size per ESME");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(group, CounterCategory.ResponseQueueSize, esmeName);
+
             esmeMaintCountersEnabledMap.put(esmeName, true);
         }
     }
@@ -713,67 +738,83 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
         boolean globalClusterErrorCountersEnabled = smscPropertiesManagement.isClusterErrorCountersEnabled();
         boolean globalClusterMaintenanceCountersEnabled = smscPropertiesManagement.isClusterMaintenanceCountersEnabled();
 
-        // if it was last esme in this cluster - remove this element from local map
-        // and if global property is on - remove associated counters
-        if (clusterCountersEnabledMap.get(clusterName).decrementAndGet() == 0) {
-            if (clusterCountersEnabledMap.remove(clusterName) != null) {
-                String clusterGroup = CounterGroup.Cluster.toString();
-                if (globalClusterErrorCountersEnabled) {
-                    CounterDef cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.Scheduler,
-                            clusterName, "Scheduler Errors per Cluster");
-                    String counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+        if (clusterCountersEnabledMap.get(clusterName) != null) {
+            // if it was last esme in this cluster - remove this element from local map
+            // and if global property is on - remove associated counters
+            if (clusterCountersEnabledMap.get(clusterName).decrementAndGet() == 0) {
+                if (clusterCountersEnabledMap.remove(clusterName) != null) {
+                    String clusterGroup = CounterGroup.Cluster + "_";
+                    CounterGroup group = CounterGroup.Cluster;
 
-                    cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppIn, clusterName,
-                            "SMPP IN Errors per Cluster");
-                    counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    if (globalClusterErrorCountersEnabled) {
+                        CounterDef cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.Scheduler,
+                                clusterName, "Scheduler Errors per Cluster");
+                        String counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                        errorsStatAggregator.removeCounter(group, CounterCategory.Scheduler, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppOut, clusterName,
-                            "SMPP OUT Errors per Cluster");
-                    counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
-                }
-                if (globalClusterMaintenanceCountersEnabled) {
-                    CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.RequestQueueSize.toString(),
-                            clusterName, "Request Queue Size per Cluster");
-                    String counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppIn, clusterName,
+                                "SMPP IN Errors per Cluster");
+                        counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                        errorsStatAggregator.removeCounter(group, CounterCategory.SmppIn, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Average, CounterCategory.ResponseQueueSize.toString(), clusterName,
-                            "Response Queue Size per Cluster");
-                    counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppOut, clusterName,
+                                "SMPP OUT Errors per Cluster");
+                        counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                        errorsStatAggregator.removeCounter(group, CounterCategory.SmppOut, clusterName);
+                    }
+                    if (globalClusterMaintenanceCountersEnabled) {
+                        CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.RequestQueueSize.toString(),
+                                clusterName, "Request Queue Size per Cluster");
+                        String counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        maintenanceStatAggregator.removeCounter(group, CounterCategory.RequestQueueSize, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeConnectQueueSize.toString(),
-                            clusterName, "Connecting to CLIENT ESME Queue size per Cluster");
-                    counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        cd = new CounterDefImpl(CounterType.Average, CounterCategory.ResponseQueueSize.toString(), clusterName,
+                                "Response Queue Size per Cluster");
+                        counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        maintenanceStatAggregator.removeCounter(group, CounterCategory.ResponseQueueSize, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeEnquireLinkQueueSize.toString(),
-                            clusterName, "Enquire_link to CLIENT ESME Queue size per Cluster");
-                    counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeConnectQueueSize.toString(),
+                                clusterName, "Connecting to CLIENT ESME Queue size per Cluster");
+                        counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        maintenanceStatAggregator.removeCounter(group, CounterCategory.ClientEsmeConnectQueueSize, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsTotal.toString(), clusterName,
-                            "Total number of reconnects to ESME per Cluster");
-                    counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeEnquireLinkQueueSize.toString(),
+                                clusterName, "Enquire_link to CLIENT ESME Queue size per Cluster");
+                        counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        maintenanceStatAggregator.removeCounter(group, CounterCategory.ClientEsmeEnquireLinkQueueSize,
+                                clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsSuccessful.toString(),
-                            clusterName, "Successful number of reconnects to ESMEs per Cluster");
-                    counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsTotal.toString(),
+                                clusterName, "Total number of reconnects to ESME per Cluster");
+                        counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        maintenanceStatAggregator.removeCounter(group, CounterCategory.EsmeReconnectsTotal, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsFailed.toString(), clusterName,
-                            "Number of failed of reconnects to ESMEs per Cluster");
-                    counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsSuccessful.toString(),
+                                clusterName, "Successful number of reconnects to ESMEs per Cluster");
+                        counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        maintenanceStatAggregator.removeCounter(group, CounterCategory.EsmeReconnectsSuccessful, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Average, CounterCategory.EsmesStartedTotal.toString(), clusterName,
-                            "Total number of ESMEs in Started state which are disconnected per Cluster");
-                    counterName = cd.getCounterName();
-                    smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsFailed.toString(),
+                                clusterName, "Number of failed of reconnects to ESMEs per Cluster");
+                        counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        maintenanceStatAggregator.removeCounter(group, CounterCategory.EsmeReconnectsFailed, clusterName);
+
+                        cd = new CounterDefImpl(CounterType.Average, CounterCategory.EsmesStartedTotal.toString(), clusterName,
+                                "Total number of ESMEs in Started state which are disconnected per Cluster");
+                        counterName = cd.getCounterName();
+                        smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                        maintenanceStatAggregator.removeCounter(group, CounterCategory.EsmesStartedTotal, clusterName);
+                    }
                 }
             }
         }
@@ -781,35 +822,44 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
         // if local map contains key with this esme name, and value for this key
         // is true - remove counter and set value to false
 
-        String esmeGroup = CounterGroup.ESME.toString();
+        String esmeGroup = CounterGroup.ESME + "_";
+        CounterGroup group = CounterGroup.Cluster;
+
         if (esmeErrorCountersEnabledMap.containsKey(esmeName) && esmeErrorCountersEnabledMap.get(esmeName)) {
             CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.Scheduler, esmeName,
                     "Scheduler Errors per Esme");
             String counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(group, CounterCategory.Scheduler, esmeName);
 
             cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.SmppIn, esmeName,
                     "SMPP IN Errors per Esme");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(group, CounterCategory.SmppIn, esmeName);
 
             cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.SmppOut, esmeName,
                     "SMPP OUT Errors per Esme");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(group, CounterCategory.SmppOut, esmeName);
+
             esmeErrorCountersEnabledMap.put(esmeName, false);
         }
 
         if (esmeMaintCountersEnabledMap.containsKey(esmeName) && esmeMaintCountersEnabledMap.get(esmeName)) {
-            CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.RequestQueueSize.toString(),
-                    esmeName, "Request Queue Size per ESME");
+            CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.RequestQueueSize, esmeName,
+                    "Request Queue Size per ESME");
             String counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(group, CounterCategory.RequestQueueSize, esmeName);
 
-            cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.ResponseQueueSize.toString(), esmeName,
+            cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.ResponseQueueSize, esmeName,
                     "Response Queue Size per ESME");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(group, CounterCategory.ResponseQueueSize, esmeName);
+
             esmeMaintCountersEnabledMap.put(esmeName, false);
         }
 
@@ -826,20 +876,25 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
 
         if (enableSessionCounter) {
             String errorsDefSetName = this.getErrorsCounterDefSetName();
-            String sessionGroup = CounterGroup.Session.toString();
+            String sessionGroup = CounterGroup.Session + "_";
+            CounterGroup group = CounterGroup.Session;
             String counterObjectName = key.getSessionKeyName();
 
             CounterDef cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.Scheduler, counterObjectName,
                     "Scheduler Errors per Session");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(group, CounterCategory.Scheduler, counterObjectName);
 
             cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.SmppIn, counterObjectName,
                     "SMPP IN Errors per Session");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(group, CounterCategory.SmppIn, counterObjectName);
 
             cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.SmppOut, counterObjectName,
                     "SMPP OUT Errors per Session");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(group, CounterCategory.SmppOut, counterObjectName);
+
             sessionErrorCountersEnabledMap.put(key, true);
         }
     }
@@ -852,23 +907,27 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
             sessionErrorCountersEnabledMap.remove(key);
 
             String errorsDefSetName = this.getErrorsCounterDefSetName();
-            String sessionGroup = CounterGroup.Session.toString();
+            String sessionGroup = CounterGroup.Session + "_";
+            CounterGroup group = CounterGroup.Session;
             String counterObjectName = key.getSessionKeyName();
 
             CounterDef cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.Scheduler, counterObjectName,
                     "Scheduler Errors per Session");
             String counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.addCounter(group, CounterCategory.Scheduler, counterObjectName);
 
             cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.SmppIn, counterObjectName,
                     "SMPP IN Errors per Session");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.addCounter(group, CounterCategory.SmppIn, counterObjectName);
 
             cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.SmppOut, counterObjectName,
                     "SMPP OUT Errors per Session");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.addCounter(group, CounterCategory.SmppOut, counterObjectName);
         }
     }
 
@@ -891,9 +950,11 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
                     : mprocErrorCountersEnabled;
 
             if (enableCounter) {
-                CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.MProc.toString(),
+                CounterDef cd = new CounterDefImpl(CounterType.Average, CounterGroup.MProc + "_" + CounterCategory.MProc,
                         String.valueOf(mprocId), "Mproc Errors per Mproc rule = " + mprocId);
                 smscStatProviderJmx.getCounterDefSet(getErrorsCounterDefSetName()).addCounterDef(cd);
+                errorsStatAggregator.addCounter(CounterGroup.MProc, CounterCategory.MProc, String.valueOf(mprocId));
+
                 mprocErrorCountersEnabledMap.put(mprocId, true);
             }
         }
@@ -903,10 +964,11 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     public void mprocDestroyed(int mprocId) {
         if (mprocErrorCountersEnabledMap.containsKey(mprocId) && mprocErrorCountersEnabledMap.get(mprocId)) {
             mprocErrorCountersEnabledMap.remove(mprocId);
-            CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.MProc.toString(), String.valueOf(mprocId),
-                    "Mproc Errors per Mproc rule = " + mprocId);
+            CounterDef cd = new CounterDefImpl(CounterType.Average, CounterGroup.MProc + "_" + CounterCategory.MProc,
+                    String.valueOf(mprocId), "Mproc Errors per Mproc rule = " + mprocId);
             String counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(getErrorsCounterDefSetName()).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(CounterGroup.MProc, CounterCategory.MProc, String.valueOf(mprocId));
         }
     }
 
@@ -923,18 +985,24 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
             if (enableCounter
                     && (!mprocErrorCountersEnabledMap.containsKey(mprocId) || !mprocErrorCountersEnabledMap.get(mprocId))) {
                 // if it to enable and is currently disabled - add it
-                CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.MProc.toString(),
+                CounterDef cd = new CounterDefImpl(CounterType.Average, CounterGroup.MProc + "_" + CounterCategory.MProc,
                         String.valueOf(mprocId), "Mproc Errors per Mproc rule = " + mprocId);
                 smscStatProviderJmx.getCounterDefSet(getErrorsCounterDefSetName()).addCounterDef(cd);
+                
+                errorsStatAggregator.addCounter(CounterGroup.MProc, CounterCategory.MProc, String.valueOf(mprocId));
+                
                 mprocErrorCountersEnabledMap.put(mprocId, true);
             }
             if (!enableCounter && mprocErrorCountersEnabledMap.containsKey(mprocId)
                     && mprocErrorCountersEnabledMap.get(mprocId)) {
                 // if to disable and it's currently enabled - remove it
-                CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.MProc.toString(),
+                CounterDef cd = new CounterDefImpl(CounterType.Average, CounterGroup.MProc + "_" + CounterCategory.MProc,
                         String.valueOf(mprocId), "Mproc Errors per Mproc rule = " + mprocId);
                 String counterName = cd.getCounterName();
                 smscStatProviderJmx.getCounterDefSet(getErrorsCounterDefSetName()).delCounterDef(counterName);
+                
+                errorsStatAggregator.removeCounter(CounterGroup.MProc, CounterCategory.MProc, String.valueOf(mprocId));
+                
                 mprocErrorCountersEnabledMap.put(mprocId, false);
             }
 
@@ -947,73 +1015,92 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
         if (newValue) {
             CounterDef cd = new CounterDefImpl(CounterType.Summary, CounterCategory.Scheduler.toString(), "Scheduler Errors");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(null, CounterCategory.Scheduler, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.MProc.toString(), "MProc Errors");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(null, CounterCategory.MProc, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.SmppIn.toString(), "SMPP IN Errors");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(null, CounterCategory.SmppIn, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.SmppOut.toString(), "SMPP OUT Errors");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(null, CounterCategory.SmppOut, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.SipIn.toString(), "SIP IN Errors");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(null, CounterCategory.SipIn, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.SipOut.toString(), "SIP OUT Errors");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(null, CounterCategory.SipOut, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.HttpIn.toString(), "HTTP IN Errors");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(null, CounterCategory.HttpIn, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.MapIn.toString(), "MAP IN Errors");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(null, CounterCategory.MapIn, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.MapOut.toString(), "MAP OUT Errors");
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+            errorsStatAggregator.addCounter(null, CounterCategory.MapOut, null);
         } else {
             CounterDef cd = new CounterDefImpl(CounterType.Summary, CounterCategory.Scheduler.toString(), "Scheduler Errors");
             String counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(null, CounterCategory.Scheduler, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.MProc.toString(), "MProc Errors");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(null, CounterCategory.MProc, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.SmppIn.toString(), "SMPP IN Errors");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(null, CounterCategory.SmppIn, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.SmppOut.toString(), "SMPP OUT Errors");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(null, CounterCategory.SmppOut, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.SipIn.toString(), "SIP IN Errors");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(null, CounterCategory.SipIn, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.SipOut.toString(), "SIP OUT Errors");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(null, CounterCategory.SipOut, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.HttpIn.toString(), "HTTP IN Errors");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(null, CounterCategory.HttpIn, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.MapIn.toString(), "MAP IN Errors");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(null, CounterCategory.MapIn, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.MapOut.toString(), "MAP OUT Errors");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+            errorsStatAggregator.removeCounter(null, CounterCategory.MapOut, null);
         }
 
     }
 
     public void clusterErrorCountersChanged(boolean newValue) {
         String errorsDefSetName = getErrorsCounterDefSetName();
-        String clusterGroup = CounterGroup.Cluster.toString();
+        String clusterGroup = CounterGroup.Cluster + "_";
+        CounterGroup group = CounterGroup.Cluster;
 
         Iterator<String> it = clusterCountersEnabledMap.keySet().iterator();
         while (it.hasNext()) {
@@ -1025,29 +1112,35 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
                     CounterDef cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.Scheduler,
                             clusterName, "Scheduler Errors per Cluster");
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                    errorsStatAggregator.addCounter(group, CounterCategory.Scheduler, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppIn, clusterName,
                             "SMPP IN Errors per Cluster");
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                    errorsStatAggregator.addCounter(group, CounterCategory.SmppIn, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppOut, clusterName,
                             "SMPP OUT Errors per Cluster");
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                    errorsStatAggregator.addCounter(group, CounterCategory.SmppOut, clusterName);
                 } else {
                     CounterDef cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.Scheduler,
                             clusterName, "Scheduler Errors per Cluster");
                     String counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    errorsStatAggregator.removeCounter(group, CounterCategory.Scheduler, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppIn, clusterName,
                             "SMPP IN Errors per Cluster");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    errorsStatAggregator.removeCounter(group, CounterCategory.SmppIn, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.SmppOut, clusterName,
                             "SMPP OUT Errors per Cluster");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    errorsStatAggregator.removeCounter(group, CounterCategory.SmppOut, clusterName);
                 }
             }
         }
@@ -1056,7 +1149,8 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     @Override
     public void esmeErrorCountersChanged(boolean newValue) {
         String errorsDefSetName = getErrorsCounterDefSetName();
-        String esmeGroup = CounterGroup.ESME.toString();
+        String esmeGroup = CounterGroup.ESME + "_";
+        CounterGroup group = CounterGroup.ESME;
 
         // need to iterate over every esme with esmeErrorCounter == null and add(remove) esme counters
         FastList<Esme> esmes = smppManagement.getEsmeManagement().getEsmes();
@@ -1069,30 +1163,38 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
                     CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.Scheduler, esmeName,
                             "Scheduler Errors per Esme");
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                    errorsStatAggregator.addCounter(group, CounterCategory.Scheduler, esmeName);
 
                     cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.SmppIn, esmeName,
                             "SMPP IN Errors per Esme");
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                    errorsStatAggregator.addCounter(group, CounterCategory.SmppIn, esmeName);
 
                     cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.SmppOut, esmeName,
                             "SMPP OUT Errors per Esme");
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                    errorsStatAggregator.addCounter(group, CounterCategory.SmppOut, esmeName);
+                    
                     esmeErrorCountersEnabledMap.put(esmeName, true);
                 } else {
                     CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.Scheduler, esmeName,
                             "Scheduler Errors per Esme");
                     String counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    errorsStatAggregator.removeCounter(group, CounterCategory.Scheduler, esmeName);
 
                     cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.SmppIn, esmeName,
                             "SMPP IN Errors per Esme");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    errorsStatAggregator.removeCounter(group, CounterCategory.SmppIn, esmeName);
 
                     cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.SmppOut, esmeName,
                             "SMPP OUT Errors per Esme");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    errorsStatAggregator.removeCounter(group, CounterCategory.SmppOut, esmeName);
+                    
                     esmeErrorCountersEnabledMap.put(esmeName, false);
                 }
             }
@@ -1102,7 +1204,8 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     @Override
     public void sessionErrorCountersChanged(boolean newValue) {
         String errorsDefSetName = getErrorsCounterDefSetName();
-        String sessionGroup = CounterGroup.Session.toString();
+        String sessionGroup = CounterGroup.Session + "_";
+        CounterGroup group = CounterGroup.Session;
 
         // need to iterate over every esme with sessionErrorCounter == null and add(remove) session counters
         FastList<Esme> esmes = smppManagement.getEsmeManagement().getEsmes();
@@ -1118,30 +1221,38 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
                     CounterDef cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.Scheduler,
                             counterObjectName, "Scheduler Errors per Session");
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                    errorsStatAggregator.addCounter(group, CounterCategory.Scheduler, counterObjectName);
 
                     cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.SmppIn, counterObjectName,
                             "SMPP IN Errors per Session");
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                    errorsStatAggregator.addCounter(group, CounterCategory.SmppIn, counterObjectName);
 
                     cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.SmppOut, counterObjectName,
                             "SMPP OUT Errors per Session");
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
+                    errorsStatAggregator.addCounter(group, CounterCategory.SmppOut, counterObjectName);
+                    
                     sessionErrorCountersEnabledMap.put(key, true);
                 } else {
                     CounterDef cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.Scheduler,
                             counterObjectName, "Scheduler Errors per Session");
                     String counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    errorsStatAggregator.removeCounter(group, CounterCategory.Scheduler, counterObjectName);
 
                     cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.SmppIn, counterObjectName,
                             "SMPP IN Errors per Session");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    errorsStatAggregator.removeCounter(group, CounterCategory.SmppIn, counterObjectName);
 
                     cd = new CounterDefImpl(CounterType.Average, sessionGroup + CounterCategory.SmppOut, counterObjectName,
                             "SMPP OUT Errors per Session");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).delCounterDef(counterName);
+                    errorsStatAggregator.removeCounter(group, CounterCategory.SmppOut, counterObjectName);
+                    
                     sessionErrorCountersEnabledMap.put(key, false);
                 }
             }
@@ -1151,6 +1262,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     @Override
     public void mprocErrorCountersChanged(boolean newValue) {
 
+        CounterGroup group = CounterGroup.MProc;
         // need to iterate over every esme with sessionErrorCounter == null and add(remove) session counters
         FastList<MProcRule> rules = this.mProcManagement.getMProcRules();
         ;
@@ -1166,6 +1278,8 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
                         CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.MProc.toString(),
                                 String.valueOf(mprocId), "Mproc Errors per Mproc rule = " + mprocId);
                         smscStatProviderJmx.getCounterDefSet(getErrorsCounterDefSetName()).addCounterDef(cd);
+                        errorsStatAggregator.addCounter(group, CounterCategory.MProc, String.valueOf(mprocId));
+                        
                         mprocErrorCountersEnabledMap.put(mprocId, true);
                     }
                     if (!newValue) {
@@ -1173,6 +1287,8 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
                                 String.valueOf(mprocId), "Mproc Errors per Mproc rule = " + mprocId);
                         String counterName = cd.getCounterName();
                         smscStatProviderJmx.getCounterDefSet(getErrorsCounterDefSetName()).delCounterDef(counterName);
+                        errorsStatAggregator.removeCounter(group, CounterCategory.MProc, String.valueOf(mprocId));
+                        
                         mprocErrorCountersEnabledMap.put(mprocId, false);
                     }
                 }
@@ -1189,88 +1305,107 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
             CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.RequestQueueSize.toString(),
                     "Request Queue Size");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(null, CounterCategory.RequestQueueSize, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.ResponseQueueSize.toString(), "Response Queue Size");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(null, CounterCategory.ResponseQueueSize, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeConnectQueueSize.toString(),
                     "Connecting to CLIENT ESME Queue size");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(null, CounterCategory.ClientEsmeConnectQueueSize, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeEnquireLinkQueueSize.toString(),
                     "Enquire_link to CLIENT ESME Queue size");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(null, CounterCategory.ClientEsmeEnquireLinkQueueSize, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsTotal.toString(),
                     "Total number of reconnects to ESME");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(null, CounterCategory.EsmeReconnectsTotal, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsSuccessful.toString(),
                     "Successful number of reconnects to ESMEs");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(null, CounterCategory.EsmeReconnectsSuccessful, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsFailed.toString(),
                     "Number of failed of reconnects to ESMEs");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(null, CounterCategory.EsmeReconnectsFailed, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.EsmesStartedTotal.toString(),
                     "Total number of ESMEs in Started state which are disconnected");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(null, CounterCategory.EsmesStartedTotal, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.SleeEventQueueSize.toString(),
                     "SLEE event queue size");
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+            maintenanceStatAggregator.addCounter(null, CounterCategory.SleeEventQueueSize, null);
         } else {
             CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.RequestQueueSize.toString(),
                     "Request Queue Size");
             String counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(null, CounterCategory.RequestQueueSize, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.ResponseQueueSize.toString(), "Response Queue Size");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(null, CounterCategory.ResponseQueueSize, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeConnectQueueSize.toString(),
                     "Connecting to CLIENT ESME Queue size");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(null, CounterCategory.ClientEsmeConnectQueueSize, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeEnquireLinkQueueSize.toString(),
                     "Enquire_link to CLIENT ESME Queue size");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(null, CounterCategory.ClientEsmeEnquireLinkQueueSize, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsTotal.toString(),
                     "Total number of reconnects to ESME");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(null, CounterCategory.EsmeReconnectsTotal, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsSuccessful.toString(),
                     "Successful number of reconnects to ESMEs");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(null, CounterCategory.EsmeReconnectsSuccessful, null);
 
             cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsFailed.toString(),
                     "Number of failed of reconnects to ESMEs");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(null, CounterCategory.EsmeReconnectsFailed, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.EsmesStartedTotal.toString(),
                     "Total number of ESMEs in Started state which are disconnected");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(null, CounterCategory.EsmesStartedTotal, null);
 
             cd = new CounterDefImpl(CounterType.Average, CounterCategory.SleeEventQueueSize.toString(),
                     "SLEE event queue size");
             counterName = cd.getCounterName();
             smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+            maintenanceStatAggregator.removeCounter(null, CounterCategory.SleeEventQueueSize, null);
         }
     }
 
     @Override
     public void clusterMaintenanceCountersChanged(boolean newValue) {
         String maintenanceDefSetName = getMaintenanceCounterDefSetName();
-        String clusterGroup = CounterGroup.Cluster.toString();
+        String clusterGroup = CounterGroup.Cluster + "_";
+        CounterGroup group = CounterGroup.Cluster;
 
         Iterator<String> it = clusterCountersEnabledMap.keySet().iterator();
         while (it.hasNext()) {
@@ -1279,81 +1414,93 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
             // need to make sure this cluster still has counter and it has not been concurrently added/removed yet
             if (clusterCountersEnabledMap.get(clusterName) != null) {
                 if (newValue) {
-                    CounterDef cd = new CounterDefImpl(CounterType.Average,
-                            clusterGroup + CounterCategory.RequestQueueSize.toString(), clusterName,
-                            "Request Queue Size per Cluster");
+                    CounterDef cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.RequestQueueSize,
+                            clusterName, "Request Queue Size per Cluster");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.RequestQueueSize, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.ResponseQueueSize.toString(),
-                            clusterName, "Response Queue Size per Cluster");
+                    cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.ResponseQueueSize, clusterName,
+                            "Response Queue Size per Cluster");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.ResponseQueueSize, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Average,
-                            clusterGroup + CounterCategory.ClientEsmeConnectQueueSize.toString(), clusterName,
-                            "Connecting to CLIENT ESME Queue size per Cluster");
+                    cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.ClientEsmeConnectQueueSize,
+                            clusterName, "Connecting to CLIENT ESME Queue size per Cluster");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.ClientEsmeConnectQueueSize, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Average,
-                            clusterGroup + CounterCategory.ClientEsmeEnquireLinkQueueSize.toString(), clusterName,
-                            "Enquire_link to CLIENT ESME Queue size per Cluster");
+                    cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.ClientEsmeEnquireLinkQueueSize,
+                            clusterName, "Enquire_link to CLIENT ESME Queue size per Cluster");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.ClientEsmeEnquireLinkQueueSize, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsTotal.toString(),
+                    cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsTotal,
                             clusterName, "Total number of reconnects to ESME per Cluster");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.EsmeReconnectsTotal, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Summary,
-                            clusterGroup + CounterCategory.EsmeReconnectsSuccessful.toString(), clusterName,
-                            "Successful number of reconnects to ESMEs per Cluster");
+                    cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsSuccessful,
+                            clusterName, "Successful number of reconnects to ESMEs per Cluster");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.EsmeReconnectsSuccessful, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsFailed.toString(),
+                    cd = new CounterDefImpl(CounterType.Summary, clusterGroup + CounterCategory.EsmeReconnectsFailed,
                             clusterName, "Number of failed of reconnects to ESMEs per Cluster");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.EsmeReconnectsFailed, clusterName);
 
-                    cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.EsmesStartedTotal.toString(),
-                            clusterName, "Total number of ESMEs in Started state which are disconnected per Cluster");
+                    cd = new CounterDefImpl(CounterType.Average, clusterGroup + CounterCategory.EsmesStartedTotal, clusterName,
+                            "Total number of ESMEs in Started state which are disconnected per Cluster");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.EsmesStartedTotal, clusterName);
                 } else {
                     CounterDef cd = new CounterDefImpl(CounterType.Average, CounterCategory.RequestQueueSize.toString(),
                             clusterName, "Request Queue Size per Cluster");
                     String counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.RequestQueueSize, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Average, CounterCategory.ResponseQueueSize.toString(), clusterName,
                             "Response Queue Size per Cluster");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.ResponseQueueSize, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeConnectQueueSize.toString(),
                             clusterName, "Connecting to CLIENT ESME Queue size per Cluster");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.ClientEsmeConnectQueueSize, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Average, CounterCategory.ClientEsmeEnquireLinkQueueSize.toString(),
                             clusterName, "Enquire_link to CLIENT ESME Queue size per Cluster");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.ClientEsmeEnquireLinkQueueSize, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsTotal.toString(), clusterName,
                             "Total number of reconnects to ESME per Cluster");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.EsmeReconnectsTotal, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsSuccessful.toString(),
                             clusterName, "Successful number of reconnects to ESMEs per Cluster");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.EsmeReconnectsSuccessful, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Summary, CounterCategory.EsmeReconnectsFailed.toString(), clusterName,
                             "Number of failed of reconnects to ESMEs per Cluster");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.EsmeReconnectsFailed, clusterName);
 
                     cd = new CounterDefImpl(CounterType.Average, CounterCategory.EsmesStartedTotal.toString(), clusterName,
                             "Total number of ESMEs in Started state which are disconnected per Cluster");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.EsmesStartedTotal, clusterName);
                 }
             }
         }
@@ -1362,7 +1509,8 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     @Override
     public void esmeMaintenanceCountersChanged(boolean newValue) {
         String maintenanceDefSetName = getMaintenanceCounterDefSetName();
-        String esmeGroup = CounterGroup.ESME.toString();
+        String esmeGroup = CounterGroup.ESME + "_";
+        CounterGroup group = CounterGroup.ESME;
 
         // need to iterate over every esme with esmeMaintenanceCounter == null and add(remove) esme counters
         FastList<Esme> esmes = smppManagement.getEsmeManagement().getEsmes();
@@ -1372,24 +1520,30 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
             Boolean esmeLocalCountersProperty = esme.getEsmeMaintenanceCountersEnabled();
             if (esmeLocalCountersProperty == null) {
                 if (newValue) {
-                    CounterDef cd = new CounterDefImpl(CounterType.Average,
-                            esmeGroup + CounterCategory.RequestQueueSize.toString(), esmeName, "Request Queue Size per ESME");
+                    CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.RequestQueueSize,
+                            esmeName, "Request Queue Size per ESME");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.RequestQueueSize, esmeName);
 
-                    cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.ResponseQueueSize.toString(),
-                            esmeName, "Response Queue Size per ESME");
+                    cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.ResponseQueueSize, esmeName,
+                            "Response Queue Size per ESME");
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).addCounterDef(cd);
+                    maintenanceStatAggregator.addCounter(group, CounterCategory.ResponseQueueSize, esmeName);
+                    
                     esmeMaintCountersEnabledMap.put(esmeName, true);
                 } else {
-                    CounterDef cd = new CounterDefImpl(CounterType.Average,
-                            esmeGroup + CounterCategory.RequestQueueSize.toString(), esmeName, "Request Queue Size per ESME");
+                    CounterDef cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.RequestQueueSize,
+                            esmeName, "Request Queue Size per ESME");
                     String counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.RequestQueueSize, esmeName);
 
-                    cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.ResponseQueueSize.toString(),
-                            esmeName, "Response Queue Size per ESME");
+                    cd = new CounterDefImpl(CounterType.Average, esmeGroup + CounterCategory.ResponseQueueSize, esmeName,
+                            "Response Queue Size per ESME");
                     counterName = cd.getCounterName();
                     smscStatProviderJmx.getCounterDefSet(maintenanceDefSetName).delCounterDef(counterName);
+                    maintenanceStatAggregator.removeCounter(group, CounterCategory.ResponseQueueSize, esmeName);
+                    
                     esmeMaintCountersEnabledMap.put(esmeName, false);
                 }
             }
