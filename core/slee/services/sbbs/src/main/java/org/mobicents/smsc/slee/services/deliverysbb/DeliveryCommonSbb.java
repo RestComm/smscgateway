@@ -43,6 +43,8 @@ import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
@@ -63,6 +65,9 @@ import org.mobicents.smsc.mproc.impl.MProcResult;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerActivity;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
+import org.mobicents.smsc.slee.services.mt.MtSbb;
+import org.mobicents.smsc.slee.services.sip.server.rx.RxSipServerSbb;
+import org.mobicents.smsc.slee.services.smpp.server.rx.RxSmppServerSbb;
 import org.restcomm.smpp.Esme;
 import org.restcomm.smpp.EsmeManagement;
 
@@ -116,6 +121,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
     private boolean pendingRequestsListIsLoaded;
     private boolean pendingRequestsListIsDirty;
 
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
+
     public DeliveryCommonSbb(String className) {
         this.className = className;
     }
@@ -142,8 +149,9 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
                 smsSet = SmsSetCache.getInstance().getProcessingSmsSet(targetId);
                 if (smsSet == null) {
-                    this.logger.warning("smsSet is null for DeliveryCommonSbb in dlvIsInited state: " + ", targetId: "
-                            + this.getTargetId(), new Throwable());
+                    this.logger.warning(
+                            "smsSet is null for DeliveryCommonSbb in dlvIsInited state: " + ", targetId: " + this.getTargetId(),
+                            new Throwable());
                     return;
                 }
             }
@@ -360,6 +368,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 schedulerActivity.endActivity();
             }
         } catch (Exception e) {
+            incrementErrorsCounter();
             if (this.logger != null)
                 this.logger.severe("Error while decrementing endScheduleActivity()", e);
         }
@@ -665,7 +674,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
             // generating CDRs for permanent failure messages
             this.generateCDRs(lstPermFailured, CdrGenerator.CDR_MPROC_DROP_PRE_DELIVERY, reason);
-            
+
             EsmeManagement esmeManagement = EsmeManagement.getInstance();
             Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
             String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
@@ -1041,14 +1050,13 @@ public abstract class DeliveryCommonSbb implements Sbb {
 
         // generating CDRs for permanent failure messages
         this.generateCDRs(lstPermFailured, CdrGenerator.CDR_FAILED, reason);
-        
-        
+
         EsmeManagement esmeManagement = EsmeManagement.getInstance();
         if (esmeManagement != null) {
             Esme esme = null;
-            if (smsSet.getDestClusterName() != null) { 
+            if (smsSet.getDestClusterName() != null) {
                 esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
-            } 
+            }
             String messageType = null;
             String remoteAddr = null;
             if (esme != null) {
@@ -1056,8 +1064,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                         : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
                 remoteAddr = esme.getRemoteAddressAndPort();
             }
-            this.generateDetailedCDRs(lstPermFailured, EventType.VALIDITY_PERIOD_TIMEOUT, smStatus, messageType,
-                    remoteAddr, -1);
+            this.generateDetailedCDRs(lstPermFailured, EventType.VALIDITY_PERIOD_TIMEOUT, smStatus, messageType, remoteAddr,
+                    -1);
         }
 
         // sending of failure delivery receipts
@@ -1079,13 +1087,14 @@ public abstract class DeliveryCommonSbb implements Sbb {
             sms.setDeliveryDate(new Date());
             persistence.c2_updateInSystem(sms, DBOperations.IN_SYSTEM_SENT,
                     smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
-            
+
             if (MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateArchiveTable())) {
                 persistence.c2_createRecordArchive(sms, dlvMessageId, dlvDestId,
                         !smscPropertiesManagement.getReceiptsDisabling(),
                         smscPropertiesManagement.getIncomeReceiptsProcessing());
             }
         } catch (PersistenceException e) {
+            incrementErrorsCounter();
             this.logger.severe("PersistenceException when DeliveryCommonSbb.postProcessSucceeded()" + e.getMessage(), e);
         }
     }
@@ -1110,6 +1119,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 }
             }
         } catch (PersistenceException e) {
+            incrementErrorsCounter();
             this.logger.severe("PersistenceException when DeliveryCommonSbb.postProcessPermFailures()" + e.getMessage(), e);
         }
     }
@@ -1172,6 +1182,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                         smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast);
             }
         } catch (PersistenceException e) {
+            incrementErrorsCounter();
             this.logger.severe("PersistenceException when DeliveryCommonSbb.postProcessTempFailures()" + e.getMessage(), e);
         }
     }
@@ -1197,6 +1208,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
             }
         } catch (Exception e) {
+            incrementErrorsCounter();
             this.logger.severe("Exception when DeliveryCommonSbb.postProcessRerouted() - rerouting" + e.getMessage(), e);
         }
     }
@@ -1538,14 +1550,15 @@ public abstract class DeliveryCommonSbb implements Sbb {
      * @param lastSegment
      */
     protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
-//        CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
-//                MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
-//                lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
-//                smscPropertiesManagement.getDelayParametersInCdr());
+        // CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+        // MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+        // lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
+        // smscPropertiesManagement.getDelayParametersInCdr());
         this.generateCDR(sms, status, reason, messageIsSplitted, lastSegment, -1);
     }
-    
-    protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment, int seqNumber) {
+
+    protected void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment,
+            int seqNumber) {
         CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
                 MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
                 lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(),
@@ -1690,6 +1703,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     try {
                         this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                     } catch (Exception e) {
+                        incrementErrorsCounter();
                         this.logger.severe("Exception when runnung injectSmsOnFly() for receipt in sendNewGeneratedMessage(): "
                                 + e.getMessage(), e);
                     }
@@ -1699,6 +1713,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                             sms.setStoringAfterFailure(true);
                             this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                         } catch (Exception e) {
+                            incrementErrorsCounter();
                             this.logger
                                     .severe("Exception when runnung injectSmsOnFly() for receipt in sendNewGeneratedMessage(): "
                                             + e.getMessage(), e);
@@ -1710,6 +1725,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                             persistence.c2_scheduleMessage_ReschedDueSlot(sms,
                                     smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast, true);
                         } catch (PersistenceException e) {
+                            incrementErrorsCounter();
                             this.logger
                                     .severe("PersistenceException when running c2_scheduleMessage_ReschedDueSlot() in sendNewGeneratedMessage()"
                                             + e.getMessage(), e);
@@ -1720,6 +1736,41 @@ public abstract class DeliveryCommonSbb implements Sbb {
             }
         } finally {
             SmsSetCache.getInstance().removeSmsSet(lock);
+        }
+    }
+
+    private void incrementErrorsCounter() {
+        CounterCategory category = null;
+        String esmeName = null;
+        String clusterName = null;
+        Long sessionId = null;
+        if (className.equals(RxSipServerSbb.class.getSimpleName())) {
+            category = CounterCategory.SipOut;
+        } else if (className.equals(MtSbb.class.getSimpleName())) {
+            category = CounterCategory.MapOut;
+        } else if (className.equals(RxSmppServerSbb.class.getSimpleName())) {
+            category = CounterCategory.SmppOut;
+            if (smsSet != null) {
+                esmeName = smsSet.getDestEsmeName();
+                clusterName = smsSet.getDestClusterName();
+                EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                if (esmeName != null && esmeManagement != null) {
+                    Esme esme = esmeManagement.getEsmeByName(esmeName);
+                    if (esme != null) {
+                        sessionId = esme.getLocalSessionId();
+                        if (clusterName == null) {
+                            clusterName = esme.getClusterName();
+                        }
+                    }
+                }
+            }
+        }
+        if (category != null) {
+            if (category.equals(CounterCategory.SmppOut)) {
+                errorsStatAggregator.updateCounter(category, esmeName, clusterName, sessionId);
+            } else {
+                errorsStatAggregator.updateCounter(category);
+            }
         }
     }
 

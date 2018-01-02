@@ -34,4 +34,5 @@ public interface PersistenseCommonInterface {
 
     Sms c2_getRecordArchiveForMessageId(long messageId) throws PersistenceException;
 
+    void updateMProcCounter(int ruleId);
 }

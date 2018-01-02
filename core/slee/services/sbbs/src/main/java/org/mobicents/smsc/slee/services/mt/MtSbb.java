@@ -77,6 +77,8 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.MapVersionCache;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.library.CdrGenerator;
@@ -109,6 +111,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	private static final String className = MtSbb.class.getSimpleName();
 
 	private MapVersionCache mapVersionCache = MapVersionCache.getInstance();
+
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
 	private static final int MASK_MAP_VERSION_1 = 0x01;
 	private static final int MASK_MAP_VERSION_2 = 0x02;
@@ -307,6 +311,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                         ProcessingType.SS7_MT);
             }
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 			logger.severe(
 					"Exception in MtSbb.onErrorComponent() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
@@ -332,6 +337,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     "onRejectComponent after MtForwardSM Request: " + reason != null ? reason.toString() : "", true, null,
                     false, ProcessingType.SS7_MT);
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 			logger.severe(
 					"Exception in MtSbb.onDialogProviderAbort() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
@@ -397,6 +403,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 							MessageProcessingState.resendAfterMapProtocolNegotiation, null, smsSet.getNetworkId());
 					return;
 				} catch (SmscProcessingException e) {
+		            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 					String reason = "SmscPocessingException when invoking sendMtSms() from onDialogReject()-resendAfterMapProtocolNegotiation: "
 							+ e.toString();
 					this.logger.severe(reason, e);
@@ -408,6 +415,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false, ProcessingType.SS7_MT);
 					return;
 				} catch (Throwable e) {
+		            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 					String reason = "Exception when invoking sendMtSms() from onDialogReject()-resendAfterMapProtocolNegotiation: "
 							+ e.toString();
 					this.logger.severe(reason, e);
@@ -467,6 +475,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 							MessageProcessingState.resendAfterMapProtocolNegotiation, null, smsSet.getNetworkId());
 					return;
 				} catch (SmscProcessingException e) {
+		            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 					String reason = "SmscPocessingException when invoking sendMtSms() from onDialogReject()-resendAfterMapProtocolNegotiation: "
 							+ e.toString();
 					this.logger.severe(reason, e);
@@ -478,6 +487,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 					this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false, ProcessingType.SS7_MT);
 					return;
 				} catch (Throwable e) {
+		            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 					String reason = "Exception when invoking sendMtSms() from onDialogReject()-resendAfterMapProtocolNegotiation: "
 							+ e.toString();
 					this.logger.severe(reason, e);
@@ -494,6 +504,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 					true, null, false, ProcessingType.SS7_MT);
 
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 			logger.severe(
 					"Exception in MtSbb.onDialogReject() when fetching records and issuing events: " + e1.getMessage(),
 					e1);
@@ -522,6 +533,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     "onDialogProviderAbort after MtForwardSM Request: " + abortProviderReason != null ? abortProviderReason
                             .toString() : "", true, null, false, ProcessingType.SS7_MT);
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 			logger.severe(
 					"Exception in MtSbb.onDialogProviderAbort() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
@@ -547,6 +559,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     "onDialogUserAbort after MtForwardSM Request: " + reason != null ? reason.toString() : "", true, null,
                     false, ProcessingType.SS7_MT);
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 			logger.severe(
 					"Exception in MtSbb.onDialogUserAbort() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
@@ -571,6 +584,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.MSC_REFUSES_SM,
 					"onDialogTimeout after MtForwardSM Request", true, null, false, ProcessingType.SS7_MT);
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 			logger.severe(
 					"Exception in MtSbb.onDialogTimeout() when fetching records and issuing events: " + e1.getMessage(),
 					e1);
@@ -650,6 +664,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				this.handleSmsResponse((MAPDialogSms) evt.getMAPDialog(), true);
 			}
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             String s = "Exception in MtSbb.onDialogDelimiter() when fetching records and issuing events: " + e1.getMessage();
             logger.severe(s, e1);
             markDeliveringIsEnded(true);
@@ -676,6 +691,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 						"DialogClose after Mt Request", false, null, false, ProcessingType.SS7_MT);
 			}
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in MtSbb.onDialogClose() when fetching records and issuing events: " + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
 		}
@@ -792,6 +808,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                 }
             }
         } catch (Throwable e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
         }
 
         if (this.getTotalUnsentMessageCount() == 0) {
@@ -804,6 +821,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                 this.sendMtSms(this.getMtFoSMSMAPApplicationContext(mapApplicationContextVersion),
                         MessageProcessingState.firstMessageSending, null, smsSet.getNetworkId());
             } catch (SmscProcessingException e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapOut);
                 String reason = "SmscPocessingException when invoking sendMtSms() from setupMtForwardShortMessageRequest()-firstMessageSending: "
                         + e.toString();
                 this.logger.severe(reason, e);
@@ -815,6 +833,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                 this.onDeliveryError(smsSet, ErrorAction.permanentFailure, smStatus, reason, true, null, false,
                         ProcessingType.SS7_MT);
             } catch (Throwable e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapOut);
                 String reason = "Exception when invoking sendMtSms() from setupMtForwardShortMessageRequest()-firstMessageSending: "
                         + e.toString();
                 this.logger.severe(reason, e);
@@ -855,6 +874,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                         continueDialog ? mapDialogSms : null, smsSet.getNetworkId());
                 return;
             } catch (SmscProcessingException e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapOut);
                 this.logger.severe(
                         "SmscPocessingException when invoking sendMtSms() from handleSmsResponse()-nextSegmentSending: "
                                 + e.toString(), e);
@@ -917,6 +937,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                                 continueDialog ? mapDialogSms : null, smsSet.getNetworkId());
                         return;
                     } catch (SmscProcessingException e) {
+                        errorsStatAggregator.updateCounter(CounterCategory.MapOut);
                         this.logger
                                 .severe("SmscPocessingException when invoking sendMtSms() from handleSmsResponse(): "
                                         + e.toString(), e);
@@ -929,6 +950,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                     try {
                         mapDialogSms.close(false);
                     } catch (MAPException e) {
+                        errorsStatAggregator.updateCounter(CounterCategory.MapOut);
                         this.logger.severe("MAPException when closing MAP dialog from handleSmsResponse(): " + e.toString(), e);
                     }
                 }
@@ -1054,6 +1076,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                 moreMessagesToSend = true;
             }
         } catch (Throwable e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
         }
 
 		try {

@@ -53,6 +53,8 @@ import javax.transaction.SystemException;
 
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.SmsRouteManagement;
 import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
@@ -100,6 +102,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 
 	private Date garbageCollectionTime = new Date();
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
     private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
 	public SchedulerResourceAdaptor() {
@@ -283,7 +286,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 		try {
 			this.scheduler.awaitTermination(120, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			tracer.severe("InterruptedException while awaiting termination of tasks", e);
+		    tracer.severe("InterruptedException while awaiting termination of tasks", e);
 		}
 
 		if (tracer.isInfoEnabled()) {
@@ -375,6 +378,8 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
             }
             return;
         }
+        
+        SmsSet smsSet = null;
 
 		try {
 			// garbageCollectionTime
@@ -478,6 +483,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 						break;
 					}
 				} catch (PersistenceException e1) {
+				    errorsStatAggregator.updateCounter(CounterCategory.Scheduler);
 					this.tracer.severe(
 							"PersistenceException when fetching SmsSet list from a database: " + e1.getMessage(), e1);
 					return;
@@ -488,9 +494,12 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 			Date curDate = new Date();
 			try {
 				while (true) {
-					SmsSet smsSet = schedulableSms.next();
+					smsSet = schedulableSms.next();
 					if (smsSet == null)
 						break;
+					
+					String esmeName = smsSet.getDestEsmeName();
+					String clusterName = smsSet.getDestClusterName();
 
 					try {
 						if (!smsSet.isProcessingStarted()) {
@@ -501,6 +510,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
                             }
 						}
 					} catch (Exception e) {
+					    errorsStatAggregator.updateCounter(CounterCategory.Scheduler, clusterName, esmeName);
 						this.tracer.severe("Exception when injectSms: " + e.getMessage(), e);
 					}
 					count++;
@@ -531,6 +541,13 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 				}
 			}
 		} catch (Throwable e1) {
+		    String esmeName = null;
+		    String clusterName = null;
+		    if (smsSet != null) {
+    		    esmeName = smsSet.getDestEsmeName();
+    		    clusterName = smsSet.getDestClusterName();
+		    }
+		    errorsStatAggregator.updateCounter(CounterCategory.Scheduler, clusterName, esmeName);
 			this.tracer.severe(
 					"Exception in SchedulerResourceAdaptor when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
@@ -864,6 +881,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 			try {
                 this.sleeEndpoint.fireEventTransacted(activity.getActivityHandle(), eventTypeId, event, null, null);
 			} catch (Exception e) {
+			    errorsStatAggregator.updateCounter(CounterCategory.Scheduler, smsSet.getDestClusterName(), smsSet.getDestEsmeName());
 				if (this.tracer.isSevereEnabled()) {
 					this.tracer.severe("Failed to fire SmsSet event Class=: " + eventTypeId.getEventClassName(), e);
 				}
@@ -874,6 +892,13 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 			}
 			markAsInSystem(smsSet);
 		} catch (Exception e) {
+		    String esmeName = null;
+            String clusterName = null;
+            if (smsSet != null) {
+                esmeName = smsSet.getDestEsmeName();
+                clusterName = smsSet.getDestClusterName();
+            }
+            errorsStatAggregator.updateCounter(CounterCategory.Scheduler, clusterName, esmeName);
             if (!callFromSbb) {
                 this.sleeTransactionManager.rollback();
             }

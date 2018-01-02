@@ -65,6 +65,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
     protected static HttpUsersManagement httpUsersManagement = HttpUsersManagement.getInstance();
 
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
     private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
     private static Charset utf8Charset = Charset.forName("UTF-8");
@@ -141,6 +142,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 }
             }
         } catch (HttpApiException e) {
+            errorsStatAggregator.updateCounter(CounterCategory.HttpIn);
             try {
                 if (logger.isWarningEnabled()) {
                     logger.warning(e.getMessage());
@@ -150,6 +152,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 logger.severe("Error while sending error response", ex);
             }
         } catch (UnauthorizedException e) {
+            errorsStatAggregator.updateCounter(CounterCategory.HttpIn);
             try {
                 if (logger.isWarningEnabled()) {
                     logger.warning(e.getMessage() + " UserName:" + e.getUserName() + " Password:" + e.getPassword());
@@ -167,6 +170,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 logger.severe("Error while sending error response", ex);
             }
         } catch (Exception e) {
+            errorsStatAggregator.updateCounter(CounterCategory.HttpIn);
             try {
                 if (logger.isWarningEnabled()) {
                     logger.warning(e.getMessage());
@@ -209,6 +213,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 }
             }
         } catch (HttpApiException e) {
+            errorsStatAggregator.updateCounter(CounterCategory.HttpIn);
             try {
                 if (logger.isWarningEnabled()) {
                     logger.warning(e.getMessage());
@@ -218,6 +223,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 logger.severe("Error while sending error response", ex);
             }
         } catch (UnauthorizedException e) {
+            errorsStatAggregator.updateCounter(CounterCategory.HttpIn);
             try {
                 if (logger.isWarningEnabled()) {
                     logger.warning(e.getMessage() + " UserName:" + e.getUserName() + " Password:" + e.getPassword());
@@ -235,6 +241,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 logger.severe("Error while sending error response", ex);
             }
         } catch (Exception e) {
+            errorsStatAggregator.updateCounter(CounterCategory.HttpIn);
             try {
                 if (logger.isWarningEnabled()) {
                     logger.warning(e.getMessage());
@@ -429,6 +436,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
+            errorsStatAggregator.updateCounter(CounterCategory.HttpIn);
 
             try {
                 final String message = "Error while trying to send SMS message.";
@@ -478,6 +486,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             String s = "Exception when processing SubmitMulti message: " + e1.getMessage();
             logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
+            errorsStatAggregator.updateCounter(CounterCategory.HttpIn);
             // Lets send the Response with error here
             try {
                 final String message = "Error while trying to send SubmitMultiResponse";
@@ -528,6 +537,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                         remoteAddrAndPort, -1);
             }
         } catch (Throwable e) {
+            errorsStatAggregator.updateCounter(CounterCategory.HttpIn);
             logger.severe("Error while trying to send SubmitMultiResponse=" + outgoingData, e);
 
             if (currSms != null) {

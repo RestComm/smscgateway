@@ -52,6 +52,7 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.CounterCategory;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.MessageUtil;
@@ -86,6 +87,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
         try {
             this.onSriFullResponse();
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in HrSriClientSbb.onDialogDelimiter (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
@@ -96,6 +98,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
             this.onSriFullResponse();
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in HrSriClientSbb.onDialogClose (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
@@ -156,6 +159,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
             this.returnSriFailure(correlationIdValue, null,
                     "Home routing: onDialogReject after SRI Request: " + mapRefuseReason != null ? mapRefuseReason.toString() : "");
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in SriSbb.onDialogReject() (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
@@ -175,6 +179,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
             this.returnSriFailure(correlationIdValue, null, "(home routing) onDialogUserAbort after SRI Request: " + reason != null ? reason.toString() : "");
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in SriSbb.onDialogUserAbort() (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
@@ -195,6 +200,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
             this.returnSriFailure(correlationIdValue, null,
                     "(home routing) onDialogProviderAbort after SRI Request: " + abortProviderReason != null ? abortProviderReason.toString() : "");
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in HrSriClientSbb.onDialogProviderAbort() (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
@@ -216,6 +222,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
             this.returnSriFailure(correlationIdValue, null, "(home routing) onDialogTimeout after SRI Request");
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in HrSriClientSbb.onDialogTimeout() (home routing) when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
@@ -296,6 +303,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
                 }
             }
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in HrSriClientSbb.onErrorComponent when fetching records and issuing events: " + e1.getMessage(), e1);
         }
     }
@@ -364,6 +372,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
             // 3. Finally send the request
             mapDialogSms.send();
         } catch (MAPException e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             if (mapDialogSms != null) {
                 mapDialogSms.release();
             }

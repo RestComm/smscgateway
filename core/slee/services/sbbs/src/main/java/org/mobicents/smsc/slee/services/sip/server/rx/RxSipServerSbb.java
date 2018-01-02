@@ -64,6 +64,8 @@ import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetEncoder;
 import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetEncodingData;
 import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.Sip;
 import org.mobicents.smsc.domain.SipManagement;
 import org.mobicents.smsc.domain.SipXHeaders;
@@ -106,6 +108,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
 	private SipActivityContextInterfaceFactory sipACIFactory = null;
 
 	private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+	private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
 	private static final SipManagement sipManagement = SipManagement.getInstance();
 
@@ -180,11 +183,13 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
             try {
                 this.sendMessage(smsSet);
             } catch (SmscProcessingException e) {
+                errorsStatAggregator.updateCounter(CounterCategory.SipOut);
                 String s = "SmscProcessingException when sending SIP MESSAGE=" + e.getMessage() + ", smsSet=" + smsSet;
                 logger.severe(s, e);
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s);
             }
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.SipOut);
 			logger.severe(
 					"Exception in RxSmppServerSbb.onDeliverSm() when fetching records and issuing events: "
 							+ e1.getMessage(), e1);
@@ -283,6 +288,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
                             this.sendMessage(smsSet);
                             return;
                         } catch (SmscProcessingException e) {
+                            errorsStatAggregator.updateCounter(CounterCategory.SipOut);
                             String s = "SmscProcessingException when sending sendMessage()=" + e.getMessage()
                                     + ", Message=" + sms;
                             logger.severe(s, e);
@@ -299,6 +305,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
 			}
 
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.SipOut);
             String s = "Exception in RxSipServerSbb.onSUCCESS() when fetching records and issuing events: " + e1.getMessage();
             logger.severe(s, e1);
             this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s);
@@ -462,6 +469,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
 
 			clientTransaction.sendRequest();
 		} catch (Exception e) {
+            errorsStatAggregator.updateCounter(CounterCategory.SipOut);
             throw new SmscProcessingException("RxSipServerSbb.sendMessage(): Exception while trying to send SIP Message ="
                     + e.getMessage() + "\nMessage: " + sms, 0, 0, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
 		}
@@ -492,6 +500,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
                     try {
                         bb = encoder.encode(CharBuffer.wrap(msg));
                     } catch (CharacterCodingException e) {
+                        errorsStatAggregator.updateCounter(CounterCategory.SipOut);
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
@@ -576,6 +585,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
                 }
             }
         } catch (Throwable e) {
+            errorsStatAggregator.updateCounter(CounterCategory.SipOut);
             logger.severe("Exception in RxSipServerSbb.onDeliveryError(): " + e.getMessage(), e);
             markDeliveringIsEnded(true);
         }

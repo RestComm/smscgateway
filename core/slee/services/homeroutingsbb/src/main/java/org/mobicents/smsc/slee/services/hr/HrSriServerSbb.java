@@ -57,6 +57,7 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.CounterCategory;
 import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.NextCorrelationIdResult;
 import org.mobicents.smsc.library.*;
@@ -185,6 +186,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapOut);
                 logger.severe("Home routing: Error while sending Error message", e);
                 return;
             }
@@ -279,6 +281,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
             try {
                 ret = (HrSriClientSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
             } catch (Exception e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapOut);
                 if (this.logger.isSevereEnabled()) {
                     this.logger.severe("Exception while trying to creat HrSriClientSbb child", e);
                 }
@@ -314,6 +317,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
             SmsSetCache.getInstance().putCorrelationIdCacheElement(correlationIdValue,
                     smscPropertiesManagement.getCorrelationIdLiveTime());
         } catch (Exception e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
             if (dlg != null) {
                 dlg.release();
             }
@@ -337,6 +341,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
 
             this.doSendResponse(correlationIdValue, dlg, correlationIdValue.getCorrelationID(), li);
         } catch (MAPException e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
             if (dlg != null) {
                 dlg.release();
             }
@@ -394,6 +399,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
             this.doSendResponse(correlationIdValue, dlg, sendRoutingInfoForSMResponse.getIMSI().getData(),
                     sendRoutingInfoForSMResponse.getLocationInfoWithLMSI());
         } catch (MAPException e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
             if (dlg != null) {
                 dlg.release();
             }
@@ -439,6 +445,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
             dlg.sendErrorComponent(invokeId, errorResponse);
             dlg.close(false);
         } catch (MAPException e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
             if (dlg != null) {
                 dlg.release();
             }

@@ -47,7 +47,7 @@ public class MProcMessageImpl implements MProcMessage {
     private Sms sms;
     private ProcessingType processingType;
     private PersistenseCommonInterface persistence;
-
+    
     public MProcMessageImpl(Sms sms, ProcessingType processingType, PersistenseCommonInterface persistence) {
         this.sms = sms;
         this.processingType = processingType;
@@ -244,6 +244,7 @@ public class MProcMessageImpl implements MProcMessage {
                 return null;
             }
         } catch (PersistenceException e) {
+            persistence.updateMProcCounter(-1);
             e.printStackTrace();
             return null;
         }

@@ -54,6 +54,8 @@ import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingGroup;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.Sip;
 import org.mobicents.smsc.domain.SipManagement;
 import org.mobicents.smsc.domain.SipXHeaders;
@@ -92,6 +94,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 	private MessageFactory messageFactory;
 
 	private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+	private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
     private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
 	private static final SipManagement sipManagement = SipManagement.getInstance();
@@ -198,6 +201,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 				try {
 					validityPeriod = MessageUtil.parseDate(((SIPHeader) validityHeader).getValue());
 				} catch (ParseException e) {
+	                errorsStatAggregator.updateCounter(CounterCategory.SipIn);
 					logger.severe("ParseException when parsing ValidityPeriod field: " + e.getMessage(), e);
                     if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                         generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
@@ -237,6 +241,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
                     }
                     smscStatAggregator.updateMsgInFailedAll();
                 }
+                errorsStatAggregator.updateCounter(CounterCategory.SipIn);
                 if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                     if (sms != null) {
                         generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), false, true);
@@ -257,6 +262,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 
 				return;
 			} catch (Throwable e1) {
+                errorsStatAggregator.updateCounter(CounterCategory.SipIn);
 				this.logger.severe("Exception while processing a message from sip", e1);
 				smscStatAggregator.updateMsgInFailedAll();
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
@@ -283,10 +289,12 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 				res = (this.messageFactory.createResponse(200, serverTransaction.getRequest()));
 				event.getServerTransaction().sendResponse(res);
 			} catch (Exception e) {
+                errorsStatAggregator.updateCounter(CounterCategory.SipIn);
 				this.logger.severe("Exception while trying to send Ok response to sip", e);
 			}
 
 		} catch (Exception e) {
+            errorsStatAggregator.updateCounter(CounterCategory.SipIn);
 			this.logger.severe("Error while trying to process received the SMS " + event, e);
 		}
 

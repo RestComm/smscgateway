@@ -68,6 +68,8 @@ import net.java.slee.resource.diameter.ro.events.avp.ServiceInformation;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
@@ -80,6 +82,7 @@ import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
+import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
 import org.mobicents.smsc.mproc.MProcRuleRaProvider;
@@ -146,6 +149,7 @@ public abstract class ChargingSbb implements Sbb {
 
     private static final TimerOptions defaultTimerOptions = createDefaultTimerOptions();
     private NullActivityContextInterfaceFactory nullActivityContextInterfaceFactory;
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
     private static TimerOptions createDefaultTimerOptions() {
         TimerOptions timerOptions = new TimerOptions();
@@ -478,6 +482,40 @@ public abstract class ChargingSbb implements Sbb {
             // set new timer for the case we will not get CCA in time
             timerFacility.setTimer(roACI, null, System.currentTimeMillis() + (CCR_TIMEOUT * 1000), defaultTimerOptions);
         } catch (Exception e1) {
+            CounterCategory category = null;
+            String esmeName = null;
+            String clusterName = null;
+            Long sessionId = null;
+            switch (chargingType) {
+                case HttpOrig:
+                    category = CounterCategory.HttpIn;
+                    break;
+                case MoOrig:
+                    category = CounterCategory.MapIn;
+                    break;
+                case TxSipOrig:
+                    category = CounterCategory.SipIn;
+                    break;
+                case TxSmppOrig:
+                    category = CounterCategory.SmppIn;
+                    esmeName = sms.getOrigEsmeName();
+                    if (esmeName != null) {
+                        EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                        if (esmeManagement != null) {
+                            Esme esme = esmeManagement.getEsmeByName(esmeName);
+                            if (esme != null) {
+                                clusterName = esme.getClusterName();
+                                sessionId = esme.getLocalSessionId();
+                            }
+                        }
+                    }
+                    break;
+            }
+            if (category == CounterCategory.SmppIn) {
+                errorsStatAggregator.updateCounter(category, clusterName, esmeName, sessionId);
+            } else {
+                errorsStatAggregator.updateCounter(category);
+            }
             logger.severe("setupChargingRequestInterface(): error while sending RoCreditControlRequest: " + e1.getMessage(),
                     e1);
             generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_CHARGING, e1.getMessage(), false, true);
@@ -526,6 +564,43 @@ public abstract class ChargingSbb implements Sbb {
                 rejectSmsByDiameter(chargingData, cca);
             }
         } catch (Throwable e) {
+            CounterCategory category = null;
+            String esmeName = null;
+            String clusterName = null;
+            Long sessionId = null;
+            switch (chargingData.getChargingType()) {
+                case HttpOrig:
+                    category = CounterCategory.HttpIn;
+                    break;
+                case MoOrig:
+                    category = CounterCategory.MapIn;
+                    break;
+                case TxSipOrig:
+                    category = CounterCategory.SipIn;
+                    break;
+                case TxSmppOrig:
+                    category = CounterCategory.SmppIn;
+                    Sms sms = chargingData.getSms();
+                    if (sms != null) {
+                        esmeName = chargingData.getSms().getOrigEsmeName();
+                    }
+                    if (esmeName != null) {
+                        EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                        if (esmeManagement != null) {
+                            Esme esme = esmeManagement.getEsmeByName(esmeName);
+                            if (esme != null) {
+                                clusterName = esme.getClusterName();
+                                sessionId = esme.getLocalSessionId();
+                            }
+                        }
+                    }
+                    break;
+            }
+            if (category == CounterCategory.SmppIn) {
+                errorsStatAggregator.updateCounter(category, clusterName, esmeName, sessionId);
+            } else {
+                errorsStatAggregator.updateCounter(category);
+            }
             logger.warning("Exception when processing RoCreditControlAnswer response: " + e.getMessage(), e);
         }
     }
@@ -548,6 +623,43 @@ public abstract class ChargingSbb implements Sbb {
         try {
             rejectSmsByDiameter(chargingData, null);
         } catch (Throwable e) {
+            CounterCategory category = null;
+            String esmeName = null;
+            String clusterName = null;
+            Long sessionId = null;
+            switch (chargingData.getChargingType()) {
+                case HttpOrig:
+                    category = CounterCategory.HttpIn;
+                    break;
+                case MoOrig:
+                    category = CounterCategory.MapIn;
+                    break;
+                case TxSipOrig:
+                    category = CounterCategory.SipIn;
+                    break;
+                case TxSmppOrig:
+                    category = CounterCategory.SmppIn;
+                    Sms sms = chargingData.getSms();
+                    if (sms != null) {
+                        esmeName = chargingData.getSms().getOrigEsmeName();
+                    }
+                    if (esmeName != null) {
+                        EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                        if (esmeManagement != null) {
+                            Esme esme = esmeManagement.getEsmeByName(esmeName);
+                            if (esme != null) {
+                                clusterName = esme.getClusterName();
+                                sessionId = esme.getLocalSessionId();
+                            }
+                        }
+                    }
+                    break;
+            }
+            if (category == CounterCategory.SmppIn) {
+                errorsStatAggregator.updateCounter(category, clusterName, esmeName, sessionId);
+            } else {
+                errorsStatAggregator.updateCounter(category);
+            }
             logger.warning("Exception when processing onTimerEvent response: " + e.getMessage(), e);
         }
     }

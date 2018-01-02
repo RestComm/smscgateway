@@ -65,6 +65,8 @@ import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorAction;
@@ -99,6 +101,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 	private SccpAddress serviceCenterSCCPAddress = null;
 
 	protected SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
     public MtCommonSbb(String className) {
         super(className);
@@ -156,6 +159,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                 ret = (RsdsSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
             } catch (Exception e) {
                 if (this.logger.isSevereEnabled()) {
+                    errorsStatAggregator.updateCounter(CounterCategory.MapOut);
                     this.logger.severe("Exception while trying to creat RsdsSbb child", e);
                 }
             }
@@ -236,6 +240,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 		try {
 			event.getMAPDialog().close(false);
 		} catch (Exception e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 		}
 
 		return reason;
@@ -467,6 +472,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                 }
             }
         } catch (Throwable e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in MtCommonSbb.onDeliveryError(): " + e.getMessage(), e);
             markDeliveringIsEnded(true);
         }

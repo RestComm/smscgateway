@@ -66,6 +66,8 @@ import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
 import org.mobicents.smsc.cassandra.PersistenceException;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.library.SbbStates;
 import org.mobicents.smsc.library.Sms;
@@ -94,6 +96,8 @@ public abstract class AlertSbb implements Sbb {
 	protected MAPContextInterfaceFactory mapAcif;
 	protected MAPProvider mapProvider;
 	protected MAPParameterFactory mapParameterFactory;
+	
+	private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
 	protected PersistenceRAInterface persistence;
     protected SchedulerRaSbbInterface scheduler = null;
@@ -200,6 +204,7 @@ public abstract class AlertSbb implements Sbb {
 
             this.setupAlert(evt.getMsisdn(), evt.getServiceCentreAddress(), mapDialogSms.getNetworkId());
 		} catch (MAPException e) {
+		    errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 			logger.severe("Exception while trying to send back AlertServiceCentreResponse", e);
 		}
 	}
@@ -286,6 +291,8 @@ public abstract class AlertSbb implements Sbb {
                                                     addr));
                                 }
                             }
+                        } catch(Exception e) {
+                            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
                         } finally {
                             pers.c2_unregisterDueSlotWriting(dueSlot);
                         }
@@ -297,11 +304,15 @@ public abstract class AlertSbb implements Sbb {
                         }
                     }
                 } catch (PersistenceException e) {
+                    errorsStatAggregator.updateCounter(CounterCategory.MapIn);
                     this.logger.severe("PersistenceException when setupAlert()" + e.getMessage(), e);
                 } catch (Exception e) {
+                    errorsStatAggregator.updateCounter(CounterCategory.MapIn);
                     this.logger.severe("Exception when setupAlert()" + e.getMessage(), e);
 				}
 			}
+		} catch(Exception e) { 
+		    errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 		} finally {
 			pers.releaseSynchroObject(lock);
 		}

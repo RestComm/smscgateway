@@ -401,6 +401,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
         this.mProcManagement = MProcManagement.getInstance(this.name);
         this.mProcManagement.setPersistDir(this.persistDir);
         this.mProcManagement.setSmscManagement(this);
+        this.mProcManagement.start();
 
         for (MProcRule mProcRule : mProcManagement.mprocs) {
             if (mProcRule instanceof MProcRuleDefault) {

@@ -57,6 +57,8 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.ErrorAction;
 import org.mobicents.smsc.library.ErrorCode;
@@ -81,6 +83,8 @@ import com.cloudhopper.smpp.SmppConstants;
 public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStatusInterface2 {
 
 	private static final String className = SriSbb.class.getSimpleName();
+	
+	private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
 	protected MAPApplicationContextVersion maxMAPApplicationContextVersion = null;
 
@@ -141,8 +145,9 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             try {
                 ret = (MtSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
             } catch (Exception e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapOut);
                 if (this.logger.isSevereEnabled()) {
-                    this.logger.severe("Exception while trying to creat MtSbb child", e);
+                    this.logger.severe("Exception while trying to create MtSbb child", e);
                 }
             }
         }
@@ -268,6 +273,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             this.sendSRI(smsSet, smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(),
                     this.getSRIMAPApplicationContext(this.maxMAPApplicationContextVersion));
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             String s = "Exception in SriSbb.onSms when fetching records and issuing events: " + e1.getMessage();
             logger.severe(s, e1);
             markDeliveringIsEnded(true);
@@ -298,6 +304,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                 }
             }
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in SriSbb.onErrorComponent when fetching records and issuing events: " + e1.getMessage(), e1);
         }
 	}
@@ -367,6 +374,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.HLR_REJECT_AFTER_ROUTING_INFO, "onDialogReject after SRI Request: "
                     + mapRefuseReason != null ? mapRefuseReason.toString() : "", true, null, false, ProcessingType.SS7_SRI);
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in SriSbb.onDialogReject() when fetching records and issuing events: " + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
         }
@@ -389,6 +397,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.HLR_REJECT_AFTER_ROUTING_INFO, "onDialogProviderAbort after SRI Request: "
                     + abortProviderReason != null ? abortProviderReason.toString() : "", true, null, false, ProcessingType.SS7_SRI);
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in SriSbb.onDialogProviderAbort() when fetching records and issuing events: " + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
         }
@@ -411,6 +420,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.HLR_REJECT_AFTER_ROUTING_INFO, "onDialogUserAbort after SRI Request: "
                     + reason != null ? reason.toString() : "", true, null, false, ProcessingType.SS7_SRI);
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in SriSbb.onDialogUserAbort() when fetching records and issuing events: " + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
         }
@@ -433,6 +443,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
             this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.HLR_REJECT_AFTER_ROUTING_INFO,
                     "onDialogTimeout after SRI Request", true, null, false, ProcessingType.SS7_SRI);
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in SriSbb.onDialogTimeout() when fetching records and issuing events: " + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
         }
@@ -445,6 +456,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
         try {
             this.onSriFullResponse();
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in SriSbb.onDialogDelimiter when fetching records and issuing events: " + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
         }
@@ -457,6 +469,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 
             this.onSriFullResponse();
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             logger.severe("Exception in SriSbb.onDialogClose when fetching records and issuing events: " + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
         }
@@ -531,6 +544,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 				mapDialogSms.release();
 			}
 
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
 			String reason = "MAPException when sending SRI from sendSRI(): " + e.toString();
 			this.logger.severe(reason, e);
 			ErrorCode smStatus = ErrorCode.SC_SYSTEM_ERROR;

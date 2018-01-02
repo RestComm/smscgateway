@@ -61,6 +61,8 @@ import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.HomeRoutingManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
@@ -96,6 +98,7 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
     protected MAPErrorMessageFactory mapErrorMessageFactory;
 	protected SmscStatAggregator smscStatAggregator = SmscStatAggregator
 			.getInstance();
+	protected ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
     protected PersistenceRAInterface persistence;
     private MProcRuleRaProvider itsMProcRa;
 
@@ -156,6 +159,7 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
         try {
             event.getMAPDialog().close(false);
         } catch (Exception e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
         }
 
         return reason;

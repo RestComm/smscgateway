@@ -418,6 +418,12 @@ public class PersistenceRAInterfaceProxy extends DBOperations implements Persist
         return super.getLiveTableListAsNames(keyspace);
     }
 
+    @Override
+    public void updateMProcCounter(int ruleId) {
+        // TODO Auto-generated method stub
+        
+    }
+
 //    @Override
 //    public SmsSet obtainSmsSet(TargetAddress ta) throws PersistenceException {
 //        // TODO Auto-generated method stub

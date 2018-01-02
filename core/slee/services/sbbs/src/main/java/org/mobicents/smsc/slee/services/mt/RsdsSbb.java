@@ -62,6 +62,8 @@ import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
@@ -92,6 +94,8 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
     protected ParameterFactory sccpParameterFact;
 
     private SccpAddress serviceCenterSCCPAddress = null;
+
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
     protected static final SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
 
@@ -346,6 +350,7 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
             mapDialogSms.send();
         } catch (MAPException e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapOut);
             this.logger.severe("MAPException when sending reportSMDeliveryStatusRequest: " + e.getMessage(), e);
         }
     }

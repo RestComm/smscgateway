@@ -54,6 +54,8 @@ import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetEncodingData;
 import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.slee.ChildRelationExt;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.CdrGenerator;
@@ -118,6 +120,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     protected MAPSmsTpduParameterFactory mapSmsTpduParameterFactory;
 
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
     private static Charset utf8Charset = Charset.forName("UTF-8");
     private static Charset ucs2Charset = Charset.forName("UTF-16BE");
@@ -235,6 +238,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         }
 
         if (!event.isSuccess()) {
+            String esmeName = null;
+            String clusterName = null;
+            Long sessionId = null;
             try {
                 if (isDeliveringEnded()) {
                     logger.info(
@@ -247,6 +253,16 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     logger.severe("RxSmppServerSbb.onSendPduStatus(): CMP smsSet is missed");
                     markDeliveringIsEnded(true);
                     return;
+                }
+                esmeName = smsSet.getDestEsmeName();
+                clusterName = smsSet.getDestClusterName();
+                EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                Esme esme = null;
+                if (esmeManagement != null && clusterName != null) {
+                    esme = esmeManagement.getEsmeByClusterName(clusterName);
+                }
+                if (esme != null) {
+                    sessionId = esme.getLocalSessionId();
                 }
 
                 logger.severe(String
@@ -262,9 +278,10 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 if (event.getException() != null) {
                     exceptionMessage = event.getException().getMessage();
                 }
-                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, "SendPduStatus: " + exceptionMessage,
-                        EventType.OUT_SMPP_ERROR, seqNumber);
+                this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
+                        "SendPduStatus: " + exceptionMessage, EventType.OUT_SMPP_ERROR, seqNumber);
             } catch (Throwable e1) {
+                errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
                 logger.severe("Exception in RxSmppServerSbb.onSendPduStatus(): " + e1.getMessage(), e1);
                 markDeliveringIsEnded(true);
             }
@@ -325,6 +342,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     public abstract ChildRelationExt getRxSmppServerChildSbb();
 
     private void onDeliverSmLocal(final RxSmppServerSbbUsage anSbbUsage, final SmsSetEvent event) {
+        String esmeName = null;
+        String clusterName = null;
+        Long sessionId = null;
         try {
             if (this.logger.isFineEnabled()) {
                 this.logger.fine("\nReceived Deliver SMS. event= " + event + "this=" + this);
@@ -333,9 +353,23 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             SmsSet smsSet = event.getSmsSet();
             this.addInitialMessageSet(smsSet);
 
+            if (smsSet != null) {
+                esmeName = smsSet.getDestEsmeName();
+                clusterName = smsSet.getDestClusterName();
+            }
+            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+            Esme esme = null;
+            if (esmeManagement != null && clusterName != null) {
+                esme = esmeManagement.getEsmeByClusterName(clusterName);
+            }
+            if (esme != null) {
+                sessionId = esme.getLocalSessionId();
+            }
+            
             try {
                 this.sendDeliverSm(smsSet);
             } catch (SmscProcessingException e) {
+                errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
                 String s = "SmscProcessingException when sending initial sendDeliverSm()=" + e.getMessage() + ", smsSet="
                         + smsSet;
                 logger.severe(s, e);
@@ -344,6 +378,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         EventType.OUT_SMPP_ERROR, -1);
             }
         } catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
             anSbbUsage.incrementCounterErrorDeliverSm(ONE);
             logger.severe(
                     "Exception in RxSmppServerSbb.onDeliverSm() when fetching records and issuing events: " + e1.getMessage(),
@@ -364,7 +399,27 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             this.handleResponse(event);
         } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorSubmitSmRespParent(ONE);
+            
+            String esmeName = null;
+            String clusterName = null;
+            Long sessionId = null;
+            
             SmsSet smsSet = this.getSmsSet();
+            
+            if (smsSet != null) {
+                esmeName = smsSet.getDestEsmeName();
+                clusterName = smsSet.getDestClusterName();
+            }
+            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+            Esme esme = null;
+            if (esmeManagement != null && clusterName != null) {
+                esme = esmeManagement.getEsmeByClusterName(clusterName);
+            }
+            if (esme != null) {
+                sessionId = esme.getLocalSessionId();
+            }
+            
+            errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
             logger.severe("Exception in RxSmppServerSbb.onDeliverSmResp() when fetching records and issuing events: "
                     + e1.getMessage() + "\nsmsSet=" + smsSet, e1);
             if (smsSet != null) {
@@ -387,6 +442,24 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorDeliverSmRespParent(ONE);
             SmsSet smsSet = this.getSmsSet();
+            String esmeName = null;
+            String clusterName = null;
+            Long sessionId = null;
+            
+            if (smsSet != null) {
+                esmeName = smsSet.getDestEsmeName();
+                clusterName = smsSet.getDestClusterName();
+            }
+            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+            Esme esme = null;
+            if (esmeManagement != null && clusterName != null) {
+                esme = esmeManagement.getEsmeByClusterName(clusterName);
+            }
+            if (esme != null) {
+                sessionId = esme.getLocalSessionId();
+            }
+
+            errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
             logger.severe("Exception in RxSmppServerSbb.onDeliverSmResp() when fetching records and issuing events: "
                     + e1.getMessage() + "\nsmsSet=" + smsSet, e1);
             if (smsSet != null) {
@@ -400,6 +473,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     }
 
     private void onPduRequestTimeoutParentLocal(final RxSmppServerSbbUsage anSbbUsage, final PduRequestTimeout2 event) {
+        String esmeName = null;
+        String clusterName = null;
+        Long sessionId = null;
         try {
             if (isDeliveringEnded()) {
                 logger.info(
@@ -413,6 +489,16 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 markDeliveringIsEnded(true);
                 return;
             }
+            esmeName = smsSet.getDestEsmeName();
+            clusterName = smsSet.getDestClusterName();
+            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+            Esme esme = null;
+            if (esmeManagement != null && clusterName != null) {
+                esme = esmeManagement.getEsmeByClusterName(clusterName);
+            }
+            if (esme != null) {
+                sessionId = esme.getLocalSessionId();
+            }
 
             logger.severe(
                     String.format("onPduRequestTimeout : targetId=" + smsSet.getTargetId() + ", PduRequestTimeout=" + event));
@@ -421,6 +507,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     EventType.OUT_SMPP_ERROR, event.getPduRequest().getSequenceNumber());
         } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorPduRequestTimeoutParent(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
             logger.severe("Exception in RxSmppServerSbb.onPduRequestTimeout() when fetching records and issuing events: "
                     + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
@@ -429,6 +516,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
     private void onRecoverablePduExceptionParentLocal(final RxSmppServerSbbUsage anSbbUsage,
             final RecoverablePduException event) {
+        String esmeName = null;
+        String clusterName = null;
+        Long sessionId = null;
         try {
             if (isDeliveringEnded()) {
                 logger.info(
@@ -442,6 +532,16 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 markDeliveringIsEnded(true);
                 return;
             }
+            esmeName = smsSet.getDestEsmeName();
+            clusterName = smsSet.getDestClusterName();
+            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+            Esme esme = null;
+            if (esmeManagement != null && clusterName != null) {
+                esme = esmeManagement.getEsmeByClusterName(clusterName);
+            }
+            if (esme != null) {
+                sessionId = esme.getLocalSessionId();
+            }
 
             logger.severe(String.format(
                     "\nonRecoverablePduException : targetId=" + smsSet.getTargetId() + ", RecoverablePduException=" + event));
@@ -450,6 +550,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     EventType.OUT_SMPP_ERROR, event.getPartialPdu().getSequenceNumber());
         } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorRecoverablePduExceptionParent(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
             logger.severe("Exception in RxSmppServerSbb.onRecoverablePduException() when fetching records and issuing events: "
                     + e1.getMessage(), e1);
             markDeliveringIsEnded(true);
@@ -610,6 +711,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             try {
                 ret = (RxSmppServerChildLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
             } catch (Exception e) {
+                errorsStatAggregator.updateCounter(CounterCategory.SmppOut);
                 if (this.logger.isSevereEnabled()) {
                     this.logger.severe("Exception while trying to creat RxSmppServerSbb child", e);
                 }
@@ -903,6 +1005,20 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     }
 
     private SentItem sendNextChunk(ChunkData currItem, SmsSet smsSet, Esme esme) throws SmscProcessingException {
+        String esmeName = null;
+        String clusterName = null;
+        Long sessionId = null;
+            
+            if (esme != null) {
+                esmeName = esme.getName();
+                clusterName = esme.getClusterName();
+                sessionId = esme.getLocalSessionId();
+            }
+            if (esmeName == null && smsSet != null) 
+                esmeName = smsSet.getDestEsmeName();
+            if (clusterName == null && smsSet != null)
+                clusterName = smsSet.getDestClusterName();
+            
         try {
             SmppTransaction smppServerTransaction = this.smppServerSessions.sendRequestPdu(esme, currItem.getPduRequest(),
                     esme.getWindowWaitTimeout());
@@ -915,6 +1031,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             return result;
         } catch (Throwable e) {
+            errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
             String s = "SmscProcessingException when sending initial sendDeliverSm()=RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
                     + e.getMessage() + "\nsmsSet: " + smsSet + ", smsSet=" + smsSet;
             logger.severe(s, e);
@@ -950,6 +1067,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     try {
                         bb = encoder.encode(CharBuffer.wrap(msg));
                     } catch (CharacterCodingException e) {
+                        errorsStatAggregator.updateCounter(CounterCategory.SmppOut);
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
@@ -1005,10 +1123,24 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         }
 
         SmsSet smsSet = getSmsSet();
+        String esmeName = null;
+        String clusterName = null;
+        Long sessionId = null;
+        
         if (smsSet == null) {
             logger.severe("RxSmppServerSbb.handleResponse(): CMP smsSet is missed");
             markDeliveringIsEnded(true);
             return;
+        }
+        esmeName = smsSet.getDestEsmeName();
+        clusterName = smsSet.getDestClusterName();
+        EsmeManagement esmeManagement = EsmeManagement.getInstance();
+        Esme esme = null;
+        if (esmeManagement != null && clusterName != null) {
+            esme = esmeManagement.getEsmeByClusterName(clusterName);
+        }
+        if (esme != null) {
+            sessionId = esme.getLocalSessionId();
         }
 
         int status = event.getCommandStatus();
@@ -1017,8 +1149,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             smscStatAggregator.updateMsgOutSentSmpp();
 
             boolean destAddressLimitationEnabled = false;
-            EsmeManagement esmeManagement = EsmeManagement.getInstance();
-            Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+//            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+//            Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
             if (esme != null) {
                 destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
             }
@@ -1046,7 +1178,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
             if (realID == -1 || !confirmMessageInSendingPool.sequenceNumberFound) {
                 this.logger.severe("RxSmppServerSbb.handleResponse(): no sms in MessageInSendingPool: UnconfirmedCnt="
-                        + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber() 
+                        + this.getUnconfirmedMessageCountInSendingPool() + ", sequenceNumber=" + event.getSequenceNumber()
                         + ", realID=" + realID + ", confirmMessageInSendingPool=" + confirmMessageInSendingPool);
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
                         "Received undefined SequenceNumber: " + event.getSequenceNumber() + ", SmsSet=" + smsSet,
@@ -1085,7 +1217,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 setSentChunks(list);
 
             if (!confirmMessageInSendingPool.confirmed) {
-                this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false, event.getSequenceNumber());
+                this.generateCDR(sms, CdrGenerator.CDR_PARTIAL_ESME, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false,
+                        event.getSequenceNumber());
 
                 String messageType = esme.getSmppSessionType() == Type.CLIENT ? CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM
                         : CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM;
@@ -1097,7 +1230,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             }
 
             // firstly we store remote messageId if sms has a request to delivery receipt
-            String clusterName = smsSet.getDestClusterName();
+//            String clusterName = smsSet.getDestClusterName();
             String dlvMessageId = event.getMessageId();
             sms.setDlvMessageId(dlvMessageId);
 
@@ -1119,7 +1252,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             // success CDR generating
             boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
             this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL_ESME : CdrGenerator.CDR_SUCCESS_ESME,
-                    CdrGenerator.CDR_SUCCESS_NO_REASON, confirmMessageInSendingPool.splittedMessage, true, event.getSequenceNumber());
+                    CdrGenerator.CDR_SUCCESS_NO_REASON, confirmMessageInSendingPool.splittedMessage, true,
+                    event.getSequenceNumber());
 
             String messageType = null;
             String remoteAddr = null;
@@ -1136,8 +1270,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 }
             }
 
-            this.generateDetailedCDR(sms, EventType.OUT_SMPP_SENT, sms.getSmsSet().getStatus(), messageType, status,
-                    remoteAddr, event.getSequenceNumber());
+            this.generateDetailedCDR(sms, EventType.OUT_SMPP_SENT, sms.getSmsSet().getStatus(), messageType, status, remoteAddr,
+                    event.getSequenceNumber());
 
             // adding a success receipt if it is needed
             this.generateSuccessReceipt(smsSet, sms);
@@ -1159,6 +1293,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                                 ts = warnIfLong(logger, ts, "handleResponse/status=0/in-lock/sendDeliverSm");
                                 return;
                             } catch (SmscProcessingException e) {
+                                errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
                                 SbbStatsUtils.handleProcessingException(e, getDefaultSbbUsageParameterSet());
                                 String s = "SmscProcessingException when sending next sendDeliverSm()=" + e.getMessage()
                                         + ", Message=" + sms;
@@ -1203,11 +1338,29 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private void onDeliveryError(SmsSet smsSet, ErrorAction errorAction, ErrorCode smStatus, String reason, EventType eventType,
             int seqNumber) {
         getDefaultSbbUsageParameterSet().incrementCounterErrorDelivery(ONE);
+        
+        String esmeName = null;
+        String clusterName = null;
+        Long sessionId = null;
+        
         try {
             smscStatAggregator.updateMsgOutFailedAll();
 
+            if (smsSet != null) {
+                esmeName = smsSet.getDestEsmeName();
+                clusterName = smsSet.getDestClusterName();
+            }
             EsmeManagement esmeManagement = EsmeManagement.getInstance();
-            Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+            Esme esme = null;
+            if (esmeManagement != null && clusterName != null) {
+                esme = esmeManagement.getEsmeByClusterName(clusterName);
+            }
+            if (esme != null) {
+                sessionId = esme.getLocalSessionId();
+            }
+            
+//            EsmeManagement esmeManagement = EsmeManagement.getInstance();
+//            Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
             String messageType = null;
 
             String remoteAddr = null;
@@ -1220,8 +1373,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             // generating of a temporary failure CDR (one record for all unsent messages)
             if (smscPropertiesManagement.getGenerateTempFailureCdr()) {
                 this.generateTemporaryFailureCDR(CdrGenerator.CDR_TEMP_FAILED_ESME, reason);
-                this.generateTemporaryFailureDetailedCDR(eventType, messageType, smStatus, remoteAddr,
-                        seqNumber);
+                this.generateTemporaryFailureDetailedCDR(eventType, messageType, smStatus, remoteAddr, seqNumber);
             }
 
             ArrayList<Sms> lstPermFailured = new ArrayList<Sms>();
@@ -1264,10 +1416,10 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     this.generateCDRs(lstPermFailured2, CdrGenerator.CDR_FAILED_ESME, reason);
 
                     if (!smscPropertiesManagement.getGenerateTempFailureCdr()) {
-                        generateDetailedCDRs(lstPermFailured2, EventType.OUT_SMPP_ERROR, smStatus, messageType,
-                                remoteAddr, seqNumber);
+                        generateDetailedCDRs(lstPermFailured2, EventType.OUT_SMPP_ERROR, smStatus, messageType, remoteAddr,
+                                seqNumber);
                     }
-                    
+
                     // sending of intermediate delivery receipts
                     this.generateIntermediateReceipts(smsSet, lstTempFailured2);
 
@@ -1279,6 +1431,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 }
             }
         } catch (Throwable e) {
+            errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
             getDefaultSbbUsageParameterSet().incrementCounterErrorDeliveryException(ONE);
             logger.severe("Exception in RxSmppServerSbb.onDeliveryError(): " + e.getMessage(), e);
             markDeliveringIsEnded(true);

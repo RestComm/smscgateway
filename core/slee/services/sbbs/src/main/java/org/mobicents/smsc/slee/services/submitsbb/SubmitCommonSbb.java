@@ -36,6 +36,8 @@ import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
@@ -56,6 +58,10 @@ import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.services.charging.ChargingMedium;
 import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
+import org.mobicents.smsc.slee.services.http.server.tx.TxHttpServerSbb;
+import org.mobicents.smsc.slee.services.mo.MoSbb;
+import org.mobicents.smsc.slee.services.sip.server.tx.TxSipServerSbb;
+import org.mobicents.smsc.slee.services.smpp.server.tx.TxSmppServerSbb;
 import org.restcomm.smpp.Esme;
 import org.restcomm.smpp.EsmeManagement;
 import org.restcomm.smpp.parameter.TlvSet;
@@ -93,6 +99,8 @@ public abstract class SubmitCommonSbb implements Sbb {
     private MProcRuleRaProvider itsMProcRa;
 
     private final String className;
+    
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
     public SubmitCommonSbb(String className) {
         this.className = className;
@@ -185,6 +193,19 @@ public abstract class SubmitCommonSbb implements Sbb {
             try {
                 ret = (ChargingSbbLocalObject) relation.create(ChildRelationExt.DEFAULT_CHILD_NAME);
             } catch (Exception e) {
+                CounterCategory category = null;
+                if (className.equals(TxHttpServerSbb.class.getSimpleName())) {
+                   category = CounterCategory.HttpIn;
+                } else if (className.equals(TxSipServerSbb.class.getSimpleName())) {
+                    category = CounterCategory.SipIn;
+                } else if (className.equals(MoSbb.class.getSimpleName())) {
+                    category = CounterCategory.MapIn;
+                } else if (className.equals(TxSmppServerSbb.class.getSimpleName())) {
+                    category = CounterCategory.SmppIn;
+                }
+                if (category != null) {
+                    errorsStatAggregator.updateCounter(category);
+                }
                 if (this.logger.isSevereEnabled()) {
                     this.logger.severe("Exception while trying to creat ChargingSbb child", e);
                 }

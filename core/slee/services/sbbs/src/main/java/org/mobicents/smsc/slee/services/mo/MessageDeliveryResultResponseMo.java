@@ -31,6 +31,8 @@ import org.mobicents.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCau
 import org.mobicents.protocols.ss7.map.api.primitives.NetworkResource;
 import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
 import org.mobicents.protocols.ss7.map.api.service.sms.SmsMessage;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 
@@ -50,6 +52,8 @@ public class MessageDeliveryResultResponseMo implements MessageDeliveryResultRes
 	private SmsMessage evt;
 	private long invokeId;
 	private Tracer logger;
+	
+	ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
 	public MessageDeliveryResultResponseMo(boolean onlyChargingRequest, boolean isMoOperation, MAPDialogSms dialog,
 			MAPProvider provider, SmsMessage evt, long invokeId, Tracer logger) {
@@ -85,6 +89,7 @@ public class MessageDeliveryResultResponseMo implements MessageDeliveryResultRes
 
 			dialog.close(false);
 		} catch (Throwable e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 			logger.severe("Error while sending ForwardShortMessageResponse ", e);
 		}
 	}
@@ -134,6 +139,7 @@ public class MessageDeliveryResultResponseMo implements MessageDeliveryResultRes
 
 			dialog.close(false);
 		} catch (Throwable e) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 			logger.severe("Error while sending Error message", e);
 			return;
 		}

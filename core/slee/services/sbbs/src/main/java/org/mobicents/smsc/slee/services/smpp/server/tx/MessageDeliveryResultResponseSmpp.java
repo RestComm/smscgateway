@@ -23,6 +23,8 @@
 package org.mobicents.smsc.slee.services.smpp.server.tx;
 
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 import org.restcomm.slee.resource.smpp.SmppSessions;
@@ -54,6 +56,8 @@ public class MessageDeliveryResultResponseSmpp implements MessageDeliveryResultR
     private DataSm eventData;
     private long messageId;
     private Tracer logger;
+    
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
     public MessageDeliveryResultResponseSmpp(boolean onlyChargingRequest, SmppSessions smppSessions, Esme esme,
             SubmitSm eventSubmit, DataSm eventData, long messageId) {
@@ -93,6 +97,16 @@ public class MessageDeliveryResultResponseSmpp implements MessageDeliveryResultR
                 this.smppSessions.sendResponsePdu(esme, event, response);
             }
         } catch (Throwable e) {
+            String esmeName = null;
+            String clusterName = null;
+            Long sessionId = null;
+
+            if (esme != null) {
+                esmeName = esme.getName();
+                clusterName = esme.getClusterName();
+                sessionId = esme.getLocalSessionId();
+            }
+            errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
             this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
         }
     }
@@ -128,6 +142,16 @@ public class MessageDeliveryResultResponseSmpp implements MessageDeliveryResultR
                 this.smppSessions.sendResponsePdu(esme, event, response);
             }
         } catch (Throwable e) {
+            String esmeName = null;
+            String clusterName = null;
+            Long sessionId = null;
+
+            if (esme != null) {
+                esmeName = esme.getName();
+                clusterName = esme.getClusterName();
+                sessionId = esme.getLocalSessionId();
+            }
+            errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
             this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
         }
     }

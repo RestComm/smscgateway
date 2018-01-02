@@ -80,6 +80,8 @@ import org.mobicents.slee.resource.map.events.DialogTimeout;
 import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.SmscStatProvider;
 import org.mobicents.smsc.library.*;
@@ -98,6 +100,8 @@ public abstract class MoSbb extends MoCommonSbb {
 	private static final String className = MoSbb.class.getSimpleName();
 
 	private static Charset isoCharset = Charset.forName("ISO-8859-1");
+
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
 
 	public MoSbb() {
 		super(className);
@@ -171,6 +175,7 @@ public abstract class MoSbb extends MoCommonSbb {
 			try {
 				dialog.send();
 			} catch (MAPException e) {
+	            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 				logger.severe("Error while sending Continue", e);
 			}
 		}
@@ -254,6 +259,7 @@ public abstract class MoSbb extends MoCommonSbb {
 				dialog.close(false);
                 return;
             } catch (Throwable e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapIn);
                 logger.severe("Error while sending Error message", e);
                 return;
             }
@@ -283,6 +289,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 
             try {
 				MAPErrorMessage errorMessage;
@@ -332,6 +339,7 @@ public abstract class MoSbb extends MoCommonSbb {
 		} catch (Throwable e1) {
 			this.logger.severe("Exception while processing MO message: " + e1.getMessage(), e1);
             smscStatAggregator.updateMsgInFailedAll();
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 
             try {
 				MAPErrorMessage errorMessage = this.mapProvider.getMAPErrorMessageFactory()
@@ -360,6 +368,7 @@ public abstract class MoSbb extends MoCommonSbb {
 
                 dialog.close(false);
             } catch (Throwable e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapIn);
                 logger.severe("Error while sending MoForwardShortMessageResponse ", e);
             }
         }
@@ -422,6 +431,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapIn);
                 logger.severe("Error while sending Error message", e);
                 return;
             }
@@ -456,6 +466,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 
             try {
 				MAPErrorMessage errorMessage;
@@ -508,6 +519,7 @@ public abstract class MoSbb extends MoCommonSbb {
 		} catch (Throwable e1) {
 			this.logger.severe("Exception while processing MO message: " + e1.getMessage(), e1);
             smscStatAggregator.updateMsgInFailedAll();
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 
             try {
 				MAPErrorMessage errorMessage = this.mapProvider.getMAPErrorMessageFactory()
@@ -537,6 +549,7 @@ public abstract class MoSbb extends MoCommonSbb {
 
                 dialog.close(false);
             } catch (Throwable e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapIn);
                 logger.severe("Error while sending ForwardShortMessageResponse ", e);
             }
         }
@@ -580,6 +593,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapIn);
                 logger.severe("Error while sending Error message", e);
                 return;
             }
@@ -601,6 +615,7 @@ public abstract class MoSbb extends MoCommonSbb {
                         evt.getInvokeId());
             }
 		} catch (SmscProcessingException e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 			this.logger.severe(e1.getMessage(), e1);
 			try {
 				MAPErrorMessage errorMessage;
@@ -646,6 +661,7 @@ public abstract class MoSbb extends MoCommonSbb {
 			}
 			return;
 		} catch (Throwable e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 			this.logger.severe("Exception while processing MO message: " + e1.getMessage(), e1);
 			try {
 				MAPErrorMessage errorMessage = this.mapProvider.getMAPErrorMessageFactory()
@@ -674,6 +690,7 @@ public abstract class MoSbb extends MoCommonSbb {
 
                 dialog.close(false);
             } catch (Throwable e) {
+                errorsStatAggregator.updateCounter(CounterCategory.MapIn);
                 logger.severe("Error while sending MoForwardShortMessageResponse ", e);
             }
         }
@@ -743,6 +760,7 @@ public abstract class MoSbb extends MoCommonSbb {
 				break;
 			}
 		} catch (MAPException e1) {
+		    errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 			logger.severe("Home routing: Error while decoding SmsSignalInfo ", e1);
 		}
 
@@ -814,6 +832,7 @@ public abstract class MoSbb extends MoCommonSbb {
 				break;
 			}
 		} catch (MAPException e1) {
+            errorsStatAggregator.updateCounter(CounterCategory.MapIn);
 			logger.severe("Error while decoding SmsSignalInfo ", e1);
 		}
 

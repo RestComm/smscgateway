@@ -41,6 +41,8 @@ import javax.slee.resource.ResourceAdaptorContext;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.cassandra.PreparedStatementCollection;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.library.QuerySmResponse;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
@@ -340,6 +342,12 @@ public class PersistenceResourceAdaptor implements ResourceAdaptor {
             @Override
             public Long c2_getMessageIdByRemoteMessageId(String remoteMessageId, String destId) throws PersistenceException {
                 return dbOperations_C2.c2_getMessageIdByRemoteMessageId(remoteMessageId, destId);
+            }
+
+            @Override
+            public void updateMProcCounter(int ruleId) {
+                ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
+                errorsStatAggregator.updateCounter(CounterCategory.MProc);
             }
 
 		};

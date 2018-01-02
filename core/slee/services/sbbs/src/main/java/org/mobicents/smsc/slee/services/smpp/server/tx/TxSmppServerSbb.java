@@ -55,6 +55,8 @@ import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
 import org.mobicents.smsc.cassandra.PersistenceException;
+import org.mobicents.smsc.domain.CounterCategory;
+import org.mobicents.smsc.domain.ErrorsStatAggregator;
 import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
@@ -105,6 +107,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
     private SmppTransactionACIFactory smppServerTransactionACIFactory = null;
     protected SmppSessions smppServerSessions = null;
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
+    private ErrorsStatAggregator errorsStatAggregator = ErrorsStatAggregator.getInstance();
     private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
     private static Charset utf8Charset = Charset.forName("UTF-8");
@@ -241,7 +244,15 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
         SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
         Esme esme = smppServerTransaction.getEsme();
-        String esmeName = esme.getName();
+        
+        String esmeName = null;
+        String clusterName = null;
+        Long sessionId = null;
+        if (esme != null) {
+            esmeName = esme.getName();
+            clusterName = esme.getClusterName();
+            sessionId = esme.getLocalSessionId();
+        }
 
         long timestampB = 0;
 
@@ -273,6 +284,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
                 anSbbUsage.incrementCounterErrorSubmitSm(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -282,6 +294,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
                 this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
                         + response + ".", e);
             }
@@ -295,7 +308,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                         esme.getRemoteAddressAndPort(), event.getSequenceNumber());
 
             } catch (SmscProcessingException e1) {
-
+                anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             }
             return;
         }
@@ -318,6 +332,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
                 smscStatAggregator.updateMsgInFailedAll();
             }
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                 if (sms != null) {
                     generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_ESME, e1.getMessage(), false, true);
@@ -376,6 +391,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             return;
         } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorSubmitSm(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             String s = "Exception when processing SubmitSm message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
@@ -428,6 +444,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
         } catch (Throwable e) {
             anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
                     + response + ".", e);
         }
@@ -445,6 +462,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
         Esme esme = smppServerTransaction.getEsme();
         String esmeName = esme.getName();
+        String clusterName = esme.getClusterName();
+        Long sessionId = esme.getLocalSessionId();
 
         if (this.logger.isFineEnabled()) {
             this.logger.fine("Received DATA_SM = " + event + " from Esme name=" + esmeName);
@@ -474,6 +493,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
                 anSbbUsage.incrementCounterErrorDataSm(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -482,6 +502,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
                 this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
             }
 
@@ -494,7 +515,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                         esme.getRemoteAddressAndPort(), event.getSequenceNumber());
 
             } catch (SmscProcessingException e1) {
-
+                anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             }
             return;
         }
@@ -508,6 +530,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     CdrDetailedGenerator.CDR_MSG_TYPE_DATASM, event.getSequenceNumber());
         } catch (SmscProcessingException e1) {
             anSbbUsage.incrementCounterErrorDataSm(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
                 if (e1.isIsWarning()) {
@@ -574,6 +597,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             return;
         } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorDataSm(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             String s = "Exception when processing dataSm message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
@@ -626,6 +650,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
         } catch (Exception e) {
             anSbbUsage.incrementCounterErrorDataSmResponding(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             this.logger.severe("Error while trying to send DataSmResponse=" + response, e);
         }
     }
@@ -635,6 +660,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
         Esme esme = smppServerTransaction.getEsme();
         String esmeName = esme.getName();
+        String clusterName = esme.getClusterName();
+        Long sessionId = esme.getLocalSessionId();
 
         if (this.logger.isFineEnabled()) {
             this.logger.fine("\nReceived SUBMIT_MULTI = " + event + " from Esme name=" + esmeName);
@@ -668,6 +695,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
                 anSbbUsage.incrementCounterErrorSubmitMultiSm(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -678,6 +706,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
                 this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
             }
 
@@ -690,7 +719,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                         esme.getRemoteAddressAndPort(), event.getSequenceNumber());
 
             } catch (SmscProcessingException e1) {
-
+                anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             }
             return;
         }
@@ -707,6 +737,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
         } catch (SmscProcessingException e1) {
             anSbbUsage.incrementCounterErrorSubmitMultiSm(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
                 if (e1.isIsWarning()) {
@@ -773,6 +804,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             return;
         } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorSubmitMultiSm(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             String s = "Exception when processing SubmitMulti message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
@@ -823,6 +855,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             } catch (SmppInvalidArgumentException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             }
         }
 
@@ -836,6 +869,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
         } catch (Throwable e) {
             anSbbUsage.incrementCounterErrorSubmitMultiSmResponding(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             this.logger.severe("Error while trying to send SubmitMultiResponse=" + response, e);
         }
     }
@@ -845,6 +879,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         SmppTransaction smppServerTransaction = (SmppTransaction) aci.getActivity();
         Esme esme = smppServerTransaction.getEsme();
         String esmeName = esme.getName();
+        String clusterName = esme.getClusterName();
+        Long sessionId = esme.getLocalSessionId();
 
         if (this.logger.isFineEnabled()) {
             this.logger.fine("\nReceived DELIVER_SM = " + event + " from Esme name=" + esmeName);
@@ -874,6 +910,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 response.addOptionalParameter(tlv);
             } catch (TlvConvertException e) {
                 anSbbUsage.incrementCounterErrorDeliverSm(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
                 this.logger.severe("TlvConvertException while storing TAG_ADD_STATUS_INFO Tlv parameter", e);
             }
 
@@ -882,6 +919,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 this.smppServerSessions.sendResponsePdu(esme, event, response);
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
                 this.logger.severe("Error while trying to send DeliverSmResponse=" + response, e);
             }
 
@@ -894,7 +932,8 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                         esme.getRemoteAddressAndPort(), event.getSequenceNumber());
 
             } catch (SmscProcessingException e1) {
-
+                anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
+                errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             }
             return;
         }
@@ -908,6 +947,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     CdrDetailedGenerator.CDR_MSG_TYPE_DELIVERSM, event.getSequenceNumber());
         } catch (SmscProcessingException e1) {
             anSbbUsage.incrementCounterErrorDeliverSm(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
             if (!e1.isSkipErrorLogging()) {
                 if (e1.isIsWarning()) {
@@ -975,6 +1015,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             return;
         } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorDeliverSm(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             String s = "Exception when processing SubmitSm message: " + e1.getMessage();
             this.logger.severe(s, e1);
             smscStatAggregator.updateMsgInFailedAll();
@@ -1025,6 +1066,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     SmppConstants.STATUS_OK, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
         } catch (Throwable e) {
             anSbbUsage.incrementCounterErrorDeliverSmResponding(ONE);
+            errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);
             this.logger.severe("Error while trying to send SubmitSmResponse=" + response, e);
         }
     }
@@ -1578,6 +1620,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                         messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvTlvMessageId, clusterName);
                         drFormat = "dlvTlvMessageId";
                     } catch (PersistenceException e) {
+                        errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esme.getName(), esme.getLocalSessionId());
                         logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 1: " + e.getMessage(), e);
                     }
                 }
@@ -1587,8 +1630,10 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                         messageId = persistence.c2_getMessageIdByRemoteMessageId(dlvMessageId, clusterName);
                         drFormat = "dlvMessageId";
                     } catch (PersistenceException e) {
+                        errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esme.getName(), esme.getLocalSessionId());
                         logger.severe("Exception when running c2_getMessageIdByRemoteMessageId() - 2: " + e.getMessage(), e);
                     } catch (NumberFormatException e) {
+                        errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esme.getName(), esme.getLocalSessionId());
                     }
                 }
 
