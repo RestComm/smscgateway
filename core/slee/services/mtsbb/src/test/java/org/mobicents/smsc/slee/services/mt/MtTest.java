@@ -3850,7 +3850,7 @@ public class MtTest {
             return;
 
         MProcManagement mProcManagement = MProcManagement.getInstance();
-        SmscManagement smscManagement = SmscManagement.getInstance("Test");
+        SmscManagement smscManagement = SmscManagement.getInstance("Test", null);
         SmppManagement smppManagement = SmppManagement.getInstance("Test");
         smscManagement.setSmppManagement(smppManagement);
         mProcManagement.setSmscManagement(smscManagement);
