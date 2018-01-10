@@ -1,11 +1,17 @@
 package org.mobicents.smsc.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.mobicents.protocols.ss7.oam.common.statistics.CounterDefImpl;
+import org.mobicents.protocols.ss7.oam.common.statistics.api.CounterDef;
+import org.restcomm.smpp.Esme;
+import org.restcomm.smpp.EsmeManagement;
 import org.restcomm.smpp.oam.SessionKey;
 
 public class ErrorsStatAggregator implements ErrorsStatAggregatorMBean {
@@ -67,6 +73,51 @@ public class ErrorsStatAggregator implements ErrorsStatAggregatorMBean {
         return list;
     }
 
+    /** @return
+      * clusterName --> 'Cluster' -> counterName
+      *             |
+      *             --> 'ESME' -> counters (1 per Esme)
+      *             |
+      *             --> 'Session' -> counters (1 per Esme)
+      */
+    @Override
+    public Map<String, Map<CounterGroup, List<String>>> getAllCountersPerCluster() {
+        Map<String, Map<CounterGroup, List<String>>> res = new HashMap<>();
+        
+        for (CounterKey key : map.keySet()) {
+            String clusterName = null;
+            String esmeName = null;
+            
+            if (key.getGroup() == CounterGroup.Cluster) {
+                clusterName = key.getId();
+            } else if (key.getGroup() == CounterGroup.ESME) {
+                esmeName = key.getId();
+            } else if (key.getGroup() == CounterGroup.Session) {
+                esmeName = getEsmeNameFromSessionCounter(key.getId());
+            } 
+            if (clusterName == null && esmeName != null) {
+                EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                if (esmeManagement != null) {
+                    clusterName = esmeManagement.getClusterNameByEsmeName(esmeName);
+                }
+            }
+            if (clusterName != null) { 
+                if (!res.containsKey(clusterName)) {
+                    Map<CounterGroup, List<String>> clusterNameMap = new HashMap<>();
+                    clusterNameMap.put(CounterGroup.Cluster, new ArrayList<String>());
+                    clusterNameMap.put(CounterGroup.ESME, new ArrayList<String>());
+                    clusterNameMap.put(CounterGroup.Session, new ArrayList<String>());
+                    res.put(clusterName, clusterNameMap);
+                    
+                    clusterNameMap.get(key.getGroup()).add(key.getName());
+                } else {
+                    res.get(clusterName).get(key.getGroup()).add(key.getName());
+                }
+            }
+        }
+        return res;
+    }
+    
     public AtomicLong getCounterByName(String counterName) {
         CounterGroup group = null;
         CounterCategory category = null;
@@ -167,6 +218,18 @@ public class ErrorsStatAggregator implements ErrorsStatAggregatorMBean {
         // update global counter
         updateCounter(CounterCategory.MProc);
     }
+
+    private String getEsmeNameFromSessionCounter(String str) {
+        if (str == null)
+            return null;
+        String[] parts = str.split(SessionKey.SESSION_KEY_SEPARATOR);
+        if (parts.length > 2) {
+            int substrSize = str.length() - parts[parts.length - 1].length() - 1;
+            return str.substring(0, substrSize - 1);
+        } else {
+            return parts[0];
+        }
+    }
 }
 
 class CounterKey {
@@ -183,6 +246,10 @@ class CounterKey {
 
     public CounterGroup getGroup() {
         return group;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {

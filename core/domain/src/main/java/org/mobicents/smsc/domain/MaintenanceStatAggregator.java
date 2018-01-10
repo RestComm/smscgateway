@@ -62,6 +62,7 @@ public class MaintenanceStatAggregator implements MaintenanceStatAggregatorMBean
                 list.add(key.getName());
             }
         }
+        
         return list;
     }
     
