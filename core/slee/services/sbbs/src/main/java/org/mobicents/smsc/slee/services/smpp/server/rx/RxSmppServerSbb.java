@@ -363,6 +363,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 esme = esmeManagement.getEsmeByClusterName(clusterName);
             }
             if (esme != null) {
+                if (esmeName == null) {
+                    esmeName = esme.getName();
+                }
                 sessionId = esme.getLocalSessionId();
             }
             
@@ -658,21 +661,31 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
         if (rxSmppServerSbbLocalObject != null) {
             ActivityContextInterface act = getSchedulerActivityContextInterface();
+            SmsSet smsSet = null;
+            Esme esme = null;
+            
             if (act != null) {
                 try {
                     act.attach(rxSmppServerSbbLocalObject);
                     SendPduStatus2 event2 = new SendPduStatus2(event.getException(), event.getRequest(), event.getResponse(),
                             event.getSystemId(), event.isSuccess());
 
-                    SmsSet smsSet = getSmsSet();
+                    smsSet = getSmsSet();
 
                     Pdu pduEvent = event.getRequest();
                     if (event.getResponse() != null)
                         pduEvent = event.getResponse();
 
+                    boolean destAddressLimitationEnabled = false;
+                    
                     EsmeManagement esmeManagement = EsmeManagement.getInstance();
-                    Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
-                    boolean destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
+                    if (esmeManagement != null && smsSet != null) {
+                        esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+                        destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
+                    } else {
+                        System.out.println("esmeManagement is " + esmeManagement + ", smsSet is " + smsSet);
+                    }
+                    
 
                     int realID = -1;
                     SentItemsList list = null;
@@ -694,6 +707,23 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
 
                     fireSendPduStatusChild(event2, act, null);
                 } catch (IllegalStateException e) {
+                    String esmeName = null;
+                    String clusterName = null;
+                    Long sessionId = null;
+                    if (smsSet != null) {
+                        esmeName = smsSet.getDestEsmeName();
+                        clusterName = smsSet.getDestClusterName();
+                        EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                        if (esmeManagement != null) {
+                            esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
+                            if (esme != null) {
+                                sessionId = esme.getLocalSessionId();
+                            }
+                        } else {
+                            System.out.println("esmeManagement is " + esmeManagement + ", smsSet is " + smsSet);
+                        }
+                    }
+                    errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
                     if (logger.isInfoEnabled())
                         logger.info(
                                 "onSendPduStatus - IllegalStateException (activity is ending - dropping a SLEE event because it is not needed) : new activity="
@@ -994,7 +1024,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     sentChunks.getSentList().addAll(sentResults);
                     setSentChunks(sentChunks);
                 }
+
             }
+            throw new Exception("Test Exception RxSmpp");
         } catch (Throwable e) {
             throw new SmscProcessingException(
                     "RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="

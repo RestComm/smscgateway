@@ -158,7 +158,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String PERSIST_FILE_NAME = "smscproperties.xml";
 
     private static SmscPropertiesManagement instance;
-
+    private SmscPropertiesListener listener;
+    
     private final String name;
 
     private String persistDir = null;
@@ -456,6 +457,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private SmscPropertiesManagement(String name) {
         this.name = name;
         binding.setClassAttribute(CLASS_ATTRIBUTE);
+    }
+    
+    public void setListener(SmscPropertiesListener listener) {
+        this.listener = listener;
     }
 
     public static SmscPropertiesManagement getInstance(String name) {
@@ -1485,6 +1490,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setGlobalErrorCountersEnabled(boolean globalErrorCountersEnabled) {
         this.globalErrorCountersEnabled = globalErrorCountersEnabled;
+        if (listener != null) {
+            listener.globalErrorCountersChanged(globalErrorCountersEnabled);
+        }
     }
 
     /**
@@ -1505,6 +1513,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setClusterErrorCountersEnabled(boolean clusterErrorCountersEnabled) {
         this.clusterErrorCountersEnabled = clusterErrorCountersEnabled;
+        if (listener != null) {
+            listener.clusterErrorCountersChanged(clusterErrorCountersEnabled);
+        }
     }
 
     /**
@@ -1525,6 +1536,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setEsmeErrorCountersEnabled(boolean esmeErrorCountersEnabled) {
         this.esmeErrorCountersEnabled = esmeErrorCountersEnabled;
+        if (listener != null) {
+            listener.esmeErrorCountersChanged(esmeErrorCountersEnabled);
+        }
     }
     
     /**
@@ -1545,6 +1559,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setSessionErrorCountersEnabled(boolean sessionErrorCountersEnabled) {
         this.sessionErrorCountersEnabled = sessionErrorCountersEnabled;
+        if (listener != null) {
+            listener.sessionErrorCountersChanged(sessionErrorCountersEnabled);
+        }
     }
     
     /**
@@ -1565,6 +1582,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setMprocErrorCountersEnabled(boolean mprocErrorCountersEnabled) {
         this.mprocErrorCountersEnabled = mprocErrorCountersEnabled;
+        if (listener != null) {
+            listener.mprocErrorCountersChanged(mprocErrorCountersEnabled);
+        }
     }
 
     /**
@@ -1585,6 +1605,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setGlobalMaintenanceCountersEnabled(boolean globalMaintenanceCountersEnabled) {
         this.globalMaintenanceCountersEnabled = globalMaintenanceCountersEnabled;
+        if (listener != null) {
+            listener.globalMaintenanceCountersChanged(globalMaintenanceCountersEnabled);
+        }
     }
 
     /**
@@ -1605,6 +1628,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setClusterMaintenanceCountersEnabled(boolean clusterMaintenanceCountersEnabled) {
         this.clusterMaintenanceCountersEnabled = clusterMaintenanceCountersEnabled;
+        if (listener != null) {
+            listener.clusterMaintenanceCountersChanged(clusterMaintenanceCountersEnabled);
+        }
     }
 
     /**
@@ -1625,6 +1651,9 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setEsmeMaintenanceCountersEnabled(boolean esmeMaintenanceCountersEnabled) {
         this.esmeMaintenanceCountersEnabled = esmeMaintenanceCountersEnabled;
+        if (listener != null) {
+            listener.esmeMaintenanceCountersChanged(esmeMaintenanceCountersEnabled);
+        }
     }
 
     public void start() throws Exception {

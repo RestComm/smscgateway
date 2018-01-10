@@ -1,12 +1,17 @@
 package org.mobicents.smsc.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class ErrorsStatAggregator {
+import org.restcomm.smpp.oam.SessionKey;
+
+public class ErrorsStatAggregator implements ErrorsStatAggregatorMBean {
     private final static ErrorsStatAggregator instance = new ErrorsStatAggregator();
-    // private final SmsSetCache smsSetCashe = SmsSetCache.getInstance();
+    public final static String COUNTER_GROUP_NAME_SEPARATOR = "-";
+
     private UUID sessionId = UUID.randomUUID();
 
     private ConcurrentHashMap<CounterKey, AtomicLong> map = new ConcurrentHashMap<>();
@@ -28,7 +33,11 @@ public class ErrorsStatAggregator {
 
     public void addCounter(CounterGroup group, CounterCategory category, String id) {
         CounterKey key = new CounterKey(group, category, id);
+        // System.out.println("putting new key in map " + key);
         map.put(key, new AtomicLong());
+        // for (CounterKey k : map.keySet()) {
+        // System.out.println(k + ": " + map.get(k));
+        // }
     }
 
     public void removeCounter(CounterGroup group, CounterCategory category, String id) {
@@ -36,34 +45,73 @@ public class ErrorsStatAggregator {
         map.remove(key);
     }
 
-    public AtomicLong getByCounterName(CounterGroup group, CounterCategory category, String id) {
-        CounterKey key = new CounterKey(group, category, id);
-        return map.get(key);
+    @Override
+    public List<String> getCountersByGroup(String groupStr) {
+        CounterGroup group;
+        if (groupStr.equals("")) {
+            group = null;
+        } else {
+            try {
+                group = CounterGroup.valueOf(groupStr);
+            } catch(IllegalArgumentException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        List<String> list = new ArrayList<>(); 
+        for (CounterKey key : map.keySet()) {
+            if (key.getGroup() == group) {
+                list.add(key.getName());
+            }
+        }
+        return list;
     }
 
-    public AtomicLong getByCounterName(String name, String id) {
-        String[] parts = name.split("_");
-        CounterGroup group = CounterGroup.valueOf(parts[0]);
-        CounterCategory category = CounterCategory.valueOf(parts[1]);
-        CounterKey key = new CounterKey(group, category, id);
+    public AtomicLong getCounterByName(String counterName) {
+        CounterGroup group = null;
+        CounterCategory category = null;
+        String objName = null;
+        String[] parts = counterName.split(COUNTER_GROUP_NAME_SEPARATOR);
+        // System.out.println("couterName is " + counterName + " was splitted in " + parts.length + " parts");
+        if (parts.length == 1) {
+            category = CounterCategory.valueOf(parts[0]);
+        } else if (parts.length == 3) {
+            group = CounterGroup.valueOf(parts[0]);
+            category = CounterCategory.valueOf(parts[1]);
+            objName = parts[2];
+        }
+        CounterKey key = new CounterKey(group, category, objName);
+        // System.out.println("key is " + key);
+        if (map.get(key) == null) {
+            for (CounterKey k : map.keySet()) {
+                System.out.println(k + ": " + map.get(k));
+            }
+        }
         return map.get(key);
     }
 
     public void updateCounter(CounterCategory category) {
+        System.out.println("incrementing counter 1 " + category);
         CounterKey key = new CounterKey(null, category, null);
         AtomicLong value = map.get(key);
         if (value != null) {
             value.incrementAndGet();
+            System.out.println("new value is " + value.get());
+        } else {
+            System.out.println("no mapping for key " + key);
         }
     }
 
     public void updateCounter(CounterCategory category, String clusterName) {
-
+        System.out.println("incrementing counter 2 " + category + "-" + clusterName);
         // update cluster counter
         CounterKey key = new CounterKey(CounterGroup.Cluster, category, clusterName);
         AtomicLong value = map.get(key);
         if (value != null) {
             value.incrementAndGet();
+            System.out.println("new value is " + value.get());
+        } else {
+            System.out.println("no mapping for key " + key);
         }
 
         // update global counter
@@ -71,12 +119,15 @@ public class ErrorsStatAggregator {
     }
 
     public void updateCounter(CounterCategory category, String clusterName, String esmeName) {
-
+        System.out.println("incrementing counter 3 " + category + "-" + clusterName + "-" + esmeName);
         // update esme counter
         CounterKey key = new CounterKey(CounterGroup.ESME, category, esmeName);
         AtomicLong value = map.get(key);
         if (value != null) {
             value.incrementAndGet();
+            System.out.println("new value is " + value.get());
+        } else {
+            System.out.println("no mapping for key " + key);
         }
 
         // update global and cluster counters
@@ -84,16 +135,16 @@ public class ErrorsStatAggregator {
     }
 
     public void updateCounter(CounterCategory category, String clusterName, String esmeName, Long sessionId) {
-
+        System.out.println("incrementing counter 4 " + category + "-" + clusterName + "-" + esmeName + "-" + sessionId);
         // update session counter
-        String sessionIdStr = null;
-        if (sessionId != null) {
-            sessionIdStr = String.valueOf(sessionId);
-        }
-        CounterKey key = new CounterKey(CounterGroup.Session, category, sessionIdStr);
+        SessionKey sessionKey = new SessionKey(esmeName, sessionId);
+        CounterKey key = new CounterKey(CounterGroup.Session, category, sessionKey.getSessionKeyName());
         AtomicLong value = map.get(key);
         if (value != null) {
             value.incrementAndGet();
+            System.out.println("new value is " + value.get());
+        } else {
+            System.out.println("no mapping for key " + key + ", sessionId is " + sessionKey.getSessionKeyName());
         }
 
         // update global, cluster and esme counters
@@ -102,14 +153,17 @@ public class ErrorsStatAggregator {
     }
 
     public void updateCounter(int mProcRuleId) {
-
+        System.out.println("incrementing counter 5 mproc " + mProcRuleId);
         // update mproc counter
         CounterKey key = new CounterKey(CounterGroup.MProc, CounterCategory.MProc, String.valueOf(mProcRuleId));
         AtomicLong value = map.get(key);
         if (value != null) {
             value.incrementAndGet();
+            System.out.println("new value is " + value.get());
+        } else {
+            System.out.println("no mapping for key " + key);
         }
-        
+
         // update global counter
         updateCounter(CounterCategory.MProc);
     }
@@ -125,6 +179,18 @@ class CounterKey {
         this.group = group;
         this.category = category;
         this.id = id;
+    }
+
+    public CounterGroup getGroup() {
+        return group;
+    }
+
+    public String getName() {
+        if ((group == null) && (id == null)) {
+            return category.toString();
+        }
+        return group + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR + category
+                + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR + id;
     }
 
     @Override
@@ -182,4 +248,10 @@ class CounterKey {
 
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "CounterKey [group=" + group + ", category=" + category + ", id=" + id + "]";
+    }
+
 }

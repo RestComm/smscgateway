@@ -1,10 +1,12 @@
 package org.mobicents.smsc.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class MaintenanceStatAggregator {
+public class MaintenanceStatAggregator implements MaintenanceStatAggregatorMBean {
     private final static MaintenanceStatAggregator instance = new MaintenanceStatAggregator();
     // private final SmsSetCache smsSetCashe = SmsSetCache.getInstance();
     private UUID sessionId = UUID.randomUUID();
@@ -41,11 +43,48 @@ public class MaintenanceStatAggregator {
         return map.get(key);
     }
     
-    public AtomicLong getByCounterName(String name, String id) {
-        String[] parts = name.split("_");
-        CounterGroup group = CounterGroup.valueOf(parts[0]);
-        CounterCategory category = CounterCategory.valueOf(parts[1]);
-        CounterKey key = new CounterKey(group, category, id);
+    @Override
+    public List<String> getCountersByGroup(String groupStr) {
+        CounterGroup group;
+        if (groupStr.equals("")) {
+            group = null;
+        } else {
+            try {
+                group = CounterGroup.valueOf(groupStr);
+            } catch(IllegalArgumentException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        List<String> list = new ArrayList<>(); 
+        for (CounterKey key : map.keySet()) {
+            if (key.getGroup() == group) {
+                list.add(key.getName());
+            }
+        }
+        return list;
+    }
+    
+    public AtomicLong getCounterByName(String counterName) {
+        CounterGroup group = null;
+        CounterCategory category = null;
+        String objName = null;
+        String[] parts = counterName.split(ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR);
+        System.out.println("couterName is " + counterName + " was splitted in " + parts.length + " parts");
+        if (parts.length == 1) {
+            category = CounterCategory.valueOf(parts[0]);
+        } else if (parts.length == 3) {
+            group = CounterGroup.valueOf(parts[0]);
+            category = CounterCategory.valueOf(parts[1]);
+            objName = parts[2];
+        }
+        CounterKey key = new CounterKey(group, category, objName);
+        System.out.println(key);
+        if (map.get(key) == null) {
+            for (CounterKey k : map.keySet()) {
+                System.out.println(k + ": " + map.get(k));
+            }
+        }
         return map.get(key);
     }
 

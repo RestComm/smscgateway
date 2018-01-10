@@ -1,0 +1,258 @@
+				<h3 style="margin: 0px;"><i class="icon-bar-chart"></i>SMSC Errors Counters</h3>
+				<hr style="margin: 10 0px;"/>
+				
+				<span class="span5 offset7">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="select the refresh rate at which page will be refreshed">
+					<span class="add-on">Refresh Rate</span>
+					<select id="refresh-rate-select" onchange="refreshRate()">
+						<option value="5000">5 Sec</option>
+						<option value="10000">10 Sec</option>
+						<option value="15000">15 Sec</option>
+						<option value="20000">20 Sec</option>
+						<option value="30000">30 Sec</option>
+						<option selected="selected" value="60000">60 Sec</option>
+						<option value="300000">5 Min</option>
+						<option value="600000">10 Min</option>
+						<option value="900000">15 Min</option>
+						<option value="1200000">20 Min</option>
+						<option value="1800000">30 Min</option>
+						<option value="3600000">60 Min</option>
+					</select>
+					</span>					
+					<button id="refresh" style="float: right; margin-right: 20px; margin-left: 20px; height: 30px;" class="btn btn-medium btn-success" data-toggle="tooltip" data-placement="left" onclick="updateGraphs();" data-original-title="Refresh Graph"><i class="icon-refresh"></i></button>
+				</span>
+				
+				<span id="ras-table-wrapper">
+					<table id="no-campaigns-table" class="table" style="display: none;">
+						<tr>
+							<td>
+								<div class="alert alert-info fade in">
+									<strong>No Campaigns defined yet!</strong> 
+								</div>
+							</td>
+						</tr>
+					</table>	
+					
+					<div id="campaigns-div" class="control-group">
+						<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="select the campaign to display the metrics graph">
+							<span class="add-on">Campaigns</span>
+							<select id="campaigns-list-select" onchange="createGraphs()">
+								<option value="Select">Select</option>
+							</select>
+						</span>
+					</div>
+					
+					<input type="hidden" value="-1" id="timerIdValue"/>
+					
+					<div id="chart_div_global" style="width: 900px; height: 500px;"></div>				
+					<div id="chart_div_mproc" style="width: 900px; height: 500px;"></div>
+					
+				</span>
+				
+				
+				<script type='text/javascript'>
+					//@ sourceURL=loadGoogleCharts.js
+					
+					//global errors
+					var global = new google.visualization.DataTable();
+					global.addColumn('datetime', 'Time');
+					
+					var globalCountersList;
+					var globalGroup = '';
+					jolokia.execute("org.mobicents.smsc:layer=SmscErrorCounters,name=SmscManagement","getCountersByGroup", globalGroup,
+						{ 
+							success: 
+								function(response) {
+									globalCountersList = response;
+									jQuery.each(globalCountersList, function(index, value) {
+										global.addColumn('number', value + 'ErrorCounters');
+									});
+								},
+							 error: 
+								function(value) {
+									errorUID = ("st" + new Date().getTime()).hashCode();
+									createStackTrace(errorUID, value.stacktrace);
+									logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+								}
+						});
+					
+					var globalOptions = {
+					          title: 'Global Errors Counters',
+					          curveType: 'function',
+					          pointSize: 5,
+					          width: 1200,
+					      	  height: 400,
+					      	  hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}},
+					          vAxis: {minValue: 0},
+					 };
+				 
+			        var globalChart = new google.visualization.LineChart(document.getElementById('chart_div_global'));					
+					
+			        //MProc errors per mProcRuleId
+					var mproc = new google.visualization.DataTable();
+					mproc.addColumn('datetime', 'Time');
+					
+					var mprocCountersList;
+					var mprocGroup = 'MProc';
+					jolokia.execute("org.mobicents.smsc:layer=SmscErrorCounters,name=SmscManagement","getCountersByGroup", mprocGroup,
+						{ success: 
+							function(response) {
+								mprocCountersList = response;
+								jQuery.each(mprocCountersList, function(index, value) {
+									mproc.addColumn('number', value);
+								});
+							},
+							error: function(value) {
+								errorUID = ("st" + new Date().getTime()).hashCode();
+								createStackTrace(errorUID, value.stacktrace);
+								logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+							}
+						}
+					);
+					
+					 var mprocOptions = {
+					          title: 'Mproc Errors Counter',
+					          curveType: 'function',
+					          pointSize: 5,
+					          width: 1200,
+					      	  height: 400,
+					      	  hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}},
+					          vAxis: {minValue: 0},					      	  
+					 };
+				 
+			        var mprocChart = new google.visualization.LineChart(document.getElementById('chart_div_mproc'));
+					
+			        function drawCharts() {
+						globalChart.draw(global, globalOptions);
+				        mprocChart.draw(mproc, mprocOptions);
+					}
+					
+					function refreshCampaignsList(){
+						var counterSetName = "SMSC GW-SMSC-Errors";
+						jolokia.execute("org.mobicents.ss7:layer=COUNTER,name=CounterHost,type=Management","getCampaignsList", counterSetName,
+								{ success: 
+									function(response) {
+										var noOfCampaigns = 0 ;
+										
+										jQuery.each(response, function() {
+											noOfCampaigns = noOfCampaigns + 1;
+											$('#campaigns-list-select').append('<option value='+this+'>'+this+'</option>')										
+										});	
+									
+										if(noOfCampaigns == 0){
+											$('#no-campaigns-table').show();
+											$('#campaigns-div').hide();
+										}else {
+											$('#no-campaigns-table').hide();
+											$('#campaigns-div').show();
+										}	
+
+									},
+									error: function(value) {
+										errorUID = ("st" + new Date().getTime()).hashCode();
+										createStackTrace(errorUID, value.stacktrace);
+										logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
+									} 
+								}
+							);
+					}
+					
+					function refreshRate() {
+						var timerIdValue = document.getElementById("timerIdValue").value;
+						clearInterval(timerIdValue);
+
+						var e = document.getElementById("refresh-rate-select");
+						var refreshRate = e.options[e.selectedIndex].value;
+						var timerId = setAutoCancellableInterval(refreshRate, "updateGraphs", "SMSC Errors Counters");
+
+						$("#timerIdValue").val(timerId);
+					}
+
+					function createGraphs() {
+						//Remove all rows
+						var numRowsGlobal = global.getNumberOfRows();
+						if(numRowsGlobal != 0){
+							global.removeRows(0, numRowsGlobal)
+						}
+
+						var numRowsMproc = mproc.getNumberOfRows();
+						if(numRowsMproc != 0){
+							mproc.removeRows(0, numRows)
+						}
+
+						updateGraphs();
+						var timerIdValue = document.getElementById("timerIdValue").value;
+
+						if(timerIdValue == "-1"){
+							var timerId = setAutoCancellableInterval(60000, "updateGraphs", "SMSC Errors Counters");
+							$("#timerIdValue").val(timerId);
+						}
+					}
+
+					function updateGraphs() {
+
+						var e = document.getElementById("campaigns-list-select");
+						var value = e.options[e.selectedIndex].text;
+
+						if(value=="Select"){						
+							return;
+						}
+
+						jolokia.request(
+							[ 
+								{ type: "exec", mbean: "org.mobicents.ss7:layer=COUNTER,name=CounterHost,type=Management", operation: "getLastCounterValues", arguments: [value]},
+							],
+							{ success: [ 
+								function(response) {
+									if(response.value == null){
+										logToConsole("ERROR", "Last CounterValueSet Does not exist");
+										return;
+									}
+									var counterValues = response.value.counterValues;
+
+									var globalRowValuesArr = new Array();
+									var mprocRowValuesArr = new Array();
+
+									jQuery.each(globalCountersList, function(index, value) {
+										var counterName = value;
+										jQuery.each(counterValues, function() {
+											if (this.counterDef.counterName == counterName) {
+												globalRowValuesArr.push(this.longValue);
+											}
+										});
+									});
+
+									jQuery.each(mprocCountersList, function(index, value) {
+										var counterName = value;
+										jQuery.each(counterValues, function() {
+											if (this.counterDef.counterName == counterName) {
+												mprocRowValuesArr.push(this.longValue);
+											}
+										});
+									});
+
+									var dateNow = new Date();
+
+									var rowGlobal = [(dateNow)];
+									$.merge(rowGlobal, globalRowValuesArr);
+									global.addRow(rowGlobal);
+
+									rowMproc = [(dateNow)];
+									$.merge(rowMproc, mprocRowValuesArr);
+									mproc.addRow(rowMproc);
+
+									drawCharts();
+								}
+								],
+								error: function(response) {
+									alert("Jolokia request failed: " + response.error);
+								} 
+							}
+						);
+
+
+					}
+					$(document).ready(function () {
+						refreshCampaignsList();
+					});
+				</script>				

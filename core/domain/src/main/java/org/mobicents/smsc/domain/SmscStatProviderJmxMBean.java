@@ -22,11 +22,12 @@
 
 package org.mobicents.smsc.domain;
 
+import java.util.List;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
 public interface SmscStatProviderJmxMBean {
-
 }

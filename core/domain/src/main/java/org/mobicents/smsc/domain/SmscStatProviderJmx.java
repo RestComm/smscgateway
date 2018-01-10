@@ -22,7 +22,9 @@
 
 package org.mobicents.smsc.domain;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -246,16 +248,11 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
 
         long curTimeSeconds = new Date().getTime() / 1000;
         
-        SourceValueSetImpl svs;
+        SourceValueSetImpl svs = null;
         try {
-            String[] csl = this.getCounterDefSetList();
-            if (!csl[0].equals(counterDefSetName))
-                return null;
-
-            svs = new SourceValueSetImpl(smscStatAggregator.getSessionId());
-
             CounterDefSet cds = getCounterDefSet(counterDefSetName);
             if(counterDefSetName.equals(DEF_SET_MAIN)) {
+                svs = new SourceValueSetImpl(smscStatAggregator.getSessionId());
                 for (CounterDef cd : cds.getCounterDefs()) {
                     SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
     
@@ -356,11 +353,13 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                 }
             } else if (counterDefSetName.equals(DEF_SET_ERRORS)) {
                 svs = new SourceValueSetImpl(errorsStatAggregator.getSessionId());
+                
                 for (CounterDef cd : cds.getCounterDefs()) {
                     SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
     
                     SourceValueObjectImpl svo = new SourceValueObjectImpl(this.getName(), 
-                            errorsStatAggregator.getByCounterName(cd.getGroupName(), cd.getObjectName()).get());
+                            errorsStatAggregator.getCounterByName(cd.getCounterName()).get());
+                    
                     scs.addObject(svo);
                     svs.addCounter(scs);
                 }
@@ -370,7 +369,8 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                     SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
     
                     SourceValueObjectImpl svo = new SourceValueObjectImpl(this.getName(), 
-                            maintenanceStatAggregator.getByCounterName(cd.getGroupName(), cd.getObjectName()).get());
+                            maintenanceStatAggregator.getCounterByName(cd.getCounterName()).get());
+                    
                     scs.addObject(svo);
                     svs.addCounter(scs);
                 }
@@ -387,9 +387,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
 
         return svs;
     }
-
-
-
+    
     public enum SmscManagementType implements MBeanType {
         MANAGEMENT("Management");
 

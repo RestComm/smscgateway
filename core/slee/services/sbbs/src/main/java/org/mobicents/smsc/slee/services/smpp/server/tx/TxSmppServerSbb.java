@@ -321,6 +321,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             sms = this.createSmsEvent(event, esme, ta, persistence);
             this.processSms(sms, persistence, esme, event, null, null, IncomingMessageType.submit_sm,
                     CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM, event.getSequenceNumber());
+
         } catch (SmscProcessingException e1) {
             anSbbUsage.incrementCounterErrorSubmitSm(ONE);
             SbbStatsUtils.handleProcessingException(e1, anSbbUsage);
@@ -442,6 +443,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 generateDetailedCDR(sms, EventType.IN_SMPP_RECEIVED, CdrDetailedGenerator.CDR_MSG_TYPE_SUBMITSM,
                         SmppConstants.STATUS_OK, esme.getRemoteAddressAndPort(), event.getSequenceNumber());
             }
+            throw new Exception("Test Exception TxSmpp");
         } catch (Throwable e) {
             anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
             errorsStatAggregator.updateCounter(CounterCategory.SmppIn, clusterName, esmeName, sessionId);

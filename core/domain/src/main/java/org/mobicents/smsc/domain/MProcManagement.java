@@ -95,7 +95,7 @@ public class MProcManagement implements MProcManagementMBean {
     private MBeanServer mbeanServer = null;
 
     private static MProcManagement instance = null;
-    private MProcStateListener mProcStateListener = null;
+    private MProcStateListener listener = null;
 
     private SmscManagement smscManagement = null;
     private SmscPropertiesManagement smscPropertiesManagement = null;
@@ -115,6 +115,10 @@ public class MProcManagement implements MProcManagementMBean {
 
     public static MProcManagement getInstance() {
         return instance;
+    }
+
+    public void setListener(MProcStateListener listener) {
+        this.listener = listener;
     }
 
     public String getName() {
@@ -197,7 +201,8 @@ public class MProcManagement implements MProcManagementMBean {
 
         this.registerMProcRuleMbean(mProcRule);
 
-        smscManagement.mprocCreated(id);
+        if (listener != null)
+            listener.mprocCreated(id);
         return mProcRule;
     }
 
@@ -211,7 +216,8 @@ public class MProcManagement implements MProcManagementMBean {
         }
 
         mProcRule.updateRuleParameters(parametersString);
-        smscManagement.mprocModified(mProcRuleId);
+        if (listener != null)
+            listener.mprocModified(mProcRuleId);
         this.store();
 
         return mProcRule;
@@ -233,7 +239,8 @@ public class MProcManagement implements MProcManagementMBean {
 
         this.unregisterMProcRuleMbean(mProcRule.getId());
 
-        smscManagement.mprocDestroyed(mProcRuleId);
+        if (listener != null)
+            listener.mprocDestroyed(mProcRuleId);
         return mProcRule;
     }
 
@@ -512,7 +519,7 @@ public class MProcManagement implements MProcManagementMBean {
     }
     
     public void start(MProcStateListener mProcStateListener) throws Exception {
-        this.mProcStateListener = mProcStateListener;
+        this.listener = mProcStateListener;
         start();
     }
 
