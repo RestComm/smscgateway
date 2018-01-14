@@ -1,7 +1,7 @@
-# RestComm SMSC Gateway
+# RestComm SMS Gateway (SMSC)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FRestComm%2Fsmscgateway.svg?type=shield)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FRestComm%2Fsmscgateway?ref=badge_shield)
 
- RestComm SMSC Gateway to send/receive SMS from/to Mobile Operator Networks (GSM, SS7 MAP) , SMS aggregators (SMPP) and Internet Telephony Service Providers (SIP, SMPP). 
+ RestComm SMS Gateway (SMSC) to send/receive SMS from/to Mobile Operator Networks (GSM, SS7 MAP) , SMS aggregators (SMPP) and Internet Telephony Service Providers (SIP, SMPP). 
 
 ## Introduction 
 
