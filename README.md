@@ -5,7 +5,7 @@
 
 ## Introduction 
 
-RestComm SMSC Gateway is built on [RestComm SS7](https://github.com/RestComm/jss7) and RestComm JSLEE Server
+RestComm SMS Gateway (SMSC) is built on [RestComm SS7](https://github.com/RestComm/jss7), SMPP and RestComm JSLEE Server.
 
 When a user sends a text message (SMS message) to another user, the message gets stored in the SMSC (short message service center) which delivers it to the destination user when they are available. This is a store and forward option.
 
