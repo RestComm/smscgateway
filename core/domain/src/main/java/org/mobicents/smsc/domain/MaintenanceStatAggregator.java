@@ -6,9 +6,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.mobicents.protocols.ss7.oam.common.statistics.CounterDefImpl;
+
 public class MaintenanceStatAggregator implements MaintenanceStatAggregatorMBean {
     private final static MaintenanceStatAggregator instance = new MaintenanceStatAggregator();
-    // private final SmsSetCache smsSetCashe = SmsSetCache.getInstance();
+
     private UUID sessionId = UUID.randomUUID();
 
     private ConcurrentHashMap<CounterKey, AtomicLong> map = new ConcurrentHashMap<>();
@@ -70,7 +72,7 @@ public class MaintenanceStatAggregator implements MaintenanceStatAggregatorMBean
         CounterGroup group = null;
         CounterCategory category = null;
         String objName = null;
-        String[] parts = counterName.split(ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR);
+        String[] parts = counterName.split(CounterDefImpl.OBJECT_NAME_SEPARATOR, 3);
         System.out.println("couterName is " + counterName + " was splitted in " + parts.length + " parts");
         if (parts.length == 1) {
             category = CounterCategory.valueOf(parts[0]);

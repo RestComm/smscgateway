@@ -160,3 +160,16 @@ textarea.hardcore-code {
 	background-color: #000;
 	color: #0F0;
 }
+
+.errors-title {
+	width: 150px !important;
+}
+
+.next-errors-row {
+	padding-top: 10px;
+}
+
+.graph {
+	width: 900px;
+	height: 500px;
+}

@@ -1026,7 +1026,6 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                 }
 
             }
-            throw new Exception("Test Exception RxSmpp");
         } catch (Throwable e) {
             throw new SmscProcessingException(
                     "RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="

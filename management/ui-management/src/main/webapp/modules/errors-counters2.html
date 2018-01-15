@@ -45,34 +45,38 @@
 					
 					<div id="campaigns-div" class="control-group">
 						<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="select the campaign to display the metrics graph">
-							<span class="add-on">Campaigns</span>
-							<select id="campaigns-list-select" onchange="getCountersList()">
-								<option value="Select">Select</option>
-							</select>
-							<span class="add-on">Available Clusters</span>
-							<select multiple="multiple" id="clusters-list-select" onchange="createGraphs()">
-								<option value="Select">Select</option>
-							</select>
+							<div>
+								<span class="add-on errors-title">Campaigns</span>
+								<select id="campaigns-list-select" onchange="getCountersList()">
+									<option value="Select">Select</option>
+								</select>
+							</div>								
+							<div class="next-errors-row">
+								<span class="add-on errors-title">Available Clusters</span>
+								<select multiple="multiple" id="clusters-list-select" onchange="createGraphs()">
+								</select>
+							</div>
 						</span>
 					</div>
 					
 					<input type="hidden" value="-1" id="timerIdValue"/>
+					
+					<div id="graphs"/>
 					
 				</span>
 				
 				<script type='text/javascript'>
 					//@ sourceURL=loadGoogleCharts.js
 					
-					//chart arrays errors
-					var clusters = [];
-					var esmes = [];
-					var sessions = [];
+					var charts = {};
 					
 					var clusterCountersList = [];
 					var esmeCountersList = [];
 					var sessionCountersList = [];
 
-					var clustersCounters = [];
+					var selectedClusters = [];
+					
+					var clustersCountersMap;
 					
 					function refreshCampaignsList(){
 						var counterSetName = "SMSC GW-SMSC-Errors";
@@ -85,6 +89,7 @@
 											noOfCampaigns = noOfCampaigns + 1;
 											$('#campaigns-list-select').append('<option value='+this+'>'+this+'</option>')										
 										});	
+										campaignsSelect.reload();
 									
 										if(noOfCampaigns == 0){
 											$('#no-campaigns-table').show();
@@ -115,52 +120,16 @@
 							],
 							{ success: 
 								function(response) {
-									console.log(response.value.AllCountersPerCluster);
-									jQuery.each(response.value.AllCountersPerCluster, function(clusterName, value) {
-										clustersCounters.push(clusterName);
-										
-										var clusterChart = addChart();
-										var esmesChart = addChart('chart_div_esmes_' + clusterName);
-										var sessionsChart = addChart('chart_div_sessions_' + clusterName);
-										
-										
-										jQuery.each(value, function(counterGroup, val) {
-											jQuery.each(val, function(index, counterName) {
-												if (counterGroup == 'Cluster') {
-													clusterChart.addColumn('number', counterName);
-												} else if (counterGroup == 'ESME') {
-													esmesChart.addColumn('number', counterName);
-												} else if (counterGroup == 'Session') {
-													sessionsChart.addColumn('number', counterName);
-												}
-												console.log(counterName);
-											});
-										});
-										
-										if (clusterChart.getNumberOfColumns() > 1) {
-											var clusterDivName = 'chart_div_cluster_' + clusterName;
-											$('#ras-table-wrapper').append('<div id="' + clusterDivName + '" style="width: 900px; height: 500px;"></div>');
-											drawChart('Cluster ' + clusterName + ' Errors', clusterChart, clusterDivName);
-											console.log('clusterChart has ' + clusterChart.getNumberOfColumns() + ' number of columns');
-											clusters.push(clusterChart);
-										}
-										if (esmesChart.getNumberOfColumns() > 1) {
-											var esmesDivName = 'chart_div_esmes_' + clusterName;
-											$('#ras-table-wrapper').append('<div id="' + esmesDivName + '" style="width: 900px; height: 500px;"></div>');
-											drawChart('Esmes from Cluster ' + clusterName + ' Errors', esmesChart, esmesDivName);
-											console.log('esmesChart has ' + esmesChart.getNumberOfColumns() + ' number of columns');
-											esmes.push(esmesChart);
-										}
-										if (sessionsChart.getNumberOfColumns() > 1) {
-											var sessionsDivName = 'chart_div_sessions_' + clusterName;
-											$('#ras-table-wrapper').append('<div id="' + sessionsDivName + '" style="width: 900px; height: 500px;"></div>');
-											drawChart('Sessions from C;uster ' + clusterName + ' Errors', sessionsChart, sessionsDivName);
-											console.log('sessionsChart has ' + sessionsChart.getNumberOfColumns() + ' number of columns');
-											sessions.push(sessionsChart);
-										}
-										
+									
+									//clear clusters array, clear clusters select, remove allgraphs
+									clusterSelect.unSelectAll();
+									clusterSelect.removeAll();
+									$('#graphs').html('');
+									
+									clustersCountersMap = response.value.AllCountersPerCluster;
+									jQuery.each(clustersCountersMap, function(clusterName, value) {
+										clusterSelect.add(clusterName, clusterName);
 									});
-									console.log(clustersCounters);
 								},
 								error: function(value) {
 									errorUID = ("st" + new Date().getTime()).hashCode();
@@ -172,13 +141,15 @@
 						
 					}
 					
-					function addChart() {
-						var chart = new google.visualization.DataTable();
-						chart.addColumn('datetime', 'Time');
-						return chart;
+					function addDataTable() {
+						var dataTable = new google.visualization.DataTable();
+						dataTable.addColumn('datetime', 'Time');
+						return dataTable;
 					}
 					
-			        function drawChart(chartTitle, chart, divName) {
+			        function drawChart(chartTitle, dataTable, clusterName, type) {
+						var divName = 'chart_div_'+type+'_' + clusterName;
+						$('#graphs').append('<div id="' + divName + '" class="graph"/>');
 						var chartOptions = {
 								  title: chartTitle,
 								  curveType: 'function',
@@ -189,8 +160,22 @@
 								  vAxis: {minValue: 0},
 						 };
 
-						var visualChart = new google.visualization.LineChart(document.getElementById(divName));					
-						visualChart.draw(chart, chartOptions);
+						var chart = new google.visualization.LineChart(document.getElementById(divName));
+						
+						var clusterNameChartObj = charts["" + clusterName];
+						var chartDataObj = clusterNameChartObj[""+type]; 
+						chartDataObj.chartOptions = chartOptions;
+						chartDataObj.chart = chart;
+
+						chart.draw(dataTable, chartOptions);
+					}
+					
+					function redrawCharts() {
+						$.each(charts, function(clusterName, clusterNameChartObj) {
+							$.each(clusterNameChartObj, function(type, chartDataObj) {
+								chartDataObj.chart.draw(chartDataObj.dataTable, chartDataObj.chartOptions);
+							});
+						});
 					}
 					
 					function getCountersByGroup(list, group) {
@@ -226,10 +211,38 @@
 
 					function createGraphs() {
 						//Remove all rows
-						var numRowsGlobal = global.getNumberOfRows();
-						if(numRowsGlobal != 0){
-							global.removeRows(0, numRowsGlobal)
-						}
+						
+						var selectedClustersCopy = [];
+						$.each(selectedClusters, function(index, value) {
+							selectedClustersCopy.push(value);
+						});
+						
+						$('#clusters-list-select option:selected').each(function(i) {
+							//if it's NOT in selectedClusters, needs to be added, otherwise - skipped
+							var clusterName = $(this).val();
+							var pos = $.inArray(clusterName, selectedClustersCopy);
+							if (pos == -1) {
+								addClusterNameGraphs(clusterName);
+							} else {
+								selectedClustersCopy.splice(pos, 1);
+							}
+						});
+						
+						//if something was in selectedClusters but not among sleected options
+						$.each(selectedClustersCopy, function(index, value) {
+							removeClusterNameGraphs(value);
+						});
+
+						/*
+						$.each(charts, function(clusterName, clusterNameChartObj) {
+							$.each(clusterNameChartObj, function(type, chartDataObj) {
+								var numRows = chartDataObj.dataTable.getNumberOfRows();
+								if(numRows != 0) {
+									chartDataObj.dataTable.removeRows(0, numRows);
+								}
+							});
+						});
+						*/
 
 						updateGraphs();
 						var timerIdValue = document.getElementById("timerIdValue").value;
@@ -238,6 +251,58 @@
 							var timerId = setAutoCancellableInterval(60000, "updateGraphs", "SMSC Errors Counters");
 							$("#timerIdValue").val(timerId);
 						}
+					}
+					
+					function addClusterNameGraphs(clusterName) {
+						selectedClusters.push(clusterName);
+																		
+						var clusterDataTable = addDataTable();
+						var esmesDataTable = addDataTable();
+						var sessionsDataTable = addDataTable();
+
+						var value = clustersCountersMap[clusterName];
+						jQuery.each(value, function(counterGroup, val) {
+							jQuery.each(val, function(index, counterName) {
+								if (counterGroup == 'Cluster') {
+									clusterDataTable.addColumn('number', counterName);
+								} else if (counterGroup == 'ESME') {
+									esmesDataTable.addColumn('number', counterName);
+								} else if (counterGroup == 'Session') {
+									sessionsDataTable.addColumn('number', counterName);
+								}
+								//console.log(counterName);
+							});
+						});
+						
+						charts["" + clusterName] = {};
+						
+						if (clusterDataTable.getNumberOfColumns() > 1) {
+							charts["" + clusterName].cluster = {dataTable:clusterDataTable};
+							drawChart('Cluster ' + clusterName + ' Errors', clusterDataTable, clusterName, 'cluster');
+							//console.log('clusterChart has ' + clusterChart.getNumberOfColumns() + ' number of columns');
+							
+						}
+						if (esmesDataTable.getNumberOfColumns() > 1) {
+							charts["" + clusterName].esme = {dataTable:esmesDataTable};
+							drawChart('Esmes from Cluster ' + clusterName + ' Errors', esmesDataTable, clusterName, 'esme');
+							//console.log('esmesChart has ' + esmesChart.getNumberOfColumns() + ' number of columns');
+						}
+						if (sessionsDataTable.getNumberOfColumns() > 1) {
+							charts["" + clusterName].session = {dataTable:sessionsDataTable};
+							drawChart('Sessions from Cluster ' + clusterName + ' Errors', sessionsDataTable, clusterName, 'session');
+							//console.log('sessionsChart has ' + sessionsChart.getNumberOfColumns() + ' number of columns');							
+						}
+					}
+					
+					function removeClusterNameGraphs(clusterName) {
+						selectedClusters.splice($.inArray(clusterName, selectedClusters), 1);
+							
+						var clusterDivName = 'chart_div_cluster_' + clusterName;
+						var esmesDivName = 'chart_div_esme_' + clusterName;
+						var sessionsDivName = 'chart_div_session_' + clusterName;
+						$('#'+clusterDivName).remove();
+						$('#'+esmesDivName).remove();
+						$('#'+sessionsDivName).remove();
 					}
 
 					function updateGraphs() {
@@ -260,25 +325,50 @@
 										return;
 									}
 									var counterValues = response.value.counterValues;
-
-									var globalRowValuesArr = new Array();
-
-									jQuery.each(globalCountersList, function(index, value) {
-										var counterName = value;
-										jQuery.each(counterValues, function() {
-											if (this.counterDef.counterName == counterName) {
-												globalRowValuesArr.push(this.longValue);
-											}
+									
+									console.log(counterValues);
+									
+									$.each(charts, function(clusterName, clusterNameChartObj) {
+										var countersList = clustersCountersMap[clusterName];
+										var clusterRowValuesArr = [];
+										var esmeRowValuesArr = [];
+										var sessionRowValuesArr = [];
+										jQuery.each(countersList, function(counterGroup, val) {
+											jQuery.each(val, function(index, counterName) {
+												jQuery.each(counterValues, function() {
+													if (this.counterDef.counterName == counterName) {
+														if (counterGroup == 'Cluster') {
+															clusterRowValuesArr.push(this.longValue);
+														} else if (counterGroup == 'ESME') {
+															esmeRowValuesArr.push(this.longValue);
+														} else if (counterGroup == 'Session') {
+															sessionRowValuesArr.push(this.longValue);
+														}
+													}
+												});
+											});
 										});
+										var dateNow = new Date();
+
+										
+										if (clusterRowValuesArr.length != 0) {
+											var row = [(dateNow)];
+											$.merge(row, clusterRowValuesArr);
+											clusterNameChartObj.cluster.dataTable.addRow(row);
+										}
+										if (esmeRowValuesArr.length != 0) {
+											var row = [(dateNow)];
+											$.merge(row, esmeRowValuesArr);
+											clusterNameChartObj.esme.dataTable.addRow(row);
+										}
+										if (sessionRowValuesArr.length != 0) {
+											var row = [(dateNow)];
+											$.merge(row, sessionRowValuesArr);
+											clusterNameChartObj.session.dataTable.addRow(row);
+										}
 									});
-
-									var dateNow = new Date();
-
-									var rowGlobal = [(dateNow)];
-									$.merge(rowGlobal, globalRowValuesArr);
-									global.addRow(rowGlobal);
-
-									drawCharts();
+									
+									redrawCharts();
 								}
 								],
 								error: function(response) {
@@ -286,12 +376,22 @@
 								} 
 							}
 						);
-
-
 					}
+					
+					var clusterSelect;
+					var campaignsSelect;
 					
 					$(document).ready(function () {
 						refreshCampaignsList();
+						$('#campaigns-list-select').SumoSelect();
+						campaignsSelect = $('#campaigns-list-select')[0].sumo;
+						$('#clusters-list-select').SumoSelect({
+							placeholder: 'Select',
+							search: true,
+							searchText: 'Enter here',
+							selectAll: true
+						});
+						clusterSelect = $('#clusters-list-select')[0].sumo;
 					});
 				
 				</script>				

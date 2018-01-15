@@ -358,7 +358,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                     SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
     
                     SourceValueObjectImpl svo = new SourceValueObjectImpl(this.getName(), 
-                            errorsStatAggregator.getCounterByName(cd.getCounterName()).get());
+                            errorsStatAggregator.getCounterValueByName(cd.getCounterName()).get());
                     
                     scs.addObject(svo);
                     svs.addCounter(scs);

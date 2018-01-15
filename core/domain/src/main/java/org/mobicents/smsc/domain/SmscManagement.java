@@ -367,7 +367,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
                 }
 
                 if (enableCounter) {
-                    String mprocCounterGroup = CounterGroup.MProc + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+                    String mprocCounterGroup = CounterGroup.MProc + CounterDefImpl.OBJECT_NAME_SEPARATOR;
                     CounterDef cd = new CounterDefImpl(CounterType.Maximal, mprocCounterGroup + CounterCategory.MProc,
                             String.valueOf(mProcRule.getId()), "Mproc Errors per Mproc rule = " + mProcRule.getId());
                     smscStatProviderJmx.getCounterDefSet(errorsDefSetName).addCounterDef(cd);
@@ -576,7 +576,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
         Esme esme = smppManagement.getEsmeManagement().getEsmeByName(esmeName);
         boolean globalClusterErrorCountersEnabled = smscPropertiesManagement.isClusterErrorCountersEnabled();
         boolean globalClusterMaintenanceCountersEnabled = smscPropertiesManagement.isClusterMaintenanceCountersEnabled();
-        String clusterGroup = CounterGroup.Cluster + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+        String clusterGroup = CounterGroup.Cluster + CounterDefImpl.OBJECT_NAME_SEPARATOR;
         CounterGroup group = CounterGroup.Cluster;
 
         // if local map doesn't contain clusterName yet - add counters if needed AND put value in local map,
@@ -648,7 +648,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
         enableEsmeErrorCounter = esmeErrorCountersEnabled == null ? smscPropertiesManagement.isEsmeErrorCountersEnabled()
                 : esmeErrorCountersEnabled;
 
-        String esmeGroup = CounterGroup.ESME + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+        String esmeGroup = CounterGroup.ESME + CounterDefImpl.OBJECT_NAME_SEPARATOR;
         group = CounterGroup.ESME;
         if (enableEsmeErrorCounter) {
             CounterDef cd = new CounterDefImpl(CounterType.Maximal, esmeGroup + CounterCategory.Scheduler, esmeName,
@@ -702,7 +702,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
             // and if global property is on - remove associated counters
             if (clusterCountersEnabledMap.get(clusterName).decrementAndGet() == 0) {
                 if (clusterCountersEnabledMap.remove(clusterName) != null) {
-                    String clusterGroup = CounterGroup.Cluster + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+                    String clusterGroup = CounterGroup.Cluster + CounterDefImpl.OBJECT_NAME_SEPARATOR;
                     CounterGroup group = CounterGroup.Cluster;
 
                     if (globalClusterErrorCountersEnabled) {
@@ -781,7 +781,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
         // if local map contains key with this esme name, and value for this key
         // is true - remove counter and set value to false
 
-        String esmeGroup = CounterGroup.ESME + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+        String esmeGroup = CounterGroup.ESME + CounterDefImpl.OBJECT_NAME_SEPARATOR;
         CounterGroup group = CounterGroup.Cluster;
 
         if (esmeErrorCountersEnabledMap.containsKey(esmeName) && esmeErrorCountersEnabledMap.get(esmeName)) {
@@ -835,7 +835,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
 
         if (enableSessionCounter) {
             String errorsDefSetName = this.getErrorsCounterDefSetName();
-            String sessionGroup = CounterGroup.Session + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+            String sessionGroup = CounterGroup.Session + CounterDefImpl.OBJECT_NAME_SEPARATOR;
             CounterGroup group = CounterGroup.Session;
             String counterObjectName = key.getSessionKeyName();
 
@@ -861,7 +861,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
             sessionErrorCountersEnabledMap.remove(key);
 
             String errorsDefSetName = this.getErrorsCounterDefSetName();
-            String sessionGroup = CounterGroup.Session + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+            String sessionGroup = CounterGroup.Session + CounterDefImpl.OBJECT_NAME_SEPARATOR;
             CounterGroup group = CounterGroup.Session;
             String counterObjectName = key.getSessionKeyName();
 
@@ -897,7 +897,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
             enableCounter = mprocErrorCountersEnabled == null ? smscPropertiesManagement.isMprocErrorCountersEnabled()
                     : mprocErrorCountersEnabled;
 
-            String mprocGroup = CounterGroup.MProc + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+            String mprocGroup = CounterGroup.MProc + CounterDefImpl.OBJECT_NAME_SEPARATOR;
             if (enableCounter) {
                 CounterDef cd = new CounterDefImpl(CounterType.Maximal, mprocGroup + CounterCategory.MProc,
                         String.valueOf(mprocId), "Mproc Errors per Mproc rule = " + mprocId);
@@ -913,7 +913,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     public void mprocDestroyed(int mprocId) {
         if (mprocErrorCountersEnabledMap.containsKey(mprocId) && mprocErrorCountersEnabledMap.get(mprocId)) {
             mprocErrorCountersEnabledMap.remove(mprocId);
-            String mprocGroup = CounterGroup.MProc + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+            String mprocGroup = CounterGroup.MProc + CounterDefImpl.OBJECT_NAME_SEPARATOR;
             CounterDef cd = new CounterDefImpl(CounterType.Maximal, mprocGroup + CounterCategory.MProc,
                     String.valueOf(mprocId), "Mproc Errors per Mproc rule = " + mprocId);
             String counterName = cd.getCounterName();
@@ -932,7 +932,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
 
             enableCounter = mprocErrorCountersEnabled == null ? smscPropertiesManagement.isMprocErrorCountersEnabled()
                     : mprocErrorCountersEnabled;
-            String mprocGroup = CounterGroup.MProc + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+            String mprocGroup = CounterGroup.MProc + CounterDefImpl.OBJECT_NAME_SEPARATOR;
             if (enableCounter
                     && (!mprocErrorCountersEnabledMap.containsKey(mprocId) || !mprocErrorCountersEnabledMap.get(mprocId))) {
                 // if it to enable and is currently disabled - add it
@@ -1061,7 +1061,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     @Override
     public void clusterErrorCountersChanged(boolean newValue) {
         String errorsDefSetName = getErrorsCounterDefSetName();
-        String clusterGroup = CounterGroup.Cluster + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+        String clusterGroup = CounterGroup.Cluster + CounterDefImpl.OBJECT_NAME_SEPARATOR;
         CounterGroup group = CounterGroup.Cluster;
 
         Iterator<String> it = clusterCountersEnabledMap.keySet().iterator();
@@ -1111,7 +1111,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     @Override
     public void esmeErrorCountersChanged(boolean newValue) {
         String errorsDefSetName = getErrorsCounterDefSetName();
-        String esmeGroup = CounterGroup.ESME + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+        String esmeGroup = CounterGroup.ESME + CounterDefImpl.OBJECT_NAME_SEPARATOR;
         CounterGroup group = CounterGroup.ESME;
 
         // need to iterate over every esme with esmeErrorCounter == null and add(remove) esme counters
@@ -1166,7 +1166,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     @Override
     public void sessionErrorCountersChanged(boolean newValue) {
         String errorsDefSetName = getErrorsCounterDefSetName();
-        String sessionGroup = CounterGroup.Session + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+        String sessionGroup = CounterGroup.Session + CounterDefImpl.OBJECT_NAME_SEPARATOR;
         CounterGroup group = CounterGroup.Session;
 
         // need to iterate over every esme with sessionErrorCounter == null and add(remove) session counters
@@ -1375,7 +1375,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     @Override
     public void clusterMaintenanceCountersChanged(boolean newValue) {
         String maintenanceDefSetName = getMaintenanceCounterDefSetName();
-        String clusterGroup = CounterGroup.Cluster + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+        String clusterGroup = CounterGroup.Cluster + CounterDefImpl.OBJECT_NAME_SEPARATOR;
         CounterGroup group = CounterGroup.Cluster;
 
         Iterator<String> it = clusterCountersEnabledMap.keySet().iterator();
@@ -1480,7 +1480,7 @@ public class SmscManagement implements SmscManagementMBean, SmscPropertiesListen
     @Override
     public void esmeMaintenanceCountersChanged(boolean newValue) {
         String maintenanceDefSetName = getMaintenanceCounterDefSetName();
-        String esmeGroup = CounterGroup.ESME + ErrorsStatAggregator.COUNTER_GROUP_NAME_SEPARATOR;
+        String esmeGroup = CounterGroup.ESME + CounterDefImpl.OBJECT_NAME_SEPARATOR;
         CounterGroup group = CounterGroup.ESME;
 
         // need to iterate over every esme with esmeMaintenanceCounter == null and add(remove) esme counters
