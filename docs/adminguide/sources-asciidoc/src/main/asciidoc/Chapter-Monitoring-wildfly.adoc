@@ -1,0 +1,394 @@
+= Monitoring (Wildfly 10)
+
+[[_smsc_stat_get]]
+== View SMSC Statistics
+
+[[_smsc_stat_get_cli]]
+=== Using CLI
+
+You can view the current state of SMSC using the command `smsc stat get` with appropriate parameters as described below: 
+
+----
+
+Name
+	smsc stat get
+
+SYNOPSIS
+	smsc stat get 
+
+DESCRIPTION
+	This command is used to view the details of the current state of the SMSC and
+	monitor the SMSC. The output prints the following parameters:
+
+	Time			- Current time. By obtaining this statistic twice, this 
+				  value can be used to calculate the time interval between
+				  statistic time.
+
+	MessageInProcess	- Number of messages currently being processed for 
+				  delivery in GSM (MT messages) and SMPP (messages that
+				  are routed to ESME) and SIP (messages that are routed to
+				  ESME).
+
+	MessageId		- This is the last assigned Message Id. This indicates
+				  the number of messages that have come into the SMSC
+				  from GSM (Mobile Originated messages), from ESMEs or from SIP
+				  and stored in the Cassandra database. The MessageId 
+				  counter is initiated from the time of the installation
+				  of the SMSC.
+
+	MessageScheduledTotal	- The number of messages put into the delivering
+	              process in both GSM, SMPP or SIP since the SMSC was started.
+
+	DueSlotProcessingLag	- The time (in seconds) between "in time" due_slot
+	              and "in process" due_slot. "In time" means the current actual
+	              time, "in process" means that SMSC GW is processing messages
+	              that was scheduled for that time (in the past).
+
+				  If this value is equal to 0 or 1 or 2, it means that the
+				  SMSC is not highly loaded and all the messages are 
+				  being processed on time. 
+
+				  If this value is high, say for example 300, then it 
+				  means the SMSC is overloaded and is now processing 
+				  messages, that are scheduled for processing 300 seconds 
+				  before the current time. 
+
+				  If this value is progressively increasing, then the SMSC
+				  is heavily overloaded and the incoming messages count at
+				  SMPP (and MO) are more than what the SMSC can deliver.
+				  
+				  If the incoming messages are not many, this value will
+				  decrease and will reach 0 when there are no messages.
+
+				  Normally this value will return to 0 except for few
+				  peaks. If it does not, then you must reduce the load for
+				  SMSC.
+
+	DueSlotProcessingTime - This field shows the time for which SMSC GW is
+	              processing / fetching stored in cassandra database messages
+	              ("in process" due_slot). If this time is far before the
+	              current actual time, then this means:
+                  - either SMSC GW is overloaded and can not send messages
+                    in time
+                  - or SMSC GW was turned off for much time and now is
+                    checking for messages for the time when it was off
+                  If you want to skip unsent messages that was scheduled for
+                  the time in the past (and then shift DueSlotProcessingTime
+                  to to current time) - you can use the command [the reference
+                  to CLI / GUI command "smsc skip-unsent-messages" - see the
+                  Chapter "Skipping of scheduled for the past and not yet
+                  sent messages ("In process" due_slot shifting)."
+
+	Param1			- Ignore.
+
+	Param2			- Ignore.
+	
+	SmscStartTime		- The time when the SMSC was started.
+EXAMPLES
+	smsc stat get
+	Stat: Time: Mon Jan 13 18:40:42 CET 2014, MessageInProcess: 515, MessageId: 10212,
+	MessageScheduledTotal: 8992, DueSlotProcessingLag: 0, Param1: 0, Param2: 0, 
+	SmscStartTime: Mon Jan 13 18:39:30 CET 2014
+----
+
+[[_smsc_stat_get_gui]]
+=== Using GUI
+
+.Procedure: View SMSC Statistics using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Stats' in the left panel. 
+. The main panel will display the current statistics of the SMSC and display the details of the parameters 'START TIME', 'CURRENT TIME', 'TOTAL MESSAGES SCHEDULED', 'MESSAGES IN PROCESS', 'CURRENT MESSAGE ID' and 'DUE SLOT PROCESSING LAG'. For more details of these parameters please refer to the description of the CLI command in the preceding section.
++
+This page gets auto-refreshed every 2.5 seconds and therefore the statistics get refreshed automatically. 
+
+[[_slee_stat_get]]
+== View SLEE Based SMPP Statistics
+
+{this-platform} {this-application} provides a SLEE based statistics for SMPP services.
+
+.Procedure: View SLEE Based Statistics using the GUI
+. In the SLEE Management Console for SLEE (thai is avalable by a link like `http://localhost:8080/slee-management-console/`), click on 'Services' in the left panel.
+. The main panel will display all of deployed services. Click on the 'Usage Parameters' tab.
+. Select one of the SMPP services and a SBB corresponding to the chosen one.
+. The main panel will display a parameter entries in 'Parameter Sets' tab. You can view the current SMPP statistics by clicking on the row corresponding to the name of the parameters set.
++
+You can reset a counter for a single parameter by selecting the reset option in the 'Actions' column or reset all usage parameters by clicking on the button at the bottom of the page.
+
+[[_monitoring_smsc_cdr_log]]
+== CDR Log
+
+{this-platform} {this-application} is configured to generate CDR in a plain text file located at [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml.
+The CDR generated in the text file is of the below format: 
+----
+
+DELIVERY_DATE,SUBMIT_DATE,ADDR_SRC_DIGITS,ADDR_SRC_TON,ADDR_SRC_NPI,ADDR_DST_DIGITS,ADDR_DST_TON,ADDR_DST_NPI,MESSAGE_DELIVERY_STATUS,ORIGINATION_TYPE,MESSAGE_TYPE,ORIG_SYSTEM_ID,MESSAGE_ID,DVL_MESSAGE_ID,RECEIPT_LOCAL_MESSAGE_ID,NNN_DIGITS,IMSI,CORR_ID,ORIGINATOR_SCCP_ADDRESS,MtServiceCenterAddress,ORIG_NETWORK_ID,NETWORK_ID,MPROC_NOTES,MSG_PARTS,CHAR_NUMBERS,PROCESSING_TIME,SCHEDULE_DELIVERY_DELAY,DELIVERY_COUNT,MESSAGE_PART_PROCESSING_TIME,FIRST_20_CHARACTERS_OF_SMS,_SMS,REASON_FOR_FAILURE,DELIVERY_RECEIPT_MESSAGE_STATUS,DELIVERY_RECEIPT_MESSAGE_STATE_TLV,DELIVERY_RECEIPT_MESSAGE_ERR
+----
+where `ADDR_SRC_DIGITS, ADDR_SRC_TON, ADDR_SRC_NPI, ADDR_DST_DIGITS, ADDR_DST_TON, ADDR_DST_NPI, ORIG_SYSTEM_ID, MESSAGE_ID, NNN_DIGITS, IMSI, ORIG_NETWORK_ID, NETWORK_ID, DELIVERY_COUNT` and `CORR_ID` are as explained in <<_slot_messages_table_yyyy_mm_dd>> and other values are described below in this section.
+
+NOTE: `NNN_DIGITS` and `IMSI` fields are present only in the case of SS7 terminated messages when there is a SRI positive response. `CORR_ID` is present only if a message has come to the SMSC Gateway via "home-routing" procedure. 
+
+.DELIVERY_DATE
+Time when CDR is created (and is equals the time when the message delivery is succeded / failed at SMSC Gateway)
+
+.SUBMIT_DATE
+Time when the message reached the SMSC Gateway. 
+
+.Message_Delivery_Status
+The CDR text file contains a special field, `Message_Delivery_Status`, that specifies the message delivery status.
+The possible values are described below: 
+
+.Message_Delivery_Status if delivering to GSM network:
+partial::
+  Delivered a part of a multi-part message but not the last part. 
+
+success::
+  Delivered the last part of a multi-part message or a single message. 
+
+temp_failed::
+  Failed delivering a part of a multi-part message or a single message.
+  It does not indicate if a resend will be attempted or not. 
+
+failed::
+  Failed delivering a message and the SMSC will not attempt to resend the message or part of the message. This status may also be when ValidityPeriod for a short message is expire (SMSC will now attempt to resend the message)
+
+failed_imsi::
+  Delivery process was broken by a mproc rule applying at the step when a successful SRI response has been received from HLR. 	
+
+.Message_Delivery_Status if delivering to ESME:
+partial_esme::
+  Delivered a part of a multi-part message but not the last part. 
+
+success_esme::
+  Delivered the last part of a multi-part message or a single message. 
+
+temp_failed_esme::
+  Failed delivering a part of a multi-part message or a single message. 
+
+failed_esme::
+  Failed delivering a message and the SMSC will nor attempt to resend the message or part of the message. 	
+
+.Message_Delivery_Status if delivering to SIP:
+partial_sip::
+  Delivered a part of a multi-part message but not the last part. 
+
+success_sip::
+  Delivered the last part of a multi-part message or a single message. 
+
+temp_failed_sip::
+  Failed delivering a part of a multi-part message or a single message. 
+
+failed_sip::
+  Failed delivering a message and the SMSC will not attempt to resend the message or part of the message. 	
+
+.Message_Delivery_Status if the message has been rejected by the OCS Server (Diameter Server):
+ocs_rejected::
+  OCS Server rejected an incoming message. 	
+
+.Message_Delivery_Status if the message has been rejected by a mproc rule applying at the step when a message has been arrived to SMSC GW:
+mproc_rejected::
+  A mproc rule rejected an incoming message (and reject response was sent to a message originator). 
+
+mproc_dropped::
+  A mproc rule dropped an incoming message (and accept response was sent to a message originator). 	
+
+.ORIGINATION_TYPE
+A message origination: SMPP, SS7_MO, SS7_HR, SIP, HTTP, LOCAL_ORIG (delivery receipts that are created by SMSC GW).
+
+.MESSAGE_TYPE
+message::
+  Regular messages
+  
+dlr::
+  Delivery receipts
+
+.DVL_MESSAGE_ID
+A messageID that is used at SMPP protocol when sending a message to a peer. Only for SMPP terminated messages. "MESSAGE_ID" feild displays a messageId value for a leg when SMSC GW receives a message from a SMPP peer.
+
+.RECEIPT_LOCAL_MESSAGE_ID
+This field is used for delivery receipt – an original messageId that was used in the original message in field MESSAGE_ID (for correlation between an original message and DLR). If a message is a DLR but the original message is not known for SMSC GW this field will be filled by `xxxx` value.
+
+.MtServiceCenterAddress
+Local SMSC GW address (GT) that is used in MT procedure (for mobile terminated messages).
+
+.MPROC_NOTES
+Some custom mproc rules implementations may put here some verbal remarks of made processing.
+
+.MSG_PARTS
+A count of message parts of long sms, which were sent to an operator in a solid manner (not split) (may be used for charging purposes). For other cases if a message is short, already split by a message originator or split by SMSC GW itself then this field will contain `1`.
+
+
+.CHAR_NUMBERS
+A count of characters that are present in the message / message segment. If SMSC GW is making a message splitting for a long message then only a last segment (with Message_Delivery_Status `success` or `success_esme`) will contain a character number for all segments. Non-last segments in this case (with Message_Delivery_Status `partial` or `partial_esme`) will contain 0 in this field. This is because of a way how SMSC GW makes of message splitting.
+
+.PROCESSING_TIME
+A processing time between a CDR generation time and a message submit time in milliseconds.
+
+.SCHEDULE_DELIVERY_DELAY
+A processing time between a time for which a message is scheduled and a message submit time in milliseconds (this field is empty if a message has not be scheduled to a database but was delivered immediately).
+
+.MESSAGE_PART_PROCESSING_TIME
+For messages that are split by SMSC GW at the sending time this field shows processing time of a message part: it is difference in milliseconds between a previous message part delivery timestamp and current message part delivery timestamp.
+For messages that are not split by SMSC GW and for a first part of a split message this counter will show time between message (or message part) delivery timestamp and time when message has been received by SMSC GW.
+
+.Reason_For_Failure
+The last field in the CDR generated is `Reason_For_Failure`, which records the reason for delivery failure and is empty if the delivery is successful.
+The possible delivery failure cases are explained below. 
+
+.Reasons_For_Failure
+XXX response from HLR::
+  A MAP error message is received from HLR after SRI request; XXX: `AbsentSubscriber`, `AbsentSubscriberSM`, `CallBarred`, `FacilityNotSuppored`, `SystemFailure`, `UnknownSubscriber`, `DataMissing`, `UnexpectedDataValue`, `TeleserviceNotProvisioned`.
+
+Error response from HLR: xxx::
+  Another MAP error message is received from HLR after SRI request.
+
+Error XXX after `MtForwardSM` Request::
+  A MAP error message is received from MSC/VLR after `MtForwardSM` request; XXX: `subscriberBusyForMtSms`, `absentSubscriber`, `absentSubscriberSM`, `smDeliveryFailure`, `systemFailure`, `facilityNotSup`, `dataMissing`, `unexpectedDataValue`, `facilityNotSupported`, `unidentifiedSubscriber`, `illegalSubscriber`.
+
+Error after `MtForwardSM` Request: xxx::
+  Another MAP error message is received from MSC/VLR after `MtForwardSM` request.
+
+DialogClose after `MtRequest`::
+  No `MtForwardSM` response and no error message received after `MtForwardSM` request.
+
+`onDialogProviderAbort` after `MtForwardSM` Request::
+  MAP `DialogProviderAbort` is received after `MtForwardSM` request.
+
+`onDialogProviderAbort` after SRI Request::
+  MAP `DialogProviderAbort` is received after SRI request.
+
+Error condition when invoking `sendMtSms()` from `onDialogReject()`::
+  After a `MtForwardSM` request MAP version conflict, MAP message negotiation was processed but this process failed, or other fundamental MAP error occurred.
+
+`onDialogReject` after SRI Request::
+  After a SRI request MAP version conflict, MAP message negotiation was processed but this process failed, or other fundamental MAP error occurred.
+
+`onDialogTimeout` after `MtForwardSM` Request::
+  Dialog timeout occurred after `MtForwardSM` Request.
+  The reason may be GSM network connection failure or SMSC overload.
+
+`onDialogTimeout` after SRI Request::
+  Dialog timeout occurred after SRI Request.
+  The reason may be GSM network connection failure or SMSC overload.
+
+`onDialogUserAbort` after `MtForwardSM` Request::
+  `DialogUserAbort` message is received from a peer or sent to a peer.
+  The reason may be GSM fundamental failure or SMSC overload.
+
+`onDialogUserAbort` after SRI Request::
+  `DialogUserAbort` message is received from a peer or sent to a peer.
+  The reason may be GSM fundamental failure or SMSC overload.
+
+`onRejectComponent` after `MtForwardSM` Request::
+  Reject component was received from a peer or sent to a peer.
+  This is an abnormal case and implies MAP incompatibility.
+
+`onRejectComponent` after SRI Request::
+  Reject component was received from a peer or sent to a peer.
+  This is an abnormal case and implies MAP incompatibility.
+
+Other::
+  Any other message that usually indicates some internal failure.		
+
+.DELIVERY_RECEIPT_MESSAGE_STATUS
+If a message received is a recognized delivery receipt, this field will contain value of the "Stat" field of a message body. 
+
+.DELIVERY_RECEIPT_MESSAGE_STATE_TLV
+If a message received is a recognized delivery receipt and it contains "message_state" TLV (tag 0x0427), this field will contain value of this TLV.
+
+.DELIVERY_RECEIPT_MESSAGE_ERR
+If a message received is a recognized delivery receipt, this field will contain value of the field "Err" of a message body.
+
+[[_monitoring_smsc_cdr_detailed_log]]
+== Detailed CDR Log
+
+{this-platform} {this-application} is configured to generate detailed CDR logs in a plain text file located at [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml.
+Detailed CDR generated in the text file is of the below format:
+----
+
+CDR recording timestamp,Event type,ErrorCode (status),MessageType,Status code,CorrelationId,OrigCorrelationId,DlrStatus,mprocRuleId,ESME name,Timestamp A,Timestamp B,Timestamp C,Source IP,Source port,Dest IP,Dest port,Sequence Number,
+----
+
+NOTE: Detailed CDR once turned on, will only be generated for SMPP (IN and OUT) and HTTP (OUT only) messages.
+
+.CDR recording timestamp
+Time when CDR is created
+
+.Event type
+Event types can be of two categories - `IN` and `OUT`:
+`IN` event types (a result of message receiving). Only SMPP and HTTP events of this type will be recorded in detailed log.
+
+`IN_SMPP_RECEIVED`:: a message is accepted from SMPP connector and is processed without error.
+`IN_SMPP_REJECT_FORBIDDEN`:: SMPP message is rejected for administrative reasons. For example, SMSC is stopped or paused, Cassandra database is not available, all messages from SMPP connector or specific ESME are forbidden.
+`IN_SMPP_REJECT_CONG`:: SMPP message is rejected for a following reason: congestion at SMSC GW level or customer's limitation.
+`IN_SMPP_REJECT_DIAMETER`:: SMPP message is rejected for a reason: rejection by a diameter server.
+`IN_SMPP_REJECT_MPROC`:: SMPP message is rejected for a reason: rejection by mproc rules.
+`IN_SMPP_DROP_MPROC`:: SMPP message is dropped (OK result was sent to a sender but message was dropped) for a reason: drop by mproc rules
+`IN_SMPP_ERROR`:: SMPP message processing failed for other reasons.
+
+`IN_HTTP_RECEIVED`:: a message is accepted from HTTP connector and is processed without error.
+`IN_HTTP_REJECT_FORBIDDEN`:: HTTP message is rejected for administrative reasons, such as SMSC is stopped or paused, Cassandra database is not available, all messages from HTTP connector are forbidden.
+`IN_HTTP_REJECT_CONG`:: HTTP message is rejected for a reason: congestion at SMSC GW level or due to a customer's limitation.
+`IN_HTTP_REJECT_DIAMETER`:: HTTP message is rejected for a reason: rejection by a diameter server.
+`IN_HTTP_REJECT_MPROC`:: HTTP message is rejected for a reason: rejection by mproc rules.
+`IN_HTTP_DROP_MPROC`:: HTTP message is dropped (OK result was sent to a sender but a message is dropped) for a reason: rejection by mproc rules.
+`IN_HTTP_ERROR`:: HTTP message processing failed for other reasons.
+
+b. `OUT` event types (a result of message sending). Only SMPP events of this type will be recorded in detailed log.
+
+`OUT_SMPP_SENT`:: SMPP message has been successfully sent.
+`OUT_SMPP_REJECTED`:: received non zero SMPP response code after message was sent.
+`OUT_SMPP_ERROR`:: error while sending SMPP message, for example, a channel error.
+`OUT_SMPP_TIMEOUT`:: no response from a peer within time specified by SMSC GW settings. Possible reason might be because connection problems or peer malfunction, delivery timeout case included.
+`VALIDITY_PERIOD_TIMEOUT`:: SMPP message has not been sent due to a validity period timeout.
+
+.ErrorCode (status)
+Internal SMSC GW delivery error code value.
+
+.MessageType
+Either `SubmitSm`, `SubmitMulti`, `DeliverSm` or `DataSm` for SMPP message and `Http` for HTTP message
+
+.Status code:
+a. For `OUT_SMPP_REJECTED` case: received non zero smpp response code when message sending, 0 for other cases)
+b. In SMPP response value (for in_smpp_reject_* cases - sent non zero smpp response code when message receiving, 0 for other cases)
+c. In HTTP response code (for in_http_reject_* cases - sent non zero http response code when a http response sending (code in the message body), 0 for other cases)
+
+.CorrelationId
+messageId of a message.
+
+.OrigCorrelationId
+messageId of an original message if this a recognized delivery response and an original message is found, otherwise -- empty value
+
+.DlrStatus
+If a message is recognized delivery response (DLR), then this field contains value of `stat` field of DLR, if it's not a delivery response otherwise empty if it is not a DLR. If a message is recognized DLR, but the field is not parsed or have different values in text and TLV parts, then this field is `"err"`.
+
+.mprocRuleId
+Id of an mproc rule which led to a message drop/reject in `IN_SMPP_REJECT_MPROC`, `IN_SMPP_DROP_MPROC`, `IN_HTTP_REJECT_MPROC` or `IN_HTTP_DROP_MPROC` cases, otherwise -- empty value.
+
+.ESME name
+Name of ESME through which a message has come to SMSC for an `IN` case or to which a message was sent from SMSC GW for an `OUT` case. This field will contain an empty value for other cases.
+
+.Timestamp A
+- `IN`: The time the message is successfully decoded
+- `OUT`: The time the message is received for sending
+
+.Timestamp B
+- `IN`: timestamp taken immediately after sending response
+- `OUT`: timestamp taken immediately after sending request
+
+.Timestamp C
+- `IN`: timestamp taken immediately after submission for further processing
+- `OUT`: timestamp when message response is successfully decoded
+
+.Source IP
+IP of a source peer, if a value is available for a channel connection.
+
+.Source port
+Port from which message has come to SMSC GW if a value is available for a channel connection.
+
+.Dest IP
+IP of a destination peer, if a value is available for a channel connection.
+
+.Dest port
+Port to which message has been sent from SMSC GW if a value is available for a channel connection.
+
+.Sequence Number
+This value will be recorded for SMPP messages in both sending and receiving cases.

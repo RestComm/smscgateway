@@ -1,4 +1,4 @@
-= Configuring
+= Configuring (JBOSS 5)
 
 You must fine-tune Memory and Database settings for better performance before using {this-platform} {this-application} in production.
 Once you complete setting up the Gateway you must configure the SS7 Stack the SMSC Gateway following the instructions specified in this guide.

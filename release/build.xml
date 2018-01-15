@@ -46,9 +46,9 @@
 	<property name="restcomm-diam.resources.version" value="7.1.18" />
 
 	<!-- SMPP extentions and and RAs -->
-	<property name="restcomm-smpp-extensions.build-number" value="95" />
+	<property name="restcomm-smpp-extensions.build-number" value="128" />
 	<property name="restcomm-smpp-extensions.version" value="7.1.0" />
-	<property name="restcomm-smpp-ra.build-number" value="91" />
+	<property name="restcomm-smpp-ra.build-number" value="128" />
 	<property name="restcomm-smpp-ra.version" value="7.1.0" />
 
 	<!-- Cassandra community version -->

@@ -1,4 +1,4 @@
-= Monitoring
+= Monitoring (JBOSS 5)
 
 [[_smsc_stat_get]]
 == View SMSC Statistics

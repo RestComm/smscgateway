@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Map;
 
 import javolution.text.TextBuilder;
@@ -262,7 +263,13 @@ public class HomeRoutingManagement implements HomeRoutingManagementMBean {
         ccMccmncCollection = new CcMccmncCollection();
         XMLObjectReader reader = null;
         try {
-            reader = XMLObjectReader.newInstance(new FileInputStream(persistFile.toString()));
+            FileInputStream fis = new FileInputStream(persistFile.toString());
+            try {
+                System.out.println("fis.available():" + fis.available());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            reader = XMLObjectReader.newInstance(fis);
             try {
                 reader.setBinding(binding);
                 ccMccmncCollection = reader.read(CC_MCCMNS_COLLECTION, CcMccmncCollection.class);

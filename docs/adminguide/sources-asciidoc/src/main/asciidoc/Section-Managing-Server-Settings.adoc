@@ -1,5 +1,5 @@
 
-= SMSC Gateway Server Settings
+= SMSC Gateway Server Settings (JBOSS 5)
 
 [[_smsc_gateway_server_properties]]
 == SMSC Server Properties

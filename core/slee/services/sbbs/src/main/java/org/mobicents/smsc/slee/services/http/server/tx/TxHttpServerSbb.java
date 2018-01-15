@@ -23,8 +23,6 @@
 package org.mobicents.smsc.slee.services.http.server.tx;
 
 import com.cloudhopper.smpp.SmppConstants;
-import com.cloudhopper.smpp.pdu.BaseSm;
-import com.cloudhopper.smpp.tlv.Tlv;
 
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
@@ -42,7 +40,6 @@ import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpRequestUtils;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpUtils;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.ResponseFormatter;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
-import org.restcomm.smpp.parameter.TlvSet;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;

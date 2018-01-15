@@ -1,0 +1,444 @@
+= Running (Wildfly 10)
+
+== Running the Gateway
+
+.Procedure: Run {this-platform} {this-application} 
+. Pre-requisite: 
++
+* You must have {this-platform} {this-application} installed as explained in the Installation Guide.
+* If you are using the SS7 board on server, you must ensure that the `java.library.path` variable is set to point to the directory containing the native component.
+  Alternatively you can copy it to the JBoss native library path manually.
+* You must have Cassandra database running and configured as explained in the Installation Guide.
+* You must have the Cassandra Keyspace created as explained in the Installation Guide.
+
+. All you have to do to start the Gateway is start the Wildfly Application Server.
+  To start the Wildfly Server you must execute the [path]_standalone.sh_ (Unix) or [path]_standalone.bat_ (Microsoft Windows) startup script in the [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/bin_ folder (on Unix or Windows). Note that this will start the server in the default profile.
+  The "default" profile is a clean profile where you will have to start from scratch and configure the entire SS7 Stack and SMSC Gateway. 
+. Result: If the service started properly you should see the following last few output lines in the Unix terminal or Command Prompt depending on your environment: 
++
+----
+
+11:34:58,561 INFO  [org.mobicents.slee.container.management.ResourceManagement] (Timer-2) Bound link between RA Entity MProcResourceAdaptor and Name MProcResourceAdaptor
+11:34:58,812 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installing DeployableUnitID[url=file:/home/anatolysatanovskiy/telestax/smsc/restcomm-smsc-7.4.0-SNAPSHOT/wildfly-10.1.0.Final/standalone/tmp/vfs/temp/tempebc06fc1764d973c/content-aa26aa130875fa41/content/]
+11:34:58,838 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,839 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,839 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,839 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,839 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,839 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,839 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,839 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,839 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,839 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,846 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,846 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,850 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:58,867 INFO  [org.mobicents.slee.container.component.deployment.PreferredPackagesBuilder] (Timer-2) No preferred package entry found. Applying defaults.
+11:34:59,424 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed LibraryID[name=smsc-library,vendor=org.mobicents.smsc,version=1.0]
+11:34:59,469 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=SriSbb,vendor=org.mobicents,version=1.0]
+11:34:59,472 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=AlertSbb,vendor=org.mobicents,version=1.0]
+11:34:59,493 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=RsdsSbb,vendor=org.mobicents,version=1.0]
+11:34:59,507 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=TxHttpServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,540 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=MoSbb,vendor=org.mobicents,version=1.0]
+11:34:59,569 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=HrSriClientSbb,vendor=org.mobicents,version=1.0]
+11:34:59,590 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=RxSmppServerChildSbb,vendor=org.mobicents,version=1.0]
+11:34:59,623 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=RxSipServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,673 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=TxSmppServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,724 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=RxSmppServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,745 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=HrSriServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,776 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=MtSbb,vendor=org.mobicents,version=1.0]
+11:34:59,791 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=ChargingSbb,vendor=org.mobicents,version=1.0]
+11:34:59,805 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed SbbID[name=TxSipServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,817 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=MoService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=MoSbb,vendor=org.mobicents,version=1.0]
+11:34:59,817 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=AlertService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=AlertSbb,vendor=org.mobicents,version=1.0]
+11:34:59,822 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=SmscRxSmppServerService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=RxSmppServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,822 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=SmscTxHttpServerService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=TxHttpServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,826 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=SmscTxSmppServerService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=TxSmppServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,826 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=HomeRoutingService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=HrSriServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,826 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=ChargingService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=ChargingSbb,vendor=org.mobicents,version=1.0]
+11:34:59,827 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=SmscTxSipServerService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=TxSipServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,827 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=MtService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=SriSbb,vendor=org.mobicents,version=1.0]
+11:34:59,827 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed ServiceID[name=SmscRxSipServerService,vendor=org.mobicents,version=1.0]. Root sbb is SbbID[name=RxSipServerSbb,vendor=org.mobicents,version=1.0]
+11:34:59,827 INFO  [org.mobicents.slee.container.management.jmx.DeploymentMBeanImpl] (Timer-2) Installed DeployableUnitID[url=file:/home/anatolysatanovskiy/telestax/smsc/restcomm-smsc-7.4.0-SNAPSHOT/wildfly-10.1.0.Final/standalone/tmp/vfs/temp/tempebc06fc1764d973c/content-aa26aa130875fa41/content/]
+11:35:00,117 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=MoService,vendor=org.mobicents,version=1.0]
+11:35:00,126 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-2-thread-1) Thread[SLEE-EventRouterExecutor-2-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@e4def2f[Unlocked] for /ServiceID[name=MoService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ffd____
+11:35:00,173 INFO  [javax.slee.SbbNotification[service=ServiceID[name=MoService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=MoSbb,vendor=org.mobicents,version=1.0]].MoSbb] (SLEE-EventRouterExecutor-2-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@f2581f6, serviceID=ServiceID[name=MoService,vendor=org.mobicents,version=1.0]
+11:35:00,198 INFO  [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-80-thread-1) Not all SBB are running now: ServicesDownList=[smscTxSmppServerServiceState, smscRxSmppServerServiceState, smscTxSipServerServiceState, smscRxSipServerServiceState, smscTxHttpServerServiceState, homeRoutingServiceState, mtServiceState, alertServiceState, chargingServiceState, ]
+11:35:00,370 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=AlertService,vendor=org.mobicents,version=1.0]
+11:35:00,370 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-1-thread-1) Thread[SLEE-EventRouterExecutor-1-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@1c8c55bb[Unlocked] for /ServiceID[name=AlertService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ffc____
+11:35:00,379 INFO  [javax.slee.SbbNotification[service=ServiceID[name=AlertService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=AlertSbb,vendor=org.mobicents,version=1.0]].AlertSbb] (SLEE-EventRouterExecutor-1-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@6e3b37d2, serviceID=ServiceID[name=AlertService,vendor=org.mobicents,version=1.0]
+11:35:00,398 INFO  [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-80-thread-1) Not all SBB are running now: ServicesDownList=[smscTxSmppServerServiceState, smscRxSmppServerServiceState, smscTxSipServerServiceState, smscRxSipServerServiceState, smscTxHttpServerServiceState, homeRoutingServiceState, mtServiceState, chargingServiceState, ]
+11:35:00,621 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=ChargingService,vendor=org.mobicents,version=1.0]
+11:35:00,622 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-5-thread-1) Thread[SLEE-EventRouterExecutor-5-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@57da25fb[Unlocked] for /ServiceID[name=ChargingService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ffb____
+11:35:00,626 INFO  [javax.slee.SbbNotification[service=ServiceID[name=ChargingService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=ChargingSbb,vendor=org.mobicents,version=1.0]].ChargingSbbImpl] (SLEE-EventRouterExecutor-5-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@25f38860, serviceID=ServiceID[name=ChargingService,vendor=org.mobicents,version=1.0]
+11:35:00,798 INFO  [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-80-thread-1) Not all SBB are running now: ServicesDownList=[smscTxSmppServerServiceState, smscRxSmppServerServiceState, smscTxSipServerServiceState, smscRxSipServerServiceState, smscTxHttpServerServiceState, homeRoutingServiceState, mtServiceState, ]
+11:35:00,873 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=SmscTxSmppServerService,vendor=org.mobicents,version=1.0]
+11:35:00,873 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-2-thread-1) Thread[SLEE-EventRouterExecutor-2-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@4dada36d[Unlocked] for /ServiceID[name=SmscTxSmppServerService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ffa____
+11:35:00,883 INFO  [javax.slee.SbbNotification[service=ServiceID[name=SmscTxSmppServerService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=TxSmppServerSbb,vendor=org.mobicents,version=1.0]].TxSmppServerSbb] (SLEE-EventRouterExecutor-2-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@7426f5ed, serviceID=ServiceID[name=SmscTxSmppServerService,vendor=org.mobicents,version=1.0]
+11:35:00,998 INFO  [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-80-thread-1) Not all SBB are running now: ServicesDownList=[smscRxSmppServerServiceState, smscTxSipServerServiceState, smscRxSipServerServiceState, smscTxHttpServerServiceState, homeRoutingServiceState, mtServiceState, ]
+11:35:01,125 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=SmscRxSmppServerService,vendor=org.mobicents,version=1.0]
+11:35:01,125 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-7-thread-1) Thread[SLEE-EventRouterExecutor-7-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@20159f53[Unlocked] for /ServiceID[name=SmscRxSmppServerService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ff9____
+11:35:01,133 INFO  [javax.slee.SbbNotification[service=ServiceID[name=SmscRxSmppServerService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=RxSmppServerSbb,vendor=org.mobicents,version=1.0]].RxSmppServerSbb] (SLEE-EventRouterExecutor-7-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@201eb958, serviceID=ServiceID[name=SmscRxSmppServerService,vendor=org.mobicents,version=1.0]
+11:35:01,198 INFO  [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-80-thread-1) Not all SBB are running now: ServicesDownList=[smscTxSipServerServiceState, smscRxSipServerServiceState, smscTxHttpServerServiceState, homeRoutingServiceState, mtServiceState, ]
+11:35:01,376 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=MtService,vendor=org.mobicents,version=1.0]
+11:35:01,376 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-5-thread-1) Thread[SLEE-EventRouterExecutor-5-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@7feef89[Unlocked] for /ServiceID[name=MtService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ff8____
+11:35:01,381 INFO  [javax.slee.SbbNotification[service=ServiceID[name=MtService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=SriSbb,vendor=org.mobicents,version=1.0]].SriSbb] (SLEE-EventRouterExecutor-5-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@76b9507d, serviceID=ServiceID[name=MtService,vendor=org.mobicents,version=1.0]
+11:35:01,398 INFO  [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-80-thread-1) Not all SBB are running now: ServicesDownList=[smscTxSipServerServiceState, smscRxSipServerServiceState, smscTxHttpServerServiceState, homeRoutingServiceState, ]
+11:35:01,628 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=SmscTxSipServerService,vendor=org.mobicents,version=1.0]
+11:35:01,628 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-5-thread-1) Thread[SLEE-EventRouterExecutor-5-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@6deb5658[Unlocked] for /ServiceID[name=SmscTxSipServerService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ff7____
+11:35:01,632 INFO  [javax.slee.SbbNotification[service=ServiceID[name=SmscTxSipServerService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=TxSipServerSbb,vendor=org.mobicents,version=1.0]].TxSipServerSbb] (SLEE-EventRouterExecutor-5-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@44c7cd6b, serviceID=ServiceID[name=SmscTxSipServerService,vendor=org.mobicents,version=1.0]
+11:35:01,798 INFO  [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-80-thread-1) Not all SBB are running now: ServicesDownList=[smscRxSipServerServiceState, smscTxHttpServerServiceState, homeRoutingServiceState, ]
+11:35:01,880 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=SmscRxSipServerService,vendor=org.mobicents,version=1.0]
+11:35:01,880 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-1-thread-1) Thread[SLEE-EventRouterExecutor-1-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@39a12701[Unlocked] for /ServiceID[name=SmscRxSipServerService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ff6____
+11:35:01,883 INFO  [javax.slee.SbbNotification[service=ServiceID[name=SmscRxSipServerService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=RxSipServerSbb,vendor=org.mobicents,version=1.0]].RxSipServerSbb] (SLEE-EventRouterExecutor-1-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@e931240, serviceID=ServiceID[name=SmscRxSipServerService,vendor=org.mobicents,version=1.0]
+11:35:01,998 INFO  [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-80-thread-1) Not all SBB are running now: ServicesDownList=[smscTxHttpServerServiceState, homeRoutingServiceState, ]
+11:35:02,131 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=HomeRoutingService,vendor=org.mobicents,version=1.0]
+11:35:02,131 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-1-thread-1) Thread[SLEE-EventRouterExecutor-1-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@3deffa19[Unlocked] for /ServiceID[name=HomeRoutingService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ff5____
+11:35:02,135 INFO  [javax.slee.SbbNotification[service=ServiceID[name=HomeRoutingService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=HrSriServerSbb,vendor=org.mobicents,version=1.0]].HrSriServerSbb] (SLEE-EventRouterExecutor-1-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@4fe0f95f, serviceID=ServiceID[name=HomeRoutingService,vendor=org.mobicents,version=1.0]
+11:35:02,198 INFO  [javax.slee.RAEntityNotification[entity=SchedulerResourceAdaptor].SchedulerResourceAdaptor] (pool-80-thread-1) Not all SBB are running now: ServicesDownList=[smscTxHttpServerServiceState, ]
+11:35:02,383 INFO  [org.mobicents.slee.container.management.ServiceManagementImpl] (Timer-2) Activated ServiceID[name=SmscTxHttpServerService,vendor=org.mobicents,version=1.0]
+11:35:02,383 INFO  [org.mobicents.slee.runtime.sbbentity.SbbEntityLockFacility] (SLEE-EventRouterExecutor-2-thread-1) Thread[SLEE-EventRouterExecutor-2-thread-1,5,main] put of lock java.util.concurrent.locks.ReentrantLock@2942fb1a[Unlocked] for /ServiceID[name=SmscTxHttpServerService,vendor=org.mobicents,version=1.0]/-a7c20b9:160116d9216:-7ff4____
+11:35:02,386 INFO  [javax.slee.SbbNotification[service=ServiceID[name=SmscTxHttpServerService,vendor=org.mobicents,version=1.0],sbb=SbbID[name=TxHttpServerSbb,vendor=org.mobicents,version=1.0]].TxHttpServerSbb] (SLEE-EventRouterExecutor-2-thread-1) Rx: onServiceStartedEvent: event=org.mobicents.slee.container.service.ServiceStartedEventImpl@73ab3bc6, serviceID=ServiceID[name=SmscTxHttpServerService,vendor=org.mobicents,version=1.0]
+----		 
+. If you are starting {this-platform} {this-application} for the first time, SS7 and SMSC working parameters (and possibly database access) are not configured.
+  You need to use the Shell Client or the GUI to connect to the Gateway and configure the SS7 Stack and SMSC.
+  Once configured, the state and configuration is persisted which stands server re-start.
+  The next chapter will discuss in detail about configuration.
+
+.Procedure: Bind the SMSC Gateway to a specific IP 
+Using `standalone.sh` without any arguments binds the SMSC Gateway to localhost `127.0.0.1`.
+To bind the Gateway to a different IP, pass the IP address as value to the `-b` and '-bmanagement=' command line options.
+For example to bind the SMSC to `10.199.7.23` you will use the command from the [path]_bin_ folder as below: 
+----
+
+[vsmsc bin]$ ./standalone.sh -b 10.199.7.23 -bmanagement=10.199.7.23
+----				
+
+.Procedure: Stop the Gateway
+. To stop the {this-platform} {this-application} , you must shut down the Wildfly Server.
+  To shut down the server(s) you must execute the `./jboss-cli.sh --connect command=:shutdown` (Unix) or  `./jboss-cli.bat --connect command=:shutdown` (Microsoft Windows) script in the [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/bin_  directory (on Unix or Windows).
+. If the server stopped properly, you will see the following three lines as the  last output in the Unix terminal or Command Prompt: 
++
+----
+WildFly Full 10.1.0.Final (WildFly Core 2.2.0.Final) stopped
+----
+
+[[_running_the_gateway_simulator]]
+== Running the Gateway - Simulator Profile
+
+The {this-platform} {this-application} offers you an option to run the Gateway with a "simulator" profile for testing purpose.
+The "simulator" profile is a pre-configured profile to work with the jss7-simulator, the smpp-simulator, some SIP phone and loading of messages via a HTTP connector.
+Starting the Gateway with "simulator profile" requires passing "-Djboss.server.base.dir" property with path to simulator-s directory
+----
+
+[bin]$ ./standalone.sh -Djboss.server.base.dir=[path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/simulator
+----
+
+
+By default, the SMSC Simulator profile is configured for use in Linux systems.
+For using it under Microsoft Windows you need to open the file [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/simulator/data/SCTPManagement_sctp.xml_ and replace (in two places) `ipChannelType="0"` to `ipChannelType="1"` for using a TCP connection instead of SCTP (SCTP is not supported under Windows).  
+
+[[_configuring_the_gateway_simulator_profile]]
+=== Configuring the Gateway in Simulator Profile
+
+The SMSC Gateway in a Simulator Profile is configured as it would have been if configured with the following CLI commands:
+
+----
+
+
+sctp server create serv1 127.0.0.1 8012 sockettype TCP
+sctp server start serv1
+sctp association create ass1 SERVER serv1 127.0.0.1 8011 sockettype TCP
+
+m3ua as create as1 IPSP mode SE ipspType server rc 101 traffic-mode loadsharing network-appearance 102
+m3ua asp create asp1 ass1
+m3ua as add as1 asp1
+m3ua asp start asp1
+m3ua route add as1 1 2 3
+
+sccp sap create 1 1 2 2
+sccp dest create 1 1 1 1 0 255 255
+sccp address create 1 82 1 8 0 1 4 000
+sccp address create 2 82 2 8 0 1 4 000
+sccp rule create 1 K 82 0 0 0 1 4 * solitary 1 origination-type localOriginated
+sccp rule create 2 K 82 0 0 0 1 4 * solitary 2 origination-type remoteOriginated
+sccp rsp create 1 1 0 0
+sccp rss create 1 1 8 0
+
+smsc set scgt 22220
+smsc set scssn 8
+smsc set hlrssn 8
+smsc set mscssn 8
+smsc set maxmapv 3
+
+smsc set httpdefaultnetworkid 10
+smsc httpuser add user password password networkId 10
+
+smpp esme create test test 127.0.0.1 -1 TRANSCEIVER SERVER password test esme-ton -1 esme-npi -1 esme-range 6666 source-range ^[0-9a-zA-Z]* routing-range ^[0-9a-zA-Z]* networkid 20
+smpp esme create test2 test2 127.0.0.1 -1 TRANSCEIVER SERVER password test esme-ton -1 esme-npi -1 esme-range 6667 source-range ^[0-9a-zA-Z]* routing-range ^[0-9a-zA-Z]* networkid 21
+smpp esme start test
+smpp esme start test2
+
+smsc sip modify SIP cluster-name SIP host 127.0.0.1 port 5065 routing-ton 1 routingnpi 1 routing-range ^[0-9a-zA-Z]* counters-enabled false charging-enabled false networkid 30
+
+smsc mproc add mproc 1 destdigmask 6666 newnetworkid 20
+smsc mproc add mproc 2 destdigmask 6667 newnetworkid 21
+smsc mproc add mproc 3 destdigmask 5555 newnetworkid 30
+smsc mproc add mproc 4 destdigmask ^(?!6666|6667|5555).* newnetworkid 0
+----
+
+We use following message Id values:
+
+.The list of Id values
+[cols="1,1", frame="all", options="header"]
+|===
+| Network Id value | Connector
+| 0 | SS7
+| 10 | HTTP
+| 20, 21 | SMPP
+| 30 | SIP
+|===
+
+
+[[_running_the_simulator_ss7]]
+=== Running the jSS7 Simulator
+
+If you are not familiar with the {this-platform} jss7 Simulator, you can find instructions about using the jss7-simulator in the {this-platform} jSS7 User Guide.
+You will also find example test cases explained in detail in the jSS7 User Guide.
+
+.Procedure: Running {this-platform} jSS7 Simulator
+. Change the working directory to the bin folder in the Simulator's installation directory. 
++
+----
+[vinu@vinu-neha ~]$ cd {this-folder}-smsc-<version>/tools/{this-folder}-ss7-simulator/bin
+----			
+. Ensure that the [path]_run.sh_ start script is executable. 
++
+----
+bin$ chmod +x run.sh
+----					 
+. Execute the [path]_run.sh_. Bourne shell script with the command `./run.sh gui` or in the case of Windows `./run.bat gui`.
++
+----
+bin$ ./run.sh gui
+----
+This will launch the Simulator GUI Application. 
+. When the GUI shows up, select "main" (default) as host name [or type "win" as host name under Windows] and press the 'Start' button.
+  The Simulator is already pre-configured to connect to the SMSC Gateway (running in simulator profile). Press 'Run test' and again click on 'Start' in the next screen.
+  The Simulator will connect to SMSC (via m3ua protocol). 
+. The Low level part is configured to SCTP (not TCP) protocol and hence you can test the SMSC in a Linux environment.
+  To test under Windows OS, you must change the SS7 simulator settings to TCP.
+  The SS7 Simulator will play both HLR and MSC roles and respond to `SendRoutingInfo` and `ForwardSM` requests from SMSC gateways.
+. You can configure the `SMS_TEST_CLIENT` testing task to play with different modes including return error responses to SMSC and bulk mode without adding information for any event to an application form.
+  You can also play with different data coding schemes and MAP protocol versions. 
+
+[[_running_the_simulator_smpp]]
+=== Running the SMPP Simulator
+
+.Procedure: Running SMPP Simulator
+. Change the working directory to the bin folder for the SMPP Simulator. 
++
+----
+[vinu@vinu-neha ~]$ cd {this-folder}-smsc-<version>/tools/{this-folder}-smpp-simulator/bin
+----			
+. Ensure that the [path]_run.sh_ start script is executable. 
++
+----
+bin$ chmod +x run.sh
+----					 
+. Execute the [path]_run.sh_. Bourne shell script with the command `./run.sh` or in the case of Windows `./run.bat`.
++
+----
+bin$ ./run.sh
+----
+This will launch the SMPP Simulator GUI Application. 
+. The SMPP Simulator default settings fit to connect to the SMSC Gateway (running in simulator profile). You can in this case just press 'Run test' and then press on 'Start Session' to connect to the SMSC Gateway. 
+. Using the button 'Configuring data for message submitting', you can configure different sending modes, data coding schemas, origination and destination addresses.
+  See chapter <<_smpp_simulator>> to understand more of SMPP simulator usage.
+. When the SMSC Gateway is running in a "simulator" profile it works with SMPP as ESME with the address "6666" (TON=1, NPI=1). So all messages with the destination address "6666" (TON=1, NPI=1) will be routed to SMPP Simulator.
+  All other messages will be routed to SS7 Simulator (except messages for "5555" address that will be routed to SIP). 
++
+With the SMPP Simulator you can also simulate a bulk message delivery to {this-application} .
+This may be random bulk messages and bulk messages obtained from a pcap file. 
+
+
+[[_running_the_simulator_hlr]]
+=== Running the HLR Simulator
+
+You can use the Command line HLR Simulator for load testing the {this-application} .
+{this-folder}-hlr-simulator is pre-configured to integrate with SMSC run in simulator profile.
+The HLR Simulator receives the MAP SRI request from SMSC and returns response with random VLR and IMSI.
+SMSC will then forward `MT_Forward_SM` request to HLR.
+For every 7th `MT_Forward_SM` request, the HLR Simulator will return an `AbsentSubscriber` error. 
+
+For every 400 messages processed by the HLR Simulator, it shows the below message (time in milli seconds) 
+----
+
+				Received 400 MAP Dialog requests in 1000
+----				 
+
+.Procedure: Running HLR Simulator
+. Change the working directory to the bin folder for the HLR Simulator. 
++
+----
+[vinu@vinu-neha ~]$ cd {this-folder}-smsc-<version>/tools/{this-folder}-hlr-simulator/bin
+----			
+. Ensure that the [path]_run.sh_ start script is executable. 
++
+----
+bin$ chmod +x run.sh
+----					 
+. Execute the [path]_run.sh_							 
++
+----
+bin$ ./run.sh
+----
+This will launch the HLR Simulator ready for processing SRI and MT_Forward_SM requests 
+. The HLR Simulator is already pre-configured to connect to the SMSC Gateway (running in simulator profile). 
+
+Additional configuring of the HLR Simulator is possible only by manually updating the configuration files in the [path]_{this-folder}-hlr-simulator/data_ folder.
+For example, in order to run the HLR Simulator in Microsoft Windows you need to update the file [path]_SCTPManagement_sctp.xml_ and set the parameter `ipChannelType` to "1". 
+
+[[_running_the_simulator_smpp_load]]
+=== Running the SMPP Load tool
+
+The smpp-load tool is a Command line simulator to generate SMPP load.
+You must have `ant` installed to be able to run this tool.
+The smpp-load tool can be started as a SMPP Server accepting in-coming connection (BIND) from {this-platform}  {this-application}  or can be started as a SMPP Client to send BIND to {this-platform}  {this-application} .
+You can modify the configuration parameters in the [path]_build.xml_ to define how many SMPP connections should be initiated, what kind of load should be generated, etc. 
+
+.Procedure: Running SMPP Load Tool
+. Change the working directory to the bin folder for the SMPP Load Tool. 
++
+----
+[vinu@vinu-neha ~]$ cd {this-folder}-smsc-<version>/tools/{this-folder}-smpp-simulator/bin
+----			
+. Execute the `ant client` command to start the SMPP load tool as a client or execute the `ant server` command to start the SMPP load tool as a SMPP Server.
++
+----
+ant client
+----
++
+This will launch the SMPP load tool as a SMPP Client. 
++
+----
+ant server
+----
++
+This will launch the SMPP load tool as a SMPP Server.
+. The SMPP load client is already pre-configured to connect to the {this-platform} {this-application} (running in simulator profile). 
+
+[[_sip_phone]]
+=== Running Jitsi or Linphone SIP phones
+
+In order to test SMSC features for interconnection with SIP servers, you can use Jisti or Linphone SIP phones that can play the role of a SIP server. 
+
+.Procedure: Configure Jitsi
+. Download Jisti from the http://www.jitsi.org/[website] and run it. 
+. Create a registrarless account (do not provide password, registrar and proxy address), enable PRESENSE (SIMPLE) at the forth tab for this account (Advanced). Identifier of this account must be "5555" because SMSC is configured to route all messages for subscriber "5555" to SIP. 
+. In the menu, go to Tools -> Options -> Security -> Chat, and enable all three options at the end. 
+. Then go to Tools -> Options -> Advanced -> SIP and define SIP port as "5065" (SMSC is configured for sending outgoing SIP messages to this port). 
+. In the menu, go to File -> Add contact and add a new contact with definition to which subscriber you will send messages to.
+SMSC is configured such that all messages for "6666" will be routed to ESME (SMPP simulator) and others (except "5555" that is for SIP) to GSM network (to SS7 Simulator). Therefore you can add two new contacts as below: 
++
+* for SS7 Simulator: "sip:1111@127.0.0.1:5060"
+* for SMPP Simulator: "sip:6666@127.0.0.1:5060"
++
+The SMSC listens to 5060 port for incoming SIP messages.
+For addressing to/from the SS7 Simulator, the address "1111" will be used. 
+
+.Procedure: Configure Linphone
+. Download Linphone from the http://www.linphone.org/[website] and run it. 
+. Go to Parameters -> Network settings -> Network protocols and ports -> SIP UDP port and set the port to 5066. 
+. Add a contact with SIP address: "sip:6666@127.0.0.1:5060" for message exchange with SMPP simulator. 
+. Add a contact with SIP address: "sip:1111@127.0.0.1:5060" for message exchange with SS7 simulator. 
+
+Now you can run the following tests: 
+
+. For testing sending messages from a SIP phone you can use the feature "Send message" to a concrete contact, type a message text and send.
+  After about 1 minute you will receive the message on the SS7 Simulator or the SIP Simulator. 
+. For testing sending messages to the SIP phone you just need to send a message from the SS7 Simulator or SMPP Simulator to the address "5555". You must put the originating address as "1111" for SS7 Simulator and "6666" for SMPP Simulator. 
+
+
+[[_http_connector]]
+=== Usage of a HTTP connector for message uploading
+
+SMSC GW with a "simulator" profile is configured for accepting messages via HTTP connector with a preconfigured user name "user" and a password "password". Examples for sending of messages by a WEB browser are:
+
+[subs="attributes"]
+----
+127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user&password=password&msg=Thisisamessage_00001&sender=4444&to=6666
+127.0.0.1:8080/{this-httpprefix}/sendSms?userid=user&password=password&msg=Thisisamessage_00002&sender=4444&to=1111
+----
+
+These examples send messages "Thisisamessage_00001" and "Thisisamessage_00002" to destination addresses "6666" (for delivering into SMPP Simulator) and "1111" (for delivering into SS7 Simulator).
+
+
+
+[[_running_shell]]
+== Running the Shell
+
+You must start the Shell client and connect to the managed instance prior to executing commands to configure the Gateway.
+Shell can be started by issuing the following command from [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/bin_ directory: 
+
+[source]
+----
+[$] ./ss7-cli.sh
+----
+
+Once console starts, it will print following information and await further commands:
+
+----
+
+version=6.2.8.493,name={this-platform} CLI,prefix={this-folder},vendor=TeleStax
+{this-folder}>
+----
+
+Before issuing further commands you must connect to a managed instance.
+For more details on connecting to an instance and for a list of all supported commands and details on configuring the SS7 stack refer to the {this-platform} SS7 Stack User Guide.
+ 
+
+[[_using_gui]]
+== Running the Graphical User Interface
+
+Open a Web Browser and navigate to http://IP:8080/{this-folder}-management/ (where IP is the IP Address to which the SMSC is bound to). This will launch the {this-platform} GUI Management Console which is horizontally segregated into multiple tabs, one tab for each product in the {this-platform} Suite.
+You will notice that only the tabs of products whose binaries are installed already will be shown enabled and active in the GUI.
+If you have successfully installed the {this-platform} {this-application} you will find the tabs for JAIN-SLEE, JMX, SS7 and SMSC GW active and enabled.
+For more details on using the GUI for SS7 or JAIN-SLEE please refer to their respective user guides.
+This document only provides instructions for using the GUI to configure the SMSC Gateway.
+
+Some versions do not have an integrated console. In this case you can use separate GUI consoles for configuring:
+
+* http://IP:8080/smsc-management/ - for access for general SMSC GW settings, SIP setting, mproc rules settings
+* http://IP:8080/smpp-management/ - for access for SMPP server options and ESME configuring
+* http://IP:8080/jss7-management-console/ - for access for SS7 part configuring
+
+
+Switch to the SMSC GW tab and you will find that the window will look similar to the figure below.
+The GUI is divided into three sections: 
+
+* A left panel listing the management and monitoring units (Server Settings, SMPP Server, ESMEs, SIPs, MAP Version Cache, DB Routing Rules). You can click on any of these to select and navigate to the specific management unit.
+* A main panel displaying the currently selected management unit. The main view is categorized into multiple tabs to manage different aspects of the selected layer.
+* A bottom panel displaying the log data.
+  You can clear the log anytime by clicking on the trash icon at the top right corner of this panel.
+  You can also minimize or maximize this panel to suit your needs.	
+
+.GUI - {this-platform} {this-application} 
+image::images/GUI-SMSC-GW-main.png[]
+
+
+[[_connect_gui]]
+=== Connect to a new Instance
+
+You can connect to a new instance by entering the IP:Port values and the login credentials in the top left corner of the GUI.
+However please note that this feature is not available in this release but will be fully functional in the next release.
+ 
+
+[[_gui_security]]
+=== Authentication
+
+{this-platform} {this-application} GUI Management Security is based on the JBoss Security Framework.
+To read more on JBoss Security Framework refer JBoss Installation Guide http://docs.jboss.org/jbossas/docs/Installation_And_Getting_Started_Guide/5/html_single/index.html#Basic_Configuration_Issues-Security_Service[here]			
+
+NOTE: Deafult user-id and password for GUI Management Console is admin and admin.
+You can change the user-id and password in files [path]_jmx-console-roles.properties_ and [path]_jmx-users.properties_  located at [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/<profile>/configuration/_				

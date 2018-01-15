@@ -1,6 +1,6 @@
 
 [[_db_routing_rule_settings]]
-= Database Routing Rules
+= Database Routing Rules (JBOSS 5)
 
 {this-platform} {this-application} can now act as a SMPP Server accepting incoming SMPP connections or can also act as a SMPP client initiating a connection to a remote SMSC server.
 Therefore you can now set an intelligent database routing rule to route SMS between SMPP connections or between SMPP, SIP and GSM. 

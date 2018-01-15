@@ -1,6 +1,6 @@
 package org.mobicents.smsc.slee.services.http.server.tx;
 
-import org.junit.Ignore;
+//import org.junit.Ignore;
 import org.mobicents.smsc.domain.HttpUsersManagement;
 import org.mobicents.smsc.domain.MProcManagement;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
@@ -747,7 +747,7 @@ public class TxHttpServerSbbTest {
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
 
-    @Ignore
+//    @Ignore
     @Test
     public void getStatusGETSuccessTest() {
         System.out.println("getStatusGETSuccessTest");
