@@ -418,29 +418,31 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
             ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
 
             // generate text for Delivery receipts
-            MAPErrorMessageSMDeliveryFailure smDeliveryFailure = errMessage.getEmSMDeliveryFailure();
             String dlrText = null; // false
-            if (smDeliveryFailure != null) {
-                SmsDeliverReportTpdu tpdu = null;
-                try {
-                    tpdu = errMessage.getEmSMDeliveryFailure().getSmsDeliverReportTpdu();
-                } catch (MAPException e) {
-                    // we ignore Exception here
-                }
-                if (tpdu != null) {
-                    UserData userData = tpdu.getUserData();
-                    if (userData != null) {
-                        byte[] data = userData.getEncodedData();
-                        if (data != null) {
-                            String text = DatatypeConverter.printHexBinary(data);
-                            String smDlrWithTpdu = SmscPropertiesManagement.getInstance().getSmDeliveryFailureDlrWithTpdu();
-                            if (smDlrWithTpdu.equals("short")) {
-                                if (text.length() > 20)
-                                    dlrText = text.substring(0, 20);
-                                else
+            if (errMessage != null) {
+                MAPErrorMessageSMDeliveryFailure smDeliveryFailure = errMessage.getEmSMDeliveryFailure();
+                if (smDeliveryFailure != null) {
+                    SmsDeliverReportTpdu tpdu = null;
+                    try {
+                        tpdu = errMessage.getEmSMDeliveryFailure().getSmsDeliverReportTpdu();
+                    } catch (MAPException e) {
+                        // we ignore Exception here
+                    }
+                    if (tpdu != null) {
+                        UserData userData = tpdu.getUserData();
+                        if (userData != null) {
+                            byte[] data = userData.getEncodedData();
+                            if (data != null) {
+                                String text = DatatypeConverter.printHexBinary(data);
+                                String smDlrWithTpdu = SmscPropertiesManagement.getInstance().getSmDeliveryFailureDlrWithTpdu();
+                                if (smDlrWithTpdu.equals("short")) {
+                                    if (text.length() > 20)
+                                        dlrText = text.substring(0, 20);
+                                    else
+                                        dlrText = text;
+                                } else if (smDlrWithTpdu.equals("full")) {
                                     dlrText = text;
-                            } else if (smDlrWithTpdu.equals("full")) {
-                                dlrText = text;
+                                }
                             }
                         }
                     }
