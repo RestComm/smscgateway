@@ -41,15 +41,12 @@ import org.mobicents.smsc.slee.services.http.server.tx.utils.HttpUtils;
 import org.mobicents.smsc.slee.services.http.server.tx.utils.ResponseFormatter;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.slee.*;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -64,14 +61,11 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
     private SmscStatAggregator smscStatAggregator = SmscStatAggregator.getInstance();
     private SmscCongestionControl smscCongestionControl = SmscCongestionControl.getInstance();
 
-    private static Charset utf8Charset = Charset.forName("UTF-8");
-    private static Charset ucs2Charset = Charset.forName("UTF-16BE");
+    private static final String GET = "GET";
+    private static final String POST = "POST";
 
-    private final String GET = "GET";
-    private final String POST = "POST";
-
-    private final String SEND_SMS = "sendSms";
-    private final String MSG_QUERY = "msgQuery";
+    private static final String SEND_SMS = "sendSms";
+    private static final String MSG_QUERY = "msgQuery";
 
     public TxHttpServerSbb() {
         super(className);
@@ -79,33 +73,36 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
     public InitialEventSelector isInitialHttpRequestEvent(final InitialEventSelector ies) {
         if (logger.isFinestEnabled()) {
-            logger.finest("incomming http event: " + ies.getEvent());
+            logger.finest("Incomming HTTP event: " + ies.getEvent() + ".");
         }
-
         final Object event = ies.getEvent();
         if (event instanceof HttpServletRequestEvent) {
-            HttpServletRequest request = ((HttpServletRequestEvent) event).getRequest();
-            String requestURL = request.getRequestURL().toString();
-            if (request.getMethod().equals(GET)) {
-                String[] tmp = requestURL.split("\\?");
-                if (tmp[0].endsWith(SEND_SMS) || tmp[0].endsWith(MSG_QUERY)) {
-                    ies.setInitialEvent(true);
-                    return ies;
-                }
-            } else if (request.getMethod().equals(POST) && (requestURL.endsWith(SEND_SMS) || requestURL.endsWith(MSG_QUERY))) {
+            if (isInitialHttpRequest(((HttpServletRequestEvent) event).getRequest())) {
                 ies.setInitialEvent(true);
                 return ies;
-            } else {
-                if (logger.isFinestEnabled()) {
-                    logger.finest(request.getMethod() + " this method is not supported!");
-                }
             }
         }
         ies.setInitialEvent(false);
         if (logger.isFinestEnabled()) {
-            logger.finest("this is not an initial event!");
+            logger.finest("This is not our initial event!");
         }
         return ies;
+    }
+    
+    private boolean isInitialHttpRequest(final HttpServletRequest aRequest) {
+        final String uri = aRequest.getRequestURI();
+        if (uri == null) {
+            return false;
+        }
+        if (GET.equals(aRequest.getMethod())) {
+            final String[] tmp = uri.split("\\?");
+            return tmp[0].endsWith(SEND_SMS) || tmp[0].endsWith(MSG_QUERY);
+        }
+        if (POST.equals(aRequest.getMethod())) {
+            return uri.endsWith(SEND_SMS) || uri.endsWith(MSG_QUERY);
+        }
+        logger.warning("Request method " + aRequest.getMethod() + " is not supported!");
+        return false;
     }
 
     public void onHttpGet(HttpServletRequestEvent event, ActivityContextInterface aci) {
@@ -617,17 +614,6 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 data.getDestAddresses().get(0), 0, 0, OriginationType.HTTP, null, null, null, 0, 0, null, 0,
                 data.getShortMessage(), status, reason, true, true, lastSegment,
                 smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
-    }
-
-    @Override
-    public void setSbbContext(SbbContext sbbContext) {
-        super.setSbbContext(sbbContext);
-
-        try {
-            Context ctx = (Context) new InitialContext().lookup("java:comp/env");
-        } catch (Exception ne) {
-            logger.severe("Could not set SBB context:", ne);
-        }
     }
 
     @Override
