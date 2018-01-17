@@ -241,6 +241,7 @@ public class SmscService implements Service<SmscService> {
         try {
             SMSCShellExecutor smscShellExecutor = new SMSCShellExecutor();
             smscShellExecutor.setSmscManagement(smscManagementMBean);
+            smscShellExecutor.start();
             return smscShellExecutor;
         } catch (Exception e) {
             throw new StartException("SmscExecutor MBean creating is failed: " + e.getMessage(), e);

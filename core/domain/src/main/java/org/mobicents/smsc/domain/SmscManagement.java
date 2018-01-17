@@ -42,7 +42,6 @@ import javolution.text.TextBuilder;
 import javolution.util.FastList;
 
 import org.apache.log4j.Logger;
-import org.jboss.mx.util.MBeanServerLocator;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.mproc.MProcRuleFactory;
