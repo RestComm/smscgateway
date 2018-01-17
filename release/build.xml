@@ -15,6 +15,7 @@
 	<property name="checkout.restcomm-jss7-build.dir" value="${checkout.dir}/restcomm-jss7-build" />
 	<property name="checkout.restcomm-diam.dir" value="${checkout.dir}/restcomm-diam" />
 	<property name="checkout.restcomm-smpp-extensions.dir" value="${checkout.dir}/restcomm-smpp-extensions" />
+	<property name="checkout.restcomm-smpp-ra.dir" value="${checkout.dir}/restcomm-smpp-ra" />
 	<property name="checkout.restcomm-slee.jss7-build.dir" value="${checkout.dir}/restcomm-slee.jss7-build" />
 	<property name="checkout.restcomm-slee.jainslee-jss7-build.dir" value="${checkout.dir}/restcomm-jains-slee-jss7-build" />
 	<property name="checkout.restcomm-cloudhopper.smpp.dir" value="${checkout.dir}/restcomm-cloudhopper-smpp-build" />
@@ -35,7 +36,7 @@
 	<property name="restcomm-jss7.version" value="7.4.0-${restcomm-jss7.build-number}" />
 	<!-- <property name="restcomm-jss7.release" value="7.4.0-9" /> -->
 
-	<property name="restcomm-map-ra.build-number" value="97" />
+	<property name="restcomm-map-ra.build-number" value="177" />
 	<property name="restcomm-map-ra.version" value="7.4.0-${restcomm-map-ra.build-number}" />
 	<!-- <property name="restcomm-map-ra.release" value="7.4.0-17" /> -->
 
@@ -77,7 +78,7 @@
 	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm-jss7.version}.zip" />
 	<property name="restcomm-jss7.download.url" value="${github.url}/jss7/releases/download/${restcomm-jss7.version}/${restcomm-jss7.download.distro.file}" />
 	<property name="restcomm-jss7.distro.zip.path" value="${checkout.dir}/${restcomm-jss7.download.distro.file}" />
-	<property name="restcomm-map-ra.download.jar.file" value="restcomm-slee-ra-map-du-${restcomm-map-ra.version}.jar" />
+	<property name="restcomm-map-ra.download.jar.file" value="restcomm-slee-ra-map-du-jboss-${restcomm-map-ra.version}.jar" />
 	<property name="restcomm-map-ra.download.docs.file" value="RA_docs.zip" />
 	<property name="restcomm-map-ra.download.jar.url" value="${github.url}/jain-slee.ss7/releases/download/${restcomm-map-ra.version}/${restcomm-map-ra.download.jar.file}" />
 	<property name="restcomm-map-ra.download.docs.url" value="${github.url}/jain-slee.ss7/releases/download/${restcomm-map-ra.version}/${restcomm-map-ra.download.docs.file}" />
@@ -97,9 +98,12 @@
 	<property name="restcomm-smpp-extensions.download.distro.file" value="restcomm-smpp-extensions-${restcomm-smpp-extensions.version}-${restcomm-smpp-extensions.build-number}.zip" />
 	<property name="restcomm-smpp-extensions.download.url" value="${github.url}/smpp-extensions/releases/download/${restcomm-smpp-extensions.version}-${restcomm-smpp-extensions.build-number}/${restcomm-smpp-extensions.download.distro.file}" />
 	<property name="restcomm-smpp-extensions.distro.zip.path" value="${checkout.dir}/${restcomm-smpp-extensions.download.distro.file}" />
-	<property name="restcomm-smpp-ra.download.jar.file" value="smpp-server-ra-du-${restcomm-smpp-ra.version}-${restcomm-smpp-ra.build-number}.jar" />
+	<property name="restcomm-smpp-ra.download.jar.file" value="smpp-server-ra-du-jboss-${restcomm-smpp-ra.version}-${restcomm-smpp-ra.build-number}.jar" />
+	<property name="restcomm-smpp-ra.download.docs.file" value="smpp-ra-generated-docs.zip" />
 	<property name="restcomm-smpp-ra.download.url" value="${github.url}/jain-slee.smpp/releases/download/${restcomm-smpp-ra.version}-${restcomm-smpp-ra.build-number}/${restcomm-smpp-ra.download.jar.file}" />
+	<property name="restcomm-smpp-ra.download.docs.url" value="${github.url}/jain-slee.smpp/releases/download/${restcomm-smpp-ra.version}-${restcomm-smpp-ra.build-number}/${restcomm-smpp-ra.download.docs.file}" />
 	<property name="restcomm-smpp-ra.distro.jar.path" value="${checkout.dir}/${restcomm-smpp-ra.download.jar.file}" />
+	<property name="restcomm-smpp-ra.distro.docs.path" value="${checkout.dir}/${restcomm-smpp-ra.download.docs.file}" />
 
 
 	<property name="checkout.community-cassandra.dir" value="${cassandra.dir}/apache-${community-cassandra.version}" />
@@ -206,8 +210,8 @@
     </target>
 
 
-	<target name="get-deps" depends="get-restcomm-slee,get-restcomm-jss7,get-restcomm-map-ra,get-restcomm-map-ra-docs,get-restcomm-diam,get-restcomm-diam-base,get-restcomm-diam-ro,get-restcomm-smpp-extensions,get-restcomm-smpp-ra,get-community-cassandra" />
-	<target name="extract-deps" depends="extract-restcomm-slee,extract-restcomm-jss7,extract-restcomm-map-ra-docs,extract-restcomm-diam,extract-restcomm-smpp-extensions,extract-community-cassandra" />
+	<target name="get-deps" depends="get-restcomm-slee,get-restcomm-jss7,get-restcomm-map-ra,get-restcomm-map-ra-docs,get-restcomm-diam,get-restcomm-diam-base,get-restcomm-diam-ro,get-restcomm-smpp-extensions,get-restcomm-smpp-ra,get-restcomm-smpp-ra-docs,get-community-cassandra" />
+	<target name="extract-deps" depends="extract-restcomm-slee,extract-restcomm-jss7,extract-restcomm-map-ra-docs,extract-restcomm-diam,extract-restcomm-smpp-extensions,extract-restcomm-smpp-ra-docs,extract-community-cassandra" />
 
 	
 	<available file="${restcomm-slee.distro.zip.path}" property="got.restcomm-slee" />
@@ -368,6 +372,22 @@
 		    <arg value="--no-check-certificate" />
 		</exec>
 		<move file="${base.dir}/${restcomm-smpp-ra.download.jar.file}" todir="${checkout.dir}"/>
+	</target>
+
+	<available file="${restcomm-smpp-ra.distro.docs.path}" property="got.restcomm-smpp-ra-docs" />
+	<target name="get-restcomm-smpp-ra-docs" unless="got.restcomm-smpp-ra-docs">
+		<echo>Downloading RestComm SMPP RA docs version: ${restcomm-smpp-ra.version}</echo>
+		<exec failonerror="true" executable="wget">
+			<arg value="${restcomm-smpp-ra.download.docs.url}" />
+		    <arg value="--output-document=${restcomm-smpp-ra.download.docs.file}" />
+		    <arg value="--no-check-certificate" />
+		</exec>
+		<move file="${base.dir}/${restcomm-smpp-ra.download.docs.file}" todir="${checkout.dir}"/>
+	</target>
+
+	<target name="extract-restcomm-smpp-ra-docs" depends="get-restcomm-smpp-ra-docs">
+		<delete dir="${checkout.restcomm-smpp-ra.dir}" failonerror="false" />
+		<unzip src="${restcomm-smpp-ra.distro.docs.path}" dest="${checkout.restcomm-smpp-ra.dir}"/>
 	</target>
 
 	<!-- Cassandra  -->
@@ -796,8 +816,22 @@
 			</fileset>
 		</copy>
 
+		<copy todir="${docs.dir}/resources/smpp/html-book" failonerror="true">
+			<fileset dir="${checkout.restcomm-smpp-ra.dir}/generated-docs/html-book">
+			</fileset>
+		</copy>
+		<copy todir="${docs.dir}/resources/smpp/pdf" failonerror="true">
+			<fileset dir="${checkout.restcomm-smpp-ra.dir}/generated-docs/pdf">
+			</fileset>
+		</copy>
+
+		<mkdir dir="${docs.dir}/smpp"/>
 		<mkdir dir="${docs.dir}/jss7"/>
 		<mkdir dir="${docs.dir}/smsc"/>
+		<copy todir="${docs.dir}/smpp" failonerror="true">
+			<fileset dir="${checkout.restcomm-smpp-extensions.dir}/restcomm-smpp-extensions-${restcomm-smpp-extensions.version}-${restcomm-smpp-ra.build-number}/_docs/">
+			</fileset>
+		</copy>
 		<copy todir="${docs.dir}/jss7" failonerror="true">
 			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/_docs/">
 			</fileset>
@@ -824,7 +858,7 @@
 
 
 	<target name="make-final-zip" depends="set-time-stamp">
-		<zip destfile="${base.dir}/restcomm-smsc-${restcomm.smsc.release.version}.zip" filesonly="false">
+		<zip destfile="${base.dir}/restcomm-smsc-jboss-${restcomm.smsc.release.version}.zip" filesonly="false">
 			<zipfileset dir="${release.dir}" prefix="restcomm-smsc-${restcomm.smsc.release.version}">
 				<include name="**" />
 			</zipfileset>
