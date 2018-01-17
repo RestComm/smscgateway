@@ -669,6 +669,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	}
 
     @Override
+    public String getSmppEncodingForGsm7Str() {
+        if (smppEncodingForGsm7 != null)
+            return smppEncodingForGsm7.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setSmppEncodingForGsm7Str(String smppEncodingForGsm7) {
+        this.smppEncodingForGsm7 = SmppEncoding.valueOf(smppEncodingForGsm7);
+        this.store();
+    }
+
+    @Override
     public SmppEncoding getSmppEncodingForUCS2() {
         return smppEncodingForUCS2;
     }
@@ -676,6 +690,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setSmppEncodingForUCS2(SmppEncoding smppEncodingForUCS2) {
         this.smppEncodingForUCS2 = smppEncodingForUCS2;
+        this.store();
+    }
+
+    @Override
+    public String getSmppEncodingForUCS2Str() {
+        if (smppEncodingForUCS2 != null)
+            return smppEncodingForUCS2.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setSmppEncodingForUCS2Str(String smppEncodingForUCS2) {
+        this.smppEncodingForUCS2 = SmppEncoding.valueOf(smppEncodingForUCS2);
         this.store();
     }
 
@@ -691,6 +719,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     }
 
     @Override
+    public String getHttpEncodingForGsm7Str() {
+        if (httpEncodingForGsm7 != null)
+            return httpEncodingForGsm7.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setHttpEncodingForGsm7Str(String httpEncodingForGsm7) {
+        this.httpEncodingForGsm7 = HttpEncoding.valueOf(httpEncodingForGsm7);
+        this.store();
+    }
+
+    @Override
     public HttpEncoding getHttpEncodingForUCS2() {
         return httpEncodingForUCS2;
     }
@@ -698,6 +740,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setHttpEncodingForUCS2(HttpEncoding httpEncodingForUCS2) {
         this.httpEncodingForUCS2 = httpEncodingForUCS2;
+        this.store();
+    }
+
+    @Override
+    public String getHttpEncodingForUCS2Str() {
+        if (httpEncodingForUCS2 != null)
+            return httpEncodingForUCS2.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setHttpEncodingForUCS2Str(String httpEncodingForUCS2) {
+        this.httpEncodingForUCS2 = HttpEncoding.valueOf(httpEncodingForUCS2);
         this.store();
     }
 
@@ -1027,6 +1083,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     }
 
     @Override
+    public String getMoChargingStr() {
+        if (moCharging != null)
+            return moCharging.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setMoChargingStr(String moCharging) {
+        this.moCharging = MoChargingType.valueOf(moCharging.toLowerCase());
+        this.store();
+    }
+
+    @Override
     public MoChargingType getHrCharging() {
         return hrCharging;
     }
@@ -1034,6 +1104,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public void setHrCharging(MoChargingType mtCharging) {
         this.hrCharging = mtCharging;
+        this.store();
+    }
+
+    @Override
+    public String getHrChargingStr() {
+        if (hrCharging != null)
+            return hrCharging.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setHrChargingStr(String hrCharging) {
+        this.hrCharging = MoChargingType.valueOf(hrCharging.toLowerCase());
         this.store();
     }
 
@@ -1048,6 +1132,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
+    @Override
+    public String getStoreAndForwordModeStr() {
+        if (storeAndForwordMode != null)
+            return storeAndForwordMode.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setStoreAndForwordModeStr(String storeAndForwordMode) {
+        this.storeAndForwordMode = StoreAndForwordMode.valueOf(storeAndForwordMode.toLowerCase());
+        this.store();
+    }
+
 	@Override
 	public ChargingType getTxSmppChargingType() {
 		return txSmppCharging;
@@ -1058,6 +1156,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 		this.txSmppCharging = txSmppCharging;
         this.store();
 	}
+
+    @Override
+    public String getTxSmppChargingTypeStr() {
+        if (txSmppCharging != null)
+            return txSmppCharging.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setTxSmppChargingTypeStr(String txSmppCharging) {
+        this.txSmppCharging = ChargingType.valueOf(txSmppCharging);
+        this.store();
+    }
 
 	@Override
 	public ChargingType getTxSipChargingType() {
@@ -1071,6 +1183,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 	}
 
     @Override
+    public String getTxSipChargingTypeStr() {
+        if (txSipCharging != null)
+            return txSipCharging.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setTxSipChargingTypeStr(String txSipCharging) {
+        this.txSipCharging = ChargingType.valueOf(txSipCharging);
+        this.store();
+    }
+
+    @Override
     public MoChargingType getTxHttpCharging() {
         return txHttpCharging;
     }
@@ -1081,12 +1207,40 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
+    @Override
+    public String getTxHttpChargingStr() {
+        if (txHttpCharging != null)
+            return txHttpCharging.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setTxHttpChargingStr(String txHttpCharging) {
+        this.txHttpCharging = MoChargingType.valueOf(txHttpCharging);
+        this.store();
+    }
+
     public GlobalTitleIndicator getGlobalTitleIndicator() {
         return globalTitleIndicator;
     }
 
     public void setGlobalTitleIndicator(GlobalTitleIndicator globalTitleIndicator) {
         this.globalTitleIndicator = globalTitleIndicator;
+        this.store();
+    }
+
+    @Override
+    public String getGlobalTitleIndicatorStr() {
+        if (globalTitleIndicator != null)
+            return globalTitleIndicator.toString();
+        else
+            return null;
+    }
+
+    @Override
+    public void setGlobalTitleIndicatorStr(String globalTitleIndicator) {
+        this.globalTitleIndicator = GlobalTitleIndicator.valueOf(globalTitleIndicator);
         this.store();
     }
 
@@ -1306,7 +1460,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.generateCdr = generateCdr;
         this.store();
     }
-    
+
     @Override
     public int getGenerateCdrInt() {
         return this.generateCdr.getValue();
@@ -1478,6 +1632,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     }
 
     @Override
+    public void setSmDeliveryFailureStr(int causeCode, String status) throws IllegalArgumentException {
+        setSmDeliveryFailure(causeCode, PermanentTemporaryFailure.valueOf(status));
+    }
+
+    @Override
+    public String getSmDeliveryFailureStr(int causeCode) {
+        PermanentTemporaryFailure val = getSmDeliveryFailure(causeCode);
+        if (val != null)
+            return val.toString();
+        else
+            return null;
+    }
+
+    @Override
     public void setSmDeliveryFailureTpCause(int causeCode, PermanentTemporaryFailure status) throws IllegalArgumentException {
         if (status == null)
             this.smDeliveryFailureTpFailureCause.remove(causeCode);
@@ -1493,6 +1661,20 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     @Override
     public Map<Integer, PermanentTemporaryFailure> getSmDeliveryFailureTpCause(){
         return this.smDeliveryFailureTpFailureCause;
+    }
+
+    @Override
+    public void setSmDeliveryFailureTpCauseStr(int causeCode, String status) throws IllegalArgumentException {
+        setSmDeliveryFailureTpCause(causeCode, PermanentTemporaryFailure.valueOf(status));
+    }
+
+    @Override
+    public String getSmDeliveryFailureTpCauseStr(int causeCode) {
+        PermanentTemporaryFailure val = getSmDeliveryFailureTpCause(causeCode);
+        if (val != null)
+            return val.toString();
+        else
+            return null;
     }
 
 
@@ -2147,4 +2329,6 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             super(SM_DELIVERY_FAILURE_TP_FAILURE_CAUSE_LIST, SmDeliveryFailureTpFailureCauseListElement.class, data);
         }
     }
+
+
 }

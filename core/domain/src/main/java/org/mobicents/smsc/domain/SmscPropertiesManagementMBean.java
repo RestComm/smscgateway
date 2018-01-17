@@ -107,9 +107,17 @@ public interface SmscPropertiesManagementMBean {
 
     public void setSmppEncodingForGsm7(SmppEncoding smppEncodingForGsm7);
 
+    public String getSmppEncodingForGsm7Str();
+
+    public void setSmppEncodingForGsm7Str(String smppEncodingForGsm7);
+
 	public SmppEncoding getSmppEncodingForUCS2();
 
 	public void setSmppEncodingForUCS2(SmppEncoding smppEncodingForUCS2);
+
+    public String getSmppEncodingForUCS2Str();
+
+    public void setSmppEncodingForUCS2Str(String smppEncodingForUCS2);
 
     public String getDbHosts();
 
@@ -190,29 +198,57 @@ public interface SmscPropertiesManagementMBean {
 
     public void setMoCharging(MoChargingType moCharging);
 
+    public String getMoChargingStr();
+
+    public void setMoChargingStr(String moCharging);
+
     public MoChargingType getHrCharging();
 
     public void setHrCharging(MoChargingType hrCharging);
+
+    public String getHrChargingStr();
+
+    public void setHrChargingStr(String hrCharging);
 
     public StoreAndForwordMode getStoreAndForwordMode();
 
     public void setStoreAndForwordMode(StoreAndForwordMode storeAndForwordMode);
 
+    public String getStoreAndForwordModeStr();
+
+    public void setStoreAndForwordModeStr(String storeAndForwordMode);
+
 	public ChargingType getTxSmppChargingType();
 
 	public void setTxSmppChargingType(ChargingType txSmppCharging);
 
+    public String getTxSmppChargingTypeStr();
+
+    public void setTxSmppChargingTypeStr(String txSmppCharging);
+
 	public ChargingType getTxSipChargingType();
 
-	public void setTxSipChargingType(ChargingType txSmppCharging);
+	public void setTxSipChargingType(ChargingType txSipCharging);
+
+    public String getTxSipChargingTypeStr();
+
+    public void setTxSipChargingTypeStr(String txSipCharging);
 
     public MoChargingType getTxHttpCharging();
 
     public void setTxHttpCharging(MoChargingType txHttpCharging);
 
+    public String getTxHttpChargingStr();
+
+    public void setTxHttpChargingStr(String txHttpCharging);
+
     public GlobalTitleIndicator getGlobalTitleIndicator();
 
     public void setGlobalTitleIndicator(GlobalTitleIndicator globalTitleIndicator);
+
+    public String getGlobalTitleIndicatorStr();
+
+    public void setGlobalTitleIndicatorStr(String globalTitleIndicator);
 
     public int getTranslationType();
 
@@ -374,9 +410,17 @@ public interface SmscPropertiesManagementMBean {
 
     public void setHttpEncodingForGsm7(HttpEncoding httpEncodingForGsm7);
 
+    public String getHttpEncodingForGsm7Str();
+
+    public void setHttpEncodingForGsm7Str(String httpEncodingForGsm7);
+
     public HttpEncoding getHttpEncodingForUCS2();
 
     public void setHttpEncodingForUCS2(HttpEncoding httpEncodingForUCS2);
+
+    public String getHttpEncodingForUCS2Str();
+
+    public void setHttpEncodingForUCS2Str(String httpEncodingForUCS2);
 
     public long getMinMessageId();
 
@@ -398,9 +442,17 @@ public interface SmscPropertiesManagementMBean {
 
     public PermanentTemporaryFailure getSmDeliveryFailure(int causeCode);
 
+    public void setSmDeliveryFailureStr(int causeCode, String status) throws IllegalArgumentException;
+
+    public String getSmDeliveryFailureStr(int causeCode);
+
     public void setSmDeliveryFailureTpCause(int causeCode, PermanentTemporaryFailure status) throws IllegalArgumentException;
 
     public PermanentTemporaryFailure getSmDeliveryFailureTpCause(int causeCode);
+
+    public void setSmDeliveryFailureTpCauseStr(int causeCode, String status) throws IllegalArgumentException;
+
+    public String getSmDeliveryFailureTpCauseStr(int causeCode);
 
     public void setSmDeliveryFailureDlrWithTpdu(String status) throws IllegalArgumentException;
 
