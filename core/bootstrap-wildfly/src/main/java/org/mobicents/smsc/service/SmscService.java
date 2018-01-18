@@ -210,6 +210,7 @@ public class SmscService implements Service<SmscService> {
         smscManagementMBean.setPersistDir(dataDir);
         smscManagementMBean.setSmppManagement(smppManagement);
 
+        // specify mproc rules factories
         ArrayList<MProcRuleFactory> ruleFactories = new ArrayList<MProcRuleFactory>();
         String factoryNames = getPropertyString("SmscManagement", "MProcRuleFactories",
                 "org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault");
@@ -227,6 +228,15 @@ public class SmscService implements Service<SmscService> {
             }
         }
         smscManagementMBean.setMProcRuleFactories(ruleFactories);
+
+        // specify of smsRoutingRuleClass class
+        String smsRoutingRuleClass = getPropertyString("SmscManagement", "smsRoutingRuleClass", null);
+        if (smsRoutingRuleClass != null) {
+            log.info("Loaded smsRoutingRuleClass class name: " + smsRoutingRuleClass);
+            smscManagementMBean.setSmsRoutingRuleClass(smsRoutingRuleClass);
+        } else {
+            log.info("smsRoutingRuleClass class not found in config");
+        }
 
         try {
             smscManagementMBean.start();

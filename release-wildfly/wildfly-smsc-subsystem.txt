@@ -3,6 +3,10 @@
             <mbean name="SS7Scheduler" type="SS7Scheduler"/>
             <mbean name="SmscManagement" type="SmscManagement">
                 <property name="MProcRuleFactories" type="String" value="org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault"/>
+<!--
+                <property name="MProcRuleFactories" type="String" value="org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault,org.mobicents.smsc.mproc.testimpl.MProcRuleFactoryTestImpl"/>
+                <property name="smsRoutingRuleClass" type="String" value="org.mobicents.smsc.domain.DatabaseSmsRoutingRule"/>
+-->
             </mbean>
             <mbean name="SMSCShellExecutor" type="SMSCShellExecutor"/>
             <mbean name="ShellExecutor" type="ShellExecutor">

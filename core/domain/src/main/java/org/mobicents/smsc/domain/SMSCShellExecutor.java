@@ -1750,11 +1750,11 @@ public class SMSCShellExecutor implements ShellExecutor {
 
         int count = 5;
         String command;
-        SmsRoutingRuleType smsRoutingRuleType = SmsRoutingRuleType.SMPP;
+        String smsRoutingRuleType = "SMPP";
         int networkId = 0;
         while (count < args.length && ((command = args[count++]) != null)) {
             if (command.equals("SMPP") || command.equals("SIP")) {
-                smsRoutingRuleType = SmsRoutingRuleType.valueOf(command);
+                smsRoutingRuleType = command;
             } else if (command.equals("networkid")) {
                 if (count < args.length) {
                     String value = args[count++];
@@ -1788,11 +1788,11 @@ public class SMSCShellExecutor implements ShellExecutor {
 
         int count = 4;
         String command;
-        SmsRoutingRuleType smsRoutingRuleType = SmsRoutingRuleType.SMPP;
+        String smsRoutingRuleType = "SMPP";
         int networkId = 0;
         while (count < args.length && ((command = args[count++]) != null)) {
             if (command.equals("SMPP") || command.equals("SIP")) {
-                smsRoutingRuleType = SmsRoutingRuleType.valueOf(command);
+                smsRoutingRuleType = command;
             } else if (command.equals("networkid")) {
                 if (count < args.length) {
                     String value = args[count++];
@@ -1826,11 +1826,11 @@ public class SMSCShellExecutor implements ShellExecutor {
 
         int count = 4;
         String command;
-        SmsRoutingRuleType smsRoutingRuleType = SmsRoutingRuleType.SMPP;
+        String smsRoutingRuleType = "SMPP";
         int networkId = 0;
         while (count < args.length && ((command = args[count++]) != null)) {
             if (command.equals("SMPP") || command.equals("SIP")) {
-                smsRoutingRuleType = SmsRoutingRuleType.valueOf(command);
+                smsRoutingRuleType = command;
             } else if (command.equals("networkid")) {
                 if (count < args.length) {
                     String value = args[count++];
@@ -1841,7 +1841,7 @@ public class SMSCShellExecutor implements ShellExecutor {
 
         DbSmsRoutingRule res = smsRoutingRule.getSmsRoutingRule(smsRoutingRuleType, address, networkId);
         if (res == null) {
-            return String.format(SMSCOAMMessages.NO_ROUTING_RULE_DEFINED_YET, smsRoutingRuleType.name(), address, networkId);
+            return String.format(SMSCOAMMessages.NO_ROUTING_RULE_DEFINED_YET, smsRoutingRuleType, address, networkId);
         }
         return res.toString();
     }
@@ -1859,7 +1859,7 @@ public class SMSCShellExecutor implements ShellExecutor {
             return SMSCOAMMessages.INVALID_COMMAND;
         }
 
-        SmsRoutingRuleType smsRoutingRuleType = SmsRoutingRuleType.valueOf(args[3]);
+        String smsRoutingRuleType = args[3];
 
         if (smsRoutingRuleType == null) {
             return SMSCOAMMessages.INVALID_COMMAND;
