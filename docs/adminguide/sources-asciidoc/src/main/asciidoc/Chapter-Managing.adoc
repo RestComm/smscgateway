@@ -22,12 +22,6 @@ include::Section-Managing-Server-Settings.adoc[]
 
 :leveloffset: +1
 
-include::Section-Managing-Server-Settings-wildfly.adoc[]
-
-:leveloffset: -1
-
-:leveloffset: +1
-
 include::Section-Managing-SMPP-Server-Settings.adoc[]
 
 :leveloffset: -1
@@ -65,12 +59,6 @@ include::Section-Managing-MAP-Version-Cache-Settings.adoc[]
 :leveloffset: +1
 
 include::Section-Managing-DB-Routing-Settings.adoc[]
-
-:leveloffset: -1
-
-:leveloffset: +1
-
-include::Section-Managing-DB-Routing-Settings-wildfly.adoc[]
 
 :leveloffset: -1
 
