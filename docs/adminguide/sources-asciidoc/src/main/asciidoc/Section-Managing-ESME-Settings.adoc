@@ -26,9 +26,9 @@ image::images/smsc-SMPP-Loadbalancing.png[]
 
 You can define multiple ESMEs, each with a unique name but the same `systemId` and declare their `host-ip` and `port` values as -1 (only for SMPP type Server). The SMSC will now accept multiple incoming BIND requests from any `IP` and any `port` as far as the `systemId` and `Password` matches.
 
-
 Alternatively, if you declare a real value for `host-ip` (say for example 10.199.7.23) and `port` as -1, the SMSC will accept as many BINDS as ESMEs defined from the specified IP but any port as far as the `systemId` and `Password` matches.
 
+Additionally, if sending queue through one of ESMEs in cluster will grow high (what's high is specified with ESME overloadThreshold property), SMSC will stop routing new messages through this ESME and will send them through other ESMEs in same cluster if available or store in database until after queue will drop to a normal size (specified by ESME property 'normalThreshold').
 
 [[_esme_settings_create]]
 == Create new ESME
@@ -434,6 +434,23 @@ PARAMETERS
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
+
+	overload-threshold    - This value may be used by application to compare
+					messages queue size with it and based on outcome mark ESME
+					as 'overloaded'. Then based on this state further
+					functionality may be applied by application, such as
+					bypassing this ESME while sending new messages.
+					Default value is -1, otherwise non-positive value
+					will be ignored. Overload Threshold cannot be set unless
+					Normal Threshold has been already defined
+
+	normal-threshold 	  - This value is opposite to overload-threshold and might
+					be used as a condition to mark current ESME state as
+					not 'overloaded' and consequent resuming of sending new messages
+					through this ESME.
+					Default value is -1, otherwise negative value will be ignored.
+					It won't be possible to set Normal Threshold to -1 if
+					Overload Threshold is currently set.
 
 EXAMPLES
 	smpp esme create test test 127.0.0.1 -1 TRANSCEIVER SERVER password yyyy esme-range 6667
@@ -844,6 +861,23 @@ PARAMETERS
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
+
+	overload-threshold    - This value may be used by application to compare
+					messages queue size with it and based on outcome mark ESME
+					as 'overloaded'. Then based on this state further
+					functionality may be applied by application, such as
+					bypassing this ESME while sending new messages.
+					Default value is -1, otherwise non-positive value
+					will be ignored. Overload Threshold cannot be set unless
+					Normal Threshold has been already defined
+
+	normal-threshold 	  - This value is opposite to overload-threshold and might
+					be used as a condition to mark current ESME state as
+					not 'overloaded' and consequent resuming of sending new messages
+					through this ESME.
+					Default value is -1, otherwise negative value will be ignored.
+					It won't be possible to set Normal Threshold to -1 if
+					Overload Threshold is currently set.
 
 EXAMPLES
 	smpp esme modify test password yyyy

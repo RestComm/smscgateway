@@ -573,8 +573,14 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         pduEvent = event.getResponse();
 
                     EsmeManagement esmeManagement = EsmeManagement.getInstance();
-                    Esme esme = esmeManagement.getEsmeByName(smsSet.getDestEsmeName());
-                    boolean destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
+                    Boolean destAddressLimitationEnabled = false;
+
+                    if (esmeManagement != null && smsSet != null) {
+                        Esme esme = esmeManagement.getEsmeByName(smsSet.getDestEsmeName());
+                        if (esme != null) {
+                            destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
+                        }
+                    }
 
                     int realID = -1;
                     SentItemsList list = null;
