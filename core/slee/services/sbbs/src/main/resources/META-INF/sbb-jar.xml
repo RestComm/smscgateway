@@ -223,7 +223,7 @@
 			<description>Max number of messages to be sent to single ESME upon arrival of SmsSet</description>          
 			<env-entry-name>maxMessagesPerStep</env-entry-name>          
 			<env-entry-type>java.lang.Integer</env-entry-type>          
-			<env-entry-value>89</env-entry-value>         
+			<env-entry-value>100</env-entry-value>         
 		</env-entry>
 
 
