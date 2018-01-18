@@ -1,4 +1,4 @@
-= Monitoring (JBOSS 5)
+= Monitoring
 
 [[_smsc_stat_get]]
 == View SMSC Statistics
@@ -116,7 +116,7 @@ You can reset a counter for a single parameter by selecting the reset option in 
 [[_monitoring_smsc_cdr_log]]
 == CDR Log
 
-{this-platform} {this-application} is configured to generate CDR in a plain text file located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr.log_.
+{this-platform} {this-application} is configured to generate CDR in a plain text file `cdr.log` located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/_ for JBOSS 5 server and [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/log for Wildfly 10.
 The CDR generated in the text file is of the below format: 
 ----
 
@@ -300,7 +300,7 @@ If a message received is a recognized delivery receipt, this field will contain 
 [[_monitoring_smsc_cdr_detailed_log]]
 == Detailed CDR Log
 
-{this-platform} {this-application} is configured to generate detailed CDR logs in a plain text file located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr_detailed.log_.
+{this-platform} {this-application} is configured to generate detailed CDR logs in a plain text file `cdr_detailed.log` located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log_ for JBOSS 5 and [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/log for Wildfly 10.
 Detailed CDR generated in the text file is of the below format:
 ----
 

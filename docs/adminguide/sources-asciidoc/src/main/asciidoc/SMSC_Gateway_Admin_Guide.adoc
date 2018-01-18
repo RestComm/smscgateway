@@ -46,19 +46,7 @@ include::Chapter-Running.adoc[]
 
 :leveloffset: 1
 
-include::Chapter-Running-wildfly.adoc[]
-
-:leveloffset: 0
-
-:leveloffset: 1
-
 include::Chapter-Configuring.adoc[]
-
-:leveloffset: 0
-
-:leveloffset: 1
-
-include::Chapter-Configuring-wildfly.adoc[]
 
 :leveloffset: 0
 
@@ -77,12 +65,6 @@ include::Chapter-Maintenance.adoc[]
 :leveloffset: 1
 
 include::Chapter-Monitoring.adoc[]
-
-:leveloffset: 0
-
-:leveloffset: 1
-
-include::Chapter-Monitoring-wildfly.adoc[]
 
 :leveloffset: 0
 

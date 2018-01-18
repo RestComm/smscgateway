@@ -1,4 +1,4 @@
-= Configuring (JBOSS 5)
+= Configuring
 
 You must fine-tune Memory and Database settings for better performance before using {this-platform} {this-application} in production.
 Once you complete setting up the Gateway you must configure the SS7 Stack the SMSC Gateway following the instructions specified in this guide.
@@ -6,10 +6,21 @@ Once you complete setting up the Gateway you must configure the SS7 Stack the SM
 [[_fine_tuning]]
 == Memory Settings and fine tuning
 
-=== Memory Settings
+=== Memory Settings (JBOSS 5)
 
 You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size. 4 GB is recommended.
 These settings are specified in the file [path]_{this-folder}-smscgateway-version>/jboss-5.1.0.GA/bin/run.conf_.
+
+-Xms3072m::
+  Initial heap size, set in megabytes
+
+-Xmx3072m::
+  Maximum heap size, set in megabytes
+
+=== Memory Settings (Wildfly 10)
+
+You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size. 4 GB is recommended.
+These settings are specified in the file [path]_{this-folder}-smscgateway-version>/wildfly-10.1.0.Final/bin/standalone.conf by adding following parameters to JAVA_OPTS
 
 -Xms3072m::
   Initial heap size, set in megabytes
@@ -34,7 +45,13 @@ For monitoring you can use <<_smsc_stat_get>> chapter. DueSlotProcessingLag outp
 
 In the configuration of SCTP layer leave the parameter "SingleThread" as "true". The count of threads that will process incoming SS7 messages is specified by a parameter "deliveryMessageThreadCount". We need to do it if we have some bottleneck in SS7 part.
 
+.Procedure for JBOSS 5
 * open file jboss/server/default/deploy/telscale-smsc-server/META-INF/jboss-beans.xml in the text editor
+* find "bean name="Mtp3UserPart"" mbean definition
+* update parameter "deliveryMessageThreadCount" to some value like "processor count * 2"
+
+.Procedure for Wildfly 10
+* open file wildfly-10.1.0.Final/standalone/configuration/standalone.xml in the text editor
 * find "bean name="Mtp3UserPart"" mbean definition
 * update parameter "deliveryMessageThreadCount" to some value like "processor count * 2"
 
@@ -59,7 +76,7 @@ If we run several instanses of the same server (by mistake) the second instanse 
 
 
 [[_logging]]
-== Configuring log4j Logging Service
+== Configuring log4j Logging Service (JBOSS 5)
 
 {this-platform} {this-application} uses `Apache log4j` for logging.
 If you are not familiar with the `log4j` package, you can read more about it at the Jakarta http://jakarta.apache.org/log4j/[website].
@@ -67,6 +84,20 @@ If you are not familiar with the `log4j` package, you can read more about it at 
 Logging is controlled from a central configuration file located at [path]{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/conf/jboss-log4j.xml_, one for each JBoss AS configuration profile.
 This file defines a set of appenders specifying the log files, what categories of messages should go there, the message format and the level of filtering.
 For more details, please refer to Section 9.6.3, "Logging Service" in the JBoss AS Getting Started Guide available https://community.jboss.org/wiki/JBossAS5InstallationAndGettingStartedGuide[here].
+
+You must make sure `log4j` is fine tuned for optimal performance in production.
+We recommend that you set logging threshold to `WARN` and let the CDR appender be `DEBUG`.
+
+
+[[_logging_wildfly]]
+== Configuring log4j Logging Service (Wildfly 10)
+
+{this-platform} {this-application} uses `Apache log4j` for logging.
+If you are not familiar with the `log4j` package, you can read more about it at the Jakarta http://jakarta.apache.org/log4j/[website]. 
+
+Logging is controlled from a central configuration file located at [path]{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml.
+This file defines a set of appenders specifying the log files, what categories of messages should go there, the message format and the level of filtering.
+For more details, please refer to Wildfly 10 "Logging Configuration" guide https://docs.jboss.org/author/display/WFLY10/Logging+Configuration 
 
 You must make sure `log4j` is fine tuned for optimal performance in production.
 We recommend that you set logging threshold to `WARN` and let the CDR appender be `DEBUG`.
@@ -1323,9 +1354,9 @@ public interface PostDeliveryTempFailureProcessor {
 }
 ----
 
-
 . Once all the source code is fully implemented, user should deploy it.
 
+.Procedure for JBOSS 5
 
 * User must compile java code and create a jar library.
   Copy the created jar into the folder [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/lib_.
@@ -1354,6 +1385,24 @@ In the "bean name="SmscManagement"" section - property <property name="MProcRule
             </list>
         </property>
 ----
+
+.Procedure for Wildfly 10
+
+* User must compile java code and create a jar library.
+  Copy the created jar into the folder [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/modules/system/layers/base/org/mobicents/smsc/bootstrap/main. 
+* You need to update [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml config file. 
++
+In the "bean name="SmscManagement"" section - property <property name="MProcRuleFactories"> - update the line <inject bean="MProcRuleFactoryDefault"/> (that already contains default mproc rules implementing) - add into line your new created mproc rules factory class using `,` as a separator (several classes can be added): 
++
+[source,xml]
+----
+
+            <mbean name="SmscManagement" type="SmscManagement">
+                <property name="MProcRuleFactories" type="String" value="org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault,org.mobicents.smsc.mproc.testimpl.MProcRuleFactoryTestImpl"/>
+            </mbean>
+----
+
+[start=11]
 . Start SMSC GW
 . Create an mproc rule by using CLI interface.
   Let's create a rule with id=1 that will be applied for messages which destination adresses are started with "22" and this rule will add prefix "33". To achive it run CLI console and run the following command
@@ -1387,7 +1436,9 @@ There are two possible modes of home routing functionality:
 * non-transparent mode - default mode when SMSC GW returns with successfull responses to incoming MT requests (without waiting till a message is delivered to a destination).
 * transparent mode - SMSC GW waits (after a MT request) till a message is delivered to a destination and responds to the MT request with a result of message delivering (success / failure). To activate this mode you need to configure the option <<_hrdefaultmessagingmode>> to "Transactional".
 
-Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" and listens an extra SSN (usually SSN 6 as additionto SSN 8 for other functionality). These parameters are configured in `jboss-beans.xml` file for TCAP stack. You can find below the example of configuring of two listerning SSNs (8 and 6 in the example). This configuration is a default configuration out of box.
+Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" and listens an extra SSN (usually SSN 6 as additionto SSN 8 for other functionality). These parameters are configured in `jboss-beans.xml` for JBOSS 5 case and `standalone.xml` for Wildfly 10 case file for TCAP stack. You can find below the example of configuring of two listerning SSNs (8 and 6 in the example). This configuration is a default configuration out of box.
+
+.Content for JBOSS 5
 
 [source,xml]
 ----
@@ -1406,6 +1457,22 @@ Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" an
 			</list>
 		</property>
 	</bean>
+----
+
+.Content for Wildfly 10
+
+[source,xml]
+----
+	<mbean class="org.mobicents.protocols.ss7.tcap.TCAPStackImpl" enabled="true" name="TcapStackMap" reflection="false" type="TcapStack">
+                <property name="sccpStack" type="Bean" value="SccpStack"/>
+                <property name="ssn" type="int" value="8"/>
+                <property name="previewMode" type="bool" value="false"/>
+
+                <property name="extraSsns" type="Map" value="empty">
+                    <entry key="1" type="int" value="6"/>
+                </property>
+
+            </mbean>
 ----
 
 
@@ -1594,15 +1661,16 @@ Here there is a describtion for the case of Telestax OCS server and as an exampl
 . SMSC GW must be already configured for accepting and sending messages (general, SS7, SMPP, etc parts)
 . You can download for testing the Telestax OCS server from https://telestax.zendesk.com/forums/22947518-Product-Downloads.
   Download and unpack it to a separate folder.
-. SMSC GW uses the updated AVP dictionary library.
-  Before using of OCS server copy from SMSC GW the file <smsc gw root folder>/resource/ocs/dictionary.xml to Telestax OCS server to the folder <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config.
+
 . for simple test configuring of SMSC GW and OCS server you can copy example config files jdiameter-config.xml
 
-* from <smsc gw root folder>/resource/ocs/smsc-part to SMSC GW <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config
+* from <smsc gw root folder>/resource/ocs/smsc-part to SMSC GW <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config for JBOSS 5 server and <smsc gw root
+folder>/extra/restcomm-diam/modules/lib/main/config for Wildfly 10 server
 * from <smsc gw root folder>/resource/ocs/ocs-part to OCS server <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config
 
-This file is already copied to SMSC GW into Simulator profile.
+This file is already copied to SMSC GW into Simulator profile for JBOSS 5 case. It is not performed for Wildfly 10 server because Wildfly 10 has same comfiguring files placed for diameter module for all profiles.
 
+[start=4]
 . Those configs suppose that you use Telestax OCS server and it is on the same host.
 If not you need to make extra configuring.
 In the testing config files SMSC GW plays a role of a diameter client and OCS server - a diameter server.
@@ -1651,7 +1719,7 @@ To be safe a good way to use diameter server requests for messages where we can 
 
 == CDR Logging Settings
 
-{this-platform} {this-application} is configured to generate CDR in a plain text file located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr.log_ and also detailed CDR in Cassandra table `MESSAGES_yyyy_mm_dd`.
+{this-platform} {this-application} is configured to generate CDR in a plain text files `cdr.log` and `cdr_detailed.log` located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr.log_ for JBOSS 5 server and [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/log for Wildfly 10 server and also detailed CDR in Cassandra tables `MESSAGES_yyyy_mm_dd`.
 
 
 {this-platform} {this-application} can be configured to generate CDR for different message processing modes (`datagramm, transactional, storeAndForward`) and also for both receipt and regular messages or generate CDR only for regular messages.
