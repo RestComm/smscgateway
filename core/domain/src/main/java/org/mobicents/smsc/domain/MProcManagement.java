@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.management.ManagementFactory;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -33,13 +35,13 @@ import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
-import org.jboss.mx.util.MBeanServerLocator;
 import org.mobicents.smsc.library.CorrelationIdValue;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.mproc.MProcMessage;
@@ -256,6 +258,7 @@ public class MProcManagement implements MProcManagementMBean {
                     if (logger.isDebugEnabled()) {
                         logger.debug("MRule matches at Arrival phase to a message:\nrule: " + rule + "\nmessage: " + sms);
                     }
+                    pap.setRuleIdInProcessing(rule.getId());
                     rule.onPostArrival(anMProcRuleRa, pap, message);
                 }
             }
@@ -267,17 +270,20 @@ public class MProcManagement implements MProcManagementMBean {
             return res;
         }
 
-        MProcResult res = new MProcResult();;
+        MProcResult res = new MProcResult();
         FastList<Sms> res0 = new FastList<Sms>();
         res.setMessageList(res0);
         FastList<MProcNewMessage> newMsgs = pap.getPostedMessages();
         if (pap.isNeedDropMessage()) {
             res.setMessageDropped(true);
+            res.setRuleIdDropReject(pap.getRuleIdDropReject());
         } else if (pap.isNeedRejectMessage()) {
             res.setMessageRejected(true);
+//            res.setMprocRejectingRuleId(pap.);
             res.setMapErrorCode(pap.getMapErrorCode());
             res.setHttpErrorCode(pap.getHttpErrorCode());
             res.setSmppErrorCode(pap.getSmppErrorCode());
+            res.setRuleIdDropReject(pap.getRuleIdDropReject());
         } else {
             res0.add(sms);
         }
@@ -514,7 +520,27 @@ public class MProcManagement implements MProcManagementMBean {
         }
 
         try {
-            this.mbeanServer = MBeanServerLocator.locateJBoss();
+            boolean servFound = false;
+            String agentId = "jboss";
+            List<MBeanServer> servers = MBeanServerFactory.findMBeanServer(null);
+            if (servers != null && servers.size() > 0) {
+                for (MBeanServer server : servers) {
+                    String defaultDomain = server.getDefaultDomain();
+
+                    if (defaultDomain != null && defaultDomain.equals(agentId)) {
+                        mbeanServer = server;
+                        servFound = true;
+                        logger.info(String.format("Found MBeanServer matching for agentId=%s", agentId));
+                    } else {
+                        logger.warn(String.format("Found non-matching MBeanServer with default domian = %s", defaultDomain));
+                    }
+                }
+            }
+
+            if (!servFound) {
+                this.mbeanServer = ManagementFactory.getPlatformMBeanServer();
+            }            
+            logger.info("servFound =" + servFound + ", this.mbeanServer = " + this.mbeanServer);            
         } catch (Exception e) {
         }
 

@@ -1,0 +1,26 @@
+Name
+	smsc set smdeliveryfailure
+
+SYNOPSIS
+	smsc set smdeliveryfailure <code> <permanent|temporary|clear>
+
+DESCRIPTION
+	When SMSC GW gets a SMDeliveryFailure MAP error message
+	and this message does not contain SMS-DELIVER Report tpdu with
+	TP-Failure-Cause on board then SMSC GW will decide of if this failure is
+	temporary or permanent depending of a value of DeliveryFailureCause of
+	MAP error message. By default value 0 (memoryCapacityExceeded) is treated
+	as temporary and all other values are threated as permanent. We can set by this
+	option a need behavior for any type of DeliveryFailureCause as needed.
+	- If it set to 'permanent' for a received DeliveryFailureCause then SMSC will treat
+	  the error with code as permanent (with no more delivery attempts)
+	- If it set to 'temporary' for a received DeliveryFailureCause then SMSC will treat
+	  the error with code as temporary (with more delivery attempts)
+	Value 'clear' drops a setting and SMSC GW will treat it as default.
+
+EXAMPLES
+	smsc set smdeliveryfailure 1 permanent
+
+SEE ALSO
+	smsc set smdeliveryfailure, smsc set smdeliveryfailure_tpfailurecause
+	smsc set smdeliveryfailure_dlr_withtpuserdata

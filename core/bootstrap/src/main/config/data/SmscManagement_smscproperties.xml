@@ -29,6 +29,7 @@
 <nationalLanguageLockingShift value="0"/>
 <maxActivityCount value="500"/>
 <deliveryTimeout value="120"/>
+<deliveryTimeoutDeltaPerMessage value="1"/>
 <vpProlong value="120"/>
 <smppEncodingForGsm7 value="Utf8"/>
 <smppEncodingForUCS2 value="Utf8"/>
@@ -37,7 +38,9 @@
 <reviseSecondsOnSmscStart value="60"/>
 <processingSmsSetTimeout value="600"/>
 <generateReceiptCdr value="false"/>
+<generateDetailedCdr value="true"/>
 <generateTempFailureCdr value="true"/>
+<generateRejectionCdr value="true"/>
 <calculateMsgPartsLenCdr value="false"/>
 <delayParametersInCdr value="false"/>
 <receiptsDisabling value="false"/>

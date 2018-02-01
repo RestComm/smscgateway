@@ -1,15 +1,26 @@
 = Configuring
 
 You must fine-tune Memory and Database settings for better performance before using {this-platform} {this-application} in production.
-Once you complete setting up the Gateway you must configure the SS7 Stack the SMSC Gateway following the instructions specified in this guide. 
+Once you complete setting up the Gateway you must configure the SS7 Stack the SMSC Gateway following the instructions specified in this guide.
 
 [[_fine_tuning]]
 == Memory Settings and fine tuning
 
-=== Memory Settings
+=== Memory Settings (JBOSS 5)
 
 You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size. 4 GB is recommended.
-These settings are specified in the file [path]_{this-folder}-smscgateway-version>/jboss-5.1.0.GA/bin/run.conf_. 
+These settings are specified in the file [path]_{this-folder}-smscgateway-version>/jboss-5.1.0.GA/bin/run.conf_.
+
+-Xms3072m::
+  Initial heap size, set in megabytes
+
+-Xmx3072m::
+  Maximum heap size, set in megabytes
+
+=== Memory Settings (Wildfly 10)
+
+You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size. 4 GB is recommended.
+These settings are specified in the file [path]_{this-folder}-smscgateway-version>/wildfly-10.1.0.Final/bin/standalone.conf by adding following parameters to JAVA_OPTS
 
 -Xms3072m::
   Initial heap size, set in megabytes
@@ -19,7 +30,7 @@ These settings are specified in the file [path]_{this-folder}-smscgateway-versio
 
 === Message flow types
 
-We have two possible message flow type. 
+We have two possible message flow type.
 
 1. When a message is firstly stored into a cassandra database - StoreAndForward mode (StoreAndForward messages when <<_storeandforwardmode>> is set to "normal")
 2. When a first delivery retry is done without storing a message into a cassandra database - datagramm, Transactional, ForwardAndStore (StoreAndForward messages when <<_storeandforwardmode>> is set to "fast").
@@ -34,7 +45,13 @@ For monitoring you can use <<_smsc_stat_get>> chapter. DueSlotProcessingLag outp
 
 In the configuration of SCTP layer leave the parameter "SingleThread" as "true". The count of threads that will process incoming SS7 messages is specified by a parameter "deliveryMessageThreadCount". We need to do it if we have some bottleneck in SS7 part.
 
+.Procedure for JBOSS 5
 * open file jboss/server/default/deploy/telscale-smsc-server/META-INF/jboss-beans.xml in the text editor
+* find "bean name="Mtp3UserPart"" mbean definition
+* update parameter "deliveryMessageThreadCount" to some value like "processor count * 2"
+
+.Procedure for Wildfly 10
+* open file wildfly-10.1.0.Final/standalone/configuration/standalone.xml in the text editor
 * find "bean name="Mtp3UserPart"" mbean definition
 * update parameter "deliveryMessageThreadCount" to some value like "processor count * 2"
 
@@ -59,14 +76,28 @@ If we run several instanses of the same server (by mistake) the second instanse 
 
 
 [[_logging]]
-== Configuring log4j Logging Service
+== Configuring log4j Logging Service (JBOSS 5)
+
+{this-platform} {this-application} uses `Apache log4j` for logging.
+If you are not familiar with the `log4j` package, you can read more about it at the Jakarta http://jakarta.apache.org/log4j/[website].
+
+Logging is controlled from a central configuration file located at [path]{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/conf/jboss-log4j.xml_, one for each JBoss AS configuration profile.
+This file defines a set of appenders specifying the log files, what categories of messages should go there, the message format and the level of filtering.
+For more details, please refer to Section 9.6.3, "Logging Service" in the JBoss AS Getting Started Guide available https://community.jboss.org/wiki/JBossAS5InstallationAndGettingStartedGuide[here].
+
+You must make sure `log4j` is fine tuned for optimal performance in production.
+We recommend that you set logging threshold to `WARN` and let the CDR appender be `DEBUG`.
+
+
+[[_logging_wildfly]]
+== Configuring log4j Logging Service (Wildfly 10)
 
 {this-platform} {this-application} uses `Apache log4j` for logging.
 If you are not familiar with the `log4j` package, you can read more about it at the Jakarta http://jakarta.apache.org/log4j/[website]. 
 
-Logging is controlled from a central configuration file located at [path]{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/conf/jboss-log4j.xml_, one for each JBoss AS configuration profile.
+Logging is controlled from a central configuration file located at [path]{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml.
 This file defines a set of appenders specifying the log files, what categories of messages should go there, the message format and the level of filtering.
-For more details, please refer to Section 9.6.3, "Logging Service" in the JBoss AS Getting Started Guide available https://community.jboss.org/wiki/JBossAS5InstallationAndGettingStartedGuide[here]. 
+For more details, please refer to Wildfly 10 "Logging Configuration" guide https://docs.jboss.org/author/display/WFLY10/Logging+Configuration 
 
 You must make sure `log4j` is fine tuned for optimal performance in production.
 We recommend that you set logging threshold to `WARN` and let the CDR appender be `DEBUG`.
@@ -75,7 +106,7 @@ We recommend that you set logging threshold to `WARN` and let the CDR appender b
 == SMSC GW routing fundamentals
 
 SMSC GW needs clear info to where it must route messages that have come to SMSC GW from SMPP / SS7 / SIP / HTTP connectors or created inside SMSC GW receipts.
-Routing procedures gives the answer to this questions, that a user must configure before SMSC GW can properly work. 
+Routing procedures gives the answer to this questions, that a user must configure before SMSC GW can properly work.
 
 
 SMSC GW has two routing procedures:
@@ -88,22 +119,22 @@ SMSC GW has two routing procedures:
 === The procedure based on dividing of separated routing area into several areas ("subnetworks").
 
 Each area has its unique digital "networkId" value.
-Each SMPP connection (ESME), SS7 SCCP service access point (SAP), SIP connector and a database routing rule (if you use them instead of default ESME routing rules) belongs to one of network (to each of the a networkId value is assigned). For messages that come via HTTP connector a networkId is assigned depending on a value in HTTP payload or with a default configured value. Default networkId value is "0". If a user does not specify a networkId value when ESME, SAP, SIP or a database routing rule creation, networkId=0 will be assigned. 
+Each SMPP connection (ESME), SS7 SCCP service access point (SAP), SIP connector and a database routing rule (if you use them instead of default ESME routing rules) belongs to one of network (to each of the a networkId value is assigned). For messages that come via HTTP connector a networkId is assigned depending on a value in HTTP payload or with a default configured value. Default networkId value is "0". If a user does not specify a networkId value when ESME, SAP, SIP or a database routing rule creation, networkId=0 will be assigned.
 
 When a message has come to SMSC GW a networkId value from ESME, SAP, SIP or HTTP is assigned for the message.
 The message can be routed only inside the area with the same networkId to what the message belongs.
-So this means that by default a message can not leave a "networkId" area via which it has come to SMSC GW. 
+So this means that by default a message can not leave a "networkId" area via which it has come to SMSC GW.
 
 If a user needs that a message will be delivered to another "networkId" area, he can configure "message processing" rules ("mproc" rules). There we can configure that a message from a specified networkId1 and which fits some other conditions (like destination address fit to some mask) must be routed to networkId2 (newNetworkId action of a mproc rule). And the message will be delivered via ESME, SAP or SIP that belongs to networkId2. newNetworkId action in a mproc rule is applied at the step when a message has just come to SMSC GW for processing. There are also other options. A messages can be rerouted to another networkId (or dropped) just before a delivery attempt, after a successfull SRI request to HLR, after temporary or permanent failure.
 
 Multi-tenancy support is also based on this routing procedure.
-For each networkId we can configure a separate SS7 GlobalTitle and for an external peer each networkId can play a role as a separate independed SMSC. 
+For each networkId we can configure a separate SS7 GlobalTitle and for an external peer each networkId can play a role as a separate independed SMSC.
 
 
 NetworkId for a generated inside SMSC receipts and SMS-STATUS-REPORTs is assigned by two algoritms:
 
-* if the option "Delivery receipts will be routed to the origination networkId" is set to true - networkId from ESME/SIP/SAP via what an original message has left SMSC GW will be assigned
-* if the option "Delivery receipts will be routed to the origination networkId" is set to false - networkId from ESME/SIP/SAP via what an original message has come to SMSC GW will be assigned
+* if the option "Delivery receipts will be routed to the origination networkId" is set to true - networkId from ESME/SIP/SAP via what an original message has come SMSC GW will be assigned
+* if the option "Delivery receipts will be routed to the origination networkId" is set to false - networkId from ESME/SIP/SAP via what an original message has left to SMSC GW will be assigned
 
 Please take into account that mproc rules in `Arrival` trigger (actions like `newnetworkid`) do not affect receipts and SMS-STATUS-REPORTs. This may be used for do not pay attention for receipt routing and concentrate for routing of original messages.
 
@@ -117,11 +148,11 @@ NetworkId are specified at different places:
 * for SIP level see the chapter <<_sip>>.
 * for database routing rules see <<_db_routing_rule_settings>>
 
-For configuring of mproc rules - see chapters <<_mproc_rules_fundamentals>> and <<_mproc_rule_settings>>. 
+For configuring of mproc rules - see chapters <<_mproc_rules_fundamentals>> and <<_mproc_rule_settings>>.
 
-For configuring of option "Delivery receipts will be routed to the origination networkId" - see the chapter <<_smsc_gateway_server_routing_dlv>>. 
+For configuring of option "Delivery receipts will be routed to the origination networkId" - see the chapter <<_smsc_gateway_server_routing_dlv>>.
 
-For configuring of SMSC Global Titles - see chapters <<_set_scgt>>. 
+For configuring of SMSC Global Titles - see chapters <<_set_scgt>>.
 
 [[_routing_fundamentals_2]]
 === The procedure of routing messages to destinations inside subnetworks.
@@ -145,12 +176,12 @@ For configuring of ESME and SIP routing parameters see <<_esme_settings>> and <<
 Instead of default routing rules database routing rules can be used.
 This is a set of stored in the cassandra database rules that describes where SMSC GW will route a message (to some ESME / SIP) depending on a message destination address.
 Messages that fit to no rules will be routed to SS7 network.
-For configuring of database routing rules see the chapter <<_mproc_rule_settings>>| | 
+For configuring of database routing rules see the chapter <<_mproc_rule_settings>>| |
 
 [[_routing_fundamentals_3]]
 === Using of different routing procedures.
 
-You can use only the procedure based on subnetworks (networkId) areas, only the procedure of routing messages inside subnetworks or both. 
+You can use only the procedure based on subnetworks (networkId) areas, only the procedure of routing messages inside subnetworks or both.
 
 
 
@@ -171,7 +202,7 @@ If you want to use only the procedure based on subnetworks (networkId) areas you
 * you do not need to configure mproc rules for routing
 
 If you want to use both, you need to configure both parts.
-Messages will be routed between subnetworks (networkIds) by mproc rules and inside a subnetwork (networkId) by configuring of ESME / SIP "Routing Type of number (TON)", "Routing Number plan indicator (NPI)" and "Routing Range" (or database routing rules). 
+Messages will be routed between subnetworks (networkIds) by mproc rules and inside a subnetwork (networkId) by configuring of ESME / SIP "Routing Type of number (TON)", "Routing Number plan indicator (NPI)" and "Routing Range" (or database routing rules).
 
 [[_routing_fundamentals_4]]
 === Routing model examples.
@@ -180,15 +211,15 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 
 If you have one ESME and JSS7 connector, and the only traffic is ESME -> JSS7
 
-* use networkId=0 for all 
-* configure "Routing Range" value of the ESME to a value that fits to no mobile subscriber (for example "0") 
+* use networkId=0 for all
+* configure "Routing Range" value of the ESME to a value that fits to no mobile subscriber (for example "0")
 
 ==== All JSS7 originated messages must be routed to ESME and all ESME originated messages must be routed to JSS7
 
 If you use the model "all JSS7 originated messages must be routed to ESME and all ESME originated messages must be routed to JSS7", you can:
 
-* set networkId=0 for JSS7 and networkId=1 for ESME 
-* set ESME routing address so it accepts all messages 
+* set networkId=0 for JSS7 and networkId=1 for ESME
+* set ESME routing address so it accepts all messages
 * set mproc rules:
 +
 smsc mproc add mproc 1 networkidmask=1 newnetworkid=0
@@ -199,8 +230,8 @@ smsc mproc add mproc 2 networkidmask=0 newnetworkid=1
 
 If you have several ESMEs that send message to one SS7 connection and you need that delivery receipts come back to an originator ESME (and no more traffic), you can:
 
-* put SS7 SAP / SCCP rules to networkId=0 
-* put each ESME to each own networkId (1,2,3) 
+* put SS7 SAP / SCCP rules to networkId=0
+* put each ESME to each own networkId (1,2,3)
 * create a set of mproc rules that move ESME originated messages into SS7 network.
   CLI commabd can be like:
 +
@@ -210,7 +241,7 @@ smsc mproc add mproc 2 networkidmask=2 newnetworkid=0
 +
 smsc mproc add mproc 3 networkidmask=3 newnetworkid=0
 
-* set the option "Delivery receipts will be routed to the origination networkId" is set to true 
+* set the option "Delivery receipts will be routed to the origination networkId" is set to true
 
 ==== Routing desision based on SRI request results
 
@@ -247,17 +278,39 @@ We can add mproc rules like
 This rule will reroute a message to networkId==22 area for further delivering if IMSI from a SRI response matches the mask. You can use also other conditions here for proper filtering (networkidmask, destdigmask, nnndigitsmask, etc). If in the new networkId area a message will be delivered again to SS7 network then a new SRI will be performed.
 
 
+[[_failure_reasons]]
+=== Temporary and permanent failure reasons.
+
+* Permanent error reasons:
+** Internal System failures
+** Bad destination address
+** MT: ProviderDialogAbort, UserDialogAbort
+** MT: RejectComponent / Dialog
+** MT: Failure of MAP protocol ACN / version negotiation
+** MT: SMDeliveryFailure MAP error message with causes except of "memoryCapacityExceeded" and "equipmentProtocolError"
+** MT: MAP error messages of SubscriberBusyForMtSms, AbsentSubscriber, AbsentSubscriberSM, SMDeliveryFailure, SystemFailure
+** SMPP: SMPP response error with error codes except of STATUS_THROTTLED (0x58), STATUS_X_T_APPN (0x64), STATUS_SYSERR (0x08), STATUS_INVBNDSTS (0x00000004), STATUS_MSGQFUL (0x14)
+
+* Temporary error reasons:
+** DeliveryTimeout
+** MT: MAP dialog timeout
+** MT: SMDeliveryFailure MAP error message with causes "memoryCapacityExceeded" and "equipmentProtocolError"
+** MT: MAP error messages SubscriberBusyForMtSms, AbsentSubscriber, AbsentSubscriberSM, SMDeliveryFailure, SystemFailure
+** SMPP: SMPP response error with error codes STATUS_THROTTLED (0x58), STATUS_X_T_APPN (0x64), STATUS_SYSERR (0x08), STATUS_INVBNDSTS (0x00000004), STATUS_MSGQFUL (0x14)
+** SMPP: PduRequestTimeout and other sending error
+
+
 [[_mproc_rules_fundamentals]]
 == Message processing rules (mproc rules)
 
 Message processing rules (mproc rules) is a tool for processing messages and changing properties of message, for example source/destination TON, NPI, NetworkId etc.
-MProc rules are only applied if they match pre configured criterian. 
+MProc rules are only applied if they match pre configured criterian.
 
-MProc can be applied at several different message processing steps (triggers). Following are the triggers at which mproc rules can be applied to messages: 
+MProc can be applied at several different message processing steps (triggers). Following are the triggers at which mproc rules can be applied to messages:
 
 * `HrSri trigger` : triggers inside HomeRouting procedure when a successfull SRI response from a local HLR has received. At this trigger HomeRouting procedure can be bypassed (this means that an original IMSI / NetworkNodeNumber will be returned to a remote SMSC GW and no MT messages will be delivered to a local SMSC GW).
 
-* `Arrival trigger` : triggers when a message arrives in SMSC GW and has been already processed (accepted) by Diameter server (if Diameter server is configured). Following actions are possible: 
+* `Arrival trigger` : triggers when a message arrives in SMSC GW and has been already processed (accepted) by Diameter server (if Diameter server is configured). Following actions are possible:
 
 ** a message can be dropped (a success response will be returned to a message originator)
 ** a message can be rejected (a reject response will be returned to a message originator)
@@ -289,28 +342,28 @@ MProc can be applied at several different message processing steps (triggers). F
 
 SMSC comes with predifined set of mproc rules (default implementation) (see chapter <<_mproc_rules_default>>). However users can make their own customized implementation of mproc rules by using java programming and implementing provided interfaces  (see chapter <<_mproc_rules_customized>>). All mproc rules implementation has its Class Name.
 The Class Name of a default implementation is "mproc".  This is the name by which users can create new mproc rule instances.
- 
+
 
 Users can create one or more mproc rules, modify, show and remove some of them by CLI or GUI interface.
 See details in chapter <<_mproc_rule_settings>>.
 Each mproc rule has it's unique serial id.
 Mproc rule are sorted by this id value.
-SMSC appliec mproc rules to a message in ascending order,  that is mproc rule with the least id is applied before mproc rule with next id etc. 
+SMSC appliec mproc rules to a message in ascending order,  that is mproc rule with the least id is applied before mproc rule with next id etc.
 
 While checking if mproc rule conditions match to a message, updates (that were made after previous rules applying) are taken into account.
-For example if a message destination address has been changed by rule 1, then rule 2 will check if this updated destination address matches to rules 2 or not. 
+For example if a message destination address has been changed by rule 1, then rule 2 will check if this updated destination address matches to rules 2 or not.
 
 [[_mproc_rules_default]]
 === Default message processing rules implementation
 
 SMSC GW contains a default implementation of mproc rules that cover some requirenments.
 Information how to manage rules can be found in chapter <<_mproc_rule_settings>>.
-This chapter covers a description of conditions and actions that are present in default mproc rules implementation. 
+This chapter covers a description of conditions and actions that are present in default mproc rules implementation.
 
-Parameters for mproc rule are divided into two cathegories: 
+Parameters for mproc rule are divided into two cathegories:
 
 a) Conditions.
-If a message fits to all conditions then the rule will be applied to the message. 
+If a message fits to all conditions then the rule will be applied to the message.
 
 .The list of possible conditions
 [cols="1,1,1,1", frame="all", options="header"]
@@ -341,7 +394,7 @@ If a message fits to all conditions then the rule will be applied to the message
 | percent | <percent value> | Defines probability with which mproc rule will be applied to a message. For example, if percent is specified as 60, there will be 60% chance that this rule will be applied. Consequently, in 40% of cases, mproc rule will be skipped. | "-1". This means that mproc rule will be applied to 100% of messages.
 |===
 
-b) Actions, which will be applied to messages. 
+b) Actions, which will be applied to messages.
 
 .The list of possible actions
 [cols="1,1,1,1", frame="all", options="header"]
@@ -355,6 +408,8 @@ b) Actions, which will be applied to messages.
 | newsourceton | Arrival trigger / <new source type of number> | a message source Type of Number will be changed to "newsourceton" value. | "-1". This means that source Type of Number of the message will not be changed.
 | newsourcenpi | Arrival trigger / <new source numbering plan indicator> | a message source Numbering Plan Indicator will be changed to "newsourcenpi" value. | "-1". This means that source Numbering Plan Indicator of the message will not be changed.
 | newsourceaddr | Arrival trigger / <new source address value> | a message source address will be changed to "newsourceaddr" value. | "-1". This means that source address of the message will not be changed.
+| mtlocalsccpgt | Arrival trigger / <new gt value> | global title of a local SCCP address of an MT message will be changed to <new gt value>. This means that GT in originating SCCP address of an MT message will be changed from what is specified by SMSC for current networkId. | "-1". This means that GT of local address will not be changed.
+| mtremotesccptt | Arrival trigger / <new tt value> | translation type of a remote SCCP address for MT message will be changed to <new tt value>. This means that desired TT of remote SCCP address for an MT message will be used rather than what SMSC sets by default for current networkId. | -1. This means that TT of the message will not be changed.
 | makecopy | Arrival trigger / <false \| true> | If the makecopy action is present then SMSC GW makes a copy of a message and then post the copy for further message processing in addition to the original message. All other actions in the rule will be applied only to the copy. For example user wants to make copies of messages and send them to another destinations (by sending of copies into another networkId), then for this you can create a rule and set for the rule "makecopy true" and "newnetworkid <new networkId value>" parameters. This makes a copy of a message and set for the copy a new networkId value. | false
 | hrbypass | HrSri trigger / <false \| true> | This action may be applied inside Home Routing procedure after SMSC GW receives a response from a local HLR. Then SMSC GW will bypass HR procedure by sending back to an original SMSC GW origin original IMSI and NNN. SMSC GW will not get MT message then. | false
 | dropaftersri | ImsiRequest trigger / <false \| true> | This is an action at the step when a successful SRI response has been received from HLR for an SS7 destination message. If a SRI success response has received then the message will be dropped without delivery attempt. A delivery response in this case will contain extra fields (IMSI and NetworkNodeNumber values). | false
@@ -365,35 +420,36 @@ b) Actions, which will be applied to messages.
 | droponarrival | Arrival trigger / <false \| true> | This action is performed at the step when message has arrived to the server. Message will be dropped without delivery attempt and success response will be returned to a sender. | false
 | rejectonarrival | Arrival trigger / <NONE \| DEFAULT \| UNEXPECTED\_DATA\_VALUE \| SYSTEM\_FAILURE \| THROTTLING \| FACILITY\_NOT\_SUPPORTED> | This action is performed at the step when message has arrived to the server. If value is NONE, no action will be performed. Otherwise message will be rejected without delivery attempt and reject response will be returned to a sender. Reject response will contain error codes for SMPP, SS7 and HTTP. Following are error codes listed in order SS7-SMPP-HTTP: DEFAULT: 34 (systemFailure) - 0 (Success) - 1; UNEXPECTED\_DATA\_VALUE: 36 (unexpectedDataValue) - 0x15 (Invalid service type) - 2; SYSTEM\_FAILURE: 34 (systemFailure) - 0x8 (System error) - 3; THROTTLING: 51 (resoureLimitation) - 0x58 (Throttling error) - 4; FACILITY_NOT_SUPPORTED: 21 (facilityNotSupported) - 0x65 (Permanent application error) - 5. | NONE
 | remove_tlv | Arrival trigger / <tlv tag value> | Optional parameter with the tag value in the message will be removed. | "-1". This means that no optional parameter will be removed.
+| removedestdigprefix | Arrival trigger / <value> | First <value> digits of destination address will be removed. | "0". This means that no action will be taken.
 |===
 
 [[_mproc_rules_customized]]
 === Customized message processing rules
 
 Default mproc rules allows to change the properties of a message in pre defined way, however if a user wants to achieve more, SMSC allows users to implement their own  custom logic.
-Below steps describes how to implement custom mproc rules. 
+Below steps describes how to implement custom mproc rules.
 
 
 
 .Procedure: Steps for custom mproc rules implementing
 . User should implement the business logic as java code.
 There is a couple of interfaces exposed by SMSC, [class]`MProcRuleFactory` and [class]`MProcRule` that must be implemented and add the custom business logic.
-User needs to cover two parts of rules usage - a rule configuring part and a rule applying part. 
+User needs to cover two parts of rules usage - a rule configuring part and a rule applying part.
 +
 [IMPORTANT]
 ====
 Please pay attention that in your code you may not perform long delays in order not to dramatically decrease of SMSC GW productivity.
-==== 
+====
 +
 Once custom rule is implemented, user will have to create jar file and deploy it into SMSC Gateway.
 
 * User needs to decide a rule class name that will be used to uniquely identify the custom rules.
   This can be any word without spaces.
-  For default mproc rules implementation the rule class name is "mproc". For example consider rule class name as "testrule". 
+  For default mproc rules implementation the rule class name is "mproc". For example consider rule class name as "testrule".
 * User needs to impelent two interfaces: [class]`MProcRuleFactory` and [class]`MProcRule`.
-  For example consider [class]`MProcRuleFactoryTestImpl` and [class]`MProcRuleTestImpl`. 
+  For example consider [class]`MProcRuleFactoryTestImpl` and [class]`MProcRuleTestImpl`.
 * User needs to decide which actions will custom rules perform and for which messages. For example create a custom rule that will be applied to any message at `onPostArrival` state  who's destination address digits are starting with a configurable parameter "par1". For all the messages which match's this rules condition,  prefix "par2" (the configurable parameter) is to be applied to message destination address.
-. Creating custom classes: 
+. Creating custom classes:
 +
 [source,java]
 ----
@@ -417,7 +473,7 @@ public class MProcRuleTestImpl implements MProcRule {
 }
 ----
 . Implementing [class]`MProcRuleFactory` interface.
-The interface is: 
+The interface is:
 +
 [source,java]
 ----
@@ -431,7 +487,7 @@ public interface MProcRuleFactory {
 ----
 +
 Method `getRuleClassName()` must return the rule class name.
-Method `createMProcRuleInstance()` must return a custom implementation of [class]`MProcRule`  (in this example instance of [class]`MProcRuleTestImpl` class). Here is an example of implementation: 
+Method `createMProcRuleInstance()` must return a custom implementation of [class]`MProcRule`  (in this example instance of [class]`MProcRuleTestImpl` class). Here is an example of implementation:
 +
 [source,java]
 ----
@@ -458,7 +514,7 @@ public class MProcRuleFactoryTestImpl implements MProcRuleFactory {
 ----
 . Next is actual business logic that should go in implement of [class]`MProcRule` interface.
 Let's start with learning of the interface.
-The content of the interface is the following: 
+The content of the interface is the following:
 +
 [source,java]
 ----
@@ -555,7 +611,7 @@ public interface MProcRule extends MProcRuleMBean {
 }
 ----
 +
-and the parent interface content is: 
+and the parent interface content is:
 +
 [source,java]
 ----
@@ -583,7 +639,7 @@ public interface MProcRuleMBean {
 
     /**
      * @return true if the mproc rule is used for the phase SMSC GW receives SRI response
-     * from a local HLR in HR procedure 
+     * from a local HLR in HR procedure
      */
     boolean isForPostHrSriState();
 
@@ -622,7 +678,7 @@ public interface MProcRuleMBean {
 .[class]`MProcRule` and [class]`MProcRuleMBean` interfaces methods description
 [cols="1,1", frame="all", options="header"]
 |===
-| Methods | Description 
+| Methods | Description
 | getId(), setId() | mproc rule id getter and setter. id value is unique for each mproc rule inside SMSC GW.
 | getRuleClassName() | Returns the rule class name ("testrule" in this example)
 | getRuleParameters(), setInitialRuleParameters(), updateRuleParameters() | Getter and setters of configured parameters for a rule instance. Parameters are formed as a plain text string, that can be provided by CLI interface. In this example we need to configure two parameters par1 and par2. Let's specify the parameters strinf as "par1" and "par2" (two values after a space, for example "11 34").
@@ -630,12 +686,12 @@ public interface MProcRuleMBean {
 | matchesPostHrSri(MProcMessage message), matchesPostArrival(MProcMessage message), matchesPostPreDelivery(MProcMessage message), matchesPostImsiRequest(MProcMessage message), matchesPostDelivery(MProcMessage message), matchesPostDeliveryTempFailure(MProcMessage message) | These methods must return true if rule should be applied or false if not (for HrSri, Arrival, PreDelivery, Imsi, Delivery and DeliveryTempFailure triggers).
 | onPostHrSri(), onPostArrival(), onPostPreDelivery(), onPostImsiRequest(), onPostDelivery(), onPostDeliveryTempFailure() | These methods are needed for implementing of rule applying actions.
 |===
-Id parameter and custom rule parameters ("par1" and "par2" in this example) must be stored into xml config file (it is located in [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/data/SmscManagement_mproc.xml_). For this user needs to implement several extra methods that will be described later. 
+Id parameter and custom rule parameters ("par1" and "par2" in this example) must be stored into xml config file (it is located in [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/data/SmscManagement_mproc.xml_). For this user needs to implement several extra methods that will be described later.
 
 . Reusing of base [class]`MProcRuleBaseImpl` class.
-  It is recommended for your custom [class]`MProcRuleTestImpl` to extend  [class]`MProcRuleBaseImpl` provided by SMSC. [class]`MProcRuleBaseImpl` class contains some useful methods that cover code for persisting of its parameters into xml config file (read() and write() methods), default stubs for `matches()` and `onPost*()` methods and a service method for splitting of a parameters plain text string into subparameters (splitParametersString()).  
+  It is recommended for your custom [class]`MProcRuleTestImpl` to extend  [class]`MProcRuleBaseImpl` provided by SMSC. [class]`MProcRuleBaseImpl` class contains some useful methods that cover code for persisting of its parameters into xml config file (read() and write() methods), default stubs for `matches()` and `onPost*()` methods and a service method for splitting of a parameters plain text string into subparameters (splitParametersString()).
 +
-Here is the new template of [class]`MProcRuleTestImpl` class implementation that reuses the base class [class]`MProcRuleBaseImpl`: 
+Here is the new template of [class]`MProcRuleTestImpl` class implementation that reuses the base class [class]`MProcRuleBaseImpl`:
 +
 [source,java]
 ----
@@ -649,7 +705,7 @@ public class MProcRuleTestImpl extends MProcRuleBaseImpl {
 ----
 
 . Implementing of `getRuleClassName()` method of [class]`MProcRule`.
-Below is an example: 
+Below is an example:
 +
 [source,java]
 ----
@@ -662,12 +718,12 @@ Below is an example:
 . Implementing of methods that cover getters / setters for message custom parameters and storing them into xml config file.
 +
 In the example setInitialRuleParameters() and updateRuleParameters() methods are implemented in the same way.
-You can implement them in different ways so that updateRuleParameters() method can accept not the whole set of parameters but only that ones that a user wants to change. 
+You can implement them in different ways so that updateRuleParameters() method can accept not the whole set of parameters but only that ones that a user wants to change.
 +
 M_PROC_RULE_TEST_XML is responsible for XML serializing / deserializing.
-See more info for them in javolution library specification. 
+See more info for them in javolution library specification.
 +
-Here is an example (only the part that is described in this step): 
+Here is an example (only the part that is described in this step):
 +
 [source,java]
 ----
@@ -736,7 +792,7 @@ public class MProcRuleTestImpl extends MProcRuleBaseImpl {
 }
 ----
 
-. Overiding one of `isForPost*()` methods (for allowing of processing of a needed message processing step). In our example it is `isForPostArrivalState()`: 
+. Overiding one of `isForPost*()` methods (for allowing of processing of a needed message processing step). In our example it is `isForPostArrivalState()`:
 +
 [source,java]
 ----
@@ -747,7 +803,7 @@ public class MProcRuleTestImpl extends MProcRuleBaseImpl {
     }
 ----
 . Implementing of a needed `matches***()` methods.
-In our example we process messages which destination address digits are started with a configurable parameter "par1". 
+In our example we process messages which destination address digits are started with a configurable parameter "par1".
 +
 [source,java]
 ----
@@ -762,7 +818,7 @@ In our example we process messages which destination address digits are started 
 ----
 For `matches***()` methods we will use interface [class]`MProcMessage` interface which provides info for processing message fields.
 Here is a code of these interfaces.
-+ 
++
 [source,java]
 ----
 
@@ -866,9 +922,9 @@ public interface MProcMessage {
     MProcMessage getOriginMessageForDeliveryReceipt(long messageId);
 
 }
----- 
+----
 . Implementing of methods that make some actions: In example above this is `onPostArrival()` and the action is adding "par2" prefix into destination address digits.
-These methods will be invoked for all messages that match rule's conditions. 
+These methods will be invoked for all messages that match rule's conditions.
 +
 [source,java]
 ----
@@ -879,9 +935,9 @@ These methods will be invoked for all messages that match rule's conditions.
         factory.updateMessageDestAddr(message, destAddr);
     }
 ----
-In  `onPostHrSri()`, `onPostArrival()`, `onPostPreDelivery()`, `onPostImsiRequest()` and `onPostDelivery()`, `onPostDeliveryTempFailure()` methods user can use provided interfaces  [class]`PostHrSriProcessor`, [class]`PostArrivalProcessor`, [class]`PostPreDeliveryProcessor`, [class]`PostImsiProcessor` and [class]`PostDeliveryProcessor`, [class]`onPostDeliveryTempFailure` that provide methods for message processing / adding / dropping / rejecting. 
+In  `onPostHrSri()`, `onPostArrival()`, `onPostPreDelivery()`, `onPostImsiRequest()` and `onPostDelivery()`, `onPostDeliveryTempFailure()` methods user can use provided interfaces  [class]`PostHrSriProcessor`, [class]`PostArrivalProcessor`, [class]`PostPreDeliveryProcessor`, [class]`PostImsiProcessor` and [class]`PostDeliveryProcessor`, [class]`onPostDeliveryTempFailure` that provide methods for message processing / adding / dropping / rejecting.
 +
-** [class]`PostHrSriProcessor` interface content: 
+** [class]`PostHrSriProcessor` interface content:
 +
 [source,java]
 ----
@@ -909,7 +965,7 @@ public interface PostHrSriProcessor {
 }
 ----
 +
-** [class]`PostArrivalProcessor` interface content: 
+** [class]`PostArrivalProcessor` interface content:
 +
 [source,java]
 ----
@@ -945,7 +1001,7 @@ public interface PostArrivalProcessor {
 
     /**
      * Updating of destination address message TON. In case of bad value (<0 or >6) MProcRuleException will be thrown
-     * 
+     *
      * @param message
      * @param newDestTon
      * @throws MProcRuleException
@@ -956,7 +1012,7 @@ public interface PostArrivalProcessor {
     /**
      * Updating of destination address message NPI. In case of bad value (<0 or >6)
      * MProcRuleException will be thrown
-     * 
+     *
      * @param message
      * @param newDestNpi
      * @throws MProcRuleException
@@ -967,7 +1023,7 @@ public interface PostArrivalProcessor {
      * Updating of destination address message digits. Value can not be null and must have
      * length 1-21 characters. In case of
      * bad value MProcRuleException will be thrown
-     * 
+     *
      * @param message
      * @param newDigits
      * @throws MProcRuleException
@@ -976,7 +1032,7 @@ public interface PostArrivalProcessor {
 
     /**
      * Updating of source address message TON. In case of bad value (<0 or >6) MProcRuleException will be thrown
-     * 
+     *
      * @param message
      * @param newSourceTon
      * @throws MProcRuleException
@@ -986,7 +1042,7 @@ public interface PostArrivalProcessor {
     /**
      * Updating of source address message NPI. In case of bad value (<0 or >6)
      * MProcRuleException will be thrown
-     * 
+     *
      * @param message
      * @param newSourceNpi
      * @throws MProcRuleException
@@ -996,7 +1052,7 @@ public interface PostArrivalProcessor {
     /**
      * Updating of source address message digits. Value can not be null and must have length 1-21 characters. In case of
      * bad value MProcRuleException will be thrown
-     * 
+     *
      * @param message
      * @param newDigits
      * @throws MProcRuleException
@@ -1007,7 +1063,7 @@ public interface PostArrivalProcessor {
      * Updating of message text. Value must not be null and must have length 0-4300.
      * In case of bad value MProcRuleException
      * will be thrown
-     * 
+     *
      * @param message
      * @param newShortMessageText
      * @throws MProcRuleException
@@ -1018,7 +1074,7 @@ public interface PostArrivalProcessor {
      * Updating of UDH binary content. Value can be null or must have length > 0. In case
      * of bad value MProcRuleException will
      * be thrown
-     * 
+     *
      * @param message
      * @param newShortMessageText
      * @throws MProcRuleException
@@ -1035,7 +1091,7 @@ public interface PostArrivalProcessor {
      * period end will be set. If you change both ValidityPeriod and ScheduleDeliveryTime
      * values, then you have to setup
      * ValidityPeriod value firstly.
-     * 
+     *
      * @param message
      * @param newScheduleDeliveryTime
      */
@@ -1049,7 +1105,7 @@ public interface PostArrivalProcessor {
      * validity period will be used instead of a provided value. If you change both
      * ValidityPeriod and ScheduleDeliveryTime
      * values, then you have to setup ValidityPeriod value firstly.
-     * 
+     *
      * @param message
      * @param newValidityPeriod
      */
@@ -1116,7 +1172,7 @@ public interface PostArrivalProcessor {
 }
 ----
 
-** [class]`PostPreDeliveryProcessor` interface content: 
+** [class]`PostPreDeliveryProcessor` interface content:
 +
 [source,java]
 ----
@@ -1166,7 +1222,7 @@ public interface PostPreDeliveryProcessor {
 }
 ----
 
-** [class]`PostImsiProcessor` interface content: 
+** [class]`PostImsiProcessor` interface content:
 +
 [source,java]
 ----
@@ -1199,7 +1255,7 @@ public interface PostImsiProcessor {
 
 }
 ----
-** [class]`PostDeliveryProcessor` interface content: 
+** [class]`PostDeliveryProcessor` interface content:
 +
 [source,java]
 ----
@@ -1249,7 +1305,7 @@ public interface PostDeliveryProcessor {
 }
 ----
 
-** [class]`PostDeliveryTempFailureProcessor` interface content: 
+** [class]`PostDeliveryTempFailureProcessor` interface content:
 +
 [source,java]
 ----
@@ -1298,15 +1354,15 @@ public interface PostDeliveryTempFailureProcessor {
 }
 ----
 
-
 . Once all the source code is fully implemented, user should deploy it.
- 
+
+.Procedure for JBOSS 5
 
 * User must compile java code and create a jar library.
-  Copy the created jar into the folder [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/lib_. 
-* You need to update [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_ config file. 
+  Copy the created jar into the folder [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/lib_.
+* You need to update [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_ config file.
 +
-Define factory implementing [class]``MProcRuleFactory``in above example it will be [class]`MProcRuleFactoryTestImpl`: 
+Define factory implementing [class]``MProcRuleFactory``in above example it will be [class]`MProcRuleFactoryTestImpl`:
 +
 [source,xml]
 ----
@@ -1317,7 +1373,7 @@ Define factory implementing [class]``MProcRuleFactory``in above example it will 
 +
 bean name can be some unique name.
 +
-In the "bean name="SmscManagement"" section - property <property name="MProcRuleFactories"> - after the line <inject bean="MProcRuleFactoryDefault"/> (that means default mproc rules implementing) - add the line that describes your new created bean: 
+In the "bean name="SmscManagement"" section - property <property name="MProcRuleFactories"> - after the line <inject bean="MProcRuleFactoryDefault"/> (that means default mproc rules implementing) - add the line that describes your new created bean:
 +
 [source,xml]
 ----
@@ -1329,6 +1385,24 @@ In the "bean name="SmscManagement"" section - property <property name="MProcRule
             </list>
         </property>
 ----
+
+.Procedure for Wildfly 10
+
+* User must compile java code and create a jar library.
+  Copy the created jar into the folder [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/modules/system/layers/base/org/mobicents/smsc/bootstrap/main. 
+* You need to update [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml config file. 
++
+In the "bean name="SmscManagement"" section - property <property name="MProcRuleFactories"> - update the line <inject bean="MProcRuleFactoryDefault"/> (that already contains default mproc rules implementing) - add into line your new created mproc rules factory class using `,` as a separator (several classes can be added): 
++
+[source,xml]
+----
+
+            <mbean name="SmscManagement" type="SmscManagement">
+                <property name="MProcRuleFactories" type="String" value="org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault,org.mobicents.smsc.mproc.testimpl.MProcRuleFactoryTestImpl"/>
+            </mbean>
+----
+
+[start=11]
 . Start SMSC GW
 . Create an mproc rule by using CLI interface.
   Let's create a rule with id=1 that will be applied for messages which destination adresses are started with "22" and this rule will add prefix "33". To achive it run CLI console and run the following command
@@ -1337,21 +1411,21 @@ smsc mproc add testrule 1 22 33
 +
 where "testrule" is an implemented class name, "22 33" is aparameter string.
 
-. Send a message to the destination address that starts with "22" (for example "221111") and find that the message will be delivered to the address with prefix "33" ("33221111" in our example).| | 
+. Send a message to the destination address that starts with "22" (for example "221111") and find that the message will be delivered to the address with prefix "33" ("33221111" in our example).| |
 
 == SMS Home Routing
 
 According to traditional GSM specifications, all outbound messages pass through an SMSC in the sending network.
 This allows the SMSC to convert the Mobile Originated (MO) messages into Mobile Terminated (MT) messages and deliver them directly to the destination devices, regardless of what network they are on.
 As a result, inbound messages generated on other networks will be sent directly to the destination devices under the control of the SMSC in the sending network, not the home network.
-In this traditional setup, operators can add value to the MO messages but not to the MT messages that the customer may receive from other networks, since they do not pass through an SMSC in the home network. 
+In this traditional setup, operators can add value to the MO messages but not to the MT messages that the customer may receive from other networks, since they do not pass through an SMSC in the home network.
 
 SMS Home Routing is a modification to the original GSM specifications, adopted by the 3GPP in 2007, that changed the way inbound messages are treated by the mobile networks.
 Home Routing uses the recipient network's Home Location Register (HLR) to change the flow of inbound messages, directing them to an MT Services Platform, rather than straight to the destination devices.
 The MT Services platform can add value to the MT messages and apply advanced services such as anti-spam, protection, divert, archiving, etc.
-to the messages prior to delivery. 
+to the messages prior to delivery.
 
-Home Routing enables operators to offer a full range of value-added services to both inbound and outbound SMS thereby enhancing customer experience while generating additional revenue for the operators. 
+Home Routing enables operators to offer a full range of value-added services to both inbound and outbound SMS thereby enhancing customer experience while generating additional revenue for the operators.
 
 {this-platform} {this-application} supports SMS Home Routing that enables you to handle Mobile Terminated messages in the network that owns the customer so you can offer a full range of advanced and value added services on both inbound and outbound SMS.
 You need to configure SMSC GW before you can use SMS Home Routing.
@@ -1362,7 +1436,9 @@ There are two possible modes of home routing functionality:
 * non-transparent mode - default mode when SMSC GW returns with successfull responses to incoming MT requests (without waiting till a message is delivered to a destination).
 * transparent mode - SMSC GW waits (after a MT request) till a message is delivered to a destination and responds to the MT request with a result of message delivering (success / failure). To activate this mode you need to configure the option <<_hrdefaultmessagingmode>> to "Transactional".
 
-Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" and listens an extra SSN (usually SSN 6 as additionto SSN 8 for other functionality). These parameters are configured in `jboss-beans.xml` file for TCAP stack. You can find below the example of configuring of two listerning SSNs (8 and 6 in the example). This configuration is a default configuration out of box.
+Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" and listens an extra SSN (usually SSN 6 as additionto SSN 8 for other functionality). These parameters are configured in `jboss-beans.xml` for JBOSS 5 case and `standalone.xml` for Wildfly 10 case file for TCAP stack. You can find below the example of configuring of two listerning SSNs (8 and 6 in the example). This configuration is a default configuration out of box.
+
+.Content for JBOSS 5
 
 [source,xml]
 ----
@@ -1383,6 +1459,22 @@ Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" an
 	</bean>
 ----
 
+.Content for Wildfly 10
+
+[source,xml]
+----
+	<mbean class="org.mobicents.protocols.ss7.tcap.TCAPStackImpl" enabled="true" name="TcapStackMap" reflection="false" type="TcapStack">
+                <property name="sccpStack" type="Bean" value="SccpStack"/>
+                <property name="ssn" type="int" value="8"/>
+                <property name="previewMode" type="bool" value="false"/>
+
+                <property name="extraSsns" type="Map" value="empty">
+                    <entry key="1" type="int" value="6"/>
+                </property>
+
+            </mbean>
+----
+
 
 [[_smpp_interface_description]]
 == SMPP interface description
@@ -1401,7 +1493,7 @@ DCS parameter means the encoding that will be used when a message will be transf
 For DCS 0 (GSM7 encdoing) and 8 (UCS2 encoding) SMSC GW decodes messages when receiving from SMPP connector and encode messages before sending them into SMPP connector. For this task it is important which data coding schema will be used for messages decoding / encoding.
 SMSC GW has two configurable parameters for decoding / encodoing, one for GSM 7 ancoding and another for UCS2 encoding (SMPP Encoding for GSM7 / SMPP Encoding for UCS2). See following chapter for configuring details: <<_smpp_encoding_for_ucs2>>. A user schould configure these parameters before of SMSC GW usage depending on which encoding are used by user's SMPP applications for message body encoding.
 
-One of indication that says that message encoding parameters are wrongly configured is messages in server.log like `Message length in bytes is too big for solid message: 268>134`. This may mean that SMPP application sends messages to SMSC GW in UCS2 encoding and SMSC GW decodes them in UTF8 encodoing and a message bode becomes too big length after it.
+One of indication that says that message encoding parameters are wrongly configured is messages in server.log like `Message length in bytes is too big for solid message: 268>134`. This may mean that SMPP application sends messages to SMSC GW in UCS2 encoding and SMSC GW decodes them in UTF8 encodoing and a message bode becomes too big length after it. Another reason for `Message length in bytes is too big` message may be that you are trying to use GSM7 encoding and your message contains characters from GSM7 extended table (like '[' or ']'). Such characters demands 2 septets for encdoning and so a message / message segment (if it contains such characters) must contain lower character count.
 
 [[_smpp_dlivery_receipt_transit]]
 === Delivery receipts transit at SMPP interface
@@ -1519,18 +1611,17 @@ error:4,message ID not exists
 [[_diameter_ocs_server_general]]
 === General information
 
-SMSC GW can interoperate with an OCS server via Diameter protocol connection. 
+SMSC GW can interoperate with an OCS server via Diameter protocol connection.
 
-For this case SMSC GW can be configured so any incoming SMPP, MO SS7, Home Routing SS7 and SIP originated messages before next processing will be sent to OCS server.
+For this case SMSC GW can be configured so any incoming SMPP (only submit_sm and data_sm are supported), MO SS7 and Home Routing SS7 originated messages before next processing will be sent to OCS server.
 Then OCS server can check if SMSC GW must accept the message or not.
 If yes, SMSC GW will process the message, if not, the message will be dropped.
-OCS server can also make any charging operations as needed. 
+OCS server can also make any charging operations as needed.
 
-For SMPP and MO SS7 originated messages SMSC GW will return error (reject) in the response back to the orgiginated message submit message.
-So MO and SMPP part will be informed if the message is rejected.
-(This functionality is not implemented now for Home Routing SS7 and SIP originated messages). 
+For SMPP and MO and HR SS7 originated messages SMSC GW will return error (reject) in the response back to the originated submit message.
+So MO SS7, HR SS7 and SMPP part will be informed if the message is rejected.
 
-For interconnecting with OCS Server SMSC GW uses diameter CCR (Credit-Control Request) with following filled AVPs (all of them are located in AVP Service-Information (873)): 
+For interconnecting with OCS Server SMSC GW uses diameter CCR (Credit-Control Request) with following filled AVPs (all of them are located in AVP Service-Information (873)):
 
 
 
@@ -1555,14 +1646,14 @@ For interconnecting with OCS Server SMSC GW uses diameter CCR (Credit-Control Re
 | Address-Data | 897 | UTF8-String | Originator-Received-Address | Digits of Originator-Received-Address
 |===
 
-When OCS server responds with 2001 code (access granted) SMSC GW will accept the message, all other respond codes will reject the message. 
+When OCS server responds with 2001 code (access granted) SMSC GW will accept the message, all other respond codes will reject the message.
 
 [[_diameter_ocs_server_conig]]
 === Configuring
 
 You can use Telestax OCS server or any third party OCS server as you wish.
 SMSC GW party configuring is the same for both.
-Here there is a describtion for the case of Telestax OCS server and as an example - the simpliest case when we have OCS at the same host as SMSC GW. 
+Here there is a describtion for the case of Telestax OCS server and as an example - the simpliest case when we have OCS at the same host as SMSC GW.
 
 
 
@@ -1570,24 +1661,25 @@ Here there is a describtion for the case of Telestax OCS server and as an exampl
 . SMSC GW must be already configured for accepting and sending messages (general, SS7, SMPP, etc parts)
 . You can download for testing the Telestax OCS server from https://telestax.zendesk.com/forums/22947518-Product-Downloads.
   Download and unpack it to a separate folder.
-. SMSC GW uses the updated AVP dictionary library.
-  Before using of OCS server copy from SMSC GW the file <smsc gw root folder>/resource/ocs/dictionary.xml to Telestax OCS server to the folder <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config.
-. for simple test configuring of SMSC GW and OCS server you can copy example config files jdiameter-config.xml 
 
-* from <smsc gw root folder>/resource/ocs/smsc-part to SMSC GW <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config
+. for simple test configuring of SMSC GW and OCS server you can copy example config files jdiameter-config.xml
+
+* from <smsc gw root folder>/resource/ocs/smsc-part to SMSC GW <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config for JBOSS 5 server and <smsc gw root
+folder>/extra/restcomm-diam/modules/lib/main/config for Wildfly 10 server
 * from <smsc gw root folder>/resource/ocs/ocs-part to OCS server <jboss>/server/default/deploy/{this-folder}-diameter-mux-6.2.0.GA.sar/config
 
-This file is already copied to SMSC GW into Simulator profile.
+This file is already copied to SMSC GW into Simulator profile for JBOSS 5 case. It is not performed for Wildfly 10 server because Wildfly 10 has same comfiguring files placed for diameter module for all profiles.
 
+[start=4]
 . Those configs suppose that you use Telestax OCS server and it is on the same host.
 If not you need to make extra configuring.
 In the testing config files SMSC GW plays a role of a diameter client and OCS server - a diameter server.
-In this case for OCS server part we need to update jdiameter-config.xml file: 
+In this case for OCS server part we need to update jdiameter-config.xml file:
 
 * <LocalPeer> section with URI, IPAddresses and Realm.
 * In <Network> we need to specify <Peer> (SMSC GW diameter IP) and <Realm> (name and the same Realm that is configured in SMSC GW part)
 +
-For SMSC GW part we need to update: 
+For SMSC GW part we need to update:
 +
 * <LocalPeer> section with URI, IPAddresses and Realm.
 * In <Network> we need to specify <Peer> (OCS server diameter IP) and <Realm> (name and the same Realm that is configured in OCS server part)
@@ -1614,17 +1706,25 @@ You need to specify an address of message sender (source address). OCS Server id
 . SMSC GW is configured
 
 
+== Security issues
 
+When you configure SMSC GW for the first usage you need to care for security to avoid of unauthorized usage. Here you can find some tips for this.
+
+If we do not accept messages from SS7 connection (and any other connection) - disable of all messages from all concrete type of connections. Find extra in <<_dest_mocharging>>, <<_dest_txsmppcharging>>, <<_dest_txsipcharging>>, <<_dest_hrcharging>>, <<_dest_txhttpcharging>>.
+
+if we accept MO messages from our subscribers we need to specify (via mproc rules) that we will reject incoming messages with "sourcedigmask" value is out of our subscriber's range (a mproc rule)
+
+To be safe a good way to use diameter server requests for messages where we can implement logic of spam avoiding.
 
 
 == CDR Logging Settings
 
-{this-platform} {this-application} is configured to generate CDR in a plain text file located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr.log_ and also detailed CDR in Cassandra table `MESSAGES_yyyy_mm_dd`.
- 
+{this-platform} {this-application} is configured to generate CDR in a plain text files `cdr.log` and `cdr_detailed.log` located at [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/<profile>/log/cdr.log_ for JBOSS 5 server and [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/log for Wildfly 10 server and also detailed CDR in Cassandra tables `MESSAGES_yyyy_mm_dd`.
+
 
 {this-platform} {this-application} can be configured to generate CDR for different message processing modes (`datagramm, transactional, storeAndForward`) and also for both receipt and regular messages or generate CDR only for regular messages.
 This is configurable by setting `generateCdr`, `generateArchiveTable` and `generateReceiptCdr` using the CLI or the GUI.
-For more details refer to Sections <<_generatecdr>>, <<_generatearchivetable>> and <<_generatereceiptcdr>>. 
+For more details refer to Sections <<_generatecdr>>, <<_generatearchivetable>> and <<_generatereceiptcdr>>.
 
 The CDR generated in a text file is of a specific format.
-The details of the format and the possible values for the fields recorded in the CDR log file are explained in <<_monitoring_smsc_cdr_log>>. 
+The details of the format and the possible values for the fields recorded in the CDR log file are explained in <<_monitoring_smsc_cdr_log>>.

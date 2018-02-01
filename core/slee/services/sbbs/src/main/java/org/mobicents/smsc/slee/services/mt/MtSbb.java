@@ -25,6 +25,7 @@ package org.mobicents.smsc.slee.services.mt;
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.tlv.Tlv;
 import com.cloudhopper.smpp.tlv.TlvConvertException;
+
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
@@ -55,17 +56,7 @@ import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
 import org.mobicents.protocols.ss7.map.api.service.sms.SM_RP_DA;
 import org.mobicents.protocols.ss7.map.api.service.sms.SM_RP_OA;
 import org.mobicents.protocols.ss7.map.api.service.sms.SmsSignalInfo;
-import org.mobicents.protocols.ss7.map.api.smstpdu.AbsoluteTimeStamp;
-import org.mobicents.protocols.ss7.map.api.smstpdu.AddressField;
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
-import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverTpdu;
-import org.mobicents.protocols.ss7.map.api.smstpdu.SmsStatusReportTpdu;
-import org.mobicents.protocols.ss7.map.api.smstpdu.Status;
-import org.mobicents.protocols.ss7.map.api.smstpdu.TypeOfNumber;
-import org.mobicents.protocols.ss7.map.api.smstpdu.UserData;
-import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
-import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeaderElement;
+import org.mobicents.protocols.ss7.map.api.smstpdu.*;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
 import org.mobicents.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.mobicents.slee.resource.map.events.DialogAccept;
@@ -83,6 +74,7 @@ import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorAction;
 import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageUtil;
+import org.mobicents.smsc.library.PermanentTemporaryFailure;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsDeliveryReportData;
 import org.mobicents.smsc.library.SmsSet;
@@ -94,6 +86,7 @@ import org.mobicents.smsc.slee.services.smpp.server.events.SendMtEvent;
 
 import javax.slee.ActivityContextInterface;
 import javax.slee.EventContext;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -206,6 +199,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         setupMtForwardShortMessageRequest(event.getNetworkNode(), event.getImsiData(), event.getLmsi(), smsSet.getNetworkId());
     }
 
+
     // *********
     // MAP Component events
 
@@ -238,18 +232,48 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                         mapErrorMessage, false, ProcessingType.SS7_MT);
             } else if (mapErrorMessage.isEmSMDeliveryFailure()) {
                 MAPErrorMessageSMDeliveryFailure smDeliveryFailure = mapErrorMessage.getEmSMDeliveryFailure();
-                if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded) {
-                    this.onDeliveryError(smsSet, ErrorAction.memoryCapacityExceededFlag, ErrorCode.MESSAGE_QUEUE_FULL,
-                            "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
-                            mapErrorMessage, false, ProcessingType.SS7_MT);
-                } else if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.equipmentProtocolError) {
-                    this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.MS_NOT_EQUIPPED,
+                SmsDeliverReportTpdu tpdu = null;
+                try {
+                    tpdu = smDeliveryFailure.getSmsDeliverReportTpdu();
+                } catch (MAPException e) {
+                    // we skip any possible Exception here
+                }
+
+                ErrorAction errAction;
+                // checking firstly a case of FailureCause existence in tpdu
+                if (tpdu != null && tpdu.getFailureCause() != null) {
+                    int tpduCauseCode = tpdu.getFailureCause().getCode();
+                    PermanentTemporaryFailure tpFailureCauseStatus = SmscPropertiesManagement.getInstance()
+                            .getSmDeliveryFailureTpCause(tpduCauseCode);
+                    if (tpFailureCauseStatus == PermanentTemporaryFailure.temporary) {
+                        errAction = ErrorAction.temporaryFailure;
+                    } else {
+                        errAction = ErrorAction.permanentFailure;
+                    }
+                    this.onDeliveryError(smsSet, errAction, ErrorCode.SENDING_SM_FAILED,
                             "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
                             mapErrorMessage, false, ProcessingType.SS7_MT);
                 } else {
-                    this.onDeliveryError(smsSet, ErrorAction.permanentFailure, ErrorCode.SENDING_SM_FAILED,
-                            "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
-                            mapErrorMessage, false, ProcessingType.SS7_MT);
+                    // no FailureCause existence in tpdu - then checking DeliveryFailureCause code
+                    PermanentTemporaryFailure smDlrStatus = SmscPropertiesManagement.getInstance().getSmDeliveryFailure(
+                            smDeliveryFailure.getSMEnumeratedDeliveryFailureCause().getCode());
+                    if (smDeliveryFailure.getSMEnumeratedDeliveryFailureCause() == SMEnumeratedDeliveryFailureCause.memoryCapacityExceeded) {
+                        if (smDlrStatus == PermanentTemporaryFailure.permanent)
+                            errAction = ErrorAction.permanentFailure;
+                        else
+                            errAction = ErrorAction.memoryCapacityExceededFlag;
+                        this.onDeliveryError(smsSet, errAction, ErrorCode.MESSAGE_QUEUE_FULL,
+                                "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
+                                mapErrorMessage, false, ProcessingType.SS7_MT);
+                    } else {
+                        if (smDlrStatus == PermanentTemporaryFailure.temporary)
+                            errAction = ErrorAction.temporaryFailure;
+                        else
+                            errAction = ErrorAction.permanentFailure;
+                        this.onDeliveryError(smsSet, errAction, ErrorCode.SENDING_SM_FAILED,
+                                "Error smDeliveryFailure after MtForwardSM Request: " + smDeliveryFailure.toString(), true,
+                                mapErrorMessage, false, ProcessingType.SS7_MT);
+                    }
                 }
             } else if (mapErrorMessage.isEmSystemFailure()) {
                 // TODO: may be it is not a permanent case ???
@@ -665,8 +689,13 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				this.setResponseReceived(0);
 				this.handleSmsResponse((MAPDialogSms) evt.getMAPDialog(), false);
 			} else {
-	            SmsSet smsSet = getSmsSet();
-	            if (smsSet == null) {
+                if (this.getDlvIsEnded()) {
+                    // we have already processes an error
+                    return;
+                }
+
+                SmsSet smsSet = getSmsSet();
+                if (smsSet == null) {
 	                logger.severe("MtSbb.onDialogClose(): CMP smsSet is missed");
 	                markDeliveringIsEnded(true);
 	                return;
@@ -746,17 +775,19 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
             return;
         }
 
-		SccpAddress networkNodeSccpAddress = this.getMSCSccpAddress(networkNode);
+        Sms sms0 = smsSet.getSms(0);
+        Integer mtRemoteSccpTt = sms0.getMtRemoteSccpTt();
+        
+        SccpAddress networkNodeSccpAddress = this.getMSCSccpAddress(networkNode,mtRemoteSccpTt);
 
         IMSI imsi = this.mapParameterFactory.createIMSI(imsiData);
         SM_RP_DA sm_RP_DA = this.mapParameterFactory.createSM_RP_DA(imsi);
 		AddressString scAddress = this.getServiceCenterAddressString(networkId);
 		SM_RP_OA sm_RP_OA = this.mapParameterFactory.createSM_RP_OA_ServiceCentreAddressOA(scAddress);
 
-        Sms sms0 = smsSet.getSms(0);
-        if (sms0 != null)
-		    sms0.setMtServiceCenterAddress(scAddress.getAddress()); // we only set it for first sms in the list
-
+        if (sms0 != null) {
+		    sms0.setMtServiceCenterAddress(scAddress.getAddress()); // we only set it for first sms in the list		    
+        }
 
 		this.setNnn(networkNode);
 		this.setNetworkNode(networkNodeSccpAddress);
@@ -842,7 +873,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         int messageSegmentNumber = this.getMessageSegmentNumber();
         SmsSignalInfo[] segments = this.getSegments();
         if (segments != null && messageSegmentNumber < segments.length - 1) {
-            this.generateCDR(sms, CdrGenerator.CDR_PARTIAL, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false);
+            this.generateCDR(sms, CdrGenerator.CDR_PARTIAL, CdrGenerator.CDR_SUCCESS_NO_REASON, true, false, messageSegmentNumber);
 
             // we have more message parts to be sent yet
             messageSegmentNumber++;
@@ -878,7 +909,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         // success CDR generating
         boolean isPartial = MessageUtil.isSmsNotLastSegment(sms);
         this.generateCDR(sms, isPartial ? CdrGenerator.CDR_PARTIAL : CdrGenerator.CDR_SUCCESS,
-                CdrGenerator.CDR_SUCCESS_NO_REASON, segments != null, true);
+                CdrGenerator.CDR_SUCCESS_NO_REASON, segments != null, true, messageSegmentNumber);
 
         // adding a success receipt if it is needed
         this.generateSuccessReceipt(smsSet, sms);
@@ -951,8 +982,17 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
         if (informServiceCenterContainer != null && informServiceCenterContainer.getMwStatus() != null
                 && informServiceCenterContainer.getMwStatus().getScAddressNotIncluded() == false && versionMore1) {
             // sending a report to HLR of a success delivery
+            Sms sms0 = smsSet.getSms(0);
+            String mtLocalSccpGt = null;
+            Integer mtRemoteSccpTt = null;
+            if (sms0 != null) {
+                mtLocalSccpGt = sms0.getMtLocalSccpGt();
+                mtRemoteSccpTt = sms0.getMtRemoteSccpTt();
+            }
+
             this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(),
-                    SMDeliveryOutcome.successfulTransfer, smsSet.getTargetId(), smsSet.getNetworkId());
+                    SMDeliveryOutcome.successfulTransfer, smsSet.getTargetId(), smsSet.getNetworkId(), mtLocalSccpGt,
+                    mtRemoteSccpTt);
         }
     }
 
@@ -1060,8 +1100,19 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			boolean newDialog = false;
 			if (mapDialogSms == null) {
 				newDialog = true;
+				
+				String mtLocalSccpGt = sms.getMtLocalSccpGt();
+	            
+	            SccpAddress originSccpAddress;
+	            
+	            if (mtLocalSccpGt != null) {
+	                originSccpAddress = this.getServiceCenterSccpAddress(mtLocalSccpGt, networkId);
+	            } else {
+	                originSccpAddress = this.getServiceCenterSccpAddress(networkId);
+	            }
+	            
 				mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext,
-						this.getServiceCenterSccpAddress(networkId), null, this.getNetworkNode(), null);
+				        originSccpAddress, null, this.getNetworkNode(), null);
                 mapDialogSms.setNetworkId(networkId);
 
 				ActivityContextInterface mtFOSmsDialogACI = this.mapAcif.getActivityContextInterface(mapDialogSms);
@@ -1197,6 +1248,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 			}
 
 			mapDialogSms.send();
+			sms.putMsgPartDeliveryTime(getMessageSegmentNumber(), System.currentTimeMillis());
 
 		} catch (MAPException e) {
 			if (mapDialogSms != null)
@@ -1226,10 +1278,10 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		}
 	}
 
-	private SccpAddress getMSCSccpAddress(ISDNAddressString networkNodeNumber) {
+	private SccpAddress getMSCSccpAddress(ISDNAddressString networkNodeNumber, Integer mtRemoteSccpTt) {
         return MessageUtil.getSccpAddress(sccpParameterFact, networkNodeNumber.getAddress(), networkNodeNumber.getAddressNature().getIndicator(),
                 networkNodeNumber.getNumberingPlan().getIndicator(), smscPropertiesManagement.getMscSsn(), smscPropertiesManagement.getGlobalTitleIndicator(),
-                smscPropertiesManagement.getTranslationType());
+                mtRemoteSccpTt != null ? mtRemoteSccpTt : smscPropertiesManagement.getTranslationType());
 	}
 
 	private AddressField getSmsTpduOriginatingAddress(int ton, int npi, String address) {

@@ -59,9 +59,7 @@ import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.RejectComponent;
 import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.NextCorrelationIdResult;
-import org.mobicents.smsc.library.CorrelationIdValue;
-import org.mobicents.smsc.library.SbbStates;
-import org.mobicents.smsc.library.SmsSetCache;
+import org.mobicents.smsc.library.*;
 
 /**
  * 
@@ -181,7 +179,9 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("\nHome routing: Sent ErrorComponent = " + errorMessage);
                 }
-
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(dialog.getNetworkId(), CdrGenerator.CDR_SUBMIT_FAILED_HR, errorMessage.toString(), true);
+                }
                 dialog.close(false);
                 return;
             } catch (Throwable e) {
@@ -437,7 +437,6 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
 
             long invokeId = this.getInvokeId();
             dlg.sendErrorComponent(invokeId, errorResponse);
-
             dlg.close(false);
         } catch (MAPException e) {
             if (dlg != null) {
@@ -459,5 +458,13 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
         }
 
         return null;
+    }
+
+    private void generateCDR(int networkId, String status, String reason, boolean lastSegment) {
+
+        CdrGenerator.generateCdr(null, 0, 0, null, 0, 0, OriginationType.SS7_HR, null,
+                null, null, networkId, 0, null, 0, null, status, reason,
+                true, true, lastSegment,
+                smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
     }
 }

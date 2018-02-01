@@ -7,12 +7,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.management.ManagementFactory;
 import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
@@ -191,7 +193,27 @@ public class SipManagement implements SipManagementMBean {
 	public void start() throws Exception {
 
         try {
-            this.mbeanServer = MBeanServerLocator.locateJBoss();
+            boolean servFound = false;
+            String agentId = "jboss";
+            List<MBeanServer> servers = MBeanServerFactory.findMBeanServer(null);
+            if (servers != null && servers.size() > 0) {
+                for (MBeanServer server : servers) {
+                    String defaultDomain = server.getDefaultDomain();
+
+                    if (defaultDomain != null && defaultDomain.equals(agentId)) {
+                        mbeanServer = server;
+                        servFound = true;
+                        logger.info(String.format("Found MBeanServer matching for agentId=%s", agentId));
+                    } else {
+                        logger.warn(String.format("Found non-matching MBeanServer with default domian = %s", defaultDomain));
+                    }
+                }
+            }
+
+            if (!servFound) {
+                this.mbeanServer = ManagementFactory.getPlatformMBeanServer();
+            }            
+            logger.info("servFound =" + servFound + ", this.mbeanServer = " + this.mbeanServer);            
         } catch (Exception e) {
             this.logger.error("Exception when obtaining of MBeanServer: " + e.getMessage(), e);
         }

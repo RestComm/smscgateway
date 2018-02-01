@@ -51,6 +51,8 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
     private boolean needDropMessage = false;
     private boolean needRejectMessage = false;
     private FastList<MProcNewMessage> postedMessages = new FastList<MProcNewMessage>();
+    private int ruleIdInProcessing;
+    private int ruleIdDropReject;
 
     private int itsMapErrorCode;
     private int itsHttpErrorCode;
@@ -60,6 +62,22 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
         this.defaultValidityPeriodHours = defaultValidityPeriodHours;
         this.maxValidityPeriodHours = maxValidityPeriodHours;
         this.logger = logger;
+    }
+
+    public int getRuleIdInProcessing() {
+        return ruleIdInProcessing;
+    }
+
+    public void setRuleIdInProcessing(int val) {
+        ruleIdInProcessing = val;
+    }
+
+    public int getRuleIdDropReject() {
+        return ruleIdDropReject;
+    }
+
+    public void setRuleIdDropReject(int val) {
+        ruleIdDropReject = val;
     }
 
     // results of message processing
@@ -115,6 +133,7 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
 
         actionAdded = true;
         needDropMessage = true;
+        ruleIdDropReject = ruleIdInProcessing;
     }
 
     @Override
@@ -124,6 +143,7 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
 
         actionAdded = true;
         needRejectMessage = true;
+        ruleIdDropReject = ruleIdInProcessing;
     }
 
     @Override
@@ -134,6 +154,7 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
         }
         actionAdded = true;
         needRejectMessage = true;
+        ruleIdDropReject = ruleIdInProcessing;
         itsSmppErrorCode = anSmppErrorCode;
         itsMapErrorCode = aMapErrorCode;
         itsHttpErrorCode = aHttpErrorCode;
@@ -146,7 +167,7 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
         sms.getSmsSet().setNetworkId(newNetworkId);
         sms.getSmsSet().setCorrelationId(null);
     }
-
+    
     @Override
     public void updateMessageDestAddrTon(MProcMessage message, int newDestTon) throws MProcRuleException {
         MProcUtility.checkDestAddrTon(newDestTon);
@@ -196,6 +217,22 @@ public class PostArrivalProcessorImpl implements PostArrivalProcessor {
         MProcMessageImpl msg = (MProcMessageImpl) message;
         Sms sms = msg.getSmsContent();
         sms.setSourceAddr(newDigits);
+    }
+    
+    @Override
+    public void updateMessageMtLocalSccpGt(MProcMessage message, String newMtLocalSccpGt) throws MProcRuleException {
+        MProcUtility.checkMtLocalSccpGt(newMtLocalSccpGt);
+        MProcMessageImpl msg = (MProcMessageImpl) message;
+        Sms sms = msg.getSmsContent();
+        sms.setMtLocalSccpGt(newMtLocalSccpGt);
+    }
+    
+    @Override
+    public void updateMessageMtRemoteSccpTt(MProcMessage message, Integer newMtRemoteSccpTt) throws MProcRuleException {
+        MProcUtility.checkMtRemoteSccpTt(newMtRemoteSccpTt);
+        MProcMessageImpl msg = (MProcMessageImpl) message;
+        Sms sms = msg.getSmsContent();
+        sms.setMtRemoteSccpTt(newMtRemoteSccpTt);
     }
 
     @Override

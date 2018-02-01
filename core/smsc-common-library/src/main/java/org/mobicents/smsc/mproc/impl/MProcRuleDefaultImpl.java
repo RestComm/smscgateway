@@ -52,10 +52,10 @@ import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.tlv.Tlv;
 
 /**
-*
-* @author sergey vetyutnev
-*
-*/
+ *
+ * @author sergey vetyutnev
+ *
+ */
 public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRuleDefault {
     private static final String DEST_TON_MASK = "destTonMask";
     private static final String DEST_NPI_MASK = "destNpiMask";
@@ -86,6 +86,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String NEW_SOURCE_TON = "newSourceTon";
     private static final String NEW_SOURCE_NPI = "newSourceNpi";
     private static final String NEW_SOURCE_ADDR = "newSourceAddr";
+    private static final String MT_LOCAL_SCCP_GT = "mtLocalSccpGt";
+    private static final String MT_REMOTE_SCCP_TT = "mtRemoteSccpTt";
     private static final String MAKE_COPY = "makeCopy";
     private static final String DROP_AFTER_SRI = "dropAfterSri";
     private static final String DROP_AFTER_TEMP_FAIL = "dropAfterTempFail";
@@ -96,19 +98,21 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private static final String NEW_NETWORK_ID_AFTER_TEMP_FAIL = "newNetworkIdAfterTempFail";
     private static final String HR_BY_PASS = "hrByPass";
     private static final String TLV_TAG_TO_REMOVE = "tlvTagToRemove";
+    private static final String REMOVE_DEST_DIG_PREFIX = "removeDestDigPrefix";
 
     // TODO: we need proper implementing
-//    // test magic mproc rules - we need to remove then later after proper implementing
-//    public static final int MAGIC_RULES_ID_START = -21100;
-//    public static final int MAGIC_RULES_ID_END = -21000;
-//    // Testing PostImsi case: if NNN digits are started with "1", MT messages will be dropped
-//    public static final int MAGIC_RULES_ID_NNN_CHECK = -21000;
-//    // Testing PostDelivery case: generating a report to originator for all delivered / failed message as a plain text message
-//    public static final int MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT = -21001;
-//    // Testing PostArrivale case: drop a message
-//    public static final int MAGIC_RULES_ID_ARRIVAL_DROP = -21002;
-//    // Testing PostArrivale case: reject a message
-//    public static final int MAGIC_RULES_ID_ARRIVAL_REJECT = -21003;
+    // // test magic mproc rules - we need to remove then later after proper implementing
+    // public static final int MAGIC_RULES_ID_START = -21100;
+    // public static final int MAGIC_RULES_ID_END = -21000;
+    // // Testing PostImsi case: if NNN digits are started with "1", MT messages will be dropped
+    // public static final int MAGIC_RULES_ID_NNN_CHECK = -21000;
+    // // Testing PostDelivery case: generating a report to originator for all delivered / failed message as a plain text
+    // message
+    // public static final int MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT = -21001;
+    // // Testing PostArrivale case: drop a message
+    // public static final int MAGIC_RULES_ID_ARRIVAL_DROP = -21002;
+    // // Testing PostArrivale case: reject a message
+    // public static final int MAGIC_RULES_ID_ARRIVAL_REJECT = -21003;
     // TODO: we need proper implementing
 
     private int destTonMask = -1;
@@ -140,6 +144,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private int newSourceTon = -1;
     private int newSourceNpi = -1;
     private String newSourceAddr = "-1";
+    private String mtLocalSccpGt = "-1";
+    private int mtRemoteSccpTt = -1;
     private boolean makeCopy = false;
     private boolean dropAfterSri = false;
     private boolean dropAfterTempFail = false;
@@ -150,6 +156,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private int newNetworkIdAfterTempFail = -1;
     private boolean hrByPass = false;
     private short tlvTagToRemove = -1;
+    private int removeDestDigPrefix = -1;
 
     private Pattern destDigMaskPattern;
     private Pattern sourceDigMaskPattern;
@@ -158,7 +165,6 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     private Pattern imsiDigitsMaskPattern;
     private Pattern nnnDigitsMaskPattern;
     private FastMap<Integer, Integer> errorCodePattern;
-
 
     @Override
     public String getRuleClassName() {
@@ -421,15 +427,16 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.resetPattern();
     }
 
-	@Override
+    @Override
     public int getPercent() {
-		return percent;
-	}
+        return percent;
+    }
 
     @Override
-	public void setPercent(int percent) {
-		this.percent = percent;
+    public void setPercent(int percent) {
+        this.percent = percent;
     }
+
     /**
      * @return if !=-1: the new networkId will be assigned to a message
      */
@@ -521,8 +528,29 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     }
 
     /**
-     * @return if true - a copy of a message will be created. All other next
-     *         rules will be applied only for a copy of a message
+     * @return if !="-1": the new MT GT that message will be sent to
+     */
+    public String getMtLocalSccpGt() {
+        return mtLocalSccpGt;
+    }
+
+    public void setMtLocalSccpGt(String mtLocalSccpGt) {
+        this.mtLocalSccpGt = mtLocalSccpGt;
+    }
+
+    /**
+     * @return if !=-1: the new MT TT that message will be sent to
+     */
+    public Integer getMtRemoteSccpTt() {
+        return mtRemoteSccpTt;
+    }
+
+    public void setMtRemoteSccpTt(Integer mtRemoteSccpTt) {
+        this.mtRemoteSccpTt = mtRemoteSccpTt;
+    }
+
+    /**
+     * @return if true - a copy of a message will be created. All other next rules will be applied only for a copy of a message
      */
     public boolean isMakeCopy() {
         return makeCopy;
@@ -635,10 +663,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     public void setDropOnArrival(boolean dropOnArrival) {
         this.dropOnArrival = dropOnArrival;
     }
-    
+
     /**
-     * @return type of reject response to be returned to a message originator. 
-     * if NONE, message will not be rejected
+     * @return type of reject response to be returned to a message originator. if NONE, message will not be rejected
      */
     @Override
     public RejectType getRejectOnArrival() {
@@ -648,6 +675,20 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     @Override
     public void setRejectOnArrival(RejectType rejectOnArrival) {
         this.rejectOnArrival = rejectOnArrival;
+    }
+
+    /**
+     * @return if 0 or negative value - do nothing positive value means number of first digits (prefix) that will be removed
+     *         from destination address
+     */
+    @Override
+    public int getRemoveDestDigPrefix() {
+        return removeDestDigPrefix;
+    }
+
+    @Override
+    public void setRemoveDestDigPrefix(int removeDestDigPrefix) {
+        this.removeDestDigPrefix = removeDestDigPrefix;
     }
 
     private void resetPattern() {
@@ -669,7 +710,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             this.origEsmeNameMaskPattern = null;
         }
 
-        if (this.originatorSccpAddressMask != null && !this.originatorSccpAddressMask.equals("") && !this.originatorSccpAddressMask.equals("-1")) {
+        if (this.originatorSccpAddressMask != null && !this.originatorSccpAddressMask.equals("")
+                && !this.originatorSccpAddressMask.equals("-1")) {
             this.originatorSccpAddressMaskPattern = Pattern.compile(this.originatorSccpAddressMask);
         } else {
             this.originatorSccpAddressMaskPattern = null;
@@ -703,15 +745,16 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         }
     }
 
-    protected void setRuleParameters(int destTonMask, int destNpiMask, String destDigMask, int sourceTonMask,
-            int sourceNpiMask, String sourceDigMask, OrigType originatingMask, int networkIdMask, int originNetworkIdMask,
+    protected void setRuleParameters(int destTonMask, int destNpiMask, String destDigMask, int sourceTonMask, int sourceNpiMask,
+            String sourceDigMask, OrigType originatingMask, int networkIdMask, int originNetworkIdMask,
             int receiptNetworkIdMask, String origEsmeNameMask, String originatorSccpAddressMask, String imsiDigitsMask,
-            String nnnDigitsMask, ProcessingType processingType, String errorCode, int percent, int newNetworkId, int newDestTon,
-            int newDestNpi, String addDestDigPrefix, String addSourceDigPrefix, int newSourceTon, int newSourceNpi,
-            String newSourceAddr, boolean makeCopy, boolean hrByPass, boolean dropAfterSri, boolean dropAfterTempFail, 
-            boolean dropOnArrival, RejectType rejectOnArrival,int newNetworkIdAfterSri, int newNetworkIdAfterPermFail, 
-            int newNetworkIdAfterTempFail, short tlvTagToMatch, TlvValueType tlvValueTypeToMatch, String tlvValueToMatch, 
-            short tlvTagToRemove) {
+            String nnnDigitsMask, ProcessingType processingType, String errorCode, int percent, int newNetworkId,
+            int newDestTon, int newDestNpi, String addDestDigPrefix, String addSourceDigPrefix, int newSourceTon,
+            int newSourceNpi, String newSourceAddr, String mtLocalSccpGt, int mtRemoteSccpTt, boolean makeCopy,
+            boolean hrByPass, boolean dropAfterSri, boolean dropAfterTempFail, boolean dropOnArrival,
+            RejectType rejectOnArrival, int newNetworkIdAfterSri, int newNetworkIdAfterPermFail, int newNetworkIdAfterTempFail,
+            short tlvTagToMatch, TlvValueType tlvValueTypeToMatch, String tlvValueToMatch, short tlvTagToRemove,
+            int removeDestDigPrefix) {
         this.destTonMask = destTonMask;
         this.destNpiMask = destNpiMask;
         this.destDigMask = destDigMask;
@@ -741,6 +784,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.newSourceTon = newSourceTon;
         this.newSourceNpi = newSourceNpi;
         this.newSourceAddr = newSourceAddr;
+        this.mtLocalSccpGt = mtLocalSccpGt;
+        this.mtRemoteSccpTt = mtRemoteSccpTt;
         this.makeCopy = makeCopy;
         this.hrByPass = hrByPass;
         this.dropAfterSri = dropAfterSri;
@@ -751,22 +796,24 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         this.newNetworkIdAfterPermFail = newNetworkIdAfterPermFail;
         this.newNetworkIdAfterTempFail = newNetworkIdAfterTempFail;
         this.tlvTagToRemove = tlvTagToRemove;
+        this.removeDestDigPrefix = removeDestDigPrefix;
         this.resetPattern();
     }
 
-
     @Override
     public boolean isForPostArrivalState() {
-        if (this.makeCopy
-                || this.newNetworkId != -1
+        if (this.makeCopy || this.newNetworkId != -1
                 || (this.addDestDigPrefix != null && !this.addDestDigPrefix.equals("") && !this.addDestDigPrefix.equals("-1"))
-                || (this.addSourceDigPrefix != null && !this.addSourceDigPrefix.equals("") && !this.addSourceDigPrefix
-                        .equals("-1"))
+                || (this.addSourceDigPrefix != null && !this.addSourceDigPrefix.equals("")
+                        && !this.addSourceDigPrefix.equals("-1"))
                 || (this.newSourceAddr != null && !this.newSourceAddr.equals("") && !this.newSourceAddr.equals("-1"))
                 || this.newDestNpi != -1 || this.newDestTon != -1 || this.newSourceNpi != -1 || this.newSourceTon != -1
-                || (this.tlvTagToMatch != -1 && tlvValueTypeToMatch != null && tlvValueToMatch != null && !tlvValueToMatch
-                        .isEmpty()) 
-                || this.tlvTagToRemove != -1 || this.dropOnArrival || this.rejectOnArrival != null) {
+                || (this.mtLocalSccpGt != null && !this.mtLocalSccpGt.equals("") && !this.mtLocalSccpGt.equals("-1"))
+                || this.mtRemoteSccpTt != -1
+                || (this.tlvTagToMatch != -1 && tlvValueTypeToMatch != null && tlvValueToMatch != null
+                        && !tlvValueToMatch.isEmpty())
+                || this.tlvTagToRemove != -1 || this.dropOnArrival || this.rejectOnArrival != null
+                || this.removeDestDigPrefix > 0) {
             return true;
         } else
             return false;
@@ -796,8 +843,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     @Override
     public boolean isForPostDeliveryState() {
         // TODO: we need proper implementing
-//        if (this.getId() == MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT)
-//            return true;
+        // if (this.getId() == MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT)
+        // return true;
         // TODO: we need proper implementing
 
         if (this.newNetworkIdAfterPermFail != -1) {
@@ -901,28 +948,27 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 && this.originatorSccpAddressMask.charAt(0) != message.getOriginatorSccpAddress().charAt(0))
             return false;
 
-        //check tlv
-        if ((this.tlvTagToMatch != -1 && this.tlvValueTypeToMatch != null && tlvValueToMatch != null && !tlvValueToMatch
-                .isEmpty())) {
+        // check tlv
+        if ((this.tlvTagToMatch != -1 && this.tlvValueTypeToMatch != null && tlvValueToMatch != null
+                && !tlvValueToMatch.isEmpty())) {
             TlvSet tlvSet = message.getTlvSet();
-            if(tlvSet.hasOptionalParameter(this.tlvTagToMatch))
-            {
+            if (tlvSet.hasOptionalParameter(this.tlvTagToMatch)) {
                 Tlv tlv = tlvSet.getOptionalParameter(this.tlvTagToMatch);
                 try {
                     String val = "";
-                    switch(this.tlvValueTypeToMatch) {
-                    case BYTE:
-                        val = (new Byte(tlv.getValueAsByte())).toString();
-                        break;
-                    case INT:
-                        val = (new Integer(tlv.getValueAsInt())).toString();
-                        break;
-                    case STRING:
-                    default:
-                        val = tlv.getValueAsString();
-                        break;
+                    switch (this.tlvValueTypeToMatch) {
+                        case BYTE:
+                            val = (new Byte(tlv.getValueAsByte())).toString();
+                            break;
+                        case INT:
+                            val = (new Integer(tlv.getValueAsInt())).toString();
+                            break;
+                        case STRING:
+                        default:
+                            val = tlv.getValueAsString();
+                            break;
                     }
-                    if( !this.tlvValueToMatch.equals(val) ) {
+                    if (!this.tlvValueToMatch.equals(val)) {
                         return false;
                     }
                 } catch (Exception e) {
@@ -934,7 +980,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             }
         }
         if (percent != -1) {
-        	return MProcUtility.checkRuleProbability(percent);
+            return MProcUtility.checkRuleProbability(percent);
         }
         return true;
     }
@@ -963,14 +1009,13 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     @Override
     public boolean matchesPostImsiRequest(MProcMessage message) {
         // TODO: we need proper implementing
-//        if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
-//            return true;
-//        }
-//      if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
-//          return true;
-//      }
-      // TODO: we need proper implementing
-
+        // if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
+        // return true;
+        // }
+        // if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
+        // return true;
+        // }
+        // TODO: we need proper implementing
 
         return matches(message);
     }
@@ -978,13 +1023,13 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     @Override
     public boolean matchesPostDelivery(MProcMessage message) {
         // TODO: we need proper implementing
-//        if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
-//            return true;
-//        }
-//      if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
-//          return true;
-//      }
-      // TODO: we need proper implementing
+        // if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
+        // return true;
+        // }
+        // if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
+        // return true;
+        // }
+        // TODO: we need proper implementing
 
         return matches(message);
     }
@@ -998,60 +1043,64 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     public void onPostArrival(final MProcRuleRaProvider anMProcRuleRa, PostArrivalProcessor factory, MProcMessage message)
             throws Exception {
         // TODO: we need proper implementing
-//        if (this.getId() == MAGIC_RULES_ID_ARRIVAL_DROP) {
-//            factory.dropMessage();
-//            return;
-//        }
-//        if (this.getId() == MAGIC_RULES_ID_ARRIVAL_REJECT) {
-//            factory.rejectMessage();
-//            return;
-//        }
+        // if (this.getId() == MAGIC_RULES_ID_ARRIVAL_DROP) {
+        // factory.dropMessage();
+        // return;
+        // }
+        // if (this.getId() == MAGIC_RULES_ID_ARRIVAL_REJECT) {
+        // factory.rejectMessage();
+        // return;
+        // }
         // TODO: we need proper implementing
 
         // TODO: we need proper implementing
-//        if (message.isDeliveryReceipt()) {
-//            Long receiptLocalMessageId = message.getReceiptLocalMessageId();
-//            DeliveryReceiptData deliveryReceiptData = message.getDeliveryReceiptData();
-//            if (receiptLocalMessageId != null && deliveryReceiptData != null) {
-//                MProcMessage sentMsg = message.getOriginMessageForDeliveryReceipt(receiptLocalMessageId);
-//                factory.dropMessage();
-//                if (sentMsg != null) {
-//                    MProcNewMessage newMsg = factory.createNewCopyMessage(sentMsg);
-//                    newMsg.setNetworkId(11);
-//                    factory.postNewMessage(newMsg);
-//                }
-//            }
-//        }
+        // if (message.isDeliveryReceipt()) {
+        // Long receiptLocalMessageId = message.getReceiptLocalMessageId();
+        // DeliveryReceiptData deliveryReceiptData = message.getDeliveryReceiptData();
+        // if (receiptLocalMessageId != null && deliveryReceiptData != null) {
+        // MProcMessage sentMsg = message.getOriginMessageForDeliveryReceipt(receiptLocalMessageId);
+        // factory.dropMessage();
+        // if (sentMsg != null) {
+        // MProcNewMessage newMsg = factory.createNewCopyMessage(sentMsg);
+        // newMsg.setNetworkId(11);
+        // factory.postNewMessage(newMsg);
+        // }
+        // }
+        // }
         // TODO: we need proper implementing
 
-    	if (this.dropOnArrival) {
-    		factory.dropMessage();
-    	}
-    	
-    	if (this.rejectOnArrival != null) {
-	    	switch (this.rejectOnArrival) {
-	    		case NONE:
-	    			break;
-	    		case DEFAULT:
-	    			factory.rejectMessage();
-	    			break;
-	    		case UNEXPECTED_DATA_VALUE:
-	    			factory.rejectMessage(SmppConstants.STATUS_INVSERTYP, MAPErrorCode.unexpectedDataValue, HttpCode.LOCAL_RESPONSE_2.getCode());
-	    			break;
-	    		case SYSTEM_FAILURE:
-	    			factory.rejectMessage(SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure, HttpCode.LOCAL_RESPONSE_3.getCode());
-	    			break;
-	    		case THROTTLING:
-	    			factory.rejectMessage(SmppConstants.STATUS_THROTTLED, MAPErrorCode.resourceLimitation, HttpCode.LOCAL_RESPONSE_4.getCode());
-	    			break;
-	    		case FACILITY_NOT_SUPPORTED:
-	    			factory.rejectMessage(SmppConstants.STATUS_X_P_APPN, MAPErrorCode.facilityNotSupported, HttpCode.LOCAL_RESPONSE_5.getCode());
-	    			break;
-	    		default:
-	    			break;
-	    	}
-    	}
-    	
+        if (this.dropOnArrival) {
+            factory.dropMessage();
+        }
+
+        if (this.rejectOnArrival != null) {
+            switch (this.rejectOnArrival) {
+                case NONE:
+                    break;
+                case DEFAULT:
+                    factory.rejectMessage();
+                    break;
+                case UNEXPECTED_DATA_VALUE:
+                    factory.rejectMessage(SmppConstants.STATUS_INVSERTYP, MAPErrorCode.unexpectedDataValue,
+                            HttpCode.LOCAL_RESPONSE_2.getCode());
+                    break;
+                case SYSTEM_FAILURE:
+                    factory.rejectMessage(SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+                            HttpCode.LOCAL_RESPONSE_3.getCode());
+                    break;
+                case THROTTLING:
+                    factory.rejectMessage(SmppConstants.STATUS_THROTTLED, MAPErrorCode.resourceLimitation,
+                            HttpCode.LOCAL_RESPONSE_4.getCode());
+                    break;
+                case FACILITY_NOT_SUPPORTED:
+                    factory.rejectMessage(SmppConstants.STATUS_X_P_APPN, MAPErrorCode.facilityNotSupported,
+                            HttpCode.LOCAL_RESPONSE_5.getCode());
+                    break;
+                default:
+                    break;
+            }
+        }
+
         if (this.makeCopy) {
             MProcNewMessage copy = factory.createNewCopyMessage(message);
             factory.postNewMessage(copy);
@@ -1091,8 +1140,20 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             factory.updateMessageSourceAddrTon(message, this.newSourceTon);
         }
 
+        if (this.mtLocalSccpGt != null && !this.mtLocalSccpGt.equals("") && !this.mtLocalSccpGt.equals("-1")) {
+            factory.updateMessageMtLocalSccpGt(message, this.mtLocalSccpGt);
+        }
+
+        if (this.mtRemoteSccpTt != -1) {
+            factory.updateMessageMtRemoteSccpTt(message, this.mtRemoteSccpTt);
+        }
+
         if (this.tlvTagToRemove != -1) {
             factory.removeTlvParameter(message, this.tlvTagToRemove);
+        }
+        if (this.removeDestDigPrefix > 0) {
+            String newAddr = MProcUtility.removeDestDigPrefix(message.getDestAddr(), removeDestDigPrefix);
+            factory.updateMessageDestAddr(message, newAddr);
         }
     }
 
@@ -1112,11 +1173,11 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     public void onPostImsiRequest(final MProcRuleRaProvider anMProcRuleRa, PostImsiProcessor factory, MProcMessage messages)
             throws Exception {
         // TODO: we need proper implementing
-//        if (this.getId() == MAGIC_RULES_ID_NNN_CHECK) {
-//            if (factory.getNnnDigits().startsWith("1")) {
-//                factory.dropMessages();
-//            }
-//        }
+        // if (this.getId() == MAGIC_RULES_ID_NNN_CHECK) {
+        // if (factory.getNnnDigits().startsWith("1")) {
+        // factory.dropMessages();
+        // }
+        // }
         // TODO: we need proper implementing
 
         if (this.dropAfterSri) {
@@ -1131,20 +1192,20 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     public void onPostDelivery(final MProcRuleRaProvider anMProcRuleRa, PostDeliveryProcessor factory, MProcMessage message)
             throws Exception {
         // TODO: we need proper implementing
-//        if (this.getId() == MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT) {
-//            // this is a protection against cyclic report for report
-//            if (message.getShortMessageText().startsWith("Delivery ") || (message.getEsmClass() & 0x3C) != 0)
-//                return;
-//
-//            String respTxt;
-//            if (factory.isDeliveryFailure())
-//                respTxt = "Delivery failed for a dest:" + message.getDestAddr() + ", msg:" + message.getShortMessageText();
-//            else
-//                respTxt = "Delivery succeded for a dest:" + message.getDestAddr() + ", msg:" + message.getShortMessageText();
-//            MProcNewMessage resp = factory.createNewResponseMessage(message);
-//            resp.setShortMessageText(respTxt);
-//            factory.postNewMessage(resp);
-//        }
+        // if (this.getId() == MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT) {
+        // // this is a protection against cyclic report for report
+        // if (message.getShortMessageText().startsWith("Delivery ") || (message.getEsmClass() & 0x3C) != 0)
+        // return;
+        //
+        // String respTxt;
+        // if (factory.isDeliveryFailure())
+        // respTxt = "Delivery failed for a dest:" + message.getDestAddr() + ", msg:" + message.getShortMessageText();
+        // else
+        // respTxt = "Delivery succeded for a dest:" + message.getDestAddr() + ", msg:" + message.getShortMessageText();
+        // MProcNewMessage resp = factory.createNewResponseMessage(message);
+        // resp.setShortMessageText(respTxt);
+        // factory.postNewMessage(resp);
+        // }
         // TODO: we need proper implementing
 
         if (this.newNetworkIdAfterPermFail != -1 && factory.isDeliveryFailure())
@@ -1165,9 +1226,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     @Override
     public void setInitialRuleParameters(String parametersString) throws Exception {
         // TODO: we need proper implementing
-//        if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
-//            return;
-//        }
+        // if (this.getId() >= MAGIC_RULES_ID_START && this.getId() <= MAGIC_RULES_ID_END) {
+        // return;
+        // }
         // TODO: we need proper implementing
 
         String[] args = splitParametersString(parametersString);
@@ -1204,6 +1265,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int newSourceTon = -1;
         int newSourceNpi = -1;
         String newSourceAddr = "-1";
+        String mtLocalSccpGt = "-1";
+        Integer mtRemoteSccpTt = -1;
         boolean makeCopy = false;
         boolean hrByPass = false;
         boolean dropAfterSri = false;
@@ -1215,6 +1278,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         int newNetworkIdAfterTempFail = -1;
         short tlvTagToRemove = -1;
         int percent = -1;
+        int removeDestDigPrefix = -1;
 
         while (count < args.length) {
             command = args[count++];
@@ -1255,8 +1319,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } else if (command.startsWith("tlv_")) {
                     try {
                         int upos = command.indexOf("_", 4);
-                        tlvTagToMatch = Short.parseShort(command.substring(upos+1));
-                        //find value type
+                        tlvTagToMatch = Short.parseShort(command.substring(upos + 1));
+                        // find value type
                         String valType = command.substring(4, upos);
                         tlvValueTypeToMatch = TlvValueType.valueOf(valType.toUpperCase());
                         tlvValueToMatch = value;
@@ -1293,6 +1357,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } else if (command.equals("newsourceaddr")) {
                     newSourceAddr = value;
                     success = true;
+                } else if (command.equals("mtlocalsccpgt")) {
+                    mtLocalSccpGt = value;
+                    success = true;
+                } else if (command.equals("mtremotesccptt")) {
+                    mtRemoteSccpTt = Integer.parseInt(value);
+                    success = true;
                 } else if (command.equals("makecopy")) {
                     makeCopy = Boolean.parseBoolean(value);
                     success = true;
@@ -1315,11 +1385,11 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     newNetworkIdAfterTempFail = Integer.parseInt(value);
                     success = true;
                 } else if (command.equals("droponarrival")) {
-                	dropOnArrival = Boolean.parseBoolean(value);
-                	success = true;
+                    dropOnArrival = Boolean.parseBoolean(value);
+                    success = true;
                 } else if (command.equals("rejectonarrival")) {
-                	rejectOnArrival = value;
-                	success = true;
+                    rejectOnArrival = value;
+                    success = true;
                 } else if (command.equals("remove_tlv")) {
                     try {
                         tlvTagToRemove = Short.parseShort(value);
@@ -1327,9 +1397,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     } catch (Exception e) {
                         // dont have to do anything
                     }
+                } else if (command.equals("removedestdigprefix")) {
+                    removeDestDigPrefix = Integer.parseInt(value);
+                    success = true;
                 }
             }
-        }// while
+        } // while
 
         if (!success) {
             throw new Exception(MProcRuleOamMessages.SET_RULE_PARAMETERS_FAIL_NO_PARAMETERS_POVIDED);
@@ -1347,7 +1420,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         }
         RejectType rejectOnArrivalVal = null;
         try {
-        	rejectOnArrivalVal = RejectType.parse(rejectOnArrival);
+            rejectOnArrivalVal = RejectType.parse(rejectOnArrival);
         } catch (Exception e) {
         }
 
@@ -1355,9 +1428,9 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 originatingMaskVal, networkIdMask, originNetworkIdMask, receiptNetworkIdMask, origEsmeNameMask,
                 originatorSccpAddressMask, imsiDigitsMask, nnnDigitsMask, processingTypeVal, errorCode, percent, newNetworkId,
                 newDestTon, newDestNpi, addDestDigPrefix, addSourceDigPrefix, newSourceTon, newSourceNpi, newSourceAddr,
-                makeCopy, hrByPass, dropAfterSri, dropAfterTempFail, dropOnArrival, rejectOnArrivalVal, newNetworkIdAfterSri, 
-                newNetworkIdAfterPermFail, newNetworkIdAfterTempFail, tlvTagToMatch, tlvValueTypeToMatch, tlvValueToMatch, 
-                tlvTagToRemove);
+                mtLocalSccpGt, mtRemoteSccpTt, makeCopy, hrByPass, dropAfterSri, dropAfterTempFail, dropOnArrival,
+                rejectOnArrivalVal, newNetworkIdAfterSri, newNetworkIdAfterPermFail, newNetworkIdAfterTempFail, tlvTagToMatch,
+                tlvValueTypeToMatch, tlvValueToMatch, tlvTagToRemove, removeDestDigPrefix);
     }
 
     @Override
@@ -1438,13 +1511,13 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     this.setErrorCode(value);
                     success = true;
                 } else if (command.startsWith("tlv_")) {
-                    short prevTlvTagToMatch = this.tlvTagToMatch ;
+                    short prevTlvTagToMatch = this.tlvTagToMatch;
                     TlvValueType prevTlvValueTypeToMatch = this.tlvValueTypeToMatch;
                     String prevTlvValueToMatch = this.tlvValueToMatch;
                     try {
                         int upos = command.indexOf("_", 4);
-                        this.tlvTagToMatch = Short.parseShort(command.substring(upos+1));
-                        //find value type
+                        this.tlvTagToMatch = Short.parseShort(command.substring(upos + 1));
+                        // find value type
                         String valType = command.substring(4, upos);
                         this.tlvValueTypeToMatch = TlvValueType.valueOf(valType.toUpperCase());
                         this.tlvValueToMatch = value;
@@ -1488,6 +1561,13 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } else if (command.equals("newsourceaddr")) {
                     this.setNewSourceAddr(value);
                     success = true;
+                } else if (command.equals("mtlocalsccpgt")) {
+                    this.setMtLocalSccpGt(value);
+                    success = true;
+                } else if (command.equals("mtremotesccptt")) {
+                    int val = Integer.parseInt(value);
+                    this.setMtRemoteSccpTt(val);
+                    success = true;
                 } else if (command.equals("makecopy")) {
                     boolean val = Boolean.parseBoolean(value);
                     this.setMakeCopy(val);
@@ -1497,7 +1577,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     this.setHrByPass(val);
                     success = true;
                 } else if (command.equals("dropaftersri")) {
-                	boolean val = Boolean.parseBoolean(value);
+                    boolean val = Boolean.parseBoolean(value);
                     this.setDropAfterSri(val);
                     success = true;
                 } else if (command.equals("dropaftertempfail")) {
@@ -1505,13 +1585,20 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     this.setDropAfterTempFail(val);
                     success = true;
                 } else if (command.equals("droponarrival")) {
-                	boolean val = Boolean.parseBoolean(value);
-                	this.setDropOnArrival(val);
-                	success = true;
+                    boolean val = Boolean.parseBoolean(value);
+                    this.setDropOnArrival(val);
+                    success = true;
                 } else if (command.equals("rejectonarrival")) {
-                    RejectType rejectOnArrival = RejectType.parse(value);
-                    this.setRejectOnArrival(rejectOnArrival);
-                	success = true;
+                    if (value != null && value.equals("-1")) {
+                        this.setRejectOnArrival(null);
+                    } else {
+                        RejectType rejectOnArrival = RejectType.parse(value);
+                        if (rejectOnArrival.equals(RejectType.NONE))
+                            this.setRejectOnArrival(null);
+                        else
+                            this.setRejectOnArrival(rejectOnArrival);
+                    }
+                    success = true;
                 } else if (command.equals("newnetworkidaftersri")) {
                     int val = Integer.parseInt(value);
                     this.setNewNetworkIdAfterSri(val);
@@ -1531,9 +1618,13 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     } catch (Exception e) {
                         // dont have to do anything
                     }
+                } else if (command.equals("removedestdigprefix")) {
+                    int val = Integer.parseInt(value);
+                    this.setRemoveDestDigPrefix(val);
+                    success = true;
                 }
             }
-        }// while
+        } // while
 
         if (!success) {
             throw new Exception(MProcRuleOamMessages.SET_RULE_PARAMETERS_FAIL_NO_PARAMETERS_POVIDED);
@@ -1544,14 +1635,14 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
     public String getRuleParameters() {
 
         // TODO: we need proper implementing
-//        if (this.getId() == MAGIC_RULES_ID_NNN_CHECK)
-//            return "MAGIC_RULES_ID_NNN_CHECK";
-//        if (this.getId() == MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT)
-//            return "MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT";
-//        if (this.getId() == MAGIC_RULES_ID_ARRIVAL_DROP)
-//            return "MAGIC_RULES_ID_ARRIVAL_DROP";
-//        if (this.getId() == MAGIC_RULES_ID_ARRIVAL_REJECT)
-//            return "MAGIC_RULES_ID_ARRIVAL_REJECT";
+        // if (this.getId() == MAGIC_RULES_ID_NNN_CHECK)
+        // return "MAGIC_RULES_ID_NNN_CHECK";
+        // if (this.getId() == MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT)
+        // return "MAGIC_RULES_ID_DELIVERY_ANNOUNCEMENT";
+        // if (this.getId() == MAGIC_RULES_ID_ARRIVAL_DROP)
+        // return "MAGIC_RULES_ID_ARRIVAL_DROP";
+        // if (this.getId() == MAGIC_RULES_ID_ARRIVAL_REJECT)
+        // return "MAGIC_RULES_ID_ARRIVAL_REJECT";
         // TODO: we need proper implementing
 
         StringBuilder sb = new StringBuilder();
@@ -1608,14 +1699,11 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         }
         if (this.tlvTagToMatch != -1 && this.tlvValueTypeToMatch != null && tlvValueToMatch != null
                 && !tlvValueToMatch.isEmpty()) {
-            //FIXME: really bad, could use a library instead or regex?
+            // FIXME: really bad, could use a library instead or regex?
             StringBuilder param = new StringBuilder();
             String valTypeStr = this.tlvValueTypeToMatch.toString();
-            param.append("tlv")
-                .append(valTypeStr.substring(0, 1))
-                .append(valTypeStr.substring(1).toLowerCase())
-                .append("_")
-                .append(this.tlvTagToMatch);
+            param.append("tlv").append(valTypeStr.substring(0, 1)).append(valTypeStr.substring(1).toLowerCase()).append("_")
+                    .append(this.tlvTagToMatch);
 
             writeParameter(sb, parNumber++, param.toString(), this.tlvValueToMatch, ", ", "=");
         }
@@ -1647,6 +1735,12 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (this.newSourceAddr != null && !this.newSourceAddr.equals("") && !this.newSourceAddr.equals("-1")) {
             writeParameter(sb, parNumber++, "newSourceAddr", newSourceAddr, ", ", "=");
         }
+        if (this.mtLocalSccpGt != null && !this.mtLocalSccpGt.equals("") && !this.mtLocalSccpGt.equals("-1")) {
+            writeParameter(sb, parNumber++, "mtLocalSccpGt", mtLocalSccpGt, ", ", "=");
+        }
+        if (mtRemoteSccpTt != -1) {
+            writeParameter(sb, parNumber++, "mtRemoteSccpTt", mtRemoteSccpTt, ", ", "=");
+        }
         if (makeCopy) {
             writeParameter(sb, parNumber++, "makeCopy", makeCopy, ", ", "=");
         }
@@ -1677,13 +1771,17 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
         if (tlvTagToRemove != -1) {
             writeParameter(sb, parNumber++, "tlvTagToRemove", this.tlvTagToRemove, ", ", "=");
         }
+        if (removeDestDigPrefix != -1) {
+            writeParameter(sb, parNumber++, "removeDestDigPrefix", removeDestDigPrefix, ", ", "=");
+        }
         return sb.toString();
     }
 
     /**
      * XML Serialization/Deserialization
      */
-    protected static final XMLFormat<MProcRuleDefaultImpl> M_PROC_RULE_DEFAULT_XML = new XMLFormat<MProcRuleDefaultImpl>(MProcRuleDefaultImpl.class) {
+    protected static final XMLFormat<MProcRuleDefaultImpl> M_PROC_RULE_DEFAULT_XML = new XMLFormat<MProcRuleDefaultImpl>(
+            MProcRuleDefaultImpl.class) {
 
         @Override
         public void read(javolution.xml.XMLFormat.InputElement xml, MProcRuleDefaultImpl mProcRule) throws XMLStreamException {
@@ -1712,7 +1810,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.originatorSccpAddressMask = xml.getAttribute(ORIGINATOR_SCCP_ADDRESS_MASK, "-1");
             mProcRule.imsiDigitsMask = xml.getAttribute(IMSI_DIGITS_MASK, "-1");
             mProcRule.nnnDigitsMask = xml.getAttribute(NNN_DIGITS_MASK, "-1");
-			mProcRule.percent = xml.getAttribute(PERCENT, -1);
+            mProcRule.percent = xml.getAttribute(PERCENT, -1);
 
             val = xml.getAttribute(PROCESSING_TYPE, "");
             if (val != null) {
@@ -1723,7 +1821,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             }
 
             mProcRule.errorCode = xml.getAttribute(ERROR_CODE, "-1");
-            mProcRule.tlvTagToMatch = xml.getAttribute(TLV_TAG_TO_MATCH, (short)-1);
+            mProcRule.tlvTagToMatch = xml.getAttribute(TLV_TAG_TO_MATCH, (short) -1);
             val = xml.getAttribute(TLV_VALUE_TYPE_TO_MATCH, "");
             if (val != null) {
                 try {
@@ -1741,12 +1839,14 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             mProcRule.newSourceTon = xml.getAttribute(NEW_SOURCE_TON, -1);
             mProcRule.newSourceNpi = xml.getAttribute(NEW_SOURCE_NPI, -1);
             mProcRule.newSourceAddr = xml.getAttribute(NEW_SOURCE_ADDR, "-1");
+            mProcRule.mtLocalSccpGt = xml.getAttribute(MT_LOCAL_SCCP_GT, "-1");
+            mProcRule.mtRemoteSccpTt = xml.getAttribute(MT_REMOTE_SCCP_TT, -1);
             mProcRule.makeCopy = xml.getAttribute(MAKE_COPY, false);
             mProcRule.hrByPass = xml.getAttribute(HR_BY_PASS, false);
             mProcRule.dropAfterSri = xml.getAttribute(DROP_AFTER_SRI, false);
             mProcRule.dropAfterTempFail = xml.getAttribute(DROP_AFTER_TEMP_FAIL, false);
             mProcRule.dropOnArrival = xml.getAttribute(DROP_ON_ARRIVAL, false);
-            
+
             val = xml.getAttribute(REJECT_ON_ARRIVAL, "");
             if (val != null) {
                 try {
@@ -1754,17 +1854,19 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                 } catch (Exception e) {
                 }
             }
-       
+
             mProcRule.newNetworkIdAfterSri = xml.getAttribute(NEW_NETWORK_ID_AFTER_SRI, -1);
             mProcRule.newNetworkIdAfterPermFail = xml.getAttribute(NEW_NETWORK_ID_AFTER_PERM_FAIL, -1);
             mProcRule.newNetworkIdAfterTempFail = xml.getAttribute(NEW_NETWORK_ID_AFTER_TEMP_FAIL, -1);
-            mProcRule.tlvTagToRemove = xml.getAttribute(TLV_TAG_TO_REMOVE , (short)-1);
+            mProcRule.tlvTagToRemove = xml.getAttribute(TLV_TAG_TO_REMOVE, (short) -1);
+            mProcRule.removeDestDigPrefix = xml.getAttribute(REMOVE_DEST_DIG_PREFIX, -1);
 
             mProcRule.resetPattern();
         }
 
         @Override
-        public void write(MProcRuleDefaultImpl mProcRule, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
+        public void write(MProcRuleDefaultImpl mProcRule, javolution.xml.XMLFormat.OutputElement xml)
+                throws XMLStreamException {
             M_PROC_RULE_BASE_XML.write(mProcRule, xml);
 
             if (mProcRule.destTonMask != -1)
@@ -1833,14 +1935,19 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
                     && !mProcRule.addSourceDigPrefix.equals("-1"))
                 xml.setAttribute(ADD_SOURCE_DIG_PREFIX, mProcRule.addSourceDigPrefix);
 
-           if (mProcRule.newSourceTon != -1)
+            if (mProcRule.newSourceTon != -1)
                 xml.setAttribute(NEW_SOURCE_TON, mProcRule.newSourceTon);
             if (mProcRule.newSourceNpi != -1)
                 xml.setAttribute(NEW_SOURCE_NPI, mProcRule.newSourceNpi);
 
-            if (mProcRule.newSourceAddr != null && !mProcRule.newSourceAddr.equals("")
-                    && !mProcRule.newSourceAddr.equals("-1"))
+            if (mProcRule.newSourceAddr != null && !mProcRule.newSourceAddr.equals("") && !mProcRule.newSourceAddr.equals("-1"))
                 xml.setAttribute(NEW_SOURCE_ADDR, mProcRule.newSourceAddr);
+
+            if (mProcRule.mtLocalSccpGt != null && !mProcRule.mtLocalSccpGt.equals("") && !mProcRule.mtLocalSccpGt.equals("-1"))
+                xml.setAttribute(MT_LOCAL_SCCP_GT, mProcRule.mtLocalSccpGt);
+
+            if (mProcRule.mtRemoteSccpTt != -1)
+                xml.setAttribute(MT_REMOTE_SCCP_TT, mProcRule.mtRemoteSccpTt);
 
             if (mProcRule.makeCopy)
                 xml.setAttribute(MAKE_COPY, mProcRule.makeCopy);
@@ -1854,7 +1961,7 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
             if (mProcRule.dropOnArrival)
                 xml.setAttribute(DROP_ON_ARRIVAL, mProcRule.dropOnArrival);
             if (mProcRule.rejectOnArrival != null)
-                xml.setAttribute(REJECT_ON_ARRIVAL, mProcRule.rejectOnArrival.toString());          
+                xml.setAttribute(REJECT_ON_ARRIVAL, mProcRule.rejectOnArrival.toString());
             if (mProcRule.newNetworkIdAfterSri != -1)
                 xml.setAttribute(NEW_NETWORK_ID_AFTER_SRI, mProcRule.newNetworkIdAfterSri);
             if (mProcRule.newNetworkIdAfterPermFail != -1)
@@ -1864,6 +1971,8 @@ public class MProcRuleDefaultImpl extends MProcRuleBaseImpl implements MProcRule
 
             if (mProcRule.tlvTagToRemove != -1)
                 xml.setAttribute(TLV_TAG_TO_REMOVE, mProcRule.tlvTagToRemove);
+            if (mProcRule.removeDestDigPrefix > 0)
+                xml.setAttribute(REMOVE_DEST_DIG_PREFIX, mProcRule.removeDestDigPrefix);
         }
     };
 

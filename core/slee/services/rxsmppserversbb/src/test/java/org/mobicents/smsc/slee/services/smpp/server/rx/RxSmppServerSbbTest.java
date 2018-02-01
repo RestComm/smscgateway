@@ -185,11 +185,11 @@ public class RxSmppServerSbbTest {
 //
         esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null, SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER,
                 SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, 0,
-                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1);
+                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
 
         SmsSetCache.getInstance().clearProcessingSmsSet();
 
-        RxSmppServerSbb.MAX_MESSAGES_PER_STEP = 2;
+        sbb.setMaxMessagesPerStep(2);
     }
 
     @AfterMethod
@@ -661,6 +661,10 @@ public class RxSmppServerSbbTest {
 			// TODO Auto-generated method stub
 			return null;
 		}
+		
+		protected void setMaxMessagesPerStep(int maxMessagesPerStep) {
+            this.maxMessagesPerStep = maxMessagesPerStep;
+        }
     }
 
     private class SmppTransactionProxy implements SmppTransaction, ActivityContextInterface {

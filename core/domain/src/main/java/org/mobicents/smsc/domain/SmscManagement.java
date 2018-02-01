@@ -24,13 +24,17 @@ package org.mobicents.smsc.domain;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.management.ManagementFactory;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
@@ -38,7 +42,6 @@ import javolution.text.TextBuilder;
 import javolution.util.FastList;
 
 import org.apache.log4j.Logger;
-import org.jboss.mx.util.MBeanServerLocator;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.mproc.MProcRuleFactory;
@@ -221,7 +224,27 @@ public class SmscManagement implements SmscManagementMBean {
 
 		// Step 1 Get the MBeanServer
         try {
-            this.mbeanServer = MBeanServerLocator.locateJBoss();
+            boolean servFound = false;
+            String agentId = "jboss";
+            List<MBeanServer> servers = MBeanServerFactory.findMBeanServer(null);
+            if (servers != null && servers.size() > 0) {
+                for (MBeanServer server : servers) {
+                    String defaultDomain = server.getDefaultDomain();
+
+                    if (defaultDomain != null && defaultDomain.equals(agentId)) {
+                        mbeanServer = server;
+                        servFound = true;
+                        logger.info(String.format("Found MBeanServer matching for agentId=%s", agentId));
+                    } else {
+                        logger.warn(String.format("Found non-matching MBeanServer with default domian = %s", defaultDomain));
+                    }
+                }
+            }
+
+            if (!servFound) {
+                this.mbeanServer = ManagementFactory.getPlatformMBeanServer();
+            }            
+            logger.info("servFound =" + servFound + ", this.mbeanServer = " + this.mbeanServer);            
         } catch (Exception e) {
             this.logger.error("Exception when obtaining of MBeanServer: " + e.getMessage(), e);
         }
@@ -343,10 +366,17 @@ public class SmscManagement implements SmscManagementMBean {
         this.smscDatabaseManagement = SmscDatabaseManagement.getInstance(this.name);
         this.smscDatabaseManagement.start();
 
+        // Step 14. Load counters from database into SmsSetCache
+        Date date = new Date();
+        ConcurrentHashMap<Long, AtomicLong> storedMessages = DBOperations.getInstance().c2_getStoredMessagesCounter(date); 
+        ConcurrentHashMap<Long, AtomicLong> sentMessages = DBOperations.getInstance().c2_getSentMessagesCounter(date);
+        SmsSetCache.getInstance().loadMessagesCountersFromDatabase(storedMessages, sentMessages);
+        
         ObjectName smscDatabaseManagementObjName = new ObjectName(SmscManagement.JMX_DOMAIN + ":layer="
                 + JMX_LAYER_SMSC_DATABASE_MANAGEMENT + ",name=" + this.getName());
         this.registerMBean(this.smscDatabaseManagement, SmscDatabaseManagement.class, true, smscDatabaseManagementObjName);
 
+        logger.warn("Started SmscManagemet " + name);
 	}
 
 	public void stop() throws Exception {

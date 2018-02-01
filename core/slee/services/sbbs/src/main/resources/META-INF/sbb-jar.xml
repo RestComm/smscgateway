@@ -218,6 +218,13 @@
 				<event-type-version>1.0</event-type-version>
 			</event-type-ref>
 		</event>
+		
+		<env-entry>          
+			<description>Max number of messages to be sent to single ESME upon arrival of SmsSet</description>          
+			<env-entry-name>maxMessagesPerStep</env-entry-name>          
+			<env-entry-type>java.lang.Integer</env-entry-type>          
+			<env-entry-value>100</env-entry-value>         
+		</env-entry>
 
 
 		<resource-adaptor-type-binding>
@@ -2034,7 +2041,7 @@
         <resource-adaptor-type-binding>
             <resource-adaptor-type-ref>
                 <resource-adaptor-type-name>HttpServletResourceAdaptorType</resource-adaptor-type-name>
-                <resource-adaptor-type-vendor>org.mobicents</resource-adaptor-type-vendor>
+                <resource-adaptor-type-vendor>org.restcomm</resource-adaptor-type-vendor><!--HTTP RESOURCE ADAPTOR type-vendor-->
                 <resource-adaptor-type-version>1.0</resource-adaptor-type-version>
             </resource-adaptor-type-ref>
             <activity-context-interface-factory-name>slee/resources/http-server/acifactory</activity-context-interface-factory-name>

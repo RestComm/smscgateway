@@ -1,11 +1,11 @@
-# RestComm SMSC Gateway
+# RestComm SMS Gateway (SMSC)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FRestComm%2Fsmscgateway.svg?type=shield)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FRestComm%2Fsmscgateway?ref=badge_shield)
 
- RestComm SMSC Gateway to send/receive SMS from/to Mobile Operator Networks (GSM, SS7 MAP) , SMS aggregators (SMPP) and Internet Telephony Service Providers (SIP, SMPP). 
+ RestComm SMS Gateway (SMSC) to send/receive SMS from/to Mobile Operator Networks (GSM, SS7 MAP) , SMS aggregators (SMPP) and Internet Telephony Service Providers (SIP, SMPP). 
 
 ## Introduction 
 
-RestComm SMSC Gateway is built on [RestComm SS7](https://github.com/RestComm/jss7) and RestComm JSLEE Server
+RestComm SMS Gateway (SMSC) is built on [RestComm SS7](https://github.com/RestComm/jss7), SMPP and RestComm JSLEE Server.
 
 When a user sends a text message (SMS message) to another user, the message gets stored in the SMSC (short message service center) which delivers it to the destination user when they are available. This is a store and forward option.
 
@@ -34,7 +34,7 @@ RestComm SMSC Gateway is lead by [TeleStax, Inc.](www.telestax.com) and develope
 
 ## Downloads
 
-Download binary from [here](https://github.com/RestComm/smscgateway/releases) or Continuous Delivery builds from [CloudBees](https://mobicents.ci.cloudbees.com/job/Restcomm-SMSC/)
+Download your binaries from [the Restcomm site Downloads section](https://www.restcomm.com/downloads/).
 
 ## Maven Repository
 

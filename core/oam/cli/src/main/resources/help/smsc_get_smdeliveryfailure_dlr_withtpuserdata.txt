@@ -1,0 +1,14 @@
+Name
+	smsc get smdeliveryfailure_dlr_withtpuserdata
+
+SYNOPSIS
+	smsc get smdeliveryfailure_dlr_withtpuserdata
+
+DESCRIPTION
+	This command is used to get a value of parameter smdeliveryfailure_dlr_withtpuserdata
+
+EXAMPLES
+	smsc get smdeliveryfailure_dlr_withtpuserdata
+
+SEE ALSO
+	smsc set smdeliveryfailure_dlr_withtpuserdata

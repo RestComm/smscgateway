@@ -199,7 +199,8 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
     public void onSendRsds(SendRsdsEvent event, ActivityContextInterface aci, EventContext eventContext) {
         setupReportSMDeliveryStatusRequest(event.getMsisdn(), event.getServiceCentreAddress(), event.getSMDeliveryOutcome(),
-                event.getDestAddress(), event.getMapApplicationContext(), event.getTargetId(), event.getNetworkId());
+                event.getDestAddress(), event.getMapApplicationContext(), event.getTargetId(), event.getNetworkId(),
+                event.getMtLocalSccpGt());
     }
 
     // *********
@@ -317,7 +318,7 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
     public void setupReportSMDeliveryStatusRequest(ISDNAddressString msisdn, AddressString serviceCentreAddress,
             SMDeliveryOutcome smDeliveryOutcome, SccpAddress destAddress, MAPApplicationContext mapApplicationContext,
-            String targetId, int networkId) {
+            String targetId, int networkId, String mtLocalSccpGt) {
         if (this.logger.isInfoEnabled()) {
             this.logger.info("\nReceived setupReportSMDeliveryStatus request msisdn= " + msisdn
                     + ", serviceCentreAddress=" + serviceCentreAddress + ", sMDeliveryOutcome=" + smDeliveryOutcome
@@ -329,8 +330,15 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
         MAPDialogSms mapDialogSms;
         try {
-            mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext,
-                    this.getServiceCenterSccpAddress(networkId), null, destAddress, null);
+            SccpAddress originSccpAddress;
+            if (mtLocalSccpGt != null) {
+                originSccpAddress = this.getServiceCenterSccpAddress(mtLocalSccpGt, networkId);
+            } else {
+                originSccpAddress = this.getServiceCenterSccpAddress(networkId);
+            }
+
+            mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(mapApplicationContext, originSccpAddress, null,
+                    destAddress, null);
             mapDialogSms.setNetworkId(networkId);
 
             ActivityContextInterface mtFOSmsDialogACI = this.mapAcif.getActivityContextInterface(mapDialogSms);
@@ -368,5 +376,19 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
                     smscPropertiesManagement.getServiceCenterSsn(), smscPropertiesManagement.getGlobalTitleIndicator(),
                     smscPropertiesManagement.getTranslationType());
         }
+    }
+
+    protected SccpAddress getServiceCenterSccpAddress(String mtLocalSccpGt, int networkId) {
+        if (mtLocalSccpGt == null) {
+            if (networkId == 0) {
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt();
+            } else {
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt(networkId);
+            }
+        }
+
+        return MessageUtil.getSccpAddress(sccpParameterFact, mtLocalSccpGt, AddressNature.international_number.getIndicator(),
+                NumberingPlan.ISDN.getIndicator(), smscPropertiesManagement.getServiceCenterSsn(),
+                smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
     }
 }

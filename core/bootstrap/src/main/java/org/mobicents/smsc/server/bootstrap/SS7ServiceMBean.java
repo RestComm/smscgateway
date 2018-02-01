@@ -58,4 +58,8 @@ public interface SS7ServiceMBean {
 	public String getSS7ServiceName();
 
 	public boolean isStarted();
+
+    Object getStack();
+
+    void setStack(Object stack);
 }

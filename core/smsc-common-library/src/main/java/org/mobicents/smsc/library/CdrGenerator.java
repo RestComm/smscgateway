@@ -23,10 +23,12 @@ package org.mobicents.smsc.library;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.mobicents.smsc.mproc.DeliveryReceiptData;
 
 /**
  * 
@@ -48,6 +50,13 @@ public class CdrGenerator {
     public static final String CDR_MPROC_DROPPED = "mproc_dropped";
     public static final String CDR_MPROC_DROP_PRE_DELIVERY = "mproc_drop_pre_delivery";
 
+    public static final String CDR_SUBMIT_FAILED_MO = "submit_failed_mo";
+    public static final String CDR_SUBMIT_FAILED_HR = "submit_failed_hr";
+    public static final String CDR_SUBMIT_FAILED_ESME = "submit_failed_esme";
+    public static final String CDR_SUBMIT_FAILED_SIP = "submit_failed_sip";
+    public static final String CDR_SUBMIT_FAILED_HTTP = "submit_failed_http";
+    public static final String CDR_SUBMIT_FAILED_CHARGING = "submit_failed_charging";
+
     public static final String CDR_SUCCESS_ESME = "success_esme";
     public static final String CDR_PARTIAL_ESME = "partial_esme";
     public static final String CDR_FAILED_ESME = "failed_esme";
@@ -68,9 +77,16 @@ public class CdrGenerator {
 
     public static void generateCdr(Sms smsEvent, String status, String reason, boolean generateReceiptCdr, boolean generateCdr,
             boolean messageIsSplitted, boolean lastSegment, boolean calculateMsgPartsLenCdr, boolean delayParametersInCdr) {
+        CdrGenerator.generateCdr(smsEvent, status, reason, generateReceiptCdr, generateCdr, messageIsSplitted, 
+                lastSegment, calculateMsgPartsLenCdr, delayParametersInCdr, -1);
+    }
+    
+    public static void generateCdr(Sms smsEvent, String status, String reason, boolean generateReceiptCdr, boolean generateCdr,
+            boolean messageIsSplitted, boolean lastSegment, boolean calculateMsgPartsLenCdr, boolean delayParametersInCdr, int seqNumber) {
         // Format is
         // SUBMIT_DATE,SOURCE_ADDRESS,SOURCE_TON,SOURCE_NPI,DESTINATION_ADDRESS,DESTINATION_TON,DESTINATION_NPI,STATUS,SYSTEM-ID,MESSAGE-ID,
-	    // VLR, IMSI, CorrelationID, First 20 char of SMS, REASON
+        // VLR, IMSI, CorrelationID, First 20 char of SMS, REASON, DELIVERY_RECEIPT_MESSAGE_STATUS, DELIVERY_RECEIPT_MESSAGE_STATE_TLV, 
+        // DELIVERY_RECEIPT_MESSAGE_ERR
 
         if (!generateCdr)
             return;
@@ -96,6 +112,26 @@ public class CdrGenerator {
         }
 
         Long receiptLocalMessageId = smsEvent.getReceiptLocalMessageId();
+        
+        long msgPartDelTime = -1;
+
+         if (smsEvent.getMsgPartsSeqNumbers().contains(seqNumber - 1)) {
+             msgPartDelTime = smsEvent.getMsgPartDelTime(seqNumber) - smsEvent.getMsgPartDelTime(seqNumber - 1);
+         } else if (smsEvent.getMsgPartsSeqNumbers().contains(seqNumber)) {
+             msgPartDelTime = smsEvent.getMsgPartDelTime(seqNumber) - smsEvent.getSubmitDate().getTime();
+         }
+        
+        DeliveryReceiptData deliveryReceiptData = MessageUtil.parseDeliveryReceipt(smsEvent.getShortMessageText(),
+                smsEvent.getTlvSet());
+        String st = null;
+        int tlvMessageState = -1;
+        int err = -1;
+        
+        if (deliveryReceiptData != null) {
+            st = deliveryReceiptData.getStatus();
+            tlvMessageState = deliveryReceiptData.getTlvMessageState() == null ? -1 : deliveryReceiptData.getTlvMessageState();
+            err = deliveryReceiptData.getError();
+        }
         
         StringBuffer sb = new StringBuffer();
         sb.append(DATE_FORMAT.format(smsEvent.getSubmitDate()))
@@ -153,13 +189,114 @@ public class CdrGenerator {
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(delayParametersInCdr ? smsEvent.getDeliveryCount() : CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
+                .append(msgPartDelTime != -1 ? msgPartDelTime : CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
                 .append("\"")
                 .append(getEscapedString(getFirst20CharOfSMS(smsEvent.getShortMessageText())))
                 .append("\"")
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append("\"")
                 .append(getEscapedString(reason))
-                .append("\"");
+                .append("\"")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(st != null ? st : CdrGenerator.CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(tlvMessageState != -1 ? tlvMessageState : CdrGenerator.CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(err != -1 ? err : CdrGenerator.CDR_EMPTY);
+        
+        CdrGenerator.generateCdr(sb.toString());
+    }
+
+    public static void generateCdr(String sourceAddr, int sourceAddressTon, int sourceAddrNpi, String destAddr, int destAddrTon,
+                                   int destAddrNpi, OriginationType originationType, String origSystemId, String imsi,
+                                   String originatorSccpAddress, int origNetworkId, int networkId, Date scheduleDeliveryTime,
+                                   int deliveryCount, String message, String status, String reason, boolean generateReceiptCdr,
+                                   boolean generateCdr, boolean lastSegment, boolean calculateMsgPartsLenCdr, boolean delayParametersInCdr) {
+
+        if (!generateCdr || !generateReceiptCdr)
+            return;
+
+        int msgParts = 0, charNumbers = 0;
+        if (calculateMsgPartsLenCdr && message != null) {
+            if (lastSegment) {
+                charNumbers = message.length();
+            } else {
+                charNumbers = 0;
+            }
+        }
+        Date submitDate = new Date();
+
+        StringBuffer sb = new StringBuffer();
+        sb.append(DATE_FORMAT.format(submitDate))
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(sourceAddr)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(sourceAddressTon)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(sourceAddrNpi)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(destAddr)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(destAddrTon)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(destAddrNpi)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(status)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(originationType)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append("message")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(origSystemId)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(imsi)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(originatorSccpAddress)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(origNetworkId)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(networkId)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(msgParts)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(charNumbers)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(delayParametersInCdr ? getProcessingTime(submitDate) : CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(delayParametersInCdr ? getScheduleDeliveryDelayMilis(submitDate, scheduleDeliveryTime) : CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(delayParametersInCdr ? deliveryCount : CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append("\"")
+                .append(getEscapedString(getFirst20CharOfSMS(message)))
+                .append("\"")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append("\"")
+                .append(getEscapedString(reason))
+                .append("\"")
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(CDR_EMPTY);
         CdrGenerator.generateCdr(sb.toString());
     }
 
@@ -175,13 +312,16 @@ public class CdrGenerator {
     }
 
     private static String getEscapedString(final String aValue) {
+	    if (aValue == null) {
+	        return CDR_EMPTY;
+        }
 	    return aValue.replaceAll("\n", "n").replaceAll(",", " ").replace("\"", "'").replace('\u0000', '?').replace('\u0006', '?');
     }
 
     private static String getProcessingTime(final Date aSubmitDate) {
         if (aSubmitDate == null) {
             return CDR_EMPTY;
-}
+        }
         return String.valueOf(System.currentTimeMillis() - aSubmitDate.getTime());
     }
 

@@ -15,19 +15,19 @@ import org.mobicents.smsc.library.DbSmsRoutingRule;
  */
 public interface DatabaseSmsRoutingRuleMBean extends SmsRoutingRule {
 
-	public void updateDbSmsRoutingRule(SmsRoutingRuleType dbSmsRoutingRuleType, String address, int networkId, String systemId)
+	public void updateDbSmsRoutingRule(String dbSmsRoutingRuleType, String address, int networkId, String systemId)
 			throws PersistenceException;
 
-	public void deleteDbSmsRoutingRule(SmsRoutingRuleType dbSmsRoutingRuleType, String address, int networkId)
+	public void deleteDbSmsRoutingRule(String dbSmsRoutingRuleType, String address, int networkId)
 			throws PersistenceException;
 
-	public DbSmsRoutingRule getSmsRoutingRule(SmsRoutingRuleType dbSmsRoutingRuleType, String address, int networkId)
+	public DbSmsRoutingRule getSmsRoutingRule(String dbSmsRoutingRuleType, String address, int networkId)
 			throws PersistenceException;
 
-	public List<DbSmsRoutingRule> getSmsRoutingRulesRange(SmsRoutingRuleType dbSmsRoutingRuleType)
+	public List<DbSmsRoutingRule> getSmsRoutingRulesRange(String dbSmsRoutingRuleType)
 			throws PersistenceException;
 
-	public List<DbSmsRoutingRule> getSmsRoutingRulesRange(SmsRoutingRuleType dbSmsRoutingRuleType, String lastAdress)
+	public List<DbSmsRoutingRule> getSmsRoutingRulesRange(String dbSmsRoutingRuleType, String lastAdress)
 			throws PersistenceException;
 
 }

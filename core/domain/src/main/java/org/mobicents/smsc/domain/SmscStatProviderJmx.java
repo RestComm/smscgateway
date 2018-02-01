@@ -198,6 +198,9 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
 
         cd = new CounterDefImpl(CounterType.Summary_Cumulative, "SmscDeliveringLag", "Lag of delivering messages by Smsc (in seconds)");
         cds.addCounterDef(cd);
+        
+        cd = new CounterDefImpl(CounterType.Maximal, "MsgPendingInDb", "Messages stored in database which are to be delivered yet");
+        cds.addCounterDef(cd);
 
         lstCounters = lst;
     }
@@ -327,7 +330,10 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                         svo = new SourceValueObjectImpl(this.getName(), res);
                 } else if (cd.getCounterName().equals("SmscDeliveringLag")) {
                     svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmscDeliveringLag());
+                } else if (cd.getCounterName().equals("MsgPendingInDb")) {
+                    svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgPendingInDbRes());
                 }
+                
                 if (svo != null)
                     scs.addObject(svo);
 

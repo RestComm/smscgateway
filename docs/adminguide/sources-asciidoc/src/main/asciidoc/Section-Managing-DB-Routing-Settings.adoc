@@ -17,11 +17,25 @@ The destined number of SMS is checked with address range. {this-platform} {this-
 
 The above methodology can work if the routing rule is based on MSISDN range, however if the range is not fixed (like in case of Number Portability) the above process will break.
 In such cases you can define a Database routing rule.
+
+.Procedure of Database routing rule configuring for JBOSS 5
 You must change the value of the property `smsRoutingRuleClass` in the file [path]_{this-folder}-smscgateway-<version>/jboss-5.1.0.GA/server/default/deploy/{this-folder}-smsc-server/META-INF/jboss-beans.xml_ to look like below and un-comment if its commented out: 
 ----
 
 <property name="smsRoutingRuleClass">org.mobicents.smsc.smpp.DatabaseSmsRoutingRule</property>
 ----
+
+.Procedure of Database routing rule configuring for Wildfly 10
+You must change the definifion of a mbean definition `mbean name="SmscManagement"` by adding of an extra property `smsRoutingRuleClass`
+ in the file [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml_ to look like below: 
+----
+<mbean name="SmscManagement" type="SmscManagement">
+    <property name="MProcRuleFactories" type="String" value="org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault"/>
+    <property name="smsRoutingRuleClass" type="String" value="org.mobicents.smsc.domain.DatabaseSmsRoutingRule"/>
+</mbean>
+----
+
+
 SMSC stores the routing rule in the Cassandra Database.
 You can populate this table with address and corresponding cluster name as explained in the sections below. 
 

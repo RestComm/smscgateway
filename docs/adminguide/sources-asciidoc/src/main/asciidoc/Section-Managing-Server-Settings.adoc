@@ -11,7 +11,7 @@
 ==== Using CLI
 
 You can set the 'Default Validity Period (in hours)' by issuing the command `smsc set defaultvalidityperiodhours` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get defaultvalidityperiodhours` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get defaultvalidityperiodhours` which will display the value set for this property.
 
 ----
 
@@ -22,10 +22,10 @@ SYNOPSIS
 	smsc set defaultvalidityperiodhours <default-validity-period-hours>
 
 DESCRIPTION
-	This command is used to set a value for default validity period (in hours) for 
-	incoming SMSC messages that do not have their own validity period value. Validity 
+	This command is used to set a value for default validity period (in hours) for
+	incoming SMSC messages that do not have their own validity period value. Validity
 	period is the time duration for which the SMSC Gateway will attempt to
-	send the SMS. If the time period expires before the message can be delivered, 
+	send the SMS. If the time period expires before the message can be delivered,
 	the SMSC Gateway will drop it.
 
 EXAMPLES
@@ -36,12 +36,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Default Validity Period using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the default validity period (in hours) by entering the value in the text field 'Default validity period hours (in hours)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_maxvalidityperiodhours]]
 === Maximum Validity Period (in hours)
@@ -50,7 +50,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Max Validity Period (in hours)' by issuing the command `smsc set maxvalidityperiodhours` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get maxvalidityperiodhours` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get maxvalidityperiodhours` which will display the value set for this property.
 
 ----
 
@@ -75,12 +75,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Maximum Validity Period using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the maximum validity period (in hours) by entering the value in the text field 'Maximum validity period (in hours)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_defaultton]]
 === Default Type of Number (TON)
@@ -89,7 +89,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Default type of number (TON)' by issuing the command `smsc set defaultton` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get defaultton` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get defaultton` which will display the value set for this property.
 
 ----
 
@@ -102,7 +102,7 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to set a value for default TON (Type Of Number). If an
 	incoming message does not have a value defined for TON, i.e. if TON is set as
-	'unknown', then the value specified for defaultton will be used as TON for that 
+	'unknown', then the value specified for defaultton will be used as TON for that
 	message.
 
 EXAMPLES
@@ -113,12 +113,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Default type of number (TON) using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the Default type of number (TON) by entering the value in the text field 'Default type of number (TON)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_defaultnpi]]
 === Default numbering plan indicator (NPI)
@@ -127,7 +127,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Default numbering plan indicator (NPI)' value by issuing the command `smsc set defaultnpi` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get defaultnpi` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get defaultnpi` which will display the value set for this property.
 
 ----
 
@@ -140,7 +140,7 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to set a value for default NPI (Number Plan Indicator). If an
 	incoming message does not have a value defined for NPI, i.e. if NPI is set as
-	'unknown', then the value specified for defaultnpi will be used as NPI for that 
+	'unknown', then the value specified for defaultnpi will be used as NPI for that
 	message.
 
 EXAMPLES
@@ -151,12 +151,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Default numbering plan indicator (NPI) using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the Default numbering plan indicator (NPI) by entering the value in the text field 'Default numbering plan indicator (NPI)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_esmedefaultcluster]]
 === Cluster Name
@@ -176,11 +176,11 @@ SYNOPSIS
 	smsc set esmedefaultcluster <esme-default-cluster>
 
 DESCRIPTION
-	This command is used to set a value for ESME default cluster. If the 
+	This command is used to set a value for ESME default cluster. If the
 	destination-address does not match to any ESME (any Cluster Name) the message will
 	be routed to the cluster with the name specified here for esme-default-cluster.
 	This parameter affects only for DatabaseSmsRoutingRule (not used for default
-	routing). 
+	routing).
 ----
 
 You can remove an ESME default cluster by issuing a command in the below format:
@@ -194,22 +194,22 @@ SYNOPSIS
 	smsc remove esmedefaultcluster <esme-default-cluster>
 
 DESCRIPTION
-	This command is used to remove the value configured for ESME default cluster. If 
+	This command is used to remove the value configured for ESME default cluster. If
 	this value is removed, all unrouted messages will be routed into the GSM network.
 	This parameter affects only for DatabaseSmsRoutingRule (not used for default
-	routing). 
+	routing).
 ----
 
 [[_esmedefaultcluster_gui]]
 ==== Using GUI
 
 .Procedure: Set Cluster Name using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the Cluster Name by entering the value in the text field 'Cluster Name'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_smpp_encoding_for_ucs2]]
 === SMPP Encoding for GSM7/UCS2
@@ -219,7 +219,7 @@ DESCRIPTION
 
 You can set the 'SMPP Encoding for GSM7 (DCS=0)' and 'SMPP Encoding for UCS2 (DCS=8)' value by issuing the commands `smsc set smppencodingforgsm7` / `smsc set smppencodingforucs2` with appropriate parameters as described below.
 You can verify this by issuing the commands `smsc get smppencodingforgsm7` / `smsc get smppencodingforucs2` which will display the value set for these property.
-When GSM8 encoding type no recoding of message content is made. 
+When GSM8 encoding type no recoding of message content is made.
 
 ----
 
@@ -233,22 +233,22 @@ SYNOPSIS
 
 DESCRIPTION
     These commands are used to set the Encoding Scheme at SMPP side for
-    different GSM data coding schemas (DCS). 
-    
-    For GSM7 encoding (DCS = 0) you must use the command 
-    smsc set smppencodingforgsm7, in order to set text encoding style. 
-    
+    different GSM data coding schemas (DCS).
+
+    For GSM7 encoding (DCS = 0) you must use the command
+    smsc set smppencodingforgsm7, in order to set text encoding style.
+
     For UCS2 encoding (DCS = 8), you must use the command
     smsc set smppencodingforucs2, in order to set text encoding style.
-    
+
     At the SMPP side, messages accept 3 different encoding schemes namely UTF8,
     UNICODE and GSM7 (8-bit), for both sending and receiving messages. The SMSC
     can be configured to accept one of them (the one that ESME supports). If this
     is not set, then the default encoding sheme is UTF8. For GSM8 encoding (DCS = 4),
-    no charset encoding made in the SMSC. 
+    no charset encoding made in the SMSC.
 
 EXAMPLES
-	smsc set smppencodingforgsm7 utf8 
+	smsc set smppencodingforgsm7 utf8
 	or
 	smsc set smppencodingforucs2 unicode
 ----
@@ -257,12 +257,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set SMPP Encoding for GSM7 and UCS2 using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the encoding scheme by choosing from the values (UTF8 | UNICODE | GSM7) in the list for 'SMPP Encoding for GSM7' (DCS=0) or 'SMPP Encoding for UCS2' (DCS=8). For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_storeandforwardmode]]
 === Store And Forward Mode
@@ -271,7 +271,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Store And Forward Mode' value by issuing the command `smsc set storeandforwordmode` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get storeandforwordmode` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get storeandforwordmode` which will display the value set for this property.
 
 ----
 
@@ -284,9 +284,9 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to set the storeandforwordmode value.
 	storeandforwordmode has two possible values:
-	
-	normal - StoreAndForward mode is used for incoming 
-	smpp StoreAndForward messages and all SS7 and SIP messages. All 
+
+	normal - StoreAndForward mode is used for incoming
+	smpp StoreAndForward messages and all SS7 and SIP messages. All
 	the incoming messages into SMSC will be persisted before trying
 	for delivery.
 
@@ -295,8 +295,8 @@ DESCRIPTION
 	can be switched without SMSC restart. All the incoming messages into
 	SMSC will be tried for delivery first and only if delivery fails,
 	it will be persisted for later re-try.
-	
-	Datagramm and Transactional modes will work in the same way for both normal and fast modes. 
+
+	Datagramm and Transactional modes will work in the same way for both normal and fast modes.
 
 EXAMPLES
 	smsc get storeandforwordmode fast
@@ -306,12 +306,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Store And Forward Mode using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the Store And Forward Mode by selecting the value from the dropdown field 'Store And Forward Mode'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_locking_s_table]]
 === National language locking shift table
@@ -320,7 +320,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'National language locking shift table' value by issuing the command smsc set nationallanguagelockingshift with appropriate parameters as described below.
-You can verify this by issuing the command smsc get nationallanguagelockingshift which will display the value set for this property. 
+You can verify this by issuing the command smsc get nationallanguagelockingshift which will display the value set for this property.
 
 ----
 
@@ -348,12 +348,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set National language locking shift table using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
-. You can specify the National language locking shift table by entering the value in the text field 'National language locking shift'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section. 
+  Switch to the 'Properties' tab in the GUI.
+. You can specify the National language locking shift table by entering the value in the text field 'National language locking shift'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_single_s_table]]
 === National language single shift table
@@ -362,7 +362,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'National language single shift table' value by issuing the command smsc set nationallanguagesingleshift with appropriate parameters as described below.
-You can verify this by issuing the command smsc get nationallanguagesingleshift which will display the value set for this property. 
+You can verify this by issuing the command smsc get nationallanguagesingleshift which will display the value set for this property.
 
 ----
 
@@ -390,12 +390,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set National language single shift table using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
-. You can specify the National language single shift table by entering the value in the text field 'National language single shift'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section. 
+  Switch to the 'Properties' tab in the GUI.
+. You can specify the National language single shift table by entering the value in the text field 'National language single shift'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_subscriberbusyduedelay]]
 === Subscriber busy due delay (in sec)
@@ -404,7 +404,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Subscriber busy due delay (in sec)' value by issuing the command `smsc set subscriberbusyduedelay` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get subscriberbusyduedelay` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get subscriberbusyduedelay` which will display the value set for this property.
 
 ----
 
@@ -427,12 +427,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Subscriber busy due delay (in sec) using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the Subscriber busy due delay by entering the value in the text field 'Subscriber busy due delay (in sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_firstduedelay]]
 === First due delay (in sec)
@@ -441,7 +441,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'First due delay (in sec)' value by issuing the command `smsc set firstduedelay` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get firstduedelay` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get firstduedelay` which will display the value set for this property.
 
 ----
 
@@ -452,8 +452,8 @@ SYNOPSIS
 	smsc set firstduedelay <first-due-delay>
 
 DESCRIPTION
-	This command is used to set a value for first-due-delay (in seconds). This 
-	parameter specifies the delay time period in seconds between message incoming time 
+	This command is used to set a value for first-due-delay (in seconds). This
+	parameter specifies the delay time period in seconds between message incoming time
 	and first delivery attempt.
 
 EXAMPLES
@@ -464,12 +464,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set First due delay (in sec) using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the First due delay by entering the value in the text field 'First due delay (in sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_secondduedelay]]
 === Second due delay (in sec)
@@ -478,7 +478,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Second due delay (in sec)' value by issuing the command `smsc set secondduedelay` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get secondduedelay` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get secondduedelay` which will display the value set for this property.
 
 ----
 
@@ -489,8 +489,8 @@ SYNOPSIS
 	smsc set secondduedelay <second-due-delay>
 
 DESCRIPTION
-	This command is used to set a value for second-due-delay (in seconds). This 
-	parameter specifies the delay time period in seconds between the first and second 
+	This command is used to set a value for second-due-delay (in seconds). This
+	parameter specifies the delay time period in seconds between the first and second
 	delivery attempt (i.e. if the first delivery attempt failed).
 
 EXAMPLES
@@ -501,12 +501,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Second due delay (in sec) using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the Second due delay by entering the value in the text field 'Second due delay (in sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_maxduedelay]]
 === Max due delay (in sec)
@@ -515,7 +515,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Max due delay (in sec)' value by issuing the command `smsc set maxduedelay` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get maxduedelay` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get maxduedelay` which will display the value set for this property.
 
 ----
 
@@ -526,7 +526,7 @@ SYNOPSIS
 	smsc set maxduedelay <maxduedelay>
 
 DESCRIPTION
-	This command is used to set a value for max-due-delay (in seconds). This parameter 
+	This command is used to set a value for max-due-delay (in seconds). This parameter
 	specifies the maximum possible delay time period in seconds between delivery
 	attempts.
 
@@ -538,12 +538,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Max due delay (in sec) using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the Max due delay by entering the value in the text field 'Max due delay (in sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_duedelaymultiplicator]]
 === Due delay multiplicator
@@ -552,7 +552,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Due delay multiplicator' value by issuing the command `smsc set duedelaymultiplicator` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get duedelaymultiplicator` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get duedelaymultiplicator` which will display the value set for this property.
 
 ----
 
@@ -563,19 +563,19 @@ SYNOPSIS
 	smsc set duedelaymultiplicator <due-delay-multiplicator>
 
 DESCRIPTION
-	This command is used to set a value for due-delay-multiplicator. This parameter 
-	specifies the delay multiplicator value before another delivery attempt (after 
-	failure) is made. 
+	This command is used to set a value for due-delay-multiplicator. This parameter
+	specifies the delay multiplicator value before another delivery attempt (after
+	failure) is made.
 
-	After a message delivery failure (if message validity period is not over and the 
+	After a message delivery failure (if message validity period is not over and the
 	failure is temporary), a delay period is induced before the next delivery attempt.
-	This delay period is calculated as follows: 
+	This delay period is calculated as follows:
 
-	Delay after the first delivery failure = 
+	Delay after the first delivery failure =
 				second-due-delay
 
-	Delay after every consecutive delivery failure = 
-				prev-due-delay * due-delay-multiplicator / 100 
+	Delay after every consecutive delivery failure =
+				prev-due-delay * due-delay-multiplicator / 100
 			        where prev-due-delay is the delay at the previous step.
 
 EXAMPLES
@@ -585,22 +585,22 @@ EXAMPLES
 	300 seconds, and the due-delay-multiplicator is 200, the attempts will be made
 	as below:
 
-	First attempt will be after 60 seconds (1 min) 
+	First attempt will be after 60 seconds (1 min)
 	[delay is configured in First due delay]
 
-	Second attempt will be after 300 seconds (5 min) 
-	[delay is configured in Second due delay assuming 
+	Second attempt will be after 300 seconds (5 min)
+	[delay is configured in Second due delay assuming
 	delivery failed not because of "Subscriber busy"]
 
-	Third attempt will be after 600 sec (10 min) 
+	Third attempt will be after 600 sec (10 min)
 	[delay is calculated based on Due delay multiplicator]
 	Delay = 300 * 200 / 100	= 600
 
-	Fourth attempt will be after 1200 sec (20 min) 
+	Fourth attempt will be after 1200 sec (20 min)
 	[delay is calculated based on Due delay multiplicator]
 	Delay = 600 * 200 / 100	= 1200
 
-	Fifth attempt will be after 2400 sec (40 min) 
+	Fifth attempt will be after 2400 sec (40 min)
 	[delay is calculated based on Due delay multiplicator]
 	Delay = 1200 * 200 / 100 = 2400
 ----
@@ -609,12 +609,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Due delay multiplicator using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the Due delay multiplicator by entering the value in the text field 'Due delay multiplicator'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 [[_vpprolong]]
@@ -624,7 +624,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Validity period scheduling prolongation (sec)' value by issuing the command `smsc set vpprolong` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get vpprolong` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get vpprolong` which will display the value set for this property.
 
 ----
 
@@ -658,12 +658,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Validity period scheduling prolongation using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Properties' tab in the GUI. 
+  Switch to the 'Properties' tab in the GUI.
 . You can specify the Validity period scheduling prolongation by entering the value in the text field 'Validity period scheduling prolongation (sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 [[_smsc_ss7_settings]]
@@ -676,7 +676,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'SMSC Gateway Global Title' by issuing the command `smsc set scgt` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get scgt` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get scgt` which will display the value set for this property.
 
 ----
 
@@ -692,12 +692,12 @@ DESCRIPTION
         networkId - a specifies Global Title for a virtual SS7
         subnetwork (this is for Multi-tenancy support). By using of
         this command with different networkIds you can specify
-        Global Titles for several subnetworks. 
+        Global Titles for several subnetworks.
         If this parameter is skipped - networkId will be set to "0"
         when Global Title creation (master networkId).
         When we do not specify Global Title for some networkid -
         Global Title for master networkId will be used. When we
-        use "0" as Global Title value 
+        use "0" as Global Title value
         (like "smsc set scgt 0 networkid <xxx>") -
         this will just clear Global Title for an specified networkid.
 ----
@@ -706,14 +706,14 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Set SMSC Global Title using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify the SMSC Global Title by entering values into fields pair 'SMSC Gateway Global Title Indicator Network Id' and 'SMSC Gateway Global Title'. You are able to set Global Title for definite networkId.
   Setting of Global Title for networkId to "0" leads clearing of Global Title for networkId.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_set_gti]]
 === SMSC Gateway Global Title Indicator
@@ -722,7 +722,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set the 'SMSC Gateway Global Title Indicator' by issuing the command `smsc set gti` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get gti` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get gti` which will display the value set for this property.
 
 ----
 
@@ -733,7 +733,7 @@ SYNOPSIS
         smsc set gti 0001|0010|0011|0100
 
 DESCRIPTION
-        This command is used to set the value of SMSC Gateway Global Title 
+        This command is used to set the value of SMSC Gateway Global Title
         Indicator.
         This Global Title Indicator will be used for SCCP outgoing messages.
         Default value for ITU-T is 0100.
@@ -749,12 +749,12 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Set SCCP Global Title type using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify the SCCP Global Title type by entering the value in the text field 'SMSC Gateway Global Title Indicator'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_set_tt]]
 === SMSC Gateway Global Title - Translation Type
@@ -763,7 +763,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set the 'SMSC Gateway Global Title - Translation Type' by issuing the command `smsc set tt` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get tt` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get tt` which will display the value set for this property.
 
 ----
 
@@ -783,12 +783,12 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Set SCCP translation type value using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify the SCCP translation type value by entering the value in the text field 'SMSC Gateway Global Title - Translation Type'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_set_scssn]]
 === SMSC Sub System Number (SSN)
@@ -797,7 +797,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set the 'SMSC SSN' by issuing the command `smsc set scssn` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get scssn` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get scssn` which will display the value set for this property.
 
 ----
 
@@ -808,23 +808,23 @@ SYNOPSIS
         smsc set scssn <smscSubSystemNumber>
 
 DESCRIPTION
-        This command is used to set the value of SMSC Sub System Number (SSN). Issuing 
+        This command is used to set the value of SMSC Sub System Number (SSN). Issuing
         this command in CLI will set the SSN value but you must ensure that the SSN number
         is properly configured in the TCAP Stack in the xml descriptor file
         "mobicents-smscgateway-version/jboss-5.1.0.GA/server/default/deploy/
-        mobicents-smsc-server/META-INF/jboss-beans.xml".
+        mobicents-smsc-server/META-INF/jboss-beans.xml" for JBOSS 5 server and "mobicents-smscgateway-version/wildfly-10.1.0.Final/standalone/configuration/standalone.xml" for Wildfly 10 server.
 ----
 
 [[_set_scssn_gui]]
 ==== Using GUI
 
 .Procedure: Set SMSC Sub System Number (SSN) using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify the SMSC Sub System Number (SSN) by entering the value in the text field 'SMSC Gateway subsystem number'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_set_hlrssn]]
 === HLR Sub System Number (HLR SSN)
@@ -833,7 +833,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set the 'HLR SSN' by issuing the command `smsc set hlrssn` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get hlrssn` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get hlrssn` which will display the value set for this property.
 
 ----
 
@@ -851,12 +851,12 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Set HLR Sub System Number (SSN) using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify the HLR Sub System Number (SSN) by entering the value in the text field 'HLR subsystem number'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_set_mscssn]]
 === MSC Sub System Number (SSN)
@@ -865,7 +865,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set the 'MSC SSN' by issuing the command `smsc set mscssn` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get mscssn` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get mscssn` which will display the value set for this property.
 
 ----
 
@@ -883,12 +883,12 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Set MSC Sub System Number (SSN) using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify the MSC Sub System Number (SSN) by entering the value in the text field 'MSC subsystem number'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_set_maxmapv]]
 === MAP Application Context version
@@ -897,7 +897,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set the 'MAP Application Context version' by issuing the command `smsc set maxmapv` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get maxmapv` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get maxmapv` which will display the value set for this property.
 
 ----
 
@@ -922,12 +922,12 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Set MAP Application Context version using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify the MAP Application Context version by entering the value in the text field 'MAP version supported'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_set_maxmessagelengthreducer]]
 === Max Message Length Reducer
@@ -936,7 +936,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set the 'Max Message Length Reducer' value by issuing the command `smsc set maxmessagelengthreducer` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get maxmessagelengthreducer` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get maxmessagelengthreducer` which will display the value set for this property.
 
 ----
 
@@ -948,21 +948,21 @@ SYNOPSIS
 
 DESCRIPTION
 	This command is used to set an integer value for max-message-length-reducer.
-	The recommended value is 6. Possible values are numbers from 0 to 12. 
+	The recommended value is 6. Possible values are numbers from 0 to 12.
 
 	Empty TC-BEGIN will be used if the message length is greater than the maximum
 	possible message length minus the value specified for max-message-length-reducer.
 
-	(message-length > max-possible-message-length - max-message-length-reducer) 
+	(message-length > max-possible-message-length - max-message-length-reducer)
 
-	Empty TC-BEGIN is used in MAP Version 2 and 3 for forwardSM and Mt-ForwardSM 
+	Empty TC-BEGIN is used in MAP Version 2 and 3 for forwardSM and Mt-ForwardSM
 	requests. In MAP Version 2 the dailog portion
-	(ApplicationContextName, MAPOpenInfo primitive) and the component portion 
-	(forwardSM and mt-ForwardSM requests) may both together be too long to fit within 
-	a MTP message. In Empty TC-BEGIN case, it first sends the dailog portion in 
-	TC-BEGIN followed by the component portion in the next TC-CONTINUE. 
-	Whether empty TC-BEGIN is used or not depends on the length of a message and the 
-	length of SCCP addresses. This option increases the guarantee of delivery of a 
+	(ApplicationContextName, MAPOpenInfo primitive) and the component portion
+	(forwardSM and mt-ForwardSM requests) may both together be too long to fit within
+	a MTP message. In Empty TC-BEGIN case, it first sends the dailog portion in
+	TC-BEGIN followed by the component portion in the next TC-CONTINUE.
+	Whether empty TC-BEGIN is used or not depends on the length of a message and the
+	length of SCCP addresses. This option increases the guarantee of delivery of a
 	message  to some network.
 
 EXAMPLES
@@ -973,12 +973,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Max Message Length Reducer using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify the Max Message Length Reducer by entering the value in the text field 'Max Message Length Reducer'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_hrhlrnumber_sri]]
 === Pre-configured HLR address for SRI requests
@@ -988,7 +988,7 @@ EXAMPLES
 
 You can set a pre-configured HLR address for SRI requests by issuing the command `smsc set hrhlrnumber` with appropriate parameters as described below.
 You can remove this pre-configured address by issuing the command `smsc remove hrhlrnumber`.
-You can verify this by issuing the command `smsc get hrhlrnumber` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get hrhlrnumber` which will display the value set for this property.
 
 ----
 
@@ -1006,17 +1006,17 @@ DESCRIPTION
 	In some scenarios it may be required to set a HLR address instead of a
 	MSISDN address into the SCCP 'CalledPartyAddress' of 'SendRoutingInfo'
 	requests issued by the SMSC GW in both mobile terminated and home routing
-	modes. In such cases, you must set this parameter 'hrhlrnumber' to a 
-	pre-configured HLR address. 
+	modes. In such cases, you must set this parameter 'hrhlrnumber' to a
+	pre-configured HLR address.
 
 	For all other scenarios where this is not required, you may leave this
-	parameter empty. When this is empty, the SCCP 'CalledPartyAddress' of 
-	'SendRoutingInfo' request will be set to the destination MSISDN of a 
+	parameter empty. When this is empty, the SCCP 'CalledPartyAddress' of
+	'SendRoutingInfo' request will be set to the destination MSISDN of a
 	subscriber.
 
 	networkId - specifies a virtual SS7 subnetwork (this is for Multi-tenancy
 	support). By using of this command with different networkIds you can
-	specify hrhlrnumber for several subnetworks. 
+	specify hrhlrnumber for several subnetworks.
 	If this parameter is skipped - networkId will be set to "0".
 ----
 
@@ -1024,13 +1024,13 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Set Pre-configured HLR address for SRI requests using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify (set or remove) the "Pre-configured HLR address for SRI requests" by entering appropriate values for a specified networkID. Select needed "Pre-configured HLR address for SRI requests Network Id" field value or type a new networkId value if no such value already specifyied. Then type needed HLR address into below field.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_set_sriresponselivetime]]
 === SRI responses Cache Time (in secs)
@@ -1039,7 +1039,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set a SRI responses Cache Time by issuing the command `smsc set sriresponselivetime` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get sriresponselivetime` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get sriresponselivetime` which will display the value set for this property.
 
 ----
 
@@ -1059,7 +1059,7 @@ DESCRIPTION
 	resources and is recommended only if you need it for some scenarious (like
 	you send firstly only an SRI request and do not deliver a message just to
 	understend IMSI / NetworkNodeNumber (this scenario is achieavable by mproc
-	rules) and then send a message in short time if needed). 
+	rules) and then send a message in short time if needed).
 
 DEFAULT VALUE
 	0 - this means no caching.
@@ -1072,13 +1072,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set SRI responses Cache Time using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'SS7 Settings' tab in the GUI. 
+  Switch to the 'SS7 Settings' tab in the GUI.
 . You can specify (set or remove) the "SRI responses Cache Time (in secs)" by entering appropriate values.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_smsc_db_settings]]
 == Cassandra Settings
@@ -1093,7 +1093,7 @@ Note that the modified settings will become effective only when the SMSC is re-s
 ==== Using CLI
 
 You can set the 'host addresses' value for Cassandra settings by issuing the command `smsc set dbhosts` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get dbhosts` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get dbhosts` which will display the value set for this property.
 
 ----
 
@@ -1114,12 +1114,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Cassandra Configuration - Host Addresses using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Cassandra' tab in the GUI. 
+  Switch to the 'Cassandra' tab in the GUI.
 . You can specify the host-ip address by entering appropriate values in the text field 'Host Address'. For more details of these parameters, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_db_port]]
 === Cassandra Configuration - Port
@@ -1128,7 +1128,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'port' value for Cassandra settings by issuing the command `smsc set dbport` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get dbport` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get dbport` which will display the value set for this property.
 
 ----
 
@@ -1151,12 +1151,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Cassandra Configuration - Port using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Cassandra' tab in the GUI. 
+  Switch to the 'Cassandra' tab in the GUI.
 . You can specify the host-ip address and port by entering appropriate values in the text field 'Port'. For more details of these parameters, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_db_keyspace]]
 === Cassandra Configuration - Keyspace Name
@@ -1165,7 +1165,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'DB Keyspace Name' by issuing the command `smsc set keyspacename` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get keyspacename` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get keyspacename` which will display the value set for this property.
 
 ----
 
@@ -1185,12 +1185,12 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Set Cassandra Configuration - Keyspace Name using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Cassandra' tab in the GUI. 
+  Switch to the 'Cassandra' tab in the GUI.
 . You can specify the Keyspace Name by entering the value in the text field 'Keyspace Name'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_db_cluster]]
 === Cassandra Configuration - Cluster Name
@@ -1199,7 +1199,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set the 'DB Cluster Name' value by issuing the command `smsc set clustername` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get clustername` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get clustername` which will display the value set for this property.
 
 ----
 
@@ -1212,7 +1212,7 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to set the Cluster name for Cassandra Database. If you use
 	the script available in the distributive the name will be set to 'RestCommSMSC' by
-	default. 
+	default.
 
 EXAMPLES
 	smsc set clustername RestCommSMSC
@@ -1222,12 +1222,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Cassandra Configuration - Cluster Name using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Cassandra' tab in the GUI. 
+  Switch to the 'Cassandra' tab in the GUI.
 . You can specify the Cluster Name by entering the value in the text field 'Cluster Name'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[cassandra_user]]
 === Cassandra Configuration - User Name
@@ -1304,7 +1304,7 @@ DESCRIPTION
 ==== Using CLI
 
 You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removinglivetablesdays` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get removinglivetablesdays` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get removinglivetablesdays` which will display the value set for this property.
 
 ----
 
@@ -1315,13 +1315,13 @@ SYNOPSIS
 	smsc set removinglivetablesdays <value>
 
 DESCRIPTION
-	This command is used to configure the SMSC to automatically drop LIVE tables from 
+	This command is used to configure the SMSC to automatically drop LIVE tables from
 	the Cassandra Database. The SMSC will attempt to delete tables just after
 	midnight and after every SMSC restart.
 
 PARAMETERS
 	removinglivetablesdays		- This parameter is used to specify the number
-					  of days the LIVE tables should be kept before 
+					  of days the LIVE tables should be kept before
 					  attempting to drop them automatically.
 
 					  If this value is specified as "0", the SMSC
@@ -1329,13 +1329,13 @@ PARAMETERS
 					  you must manually drop tables.
 
 					  You must specify a value of 3 or more. You can
-					  not set this value to 1 or 2 days. This is to 
+					  not set this value to 1 or 2 days. This is to
 					  ensure the tables will be kept for a minimum
 					  of 2 days after creation date.
 
-					  The SMSC wil attempt to delete tables for one 
-					  day. If the Cassandra Database keeps tables for 
-					  older days, then the administrator should drop 
+					  The SMSC wil attempt to delete tables for one
+					  day. If the Cassandra Database keeps tables for
+					  older days, then the administrator should drop
 					  these manually.
 ----
 
@@ -1343,12 +1343,12 @@ PARAMETERS
 ==== Using GUI
 
 .Procedure: Set Cassandra Configuration - Removing Live Tables Days
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Cassandra' tab in the GUI. 
+  Switch to the 'Cassandra' tab in the GUI.
 . You can specify the Removing Live Tables Days by entering the value in the text field 'Removing Live Tables Days'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_db_removingarchivetablesdays]]
 === Cassandra Configuration - Removing Live Tables Days
@@ -1357,7 +1357,7 @@ PARAMETERS
 ==== Using CLI
 
 You can set the 'Removing Live Tables Days' value by issuing the command `smsc set removingarchivetablesdays` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get removingarchivetablesdays` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get removingarchivetablesdays` which will display the value set for this property.
 
 ----
 
@@ -1368,13 +1368,13 @@ SYNOPSIS
 	smsc set removingarchivetablesdays <value>
 
 DESCRIPTION
-	This command is used to configure the SMSC to automatically drop ARCHIVE tables 
+	This command is used to configure the SMSC to automatically drop ARCHIVE tables
 	from the Cassandra Database. The SMSC will attempt to delete tables just after
 	midnight and after every SMSC restart.
 
 PARAMETERS
 	removingarchivetablesdays	- This parameter is used to specify the number
-					  of days the ARCHIVE tables should be kept before 
+					  of days the ARCHIVE tables should be kept before
 					  attempting to drop them automatically.
 
 					  If this value is specified as "0", the SMSC
@@ -1382,13 +1382,13 @@ PARAMETERS
 					  you must manually drop tables.
 
 					  You must specify a value of 3 or more. You can
-					  not set this value to 1 or 2 days. This is to 
+					  not set this value to 1 or 2 days. This is to
 					  ensure the tables will be kept for a minimum
 					  of 2 days after creation date.
 
-					  The SMSC wil attempt to delete tables for one 
-					  day. If the Cassandra Database keeps tables for 
-					  older days, then the administrator should drop 
+					  The SMSC wil attempt to delete tables for one
+					  day. If the Cassandra Database keeps tables for
+					  older days, then the administrator should drop
 					  these manually.
 ----
 
@@ -1396,12 +1396,12 @@ PARAMETERS
 ==== Using GUI
 
 .Procedure: Set Cassandra Configuration - Removing Archive Tables Days
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Cassandra' tab in the GUI. 
+  Switch to the 'Cassandra' tab in the GUI.
 . You can specify the Removing Archive Tables Days by entering the value in the text field 'Removing Archive Tables Days'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_smsc_scheduler_settings]]
 == Scheduler Settings
@@ -1417,7 +1417,7 @@ However modified settings for Max Rows and Max Activity Count will take effect i
 ==== Using CLI
 
 You can set the 'Fetch Period' value by issuing the command `smsc set fetchperiod` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get fetchperiod` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get fetchperiod` which will display the value set for this property.
 
 ----
 
@@ -1429,7 +1429,7 @@ SYNOPSIS
 
 DESCRIPTION
 	This command is used to set the fetch period value in milli-seconds for the
-	Cassandra database. The parameter fetch-period specifies the time 
+	Cassandra database. The parameter fetch-period specifies the time
 	period (in milli-seconds) of fetching messages for delivery from the database.
 	The default value is 5 seconds.
 
@@ -1441,12 +1441,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Cassandra Configuration - Cluster Name using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Scheduler' tab in the GUI. 
+  Switch to the 'Scheduler' tab in the GUI.
 . You can specify the Fetch Period by entering the value in the text field 'Fetch Period (in ms)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_max_rows]]
 === Max Rows
@@ -1455,7 +1455,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Max Rows' value by issuing the command `smsc set fetchmaxrows` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get fetchmaxrows` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get fetchmaxrows` which will display the value set for this property.
 
 ----
 
@@ -1478,12 +1478,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Max Rows using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Scheduler' tab in the GUI. 
+  Switch to the 'Scheduler' tab in the GUI.
 . You can specify the Max Rows by entering the value in the text field 'Max Rows'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_max_activity_count]]
 === Max Activity Count
@@ -1492,7 +1492,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Max Activity Count' value by issuing the command `smsc set maxactivitycount` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get maxactivitycount` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get maxactivitycount` which will display the value set for this property.
 
 ----
 
@@ -1503,11 +1503,11 @@ SYNOPSIS
 	smsc set maxactivitycount <max-activity-count>
 
 DESCRIPTION
-	This command is used to set the maximum count of delivering activities that are 
-	possible at the same time. 'Count of delivering activities' means the count of 
-	messages that are in the state 'delivering' (messages that are fetched from the 
-	database and may be already sent or are going to be sent but 
-	no delivery acception/rejection has been received). 
+	This command is used to set the maximum count of delivering activities that are
+	possible at the same time. 'Count of delivering activities' means the count of
+	messages that are in the state 'delivering' (messages that are fetched from the
+	database and may be already sent or are going to be sent but
+	no delivery acception/rejection has been received).
 	When the delivery process of a message is in progress, field LIVE.IN_SYSTEM==2.
 
 EXAMPLES
@@ -1518,12 +1518,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Max Activity Count using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Scheduler' tab in the GUI. 
+  Switch to the 'Scheduler' tab in the GUI.
 . You can specify the Max Activity Count by entering the value in the text field 'Max Activity Count'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_revisesecondsonsmscstart]]
 === Revise period after SMSC restart
@@ -1533,7 +1533,7 @@ EXAMPLES
 
 You can set the 'Revise period (in seconds) after SMSC restart' value by issuing the command `smsc set revisesecondsonsmscstart` with appropriate parameters as described below.
 You can verify this by issuing the command `smsc get revisesecondsonsmscstart` which will display the value set for this property.
-If unspecified, the default value for this parameter is 60 seconds. 
+If unspecified, the default value for this parameter is 60 seconds.
 
 ----
 
@@ -1556,12 +1556,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Revise Period using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Scheduler' tab in the GUI. 
+  Switch to the 'Scheduler' tab in the GUI.
 . You can specify the revise period in seconds by entering the value in the text field 'Revise period after SMSC restart (sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_processingsmssettimeout]]
 === Cache timeout period
@@ -1572,7 +1572,7 @@ EXAMPLES
 You can set the 'Cache timeout period' value by issuing the command `smsc set processingsmssettimeout` with appropriate parameters as described below.
 You can verify this by issuing the command `smsc get processingsmssettimeout` which will display the value set for this property.
 If unspecified, the default value for this parameter is 600 seconds.
-Generally, you may not have to modify this value. 
+Generally, you may not have to modify this value.
 
 ----
 
@@ -1583,10 +1583,10 @@ SYNOPSIS
 	smsc set processingsmssettimeout <seconds>
 
 DESCRIPTION
-	This command is used to set the Cache timeout period (in seconds). 
-	Messages are cached in the SMSC until the processing is completed. In case of a 
-	delivery failure, these cached messages are force cleaned by the SMSC after 
-	waiting for the timeout period set for the parameter 'processingsmssettimeout' 
+	This command is used to set the Cache timeout period (in seconds).
+	Messages are cached in the SMSC until the processing is completed. In case of a
+	delivery failure, these cached messages are force cleaned by the SMSC after
+	waiting for the timeout period set for the parameter 'processingsmssettimeout'
 	using this command.
 EXAMPLES
 	smsc set processingsmssettimeout 45
@@ -1596,12 +1596,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Cache timeout Period using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Scheduler' tab in the GUI. 
+  Switch to the 'Scheduler' tab in the GUI.
 . You can specify the Cache timeout period in seconds by entering the value in the text field 'Processing Sms set cache timeout (sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_deliverytimeout]]
 === Delivery timeout
@@ -1612,7 +1612,7 @@ EXAMPLES
 You can set the 'Delivery timeout' value by issuing the command `smsc set deliverytimeout` with appropriate parameters as described below.
 You can verify this by issuing the command `smsc get deliverytimeout` which will display the value set for this property.
 If unspecified, the default value for this parameter is 600 seconds.
-Generally, you may not have to modify this value. 
+Generally, you may not have to modify this value.
 
 ----
 
@@ -1637,15 +1637,51 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Delivery timeout using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Scheduler' tab in the GUI. 
+  Switch to the 'Scheduler' tab in the GUI.
 . You can specify the Delivery timeout in seconds by entering the value in the text field 'Delivery timeout (sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
+[[_deliverytimeoutdeltapermessage]]
+=== Delivery timeout delta per message
 
+[[_deliverytimeoutdeltapermessage_cli]]
+==== Using CLI
 
+You can set the 'Delivery timeout delta per message' value by issuing the command `smsc set deliverytimeoutdeltapermessage` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get deliverytimeoutdeltapermessage` which will display the value set for this property.
+If unspecified, the default value for this parameter is 1 second.
+Generally, you may not have to modify this value.
+
+----
+
+Name
+	smsc set deliverytimeoutdeltapermessage
+
+SYNOPSIS
+	smsc set deliverytimeoutdeltapermessage <delivery-timeout-delta-per-message>
+
+DESCRIPTION
+	This command is used to increase a length of delivery process timeout based on
+	number of messages being currently delivered in a set. Time unit is seconds.
+	Default value: 1 second.
+
+EXAMPLES
+	smsc set deliverytimeoutdeltapermessage 120
+----
+
+[[_deliverytimeoutdeltapermessage_gui]]
+==== Using GUI
+
+.Procedure: Set Delivery timeout delta per message using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Scheduler' tab in the GUI.
+. You can specify the Delivery timeout delta per message in seconds by entering the value in the text field 'Delivery timeout delta per message (sec)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 
@@ -1660,7 +1696,7 @@ This command will skip of processing / fetching of messages that was scheduled f
 <time in seconds> means the point of the time (actual current time - <time in seconds>) to which the point of processing / fetching of messages will be shifted.
 If the value "0" is provided this means SMSC GW will be shifted into an actual (current) time ("in process" due_slot will be shifted to "in time" due_slot). If the value is positive this means SMSC GW "in process" due_slot will be shifted into a some time in the past (for example if the value is 3600 - to the time before the current time ("in time" due_slot) for 1 hour). Negative values are not accepted.
 "In process" due_slot can be shifted only forward.
-It is not possible to shift "in process" due_slot backward (and resend messages that was already sent once). 
+It is not possible to shift "in process" due_slot backward (and resend messages that was already sent once).
 
 ----
 
@@ -1685,12 +1721,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Skipping of scheduled for the past and not yet sent messages ("In process" due_slot shifting) by the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Scheduler' tab in the GUI. 
-. Set "Skip Unsent Messages (in sec) " field to 0 or positive value. 
+  Switch to the 'Scheduler' tab in the GUI.
+. Set "Skip Unsent Messages (in sec) " field to 0 or positive value.
 . You must click on the button 'Save' that is below to skip scheduled messages.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_smsc_diameter_settings]]
 == Diameter Settings
@@ -1704,7 +1740,7 @@ You can modify Diameter settings using the CLI or GUI.
 ==== Using CLI
 
 You can set the 'Destination Realm' value by issuing the command `smsc set diameterdestrealm` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get diameterdestrealm` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get diameterdestrealm` which will display the value set for this property.
 
 ----
 
@@ -1726,13 +1762,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Diameter Destination Realm using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Diameter' tab in the GUI. 
+  Switch to the 'Diameter' tab in the GUI.
 . You can specify the Destination Realm by entering the value in the corresponding text field.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_dest_host]]
 === Destination Host
@@ -1741,7 +1777,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Destination Host' value by issuing the command `smsc set diameterdesthost` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get diameterdesthost` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get diameterdesthost` which will display the value set for this property.
 
 ----
 
@@ -1763,13 +1799,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Diameter Host using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Diameter' tab in the GUI. 
+  Switch to the 'Diameter' tab in the GUI.
 . You can specify the Destination Host by entering the value in the corresponding text field.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_dest_port]]
 === Destination Port
@@ -1778,7 +1814,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Destination Port' value by issuing the command `smsc set diameterdestport` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get diameterdestport` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get diameterdestport` which will display the value set for this property.
 
 ----
 
@@ -1800,13 +1836,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Diameter Port using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Diameter' tab in the GUI. 
+  Switch to the 'Diameter' tab in the GUI.
 . You can specify the Destination Port by entering the value in the corresponding text field.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_dest_username]]
 === Destination Username
@@ -1815,7 +1851,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Destination Username' value by issuing the command `smsc set diameterusername` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get diameterusername` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get diameterusername` which will display the value set for this property.
 
 ----
 
@@ -1836,13 +1872,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Diameter Username using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Diameter' tab in the GUI. 
+  Switch to the 'Diameter' tab in the GUI.
 . You can specify the Username by entering the value in the corresponding text field.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_dest_mocharging]]
 === MO accepting and charging settings
@@ -1851,7 +1887,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'MO (mobile originated) Charging' value by issuing the command `smsc set mocharging` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get mocharging` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get mocharging` which will display the value set for this property.
 
 ----
 
@@ -1877,13 +1913,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set MO Charge using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Diameter' tab in the GUI. 
+  Switch to the 'Diameter' tab in the GUI.
 . You can set 'Mobile Originated SMS Charged' value to true or false, in the corresponding list.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_dest_txsmppcharging]]
 === ESME Charge Settings
@@ -1892,7 +1928,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'ESME Originated SMS Charged' value by issuing the command `smsc set txsmppcharging` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get txsmppcharging` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get txsmppcharging` which will display the value set for this property.
 
 ----
 
@@ -1904,17 +1940,17 @@ SYNOPSIS
 
 DESCRIPTION
 	This command is used to set the value of the parameter 'txsmppcharging' to None,
-	Selected or All. 
+	Selected or All.
 
 	If this is set to 'Aall', all ESME Originated messages will be charged by OCS via
 	Diameter, prior to being sent.
 
-	If this is set to 'Selected', only those messages originating from ESMEs marked 
-	with the parameter 'charging-enabled'=true at the time of ESME creation  will be 
+	If this is set to 'Selected', only those messages originating from ESMEs marked
+	with the parameter 'charging-enabled'=true at the time of ESME creation  will be
 	charged by OCS via Diameter, prior to being sent.
 
-	If this is set to 'None', none of the ESME Originated messages will be charged by 
-	OCS via Diameter, prior to being sent. 
+	If this is set to 'None', none of the ESME Originated messages will be charged by
+	OCS via Diameter, prior to being sent.
 
 	The parameter 'txsmppcharging' is set to 'None' by default.
 
@@ -1926,13 +1962,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set ESME Charge using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Diameter' tab in the GUI. 
+  Switch to the 'Diameter' tab in the GUI.
 . You can set 'ESME Originated SMS Charged' value to none, selected or all, in the corresponding list.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_dest_txsipcharging]]
 === SIP Charge Settings
@@ -1941,7 +1977,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'SIP Originated SMS Charged' value by issuing the command `smsc set txsipcharging` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get txsipcharging` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get txsipcharging` which will display the value set for this property.
 
 ----
 
@@ -1952,13 +1988,13 @@ SYNOPSIS
     smsc set txsipcharging <None|Selected|All>
 
 DESCRIPTION
-	This command is used to set the value of the parameter 'txsipcharging' 
+	This command is used to set the value of the parameter 'txsipcharging'
 
 	If this is set to 'All', all SIP Originated messages will be charged by OCS via
 	Diameter, prior to being sent.
 
 	If this is set to 'None' or 'Selected', none of the SIP Originated messages will
-	be charged by OCS via Diameter, prior to being sent. 
+	be charged by OCS via Diameter, prior to being sent.
 
     The parameter 'txsipcharging' is set to 'None' by default.
 
@@ -1970,13 +2006,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set SIP Charge using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Diameter' tab in the GUI. 
+  Switch to the 'Diameter' tab in the GUI.
 . You can set 'SIP Originated SMS Charged' value to none, selected or all, in the corresponding list.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_dest_hrcharging]]
 === Home routing Charge Settings
@@ -1985,7 +2021,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'Home routing Originated SMS Charged' value by issuing the command `smsc set hrcharging` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get hrcharging` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get hrcharging` which will display the value set for this property.
 
 ----
 
@@ -1996,7 +2032,7 @@ SYNOPSIS
     smsc set hrcharging <accept|reject|diameter>
 
 DESCRIPTION
-    This command is used to set the value of the parameter 'hrcharging' to 
+    This command is used to set the value of the parameter 'hrcharging' to
     an appropriate value. This value is set to "accept" by default. This
     option works like mocharging option but affects on SS7 messages in home
     routing mode from upper SMSC (mocharging affects on mobile originated
@@ -2014,13 +2050,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set Home Routing Charge using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Diameter' tab in the GUI. 
+  Switch to the 'Diameter' tab in the GUI.
 . You can set 'Home Routed SMS Charged' value to none, selected or all, in the corresponding list.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_dest_txhttpcharging]]
 === HTTP Charge Settings
@@ -2029,7 +2065,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'HTTP Originated SMS Charged' value by issuing the command `smsc set txhttpcharging` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get txhttpcharging` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get txhttpcharging` which will display the value set for this property.
 
 ----
 
@@ -2044,7 +2080,7 @@ DESCRIPTION
 	needed values (accepting of messages that come from a HTTP connector).
 	This value is set to accept by default.
 
-	If this is set to 
+	If this is set to
 	accept - all incoming messages are accepted without charging
 	reject - all incoming messages will be rejected
 	diameter - all incoming messages are checked by Diameter peer before delivering
@@ -2058,13 +2094,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set HTTP originated Charge using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Diameter' tab in the GUI. 
+  Switch to the 'Diameter' tab in the GUI.
 . You can set 'HTTP originated SMS Charged' value to accept, reject or diameter, in the corresponding list.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 
@@ -2074,7 +2110,7 @@ EXAMPLES
 
 {this-platform} SMSC Gateway supports Non Transparent Home Routing as explained in 3GPP 23.840 5.2.3.
 This option can be disabled by setting "hrcharging" option to "reject" (see <<_dest_hrcharging>>). SMSC GW will accept SendRoutinInfo requests from a remote SMSC, then create a unique "correlationId" value for a requested MSISDN, then send SendRoutinInfo request to HLR, store received by HLR info into a cache and sends back to the remote SMSC SendRoutinInfo response with "correlationId" value in IMSI field and SMSC GlobalTytle (or another special configured GlobalTytle value) in LocationInfo field.
-Then SMSC GW will accept MtForwardSM messages from the remote SMSC, seaches in the cache for "correlationId" and HLR subscriber's and use this data for processing a message further. 
+Then SMSC GW will accept MtForwardSM messages from the remote SMSC, seaches in the cache for "correlationId" and HLR subscriber's and use this data for processing a message further.
 
 [[_smsc_gateway_server_hr_corrtable]]
 === Correlation table CC and MCC-MNC for home routing mode managing.
@@ -2083,7 +2119,7 @@ For home routing mode we may need to fill a special table for correlation betwee
 CorrelationId value will be returned as IMSI in SRI response to an upper SMSC GW.
 As an extra field "smsc" field can be specified for each entry of this table.
 If this field is specified and not empty then this value will be returned as a LocationInfo in SRI response to an upper SMSC GW, else SMSC GW address will be returned.
-Correlation table is stored into "jboss-5.1.0.GA/server/<server instanse, for example 'default'>"/data" and has name "SmscManagement_cc_mccmnc.xml". The content of this should follow the following template: 
+Correlation table is stored into "jboss-5.1.0.GA/server/<profile>"/data" for JBOSS 5 server and "wildfly-10.1.0.Final/standalone/data" for Wildfly 10 server and has name `SmscManagement_cc_mccmnc.xml`. The content of this should follow the following template:
 
 
 ----
@@ -2107,7 +2143,7 @@ When SMSC GW receives a SRI request from an upper SMSC GW it looks throught  the
 The last entry in the correlation table must be empty ("") countryCode value.
 This entry will be used as a default value.
 All MSISDN that are not fit to any other entries will use mccMnc of the entry of "". You can also add an optional extra field "smsc" into any record.
-This value will be used as LocationInfo field in SendRoutinInfo response. 
+This value will be used as LocationInfo field in SendRoutinInfo response.
 
 [[_correlationidlivetime]]
 === Living time of elements in correlation cache
@@ -2119,7 +2155,7 @@ In home routing mode SMSC GW specifies correlationId for any recieved SRI reques
 After it this correlationId value and corresponded to MSISDN data are stored into internal cache and will be used for processing of next coming MtForwardSM messages from other SMSC.
 Correlationidlivetime value defines how much time minimum is correlationId in cache.
 You can set the 'correlationidlivetime' option by issuing the command ``smsc set correlationidlivetime`` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get correlationidlivetime` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get correlationidlivetime` which will display the value set for this property.
 
 Also pay attention that when Telestax SMSC delivers messages received under "home routing" procedure SMSC GW will try to reuse location info and IMSI data that SMSC GW has obtained when request to HLR under "home routing" procedure.
 SMSC GW will try to reuse this info only till it is kept in correlationId cache.
@@ -2127,7 +2163,7 @@ When ForwardAndStore and datagram modes this is usually achived in correlationid
 In StoreAndForward mode messages delivery can be started some time after messages have come to SMSC GW.
 This delay depends on both SMSC GW setting (first delivery attempt) and SMSC GW overloadload rate.
 For StoreAndForward mode we need to caluclate a proper correlationidlivetime value depending on othe SMSC setting.
-But do not make this value too big - this will waste memory and location info can occure too old. 
+But do not make this value too big - this will waste memory and location info can occure too old.
 
 ----
 
@@ -2138,7 +2174,7 @@ SYNOPSIS
     smsc set correlationidlivetime <digital option>
 
 DESCRIPTION
-    This command is used to set min time duration for which 
+    This command is used to set min time duration for which
     correlationId and corresponded data kept in cache. Max
     duratuion is two times more then correlationidlivetime.
     Value is in seconds.
@@ -2153,12 +2189,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Setting of living time of elements in correlation cache using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Home Routing' tab in the GUI. 
+  Switch to the 'Home Routing' tab in the GUI.
 . You can specify CDR generation option by selecting an appropriate value in the field "Correlation Id Cache Time (in secs)". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_hrsribypass]]
 === Bypassing of SRI request to a local HLR
@@ -2167,7 +2203,7 @@ EXAMPLES
 ==== Using CLI
 
 SMSC GW home routing procedure for each networkId area can be configured to send or do not send SendRoutinInfo request to a local HLR.
-This is configured by parameter "hrsribypass". Default value is "false" - this means that SMSC GW will send SRI requests to local HLR before sending back SRI response. 
+This is configured by parameter "hrsribypass". Default value is "false" - this means that SMSC GW will send SRI requests to local HLR before sending back SRI response.
 
 .Messageflow for home routing procedure when hrsribypass==false
 ::
@@ -2186,7 +2222,7 @@ This is configured by parameter "hrsribypass". Default value is "false" - this m
   MT request:   remote SMSC GW -> Telscale SMSC GW
 
 ::
-  MT response:  Telscale SMSC GW -> remote SMSC GW	
+  MT response:  Telscale SMSC GW -> remote SMSC GW
 
 .Messageflow for home routing procedure when hrsribypass==true (SRI request to local HLR bypassing)
 ::
@@ -2201,7 +2237,7 @@ This is configured by parameter "hrsribypass". Default value is "false" - this m
 ::
   MT response:  Telscale SMSC GW -> remote SMSC GW
 You can set the 'hrsribypass' option by issuing the command ``smsc set hrsribypass`` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get hrsribypass` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get hrsribypass` which will display the value set for this property.
 
 ----
 
@@ -2217,7 +2253,7 @@ DESCRIPTION
 
 	networkId - specifies a virtual SS7 subnetwork (this is for Multi-tenancy
 	support). By using of this command with different networkIds you can
-	specify hrsribypass for several subnetworks. 
+	specify hrsribypass for several subnetworks.
 	If this parameter is skipped - networkId will be set to "0".
 	If you have not specified hrsribypass parameter for a networkId
 	then a master hrsribypass will be used (that was specified for
@@ -2234,13 +2270,13 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Setting of living time of elements in correlation cache using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Home Routing' tab in the GUI. 
+  Switch to the 'Home Routing' tab in the GUI.
 . You can specify hrsribypass option by selecting an appropriate value in the field "Bypassing of SRI request to a local HLR" for a specified networkId. Select needed "Bypassing of SRI request to a local HLR Network Id" field value or type a new networkId value if no such value already specifyied. Then select needed value into below field ("Removing value from networkId" means just remove "Bypassing of SRI request" for a selected networkId).
-  For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section. 
+  For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_hrccmccmnc_add]]
 === Create an entry for correlation table CC and MCC-MNC
@@ -2248,7 +2284,7 @@ EXAMPLES
 [[_hrccmccmnc_add_cli]]
 ==== Using CLI
 
-In home routing mode SMSC GW we may need to specify the correlation table CC and MCC-MNC (<<_smsc_gateway_server_hr_corrtable>>). You can add an entry of this table by issuing the command ``smsc hrccmccmnc add`` with appropriate parameters as described below. 
+In home routing mode SMSC GW we may need to specify the correlation table CC and MCC-MNC (<<_smsc_gateway_server_hr_corrtable>>). You can add an entry of this table by issuing the command ``smsc hrccmccmnc add`` with appropriate parameters as described below.
 
 ----
 
@@ -2273,7 +2309,7 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Creation an entry for correlation table CC and MCC-MNC using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Home Routing CC - MCC MNC Table' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Home Routing CC - MCC MNC Table' in the left panel.
 . You can add an entry of the table - you can specify "Country Code", "Mobile Country Code and Mobile Network Code", "Global Title" (optionally) and press "Add" button.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 
@@ -2283,7 +2319,7 @@ EXAMPLES
 [[_hrccmccmnc_modify_cli]]
 ==== Using CLI
 
-In home routing mode SMSC GW we may need to specify the correlation table CC and MCC-MNC (<<_smsc_gateway_server_hr_corrtable>>). You can modify an entry of this table by issuing the command ``smsc hrccmccmnc modify`` with appropriate parameters as described below. 
+In home routing mode SMSC GW we may need to specify the correlation table CC and MCC-MNC (<<_smsc_gateway_server_hr_corrtable>>). You can modify an entry of this table by issuing the command ``smsc hrccmccmnc modify`` with appropriate parameters as described below.
 
 ----
 
@@ -2308,7 +2344,7 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Modification of an entry for correlation table CC and MCC-MNC using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Home Routing CC - MCC MNC Table' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Home Routing CC - MCC MNC Table' in the left panel.
 . You can modify an entry of the table - you can specify "Country Code", "Mobile Country Code and Mobile Network Code", "Global Title" (optionally) and press "Update" button.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 
@@ -2318,7 +2354,7 @@ EXAMPLES
 [[_hrccmccmnc_remove_cli]]
 ==== Using CLI
 
-In home routing mode SMSC GW we may need to specify the correlation table CC and MCC-MNC (<<_smsc_gateway_server_hr_corrtable>>). You can remove an entry of this table by issuing the command ``smsc hrccmccmnc remove`` with appropriate parameters as described below. 
+In home routing mode SMSC GW we may need to specify the correlation table CC and MCC-MNC (<<_smsc_gateway_server_hr_corrtable>>). You can remove an entry of this table by issuing the command ``smsc hrccmccmnc remove`` with appropriate parameters as described below.
 
 ----
 
@@ -2340,7 +2376,7 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Removing of an entry for correlation table CC and MCC-MNC using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Home Routing CC - MCC MNC Table' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Home Routing CC - MCC MNC Table' in the left panel.
 . You can delete an entry of the table you - can specify "Country Code" and press "Delete" button.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 
@@ -2350,7 +2386,7 @@ EXAMPLES
 [[_hrccmccmnc_show_cli]]
 ==== Using CLI
 
-In home routing mode SMSC GW we may need to specify the correlation table CC and MCC-MNC (<<_smsc_gateway_server_hr_corrtable>>). You can observe an entry or a full list of this table by issuing the command ``smsc hrccmccmnc show`` with appropriate parameters as described below. 
+In home routing mode SMSC GW we may need to specify the correlation table CC and MCC-MNC (<<_smsc_gateway_server_hr_corrtable>>). You can observe an entry or a full list of this table by issuing the command ``smsc hrccmccmnc show`` with appropriate parameters as described below.
 
 ----
 
@@ -2375,7 +2411,7 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Displaying of an entry for correlation table CC and MCC-MNC using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Home Routing CC - MCC MNC Table' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Home Routing CC - MCC MNC Table' in the left panel.
 . You can view content of an entry of the table you or of all table.
   For viewing of one entry you need to specify "Country Code". Then press "View" button.
   Results will be shown in the bottom of the screen For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
@@ -2391,7 +2427,7 @@ EXAMPLES
 
 SMSC GW can store CDR records for each delivered or failed for delivering messages into log file (see <<_cdr_logging_settings>>). Which records will be stored is defined by 'generatecdr' SMSC option.
 You can set the 'generatecdr' option by issuing the command ``smsc set generatecdr`` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get generatecdr` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get generatecdr` which will display the value set for this property.
 
 ----
 Name
@@ -2403,16 +2439,16 @@ SYNOPSIS
 DESCRIPTION
 	This command is used to set the generatecdr value. generatecdr
 	defines which messages records will be added into .txt CDR's
-	
+
 	Options will have following bits values:
-	
-	1 - records will be done for SMPP originated messages with 
+
+	1 - records will be done for SMPP originated messages with
 	datagramm mode
-	2 - records will be done for SMPP originated messages with 
+	2 - records will be done for SMPP originated messages with
 	transactional mode
-	4 - records will be done for SMPP originated messages with 
+	4 - records will be done for SMPP originated messages with
 	storeAndForward mode and for all SS7 or SIP originated messages
-	
+
 	Value 0 will mean store none and value 7 - store all.
 	Default value: 7
 
@@ -2424,12 +2460,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set CDRs generation SMSC option using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'CDR' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI.
 . You can specify CDR generation option by selecting an appropriate value in the field "CDR generation". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_generatearchivetable]]
 === Archive table generation
@@ -2442,7 +2478,7 @@ Names of such tables have the following format: MESSAGES_yyyy_mm_dd.
 You can refer to fields definitions in <<_messages_yyyy_mm_dd>> chapter.
 Which records will be stored is defined by 'generatearchivetable' SMSC option.
 You can set the 'generatearchivetable' option by issuing the command `smsc set generatearchivetable` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get generatearchivetable` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get generatearchivetable` which will display the value set for this property.
 
 ----
 
@@ -2471,12 +2507,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set archive table CDRs generation SMSC option using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'CDR' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI.
 . You can specify archive table CDR generation option by selecting an appropriate value in the field "Archive table generation". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 [[_generatereceiptcdr]]
@@ -2486,7 +2522,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'generatereceiptcdr' value to true/false by issuing the command `smsc set generatereceiptcdr` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get generatereceiptcdr` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get generatereceiptcdr` which will display the value set for this property.
 
 ----
 Name
@@ -2496,7 +2532,7 @@ SYNOPSIS
 	smsc set generatereceiptcdr <true | false>
 
 DESCRIPTION
-	The SMSC can be configured to generate CDR for both receipt and regular messages 
+	The SMSC can be configured to generate CDR for both receipt and regular messages
 	or generate CDR only for regular messages. By default the SMSC will generate CDR
 	for regular messages only. However if you require the SMSC to generate CDR for
 	receipt messages as well, you must set the parameter 'generatereceiptcdr' to true.
@@ -2510,13 +2546,88 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set 'generate CDR for receipt messages'  using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'CDR' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI.
 . You can specify if the SMSC should generate CDR for receipt messages by choosing the value true for the field 'Generate receipt CDR'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
+
+[[_generaterejectioncdr]]
+=== Generate CDR for Rejected Messages as a message sumbission step
+
+[[_generaterejectioncdr_cli]]
+==== Using CLI
+
+You can set the 'generaterejectioncdr' value to true/false by issuing the command `smsc set generaterejectioncdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get generaterejectioncdr` which will display the value set for this property.
+
+----
+Name
+	smsc set generaterejectioncdr
+
+SYNOPSIS
+	smsc set generaterejectioncdr <true | false>
+
+DESCRIPTION
+	The SMSC can be configured to generate CDRs for rejections at submission step,
+	you must set the parameter 'generaterejectioncdr' to true.
+	Default value: false
+
+EXAMPLES
+	smsc set generaterejectioncdr false
+----
+
+[[_generaterejectioncdr_gui]]
+==== Using GUI
+
+.Procedure: Set 'generate CDR for Rejected Messages as a message sumbission step'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI.
+. You can specify if the SMSC should generate CDR for receipt messages by choosing the value true for the field 'Generate CDR for message rejection'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+
+[[_generatedetailedcdr]]
+=== Generate Detailed CDR for Messages
+
+[[_generatedetailedcdr_cli]]
+==== Using CLI
+
+You can set the 'generatedetailedcdr' value to true/false by issuing the command `smsc set generatedetailedcdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get generatedetailedcdr` which will display the value set for this property.
+
+----
+Name
+	smsc set generatedetailedcdr
+
+SYNOPSIS
+	smsc set generatedetailedcdr <true | false>
+
+DESCRIPTION
+	The SMSC can be configured to generate both regular and detailed CDR for messages
+	or to generate just regular CDR. By default the SMSC will only generate regular CDR.
+	However if you want the SMSC to also generate detailed CDR, you have to set the
+	parameter 'generatedetailedcdr' to true.
+	Default value: false
+
+EXAMPLES
+	smsc set generatedetailedcdr false
+----
+
+[[_generatedetaileddr_gui]]
+==== Using GUI
+
+.Procedure: Set 'generate detailed CDR for messages'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI.
+. You can specify if the SMSC should generate detailed CDR for messages by choosing the value true for the field 'Generate detailed CDR'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_generatetempfailurecdr]]
 === Generate CDR for temporary failure case
@@ -2525,7 +2636,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'generatetempfailurecdr' value to true/false by issuing the command `smsc set generatetempfailurecdr` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get generatetempfailurecdr` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get generatetempfailurecdr` which will display the value set for this property.
 
 ----
 Name
@@ -2551,12 +2662,51 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set 'generate CDR for a temporary failure case'  using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'CDR' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI.
 . You can specify if the SMSC should generate CDR for for a temporary failure case by choosing the value true for the field 'Generate CDR for a temporary failure case'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+
+[[_generateprocessingerrorcdr]]
+=== Generate CDR for Message Processing Errors
+
+[[_generateprocessingerrorcdr_cli]]
+==== Using CLI
+
+You can set the 'generateprocessingerrorcdr' value to true/false by issuing the command `smsc set generateprocessingerrorcdr` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get generateprocessingerrorcdr` which will display the value set for this property.
+
+----
+Name
+  smsc set generateprocessingerrorcdr
+
+SYNOPSIS
+  smsc set generateprocessingerrorcdr <true | false>
+
+DESCRIPTION
+  The SMSC can be configured to generate CDR also for unsuccessful message
+  processing. This applies both to a variety of SMSC errors (unexpected
+  internal and/or external) as well as to intentional message rejection by
+  MProc rules.
+  Default value: false
+
+EXAMPLES
+  smsc set generateprocessingerrorcdr false
+----
+
+[[_generateprocessingerrorcdr_gui]]
+==== Using GUI
+
+.Procedure: Set 'generate CDR for message processing error'  using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'CDR' tab in the GUI.
+. You can specify if the SMSC should generate CDR for message processing errors by choosing the value true for the field 'Generate CDR for an SMSC processing error case'. For more details of this parameter, please refer to the description of the CLI command in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 [[_calculatemsgpartslencdr]]
@@ -2566,7 +2716,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'calculatemsgpartslencdr' value to true/false by issuing the command `smsc set calculatemsgpartslencdr` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get calculatemsgpartslencdr` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get calculatemsgpartslencdr` which will display the value set for this property.
 
 ----
 Name
@@ -2591,12 +2741,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set 'calculating of message parts and characters count per a CDR record'  using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'CDR' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI.
 . You can specify if the SMSC should calculating of message parts and characters count per a CDR record by choosing the value true for the field 'Calculating of message parts and characters count per a CDR record'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 [[_delayparametersincdr]]
@@ -2606,7 +2756,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the 'delayparametersincdr' value to true/false by issuing the command `smsc set delayparametersincdr` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get delayparametersincdr` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get delayparametersincdr` which will display the value set for this property.
 
 ----
 Name
@@ -2630,12 +2780,12 @@ EXAMPLES
 ==== Using GUI
 
 .Procedure: Set 'Adding of delay parameters into a CDR record'  using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'CDR' tab in the GUI. 
+  Switch to the 'CDR' tab in the GUI.
 . You can specify if the SMSC should add of delay parameters into a CDR record by choosing the value true for the field 'Delay parameters in CDR'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 
@@ -2652,7 +2802,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the messaging mode for MO originated messages value by issuing the command `smsc set modefaultmessagingmode` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get modefaultmessagingmode` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get modefaultmessagingmode` which will display the value set for this property.
 
 ----
 
@@ -2682,7 +2832,7 @@ EXAMPLES
   Switch to the 'Processing' tab in the GUI.
 . You can specify the messaging mode for MO originated messages option by selecting an appropriate value in the field "Default messaging mode - MO messages". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_hrdefaultmessagingmode]]
 === Messaging mode for HR messages
@@ -2691,7 +2841,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the messaging mode for HR originated messages value by issuing the command `smsc set hrdefaultmessagingmode` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get hrdefaultmessagingmode` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get hrdefaultmessagingmode` which will display the value set for this property.
 
 ----
 
@@ -2721,7 +2871,7 @@ EXAMPLES
   Switch to the 'Processing' tab in the GUI.
 . You can specify the messaging mode for HR originated messages option by selecting an appropriate value in the field "Default messaging mode - HR messages". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_sipdefaultmessagingmode]]
 === Messaging mode for SIP messages
@@ -2730,7 +2880,7 @@ EXAMPLES
 ==== Using CLI
 
 You can set the messaging mode for SIP originated messages value by issuing the command `smsc set sipdefaultmessagingmode` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get sipdefaultmessagingmode` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get sipdefaultmessagingmode` which will display the value set for this property.
 
 ----
 
@@ -2760,7 +2910,7 @@ EXAMPLES
   Switch to the 'Processing' tab in the GUI.
 . You can specify the messaging mode for SIP originated messages option by selecting an appropriate value in the field "Default messaging mode - SIP messages". For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 === SMSC pausing
 
@@ -2771,16 +2921,16 @@ A user can pause SMSC for message delivering by issuing the command `smsc set de
 When SMSC delivery is paused no more messages are scheduled for delivering.
 When SMSC is configured in ForwardAndStore (fast) mode all incoming messages will be rejected.
 When SMSC is configured in StoreAndForward (normal) mode datagramm and transactional SMPP originated messages will be rejected but StoreAndForward SMPP originated and all SS7 / SIP originated messages will be stored into cassandra database without delivery attempts.
-Use this option with extreme caution. 
+Use this option with extreme caution.
 
 ----
 
 	Name
 	    smsc set deliverypause
-	
+
 	SYNOPSIS
 	    smsc set deliverypause <true|false>
-	
+
 	DESCRIPTION
 	    Setting to true puts SMSC GW into a pause mode and setting to false
 	    (default value) returns SMSC GW to a normal message processing.
@@ -2792,7 +2942,7 @@ Use this option with extreme caution.
 ==== Using GUI
 
 .Procedure: Pause SMSC using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . You can select "true" or "false" value.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
@@ -2807,7 +2957,7 @@ Use this option with extreme caution.
 SMCS can generate receipts of messages delivering results (success / error). See chapter "Appendix B.
 Delivery Receipt Format" of "Short Message Peer to Peer.
 Protocol Specification v3.4." You can set the 'receiptsdisabling' value to true/false by issuing the command `smsc set receiptsdisabling` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get receiptsdisabling` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get receiptsdisabling` which will display the value set for this property.
 
 ----
 
@@ -2828,13 +2978,13 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Disabling of Reciepts generating using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Processing' tab in the GUI. 
+  Switch to the 'Processing' tab in the GUI.
 . You can specify if the SMSC should disable of receipt generating by setting the value for the field 'Disable Delivery Receipt' to true or false accordingly.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 [[_enableintermediatereceipts]]
@@ -2844,7 +2994,7 @@ DESCRIPTION
 ==== Using CLI
 
 SMCS can generate intermediate receipts (for temporary failures). You can set the 'enableintermediatereceipts' value to true/false by issuing the command `smsc set enableintermediatereceipts` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get enableintermediatereceipts` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get enableintermediatereceipts` which will display the value set for this property.
 
 ----
 
@@ -2869,7 +3019,7 @@ DESCRIPTION
 ==== Using CLI
 
 SMCS can processing of incoming delivery receipts from remote SMSC GW (replacing of messageId in the receipt by a local messageId). You can set the 'incomereceiptsprocessing' value to true/false by issuing the command `smsc set incomereceiptsprocessing` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get incomereceiptsprocessing` which will display the value set for this property. 
+You can verify this by issuing the command `smsc get incomereceiptsprocessing` which will display the value set for this property.
 
 ----
 
@@ -2894,13 +3044,13 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Allowing of generating of intermediate receipts using the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Processing' tab in the GUI. 
+  Switch to the 'Processing' tab in the GUI.
 . You can specify of processing of incoming delivery receipts by setting the value for the field 'Income receipts processing' to true or false accordingly.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 [[_smsc_gateway_server_routing_dlv]]
@@ -2912,7 +3062,7 @@ DESCRIPTION
 If this option is turned on for each generated delivery receipts and SMS-STATUS-REPORTs networkId will be assigned to the value of networkId of an ESME via which the original message has come to SMSC.
 This can help for routing of receipts back to the originated ESME.
 If this option is turned off then the networkId of receipts will be taken from networkId of ESME / SS7 / SIP via which the original message has left SMSC GW.
-You can configure this option by issuing the command smsc set orignetworkidforreceipts with appropriate parameters as described below. 
+You can configure this option by issuing the command smsc set orignetworkidforreceipts with appropriate parameters as described below.
 
 ----
 
@@ -2926,7 +3076,7 @@ DESCRIPTION
 
 	Settings of this option will affect of which networkId will be assigned
 	to a message delivery receipt.
-	true: networkId of the connector via which an original message has 
+	true: networkId of the connector via which an original message has
 	      left SMSC GW
 	false: networkId of the connector via which an original message has
 	       come SMSC GW. This value is default.
@@ -2936,13 +3086,13 @@ DESCRIPTION
 ==== Using GUI
 
 .Procedure: Routing of delivery receipts option update by the GUI
-. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Processing' tab in the GUI. 
+  Switch to the 'Processing' tab in the GUI.
 . You can specify routing of delivery receipts by setting the value for the field 'Delivery receipts will be routed to the origination networkId' to true or false accordingly.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 [[_smsc_gateway_min_messageid]]
@@ -2974,11 +3124,11 @@ DESCRIPTION
 .Procedure: Minimum MessageId value option update by the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Processing' tab in the GUI. 
+  Switch to the 'Processing' tab in the GUI.
 . You can specify routing of delivery receipts by setting the value for the field 'Minimum MessageId value' to a neede value.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 
 [[_smsc_gateway_max_messageid]]
@@ -3010,9 +3160,105 @@ DESCRIPTION
 .Procedure: Maximum MessageId value option update by the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
-  Switch to the 'Processing' tab in the GUI. 
+  Switch to the 'Processing' tab in the GUI.
 . You can specify routing of delivery receipts by setting the value for the field 'Maximum MessageId value' to a neede value.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
-  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below. 
-  
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+
+[[_smsc_gateway_smdeliveryfailure]]
+=== SM Delivery Failure value
+
+[[_smsc_gateway_smdeliveryfailure_cli]]
+==== Using CLI
+
+You can set the 'smdeliveryfailure value' value by issuing the command ``smsc set smdeliveryfailure`` with appropriate parameters as described below.
+You can verify this by issuing the command ``smsc get smdeliveryfailure`` which will display the value sets for this property.
+----
+
+Name
+	smsc set smdeliveryfailure
+
+SYNOPSIS
+	smsc set smdeliveryfailure <cause-code> <permanent | temporary | clear>
+
+DESCRIPTION
+	When SMSC GW gets a SMDeliveryFailure MAP error message
+	and this message does not contain SMS-DELIVER Report tpdu with
+	TP-Failure-Cause on board then SMSC GW will decide of if this failure is
+	temporary or permanent depending of a value of DeliveryFailureCause of
+	MAP error message. By default value 0 (memoryCapacityExceeded) is treated
+	as temporary and all other values are threated as permanent. We can set by this
+	option a need behavior for any type of DeliveryFailureCause as needed.
+	- If it set to 'permanent' for a received DeliveryFailureCause then SMSC will treat
+	  the error with code as permanent (with no more delivery attempts)
+	- If it set to 'temporary' for a received DeliveryFailureCause then SMSC will treat
+	  the error with code as temporary (with more delivery attempts)
+	Value 'clear' drops a setting and SMSC GW will treat it as default.
+----
+
+
+[[_smsc_gateway_smdeliveryfailure_tpfailurecause]]
+=== SM Delivery Failure TP Failure Cause value
+
+[[_smsc_gateway_smdeliveryfailure_tpfailurecause_cli]]
+==== Using CLI
+
+You can set the 'smdeliveryfailure value' value by issuing the command ``smsc set smdeliveryfailure_tpfailurecause`` with appropriate parameters as described below.
+You can verify this by issuing the command ``smsc get smdeliveryfailure_tpfailurecause`` which will display the value sets for this property.
+----
+
+Name
+	smsc set smdeliveryfailure_tpfailurecause
+
+SYNOPSIS
+	smsc set smdeliveryfailure_tpfailurecause <cause-code> <permanent | temporary | clear>
+
+DESCRIPTION
+	This command is used to set the code of smdeliveryfailure_tpfailurecause
+	with SMS-DELIVERY-REPORT to	needed values. When SMSC GW gets a SMDeliveryFailure
+	MAP error message and this message contains SMS-DELIVER Report tpdu with
+	TP-Failure-Cause on board then SMSC GW will treat this delivery failure as
+	temporary or permanent depending of parameters set by this CLI option.
+	- If it set to 'permanent' for a received TP-Failure-Cause then SMSC will treat
+	  the error with code as permanent (with no more delivery attempts)
+	- If it set to 'temporary' for a received TP-Failure-Cause then SMSC will treat
+	  the error with code as temporary (with more delivery attempts)
+	Value 'clear' drops a setting and SMSC GW will treat it as default as permanent
+	Default value is 'clear' (no special value is set).
+----
+
+
+[[_smsc_gateway_smdeliveryfailure_dlr_withtpuserdata]]
+=== SM Delivery Failure Dlr With TP User Data value
+
+[[_smsc_gateway_smdeliveryfailure_dlr_withtpuserdata_cli]]
+==== Using CLI
+
+You can set the 'smdeliveryfailure value' value by issuing the command ``smsc set smdeliveryfailure_dlr_withtpuserdata`` with appropriate parameters as described below.
+You can verify this by issuing the command ``smsc get smdeliveryfailure_dlr_withtpuserdata`` which will display the value set for this property.
+----
+
+Name
+	smsc set smdeliveryfailure_dlr_withtpuserdata
+
+SYNOPSIS
+	smsc set smdeliveryfailure_dlr_withtpuserdata <false | short | full>
+
+DESCRIPTION
+	This command is used to set the value of smdeliveryfailure_dlr_withtpuserdata
+	When SMSC GW gets a SMDeliveryFailure MAP error message and this message contains
+	SMS-DELIVER Report tpdu with TP-User-Data on board then SMSC GW may put into
+	a generated DLR text field a value a hex encoded context of TP-User-Data depending
+	of parameters set by this CLI option.
+	When SMSC received errorReturn with SMS-DELIVERY-REPORT:
+	    - If it set to 'false' then Delivery Receipts will be generated as usual
+	    - If it set to 'short' then Delivery Receipts will carry 20 first characters
+	      of hex encoded TP-User-Data
+	    - If it set to 'full' then Delivery Receipts will carry full text
+	      of hex encoded TP-User-Data
+	This value is set to 'false' by default.
+----
+
+

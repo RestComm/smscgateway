@@ -34,15 +34,33 @@ public class SmsExtraData {
     public static final String MPROC_NOTES = "mprocNotes";
     public static final String ORIGINATION_TYPE = "originationType";
     public static final String RECEIPT_LOCAL_MESSAGEID = "receiptLocalMessageId";
+    
+    //timestamps used for DetailedCDR
+    public static final String TIMESTAMP_A = "timestampA";
+    public static final String TIMESTAMP_B = "timestampB";
+    public static final String TIMESTAMP_C = "timestampC";
+    
+
+    // global title and translation type for MT message
+    public static final String MT_LOCAL_SCCP_GT = "mtLocalSccpGt";
+    public static final String MT_REMOTE_SCCP_TT = "mtRemoteSccpTt";
 
     public static final String ZERO_STRING = null;
 
     private String mprocNotes;
     private OriginationType originationType;
     private Long receiptLocalMessageId;
+    
+    private long timestampA;
+    private long timestampB;
+    private long timestampC;
 
-    public boolean isEmpty() {
-        if (this.mprocNotes != null || this.originationType != null || this.receiptLocalMessageId != null)
+    private String mtLocalSccpGt;
+    private Integer mtRemoteSccpTt;
+
+    	public boolean isEmpty() {
+        if (this.mprocNotes != null || this.originationType != null || this.receiptLocalMessageId != null 
+        		|| this.timestampA != 0 || this.timestampB != 0 || this.timestampC != 0 || this.mtLocalSccpGt != null || this.mtRemoteSccpTt != null)
             return false;
         else
             return true;
@@ -52,6 +70,11 @@ public class SmsExtraData {
         mprocNotes = null;
         originationType = null;
         receiptLocalMessageId = null;
+        timestampA = 0;
+        timestampB = 0;
+        timestampC = 0;
+        mtLocalSccpGt = null;
+        mtRemoteSccpTt = null;
     }
 
     public String getMprocNotes() {
@@ -77,6 +100,46 @@ public class SmsExtraData {
     public void setReceiptLocalMessageId(Long receiptLocalMessageId) {
         this.receiptLocalMessageId = receiptLocalMessageId;
     }
+    
+    public long getTimestampA() {
+		return timestampA;
+	}
+
+	public void setTimestampA(long timestampA) {
+		this.timestampA = timestampA;
+	}
+
+	public long getTimestampB() {
+		return timestampB;
+	}
+
+	public void setTimestampB(long timestampB) {
+		this.timestampB = timestampB;
+	}
+
+	public long getTimestampC() {
+		return timestampC;
+	}
+
+    public void setTimestampC(long timestampC) {
+        this.timestampC = timestampC;
+    }
+    
+    public void setMtLocalSccpGt(String mtLocalSccpGt) {
+        this.mtLocalSccpGt = mtLocalSccpGt;
+    }
+    
+    public String getMtLocalSccpGt() {
+        return mtLocalSccpGt;
+    }
+    
+    public void setMtRemoteSccpTt(Integer mtRemoteSccpTt) {
+        this.mtRemoteSccpTt = mtRemoteSccpTt;
+    }
+    
+    public Integer getMtRemoteSccpTt() {
+        return mtRemoteSccpTt;
+    }
 
     @Override
     public String toString() {
@@ -96,6 +159,32 @@ public class SmsExtraData {
         if (receiptLocalMessageId != null) {
             sb.append("receiptLocalMessageId=");
             sb.append(receiptLocalMessageId);
+            sb.append(", ");
+        }
+        if (timestampA != 0) {
+        	sb.append("timestampA=");
+        	sb.append(timestampA);
+        	sb.append(", ");
+        }
+        if (timestampB != 0) {
+        	sb.append("timestampB=");
+        	sb.append(timestampB);
+        	sb.append(", ");
+        }
+        if (timestampC != 0) {
+        	sb.append("timestampC=");
+        	sb.append(timestampC);
+        	sb.append(", ");
+        }
+        if (mtLocalSccpGt != null) {
+            sb.append("mtLocalSccpGt=");
+            sb.append(mtLocalSccpGt);
+            sb.append(", ");
+        }
+
+        if (mtRemoteSccpTt != null) {
+            sb.append("mtRemoteSccpTt");
+            sb.append(mtRemoteSccpTt);
             sb.append(", ");
         }
         sb.append("]");
@@ -118,7 +207,11 @@ public class SmsExtraData {
             }
 
             extraData.mprocNotes = xml.get(MPROC_NOTES, String.class);
-            extraData.receiptLocalMessageId = xml.get(RECEIPT_LOCAL_MESSAGEID, Long.class);
+            extraData.receiptLocalMessageId = xml.get(RECEIPT_LOCAL_MESSAGEID, Long.class);      
+            
+            extraData.mtLocalSccpGt = xml.get(MT_LOCAL_SCCP_GT, String.class);
+            extraData.mtRemoteSccpTt = xml.get(MT_REMOTE_SCCP_TT, Integer.class);
+            
         }
 
         @Override
@@ -132,6 +225,12 @@ public class SmsExtraData {
             }
             if (extraData.receiptLocalMessageId != null) {
                 xml.add(extraData.receiptLocalMessageId, RECEIPT_LOCAL_MESSAGEID, Long.class);
+            }
+            if (extraData.mtLocalSccpGt != null) {
+                xml.add(extraData.mtLocalSccpGt, MT_LOCAL_SCCP_GT, String.class);
+            }
+            if (extraData.mtRemoteSccpTt != null) {
+                xml.add(extraData.mtRemoteSccpTt, MT_REMOTE_SCCP_TT, Integer.class);
             }
         }
     };

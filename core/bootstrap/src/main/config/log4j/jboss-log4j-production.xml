@@ -40,6 +40,19 @@
 		<param name="ConversionPattern" value="%d %-5p [%c] %m%n"/> 
 	    </layout> 
 	</appender> 
+	
+	<appender name="CDR_DETAILED" class="org.jboss.logging.appender.DailyRollingFileAppender">
+		<errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler" />
+		<param name="File" value="${jboss.server.home.dir}/log/cdr_detailed.log" />
+		<param name="Append" value="true" />
+		<param name="Threshold" value="DEBUG" />
+
+	    <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p [%c] %m%n" />
+		</layout>
+	</appender>	
 
 	<appender name="STATS" class="org.jboss.logging.appender.DailyRollingFileAppender"> 
 	    <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/> 
@@ -76,6 +89,11 @@
 	    <priority value="DEBUG" /> 
 	    <appender-ref ref="CDR"/> 
 	</category> 
+	
+	<category name="org.mobicents.smsc.library.CdrDetailedGenerator" additivity="false">
+		<priority value="DEBUG" />
+		<appender-ref ref="CDR_DETAILED" />
+	</category>
 
 	<category name="org.mobicents.protocols.ss7.oam.common.statistics.StatsPrinter" additivity="false">
 		<priority value="DEBUG" /> 

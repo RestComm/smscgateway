@@ -3,7 +3,7 @@
 = Message processing rules (mproc rules)
 
 The fundamentals of mproc rules you can in the chapter <<_mproc_rules_fundamentals>>.
-Here we will describe how to manage mproc rules. 
+Here we will describe how to manage mproc rules.
 
 [[_mproc_rule_settings_create]]
 == Create a mproc rule.
@@ -11,7 +11,7 @@ Here we will describe how to manage mproc rules.
 [[_mproc_rule_settings_create_cli]]
 === Using CLI
 
-You can configure a new mproc rule by issuing the command smsc mproc add with appropriate parameters as described below. 
+You can configure a new mproc rule by issuing the command smsc mproc add with appropriate parameters as described below.
 
 ----
 
@@ -39,11 +39,13 @@ SYNOPSIS
 	newdestnpi <new destination numbering plan indicator>
 	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
 	newsourceton <new source type of number> newsourcenpi
-	<new source numbering plan indicator> newsourceaddr <new source address value> hrbypass
-	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value>
-	dropaftertempfail <false | true> newnetworkidaftertempfail <networkId value>
-	droponarrival <false | true> rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE
-	| SYSTEM_FAILURE |	THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key>
+	<new source numbering plan indicator> newsourceaddr <new source address value> mtlocalsccpgt
+	<new gt of a local sccp address of an mt message> mtremotesccptt
+	<new tt for remote sccp address for mt message> hrbypass <false | true> dropaftersri
+	<false | true> newnetworkidaftersri <networkId value> dropaftertempfail <false | true>
+	newnetworkidaftertempfail <networkId value> droponarrival <false | true> rejectonarrival
+	<NONE | DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE |	THROTTLING | FACILITY_NOT_SUPPORTED>
+	remove_tlv <tlv tag key> | removedestdigprefix <value>
 
 DESCRIPTION
 
@@ -83,6 +85,8 @@ PARAMETERS
 	newsourceton - an optional parameter.
 	newsourcenpi - an optional parameter.
 	newsourceaddr - an optional parameter.
+	mtlocalsccpgt - an optional parameter.
+	mtremotesccptt - an optional parameter.
 	makecopy - an optional parameter.
 	hrbypass - an optional parameter.
 	dropaftersri - an optional parameter.
@@ -93,26 +97,27 @@ PARAMETERS
 	droponarrival - an optional parameter.
 	rejectonarrival - an optional parameter.
 	remove_tlv - an optional parameter.
-
+	removedestdigprefix - an optional parameter.
+	
 EXAMPLES
 	smsc mproc add mproc 1 networkidmask 11 newnetworkid 12
 	smsc mproc add mproc 1 tlv_int_1550 13 newnetworkid 13
 ----
-	
+
 Description of parameters is in the chapter <<_mproc_rules_default>>.
 
 [[_mproc_rule_settings_create_gui]]
 === Using GUI
 
 
-. In the GUI Management Console for SMSC Gateway, click on 'Message Processing Rules' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Message Processing Rules' in the left panel.
 . The main panel will display the existing mproc rule (if any), one each in a row with corresponding actions (delete, update) for each row.
   Below this you will find buttons  'Create Default Message Processing Rule' and 'Create Custom Message Processing Rule'. If you have not implemented your own customized rule, the only option for you is 'Create Default Message Processing Rule'. The 'Create Message Processing Rule' window will display all proc rule parameters that must be defined by you.
-  For more details of these parameters please refer to the descriptions of the CLI commands for the same in the preceding section. 
-. If you have implemented your own customized rules than you can use the button 'Create Custom Message Processing Rule'. For a custom mproc rule you need to configure rule Id, Class Name and Parameters (as a plain string that will be parsed by your customized rules). 
+  For more details of these parameters please refer to the descriptions of the CLI commands for the same in the preceding section.
+. If you have implemented your own customized rules than you can use the button 'Create Custom Message Processing Rule'. For a custom mproc rule you need to configure rule Id, Class Name and Parameters (as a plain string that will be parsed by your customized rules).
 . Enter appropriate values for all the parameters and then click on the 'Create' button at the bottom of this 'Create Message Processing Rule' window.
-  This action will create a new mproc rule with parameters as defined by you. 
-. If there is an error in defining the mproc rule, then you will find the details of the error in the Management Console Log section below. 
+  This action will create a new mproc rule with parameters as defined by you.
+. If there is an error in defining the mproc rule, then you will find the details of the error in the Management Console Log section below.
 
 [[_mproc_rule_settings_modify]]
 == Modify a mproc rule.
@@ -120,7 +125,7 @@ Description of parameters is in the chapter <<_mproc_rules_default>>.
 [[_mproc_rule_settings_modify_cli]]
 === Using CLI
 
-You can modify an existent mproc rule by issuing the command smsc mproc modify with appropriate parameters as described below. 
+You can modify an existent mproc rule by issuing the command smsc mproc modify with appropriate parameters as described below.
 
 ----
 
@@ -148,11 +153,13 @@ SYNOPSIS
 	newdestnpi <new destination numbering plan indicator>
 	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
 	newsourceton <new source type of number> newsourcenpi
-	<new source numbering plan indicator> newsourceaddr <new source address value> hrbypass
-	<false | true> dropaftersri <false | true> newnetworkidaftersri <networkId value>
-	dropaftertempfail <false | true> newnetworkidaftertempfail <networkId value>
-	droponarrival <false | true> rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE
-	| SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key>
+	<new source numbering plan indicator> newsourceaddr <new source address value>
+	mtlocalsccpgt <new gt of a local sccp address of an mt message> mtremotesccptt
+	<new tt for remote sccp address for mt message> hrbypass <false | true> dropaftersri
+	<false | true> newnetworkidaftersri <networkId value> dropaftertempfail <false | true>
+	newnetworkidaftertempfail <networkId value> droponarrival <false | true> rejectonarrival
+	<NONE | DEFAULT | UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED>
+	remove_tlv <tlv tag key> | removedestdigprefix <value>
 
 DESCRIPTION
 
@@ -190,6 +197,8 @@ PARAMETERS
 	newsourceton - an optional parameter.
 	newsourcenpi - an optional parameter.
 	newsourceaddr - an optional parameter.
+	mtlocalsccpgt - an optional parameter.
+	mtremotesccptt - an optional parameter.
 	makecopy - an optional parameter.
 	hrbypass - an optional parameter.
 	dropaftersri - an optional parameter.
@@ -200,6 +209,7 @@ PARAMETERS
 	droponarrival - an optional parameter.
 	rejectonarrival - an optional parameter.
 	remove_tlv - an optional parameter.
+	removedestdigprefix - an optional parameter.
 
 EXAMPLES
 	smsc mproc modify 1 newnetworkid 13
@@ -209,16 +219,16 @@ EXAMPLES
 === Using GUI
 
 
-. In the GUI Management Console for SMSC Gateway, click on 'Message Processing Rules' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Message Processing Rules' in the left panel.
 . The main panel will display the existing mproc rule (if any), one each in a row with corresponding actions (delete, update) for each row.
-  Below this you will find the button 'Create Message Processing Rule'. 
+  Below this you will find the button 'Create Message Processing Rule'.
 . You can modify an existent mproc rule by launching the 'Message Procesing Rule #... properties' window by clicking on the blue coloured 'Modify Message Processing Rule' button.
   The 'Message Procesing Rule #... properties' window will display all proc rule paramters that must be updated by you.
   For more details of these parameters please refer to the descriptions of the CLI commands for the same in the preceding section.
-  For customized mproc rules the set of parameters is configured as a plain string. 
+  For customized mproc rules the set of parameters is configured as a plain string.
 . Update appropriate values for all the parameters and then click on the 'Close' button.
-  This action will modify a mproc rule with parameters as defined by you. 
-. If there is an error in updating the mproc rule, then you will find the details of the error in the Management Console Log section below. 
+  This action will modify a mproc rule with parameters as defined by you.
+. If there is an error in updating the mproc rule, then you will find the details of the error in the Management Console Log section below.
 
 [[_mproc_rule_settings_view]]
 == View a mproc rule details.
@@ -226,7 +236,7 @@ EXAMPLES
 [[_mproc_rule_settings_view_cli]]
 === Using CLI
 
-You can view the details of all configured mproc rules or a specified mproc rule by issuing the command smsc mproc show as described below. 
+You can view the details of all configured mproc rules or a specified mproc rule by issuing the command smsc mproc show as described below.
 
 ----
 
@@ -257,11 +267,11 @@ EXAMPLES
 === Using GUI
 
 
-. In the GUI Management Console for SMSC Gateway, click on 'Message Processing Rules' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Message Processing Rules' in the left panel.
 . The main panel will display the existing mproc rule (if any), one each in a row with corresponding actions (delete, update) for each row.
-  Below this you will find the button 'Create Message Processing Rule'. 
+  Below this you will find the button 'Create Message Processing Rule'.
 . You can view the details of a mproc rule by clicking on the row corresponding to the mproc rule.
-  All relevant details of the mproc rule will be displayed in an expanded format. 
+  All relevant details of the mproc rule will be displayed in an expanded format.
 
 [[_mproc_rule_settings_remove]]
 == Remove an existing mproc rule.
@@ -269,7 +279,7 @@ EXAMPLES
 [[_mproc_rule_settings_remove_cli]]
 === Using CLI
 
-You can remove an existent mproc rule by issuing the command smsc mproc remove with appropriate parameters as described below. 
+You can remove an existent mproc rule by issuing the command smsc mproc remove with appropriate parameters as described below.
 
 ----
 
@@ -296,7 +306,7 @@ EXAMPLES
 === Using GUI
 
 
-. In the GUI Management Console for SMSC Gateway, click on 'Message Processing Rules' in the left panel. 
+. In the GUI Management Console for SMSC Gateway, click on 'Message Processing Rules' in the left panel.
 . The main panel will display the existing mproc rule (if any), one each in a row with corresponding actions (delete, update) for each row.
-  Below this you will find the button 'Create Message Processing Rule'. 
-. To remove an existing mproc rule click on the delete icon marked 'x' in red, for the row corresponding to the mproc rule. 
+  Below this you will find the button 'Create Message Processing Rule'.
+. To remove an existing mproc rule click on the delete icon marked 'x' in red, for the row corresponding to the mproc rule.

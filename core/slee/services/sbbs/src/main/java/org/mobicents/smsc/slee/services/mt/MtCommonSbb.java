@@ -30,10 +30,12 @@ import javax.naming.InitialContext;
 import javax.slee.ActivityContextInterface;
 import javax.slee.Sbb;
 import javax.slee.SbbContext;
+import javax.xml.bind.DatatypeConverter;
 
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.mobicents.protocols.ss7.map.api.MAPException;
 import org.mobicents.protocols.ss7.map.api.MAPParameterFactory;
 import org.mobicents.protocols.ss7.map.api.MAPProvider;
 import org.mobicents.protocols.ss7.map.api.MAPSmsTpduParameterFactory;
@@ -41,11 +43,14 @@ import org.mobicents.protocols.ss7.map.api.dialog.MAPUserAbortChoice;
 import org.mobicents.protocols.ss7.map.api.dialog.ProcedureCancellationReason;
 import org.mobicents.protocols.ss7.map.api.dialog.ResourceUnavailableReason;
 import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageSMDeliveryFailure;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
 import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan;
 import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
+import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverReportTpdu;
+import org.mobicents.protocols.ss7.map.api.smstpdu.UserData;
 import org.mobicents.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
 import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
 import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
@@ -65,6 +70,7 @@ import org.mobicents.slee.resource.map.events.DialogUserAbort;
 import org.mobicents.slee.resource.map.events.ErrorComponent;
 import org.mobicents.slee.resource.map.events.InvokeTimeout;
 import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.CdrGenerator;
 import org.mobicents.smsc.library.ErrorAction;
@@ -164,7 +170,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
     }
 
     protected void setupReportSMDeliveryStatusRequest(String destinationAddress, int ton, int npi,
-            SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId) {
+            SMDeliveryOutcome sMDeliveryOutcome, String targetId, int networkId, String mtLocalSccpGt, Integer mtRemoteSccpTt) {
         RsdsSbbLocalObject rsdsSbbLocalObject = this.getRsdsSbbObject();
 
         if (rsdsSbbLocalObject != null) {
@@ -175,10 +181,12 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
             event.setMsisdn(this.getCalledPartyISDNAddressString(destinationAddress, ton, npi));
             event.setServiceCentreAddress(getServiceCenterAddressString(networkId));
             event.setSMDeliveryOutcome(sMDeliveryOutcome);
-            event.setDestAddress(this.convertAddressFieldToSCCPAddress(destinationAddress, ton, npi));
+            SccpAddress destinationAddr = this.convertAddressFieldToSCCPAddress(destinationAddress, ton, npi, mtRemoteSccpTt);
+            event.setDestAddress(destinationAddr);
             event.setMapApplicationContext(this.getSRIMAPApplicationContext(MAPApplicationContextVersion.getInstance(this.getSriMapVersion())));
             event.setTargetId(targetId);
             event.setNetworkId(networkId);
+            event.setMtLocalSccpGt(mtLocalSccpGt);
 
             this.fireSendRsdsEvent(event, schedulerActivityContextInterface, null);
         }
@@ -360,6 +368,11 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason, true, null, false,
                 ProcessingType.SS7_MT);
     }
+	
+	@Override
+    protected Integer getMaxMessagesPerStep() {
+        return null;
+    }
 
     /**
      * Processing a case when an error in message sending process. This stops of message sending, reschedule or drop messages
@@ -404,6 +417,38 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
             ArrayList<Sms> lstRerouted = new ArrayList<Sms>();
             ArrayList<Integer> lstNewNetworkId = new ArrayList<Integer>();
 
+            // generate text for Delivery receipts
+            String dlrText = null; // false
+            if (errMessage != null) {
+                MAPErrorMessageSMDeliveryFailure smDeliveryFailure = errMessage.getEmSMDeliveryFailure();
+                if (smDeliveryFailure != null) {
+                    SmsDeliverReportTpdu tpdu = null;
+                    try {
+                        tpdu = errMessage.getEmSMDeliveryFailure().getSmsDeliverReportTpdu();
+                    } catch (MAPException e) {
+                        // we ignore Exception here
+                    }
+                    if (tpdu != null) {
+                        UserData userData = tpdu.getUserData();
+                        if (userData != null) {
+                            byte[] data = userData.getEncodedData();
+                            if (data != null) {
+                                String text = DatatypeConverter.printHexBinary(data);
+                                String smDlrWithTpdu = SmscPropertiesManagement.getInstance().getSmDeliveryFailureDlrWithTpdu();
+                                if (smDlrWithTpdu.equals("short")) {
+                                    if (text.length() > 20)
+                                        dlrText = text.substring(0, 20);
+                                    else
+                                        dlrText = text;
+                                } else if (smDlrWithTpdu.equals("full")) {
+                                    dlrText = text;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             TargetAddress lock = persistence.obtainSynchroObject(new TargetAddress(smsSet));
             synchronized (lock) {
                 try {
@@ -438,7 +483,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     this.generateIntermediateReceipts(smsSet, lstTempFailured2);
 
                     // sending of failure delivery receipts
-                    this.generateFailureReceipts(smsSet, lstPermFailured2, null);
+                    this.generateFailureReceipts(smsSet, lstPermFailured2, dlrText);
 
                     // sending of ReportSMDeliveryStatusRequest if needed
                     SMDeliveryOutcome smDeliveryOutcome = null;
@@ -456,8 +501,17 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                             break;
                     }
                     if (smDeliveryOutcome != null && lstTempFailured2.size() > 0) {
-                        this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(), smsSet.getDestAddrNpi(),
-                                smDeliveryOutcome, smsSet.getTargetId(), smsSet.getNetworkId());
+                        Sms sms0 = smsSet.getSms(0);
+                        String mtLocalSccpGt = null;
+                        Integer mtRemoteSccpTt = null;
+                        if (sms0 != null) {
+                            mtLocalSccpGt = sms0.getMtLocalSccpGt();
+                            mtRemoteSccpTt = sms0.getMtRemoteSccpTt();
+                        }
+
+                        this.setupReportSMDeliveryStatusRequest(smsSet.getDestAddr(), smsSet.getDestAddrTon(),
+                                smsSet.getDestAddrNpi(), smDeliveryOutcome, smsSet.getTargetId(), smsSet.getNetworkId(),
+                                mtLocalSccpGt, mtRemoteSccpTt);
                     }
 
                     this.markDeliveringIsEnded(removeSmsSet);
@@ -556,6 +610,35 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                     org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, smscPropertiesManagement.getServiceCenterGt(networkId));
         }
     }
+    
+    /**
+     * TODO : This is repetitive in each Sbb. Find way to make it static
+     * probably?
+     * 
+     * This is our own number. We are Service Center.
+     * 
+     * @return
+     */
+    protected AddressString getServiceCenterAddressString(String mtLocalSccpGt, int networkId) {
+        if (mtLocalSccpGt == null) {
+            if (networkId == 0) {
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt();
+            } else {
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt(networkId);
+            }
+        }
+        
+        if (networkId == 0) {
+            if (this.serviceCenterAddress == null) {
+                this.serviceCenterAddress = this.mapParameterFactory.createAddressString(AddressNature.international_number,
+                        org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, mtLocalSccpGt);
+            }
+            return this.serviceCenterAddress;
+        } else {
+            return this.mapParameterFactory.createAddressString(AddressNature.international_number,
+                    org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, mtLocalSccpGt);
+        }
+    }
 
     /**
      * TODO: This should be configurable and static as well
@@ -581,14 +664,32 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         }
     }
 
+    protected SccpAddress getServiceCenterSccpAddress(String mtLocalSccpGt, int networkId) {
+        if (mtLocalSccpGt == null) {
+            if (networkId == 0) {
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt();
+            } else {
+                mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt(networkId);
+            }
+        }
+        
+        return MessageUtil.getSccpAddress(sccpParameterFact, mtLocalSccpGt, AddressNature.international_number.getIndicator(), NumberingPlan.ISDN.getIndicator(),
+                smscPropertiesManagement.getServiceCenterSsn(), smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
+    }
+
     protected ISDNAddressString getCalledPartyISDNAddressString(String destinationAddress, int ton, int npi) {
         return this.mapParameterFactory.createISDNAddressString(AddressNature.getInstance(ton),
                 org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.getInstance(npi), destinationAddress);
     }
 
     protected SccpAddress convertAddressFieldToSCCPAddress(String address, int ton, int npi) {
+        return convertAddressFieldToSCCPAddress(address, ton, npi, null);
+    }
+    
+    protected SccpAddress convertAddressFieldToSCCPAddress(String address, int ton, int npi, Integer mtRemoteSccpTt) {
         return MessageUtil.getSccpAddress(sccpParameterFact, address, ton, npi, smscPropertiesManagement.getHlrSsn(),
-                smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
+                smscPropertiesManagement.getGlobalTitleIndicator(), mtRemoteSccpTt != null ? mtRemoteSccpTt 
+                        : smscPropertiesManagement.getTranslationType());
     }
 
     protected MAPApplicationContext getSRIMAPApplicationContext(MAPApplicationContextVersion applicationContextVersion) {

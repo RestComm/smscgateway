@@ -60,6 +60,7 @@ import org.mobicents.smsc.domain.SipXHeaders;
 import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.SmscStatProvider;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.OriginationType;
 import org.mobicents.smsc.library.SbbStates;
@@ -67,6 +68,7 @@ import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSet;
 import org.mobicents.smsc.library.SmscProcessingException;
 import org.mobicents.smsc.library.TargetAddress;
+import org.mobicents.smsc.library.*;
 import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.services.submitsbb.SubmitCommonSbb;
 
@@ -197,6 +199,10 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 					validityPeriod = MessageUtil.parseDate(((SIPHeader) validityHeader).getValue());
 				} catch (ParseException e) {
 					logger.severe("ParseException when parsing ValidityPeriod field: " + e.getMessage(), e);
+                    if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                        generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
+                                ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e.getMessage(), true);
+                    }
 
 					ServerTransaction serverTransaction = event.getServerTransaction();
 					Response res;
@@ -218,7 +224,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 				regDeliveryInt = Integer.parseInt(((SIPHeader) regDeliveryHeader).getValue());
 			}
 
-			Sms sms;
+			Sms sms = null;
 			try {
                 sms = this.createSmsEvent(fromUser, message, ta, persistence, udh, codingSchme, validityPeriod, regDeliveryInt, sip.getNetworkId());
                 this.processSms(sms, persistence);
@@ -230,6 +236,14 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
                         this.logger.severe(e1.getMessage(), e1);
                     }
                     smscStatAggregator.updateMsgInFailedAll();
+                }
+                if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
+                    if (sms != null) {
+                        generateCDR(sms, CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), false, true);
+                    } else {
+                        generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
+                                ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), true);
+                    }
                 }
 
 				ServerTransaction serverTransaction = event.getServerTransaction();
@@ -245,6 +259,10 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 			} catch (Throwable e1) {
 				this.logger.severe("Exception while processing a message from sip", e1);
 				smscStatAggregator.updateMsgInFailedAll();
+                if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+                    generateCDR(new String(message, utf8), sip.getNetworkId(), fromUser, toUser, ta.getNetworkId(),
+                            ta.getAddrTon(), ta.getAddrNpi(), CdrGenerator.CDR_SUBMIT_FAILED_SIP, e1.getMessage(), true);
+                }
 
 				ServerTransaction serverTransaction = event.getServerTransaction();
 				Response res;
@@ -482,7 +500,7 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 			break;
 		}
 
-        this.forwardMessage(sms0, withCharging, smscStatAggregator);
+        this.forwardMessage(sms0, withCharging, smscStatAggregator, CdrDetailedGenerator.CDR_MSG_TYPE_SIP, -1);
 
         
         
@@ -599,5 +617,19 @@ public abstract class TxSipServerSbb extends SubmitCommonSbb implements Sbb {
 	private DataCodingSchemeImpl createDataCodingScheme(int dcs) {
 		CharacterSet chs = CharacterSet.getInstance(dcs);
 		return new DataCodingSchemeImpl(DataCodingGroup.GeneralGroup, null, null, null, chs, false);
+	}
+
+	private void generateCDR(String message, int networkId, String fromUser, String toUser, int destNetworkId,
+							 int destAddrTon, int destAddrNpi, String status, String reason, boolean lastSegment) {
+
+		CdrGenerator.generateCdr(fromUser, 0, 0, toUser, destAddrTon, destAddrNpi, OriginationType.SIP, null, null, null,
+				networkId, destNetworkId, null, 0, message, status, reason, true, true, lastSegment,
+				smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+	}
+
+	private void generateCDR(Sms sms, String status, String reason, boolean messageIsSplitted, boolean lastSegment) {
+		CdrGenerator.generateCdr(sms, status, reason, smscPropertiesManagement.getGenerateReceiptCdr(),
+				MessageUtil.isNeedWriteArchiveMessage(sms, smscPropertiesManagement.getGenerateCdr()), messageIsSplitted,
+				lastSegment, smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
 	}
 }

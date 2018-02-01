@@ -22,6 +22,8 @@
 
 package org.mobicents.smsc.slee.services.submitsbb;
 
+import java.util.ArrayList;
+
 import javax.slee.ActivityContextInterface;
 import javax.slee.CreateException;
 import javax.slee.RolledBackContext;
@@ -39,6 +41,10 @@ import org.mobicents.smsc.domain.SmscCongestionControl;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.domain.StoreAndForwordMode;
+import org.mobicents.smsc.library.CdrDetailedGenerator;
+import org.mobicents.smsc.library.EventType;
+import org.mobicents.smsc.library.CdrGenerator;
+import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmsSetCache;
@@ -50,16 +56,21 @@ import org.mobicents.smsc.slee.resources.persistence.PersistenceRAInterface;
 import org.mobicents.smsc.slee.resources.scheduler.SchedulerRaSbbInterface;
 import org.mobicents.smsc.slee.services.charging.ChargingMedium;
 import org.mobicents.smsc.slee.services.charging.ChargingSbbLocalObject;
+import org.restcomm.smpp.Esme;
+import org.restcomm.smpp.EsmeManagement;
+import org.restcomm.smpp.parameter.TlvSet;
 
 import com.cloudhopper.smpp.SmppConstants;
+import com.cloudhopper.smpp.pdu.BaseSm;
+import com.cloudhopper.smpp.tlv.Tlv;
 
 import javolution.util.FastList;
 
 /**
-*
-* @author sergey vetyutnev
-*
-*/
+ *
+ * @author sergey vetyutnev
+ *
+ */
 public abstract class SubmitCommonSbb implements Sbb {
 
     public static SmscPropertiesManagement smscPropertiesManagement = SmscPropertiesManagement.getInstance();
@@ -73,7 +84,7 @@ public abstract class SubmitCommonSbb implements Sbb {
     public static final ResourceAdaptorTypeID MPROC_RATYPE_ID = new ResourceAdaptorTypeID("MProcResourceAdaptorType",
             "org.mobicents", "1.0");
     private static final String MPROC_RA_LINK = "MProcResourceAdaptor";
-    
+
     protected Tracer logger;
     protected SbbContextExt sbbContext;
 
@@ -86,7 +97,6 @@ public abstract class SubmitCommonSbb implements Sbb {
     public SubmitCommonSbb(String className) {
         this.className = className;
     }
-
 
     // *********
     // sbb overriding methods.
@@ -101,8 +111,7 @@ public abstract class SubmitCommonSbb implements Sbb {
             this.persistence = (PersistenceRAInterface) this.sbbContext.getResourceAdaptorInterface(PERSISTENCE_ID,
                     PERSISTENCE_LINK);
             this.scheduler = (SchedulerRaSbbInterface) this.sbbContext.getResourceAdaptorInterface(SCHEDULE_ID, SCHEDULE_LINK);
-            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MPROC_RATYPE_ID,
-                    MPROC_RA_LINK);
+            itsMProcRa = (MProcRuleRaProvider) this.sbbContext.getResourceAdaptorInterface(MPROC_RATYPE_ID, MPROC_RA_LINK);
         } catch (Exception ne) {
             logger.severe("Could not set SBB context:", ne);
         }
@@ -199,8 +208,8 @@ public abstract class SubmitCommonSbb implements Sbb {
             throw e;
         }
         // checking if SMSC is paused
-        if (smscPropertiesManagement.isDeliveryPause()
-                && (!MessageUtil.isStoreAndForward(sms) || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
+        if (smscPropertiesManagement.isDeliveryPause() && (!MessageUtil.isStoreAndForward(sms)
+                || smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast)) {
             SmscProcessingException e = new SmscProcessingException("SMSC is paused", SmppConstants.STATUS_SYSERR,
                     MAPErrorCode.facilityNotSupported, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null,
                     SmscProcessingException.INTERNAL_ERROR_STATE_PAUSED);
@@ -252,13 +261,16 @@ public abstract class SubmitCommonSbb implements Sbb {
         }
     }
 
-    protected void forwardMessage(Sms sms0, boolean withCharging, SmscStatAggregator smscStatAggregator)
-            throws SmscProcessingException {
+    protected void forwardMessage(Sms sms0, boolean withCharging, SmscStatAggregator smscStatAggregator, String messageType,
+            int seqNumber) throws SmscProcessingException {
 
         ChargingMedium chargingMedium = null;
+        EventType eventTypeFailure = null;
+        int statusCode = 0;
         switch (sms0.getOriginationType()) {
             case SMPP:
                 chargingMedium = ChargingMedium.TxSmppOrig;
+                eventTypeFailure = EventType.IN_SMPP_REJECT_MPROC;
                 break;
             case SS7_MO:
             case SS7_HR:
@@ -269,6 +281,7 @@ public abstract class SubmitCommonSbb implements Sbb {
                 break;
             case HTTP:
                 chargingMedium = ChargingMedium.HttpOrig;
+                eventTypeFailure = EventType.IN_HTTP_REJECT_MPROC;
                 break;
         }
 
@@ -280,79 +293,115 @@ public abstract class SubmitCommonSbb implements Sbb {
             MProcResult mProcResult = MProcManagement.getInstance().applyMProcArrival(itsMProcRa, sms0, persistence);
 
             FastList<Sms> smss = mProcResult.getMessageList();
-            for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
-                Sms sms = n.getValue();
-                TargetAddress ta = new TargetAddress(sms.getSmsSet());
-                TargetAddress lock = persistence.obtainSynchroObject(ta);
+            if (smss != null) {
+                for (FastList.Node<Sms> n = smss.head(), end = smss.tail(); (n = n.getNext()) != end;) {
+                    Sms sms = n.getValue();
+                    TargetAddress ta = new TargetAddress(sms.getSmsSet());
+                    TargetAddress lock = persistence.obtainSynchroObject(ta);
 
-                try {
-                    synchronized (lock) {
-                        boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
-                        if (!storeAndForwMode) {
-                            try {
-                                this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
-                            } catch (Exception e) {
-                                throw new SmscProcessingException("Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-                                        SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
-                                        SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
-                                        SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_NOT_SET);
-                            }
-                        } else {
-                            // store and forward
-                            if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast
-                                    && sms.getScheduleDeliveryTime() == null) {
+                    try {
+                        sms.setTimestampC(System.currentTimeMillis());
+
+                        synchronized (lock) {
+                            boolean storeAndForwMode = MessageUtil.isStoreAndForward(sms);
+                            if (!storeAndForwMode) {
                                 try {
-                                    sms.setStoringAfterFailure(true);
                                     this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
                                 } catch (Exception e) {
-                                    throw new SmscProcessingException(
-                                            "Exception when runnung injectSmsOnFly(): " + e.getMessage(),
-                                            SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+                                    throw new SmscProcessingException("Exception when running injectSmsOnFly(): "
+                                            + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
                                             SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
-                                            SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_FAST);
+                                            SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_NOT_SET);
                                 }
                             } else {
-                                try {
-                                    sms.setStored(true);
-                                    this.scheduler.setDestCluster(sms.getSmsSet());
-                                    persistence.c2_scheduleMessage_ReschedDueSlot(sms,
-                                            smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
-                                            false);
-                                } catch (PersistenceException e) {
-                                    throw new SmscProcessingException(
-                                            "PersistenceException when storing LIVE_SMS : " + e.getMessage(),
-                                            SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
-                                            SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
-                                            SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_NORMAL);
+                                // store and forward
+                                if (smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast
+                                        && sms.getScheduleDeliveryTime() == null) {
+                                    try {
+                                        sms.setStoringAfterFailure(true);
+                                        this.scheduler.injectSmsOnFly(sms.getSmsSet(), true);
+                                    } catch (Exception e) {
+                                        throw new SmscProcessingException("Exception when running injectSmsOnFly(): "
+                                                + e.getMessage(), SmppConstants.STATUS_SYSERR, MAPErrorCode.systemFailure,
+                                                SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
+                                                SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_FAST);
+                                    }
+                                } else {
+                                    try {
+                                        sms.setStored(true);
+                                        this.scheduler.setDestCluster(sms.getSmsSet());
+                                        persistence.c2_scheduleMessage_ReschedDueSlot(sms,
+                                                smscPropertiesManagement.getStoreAndForwordMode() == StoreAndForwordMode.fast,
+                                                false);
+                                    } catch (PersistenceException e) {
+                                        throw new SmscProcessingException("PersistenceException when storing LIVE_SMS : "
+                                                + e.getMessage(), SmppConstants.STATUS_SUBMITFAIL, MAPErrorCode.systemFailure,
+                                                SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
+                                                SmscProcessingException.INTERNAL_ERROR_INJECT_STORE_AND_FORWARD_NORMAL);
+                                    }
                                 }
                             }
                         }
+                    } finally {
+                        persistence.releaseSynchroObject(lock);
                     }
-                } finally {
-                    persistence.releaseSynchroObject(lock);
                 }
             }
 
             if (mProcResult.isMessageRejected()) {
                 sms0.setMessageDeliveryResultResponse(null);
-                final SmscProcessingException e = new SmscProcessingException("Message is rejected by MProc rules.",
-                        getErrorCode(mProcResult.getSmppErrorCode(), SmppConstants.STATUS_SUBMITFAIL),
-                        getErrorCode(mProcResult.getMapErrorCode(), MAPErrorCode.systemFailure),
-                        getErrorCode(mProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET),
-                        null, SmscProcessingException.INTERNAL_ERROR_MPROC_REJECT);
-                e.setSkipErrorLogging(true);
-                if (logger.isInfoEnabled()) {
-                    logger.info("Incoming message is rejected by mProc rules, message=[" + sms0 + "]");
+                if (eventTypeFailure != null) {
+                    String sourceAddrAndPort = null;
+                    if (eventTypeFailure == EventType.IN_SMPP_REJECT_MPROC) {
+                        EsmeManagement esmeManagement = EsmeManagement.getInstance();
+
+                        if (esmeManagement != null) {
+                            // for testing there is no EsmeManagement
+                            Esme esme = esmeManagement.getEsmeByClusterName(sms0.getOrigEsmeName());
+                            // null check is for testing
+                            if (esme != null) {
+                                sourceAddrAndPort = esme.getRemoteAddressAndPort();
+                            }
+                        }
+                        statusCode = mProcResult.getSmppErrorCode();
+                    } else if (eventTypeFailure == EventType.IN_HTTP_REJECT_MPROC) {
+                        statusCode = mProcResult.getHttpErrorCode();
+                    }
+
+                    generateMprocFailureDetailedCdr(sms0, eventTypeFailure, ErrorCode.REJECT_INCOMING_MPROC, messageType,
+                            statusCode, mProcResult.getRuleIdDropReject(), sourceAddrAndPort, seqNumber);
                 }
-                throw e;
+
+                rejectSmsByMProc(sms0, "Message is rejected by MProc rules.", mProcResult);
             }
             if (mProcResult.isMessageDropped()) {
                 sms0.setMessageDeliveryResultResponse(null);
                 smscStatAggregator.updateMsgInFailedAll();
-                if (logger.isInfoEnabled()) {
-                    logger.info("Incoming message is dropped by mProc rules, message=[" + sms0 + "]");
+
+                if (eventTypeFailure != null) {
+                    String sourceAddrAndPort = null;
+                    if (eventTypeFailure == EventType.IN_SMPP_REJECT_MPROC) {
+                        eventTypeFailure = EventType.IN_SMPP_DROP_MPROC;
+                        EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                        if (esmeManagement != null) {
+                            // for testing there is no EsmeManagement
+                            Esme esme = esmeManagement.getEsmeByClusterName(sms0.getOrigEsmeName());
+                            // null check is for testing
+                            if (esme != null) {
+                                sourceAddrAndPort = esme.getRemoteAddressAndPort();
+                            }
+                        }
+                        statusCode = mProcResult.getSmppErrorCode();
+                    } else if (eventTypeFailure == EventType.IN_HTTP_REJECT_MPROC) {
+                        eventTypeFailure = EventType.IN_HTTP_DROP_MPROC;
+                        statusCode = mProcResult.getHttpErrorCode();
+                    }
+
+                    generateMprocFailureDetailedCdr(sms0, eventTypeFailure, ErrorCode.REJECT_INCOMING_MPROC, messageType,
+                            statusCode, mProcResult.getRuleIdDropReject(), sourceAddrAndPort, seqNumber);
                 }
-                return;
+
+                rejectSmsByMProc(sms0, "Message is dropped by MProc rules.", mProcResult);
             }
 
             smscStatAggregator.updateMsgInReceivedAll();
@@ -378,7 +427,7 @@ public abstract class SubmitCommonSbb implements Sbb {
     public enum MaxActivityCountFactor {
         factor_12, factor_14,
     }
-    
+
     private static int getErrorCode(final int anErrorCode, final int aDefaultErrorCode) {
         if (anErrorCode < 0) {
             return aDefaultErrorCode;
@@ -386,4 +435,65 @@ public abstract class SubmitCommonSbb implements Sbb {
         return anErrorCode;
     }
 
+    protected void generateDetailedCDR(Sms sms, EventType eventType, String messageType, int statusCode,
+            String sourceAddrAndPort, int seqNumber) {
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, sms.getSmsSet().getStatus(), messageType, statusCode, -1,
+                sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(),
+                smscPropertiesManagement.getGenerateDetailedCdr());
+    }
+
+    protected void generateFailureDetailedCdr(Sms sms, EventType eventType, ErrorCode errorCode, String messageType,
+            int statusCode, String sourceAddrAndPort, int seqNumber) {
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, -1, sourceAddrAndPort,
+                null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(),
+                smscPropertiesManagement.getGenerateDetailedCdr());
+    }
+
+    protected void generateFailureDetailedCdr(BaseSm<?> event, Esme esme, EventType eventType, ErrorCode errorCode,
+            String messageType, int statusCode, String shortMessageText, Long timestampB) {
+        TlvSet tlvSet = new TlvSet();
+        ArrayList<Tlv> optionalParameters = event.getOptionalParameters();
+        if (optionalParameters != null && optionalParameters.size() > 0) {
+            for (Tlv tlv : optionalParameters) {
+                if (tlv.getTag() != SmppConstants.TAG_MESSAGE_PAYLOAD) {
+                    tlvSet.addOptionalParameter(tlv);
+                }
+            }
+        }
+        boolean mcDeliveryReceipt = (event.getEsmClass() & Sms.ESME_DELIVERY_ACK) != 0;
+        CdrDetailedGenerator.generateDetailedCdr(mcDeliveryReceipt, shortMessageText, tlvSet, null, timestampB, null, null,
+                esme.getName(), eventType, errorCode, messageType, statusCode, -1, esme.getRemoteAddressAndPort(), null,
+                event.getSequenceNumber(), smscPropertiesManagement.getGenerateReceiptCdr(),
+                smscPropertiesManagement.getGenerateDetailedCdr());
+    }
+
+    protected void generateMprocFailureDetailedCdr(Sms sms, EventType eventType, ErrorCode errorCode, String messageType,
+            int statusCode, int mprocRuleId, String sourceAddrAndPort, int seqNumber) {
+        CdrDetailedGenerator.generateDetailedCdr(sms, eventType, errorCode, messageType, statusCode, mprocRuleId,
+                sourceAddrAndPort, null, seqNumber, smscPropertiesManagement.getGenerateReceiptCdr(),
+                smscPropertiesManagement.getGenerateDetailedCdr());
+    }
+
+    private void rejectSmsByMProc(final Sms anSms, final String aReason, final MProcResult anMProcResult)
+            throws SmscProcessingException {
+        final SmscProcessingException e = new SmscProcessingException(aReason,
+                getErrorCode(anMProcResult.getSmppErrorCode(), SmppConstants.STATUS_SUBMITFAIL),
+                getErrorCode(anMProcResult.getMapErrorCode(), MAPErrorCode.systemFailure),
+                getErrorCode(anMProcResult.getHttpErrorCode(), SmscProcessingException.HTTP_ERROR_CODE_NOT_SET), null,
+                SmscProcessingException.INTERNAL_ERROR_MPROC_REJECT);
+        e.setSkipErrorLogging(true);
+        e.setMessageRejectCdrCreated(true);
+        if (logger.isInfoEnabled()) {
+            logger.info("Incoming message is " + (anMProcResult.isMessageRejected() ? "rejected" : "dropped")
+                    + "by mProc rules, message=[" + anSms + "]");
+        }
+        if (smscPropertiesManagement.isGenerateRejectionCdr()) {
+            CdrGenerator.generateCdr(anSms,
+                    (anMProcResult.isMessageRejected() ? CdrGenerator.CDR_MPROC_REJECTED : CdrGenerator.CDR_MPROC_DROPPED),
+                    aReason, smscPropertiesManagement.getGenerateReceiptCdr(),
+                    MessageUtil.isNeedWriteArchiveMessage(anSms, smscPropertiesManagement.getGenerateCdr()), false, true,
+                    smscPropertiesManagement.getCalculateMsgPartsLenCdr(), smscPropertiesManagement.getDelayParametersInCdr());
+        }
+        throw e;
+    }
 }

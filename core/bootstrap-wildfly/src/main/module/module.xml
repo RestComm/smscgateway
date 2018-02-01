@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="${module.name}">
+
+    <resources>
+        <resource-root path="${project.artifactId}-${project.version}.jar"/>
+        <resource-root path="domain-${project.version}.jar"/>
+        <resource-root path="mproc-api-${project.version}.jar"/>
+        <resource-root path="smsc-common-library-${project.version}.jar"/>
+        <resource-root path="cassandra-driver-core-${cassandra-driver-core.version}-shaded.jar"/>
+        <resource-root path="gson-${gson.version}.jar"/>
+        <resource-root path="guava-${google-guava.version}.jar"/>
+        <resource-root path="httpclient-${httpclient.version}.jar"/>
+        <resource-root path="httpcore-${httpcore.version}.jar"/>
+        <resource-root path="netty-${netty.version}.jar"/>
+        <resource-root path="restcomm-statistics-${restcomm.commons.version}.jar"/>
+        <resource-root path="metrics-core-${codahale-metrics.version}.jar"/>
+        <resource-root path="snappy-java-${snappy-java.version}.jar"/>        
+    </resources>
+
+    <dependencies>
+    	<module name="sun.jdk" export="true"/>
+        <module name="org.apache.log4j"/>
+        <module name="javax.api"/>
+        <module name="org.jboss.staxmapper"/>
+        <module name="org.jboss.as.controller"/>
+        <module name="org.jboss.as.jmx"/>
+        <module name="org.jboss.as.system-jmx"/>
+        <module name="org.jboss.as.server"/>
+        <module name="org.jboss.as.transactions"/>
+        <module name="org.jboss.as.naming"/>
+        <module name="org.jboss.as.connector"/>
+        <module name="org.jboss.as.security" export="true"/>
+        <module name="org.picketbox" export="true"/>
+        <module name="org.jboss.modules"/>
+        <module name="org.jboss.msc"/>
+        <module name="org.jboss.logging"/>
+        <module name="org.slf4j"/>
+        <module name="org.apache.commons.logging"/>
+        <module name="org.restcomm.smpp.bootstrap" />
+        <module name="org.mobicents.ss7.extension" />
+        <module name="org.mobicents.ss7.modules" export="true" />
+        <module name="org.mobicents.ss7.commons" export="true" />        	
+		<module name="org.omg.api" export="true" />
+    </dependencies>
+</module>

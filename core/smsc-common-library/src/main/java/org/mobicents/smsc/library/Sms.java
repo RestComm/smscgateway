@@ -28,6 +28,8 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 
 import javolution.xml.XMLObjectReader;
@@ -60,6 +62,7 @@ public class Sms implements Serializable {
 	private int sourceAddrTon;
 	private int sourceAddrNpi;
 	private String sourceAddr;
+    
     private int origNetworkId;
 
     private String originatorSccpAddress;
@@ -76,6 +79,7 @@ public class Sms implements Serializable {
 
 	private Date submitDate;
 	private Date deliveryDate;
+	private HashMap<Integer, Long> msgPartsDeliveryTime = new HashMap<>();
 
 	private String serviceType;
 	private int esmClass;
@@ -115,7 +119,7 @@ public class Sms implements Serializable {
     private String extraData_2;
     private String extraData_3;
     private String extraData_4;
-
+    
     private MessageDeliveryResultResponseInterface messageDeliveryResultResponse;
 
 	public Sms() {
@@ -231,6 +235,28 @@ public class Sms implements Serializable {
 	public void setSourceAddr(String sourceAddr) {
 		this.sourceAddr = sourceAddr;
 	}
+	
+	/**
+     * Global Title for local SCCP address for an MT message
+     */
+    public String getMtLocalSccpGt() {
+        return extraData.getMtLocalSccpGt();
+    }
+
+    public void setMtLocalSccpGt(String mtLocalSccpGt) {
+        extraData.setMtLocalSccpGt(mtLocalSccpGt);
+    }
+    
+    /**
+     * Translation Type of remote SCCP address of an MT message
+     */
+    public Integer getMtRemoteSccpTt() {
+        return extraData.getMtRemoteSccpTt();
+    }
+
+    public void setMtRemoteSccpTt(Integer mtRemoteSccpTt) {
+        extraData.setMtRemoteSccpTt(mtRemoteSccpTt);
+    }
 
     /**
      * original networkId
@@ -326,6 +352,18 @@ public class Sms implements Serializable {
 	public void setDeliveryDate(Date deliveryDate) {
 		this.deliveryDate = deliveryDate;
 	}
+
+    public long getMsgPartDelTime(int seqNum) {
+        return msgPartsDeliveryTime.get(seqNum);
+    }
+    
+    public Set<Integer> getMsgPartsSeqNumbers() {
+        return msgPartsDeliveryTime.keySet();
+    }
+
+    public void putMsgPartDeliveryTime(int seqNum, long msgPartsDeliveryTime) {
+        this.msgPartsDeliveryTime.put(seqNum, msgPartsDeliveryTime);
+    }
 
 	/**
 	 * service_type smpp param for esme originated messages
@@ -711,6 +749,14 @@ public class Sms implements Serializable {
 			sb.append(", tlvSet=");
 			sb.append(this.tlvSet.toString());
 		}
+        if (this.extraData.getMtLocalSccpGt() != null) {
+            sb.append(", mtLocalSccpGt=");
+            sb.append(this.extraData.getMtLocalSccpGt());
+        }
+        if (this.extraData.getMtRemoteSccpTt() != null) {
+            sb.append(", mtRemoteSccpTt=");
+            sb.append(this.extraData.getMtRemoteSccpTt());
+        }
 
 		sb.append("]");
 
@@ -821,6 +867,30 @@ public class Sms implements Serializable {
     public void setReceiptLocalMessageId(Long receiptLocalMessageId) {
         this.extraData.setReceiptLocalMessageId(receiptLocalMessageId);
     }
+    
+    public long getTimestampA() {
+		return this.extraData.getTimestampA();
+	}
+
+	public void setTimestampA(long timestampA) {
+		this.extraData.setTimestampA(timestampA);
+	}
+
+	public long getTimestampB() {
+		return this.extraData.getTimestampB();
+	}
+
+	public void setTimestampB(long timestampB) {
+		this.extraData.setTimestampB(timestampB);
+	}
+
+	public long getTimestampC() {
+		return this.extraData.getTimestampC();
+	}
+
+	public void setTimestampC(long timestampC) {
+		this.extraData.setTimestampC(timestampC);
+	}
 
     public String getExtraData() {
         if (this.extraData.isEmpty()) {

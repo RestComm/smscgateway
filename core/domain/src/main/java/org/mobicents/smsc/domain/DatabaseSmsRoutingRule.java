@@ -142,8 +142,9 @@ public class DatabaseSmsRoutingRule implements DatabaseSmsRoutingRuleMBean {
     }
 
     @Override
-    public void updateDbSmsRoutingRule(SmsRoutingRuleType dbSmsRoutingRuleType, String address, int networkId,
+    public void updateDbSmsRoutingRule(String dbSmsRoutingRuleTypeStr, String address, int networkId,
             String clusterName) throws PersistenceException {
+        SmsRoutingRuleType dbSmsRoutingRuleType = SmsRoutingRuleType.valueOf(dbSmsRoutingRuleTypeStr);
         DbSmsRoutingRule dbSmsRoutingRule = new DbSmsRoutingRule(dbSmsRoutingRuleType, address, networkId, clusterName);
 
 //        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
@@ -165,12 +166,13 @@ public class DatabaseSmsRoutingRule implements DatabaseSmsRoutingRuleMBean {
     }
 
     @Override
-    public void deleteDbSmsRoutingRule(SmsRoutingRuleType dbSmsRoutingRuleType, String address, int networkId)
+    public void deleteDbSmsRoutingRule(String dbSmsRoutingRuleTypeStr, String address, int networkId)
             throws PersistenceException {
 //        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
 //            dbOperations_C1.deleteDbSmsRoutingRule(address);
 //        } else {
 
+        SmsRoutingRuleType dbSmsRoutingRuleType = SmsRoutingRuleType.valueOf(dbSmsRoutingRuleTypeStr);
         switch (dbSmsRoutingRuleType) {
             case SMPP:
                 dbOperations_C2.c2_deleteSmppSmsRoutingRule(address, networkId);
@@ -186,12 +188,13 @@ public class DatabaseSmsRoutingRule implements DatabaseSmsRoutingRuleMBean {
     }
 
     @Override
-    public DbSmsRoutingRule getSmsRoutingRule(SmsRoutingRuleType dbSmsRoutingRuleType, String address, int networkId)
+    public DbSmsRoutingRule getSmsRoutingRule(String dbSmsRoutingRuleTypeStr, String address, int networkId)
             throws PersistenceException {
 //        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
 //            return dbOperations_C1.getSmsRoutingRule(address, networkId);
 //        } else {
 
+        SmsRoutingRuleType dbSmsRoutingRuleType = SmsRoutingRuleType.valueOf(dbSmsRoutingRuleTypeStr);
 
         switch (dbSmsRoutingRuleType) {
             case SMPP:
@@ -206,12 +209,13 @@ public class DatabaseSmsRoutingRule implements DatabaseSmsRoutingRuleMBean {
     }
 
     @Override
-    public List<DbSmsRoutingRule> getSmsRoutingRulesRange(SmsRoutingRuleType dbSmsRoutingRuleType) throws PersistenceException {
+    public List<DbSmsRoutingRule> getSmsRoutingRulesRange(String dbSmsRoutingRuleTypeStr) throws PersistenceException {
 //        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
 //            return dbOperations_C1.getSmsRoutingRulesRange();
 //        } else {
 
 
+        SmsRoutingRuleType dbSmsRoutingRuleType = SmsRoutingRuleType.valueOf(dbSmsRoutingRuleTypeStr);
 
         switch (dbSmsRoutingRuleType) {
             case SMPP:
@@ -227,13 +231,15 @@ public class DatabaseSmsRoutingRule implements DatabaseSmsRoutingRuleMBean {
     }
 
     @Override
-    public List<DbSmsRoutingRule> getSmsRoutingRulesRange(SmsRoutingRuleType dbSmsRoutingRuleType, String lastAdress)
+    public List<DbSmsRoutingRule> getSmsRoutingRulesRange(String dbSmsRoutingRuleTypeStr, String lastAdress)
             throws PersistenceException {
 //        if (smscPropertiesManagement.getDatabaseType() == DatabaseType.Cassandra_1) {
 //            return dbOperations_C1.getSmsRoutingRulesRange(lastAdress);
 //        } else {
 
 
+
+        SmsRoutingRuleType dbSmsRoutingRuleType = SmsRoutingRuleType.valueOf(dbSmsRoutingRuleTypeStr);
 
         switch (dbSmsRoutingRuleType) {
             case SMPP:

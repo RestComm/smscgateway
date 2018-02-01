@@ -1,0 +1,31 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="urn:org.mobicents:smsc-extensions:1.0"
+           xmlns="urn:org.mobicents:smsc-extensions:1.0"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="3.0">
+
+    <!-- The subsystem root element -->
+    <xs:element name="subsystem" type="subsystemType"/>
+
+    <xs:complexType name="subsystemType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="mbean" type="mbeanType"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="mbeanType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="property" type="propertyType"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="propertyType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+</xs:schema>
