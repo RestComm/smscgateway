@@ -229,13 +229,11 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
                 logger.severe("Error while sending error response", ex);
             }
         } catch (Exception e) {
+            logger.warning("Unable to handle HttpPost. Message: " + e.getMessage() + ".", e);
             try {
-                if (logger.isWarningEnabled()) {
-                    logger.warning(e.getMessage());
-                }
                 sendErrorResponse(event, e);
             } catch (Exception ex) {
-                logger.severe("Error while sending error response", ex);
+                logger.severe("Error while sending error response. Message: " + ex.getMessage() + ".", ex);
             }
         }
     }
