@@ -37,8 +37,7 @@ public class ErrorsStatAggregator implements ErrorsStatAggregatorMBean {
     public void addCounter(CounterGroup group, CounterCategory category, String id) {
         CounterKey key = new CounterKey(group, category, id);
         
-        map.put(key, new AtomicLong());
-        
+        map.put(key, new AtomicLong());        
     }
 
     public void removeCounter(CounterGroup group, CounterCategory category, String id) {
@@ -132,11 +131,6 @@ public class ErrorsStatAggregator implements ErrorsStatAggregatorMBean {
     }
 
     public void updateCounter(CounterCategory category) {
-        try {
-            int a = 1/0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         CounterKey key = new CounterKey(null, category, null);
         AtomicLong value = map.get(key);
         if (value != null) {
@@ -145,11 +139,6 @@ public class ErrorsStatAggregator implements ErrorsStatAggregatorMBean {
     }
 
     public void updateCounter(CounterCategory category, String clusterName) {
-        try {
-            int a = 1/0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         // update cluster counter
         CounterKey key = new CounterKey(CounterGroup.Cluster, category, clusterName);
         AtomicLong value = map.get(key);
@@ -162,11 +151,6 @@ public class ErrorsStatAggregator implements ErrorsStatAggregatorMBean {
     }
 
     public void updateCounter(CounterCategory category, String clusterName, String esmeName) {
-        try {
-            int a = 1/0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         // update esme counter
         CounterKey key = new CounterKey(CounterGroup.ESME, category, esmeName);
         AtomicLong value = map.get(key);
@@ -179,11 +163,6 @@ public class ErrorsStatAggregator implements ErrorsStatAggregatorMBean {
     }
 
     public void updateCounter(CounterCategory category, String clusterName, String esmeName, Long sessionId) {
-        try {
-            int a = 1/0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         // update session counter
         SessionKey sessionKey = new SessionKey(esmeName, sessionId);
         CounterKey key = new CounterKey(CounterGroup.Session, category, sessionKey.getSessionKeyName());

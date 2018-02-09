@@ -1,4 +1,4 @@
-				<h3 style="margin: 0px;"><i class="icon-bar-chart"></i> SMSC Errors Counters</h3>
+				<h3 style="margin: 0px;"><i class="icon-bar-chart"></i> SMSC Maintenance Counters</h3>
 				<hr style="margin: 10 0px;"/>
 				
 				<span class="span5 offset7">
@@ -72,14 +72,13 @@
 					
 					var clusterCountersList = [];
 					var esmeCountersList = [];
-					var sessionCountersList = [];
 
 					var selectedClusters = [];
 					
 					var clustersCountersMap;
 					
 					function refreshCampaignsList(){
-						var counterSetName = "SMSC GW-SMSC-Errors";
+						var counterSetName = "SMSC GW-SMSC-Maintenance";
 						jolokia.execute("org.mobicents.ss7:layer=COUNTER,name=CounterHost,type=Management","getCampaignsList", counterSetName,
 								{ success: 
 									function(response) {
@@ -112,11 +111,10 @@
 					function getCountersList() {
 						getCountersByGroup(clusterCountersList, 'Cluster');
 						getCountersByGroup(esmeCountersList, 'ESME');
-						getCountersByGroup(sessionCountersList, 'Session');
 						
 						jolokia.request(
 							[
-								{ type: "read", mbean: "org.mobicents.smsc:layer=SmscErrorCounters,name=SmscManagement"}
+								{ type: "read", mbean: "org.mobicents.smsc:layer=SmscMaintenanceCounters,name=SmscManagement"}
 							],
 							{ success: 
 								function(response) {
@@ -179,7 +177,7 @@
 					}
 					
 					function getCountersByGroup(list, group) {
-						jolokia.execute("org.mobicents.smsc:layer=SmscErrorCounters,name=SmscManagement","getCountersByGroup", group,
+						jolokia.execute("org.mobicents.smsc:layer=SmscMaintenanceCounters,name=SmscManagement","getCountersByGroup", group,
 							{ success: 
 								function(response) {
 									jQuery.each(response, function(index, value) {
@@ -204,7 +202,7 @@
 
 						var e = document.getElementById("refresh-rate-select");
 						var refreshRate = e.options[e.selectedIndex].value;
-						var timerId = setAutoCancellableInterval(refreshRate, "updateGraphs", "SMSC Errors Counters");
+						var timerId = setAutoCancellableInterval(refreshRate, "updateGraphs", "SMSC Maintenance Counters");
 
 						$("#timerIdValue").val(timerId);
 					}
@@ -248,7 +246,7 @@
 						var timerIdValue = document.getElementById("timerIdValue").value;
 
 						if(timerIdValue == "-1"){
-							var timerId = setAutoCancellableInterval(60000, "updateGraphs", "SMSC Errors Counters");
+							var timerId = setAutoCancellableInterval(60000, "updateGraphs", "SMSC Maintenance Counters");
 							$("#timerIdValue").val(timerId);
 						}
 					}
@@ -258,7 +256,6 @@
 																		
 						var clusterDataTable = addDataTable();
 						var esmesDataTable = addDataTable();
-						var sessionsDataTable = addDataTable();
 
 						var value = clustersCountersMap[clusterName];
 						jQuery.each(value, function(counterGroup, val) {
@@ -267,8 +264,6 @@
 									clusterDataTable.addColumn('number', counterName);
 								} else if (counterGroup == 'ESME') {
 									esmesDataTable.addColumn('number', counterName);
-								} else if (counterGroup == 'Session') {
-									sessionsDataTable.addColumn('number', counterName);
 								}
 								//console.log(counterName);
 							});
@@ -278,19 +273,14 @@
 						
 						if (clusterDataTable.getNumberOfColumns() > 1) {
 							charts["" + clusterName].cluster = {dataTable:clusterDataTable};
-							drawChart('Cluster ' + clusterName + ' Errors', clusterDataTable, clusterName, 'cluster');
+							drawChart('Cluster ' + clusterName + ' Maintenance Counters', clusterDataTable, clusterName, 'cluster');
 							//console.log('clusterChart has ' + clusterChart.getNumberOfColumns() + ' number of columns');
 							
 						}
 						if (esmesDataTable.getNumberOfColumns() > 1) {
 							charts["" + clusterName].esme = {dataTable:esmesDataTable};
-							drawChart('Esmes from Cluster ' + clusterName + ' Errors', esmesDataTable, clusterName, 'esme');
+							drawChart('Esmes from Cluster ' + clusterName + ' Maintenance Counters', esmesDataTable, clusterName, 'esme');
 							//console.log('esmesChart has ' + esmesChart.getNumberOfColumns() + ' number of columns');
-						}
-						if (sessionsDataTable.getNumberOfColumns() > 1) {
-							charts["" + clusterName].session = {dataTable:sessionsDataTable};
-							drawChart('Sessions from Cluster ' + clusterName + ' Errors', sessionsDataTable, clusterName, 'session');
-							//console.log('sessionsChart has ' + sessionsChart.getNumberOfColumns() + ' number of columns');							
 						}
 					}
 					
@@ -299,10 +289,8 @@
 							
 						var clusterDivName = 'chart_div_cluster_' + clusterName;
 						var esmesDivName = 'chart_div_esme_' + clusterName;
-						var sessionsDivName = 'chart_div_session_' + clusterName;
 						$('#'+clusterDivName).remove();
 						$('#'+esmesDivName).remove();
-						$('#'+sessionsDivName).remove();
 					}
 
 					function updateGraphs() {
@@ -326,13 +314,12 @@
 									}
 									var counterValues = response.value.counterValues;
 									
-									//console.log(counterValues);
+									console.log(counterValues);
 									
 									$.each(charts, function(clusterName, clusterNameChartObj) {
 										var countersList = clustersCountersMap[clusterName];
 										var clusterRowValuesArr = [];
 										var esmeRowValuesArr = [];
-										var sessionRowValuesArr = [];
 										jQuery.each(countersList, function(counterGroup, val) {
 											jQuery.each(val, function(index, counterName) {
 												jQuery.each(counterValues, function() {
@@ -341,8 +328,6 @@
 															clusterRowValuesArr.push(this.longValue);
 														} else if (counterGroup == 'ESME') {
 															esmeRowValuesArr.push(this.longValue);
-														} else if (counterGroup == 'Session') {
-															sessionRowValuesArr.push(this.longValue);
 														}
 													}
 												});
@@ -360,11 +345,6 @@
 											var row = [(dateNow)];
 											$.merge(row, esmeRowValuesArr);
 											clusterNameChartObj.esme.dataTable.addRow(row);
-										}
-										if (sessionRowValuesArr.length != 0) {
-											var row = [(dateNow)];
-											$.merge(row, sessionRowValuesArr);
-											clusterNameChartObj.session.dataTable.addRow(row);
 										}
 									});
 									

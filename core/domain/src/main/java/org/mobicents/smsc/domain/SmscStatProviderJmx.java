@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import javolution.util.FastList;
 import javolution.util.FastMap;
 
 import org.mobicents.protocols.ss7.oam.common.jmx.MBeanHost;
@@ -46,15 +47,19 @@ import org.mobicents.protocols.ss7.oam.common.statistics.api.CounterType;
 import org.mobicents.protocols.ss7.oam.common.statistics.api.SourceValueSet;
 import org.mobicents.smsc.server.bootstrap.Version;
 import org.restcomm.commons.statistics.reporter.RestcommStatsReporter;
+import org.restcomm.smpp.Esme;
+import org.restcomm.smpp.EsmeManagement;
+import org.restcomm.smpp.SmppManagement;
 
+import com.cloudhopper.smpp.SmppSession;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 
 /**
-*
-* @author sergey vetyutnev
-*
-*/
+ *
+ * @author sergey vetyutnev
+ *
+ */
 public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMediator {
 
     public static final String NAME = "SMSC";
@@ -62,7 +67,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
     public static final String DEF_SET_MAIN = MEDIATOR_NAME + "-Main";
     public static final String DEF_SET_ERRORS = MEDIATOR_NAME + "-Errors";
     public static final String DEF_SET_MAINTENANCE = MEDIATOR_NAME + "-Maintenance";
-    
+
     protected final Logger logger;
 
     private final MBeanHost ss7Management;
@@ -105,8 +110,8 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
         String projectName = System.getProperty("RestcommProjectName", Version.instance.getShortName());
         String projectType = System.getProperty("RestcommProjectType", Version.instance.getProjectType());
         String projectVersion = System.getProperty("RestcommProjectVersion", Version.instance.getProjectVersion());
-        logger.info("Restcomm Stats starting: " + projectName + " " + projectType + " " + projectVersion + " "
-                + statisticsServer);
+        logger.info(
+                "Restcomm Stats starting: " + projectName + " " + projectType + " " + projectVersion + " " + statisticsServer);
         statsReporter.setProjectName(projectName);
         statsReporter.setProjectType(projectType);
         statsReporter.setVersion(projectVersion);
@@ -135,45 +140,58 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
         CounterDefSetImpl cds = new CounterDefSetImpl(DEF_SET_MAIN);
         lst.put(cds.getName(), cds);
 
-        CounterDef cd = new CounterDefImpl(CounterType.Minimal, "MinMessagesInProcess", "A min count of messages that are in progress during a period");
+        CounterDef cd = new CounterDefImpl(CounterType.Minimal, "MinMessagesInProcess",
+                "A min count of messages that are in progress during a period");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Maximal, "MaxMessagesInProcess", "A max count of messages that are in progress during a period");
+        cd = new CounterDefImpl(CounterType.Maximal, "MaxMessagesInProcess",
+                "A max count of messages that are in progress during a period");
         cds.addCounterDef(cd);
 
         cd = new CounterDefImpl(CounterType.Summary, "MsgInReceivedAll", "Messages received and accepted via all interfaces");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "MsgInRejectedAll", "Messages received and rejected because of charging reject via all interfaces");
+        cd = new CounterDefImpl(CounterType.Summary, "MsgInRejectedAll",
+                "Messages received and rejected because of charging reject via all interfaces");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "MsgInFailedAll", "Messages received and failed to process via all interfaces");
+        cd = new CounterDefImpl(CounterType.Summary, "MsgInFailedAll",
+                "Messages received and failed to process via all interfaces");
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Summary, "MsgInReceivedSs7", "Messages received and accepted via SS7 interface");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "MsgInReceivedSs7Mo", "Messages received and accepted via SS7 interface (mobile originated)");
+        cd = new CounterDefImpl(CounterType.Summary, "MsgInReceivedSs7Mo",
+                "Messages received and accepted via SS7 interface (mobile originated)");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "MsgInReceivedSs7Hr", "Messages received and accepted via SS7 interface (home routing)");
+        cd = new CounterDefImpl(CounterType.Summary, "MsgInReceivedSs7Hr",
+                "Messages received and accepted via SS7 interface (home routing)");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "HomeRoutingCorrIdFail", "Home routing failures because of absent correlationId");
+        cd = new CounterDefImpl(CounterType.Summary, "HomeRoutingCorrIdFail",
+                "Home routing failures because of absent correlationId");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "SmppSecondRateOverlimitFail", "Rejecting of incoming SMPP messages case because of exceeding of a rate limit per a second");
+        cd = new CounterDefImpl(CounterType.Summary, "SmppSecondRateOverlimitFail",
+                "Rejecting of incoming SMPP messages case because of exceeding of a rate limit per a second");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "SmppMinuteRateOverlimitFail", "Rejecting of incoming SMPP messages case because of exceeding of a rate limit per a minute");
+        cd = new CounterDefImpl(CounterType.Summary, "SmppMinuteRateOverlimitFail",
+                "Rejecting of incoming SMPP messages case because of exceeding of a rate limit per a minute");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "SmppHourRateOverlimitFail", "Rejecting of incoming SMPP messages case because of exceeding of a rate limit per a hour");
+        cd = new CounterDefImpl(CounterType.Summary, "SmppHourRateOverlimitFail",
+                "Rejecting of incoming SMPP messages case because of exceeding of a rate limit per a hour");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "SmppDayRateOverlimitFail", "Rejecting of incoming SMPP messages case because of exceeding of a rate limit per a day");
+        cd = new CounterDefImpl(CounterType.Summary, "SmppDayRateOverlimitFail",
+                "Rejecting of incoming SMPP messages case because of exceeding of a rate limit per a day");
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Summary, "MsgInReceivedSmpp", "Messages received and accepted via SMPP interface");
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Summary, "MsgInReceivedSip", "Messages received and accepted via SIP interface");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary_Cumulative, "MsgInReceivedAllCumulative", "Messages received and accepted via all interfaces cumulative");
+        cd = new CounterDefImpl(CounterType.Summary_Cumulative, "MsgInReceivedAllCumulative",
+                "Messages received and accepted via all interfaces cumulative");
         cds.addCounterDef(cd);
 
         cd = new CounterDefImpl(CounterType.Summary, "MsgInHrSriReq", "Home routing SRI messages received");
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Summary, "MsgInHrSriPosReq", "Home routing SRI positive responses");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary, "MsgInHrSriHrByPass", "ByPass HomeRouting procedure after SRI to a local HLR");
+        cd = new CounterDefImpl(CounterType.Summary, "MsgInHrSriHrByPass",
+                "ByPass HomeRouting procedure after SRI to a local HLR");
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Summary, "MsgInHrSriNegReq", "Home routing SRI negative responses");
         cds.addCounterDef(cd);
@@ -182,13 +200,16 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Summary, "MsgOutSentAll", "Messages sent via all interfaces");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary_Cumulative, "MsgOutTryAllCumulative", "Messages sending tries via all interfaces cumulative");
+        cd = new CounterDefImpl(CounterType.Summary_Cumulative, "MsgOutTryAllCumulative",
+                "Messages sending tries via all interfaces cumulative");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Summary_Cumulative, "MsgOutSentAllCumulative", "Messages sent via all interfaces cumulative");
+        cd = new CounterDefImpl(CounterType.Summary_Cumulative, "MsgOutSentAllCumulative",
+                "Messages sent via all interfaces cumulative");
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Summary, "MsgOutFailedAll", "Messages failed to send via all interfaces");
         cds.addCounterDef(cd);
-        cd = new CounterDefImpl(CounterType.Average, "MsgOutTryAllPerSec", "Messages sending tries via all interfaces per second");
+        cd = new CounterDefImpl(CounterType.Average, "MsgOutTryAllPerSec",
+                "Messages sending tries via all interfaces per second");
         cds.addCounterDef(cd);
         cd = new CounterDefImpl(CounterType.Average, "MsgOutSentAllPerSec", "Messages sent via all interfaces per second");
         cds.addCounterDef(cd);
@@ -206,15 +227,17 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
         cd = new CounterDefImpl(CounterType.Summary, "MsgOutSentSip", "Messages sent via SIP interface");
         cds.addCounterDef(cd);
 
-        cd = new CounterDefImpl(CounterType.Summary_Cumulative, "SmscDeliveringLag", "Lag of delivering messages by Smsc (in seconds)");
+        cd = new CounterDefImpl(CounterType.Summary_Cumulative, "SmscDeliveringLag",
+                "Lag of delivering messages by Smsc (in seconds)");
         cds.addCounterDef(cd);
-        
-        cd = new CounterDefImpl(CounterType.Maximal, "MsgPendingInDb", "Messages stored in database which are to be delivered yet");
+
+        cd = new CounterDefImpl(CounterType.Maximal, "MsgPendingInDb",
+                "Messages stored in database which are to be delivered yet");
         cds.addCounterDef(cd);
-        
+
         CounterDefSetImpl cdErrors = new CounterDefSetImpl(DEF_SET_ERRORS);
         lst.put(cdErrors.getName(), cdErrors);
-        
+
         CounterDefSetImpl cdMaintenance = new CounterDefSetImpl(DEF_SET_MAINTENANCE);
         lst.put(cdMaintenance.getName(), cdMaintenance);
 
@@ -247,15 +270,15 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
             logger.debug("getSourceValueSet() - starting - campaignName=" + campaignName);
 
         long curTimeSeconds = new Date().getTime() / 1000;
-        
+
         SourceValueSetImpl svs = null;
         try {
             CounterDefSet cds = getCounterDefSet(counterDefSetName);
-            if(counterDefSetName.equals(DEF_SET_MAIN)) {
+            if (counterDefSetName.equals(DEF_SET_MAIN)) {
                 svs = new SourceValueSetImpl(smscStatAggregator.getSessionId());
                 for (CounterDef cd : cds.getCounterDefs()) {
                     SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
-    
+
                     SourceValueObjectImpl svo = null;
                     if (cd.getCounterName().equals("MsgInReceivedAll")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedAll());
@@ -263,7 +286,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInRejectedAll());
                     } else if (cd.getCounterName().equals("MsgInFailedAll")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInFailedAll());
-    
+
                     } else if (cd.getCounterName().equals("MsgInReceivedSs7")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSs7());
                     } else if (cd.getCounterName().equals("MsgInReceivedSs7Mo")) {
@@ -280,14 +303,14 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppHourRateOverlimitFail());
                     } else if (cd.getCounterName().equals("SmppDayRateOverlimitFail")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getSmppDayRateOverlimitFail());
-    
+
                     } else if (cd.getCounterName().equals("MsgInReceivedSmpp")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSmpp());
                     } else if (cd.getCounterName().equals("MsgInReceivedSip")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedSip());
                     } else if (cd.getCounterName().equals("MsgInReceivedAllCumulative")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInReceivedAllCumulative());
-    
+
                     } else if (cd.getCounterName().equals("MsgInHrSriReq")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriReq());
                     } else if (cd.getCounterName().equals("MsgInHrSriPosReq")) {
@@ -296,7 +319,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriHrByPass());
                     } else if (cd.getCounterName().equals("MsgInHrSriNegReq")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgInHrSriNegReq());
-    
+
                     } else if (cd.getCounterName().equals("MsgOutTryAll")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTryAll());
                     } else if (cd.getCounterName().equals("MsgOutSentAll")) {
@@ -307,7 +330,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentAllCumulative());
                     } else if (cd.getCounterName().equals("MsgOutFailedAll")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutFailedAll());
-    
+
                     } else if (cd.getCounterName().equals("MsgOutTryAllPerSec")) {
                         long cnt = smscStatAggregator.getMsgOutTryAll();
                         svo = new SourceValueObjectImpl(this.getName(), 0);
@@ -318,7 +341,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                         svo = new SourceValueObjectImpl(this.getName(), 0);
                         svo.setValueA(cnt);
                         svo.setValueB(curTimeSeconds);
-    
+
                     } else if (cd.getCounterName().equals("MsgOutTrySs7")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTrySs7());
                     } else if (cd.getCounterName().equals("MsgOutSentSs7")) {
@@ -331,7 +354,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutTrySip());
                     } else if (cd.getCounterName().equals("MsgOutSentSip")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgOutSentSip());
-    
+
                     } else if (cd.getCounterName().equals("MinMessagesInProcess")) {
                         Long res = smscStatAggregator.getMinMessagesInProcess(campaignName);
                         if (res != null)
@@ -345,21 +368,21 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                     } else if (cd.getCounterName().equals("MsgPendingInDb")) {
                         svo = new SourceValueObjectImpl(this.getName(), smscStatAggregator.getMsgPendingInDbRes());
                     }
-                    
+
                     if (svo != null)
                         scs.addObject(svo);
-    
+
                     svs.addCounter(scs);
                 }
             } else if (counterDefSetName.equals(DEF_SET_ERRORS)) {
                 svs = new SourceValueSetImpl(errorsStatAggregator.getSessionId());
-                
+
                 for (CounterDef cd : cds.getCounterDefs()) {
                     SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
-    
-                    SourceValueObjectImpl svo = new SourceValueObjectImpl(this.getName(), 
+
+                    SourceValueObjectImpl svo = new SourceValueObjectImpl(this.getName(),
                             errorsStatAggregator.getCounterValueByName(cd.getCounterName()).get());
-                    
+
                     scs.addObject(svo);
                     svs.addCounter(scs);
                 }
@@ -367,10 +390,30 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                 svs = new SourceValueSetImpl(maintenanceStatAggregator.getSessionId());
                 for (CounterDef cd : cds.getCounterDefs()) {
                     SourceValueCounterImpl scs = new SourceValueCounterImpl(cd);
-    
-                    SourceValueObjectImpl svo = new SourceValueObjectImpl(this.getName(), 
-                            maintenanceStatAggregator.getCounterByName(cd.getCounterName()).get());
-                    
+
+                    SourceValueObjectImpl svo = null;
+
+                    SmppManagement smppManagement = SmppManagement.getInstance();
+                    EsmeManagement esmeManagement = EsmeManagement.getInstance();
+
+                    if (cd.getCounterName().equals("ClientEsmeConnectQueueSize")) {
+                        if (cd.getObjectName() != null) {
+                            svo = new SourceValueObjectImpl(this.getName(), smppManagement.getClientEsmesInConnectQueue(cd.getObjectName()));
+                        } else {
+                            svo = new SourceValueObjectImpl(this.getName(),
+                                    smppManagement.getClientEsmesInConnectQueue());
+                        }
+                    } else if (cd.getCounterName().equals("ClientEsmeEnquireLinkQueueSize")) {
+                        if (cd.getObjectName() != null) {
+                            svo = new SourceValueObjectImpl(this.getName(), smppManagement.getClientEsmesEnquireLinkQueue(cd.getObjectName()));
+                        } else {
+                            svo = new SourceValueObjectImpl(this.getName(), smppManagement.getClientEsmesEnquireLinkQueue());
+                        }
+                    } else {
+                        svo = new SourceValueObjectImpl(this.getName(),
+                                maintenanceStatAggregator.getCounterValueByName(cd.getCounterName()).get());
+                    }
+
                     scs.addObject(svo);
                     svs.addCounter(scs);
                 }
@@ -387,7 +430,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
 
         return svs;
     }
-    
+
     public enum SmscManagementType implements MBeanType {
         MANAGEMENT("Management");
 

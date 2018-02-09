@@ -1,4 +1,4 @@
-				<h3 style="margin: 0px;"><i class="icon-bar-chart"></i> SMSC Errors Counters</h3>
+				<h3 style="margin: 0px;"><i class="icon-bar-chart"></i> SMSC Maintenance Counters</h3>
 				<hr style="margin: 10 0px;"/>
 				
 				<span class="span5 offset7">
@@ -59,13 +59,13 @@
 					
 					var globalCountersList;
 					var globalGroup = '';
-					jolokia.execute("org.mobicents.smsc:layer=SmscErrorCounters,name=SmscManagement","getCountersByGroup", globalGroup,
+					jolokia.execute("org.mobicents.smsc:layer=SmscMaintenanceCounters,name=SmscManagement","getCountersByGroup", globalGroup,
 						{ 
 							success: 
 								function(response) {
 									globalCountersList = response;
 									jQuery.each(globalCountersList, function(index, value) {
-										global.addColumn('number', value + 'ErrorCounters');
+										global.addColumn('number', value + 'MaintenanceCounters');
 									});
 								},
 							 error: 
@@ -77,7 +77,7 @@
 						});
 					
 					var globalOptions = {
-					          title: 'Global Errors Counters',
+					          title: 'Global Maintenance Counters',
 					          curveType: 'function',
 					          pointSize: 5,
 					          width: 1200,
@@ -88,56 +88,18 @@
 				 
 			        var globalChart = new google.visualization.LineChart(document.getElementById('chart_div_global'));					
 					
-			        //MProc errors per mProcRuleId
-					var mproc = new google.visualization.DataTable();
-					mproc.addColumn('datetime', 'Time');
-					
-					var mprocCountersList;
-					var mprocGroup = 'MProc';
-					jolokia.execute("org.mobicents.smsc:layer=SmscErrorCounters,name=SmscManagement","getCountersByGroup", mprocGroup,
-						{ success: 
-							function(response) {
-								mprocCountersList = response;
-								jQuery.each(mprocCountersList, function(index, value) {
-									mproc.addColumn('number', value);
-								});
-							},
-							error: function(value) {
-								errorUID = ("st" + new Date().getTime()).hashCode();
-								createStackTrace(errorUID, value.stacktrace);
-								logToConsole("ERROR", value.error + ". (<a href=\"#" + errorUID + "-modal\" data-toggle=\"modal\">Full Stack Trace</a>)");
-							}
-						}
-					);
-					
-					 var mprocOptions = {
-					          title: 'Mproc Errors Counter',
-					          curveType: 'function',
-					          pointSize: 5,
-					          width: 1200,
-					      	  height: 400,
-					      	  hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}},
-					          vAxis: {minValue: 0},					      	  
-					 };
-				 
-			        var mprocChart = new google.visualization.LineChart(document.getElementById('chart_div_mproc'));
-					
 			        function drawCharts() {
 						if (global.getNumberOfColumns() > 1) {
 							globalChart.draw(global, globalOptions);
 						}
-						if (mproc.getNumberOfColumns() > 1) {
-				        	mprocChart.draw(mproc, mprocOptions);
-						}
 					}
 					
 					function refreshCampaignsList(){
-						var counterSetName = "SMSC GW-SMSC-Errors";
+						var counterSetName = "SMSC GW-SMSC-Maintenance";
 						jolokia.execute("org.mobicents.ss7:layer=COUNTER,name=CounterHost,type=Management","getCampaignsList", counterSetName,
 								{ success: 
 									function(response) {
 										var noOfCampaigns = 0 ;
-										
 										jQuery.each(response, function() {
 											noOfCampaigns = noOfCampaigns + 1;
 											$('#campaigns-list-select').append('<option value='+this+'>'+this+'</option>')										
@@ -146,7 +108,7 @@
 										if(noOfCampaigns == 0){
 											$('#no-campaigns-table').show();
 											$('#campaigns-div').hide();
-										}else {
+										} else {
 											$('#no-campaigns-table').hide();
 											$('#campaigns-div').show();
 										}	
@@ -167,7 +129,7 @@
 
 						var e = document.getElementById("refresh-rate-select");
 						var refreshRate = e.options[e.selectedIndex].value;
-						var timerId = setAutoCancellableInterval(refreshRate, "updateGraphs", "SMSC Errors Counters");
+						var timerId = setAutoCancellableInterval(refreshRate, "updateGraphs", "SMSC Maintenance Counters");
 
 						$("#timerIdValue").val(timerId);
 					}
@@ -179,16 +141,11 @@
 							global.removeRows(0, numRowsGlobal);
 						}
 
-						var numRowsMproc = mproc.getNumberOfRows();
-						if(numRowsMproc != 0){
-							mproc.removeRows(0, numRowsMproc);
-						}
-
 						updateGraphs();
 						var timerIdValue = document.getElementById("timerIdValue").value;
 
 						if(timerIdValue == "-1"){
-							var timerId = setAutoCancellableInterval(60000, "updateGraphs", "SMSC Errors Counters");
+							var timerId = setAutoCancellableInterval(60000, "updateGraphs", "SMSC Maintenance Counters");
 							$("#timerIdValue").val(timerId);
 						}
 					}
@@ -215,8 +172,6 @@
 									var counterValues = response.value.counterValues;
 
 									var globalRowValuesArr = new Array();
-									var mprocRowValuesArr = new Array();
-
 									jQuery.each(globalCountersList, function(index, value) {
 										var counterName = value;
 										jQuery.each(counterValues, function() {
@@ -226,24 +181,11 @@
 										});
 									});
 
-									jQuery.each(mprocCountersList, function(index, value) {
-										var counterName = value;
-										jQuery.each(counterValues, function() {
-											if (this.counterDef.counterName == counterName) {
-												mprocRowValuesArr.push(this.longValue);
-											}
-										});
-									});
-
 									var dateNow = new Date();
 
 									var rowGlobal = [(dateNow)];
 									$.merge(rowGlobal, globalRowValuesArr);
 									global.addRow(rowGlobal);
-
-									var rowMproc = [(dateNow)];
-									$.merge(rowMproc, mprocRowValuesArr);
-									mproc.addRow(rowMproc);
 
 									drawCharts();
 								}

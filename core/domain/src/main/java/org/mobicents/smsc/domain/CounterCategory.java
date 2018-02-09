@@ -17,7 +17,7 @@ public enum CounterCategory {
     EsmeReconnectsTotal,
     EsmeReconnectsSuccessful,
     EsmeReconnectsFailed,
-    EsmesStartedTotal,
+    EsmesStartedNotConnected,
     SleeEventQueueSize;
 
     

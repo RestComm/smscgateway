@@ -1,12 +1,15 @@
 package org.mobicents.smsc.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.mobicents.protocols.ss7.oam.common.statistics.CounterDefImpl;
+import org.restcomm.smpp.EsmeManagement;
 
 public class MaintenanceStatAggregator implements MaintenanceStatAggregatorMBean {
     private final static MaintenanceStatAggregator instance = new MaintenanceStatAggregator();
@@ -32,17 +35,13 @@ public class MaintenanceStatAggregator implements MaintenanceStatAggregatorMBean
     
     public void addCounter(CounterGroup group, CounterCategory category, String id) {
         CounterKey key = new CounterKey(group, category, id);
+        
         map.put(key, new AtomicLong());
     }
     
     public void removeCounter(CounterGroup group, CounterCategory category, String id) {
         CounterKey key = new CounterKey(group, category, id);
         map.remove(key);
-    }
-
-    public AtomicLong getByCounterName(CounterGroup group, CounterCategory category, String id) {
-        CounterKey key = new CounterKey(group, category, id);
-        return map.get(key);
     }
     
     @Override
@@ -67,13 +66,49 @@ public class MaintenanceStatAggregator implements MaintenanceStatAggregatorMBean
         
         return list;
     }
+
+    @Override
+    public Map<String, Map<CounterGroup, List<String>>> getAllCountersPerCluster() {
+        ConcurrentHashMap<String, Map<CounterGroup, List<String>>> res = new ConcurrentHashMap<>();
+
+        for (CounterKey key : map.keySet()) {
+            String clusterName = null;
+            String esmeName = null;
+
+            if (key.getGroup() == CounterGroup.Cluster) {
+                clusterName = key.getId();
+            } else if (key.getGroup() == CounterGroup.ESME) {
+                esmeName = key.getId();
+            }
+            if (clusterName == null && esmeName != null) {
+                EsmeManagement esmeManagement = EsmeManagement.getInstance();
+                clusterName = esmeManagement.getClusterNameByEsmeName(esmeName);
+            }
+            if (clusterName != null) {
+                if (!res.containsKey(clusterName)) {
+                    Map<CounterGroup, List<String>> clusterNameMap = new HashMap<>();
+                    clusterNameMap.put(CounterGroup.Cluster, new ArrayList<String>());
+                    clusterNameMap.put(CounterGroup.ESME, new ArrayList<String>());
+
+                    Map<CounterGroup, List<String>> oldObject = res.putIfAbsent(clusterName, clusterNameMap);
+                    if (oldObject != null) {
+                        clusterNameMap = oldObject;
+                    }
+
+                    clusterNameMap.get(key.getGroup()).add(key.getName());
+                } else {
+                    res.get(clusterName).get(key.getGroup()).add(key.getName());
+                }
+            }
+        }
+        return res;
+    }
     
-    public AtomicLong getCounterByName(String counterName) {
+    public AtomicLong getCounterValueByName(String counterName) {
         CounterGroup group = null;
         CounterCategory category = null;
         String objName = null;
         String[] parts = counterName.split(CounterDefImpl.OBJECT_NAME_SEPARATOR, 3);
-        System.out.println("couterName is " + counterName + " was splitted in " + parts.length + " parts");
         if (parts.length == 1) {
             category = CounterCategory.valueOf(parts[0]);
         } else if (parts.length == 3) {
@@ -82,12 +117,7 @@ public class MaintenanceStatAggregator implements MaintenanceStatAggregatorMBean
             objName = parts[2];
         }
         CounterKey key = new CounterKey(group, category, objName);
-        System.out.println(key);
-        if (map.get(key) == null) {
-            for (CounterKey k : map.keySet()) {
-                System.out.println(k + ": " + map.get(k));
-            }
-        }
+        
         return map.get(key);
     }
 
@@ -100,46 +130,78 @@ public class MaintenanceStatAggregator implements MaintenanceStatAggregatorMBean
     }
 
     public void updateCounter(CounterCategory category, String clusterName) {
-        // update global counter first
-        CounterKey key = new CounterKey(null, category, null);
+        // update cluster counter
+        CounterKey key = new CounterKey(CounterGroup.Cluster, category, clusterName);
         AtomicLong value = map.get(key);
         if (value != null) {
             value.incrementAndGet();
-        } else {
-            map.put(key, new AtomicLong());
         }
 
-        // update cluster counter
-        key = new CounterKey(CounterGroup.Cluster, category, clusterName);
-        value = map.get(key);
-        if (value != null) {
-            value.incrementAndGet();
-        }
+        // update global counter
+        updateCounter(category);
     }
 
     public void updateCounter(CounterCategory category, String clusterName, String esmeName) {
-
-        // update global counter first
-        CounterKey key = new CounterKey(null, category, null);
+        // update esme counter
+        CounterKey key = new CounterKey(CounterGroup.ESME, category, esmeName);
         AtomicLong value = map.get(key);
         if (value != null) {
             value.incrementAndGet();
-        } else {
-            map.put(key, new AtomicLong());
         }
+        
+        // update global and cluster counters
+        updateCounter(category, clusterName);
+    }
+    
+    public void updateCounter(CounterCategory category, long delta) {
+        CounterKey key = new CounterKey(null, category, null);
+        AtomicLong value = map.get(key);
+        if (value != null) {
+            value.addAndGet(delta);
+        }
+    }
 
+    public void updateCounter(CounterCategory category, String clusterName, long delta) {
         // update cluster counter
-        key = new CounterKey(CounterGroup.Cluster, category, clusterName);
-        value = map.get(key);
-        if (value != null) {
-            value.incrementAndGet();
+        if (clusterName != null) {
+            CounterKey key = new CounterKey(CounterGroup.Cluster, category, clusterName);
+            AtomicLong value = map.get(key);
+            if (value != null) {
+                value.addAndGet(delta);
+            }
         }
 
+        // update global counter
+        updateCounter(category, delta);
+    }
+
+    public void updateCounter(CounterCategory category, String clusterName, String esmeName, long newValue) {
         // update esme counter
-        key = new CounterKey(CounterGroup.ESME, category, esmeName);
-        value = map.get(key);
-        if (value != null) {
-            value.incrementAndGet();
+        long delta = newValue;
+        if ((esmeName != null) && (clusterName != null)) {
+            CounterKey key = new CounterKey(CounterGroup.ESME, category, esmeName);
+            AtomicLong value = map.get(key);
+            if (value != null) {
+                delta = newValue - (int)value.get();
+                value.set(newValue);
+            }
         }
+        
+        // update global and cluster counters
+        updateCounter(category, clusterName, delta);
+    }
+    
+    public void updateCounterWithDelta(CounterCategory category, String clusterName, String esmeName, long delta) {
+        // update esme counter
+        if ((esmeName != null) && (clusterName != null)) {
+            CounterKey key = new CounterKey(CounterGroup.ESME, category, esmeName);
+            AtomicLong value = map.get(key);
+            if (value != null) {
+                value.addAndGet(delta);
+            }
+        }
+        
+        // update global and cluster counters
+        updateCounter(category, clusterName, delta);
     }
 }
