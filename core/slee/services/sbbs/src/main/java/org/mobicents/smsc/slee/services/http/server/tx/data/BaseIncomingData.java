@@ -84,14 +84,14 @@ public abstract class BaseIncomingData {
         String formatParameter = request.getParameter("format");
         if(formatParameter!= null) {
             return ResponseFormat.fromString(formatParameter);
-        } else {
-            try {
-                Map<String, String[]> stringMap = HttpRequestUtils.extractParametersFromPost(tracer, request);
-                String[] format = stringMap.get(HttpRequestUtils.P_FORMAT);
-                return ResponseFormat.fromString(format != null && format.length > 0 ? format[0] : null);
-            } catch (Exception e){
-                return ResponseFormat.STRING;
-            }
+        }
+        try {
+            Map<String, String[]> stringMap = HttpRequestUtils.extractParametersFromPost(tracer,
+                    request.getContentLength(), HttpRequestUtils.getInputStream(request));
+            String[] format = stringMap.get(HttpRequestUtils.P_FORMAT);
+            return ResponseFormat.fromString(format != null && format.length > 0 ? format[0] : null);
+        } catch (Exception e) {
+            return ResponseFormat.STRING;
         }
     }
 

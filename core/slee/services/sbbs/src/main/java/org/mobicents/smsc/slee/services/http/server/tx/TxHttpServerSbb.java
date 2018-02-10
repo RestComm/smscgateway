@@ -314,7 +314,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             String udhStr = request.getParameter(RequestParameter.UDH.getName());
             String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[] {};
 
-            Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
+            Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request.getContentLength(),
+                    HttpRequestUtils.getInputStream(request));
 
             if (userId == null || userId.isEmpty()) {
                 userId = getValueFromMap(map, RequestParameter.USER_ID.getName());
@@ -374,7 +375,8 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         String format = request.getParameter(RequestParameter.FORMAT.getName());
 
         if (userId == null && password == null && msgId == null) {
-            Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request);
+            Map<String, String[]> map = HttpRequestUtils.extractParametersFromPost(logger, request.getContentLength(),
+                    HttpRequestUtils.getInputStream(request));
             String[] tmp = map.get(RequestParameter.USER_ID.getName());
             userId = (tmp == null ? new String[] { "" } : tmp)[0];
 
