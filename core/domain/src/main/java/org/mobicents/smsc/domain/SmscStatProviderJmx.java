@@ -394,22 +394,29 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                     SourceValueObjectImpl svo = null;
 
                     SmppManagement smppManagement = SmppManagement.getInstance();
-                    EsmeManagement esmeManagement = EsmeManagement.getInstance();
 
                     if (cd.getCounterName().equals("ClientEsmeConnectQueueSize")) {
                         if (cd.getObjectName() != null) {
-                            svo = new SourceValueObjectImpl(this.getName(), smppManagement.getClientEsmesInConnectQueue(cd.getObjectName()));
-                        } else {
                             svo = new SourceValueObjectImpl(this.getName(),
-                                    smppManagement.getClientEsmesInConnectQueue());
+                                    smppManagement.getClientEsmesInConnectQueue(cd.getObjectName()));
+                        } else {
+                            svo = new SourceValueObjectImpl(this.getName(), smppManagement.getClientEsmesInConnectQueue());
                         }
                     } else if (cd.getCounterName().equals("ClientEsmeEnquireLinkQueueSize")) {
                         if (cd.getObjectName() != null) {
-                            svo = new SourceValueObjectImpl(this.getName(), smppManagement.getClientEsmesEnquireLinkQueue(cd.getObjectName()));
+                            svo = new SourceValueObjectImpl(this.getName(),
+                                    smppManagement.getClientEsmesEnquireLinkQueue(cd.getObjectName()));
                         } else {
                             svo = new SourceValueObjectImpl(this.getName(), smppManagement.getClientEsmesEnquireLinkQueue());
                         }
+                    } else if (cd.getCounterName().equals("SleeEventQueueSize")) {
+                        svo = new SourceValueObjectImpl(this.getName(),
+                                maintenanceStatAggregator.getSleeEventQSizeCounterValue());
                     } else {
+                        if (cd.getCounterName() == null)
+                            System.out.println("getCounterName is null: cd is " + cd);
+                        else if (maintenanceStatAggregator.getCounterValueByName(cd.getCounterName()) == null)
+                            System.out.println("getCounterValueByName is null for " + cd.getCounterName());
                         svo = new SourceValueObjectImpl(this.getName(),
                                 maintenanceStatAggregator.getCounterValueByName(cd.getCounterName()).get());
                     }
@@ -419,6 +426,7 @@ public class SmscStatProviderJmx implements SmscStatProviderJmxMBean, CounterMed
                 }
             }
         } catch (Throwable e) {
+            e.printStackTrace();
             logger.info("Exception when getSourceValueSet() - campaignName=" + campaignName + " - " + e.getMessage(), e);
             return null;
         }

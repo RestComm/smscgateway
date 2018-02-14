@@ -681,9 +681,9 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                     EsmeManagement esmeManagement = EsmeManagement.getInstance();
                     if (esmeManagement != null && smsSet != null) {
                         esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
-                        destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
-                    } else {
-                        System.out.println("esmeManagement is " + esmeManagement + ", smsSet is " + smsSet);
+                        if (esme != null) {
+                            destAddressLimitationEnabled = esme.getDestAddrSendLimit() != 0;
+                        }
                     }
                     
 
@@ -719,9 +719,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                             if (esme != null) {
                                 sessionId = esme.getLocalSessionId();
                             }
-                        } else {
-                            System.out.println("esmeManagement is " + esmeManagement + ", smsSet is " + smsSet);
-                        }
+                        } 
                     }
                     errorsStatAggregator.updateCounter(CounterCategory.SmppOut, clusterName, esmeName, sessionId);
                     if (logger.isInfoEnabled())
