@@ -24,9 +24,9 @@ Configuration for SMSC GW with RestComm jSS7 is [here](https://github.com/RestCo
 
 ## License
 
-RestComm SMSC is licensed under dual license policy. The default license is the Free Open Source [GNU Affero GPL v3.0](http://www.gnu.org/licenses/agpl-3.0.html). Alternatively a commercial license can be obtained from Telestax ([contact form](http://www.telestax.com/contactus/#InquiryForm))
+RestComm SMSC is licensed under dual license policy. The default license is the Free Open Source [GNU Affero GPL v3.0](http://www.gnu.org/licenses/agpl-3.0.html). Alternatively a commercial license can be obtained from Telestax ([contact form](https://www.restcomm.com/contact/))
 
-RestComm SMSC Gateway is lead by [TeleStax, Inc.](www.telestax.com) and developed collaboratively by a [community of individual and enterprise contributors](http://www.telestax.com/open-source-2/acknowledgments/).
+RestComm SMSC Gateway is lead by [TeleStax, Inc.](www.telestax.com) and developed collaboratively by a [community of individual and enterprise contributors](https://www.restcomm.com/acknowledgements/).
 
 
 
@@ -64,4 +64,4 @@ Read our [RestComm SMSC wiki](https://github.com/RestComm/smscgateway/wiki)
 
 ## All Open Source RestComm Projects
 
-Open Source http://telestax.com/open-source/
+Open Source https://restcomm.com/open-source/
