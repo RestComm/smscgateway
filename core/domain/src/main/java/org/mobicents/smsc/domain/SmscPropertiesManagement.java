@@ -886,10 +886,12 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
+    @Override
     public int getDeliveryTimeoutDeltaPerMessage() {
         return deliveryTimeoutDeltaPerMessage;
     }
 
+    @Override
     public void setDeliveryTimeoutDeltaPerMessage(int deliveryTimeoutDeltaPerMessage) {
         this.deliveryTimeoutDeltaPerMessage = deliveryTimeoutDeltaPerMessage;
         this.store();
@@ -1146,16 +1148,16 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         this.store();
     }
 
-	@Override
-	public ChargingType getTxSmppChargingType() {
-		return txSmppCharging;
-	}
+    @Override
+    public ChargingType getTxSmppChargingType() {
+        return txSmppCharging;
+    }
 
     @Override
     public void setTxSmppChargingType(ChargingType txSmppCharging) {
         this.txSmppCharging = txSmppCharging;
         this.store();
-	}
+    }
 
     @Override
     public String getTxSmppChargingTypeStr() {
@@ -2329,6 +2331,5 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             super(SM_DELIVERY_FAILURE_TP_FAILURE_CAUSE_LIST, SmDeliveryFailureTpFailureCauseListElement.class, data);
         }
     }
-
 
 }

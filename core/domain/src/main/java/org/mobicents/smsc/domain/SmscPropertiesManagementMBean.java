@@ -37,71 +37,71 @@ import org.restcomm.smpp.SmppEncoding;
  */
 public interface SmscPropertiesManagementMBean {
 
-	public String getServiceCenterGt();
+    public String getServiceCenterGt();
 
     public String getServiceCenterGt(int networkId);
 
-	public void setServiceCenterGt(String serviceCenterGt);
-	
-	public void setServiceCenterGt(int networkId, String serviceCenterGt);
-	
-	public Map<Integer, String> getNetworkIdVsServiceCenterGt();
+    public void setServiceCenterGt(String serviceCenterGt);
 
-	public int getServiceCenterSsn();
+    public void setServiceCenterGt(int networkId, String serviceCenterGt);
 
-	public void setServiceCenterSsn(int serviceCenterSsn);
+    public Map<Integer, String> getNetworkIdVsServiceCenterGt();
 
-	public int getHlrSsn();
+    public int getServiceCenterSsn();
 
-	public void setHlrSsn(int hlrSsn);
+    public void setServiceCenterSsn(int serviceCenterSsn);
 
-	public int getMscSsn();
+    public int getHlrSsn();
 
-	public void setMscSsn(int mscSsn);
+    public void setHlrSsn(int hlrSsn);
 
-	public int getMaxMapVersion();
+    public int getMscSsn();
 
-	public void setMaxMapVersion(int maxMapVersion);
+    public void setMscSsn(int mscSsn);
 
-	public int getDefaultValidityPeriodHours();
+    public int getMaxMapVersion();
 
-	public void setDefaultValidityPeriodHours(int defaultValidityPeriodHours);
+    public void setMaxMapVersion(int maxMapVersion);
 
-	public int getMaxValidityPeriodHours();
+    public int getDefaultValidityPeriodHours();
 
-	public void setMaxValidityPeriodHours(int maxValidityPeriodHours);
+    public void setDefaultValidityPeriodHours(int defaultValidityPeriodHours);
 
-	public int getDefaultTon();
+    public int getMaxValidityPeriodHours();
 
-	public void setDefaultTon(int defaultTon);
+    public void setMaxValidityPeriodHours(int maxValidityPeriodHours);
 
-	public int getDefaultNpi();
+    public int getDefaultTon();
 
-	public void setDefaultNpi(int defaultNpi);
+    public void setDefaultTon(int defaultTon);
 
-	public int getSubscriberBusyDueDelay();
+    public int getDefaultNpi();
 
-	public void setSubscriberBusyDueDelay(int subscriberBusyDueDelay);
+    public void setDefaultNpi(int defaultNpi);
 
-	public int getFirstDueDelay();
+    public int getSubscriberBusyDueDelay();
 
-	public void setFirstDueDelay(int firstDueDelay);
+    public void setSubscriberBusyDueDelay(int subscriberBusyDueDelay);
 
-	public int getSecondDueDelay();
+    public int getFirstDueDelay();
 
-	public void setSecondDueDelay(int secondDueDelay);
+    public void setFirstDueDelay(int firstDueDelay);
 
-	public int getMaxDueDelay();
+    public int getSecondDueDelay();
 
-	public void setMaxDueDelay(int maxDueDelay);
+    public void setSecondDueDelay(int secondDueDelay);
 
-	public int getDueDelayMultiplicator();
+    public int getMaxDueDelay();
 
-	public void setDueDelayMultiplicator(int dueDelayMultiplicator);
+    public void setMaxDueDelay(int maxDueDelay);
 
-	public int getMaxMessageLengthReducer();
+    public int getDueDelayMultiplicator();
 
-	public void setMaxMessageLengthReducer(int maxMessageLengReducer);
+    public void setDueDelayMultiplicator(int dueDelayMultiplicator);
+
+    public int getMaxMessageLengthReducer();
+
+    public void setMaxMessageLengthReducer(int maxMessageLengReducer);
 
     public SmppEncoding getSmppEncodingForGsm7();
 
@@ -111,9 +111,9 @@ public interface SmscPropertiesManagementMBean {
 
     public void setSmppEncodingForGsm7Str(String smppEncodingForGsm7);
 
-	public SmppEncoding getSmppEncodingForUCS2();
+    public SmppEncoding getSmppEncodingForUCS2();
 
-	public void setSmppEncodingForUCS2(SmppEncoding smppEncodingForUCS2);
+    public void setSmppEncodingForUCS2(SmppEncoding smppEncodingForUCS2);
 
     public String getSmppEncodingForUCS2Str();
 
@@ -127,29 +127,33 @@ public interface SmscPropertiesManagementMBean {
 
     public void setDbPort(int dbPort);
 
-	public String getKeyspaceName();
+    public String getKeyspaceName();
 
-	public void setKeyspaceName(String keyspaceName);
+    public void setKeyspaceName(String keyspaceName);
 
-	public String getClusterName();
+    public String getClusterName();
 
-	public void setClusterName(String clusterName);
+    public void setClusterName(String clusterName);
 
-	public long getFetchPeriod();
+    public long getFetchPeriod();
 
-	public void setFetchPeriod(long fetchPeriod);
+    public void setFetchPeriod(long fetchPeriod);
 
-	public int getFetchMaxRows();
+    public int getFetchMaxRows();
 
-	public void setFetchMaxRows(int fetchMaxRows);
+    public void setFetchMaxRows(int fetchMaxRows);
 
-	public int getMaxActivityCount();
+    public int getMaxActivityCount();
 
-	public void setMaxActivityCount(int maxActivityCount);
+    public void setMaxActivityCount(int maxActivityCount);
 
     public int getDeliveryTimeout();
 
     public void setDeliveryTimeout(int deliveryTimeout);
+
+    public int getDeliveryTimeoutDeltaPerMessage();
+
+    public void setDeliveryTimeoutDeltaPerMessage(int deliveryTimeoutDeltaPerMessage);
 
     public int getVpProlong();
 
@@ -157,26 +161,26 @@ public interface SmscPropertiesManagementMBean {
 
     public String getEsmeDefaultClusterName();
 
-	public void setEsmeDefaultClusterName(String val);
+    public void setEsmeDefaultClusterName(String val);
 
-//	public boolean getSMSHomeRouting();
-//	public void setSMSHomeRouting(boolean isSMSHomeRouting);
+    // public boolean getSMSHomeRouting();
+    // public void setSMSHomeRouting(boolean isSMSHomeRouting);
 
-	public int getReviseSecondsOnSmscStart();
+    public int getReviseSecondsOnSmscStart();
 
-	public void setReviseSecondsOnSmscStart(int reviseSecondsOnSmscStart);
+    public void setReviseSecondsOnSmscStart(int reviseSecondsOnSmscStart);
 
-	public int getProcessingSmsSetTimeout();
+    public int getProcessingSmsSetTimeout();
 
-	public void setProcessingSmsSetTimeout(int processingSmsSetTimeout);
+    public void setProcessingSmsSetTimeout(int processingSmsSetTimeout);
 
-	public boolean getGenerateReceiptCdr();
+    public boolean getGenerateReceiptCdr();
 
-	public void setGenerateReceiptCdr(boolean generateReceiptCdr);
+    public void setGenerateReceiptCdr(boolean generateReceiptCdr);
 
-	public boolean getGenerateDetailedCdr();
+    public boolean getGenerateDetailedCdr();
 
-	public void setGenerateDetailedCdr(boolean generateDetailedCdr);
+    public void setGenerateDetailedCdr(boolean generateDetailedCdr);
 
     public boolean getGenerateTempFailureCdr();
 
@@ -218,17 +222,17 @@ public interface SmscPropertiesManagementMBean {
 
     public void setStoreAndForwordModeStr(String storeAndForwordMode);
 
-	public ChargingType getTxSmppChargingType();
+    public ChargingType getTxSmppChargingType();
 
-	public void setTxSmppChargingType(ChargingType txSmppCharging);
+    public void setTxSmppChargingType(ChargingType txSmppCharging);
 
     public String getTxSmppChargingTypeStr();
 
     public void setTxSmppChargingTypeStr(String txSmppCharging);
 
-	public ChargingType getTxSipChargingType();
+    public ChargingType getTxSipChargingType();
 
-	public void setTxSipChargingType(ChargingType txSipCharging);
+    public void setTxSipChargingType(ChargingType txSipCharging);
 
     public String getTxSipChargingTypeStr();
 
@@ -258,21 +262,21 @@ public interface SmscPropertiesManagementMBean {
 
     public void setCorrelationIdLiveTime(int correlationIdLiveTime);
 
-	public String getDiameterDestRealm();
+    public String getDiameterDestRealm();
 
-	public void setDiameterDestRealm(String diameterDestRealm);
+    public void setDiameterDestRealm(String diameterDestRealm);
 
-	public String getDiameterDestHost();
+    public String getDiameterDestHost();
 
-	public void setDiameterDestHost(String diameterDestHost);
+    public void setDiameterDestHost(String diameterDestHost);
 
-	public int getDiameterDestPort();
+    public int getDiameterDestPort();
 
-	public void setDiameterDestPort(int diameterDestPort);
+    public void setDiameterDestPort(int diameterDestPort);
 
-	public String getDiameterUserName();
+    public String getDiameterUserName();
 
-	public void setDiameterUserName(String diameterUserName);
+    public void setDiameterUserName(String diameterUserName);
 
     public int getRemovingLiveTablesDays();
 
@@ -287,7 +291,7 @@ public interface SmscPropertiesManagementMBean {
     public boolean isSmscStopped();
 
     public void setSkipUnsentMessages(int skipUnsentMessages);
-    
+
     public int getSkipUnsentMessages();
 
     public void setDeliveryPause(boolean deliveryPause);
@@ -297,17 +301,17 @@ public interface SmscPropertiesManagementMBean {
     public void setGenerateCdr(GenerateType generateCdr);
 
     public int getGenerateCdrInt();
-    
+
     public void setGenerateCdrInt(int generateCdr);
-    
+
     public GenerateType getGenerateArchiveTable();
 
     public void setGenerateArchiveTable(GenerateType generateArchiveTable);
 
     public int getGenerateArchiveTableInt();
-    
-    public void setGenerateArchiveTableInt(int generateArchiveTable); 
-    
+
+    public void setGenerateArchiveTableInt(int generateArchiveTable);
+
     public boolean getReceiptsDisabling();
 
     public void setReceiptsDisabling(boolean receiptsDisabling);
@@ -357,7 +361,7 @@ public interface SmscPropertiesManagementMBean {
     public void setHrSriBypass(int networkId, boolean hrSriBypass);
 
     public void removeHrSriBypassForNetworkId(int networkId);
-    
+
     public int getNationalLanguageSingleShift();
 
     public void setNationalLanguageSingleShift(int nationalLanguageSingleShift);
@@ -365,9 +369,9 @@ public interface SmscPropertiesManagementMBean {
     public int getNationalLanguageLockingShift();
 
     public void setNationalLanguageLockingShift(int nationalLanguageLockingShift);
-    
+
     public int getSriResponseLiveTime();
-    
+
     public void setSriResponseLiveTime(int sriresponselivetime);
 
     public int getHttpDefaultSourceTon();
@@ -430,11 +434,11 @@ public interface SmscPropertiesManagementMBean {
 
     public void setMaxMessageId(long maxMessageId) throws IllegalArgumentException;
 
-    public void setCassandraUser(String user) throws  IllegalArgumentException;
+    public void setCassandraUser(String user) throws IllegalArgumentException;
 
     public String getCassandraUser();
 
-    public void setCassandraPass(String pass) throws  IllegalArgumentException;
+    public void setCassandraPass(String pass) throws IllegalArgumentException;
 
     public String getCassandraPass();
 
@@ -458,9 +462,8 @@ public interface SmscPropertiesManagementMBean {
 
     public String getSmDeliveryFailureDlrWithTpdu();
 
-    public Map<Integer, PermanentTemporaryFailure>  getSmDeliveryFailure();
+    public Map<Integer, PermanentTemporaryFailure> getSmDeliveryFailure();
 
     public Map<Integer, PermanentTemporaryFailure> getSmDeliveryFailureTpCause();
 
-
-    }
+}
