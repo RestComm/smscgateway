@@ -1,0 +1,125 @@
+
+[[_gsd_settings]]
+= Graceful shutdown
+
+.Note
+[NOTE]
+====
+Graceful shutdown mode is a Telscale feature, available only in our commercial version.
+====
+
+A graceful shutdown is a functionality for shutting down of a server after all messages delivery processes are finished. After a graceful shutdown initiating SMSC GW stops of getting new messages from a cassandra database for delivering. But the server continue of messages receiveing from existing connectors (SMPP, SS7, SIP, HTTP) and continue of processing and delivering of incoming messages. This means that a user needs to stop of uploading of new messages to the server, then the server will finish all existing delivery processes and force a server shutdown after it.
+
+A graceful shutdown procedure has parameters `Minimum graceful shutdown time` and `Maximum graceful shutdown time`. The first parameter specifies the time  during at least this time a server will wait before as server shutdown start even no pending dialogs more. The second parameter specifies the time duration after which a server will make shutdown even if even there are still pending dialogs. Shortly: actual shutdown will be performed from `Minimum graceful shutdown time` to `Maximum graceful shutdown time` after a procedure initiating time.
+
+[[_gsd_force]]
+== Force a graceful shutdown
+
+[[_gsd_force_cli]]
+=== Using CLI
+
+You can force a server graceful shutdown by issuing the command smsc gsd as described below.
+
+----
+
+Name
+	smsc gsd
+
+SYNOPSIS
+	smsc gsd
+
+DESCRIPTION
+	This command is used to start a graceful shutdown procedure
+	for a server. This procedure means that a server will continue
+	the work till all existing dialogs are completed. At the graceful
+	shutdown procedure start the server sends announsements to
+	a load-balancer server that the node is going to shutdown soon.  
+
+EXAMPLES
+	smsc gsd
+----
+
+[[_gsd_force_gui]]
+=== Using GUI
+
+
+. In the GUI Management Console for SMSC Gateway, click on 'Graceful shutdown' in the left panel.
+. Press a button "Force graceful shutdown".
+. A graceful shutdown sever procedure will be started.
+
+
+[[_gsd_min_time]]
+== Minimum graceful shutdown time.
+
+[[_gsd_min_time_cli]]
+=== Using CLI
+
+You can set the 'Minimum graceful shutdown time' by issuing the command `smsc set mingracefulshutdowntime` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get mingracefulshutdowntime` which will display the value set for this property.
+
+----
+
+SYNOPSIS
+	smsc set mingracefulshutdowntime <minGracefulShutDownTime-value>
+
+DESCRIPTION
+	This command is used to set the mingracefulshutdowntime value.
+	When a graceful shutdown procedure has started the server will
+	wait before shutdown start at least minGracefulShutDownTime time
+	(in seconds).
+	Default value is 20 (seconds).
+
+EXAMPLES
+	smsc set mingracefulshutdowntime 20
+----
+
+[[_gsd_min_time_gui]]
+=== Using GUI
+
+. In the GUI Management Console for SMSC Gateway, click on 'Graceful shutdown' in the left panel.
+. The main panel will display the existing Settings.
+. You can specify the Minimum graceful shutdown time (in seconds) by entering the value in the text field 'Minimum graceful shutdown time (in seconds)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the right of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+
+[[_gsd_max_time]]
+== Maximum graceful shutdown time.
+
+[[_gsd_max_time_cli]]
+=== Using CLI
+
+You can set the 'Maximum graceful shutdown time' by issuing the command `smsc set maxngracefulshutdowntime` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get maxngracefulshutdowntime` which will display the value set for this property.
+
+----
+
+Name
+	smsc set maxngracefulshutdowntime
+
+SYNOPSIS
+	smsc set maxngracefulshutdowntime <maxGracefulShutDownTime-value>
+
+DESCRIPTION
+	This command is used to set the maxngracefulshutdowntime value.
+	When a graceful shutdown procedure has started the server will
+	wait before all dialogs are completed. This waiting will not
+	more then maxGracefulShutDownTime time (in seconds). When
+	maxGracefulShutDownTime from a graceful shutdown begin
+	the server will be brought down even there are pending dialogs.
+	Default value is 90 (seconds).
+
+EXAMPLES
+	smsc set maxngracefulshutdowntime 90
+----
+
+[[_gsd_max_time_gui]]
+=== Using GUI
+
+. In the GUI Management Console for SMSC Gateway, click on 'Graceful shutdown' in the left panel.
+. The main panel will display the existing Settings.
+. You can specify the Maximum graceful shutdown time (in seconds) by entering the value in the text field 'Maximum graceful shutdown time (in seconds)'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Save' at the right of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+

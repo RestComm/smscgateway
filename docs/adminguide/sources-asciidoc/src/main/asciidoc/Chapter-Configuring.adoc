@@ -102,6 +102,32 @@ For more details, please refer to Wildfly 10 "Logging Configuration" guide https
 You must make sure `log4j` is fine tuned for optimal performance in production.
 We recommend that you set logging threshold to `WARN` and let the CDR appender be `DEBUG`.
 
+[[_active_active]]
+== Configuring of SS7 Active-Active mode with {this-platform} SS7 FEP before SS7 network
+
+.Note
+[NOTE]
+====
+SS7 Active-Active mode is a Telscale feature, available only in our commercial version.
+====
+
+This chapter introduces a description how Telestax SMSC GW Active-Active can be configured. See below an example of a configuration with 2 FEP and 2 SMSC GW nodes.
+
+image::images/SMSC-FEP-schema.png[]
+
+Two SMSC GWs ("SMSC 1" and "SMSC 2") can be deployed at different physical servers (server 1 and server 2). Front-End-Processors ("FEP 1" and "FEP 2") plays a role of SS7 load balancers. "FEP 1" and "FEP 2" can be deployed to same physical servers as "SMSC 1" and "SMSC 2" (server 1 and server 2). "FEP 1" and "FEP 2" are connected by SS7 links to remote STP node(s).
+
+A remote originated TCAP dialogs are loadshared by FEP nodes between existing SMSC nodes. Then FEP nodes are responsible for resending of TCAP dialog messages to a proper SMSC node. This guarantees that all SS7 dialogs will be processed by a same SMSC GW node and SMSC GW nodes does not demand processing of SS7 dialogs from another node. This means that SMSC GW nodes still process messages independently. FEP nodes are needed to delivery of SS7 messages to a proper SMSC GW node.
+
+When you use several FEP / SMSC GW nodes in a way that is described at a picture you can turn off any of FEP / SMSC GW node for maintanance or for other reasons. All traffic then will be processed by alive nodes. Each SMSC GW stores all pending messages (for storeAndForward and forwardAndStore modes) in it's own cassandra KeySpace. Another SMSC GW node does not have access to such stored messages. This means that we will need to turn a SMSC GW node on in order to pending messages will be delivered.
+
+SMSC GW supports of a graceful shutdown procedure. See more in a chapter <<_gsd_settings>>. A graceful shutdown procedure is initiated by a GUI / CLI interface. SMSC GW will stop of loading new messages from a database and will make a server shutdown when all message delivering processes have completed. FEP nodes will prevent of sending new external dialogs to a SS7 node that is gracefully shutting down. SMSC GW node even after a graceful shutdown start will aceept and process of incoming messages from other interfaces (SMPP, SIP, HTTP). A user must stop of sending of messages via these interfeces before of a graceful shutdown start.
+
+For a smooth support of HR (Home Routing) and AlertCerviceCenter operations between SMSC GW nodes an extra cassandra KeySpace is introduced. This new clustering KeySpace is used for cache of correlationId values and data for HR procedure and exchanging of AlertCerviceCenter requests between SMSC GW servers (for MT SS7 procedure). If you use several SMSC GW nodes then you need to turn on an option `In cluster`, prepare a new empty cassandra KeySpace (a single instance for both/all SMSC GW nodes) and configure this KeySpace in `Shared Database Configuration` section. See more info in the chapter <<_smsc_clustering_settings>>.
+
+We need to make special configuring procedures of SS7 part before SMSC GW / FEP will be able to work in a load-balancing mode. This configuring is described in a manual "Restcomm Load Balancer User Guide", check a chapter "Integration Load Balancer SS7 (FEP) with USSD and SMSC servers".
+
+
 [[_routing_fundamentals]]
 == SMSC GW routing fundamentals
 

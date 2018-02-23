@@ -1407,6 +1407,12 @@ PARAMETERS
 [[_smsc_clustering_settings]]
 == Clustering Settings
 
+.Note
+[NOTE]
+====
+SS7 Active-Active mode is a Telscale feature, available only in our commercial version.
+====
+
 	You can manage Clustering settings using the CLI or GUI.
 	Note that the some of functionality requires SMSC is restart.
 
