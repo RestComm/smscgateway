@@ -1403,6 +1403,222 @@ PARAMETERS
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
+
+[[_smsc_clustering_settings]]
+== Clustering Settings
+
+	You can manage Clustering settings using the CLI or GUI.
+	Note that the some of functionality requires SMSC is restart.
+
+[[_in_cluster]]
+=== Clustering Configuration
+
+[[_in_cluster_cli]]
+==== Using CLI
+
+	You can set the 'in cluster' value for Clustering settings by issuing the command `smsc set incluster` with appropriate parameters as described below. Enabling this property will take effect only if Shared Cassandra Database exists. Shared database name can be checked by issuing command `smsc get shareddbkeyspace`. If 'in cluster' property has been enabled, full clustering functionality will still require SMSC restart.
+	You can verify this by issuing the command `smsc get incluster` which will display the value set for this property.
+
+----
+
+	Name
+		smsc set incluster
+
+	SYNOPSIS
+		smsc set incluster <true | false>
+
+	DESCRIPTION
+		This command is used to set flag indicating whether SMSC is in cluster.
+
+	EXAMPLES
+		smsc set incluster true
+----
+
+[[_in_cluster_gui]]
+==== Using GUI
+
+.Procedure: Set Clustering Configuration using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing settings, segregated into nine horizontal tabs: Properties, SS7 Settings, Cassandra, Clustering, Scheduler, Diameter, Processing, CDR and Home Routing.
+		Switch to the 'Clustering' tab in the GUI.
+. You can specify the 'incluster' flag by choosing appropriate value from the drop down menu. For more details of these parameters, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+[[_shared_db_host]]
+=== Shared Database Configuration - Host Addresses
+
+[[_shared_db_hosts_cli]]
+==== Using CLI
+
+	You can set the 'host addresses' value for Shared Database settings by issuing the command `smsc set shareddbhosts` with appropriate parameters as described below.
+	You can verify this by issuing the command `smsc get shareddbhosts` which will display the value set for this property.
+
+----
+
+	Name
+		smsc set shareddbhosts
+
+	SYNOPSIS
+		smsc set shareddbhosts <host-ip>
+
+	DESCRIPTION
+		This command is used to set the host-ip addresses for Shared Database access.
+
+	EXAMPLES
+		smsc set shareddbhosts 127.0.0.1
+----
+
+[[_shared_db_host_gui]]
+==== Using GUI
+
+.Procedure: Set Shared Database Configuration - Host Addresses using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into nine horizontal tabs: Properties, SS7 Settings, Cassandra, Clustering, Scheduler, Diameter, Processing, CDR and Home Routing.
+ Switch to the 'Clustering' tab in the GUI.
+. You can specify the host-ip address by entering appropriate values in the text field 'Host Address'. For more details of these parameters, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+ If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+[[_shared_db_port]]
+=== Shared Database Configuration - Port
+
+[[_shared_db_port_cli]]
+==== Using CLI
+
+	You can set the 'port' value for Shared Database settings by issuing the command `smsc set shareddbport` with appropriate parameters as described below.
+	You can verify this by issuing the command `smsc get shareddbport` which will display the value set for this property.
+
+----
+
+	Name
+	    smsc set shareddbport
+
+	SYNOPSIS
+	    smsc set shareddbport <port>
+
+	DESCRIPTION
+		This command is used to set the password for Shared Database
+		access.
+
+	EXAMPLES
+	    smsc set shareddbport 9042
+----
+
+[[_db_port_gui]]
+==== Using GUI
+
+.Procedure: Set Shared Database Configuration - Port using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into nine horizontal tabs: Properties, SS7 Settings, Cassandra, Clustering, Scheduler, Diameter, Processing, CDR and Home Routing.
+Switch to the 'Clustering' tab in the GUI.
+. You can specify the port by entering appropriate values in the text field 'Port'. For more details of these parameters, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+[[_shared_db_keyspace]]
+=== Shared Database Configuration - Keyspace Name
+
+[[_shared_db_keyspace_cli]]
+==== Using CLI
+
+	You can set the 'Shared DB Keyspace' by issuing the command `smsc set shareddbkeyspace` with appropriate parameters as described below.
+	You can verify this by issuing the command `smsc get shareddbkeyspace` which will display the value set for this property.
+
+----
+
+	Name
+		smsc set shareddbkeyspace
+
+	SYNOPSIS
+		smsc set shareddbkeyspace <keyspacename>
+
+	DESCRIPTION
+		This command is used to set the Keyspace name for Shared Database. If you use
+		the script available in the distributive the name will be set to 'Shared' by
+		default.
+----
+
+[[_shared_db_keyspace_gui]]
+==== Using GUI
+
+.Procedure: Set Shared Database Configuration - Keyspace Name using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into nine horizontal tabs: Properties, SS7 Settings, Cassandra, Clustering, Scheduler, Diameter, Processing, CDR and Home Routing.
+Switch to the 'Clustering' tab in the GUI.
+. You can specify the Shared Db Keyspace Name by entering the value in the text field 'Keyspace Name'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+[[shared_db_user]]
+=== Shared Database Configuration - User Name
+
+[[_shared_db_user_cli]]
+==== Using CLI
+
+	You can set the 'Shared Db User Name' by issuing the command `smsc set shareddbuser` with appropriate parameters as described below.
+	You can verify this by issuing the command `smsc get shareddbuser` which will display the value set for this property.
+
+----
+
+	Name
+		smsc set shareddbuser
+
+	SYNOPSIS
+		smsc set shareddbuser <username>
+
+	DESCRIPTION
+		This command is used to set the user name for Shared Database. Default user is `cassandra`
+		You must restart SMSC GW to take effect.
+
+----
+
+[[_shared_db_user_gui]]
+==== Using GUI
+
+.Procedure: Set Shared Database Configuration - User Name using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into nine horizontal tabs: Properties, SS7 Settings, Cassandra, Clustering, Scheduler, Diameter, Processing, CDR and Home Routing.
+Switch to the 'Clustering' tab in the GUI.
+. You can specify the User Name by entering the value in the text field 'User Name'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+[[shared_db_pass]]
+=== Shared Database Configuration - Password
+
+[[_shared_db_pass_cli]]
+==== Using CLI
+
+	You can set the 'Shared Db Password' by issuing the command `smsc set shareddbpass` with appropriate parameters as described below.
+	You can verify this by issuing the command `smsc get shareddbpass` which will display the value set for this property.
+
+----
+
+	Name
+		smsc set shareddbpass
+
+	SYNOPSIS
+		smsc set shareddbpass <password>
+
+	DESCRIPTION
+		This command is used to set the password for Shared Database. Default password is `cassandra`
+		You must restart SMSC GW to take effect.
+
+----
+
+[[_shared_db_pass_gui]]
+==== Using GUI
+
+.Procedure: Set Shared Database Configuration - Password using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into nine horizontal tabs: Properties, SS7 Settings, Cassandra, Clustering, Scheduler, Diameter, Processing, CDR and Home Routing.
+Switch to the 'Clustering' tab in the GUI.
+. You can specify the Shared Db Password by entering the value in the text field 'Password'. For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+
 [[_smsc_scheduler_settings]]
 == Scheduler Settings
 
