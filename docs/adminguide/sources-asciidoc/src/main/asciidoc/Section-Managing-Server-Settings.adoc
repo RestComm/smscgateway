@@ -1955,6 +1955,49 @@ EXAMPLES
 
 You can modify Diameter settings using the CLI or GUI.
 
+
+
+[[_ocs_type]]
+=== Diameter OCS type
+
+[[_ocs_type_cli]]
+==== Using CLI
+
+You can set the 'Diameter OCS type' value by issuing the command `smsc set diameterocstype` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get diameterocstype` which will display the value set for this property.
+
+----
+
+Name
+	smsc set diameterocstype
+
+SYNOPSIS
+	smsc set diameterocstype <value>
+
+DESCRIPTION
+	This command is used to set the OCS type to SMSC GW will send diameter requests.
+	We support now following types:
+	- SmsInformation - usage of SMS-Information (2000) diameter AVP, vendor TGPP (10415) 
+	- OcsHuawei      - usage of P2PSMS-Information (20400) diameter AVP, vendor Huawei (2011)
+	Default value: SmsInformation
+
+EXAMPLES
+	smsc set diameterocstype SmsInformation
+----
+
+[[_ocs_type_gui]]
+==== Using GUI
+
+.Procedure: Set Diameter OCS type using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
+. The main panel will display the existing Settings, segregated into nine horizontal tabs: Properties, SS7 Settings, Cassandra, Clustering, Scheduler, Diameter, Processing, CDR and Home Routing.
+  Switch to the 'Diameter' tab in the GUI.
+. You can specify the Diameter OCS type by entering the value in the corresponding text field.
+  For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
+. You must click on the button 'Apply Changes' at the top of the window to save your settings.
+  If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
+
+
 [[_dest_realm]]
 === Destination Realm
 
