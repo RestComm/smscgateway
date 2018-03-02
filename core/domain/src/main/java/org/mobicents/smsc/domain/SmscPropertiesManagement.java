@@ -144,6 +144,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
     private static final String CASSANDRA_USER = "cassandraUser";
     private static final String CASSANDRA_PASS = "cassandraPass";
+    private static final String CASSANDRA_CURRENT_DUE_SLOT_BASE = "cassandraCurrentDueSlotBase";
 
     private static final String SM_DELIVERY_FAILURE_LIST = "smDeliveryFailureList";
     private static final String SM_DELIVERY_FAILURE_TP_FAILURE_CAUSE_LIST = "smDeliveryFailureTpFailureCauseList";
@@ -213,6 +214,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     // credential for cassandra
     private String cassandraUser = "cassandra";
     private String cassandraPass = "cassandra";
+    
+    private int cassandraCurrentDueSlotBase;
 
     // temporary/permanent delivery failure for SMDeliveryFailure per a SM-DeliveryFailureCause
     private FastMap<Integer, PermanentTemporaryFailure> smDeliveryFailure = new FastMap<Integer, PermanentTemporaryFailure>();
@@ -645,6 +648,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
     public String getCassandraPass() {
         return this.cassandraPass;
+    }
+    
+    @Override
+    public void setCassandraCurrentDueSlotBase(final int aBase) throws IllegalArgumentException {
+        cassandraCurrentDueSlotBase = aBase;
+        store();
+    }
+
+    @Override
+    public int getCassandraCurrentDueSlotBase() {
+        return cassandraCurrentDueSlotBase;
     }
 
     @Override
@@ -1862,6 +1876,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
 
             writer.write(this.cassandraUser, CASSANDRA_USER, String.class);
             writer.write(this.cassandraPass, CASSANDRA_PASS, String.class);
+            writer.write(this.cassandraCurrentDueSlotBase, CASSANDRA_CURRENT_DUE_SLOT_BASE, Integer.class);
 
             if (smDeliveryFailure.size() > 0) {
                 ArrayList<SmDeliveryFailureListElement> al = new ArrayList<SmDeliveryFailureListElement>();
@@ -2237,6 +2252,11 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             vals = reader.read(CASSANDRA_PASS, String.class);
             if (vals != null)
                 this.cassandraPass = vals;
+            
+            val = reader.read(CASSANDRA_CURRENT_DUE_SLOT_BASE, Integer.class);
+            if (val != null) {
+                cassandraCurrentDueSlotBase = val;
+            }
 
             SmscPropertiesManagement_smDeliveryFailure al4 = reader.read(SM_DELIVERY_FAILURE_LIST,
                     SmscPropertiesManagement_smDeliveryFailure.class);

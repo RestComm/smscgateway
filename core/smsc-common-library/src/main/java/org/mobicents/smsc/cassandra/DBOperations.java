@@ -77,10 +77,10 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TableMetadata;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
 
+
 /**
  *
  * @author sergey vetyutnev
- *
  */
 public class DBOperations {
 	private static final Logger logger = Logger.getLogger(DBOperations.class);
@@ -141,6 +141,8 @@ public class DBOperations {
     private long minMessageId;
     // Max value of messageId value for SMPP responses
     private long maxMessageId;
+    
+    private int itsCurrentDueSlotBase;
 
 	// data for processing
 
@@ -225,9 +227,17 @@ public class DBOperations {
     protected Session getSession() {
         return this.session;
     }
+    
+    public void start(String hosts, int port, String keyspace, String user, String password, int secondsForwardStoring,
+            int reviseSecondsOnSmscStart, int processingSmsSetTimeout, long minMessageId, long maxMessageId)
+            throws Exception {
+        start(hosts, port, keyspace, user, password, secondsForwardStoring, reviseSecondsOnSmscStart,
+                processingSmsSetTimeout, minMessageId, maxMessageId, 0);
+    }
 
     public void start(String hosts, int port, String keyspace, String user, String password, int secondsForwardStoring,
-                      int reviseSecondsOnSmscStart, int processingSmsSetTimeout, long minMessageId, long maxMessageId) throws Exception {
+            int reviseSecondsOnSmscStart, int processingSmsSetTimeout, long minMessageId, long maxMessageId,
+            final int aCurrentDueSlotBase) throws Exception {
 		if (this.started) {
 			throw new IllegalStateException("DBOperations already started");
 		}
@@ -239,6 +249,7 @@ public class DBOperations {
         this.processingSmsSetTimeout = processingSmsSetTimeout;
         this.minMessageId = minMessageId;
         this.maxMessageId = maxMessageId;
+        itsCurrentDueSlotBase = aCurrentDueSlotBase;
 
 		this.pcsDate = null;
 		currentSessionUUID = UUID.randomUUID();
@@ -332,7 +343,7 @@ public class DBOperations {
 		getSentMessagesCounter = session.prepare("SELECT * FROM \"" + Schema.FAMILY_PENDING_MESSAGES + "\" WHERE \"" + Schema.COLUMN_DAY + "\" = ?");
 
 		try {
-			currentDueSlot = c2_getCurrentSlotTable(CURRENT_DUE_SLOT);
+			currentDueSlot = c2_getCurrentSlotTable(getCurrentDueSlotKey());
 			if (currentDueSlot == 0) {
 				// not yet set
 				long l1 = this.c2_getDueSlotForTime(new Date());
@@ -341,9 +352,9 @@ public class DBOperations {
 				this.c2_setCurrentDueSlot(currentDueSlot - dueSlotReviseOnSmscStart);
 			}
 
-            messageId = c2_getCurrentSlotTable(NEXT_MESSAGE_ID);
+            messageId = c2_getCurrentSlotTable(getNextMessageIdDueSlotKey());
             messageId += MESSAGE_ID_LAG;
-            c2_setCurrentSlotTable(NEXT_MESSAGE_ID, messageId);
+            c2_setCurrentSlotTable(getNextMessageIdDueSlotKey(), messageId);
 		} catch (Exception e1) {
 			String msg = "Failed reading a currentDueSlot !";
 			throw new PersistenceException(msg, e1);
@@ -351,7 +362,7 @@ public class DBOperations {
 		
 		this.started = true;
 	}
-
+    
 	public void stop() throws Exception {
 		if (!this.started)
 			return;
@@ -407,7 +418,7 @@ public class DBOperations {
 	public void c2_setCurrentDueSlot(long newDueSlot) throws PersistenceException {
 		currentDueSlot = newDueSlot;
 
-		c2_setCurrentSlotTable(CURRENT_DUE_SLOT, newDueSlot);
+		c2_setCurrentSlotTable(getCurrentDueSlotKey(), newDueSlot);
 	}
 
 	/**
@@ -422,7 +433,7 @@ public class DBOperations {
             messageId = minMessageId;
 		if (messageId % MESSAGE_ID_LAG == 0 && databaseAvailable) {
 			try {
-				c2_setCurrentSlotTable(NEXT_MESSAGE_ID, messageId);
+				c2_setCurrentSlotTable(getNextMessageIdDueSlotKey(), messageId);
 			} catch (PersistenceException e) {
 				logger.error("Exception when storing next messageId to the database: " + e.getMessage(), e);
 			}
@@ -2583,6 +2594,14 @@ public class DBOperations {
         Arrays.sort(sss);
 
         return sss;
+    }
+
+    private int getCurrentDueSlotKey() {
+        return itsCurrentDueSlotBase + CURRENT_DUE_SLOT;
+    }
+    
+    private int getNextMessageIdDueSlotKey() {
+        return itsCurrentDueSlotBase + NEXT_MESSAGE_ID;
     }
 
     private String[] getArchiveTableListAsNames(String keyspace) {
