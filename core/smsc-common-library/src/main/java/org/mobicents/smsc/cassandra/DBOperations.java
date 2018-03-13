@@ -1163,12 +1163,13 @@ public class DBOperations {
             boundStatement.bind(dueSlot);
             ResultSet res = session.execute(boundStatement);
 
-            for (Row row : res) {
-                SmsSet smsSet = this.createSms(row, null, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
-                        psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1(), false);
-                if (smsSet != null)
-                    result.add(smsSet);
-            }
+            if (res != null)
+                for (Row row : res) {
+                    SmsSet smsSet = this.createSms(row, null, psc.getShortMessageNewStringFormat(), psc.getAddedCorrId(),
+                            psc.getAddedNetworkId(), psc.getAddedOrigNetworkId(), psc.getAddedPacket1(), false);
+                    if (smsSet != null)
+                        result.add(smsSet);
+                }
         } catch (Exception e1) {
             String msg = "Failed getRecordList()";
 

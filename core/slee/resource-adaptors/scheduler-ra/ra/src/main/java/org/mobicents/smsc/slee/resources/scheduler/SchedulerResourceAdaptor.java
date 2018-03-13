@@ -480,6 +480,9 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 				} catch (PersistenceException e1) {
 					this.tracer.severe(
 							"PersistenceException when fetching SmsSet list from a database: " + e1.getMessage(), e1);
+					Throwable ex = e1.getCause();
+					if (ex != null)
+					    this.tracer.severe("Original error: " + ex.getMessage(), ex);
 					return;
 				}
 			}
