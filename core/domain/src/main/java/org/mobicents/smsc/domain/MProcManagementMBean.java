@@ -45,12 +45,22 @@ public interface MProcManagementMBean {
 
     List<MProcRule> getMProcRules();
 
+    String[] getMProcRulesStr();
+
     MProcRule getMProcRuleById(int id);
+
+    String getMProcRuleByIdStr(int id);
 
     MProcRule createMProcRule(int id, String ruleFactoryName, String parametersString) throws Exception;
 
+    String createMProcRuleStr(int id, String ruleFactoryName, String parametersString) throws Exception;
+
     MProcRule modifyMProcRule(int id, String parametersString) throws Exception;
 
+    String modifyMProcRuleStr(int id, String parametersString) throws Exception;
+
     MProcRule destroyMProcRule(int mProcRuleId) throws Exception;
+
+    String destroyMProcRuleStr(int mProcRuleId) throws Exception;
 
 }

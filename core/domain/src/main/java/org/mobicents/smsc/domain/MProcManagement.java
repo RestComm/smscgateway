@@ -144,6 +144,16 @@ public class MProcManagement implements MProcManagementMBean {
     }
 
     @Override
+    public String[] getMProcRulesStr() {
+        int i1 = mprocs.size();
+        String[] res = new String[i1];
+        for (int i = 0; i < i1; i++) {
+            res[i] = mprocs.get(i).toString();
+        }
+        return res;
+    }
+
+    @Override
     public MProcRule getMProcRuleById(int id) {
         FastList<MProcRule> cur = mprocs;
         for (FastList.Node<MProcRule> n = cur.head(), end = cur.tail(); (n = n.getNext()) != end;) {
@@ -152,6 +162,15 @@ public class MProcManagement implements MProcManagementMBean {
                 return rule;
         }        
         return null;
+    }
+
+    @Override
+    public String getMProcRuleByIdStr(int id) {
+        MProcRule res = getMProcRuleById(id);
+        if (res != null)
+            return res.toString();
+        else
+            return "null";
     }
 
     private void resortRules(FastList<MProcRule> lst) {
@@ -202,6 +221,15 @@ public class MProcManagement implements MProcManagementMBean {
     }
 
     @Override
+    public String createMProcRuleStr(int id, String ruleFactoryName, String parametersString) throws Exception {
+        MProcRule res = createMProcRule(id, ruleFactoryName, parametersString);
+        if (res != null)
+            return res.toString();
+        else
+            return "null";
+    }
+
+    @Override
     public MProcRule modifyMProcRule(int mProcRuleId, String parametersString) throws Exception {
         logger.info("modifyMProcRule: id=" + mProcRuleId + ", parametersString=" + parametersString);
 
@@ -214,6 +242,15 @@ public class MProcManagement implements MProcManagementMBean {
         this.store();
 
         return mProcRule;
+    }
+
+    @Override
+    public String modifyMProcRuleStr(int id, String parametersString) throws Exception {
+        MProcRule res = modifyMProcRule(id, parametersString);
+        if (res != null)
+            return res.toString();
+        else
+            return "null";
     }
 
     @Override
@@ -233,6 +270,15 @@ public class MProcManagement implements MProcManagementMBean {
         this.unregisterMProcRuleMbean(mProcRule.getId());
 
         return mProcRule;
+    }
+
+    @Override
+    public String destroyMProcRuleStr(int mProcRuleId) throws Exception {
+        MProcRule res = destroyMProcRule(mProcRuleId);
+        if (res != null)
+            return res.toString();
+        else
+            return "null";
     }
 
     public MProcResult applyMProcArrival(final MProcRuleRaProvider anMProcRuleRa, Sms sms,
