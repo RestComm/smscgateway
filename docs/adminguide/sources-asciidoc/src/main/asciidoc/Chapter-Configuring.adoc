@@ -123,7 +123,18 @@ When you use several FEP / SMSC GW nodes in a way that is described at a picture
 
 SMSC GW supports of a graceful shutdown procedure. See more in a chapter <<_gsd_settings>>. A graceful shutdown procedure is initiated by a GUI / CLI interface. SMSC GW will stop of loading new messages from a database and will make a server shutdown when all message delivering processes have completed. FEP nodes will prevent of sending new external dialogs to a SS7 node that is gracefully shutting down. SMSC GW node even after a graceful shutdown start will aceept and process of incoming messages from other interfaces (SMPP, SIP, HTTP). A user must stop of sending of messages via these interfeces before of a graceful shutdown start.
 
-For a smooth support of HR (Home Routing) and AlertCerviceCenter operations between SMSC GW nodes an extra cassandra KeySpace is introduced. This new clustering KeySpace is used for cache of correlationId values and data for HR procedure and exchanging of AlertCerviceCenter requests between SMSC GW servers (for MT SS7 procedure). If you use several SMSC GW nodes then you need to turn on an option `In cluster`, prepare a new empty cassandra KeySpace (a single instance for both/all SMSC GW nodes) and configure this KeySpace in `Shared Database Configuration` section. See more info in the chapter <<_smsc_clustering_settings>>.
+For a smooth support of HR (Home Routing) and AlertCerviceCenter operations between SMSC GW nodes an extra cassandra KeySpace is introduced ss an addition to a dedicated cassandra KeySpace (default name is "Shared").
+This new clustering KeySpace is used for cache of correlationId values and data for HR procedure and exchanging of AlertCerviceCenter requests between SMSC GW servers (for MT SS7 procedure).
+If you use several SMSC GW nodes then you need to turn on an option `In cluster`, prepare a new empty cassandra KeySpace (a single instance for both/all SMSC GW nodes) and configure this KeySpace in `Shared Database Configuration` section.
+See more info in the chapter <<_smsc_clustering_settings>>.
+
+When working of {this-application} we need to have both dedicated and shared cassandra KeySpaces up. We may need to bring cassandra databases down for maintenance. A dedicated KeySpace may be turned down with a corresponded {this-application} server.
+If we need to turn down a database with a shared keyspace and some SMSC GWs are up that time then we need to follow this order:
+
+* turn `InCLuster` option to `false` - see <<_in_cluster>>
+* stop a database with shared KeySpace    
+* start a database with shared KeySpace    
+* turn `InCLuster` option to `true`
 
 We need to make special configuring procedures of SS7 part before SMSC GW / FEP will be able to work in a load-balancing mode. This configuring is described in a manual "Restcomm Load Balancer User Guide", check a chapter "Integration Load Balancer SS7 (FEP) with USSD and SMSC servers".
 
@@ -269,7 +280,59 @@ smsc mproc add mproc 3 networkidmask=3 newnetworkid=0
 
 * set the option "Delivery receipts will be routed to the origination networkId" is set to true
 
-==== Routing desision based on SRI request results
+
+==== Routing desision when we have several service providers and operators 
+
+An example of connection schema for connecting to operators and clients:
+
+image::images/SMS-routing-ex.png[]
+
+We will do routing based on message destination addresses mask. For example the algorithm may be:
+
+* all messages with destination addresses starting with "1*" will be routed to client 1 (with networkId 1)
+* all messages with destination addresses starting with "2*" will be routed to client 2 (with networkId 2)
+* all other messages will be routed to an operator (with etworkId 3)
+
+===== Routing based on destination address mask
+
+Example algorithm: we have 3 networkId areas (1, 2 and 3) for client / agents.
+
+[source]
+----
+smsc mproc add 1 destdigmask ^1[0-9].* newnetworkid 1
+smsc mproc add 2 destdigmask ^2[0-9].* newnetworkid 2
+smsc mproc add 3 destdigmask ^(?!1|2).* newnetworkid 3
+----
+
+===== Routing based on destination address mask with usage of intermediate networkId
+
+Example algorithm: we have 3 networkId areas (1, 2 and 3) for client / agents. We use intermediate networkId areas (101, 102, 103 for temporary parking routed messages) for simpler formalizing.
+
+[source]
+----
+smsc mproc add 1 destdigmask ^1[0-9].* newnetworkid 101
+smsc mproc add 2 destdigmask ^2[0-9].* newnetworkid 102
+smsc mproc add 101 networkidmask 1 newnetworkid 103
+smsc mproc add 102 networkidmask 2 newnetworkid 103
+smsc mproc add 103 networkidmask 3 newnetworkid 103
+smsc mproc add 201 networkidmask 101 newnetworkid 1
+smsc mproc add 202 networkidmask 102 newnetworkid 2
+smsc mproc add 203 networkidmask 103 newnetworkid 3
+----
+
+===== Routing when a client belongs to an operator 
+
+Example algorithm: we have operator 1 (networkId==1) and a client 1 (networkId==101) and all messages from client 1 will be routed to soperator 1 and vice versa, we have operator 2 (networkId==2) and a client 2 (networkId==102) and all messages from client 2 will be routed to soperator 2 and vice versa.
+
+[source]
+----
+smsc mproc add 1 originnetworkidmask 1 newnetworkid 101
+smsc mproc add 2 originnetworkidmask 2 newnetworkid 102
+smsc mproc add 3 originnetworkidmask 101 newnetworkid 1
+smsc mproc add 4 originnetworkidmask 102 newnetworkid 2
+----
+
+==== Routing decision based on SRI request results
 
 Sometimes we need to decide where to route messages depending on SendRoutingRequest (SRI) to HLR results. To achieve it we may use two approaches
 

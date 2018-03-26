@@ -60,7 +60,12 @@ Campaign Tool::
 
 == Database Table Structure
 
-{this-platform} {this-application} stores messages using Cassandra database. The database is used for storing:
+{this-platform} {this-application} stores messages using Cassandra database. Each {this-application} demands a dedicated KeySpace per a {this-application} instanse.
+If we use {this-application} in a clustering mode we need an extra shared KeySpace one for a whole cluster.  
+
+=== Dedicated KeySpace
+
+The dedicated database KeySpace is used for storing:
 
 * unsent messages, messages successfully sent and messages that failed to be sent
 * referenses to sent messages depending on local and remote SMSC messageId
@@ -73,7 +78,7 @@ The {this-platform} {this-application} creates tables for every new day with the
 Apart from the above tables created everyday, the database also comprises of three other tables namely `CURRENT_SLOT_TABLE`, `SMPP_SMS_ROUTING_RULE_2` and `SIP_SMS_ROUTING_RULE_2` created when the SMSC is started for the first time.
 The firts one is used for storing system-wide data and the latter two for storing the routing rules. 
 
-=== CURRENT_SLOT_TABLE
+==== CURRENT_SLOT_TABLE
 
 .`CURRENT_SLOT_TABLE`
 [cols="1,1,1", frame="all", options="header"]
@@ -84,7 +89,7 @@ The firts one is used for storing system-wide data and the latter two for storin
 |===
 
 [[_sms_routing_rule]]
-=== SMPP_SMS_ROUTING_RULE_2
+==== SMPP_SMS_ROUTING_RULE_2
 
 .`SMPP_SMS_ROUTING_RULE_2`
 [cols="1,1,1", frame="all", options="header"]
@@ -95,7 +100,7 @@ The firts one is used for storing system-wide data and the latter two for storin
 | CLUSTER_NAME | Text | The name of the SMPP Cluster.
 |===
 
-=== SIP_SMS_ROUTING_RULE_2
+==== SIP_SMS_ROUTING_RULE_2
 
 .`SIP_SMS_ROUTING_RULE_2`
 [cols="1,1,1", frame="all", options="header"]
@@ -106,7 +111,7 @@ The firts one is used for storing system-wide data and the latter two for storin
 | CLUSTER_NAME | Text | The name of the SIP Cluster. This is not used as of now and all SMS message are routed through a single SIP stack.
 |===
 
-=== DST_SLOT_TABLE_yyyy_mm_dd
+==== DST_SLOT_TABLE_yyyy_mm_dd
 
 This table contains a list of `DUE_SLOT` values for `TARGET_ID` to store the data for this day.
  
@@ -120,7 +125,7 @@ This table contains a list of `DUE_SLOT` values for `TARGET_ID` to store the dat
 |===
 
 [[_slot_messages_table_yyyy_mm_dd]]
-=== SLOT_MESSAGES_TABLE_yyyy_mm_dd
+==== SLOT_MESSAGES_TABLE_yyyy_mm_dd
 
 This table stores the messages that are scheduled for delivery.
 The messages are not deleted after delivery.
@@ -187,7 +192,7 @@ The fields "DUE_SLOT", "TARGET_ID", "ID" together act as the primary key.
 | EXTRA_DATA_4 | ASCII | A field for future usage.
 |===
 
-=== MESSAGES_yyyy_mm_dd
+==== MESSAGES_yyyy_mm_dd
 
 This table archives the messages that have been delivered successfully or whose delivery failed.
 
@@ -253,7 +258,7 @@ The fields "ADDR_DST_DIGITS", "ID" together act as the primary key.
 | EXTRA_DATA_4 | ASCII | A field for future usage.
 |===
 
-=== MES_ID_YYYY_MM_DD
+==== MES_ID_YYYY_MM_DD
 
 This table contains referenses of local messageIds to a primary keys of MESSAGES_YYYY_MM_DD tables for a possibility of finding of sent / delivery failed messages by thier messageId value.
 
@@ -268,7 +273,7 @@ The field "MESSAGE_ID" acts as the primary key.
 | ID | UUID | Record Identifier.
 |===
 
-=== DLV_MES_ID_YYYY_MM_DD
+==== DLV_MES_ID_YYYY_MM_DD
 
 This table contains referenses of remote messageIds (that are assigned by a remote SMSC GW to which a message was sent via SMPP protocol) to a local messageIds for sent to SMPP detination messages to corralate them.
 
@@ -283,8 +288,13 @@ The fields "REMOTE_MESSAGE_ID", "DEST_ID" together act as the primary key.
 | MESSAGE_ID | BIGINT | A unique message ID assigned by local SMSC.
 |===
 
+=== Shared KeySpace
+
+The shared database KeySpace is used for storing of data that is needed for different {this-application} instances information exchange. 
+
+
 [[_db_reporting]]
-=== Reporting
+== Reporting
 
 As of now there is no reporting in {this-platform} {this-application} .
 However you can leverage any external third party tool to dig Cassandra tables as defined above and create reports.
