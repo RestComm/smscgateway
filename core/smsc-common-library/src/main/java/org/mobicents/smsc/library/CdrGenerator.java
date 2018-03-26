@@ -23,7 +23,6 @@ package org.mobicents.smsc.library;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
@@ -111,6 +110,8 @@ public class CdrGenerator {
             }
         }
 
+        int dcs = smsEvent.getDataCoding();
+
         Long receiptLocalMessageId = smsEvent.getReceiptLocalMessageId();
         
         long msgPartDelTime = -1;
@@ -190,6 +191,8 @@ public class CdrGenerator {
                 .append(delayParametersInCdr ? smsEvent.getDeliveryCount() : CDR_EMPTY)
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append(msgPartDelTime != -1 ? msgPartDelTime : CDR_EMPTY)
+                .append(CdrGenerator.CDR_SEPARATOR)
+                .append(dcs)
                 .append(CdrGenerator.CDR_SEPARATOR)
                 .append("\"")
                 .append(getEscapedString(getFirst20CharOfSMS(smsEvent.getShortMessageText())))
