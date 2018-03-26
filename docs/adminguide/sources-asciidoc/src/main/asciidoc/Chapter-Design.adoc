@@ -119,6 +119,7 @@ This table contains a list of `DUE_SLOT` values for `TARGET_ID` to store the dat
 | DUE_SLOT | BIGINT | All new incoming messages will be added into this DUE_SLOT if it is not yet processed. If DUE_SLOT has been processed already or is absent, a new DUE_SLOT will be assigned.
 |===
 
+[[_slot_messages_table_yyyy_mm_dd]]
 === SLOT_MESSAGES_TABLE_yyyy_mm_dd
 
 This table stores the messages that are scheduled for delivery.
