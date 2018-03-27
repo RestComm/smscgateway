@@ -123,7 +123,7 @@ When you use several FEP / SMSC GW nodes in a way that is described at a picture
 
 SMSC GW supports of a graceful shutdown procedure. See more in a chapter <<_gsd_settings>>. A graceful shutdown procedure is initiated by a GUI / CLI interface. SMSC GW will stop of loading new messages from a database and will make a server shutdown when all message delivering processes have completed. FEP nodes will prevent of sending new external dialogs to a SS7 node that is gracefully shutting down. SMSC GW node even after a graceful shutdown start will aceept and process of incoming messages from other interfaces (SMPP, SIP, HTTP). A user must stop of sending of messages via these interfeces before of a graceful shutdown start.
 
-For a smooth support of HR (Home Routing) and AlertCerviceCenter operations between SMSC GW nodes an extra cassandra KeySpace is introduced ss an addition to a dedicated cassandra KeySpace (default name is "Shared").
+For a smooth support of HR (Home Routing) and AlertCerviceCenter operations between SMSC GW nodes an extra cassandra KeySpace is introduced as an addition to a dedicated cassandra KeySpace (default name is "Shared").
 This new clustering KeySpace is used for cache of correlationId values and data for HR procedure and exchanging of AlertCerviceCenter requests between SMSC GW servers (for MT SS7 procedure).
 If you use several SMSC GW nodes then you need to turn on an option `In cluster`, prepare a new empty cassandra KeySpace (a single instance for both/all SMSC GW nodes) and configure this KeySpace in `Shared Database Configuration` section.
 See more info in the chapter <<_smsc_clustering_settings>>.

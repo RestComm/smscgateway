@@ -82,6 +82,12 @@ include::Chapter-smpp-simulator.adoc[]
 
 :leveloffset: 1
 
+include::Appendix-mproc-API.adoc[]
+
+:leveloffset: 0
+
+:leveloffset: 1
+
 include::Appendix-SMSC-ErrorCodes.adoc[]
 
 :leveloffset: 0

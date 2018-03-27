@@ -1,0 +1,115 @@
+
+:sectnums!:
+
+[appendix]
+[[_appendix_mproc_api]]
+= API interface for access to SMSC GW configuring
+
+A user may need to configure mproc rules of SMSC GW instance or other SMSC GW configuring programmatically by a user application. SMSC GW has an API based of JMX access interface for configuring.
+We explain more detailed how to access mproc rules in this chapter. Other configuring parts can be also configured via JMX interface but by using of other management beans.
+A list of such beans can be obtained by an application `jconsole` for Wildfly based server or by WEB interface http://<IP>:8080/jmx-console for jboss 5.1 based servers.  
+
+Configuring of mproc rules can be done by implementing of a java application that will connect to SMSC GW server by JMX interface.
+
+We have MBean `MProcManagementMBean` for accessing to mproc rules, here is a code for it:
+
+[source,java]
+----
+public interface MProcManagementMBean {
+
+    List<MProcRule> getMProcRules();
+
+    String[] getMProcRulesStr();
+
+    MProcRule getMProcRuleById(int id);
+
+    String getMProcRuleByIdStr(int id);
+
+    MProcRule createMProcRule(int id, String ruleFactoryName, String parametersString) throws Exception;
+
+    String createMProcRuleStr(int id, String ruleFactoryName, String parametersString) throws Exception;
+
+    MProcRule modifyMProcRule(int id, String parametersString) throws Exception;
+
+    String modifyMProcRuleStr(int id, String parametersString) throws Exception;
+
+    MProcRule destroyMProcRule(int mProcRuleId) throws Exception;
+
+    String destroyMProcRuleStr(int mProcRuleId) throws Exception;
+
+}
+----
+
+We can use methods `createMProcRule()` for adding of an mproc rule, `modifyMProcRule()` for updating of an mproc rule, `destroyMProcRule()` for deleting of a mproc rule.
+Methods `getMProcRules()` and `getMProcRuleById()` may be used for getting info of current mproc rules state. 
+
+Methods that return `MProcRule` interface demands adding extra jars into your java application classpath - `smsc-common-library-*.jar`, `mproc-api-*.jar` and `javolution-5.5.1.jar`, all they can be obtained from SMSC GW server.
+Methods with suffix `Str` return String values and do not demand extra libraries. It is a developer choice to select needed methods.
+
+You can read details for mproc rules in <<_mproc_rules_fundamentals>> and details for message routing process there: <<_routing_fundamentals>>. 
+
+[[_appendix_mproc_api_java]]
+== Creating of a custom java application
+
+A custom java based user application can be created based on a following template. The code contains of a connection opening section, management section and connection closing section.
+You can put any code into the management section for making of configuring (adding, updating or removing of rules).
+
+[source,java]
+----
+        String urlString = "service:jmx:rmi:///jndi/rmi://localhost:9998/server";
+        JMXConnector jmxc;
+
+        // opening connecting
+        JMXServiceURL url = new JMXServiceURL(urlString);
+        jmxc = JMXConnectorFactory.connect(url, null);
+        MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
+
+        // checking of existence the target domain
+        String tagDomain = "org.mobicents.smsc";
+        String[] domains = mbsc.getDomains();
+        boolean found = false;
+        for (String domain : domains) {
+            if (tagDomain.equals(domain)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            System.out.println("Remote domain has not found: " + tagDomain);
+            jmxc.close();
+            return;
+        }
+
+        ObjectName mbeanNameMprocManagement = new ObjectName(tagDomain + ":layer=MProcManagement,name=SmscManagement");
+        MProcManagementMBean mprocBean;
+        mprocBean = JMX.newMBeanProxy(mbsc, mbeanNameMprocManagement, MProcManagementMBean.class, true);
+
+        // management actions
+        MProcRule res = mprocBean.getMProcRuleById(1);
+        // we can put extra code for message actions here
+        
+        // closing connection
+        jmxc.close();
+----
+
+[[_appendix_mproc_api_jconsole]]
+== Connecting to SMSC GW mbeans by jconsole
+
+`jconsole` is a java application from java JDK that helps us in mbeans observing and methods of mbeans invoking.
+The simpluet way of `jconsole` running is just typing:
+
+[source]
+----
+jconsole
+----   
+
+This example will not work if we want to use `MProcRule` interface of methods return values. For this we need to add into a class path extra libraries. Here is an example how to run `jconsole` (you need to replace `<path>` with an actual path to libraries and <version> to actual libraries version):
+
+[source]
+----
+jconsole -J-Djava.class.path=%JAVA_HOME%\lib\jconsole.jar;%JAVA_HOME%\lib\tools.jar;<path>\smsc-common-library-<version>.jar;<path>\mproc-api-<version>.jar;<path>\jcon\javolution-5.5.1.jar
+----   
+
+Then you need to connect to a local jboss instance or remotely, go to section "MBeans", and find there a needed mbean: "org.mobicents.smsc" - "MProcManagement" - "SmscManagement" and invoke needed beans. You can check then actions result in SMSC GW web GUI.
+
+:sectnums:
