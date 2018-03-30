@@ -24,3 +24,19 @@ Else you can update your database as DataStax recommends: http://docs.datastax.c
 Telscale SS7 FEP before SS7 network". This KeySpace is needed only for a cluster work.  
 
 Before a first {this-platform} {this-application} start we need to create an empty dedicated keyspace per SMSC GW instance (and one empty shared KeySpace only in clustering mode). {this-application} creates all needed tables itself after starting of {this-application}.  
+
+Here is the simplest script for creating a dedicated KeySpace by cassandra CQL console: 
+
+[source]
+----
+CREATE KEYSPACE "RestCommSMSC" WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor': 1};
+----
+
+Here is the simplest script for creating a dedicated KeySpace by cassandra CQL console: 
+
+[source]
+----
+CREATE KEYSPACE "Shared" WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor': 1};
+----
+
+You can use updated commands if you need other cassandra configurations like usage of cassandra cluster.

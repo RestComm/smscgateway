@@ -126,15 +126,40 @@ SMSC GW supports of a graceful shutdown procedure. See more in a chapter <<_gsd_
 For a smooth support of HR (Home Routing) and AlertCerviceCenter operations between SMSC GW nodes an extra cassandra KeySpace is introduced as an addition to a dedicated cassandra KeySpace (default name is "Shared").
 This new clustering KeySpace is used for cache of correlationId values and data for HR procedure and exchanging of AlertCerviceCenter requests between SMSC GW servers (for MT SS7 procedure).
 If you use several SMSC GW nodes then you need to turn on an option `In cluster`, prepare a new empty cassandra KeySpace (a single instance for both/all SMSC GW nodes) and configure this KeySpace in `Shared Database Configuration` section.
-See more info in the chapter <<_smsc_clustering_settings>>.
+
+Here is a script example for settings a shared KeySpace options.
+
+[source]
+----
+smsc set shareddbhosts <IP>
+smsc set shareddbport 9042
+smsc set shareddbkeyspace Shared
+smsc set shareddbuser cassandra
+smsc set shareddbpass cassandra
+
+smsc set incluster true
+----
+
+You can use also web GUI `http://localhost:8080/smsc-management/` - "Server settings" - "Clustering". See more info in the chapter <<_smsc_clustering_settings>>.
 
 When working of {this-application} we need to have both dedicated and shared cassandra KeySpaces up. We may need to bring cassandra databases down for maintenance. A dedicated KeySpace may be turned down with a corresponded {this-application} server.
 If we need to turn down a database with a shared keyspace and some SMSC GWs are up that time then we need to follow this order:
 
-* turn `InCLuster` option to `false` - see <<_in_cluster>>
+* turn `InCLuster` option to `false`
 * stop a database with shared KeySpace    
 * start a database with shared KeySpace    
 * turn `InCLuster` option to `true`
+
+Turning `InCLuster` to `false` or `true` can be done by a web GUI or by CLI commands
+
+[source]
+----
+smsc set incluster false
+
+smsc set incluster true
+----
+
+See for details <<_in_cluster>>.
 
 We need to make special configuring procedures of SS7 part before SMSC GW / FEP will be able to work in a load-balancing mode. This configuring is described in a manual "Restcomm Load Balancer User Guide", check a chapter "Integration Load Balancer SS7 (FEP) with USSD and SMSC servers".
 
