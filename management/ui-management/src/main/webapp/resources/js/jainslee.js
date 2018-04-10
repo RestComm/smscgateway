@@ -105,9 +105,9 @@ function handleError(message, response) {
 
 function setMenu(element, module) {
 	// set loader
-	$('.advertisement').hide();
-	$('.advertisement').random().show();
-	$('#loader-modal').modal();
+//	$('.advertisement').hide();
+//	$('.advertisement').random().show();
+//	$('#loader-modal').modal();
 	$('#content').load('modules/' + module + '.html', function() {
 		$('.nav-list').children('.active').removeClass('active');
 		$(element).parent().addClass('active');
