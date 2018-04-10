@@ -75,7 +75,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         if (logger.isFinestEnabled()) {
             logger.finest("Incomming HTTP event: " + ies.getEvent() + ".");
         }
-        final Object event = ies.getEvent();
+        final Object event = ies.getEvent(); 
         if (event instanceof HttpServletRequestEvent) {
             if (isInitialHttpRequest(((HttpServletRequestEvent) event).getRequest())) {
                 ies.setInitialEvent(true);
@@ -90,6 +90,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
     }
     
     private boolean isInitialHttpRequest(final HttpServletRequest aRequest) {
+        if (aRequest == null)
+            return false;
+        
         final String uri = aRequest.getRequestURI();
         if (uri == null) {
             return false;
@@ -108,7 +111,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
     public void onHttpGet(HttpServletRequestEvent event, ActivityContextInterface aci) {
         logger.fine("onHttpGet");
         HttpServletRequest request = event.getRequest();
-        String remoteAddrAndPort = request.getRemoteAddr() + ":" + request.getRemotePort();
+        String remoteAddrAndPort = null;
+        if (request != null)
+            remoteAddrAndPort = request.getRemoteAddr() + ":" + request.getRemotePort();
         long timestampB = 0L;
         // decision if getStatus or sendMessage
         try {
@@ -175,7 +180,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
     public void onHttpPost(HttpServletRequestEvent event, ActivityContextInterface aci) {
         logger.fine("onHttpPost");
         HttpServletRequest request = event.getRequest();
-        String remoteAddrAndPort = request.getRemoteAddr() + ":" + request.getRemotePort();
+        String remoteAddrAndPort = null;
+        if (request != null)
+            remoteAddrAndPort  = request.getRemoteAddr() + ":" + request.getRemotePort();
         long timestampB = 0L;
         // decision if getStatus or sendMessage
         try {
@@ -250,7 +257,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             generateCDR(event.getRequest(), CdrGenerator.CDR_SUBMIT_FAILED_HTTP, e.getMessage(), true);
         }
         HttpServletRequest request = event.getRequest();
-        String remoteAddrAndPort = request.getRemoteAddr() + ":" + request.getRemotePort();
+        String remoteAddrAndPort = null;
+        if (request != null)
+            remoteAddrAndPort  = request.getRemoteAddr() + ":" + request.getRemotePort();
         CdrDetailedGenerator.generateDetailedCdr(false, null, null, null, timestampB, null, null, null,
                 EventType.IN_HTTP_REJECT_FORBIDDEN, ErrorCode.REJECT_INCOMING, CdrDetailedGenerator.CDR_MSG_TYPE_HTTP,
                 HttpServletResponse.SC_OK, -1, remoteAddrAndPort, null, -1, smscPropertiesManagement.getGenerateReceiptCdr(),
@@ -509,7 +518,9 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
         }
         // Lets send the Response with success here
         HttpServletRequest request = event.getRequest();
-        String remoteAddrAndPort = request.getRemoteAddr() + ":" + request.getRemotePort();
+        String remoteAddrAndPort = null;
+        if (request != null)
+            remoteAddrAndPort  = request.getRemoteAddr() + ":" + request.getRemotePort();
         try {
             outgoingData.setStatus(Status.SUCCESS);
             HttpUtils.sendOkResponseWithContent(logger, event.getResponse(),
@@ -591,17 +602,22 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
 
     private void generateCDR(HttpServletRequest request, String status, String reason, boolean lastSegment) {
 
-        final String senderId = request.getParameter(RequestParameter.SENDER.getName());
-        final String destAddressParam = request.getParameter(RequestParameter.TO.getName());
+        String senderId = null;
+        String destAddressParam = null;
         int senderTon = 0;
         int senderNpi = 0;
+        String message = null;
+        String[] destAddresses = null;
         try {
+            senderId = request.getParameter(RequestParameter.SENDER.getName());
+            destAddressParam = request.getParameter(RequestParameter.TO.getName());
             senderTon = Integer.parseInt(request.getParameter(RequestParameter.SENDER_TON.getName()));
             senderNpi = Integer.parseInt(request.getParameter(RequestParameter.SENDER_NPI.getName()));
+            message = request.getParameter(RequestParameter.MESSAGE_BODY.getName());
+            destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[] {};
         } catch (Exception e) {
         }
-        final String message = request.getParameter(RequestParameter.MESSAGE_BODY.getName());
-        final String[] destAddresses = destAddressParam != null ? destAddressParam.split(",") : new String[] {};
+        
 
         CdrGenerator.generateCdr(senderId, senderTon, senderNpi, destAddresses[0], 0, 0, OriginationType.HTTP, null, null, null,
                 0, 0, null, 0, message, status, reason, true, true, lastSegment,
