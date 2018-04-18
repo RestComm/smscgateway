@@ -39,8 +39,9 @@ SYNOPSIS
 	newdestnpi <new destination numbering plan indicator>
 	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
 	newsourceton <new source type of number> newsourcenpi
-	<new source numbering plan indicator> newsourceaddr <new source address value> mtlocalsccpgt
-	<new gt of a local sccp address of an mt message> mtremotesccptt
+	<new source numbering plan indicator> newsourceaddr <new source address value>
+	sriremotesccpgtprefix <sri remote sccp gt prefix>
+	mtlocalsccpgt <new gt of a local sccp address of an mt message> mtremotesccptt
 	<new tt for remote sccp address for mt message> hrbypass <false | true> dropaftersri
 	<false | true> newnetworkidaftersri <networkId value> dropaftertempfail <false | true>
 	newnetworkidaftertempfail <networkId value> droponarrival <false | true> rejectonarrival
@@ -85,6 +86,7 @@ PARAMETERS
 	newsourceton - an optional parameter.
 	newsourcenpi - an optional parameter.
 	newsourceaddr - an optional parameter.
+	sriremotesccpgtprefix - an optional parameter.
 	mtlocalsccpgt - an optional parameter.
 	mtremotesccptt - an optional parameter.
 	makecopy - an optional parameter.
@@ -98,7 +100,7 @@ PARAMETERS
 	rejectonarrival - an optional parameter.
 	remove_tlv - an optional parameter.
 	removedestdigprefix - an optional parameter.
-	
+
 EXAMPLES
 	smsc mproc add mproc 1 networkidmask 11 newnetworkid 12
 	smsc mproc add mproc 1 tlv_int_1550 13 newnetworkid 13
@@ -154,6 +156,7 @@ SYNOPSIS
 	adddestdigprefix <prefix value> addsourcedigprefix <prefix value>
 	newsourceton <new source type of number> newsourcenpi
 	<new source numbering plan indicator> newsourceaddr <new source address value>
+	sriremotesccpgtprefix <sri remote sccp gt prefix>
 	mtlocalsccpgt <new gt of a local sccp address of an mt message> mtremotesccptt
 	<new tt for remote sccp address for mt message> hrbypass <false | true> dropaftersri
 	<false | true> newnetworkidaftersri <networkId value> dropaftertempfail <false | true>
@@ -197,6 +200,7 @@ PARAMETERS
 	newsourceton - an optional parameter.
 	newsourcenpi - an optional parameter.
 	newsourceaddr - an optional parameter.
+	sriremotesccpgtprefix - an optional parameter.
 	mtlocalsccpgt - an optional parameter.
 	mtremotesccptt - an optional parameter.
 	makecopy - an optional parameter.

@@ -441,6 +441,12 @@ Messages will be routed between subnetworks (networkIds) by mproc rules and insi
 							<entry>"-1". This means that destination address digits of the message will not be changed.</entry>
 						</row>
 						<row>
+							<entry>sriRemoteSccpGtPrefix</entry>
+							<entry>&lt;prefix for Sccp called party address to route SriForSM request to.&gt;</entry>
+							<entry>sriremotesccpgtprefix will be added to the beginning of a message SCCP called party address to route SriForSM request to.</entry>
+							<entry>"-1". This means that Sccp called party address will not be changed.</entry>
+			 			</row>
+						<row>
 							<entry>mtLocalSccpGt</entry>
 							<entry>&lt;new global title of local SCCP address of an MT message&gt;</entry>
 							<entry>global title of an originating SCCP address of an MT message will be changed to new value. </entry>
@@ -1078,7 +1084,16 @@ public interface PostArrivalProcessor {
      * @throws MProcRuleException
      */
     void updateMessageSourceAddr(MProcMessage message, String newDigits) throws MProcRuleException;
-    
+	
+    /**
+     * Prefix called party Sccp address GT with specified digits to route the SRIforSM to
+     * 
+     * @param message
+     * @param sriRemoteSccpGtPrefix
+     * @throws MProcRuleException
+     */
+    void updateMessageSriRemoteSccpGtPrefix(MProcMessage message, String sriRemoteSccpGtPrefix) throws MProcRuleException;
+	
     /**
      * Updating GT of local SCCP address of MT message. In case of bad value MProcRuleException will be thrown
      * 

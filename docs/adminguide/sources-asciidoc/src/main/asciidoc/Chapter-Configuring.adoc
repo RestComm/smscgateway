@@ -93,11 +93,11 @@ We recommend that you set logging threshold to `WARN` and let the CDR appender b
 == Configuring log4j Logging Service (Wildfly 10)
 
 {this-platform} {this-application} uses `Apache log4j` for logging.
-If you are not familiar with the `log4j` package, you can read more about it at the Jakarta http://jakarta.apache.org/log4j/[website]. 
+If you are not familiar with the `log4j` package, you can read more about it at the Jakarta http://jakarta.apache.org/log4j/[website].
 
 Logging is controlled from a central configuration file located at [path]{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml.
 This file defines a set of appenders specifying the log files, what categories of messages should go there, the message format and the level of filtering.
-For more details, please refer to Wildfly 10 "Logging Configuration" guide https://docs.jboss.org/author/display/WFLY10/Logging+Configuration 
+For more details, please refer to Wildfly 10 "Logging Configuration" guide https://docs.jboss.org/author/display/WFLY10/Logging+Configuration
 
 You must make sure `log4j` is fine tuned for optimal performance in production.
 We recommend that you set logging threshold to `WARN` and let the CDR appender be `DEBUG`.
@@ -146,8 +146,8 @@ When working of {this-application} we need to have both dedicated and shared cas
 If we need to turn down a database with a shared keyspace and some SMSC GWs are up that time then we need to follow this order:
 
 * turn `InCLuster` option to `false`
-* stop a database with shared KeySpace    
-* start a database with shared KeySpace    
+* stop a database with shared KeySpace
+* start a database with shared KeySpace
 * turn `InCLuster` option to `true`
 
 Turning `InCLuster` to `false` or `true` can be done by a web GUI or by CLI commands
@@ -306,7 +306,7 @@ smsc mproc add mproc 3 networkidmask=3 newnetworkid=0
 * set the option "Delivery receipts will be routed to the origination networkId" is set to true
 
 
-==== Routing desision when we have several service providers and operators 
+==== Routing desision when we have several service providers and operators
 
 An example of connection schema for connecting to operators and clients:
 
@@ -345,7 +345,7 @@ smsc mproc add 202 networkidmask 102 newnetworkid 2
 smsc mproc add 203 networkidmask 103 newnetworkid 3
 ----
 
-===== Routing when a client belongs to an operator 
+===== Routing when a client belongs to an operator
 
 Example algorithm: we have operator 1 (networkId==1) and a client 1 (networkId==101) and all messages from client 1 will be routed to soperator 1 and vice versa, we have operator 2 (networkId==2) and a client 2 (networkId==102) and all messages from client 2 will be routed to soperator 2 and vice versa.
 
@@ -522,6 +522,7 @@ b) Actions, which will be applied to messages.
 | newsourceton | Arrival trigger / <new source type of number> | a message source Type of Number will be changed to "newsourceton" value. | "-1". This means that source Type of Number of the message will not be changed.
 | newsourcenpi | Arrival trigger / <new source numbering plan indicator> | a message source Numbering Plan Indicator will be changed to "newsourcenpi" value. | "-1". This means that source Numbering Plan Indicator of the message will not be changed.
 | newsourceaddr | Arrival trigger / <new source address value> | a message source address will be changed to "newsourceaddr" value. | "-1". This means that source address of the message will not be changed.
+| sriremotesccpgtprefix | Arrival Trigger / <sri remote sccp gt prefix> | sriremotesccpgtprefix will be added to the beginning of a message SCCP called party address to route SriForSM request to. | "-1". This means that Sccp called party address will not be changed.
 | mtlocalsccpgt | Arrival trigger / <new gt value> | global title of a local SCCP address of an MT message will be changed to <new gt value>. This means that GT in originating SCCP address of an MT message will be changed from what is specified by SMSC for current networkId. | "-1". This means that GT of local address will not be changed.
 | mtremotesccptt | Arrival trigger / <new tt value> | translation type of a remote SCCP address for MT message will be changed to <new tt value>. This means that desired TT of remote SCCP address for an MT message will be used rather than what SMSC sets by default for current networkId. | -1. This means that TT of the message will not be changed.
 | makecopy | Arrival trigger / <false \| true> | If the makecopy action is present then SMSC GW makes a copy of a message and then post the copy for further message processing in addition to the original message. All other actions in the rule will be applied only to the copy. For example user wants to make copies of messages and send them to another destinations (by sending of copies into another networkId), then for this you can create a rule and set for the rule "makecopy true" and "newnetworkid <new networkId value>" parameters. This makes a copy of a message and set for the copy a new networkId value. | false
@@ -1503,10 +1504,10 @@ In the "bean name="SmscManagement"" section - property <property name="MProcRule
 .Procedure for Wildfly 10
 
 * User must compile java code and create a jar library.
-  Copy the created jar into the folder [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/modules/system/layers/base/org/mobicents/smsc/bootstrap/main. 
-* You need to update [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml config file. 
+  Copy the created jar into the folder [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/modules/system/layers/base/org/mobicents/smsc/bootstrap/main.
+* You need to update [path]_{this-folder}-smscgateway-<version>/wildfly-10.1.0.Final/standalone/configuration/standalone.xml config file.
 +
-In the "bean name="SmscManagement"" section - property <property name="MProcRuleFactories"> - update the line <inject bean="MProcRuleFactoryDefault"/> (that already contains default mproc rules implementing) - add into line your new created mproc rules factory class using `,` as a separator (several classes can be added): 
+In the "bean name="SmscManagement"" section - property <property name="MProcRuleFactories"> - update the line <inject bean="MProcRuleFactoryDefault"/> (that already contains default mproc rules implementing) - add into line your new created mproc rules factory class using `,` as a separator (several classes can be added):
 +
 [source,xml]
 ----
