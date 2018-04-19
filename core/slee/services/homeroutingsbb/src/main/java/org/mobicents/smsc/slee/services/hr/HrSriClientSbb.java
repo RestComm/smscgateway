@@ -243,7 +243,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
      */
     public void onSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse evt, ActivityContextInterface aci) {
         if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nHome routing: HrSriClientSbb: Received SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt + " Dialog=" + evt.getMAPDialog());
+            this.logger.fine("Home routing: HrSriClientSbb: Received SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt + " Dialog=" + evt.getMAPDialog());
         }
 
         if (evt.getMAPDialog().getApplicationContext().getApplicationContextVersion() == MAPApplicationContextVersion.version1
@@ -263,7 +263,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
 
     public void onInformServiceCentreRequest(InformServiceCentreRequest evt, ActivityContextInterface aci) {
         if (this.logger.isInfoEnabled()) {
-            this.logger.info("\nHome routing: HrSriClientSbb: Received INFORM_SERVICE_CENTER_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
+            this.logger.info("Home routing: HrSriClientSbb: Received INFORM_SERVICE_CENTER_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
         }
 
         CorrelationIdValue correlationIdValue = this.getCorrelationIdValue();
@@ -339,7 +339,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
     @Override
     public void setupSriRequest(CorrelationIdValue correlationIdValue) {
         if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nHome routing: HrSriClientSbb: Received SriRequest: event= " + correlationIdValue);
+            this.logger.fine("Home routing: HrSriClientSbb: Received SriRequest: event= " + correlationIdValue);
         }
 
         this.setCorrelationIdValue(correlationIdValue);
@@ -395,7 +395,7 @@ public abstract class HrSriClientSbb extends HomeRoutingCommonSbb implements HrS
         mapDialogSms.addSendRoutingInfoForSMRequest(isdn, sm_RP_PRI, serviceCenterAddress, null, false, null, null,
                 null);
         if (this.logger.isInfoEnabled())
-            this.logger.info("\nHome routing: HrSriClientSbb: Sending: SendRoutingInfoForSMRequest: isdn=" + isdn + ", serviceCenterAddress="
+            this.logger.info("Home routing: HrSriClientSbb: Sending: SendRoutingInfoForSMRequest: isdn=" + isdn + ", serviceCenterAddress="
                     + serviceCenterAddress + ", sm_RP_PRI=" + sm_RP_PRI);
 
         return mapDialogSms;

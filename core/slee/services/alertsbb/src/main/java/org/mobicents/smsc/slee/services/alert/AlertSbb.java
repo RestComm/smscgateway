@@ -111,15 +111,15 @@ public abstract class AlertSbb implements Sbb {
 	 */
 
 	public void onInvokeTimeout(InvokeTimeout evt, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onInvokeTimeout" + evt);
+		this.logger.severe("Rx :  onInvokeTimeout" + evt);
 	}
 
 	public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onErrorComponent" + event);
+		this.logger.severe("Rx :  onErrorComponent" + event);
 	}
 
 	public void onRejectComponent(RejectComponent event, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onRejectComponent" + event);
+		this.logger.severe("Rx :  onRejectComponent" + event);
 	}
 
 	/**
@@ -128,59 +128,59 @@ public abstract class AlertSbb implements Sbb {
 
 	public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogDelimiter=" + evt);
+			this.logger.fine("Rx :  onDialogDelimiter=" + evt);
 		}
 	}
 
 	public void onDialogAccept(DialogAccept evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogAccept=" + evt);
+			this.logger.fine("Rx :  onDialogAccept=" + evt);
 		}
 	}
 
 	public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onDialogReject=" + evt);
+		this.logger.severe("Rx :  onDialogReject=" + evt);
 	}
 
 	public void onDialogUserAbort(DialogUserAbort evt, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onDialogUserAbort=" + evt);
+		this.logger.severe("Rx :  onDialogUserAbort=" + evt);
 	}
 
 	public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onDialogProviderAbort=" + evt);
+		this.logger.severe("Rx :  onDialogProviderAbort=" + evt);
 	}
 
 	public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogClose" + evt);
+			this.logger.fine("Rx :  onDialogClose" + evt);
 		}
 	}
 
 	public void onDialogNotice(DialogNotice evt, ActivityContextInterface aci) {
 		if (logger.isWarningEnabled()) {
-			this.logger.warning("\nRx :  onDialogNotice" + evt);
+			this.logger.warning("Rx :  onDialogNotice" + evt);
 		}
 	}
 
 	public void onDialogTimeout(DialogTimeout evt, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onDialogTimeout" + evt);
+		this.logger.severe("Rx :  onDialogTimeout" + evt);
 	}
 
 	public void onDialogRequest(DialogRequest evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogRequest" + evt);
+			this.logger.fine("Rx :  onDialogRequest" + evt);
 		}
 	}
 
 	public void onDialogRelease(DialogRelease evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogRelease" + evt);
+			this.logger.fine("Rx :  onDialogRelease" + evt);
 		}
 	}
 
 	public void onAlertServiceCentreRequest(AlertServiceCentreRequest evt, ActivityContextInterface aci) {
 		if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nReceived onAlertServiceCentreRequest= " + evt);
+			this.logger.fine("Received onAlertServiceCentreRequest= " + evt);
 		}
 
 		try {
@@ -190,7 +190,7 @@ public abstract class AlertSbb implements Sbb {
 				// Send back response only for V2
 				mapDialogSms.addAlertServiceCentreResponse(evt.getInvokeId());
 				if (this.logger.isFineEnabled()) {
-					this.logger.fine("\nSending AlertServiceCentreResponse");
+					this.logger.fine("Sending AlertServiceCentreResponse");
 				}
 
 				mapDialogSms.close(false);
@@ -237,7 +237,7 @@ public abstract class AlertSbb implements Sbb {
                         // message is already in process
                         if (logger.isInfoEnabled()) {
                             logger.info(String
-                                    .format("\nReceived AlertServiceCentre for MSISDN=%s but the delivering for this dest is already in progress",
+                                    .format("Received AlertServiceCentre for MSISDN=%s but the delivering for this dest is already in progress",
                                             addr));
                         }
                         return;
@@ -254,7 +254,7 @@ public abstract class AlertSbb implements Sbb {
                                 if (smsSet != null) {
                                     if (logger.isInfoEnabled()) {
                                         logger.info(String
-                                                .format("\nReceived AlertServiceCentre for MSISDN=%s, SmsSet was loaded with %d messages",
+                                                .format("Received AlertServiceCentre for MSISDN=%s, SmsSet was loaded with %d messages",
                                                         addr, smsSet.getSmsCount()));
                                     }
 
@@ -275,14 +275,14 @@ public abstract class AlertSbb implements Sbb {
                                 } else {
                                     if (logger.isInfoEnabled()) {
                                         logger.info(String
-                                                .format("\nReceived AlertServiceCentre for MSISDN=%s, dueSlot was scheduled but no SmsSet was loaded",
+                                                .format("Received AlertServiceCentre for MSISDN=%s, dueSlot was scheduled but no SmsSet was loaded",
                                                         addr));
                                     }
                                 }
                             } else {
                                 if (logger.isInfoEnabled()) {
                                     logger.info(String
-                                            .format("\nReceived AlertServiceCentre for MSISDN=%s but no dueSlot was scheduled or the scheduled dueSlot will come soon - 2",
+                                            .format("Received AlertServiceCentre for MSISDN=%s but no dueSlot was scheduled or the scheduled dueSlot will come soon - 2",
                                                     addr));
                                 }
                             }
@@ -292,7 +292,7 @@ public abstract class AlertSbb implements Sbb {
                     } else {
                         if (logger.isInfoEnabled()) {
                             logger.info(String
-                                    .format("\nReceived AlertServiceCentre for MSISDN=%s but no dueSlot was scheduled or the scheduled dueSlot will come soon - 1",
+                                    .format("Received AlertServiceCentre for MSISDN=%s but no dueSlot was scheduled or the scheduled dueSlot will come soon - 1",
                                             addr));
                         }
                     }

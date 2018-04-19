@@ -80,7 +80,7 @@ public class MessageDeliveryResultResponseMo implements MessageDeliveryResultRes
             }
 
 			if (this.logger.isFineEnabled()) {
-				this.logger.fine("\nSent ForwardShortMessageResponse = " + evt);
+				this.logger.fine("Sent ForwardShortMessageResponse = " + evt);
 			}
 
 			dialog.close(false);
@@ -129,7 +129,7 @@ public class MessageDeliveryResultResponseMo implements MessageDeliveryResultRes
 			}
 			dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 			if (this.logger.isInfoEnabled()) {
-				this.logger.info("\nSent ErrorComponent = " + errorMessage);
+				this.logger.info("Sent ErrorComponent = " + errorMessage);
 			}
 
 			dialog.close(false);

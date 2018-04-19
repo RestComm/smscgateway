@@ -229,7 +229,7 @@ public abstract class MoSbb extends MoCommonSbb {
 	 */
 	public void onMoForwardShortMessageRequest(MoForwardShortMessageRequest evt, ActivityContextInterface aci) {
 		if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nReceived MO_FORWARD_SHORT_MESSAGE_REQUEST = " + evt);
+			this.logger.fine("Received MO_FORWARD_SHORT_MESSAGE_REQUEST = " + evt);
 		}
 
 		this.setProcessingState(MoProcessingState.OtherDataRecieved);
@@ -241,7 +241,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 MAPErrorMessage errorMessage = this.mapProvider.getMAPErrorMessageFactory().createMAPErrorMessageFacilityNotSup(null, null, null);
                 dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
                 if (this.logger.isInfoEnabled()) {
-                    this.logger.info("\nSent ErrorComponent = " + errorMessage);
+                    this.logger.info("Sent ErrorComponent = " + errorMessage);
                 }
 				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
 				    String imsiData = null;
@@ -313,7 +313,7 @@ public abstract class MoSbb extends MoCommonSbb {
 				}
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				if (this.logger.isInfoEnabled()) {
-					this.logger.info("\nSent ErrorComponent = " + errorMessage);
+					this.logger.info("Sent ErrorComponent = " + errorMessage);
 				}
 				if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                     if (sms != null) {
@@ -355,7 +355,7 @@ public abstract class MoSbb extends MoCommonSbb {
             try {
                 dialog.addMoForwardShortMessageResponse(evt.getInvokeId(), null, null);
                 if (this.logger.isFineEnabled()) {
-                    this.logger.fine("\nSent MoForwardShortMessageResponse = " + evt);
+                    this.logger.fine("Sent MoForwardShortMessageResponse = " + evt);
                 }
 
                 dialog.close(false);
@@ -410,7 +410,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 MAPErrorMessage errorMessage = this.mapProvider.getMAPErrorMessageFactory().createMAPErrorMessageFacilityNotSup(null, null, null);
                 dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
                 if (this.logger.isInfoEnabled()) {
-                    this.logger.info("\nSent ErrorComponent = " + errorMessage);
+                    this.logger.info("Sent ErrorComponent = " + errorMessage);
                 }
                 this.logger.warning("************* 0001");
 				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
@@ -496,7 +496,7 @@ public abstract class MoSbb extends MoCommonSbb {
 
                 dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				if (this.logger.isInfoEnabled()) {
-					this.logger.info("\nSent ErrorComponent = " + errorMessage);
+					this.logger.info("Sent ErrorComponent = " + errorMessage);
 				}
 				dialog.close(false);
 			} catch (Throwable e) {
@@ -531,7 +531,7 @@ public abstract class MoSbb extends MoCommonSbb {
             try {
                 dialog.addForwardShortMessageResponse(evt.getInvokeId());
                 if (this.logger.isFineEnabled()) {
-                    this.logger.fine("\nSent ForwardShortMessageResponse = " + evt);
+                    this.logger.fine("Sent ForwardShortMessageResponse = " + evt);
                 }
 
                 dialog.close(false);
@@ -558,7 +558,7 @@ public abstract class MoSbb extends MoCommonSbb {
 	 */
 	public void onMtForwardShortMessageRequest(MtForwardShortMessageRequest evt, ActivityContextInterface aci) {
 		if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nReceived MT_FORWARD_SHORT_MESSAGE_REQUEST = " + evt);
+			this.logger.fine("Received MT_FORWARD_SHORT_MESSAGE_REQUEST = " + evt);
 		}
 
 		this.setProcessingState(MoProcessingState.OtherDataRecieved);
@@ -570,7 +570,7 @@ public abstract class MoSbb extends MoCommonSbb {
                 MAPErrorMessage errorMessage = this.mapProvider.getMAPErrorMessageFactory().createMAPErrorMessageFacilityNotSup(null, null, null);
                 dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
                 if (this.logger.isInfoEnabled()) {
-                    this.logger.info("\nSent ErrorComponent = " + errorMessage);
+                    this.logger.info("Sent ErrorComponent = " + errorMessage);
                 }
 				if (smscPropertiesManagement.isGenerateRejectionCdr()) {
 					generateCDR(dialog.getNetworkId(), null, dialog.getLocalAddress(), CdrGenerator.CDR_SUBMIT_FAILED_HR,
@@ -628,7 +628,7 @@ public abstract class MoSbb extends MoCommonSbb {
 				}
 				dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
 				if (this.logger.isInfoEnabled()) {
-					this.logger.info("\nSent ErrorComponent = " + errorMessage);
+					this.logger.info("Sent ErrorComponent = " + errorMessage);
 				}
 				if (smscPropertiesManagement.isGenerateRejectionCdr() && !e1.isMessageRejectCdrCreated()) {
                     if (sms != null) {
@@ -668,7 +668,7 @@ public abstract class MoSbb extends MoCommonSbb {
             try {
                 dialog.addMtForwardShortMessageResponse(evt.getInvokeId(), null, null);
                 if (this.logger.isFineEnabled()) {
-                    this.logger.fine("\nSent MtForwardShortMessageResponse = " + evt);
+                    this.logger.fine("Sent MtForwardShortMessageResponse = " + evt);
                 }
 
                 dialog.close(false);
@@ -685,7 +685,7 @@ public abstract class MoSbb extends MoCommonSbb {
 	 * @param aci
 	 */
 	public void onMtForwardShortMessageResponse(MtForwardShortMessageResponse evt, ActivityContextInterface aci) {
-		this.logger.severe("\nReceived MT_FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
+		this.logger.severe("Received MT_FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
 
 	}
 

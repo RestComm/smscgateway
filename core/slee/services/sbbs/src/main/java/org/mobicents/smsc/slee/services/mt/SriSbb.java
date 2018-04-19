@@ -186,7 +186,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 
         try {
             if (this.logger.isFineEnabled()) {
-                this.logger.fine("\nReceived Submit SMS. event= " + event + "this=" + this);
+                this.logger.fine("Received Submit SMS. event= " + event + "this=" + this);
             }
             smscStatAggregator.updateMsgOutTryAll();
             smscStatAggregator.updateMsgOutTrySs7();
@@ -484,7 +484,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 	 */
 	public void onSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse evt, ActivityContextInterface aci) {
 		if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nReceived SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt + " Dialog=" + evt.getMAPDialog());
+			this.logger.fine("Received SEND_ROUTING_INFO_FOR_SM_RESPONSE = " + evt + " Dialog=" + evt.getMAPDialog());
 		}
 
 		if (evt.getMAPDialog().getApplicationContext().getApplicationContextVersion() == MAPApplicationContextVersion.version1
@@ -501,7 +501,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 
 	public void onInformServiceCentreRequest(InformServiceCentreRequest evt, ActivityContextInterface aci) {
 		if (this.logger.isInfoEnabled()) {
-			this.logger.info("\nReceived INFORM_SERVICE_CENTER_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
+			this.logger.info("Received INFORM_SERVICE_CENTER_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
 		}
 
 		InformServiceCenterContainer informServiceCenterContainer = new InformServiceCenterContainer();
@@ -574,7 +574,7 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
 		mapDialogSms.addSendRoutingInfoForSMRequest(isdn, sm_RP_PRI, serviceCenterAddress, null, false, null, null,
 				null);
 		if (this.logger.isInfoEnabled())
-			this.logger.info("\nSending: SendRoutingInfoForSMRequest: isdn=" + isdn + ", serviceCenterAddress="
+			this.logger.info("Sending: SendRoutingInfoForSMRequest: isdn=" + isdn + ", serviceCenterAddress="
 					+ serviceCenterAddress + ", sm_RP_PRI=" + sm_RP_PRI);
 
 		return mapDialogSms;

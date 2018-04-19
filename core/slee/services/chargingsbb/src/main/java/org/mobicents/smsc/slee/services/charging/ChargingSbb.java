@@ -472,7 +472,7 @@ public abstract class ChargingSbb implements Sbb {
 
             activity.sendEventRoCreditControlRequest(ccr);
             if (logger.isFineEnabled()) {
-                logger.fine("Sent INITIAL CCR: \n" + ccr);
+                logger.fine("Sent INITIAL CCR: " + ccr);
             }
 
             // set new timer for the case we will not get CCA in time

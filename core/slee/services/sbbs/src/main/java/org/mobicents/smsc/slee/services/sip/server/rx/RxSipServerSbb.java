@@ -171,7 +171,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
 
 		try {
 			if (this.logger.isFineEnabled()) {
-				this.logger.fine("\nReceived SIP SMS. event= " + event + "this=" + this);
+				this.logger.fine("Received SIP SMS. event= " + event + "this=" + this);
 			}
 
 			SmsSet smsSet = event.getSmsSet();
@@ -463,7 +463,7 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
 			clientTransaction.sendRequest();
 		} catch (Exception e) {
             throw new SmscProcessingException("RxSipServerSbb.sendMessage(): Exception while trying to send SIP Message ="
-                    + e.getMessage() + "\nMessage: " + sms, 0, 0, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
+                    + e.getMessage() + "Message: " + sms, 0, 0, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
 		}
 	}
 

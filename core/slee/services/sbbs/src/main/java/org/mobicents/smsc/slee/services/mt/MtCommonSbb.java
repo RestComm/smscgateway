@@ -204,7 +204,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         }
 
         if (this.logger.isInfoEnabled()) {
-            this.logger.info("\nRx :  onErrorComponent " + event + " targetId=" + smsSet.getTargetId() + ", Dialog="
+            this.logger.info("Rx :  onErrorComponent " + event + " targetId=" + smsSet.getTargetId() + ", Dialog="
                     + event.getMAPDialog());
         }
 	}
@@ -217,7 +217,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
             return;
         }
 
-        this.logger.severe("\nRx :  onRejectComponent targetId=" + smsSet.getTargetId() + ", " + event);
+        this.logger.severe("Rx :  onRejectComponent targetId=" + smsSet.getTargetId() + ", " + event);
 	}
 
 	protected String getRejectComponentReason(RejectComponent event) {
@@ -258,7 +258,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         }
 
 		if (logger.isWarningEnabled()) {
-			this.logger.warning("\nRx : onInvokeTimeout targetId=" + smsSet.getTargetId() + ", " + evt);
+			this.logger.warning("Rx : onInvokeTimeout targetId=" + smsSet.getTargetId() + ", " + evt);
 		}
 	}
 
@@ -274,7 +274,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         }
 
 		if (logger.isWarningEnabled()) {
-			this.logger.warning("\nRx : onDialogReject targetId=" + smsSet.getTargetId() + ", " + evt);
+			this.logger.warning("Rx : onDialogReject targetId=" + smsSet.getTargetId() + ", " + evt);
 		}
 	}
 
@@ -287,7 +287,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         }
 
 		if (logger.isWarningEnabled()) {
-			this.logger.warning("\nRx :  onDialogProviderAbort targetId=" + smsSet.getTargetId() + ", " + evt);
+			this.logger.warning("Rx :  onDialogProviderAbort targetId=" + smsSet.getTargetId() + ", " + evt);
 		}
 	}
 
@@ -300,7 +300,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         }
 
 		if (logger.isWarningEnabled()) {
-			this.logger.warning("\nRx :  onDialogUserAbort targetId=" + smsSet.getTargetId() + ", " + evt);
+			this.logger.warning("Rx :  onDialogUserAbort targetId=" + smsSet.getTargetId() + ", " + evt);
 		}
 	}
 
@@ -313,25 +313,25 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         }
 
 		if (logger.isWarningEnabled()) {
-			this.logger.warning("\nRx :  onDialogTimeout targetId=" + smsSet.getTargetId() + ", " + evt);
+			this.logger.warning("Rx :  onDialogTimeout targetId=" + smsSet.getTargetId() + ", " + evt);
 		}
 	}
 
 	public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogDelimiter " + evt);
+			this.logger.fine("Rx :  onDialogDelimiter " + evt);
 		}
 	}
 
 	public void onDialogAccept(DialogAccept evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogAccept=" + evt);
+			this.logger.fine("Rx :  onDialogAccept=" + evt);
 		}
 	}
 
 	public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogClose=" + evt);
+			this.logger.fine("Rx :  onDialogClose=" + evt);
 		}
 	}
 
@@ -344,19 +344,19 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         }
 
 		if (logger.isWarningEnabled()) {
-			this.logger.warning("\nRx :  onDialogNotice targetId=" + smsSet.getTargetId() + ", " + evt);
+			this.logger.warning("Rx :  onDialogNotice targetId=" + smsSet.getTargetId() + ", " + evt);
 		}
 	}
 
 	public void onDialogRequest(DialogRequest evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogRequest=" + evt);
+			this.logger.fine("Rx :  onDialogRequest=" + evt);
 		}
 	}
 
 	public void onDialogRelease(DialogRelease evt, ActivityContextInterface aci) {
 		if (logger.isInfoEnabled()) {
-			this.logger.info("\nRx :  DialogRelease=" + evt);
+			this.logger.info("Rx :  DialogRelease=" + evt);
 		}
 	}
 

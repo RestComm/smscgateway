@@ -215,7 +215,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         final TxSmppServerSbbUsage sbbu = getDefaultSbbUsageParameterSet();
         sbbu.incrementErrorRecoverablePduException(ONE);
         sbbu.sampleRecoverablePduException(0L);
-        logger.severe(String.format("\nonRecoverablePduException : RecoverablePduException=%s", event));
+        logger.severe(String.format("onRecoverablePduException : RecoverablePduException=%s", event));
         // TODO : Handle this
     }
 
@@ -246,7 +246,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         long timestampB = 0;
 
         if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived SUBMIT_SM = " + event + " from Esme name=" + esmeName);
+            this.logger.fine("Received SUBMIT_SM = " + event + " from Esme name=" + esmeName);
         }
 
         CheckMessageLimitResult cres = esme.onMessageReceived(1);
@@ -282,7 +282,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
-                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
+                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ". Response: "
                         + response + ".", e);
             }
 
@@ -350,7 +350,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 timestampB = System.currentTimeMillis();
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
-                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
+                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ". Response: "
                         + response + ".", e);
             }
 
@@ -408,7 +408,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                 }
             } catch (Exception e) {
                 anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
-                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
+                this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ". Response: "
                         + response + ".", e);
             }
 
@@ -428,7 +428,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
             }
         } catch (Throwable e) {
             anSbbUsage.incrementCounterErrorSubmitSmResponding(ONE);
-            this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ".\nResponse: "
+            this.logger.severe("Error while trying to send SubmitSmResponse. Message: " + e.getMessage() + ". Response: "
                     + response + ".", e);
         }
 
@@ -637,7 +637,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         String esmeName = esme.getName();
 
         if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived SUBMIT_MULTI = " + event + " from Esme name=" + esmeName);
+            this.logger.fine("Received SUBMIT_MULTI = " + event + " from Esme name=" + esmeName);
         }
 
         List<Address> addrList = event.getDestAddresses();
@@ -847,7 +847,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
         String esmeName = esme.getName();
 
         if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived DELIVER_SM = " + event + " from Esme name=" + esmeName);
+            this.logger.fine("Received DELIVER_SM = " + event + " from Esme name=" + esmeName);
         }
 
         CheckMessageLimitResult cres = esme.onMessageReceived(1);
@@ -1526,7 +1526,7 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
 
         sms0.setTimestampA(System.currentTimeMillis());
         if (logger.isInfoEnabled()) {
-            logger.info(String.format("\nReceived %s to ESME: %s, sms=%s", incomingMessageType.toString(), esme.getName(),
+            logger.info(String.format("Received %s to ESME: %s, sms=%s", incomingMessageType.toString(), esme.getName(),
                     sms0.toString()));
         }
 

@@ -102,15 +102,15 @@ public abstract class MoCommonSbb extends SubmitCommonSbb implements Sbb {
     // MAP Components Events
 
 	public void onInvokeTimeout(InvokeTimeout evt, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onInvokeTimeout" + evt);
+		this.logger.severe("Rx :  onInvokeTimeout" + evt);
 	}
 
 	public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onErrorComponent " + event + " Dialog=" + event.getMAPDialog());
+		this.logger.severe("Rx :  onErrorComponent " + event + " Dialog=" + event.getMAPDialog());
 	}
 
 	public void onRejectComponent(RejectComponent event, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onRejectComponent" + event);
+		this.logger.severe("Rx :  onRejectComponent" + event);
 	}
 
     // *********
@@ -118,55 +118,55 @@ public abstract class MoCommonSbb extends SubmitCommonSbb implements Sbb {
 
 	public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogDelimiter=" + evt);
+			this.logger.fine("Rx :  onDialogDelimiter=" + evt);
 		}
 	}
 
 	public void onDialogAccept(DialogAccept evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogAccept=" + evt);
+			this.logger.fine("Rx :  onDialogAccept=" + evt);
 		}
 	}
 
 	public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onDialogReject=" + evt);
+		this.logger.severe("Rx :  onDialogReject=" + evt);
 	}
 
 	public void onDialogUserAbort(DialogUserAbort evt, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onDialogUserAbort=" + evt);
+		this.logger.severe("Rx :  onDialogUserAbort=" + evt);
 	}
 
 	public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
-		this.logger.severe("\nRx :  onDialogProviderAbort=" + evt);
+		this.logger.severe("Rx :  onDialogProviderAbort=" + evt);
 	}
 
 	public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogClose" + evt);
+			this.logger.fine("Rx :  onDialogClose" + evt);
 		}
 	}
 
 	public void onDialogNotice(DialogNotice evt, ActivityContextInterface aci) {
 		if (logger.isWarningEnabled()) {
-			this.logger.warning("\nRx :  onDialogNotice" + evt);
+			this.logger.warning("Rx :  onDialogNotice" + evt);
 		}
 	}
 
 	public void onDialogTimeout(DialogTimeout evt, ActivityContextInterface aci) {
 		if (this.logger.isWarningEnabled()) {
-			this.logger.warning("\nRx :  onDialogTimeout" + evt);
+			this.logger.warning("Rx :  onDialogTimeout" + evt);
 		}
 	}
 
 	public void onDialogRequest(DialogRequest evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  onDialogRequest" + evt);
+			this.logger.fine("Rx :  onDialogRequest" + evt);
 		}
 	}
 
 	public void onDialogRelease(DialogRelease evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nRx :  DialogRelease" + evt);
+			this.logger.fine("Rx :  DialogRelease" + evt);
 		}
 	}
 

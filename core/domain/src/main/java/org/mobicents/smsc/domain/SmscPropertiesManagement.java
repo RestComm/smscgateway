@@ -1710,7 +1710,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         try {
             this.load();
         } catch (FileNotFoundException e) {
-            logger.warn(String.format("Failed to load the SMSC configuration file. \n%s", e.getMessage()));
+            logger.warn(String.format("Failed to load the SMSC configuration file. %s", e.getMessage()));
         }
 
     }

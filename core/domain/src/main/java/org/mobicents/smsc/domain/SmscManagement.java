@@ -357,7 +357,7 @@ public class SmscManagement implements SmscManagementMBean {
         try {
             this.load();
         } catch (FileNotFoundException e) {
-            logger.warn(String.format("Failed to load the SS7 configuration file. \n%s", e.getMessage()));
+            logger.warn(String.format("Failed to load the SS7 configuration file. %s", e.getMessage()));
         }
 
 		logger.warn("Started SmscManagemet " + name);

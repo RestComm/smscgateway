@@ -95,7 +95,7 @@ public class PersistenceRAInterfaceProxy extends DBOperations implements Persist
                 Metadata metadata = cluster.getMetadata();
 
                 for (Host host : metadata.getAllHosts()) {
-                    logger.info(String.format("Datacenter: %s; Host: %s; Rack: %s\n", host.getDatacenter(), host.getAddress(), host.getRack()));
+                    logger.info(String.format("Datacenter: %s; Host: %s; Rack: %s", host.getDatacenter(), host.getAddress(), host.getRack()));
                 }
 
                 Session session = cluster.connect();

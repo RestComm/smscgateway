@@ -214,7 +214,7 @@ public class HttpUsersManagement implements HttpUsersManagementMBean {
         try {
             this.load();
         } catch (FileNotFoundException e) {
-            logger.warn(String.format("Failed to load the HttpUser configuration file. \n%s", e.getMessage()));
+            logger.warn(String.format("Failed to load the HttpUser configuration file. %s", e.getMessage()));
         }
 
         for (FastList.Node<HttpUser> n = httpUsers.head(), end = httpUsers.tail(); (n = n.getNext()) != end;) {

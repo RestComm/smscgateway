@@ -645,7 +645,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 								mapDialogSms.addMtForwardShortMessageRequest(sm_RP_DA, sm_RP_OA, si,
 										moreMessagesToSend, null);
 								if (this.logger.isInfoEnabled()) {
-									this.logger.info("\nSending: MtForwardShortMessageRequest: sm_RP_DA=" + sm_RP_DA
+									this.logger.info("Sending: MtForwardShortMessageRequest: sm_RP_DA=" + sm_RP_DA
 											+ ", sm_RP_OA=" + sm_RP_OA + ", si=" + si + ", moreMessagesToSend="
 											+ moreMessagesToSend);
 								}
@@ -654,7 +654,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 							case version1:
 								mapDialogSms.addForwardShortMessageRequest(sm_RP_DA, sm_RP_OA, si, moreMessagesToSend);
 								if (this.logger.isInfoEnabled()) {
-									this.logger.info("\nSending: ForwardShortMessageRequest: sm_RP_DA=" + sm_RP_DA
+									this.logger.info("Sending: ForwardShortMessageRequest: sm_RP_DA=" + sm_RP_DA
 											+ ", sm_RP_OA=" + sm_RP_OA + ", si=" + si + ", moreMessagesToSend="
 											+ moreMessagesToSend);
 								}
@@ -720,7 +720,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	 * @param aci
 	 */
 	public void onForwardShortMessageRequest(ForwardShortMessageRequest evt, ActivityContextInterface aci) {
-		this.logger.severe("\nReceived FORWARD_SHORT_MESSAGE_REQUEST = " + evt);
+		this.logger.severe("Received FORWARD_SHORT_MESSAGE_REQUEST = " + evt);
 	}
 
 	/**
@@ -731,7 +731,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	 */
 	public void onForwardShortMessageResponse(ForwardShortMessageResponse evt, ActivityContextInterface aci) {
 		if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nReceived FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
+			this.logger.fine("Received FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
 		}
 		this.setResponseReceived(1);
 	}
@@ -743,7 +743,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	 * @param aci
 	 */
 	public void onMtForwardShortMessageRequest(MtForwardShortMessageRequest evt, ActivityContextInterface aci) {
-		this.logger.severe("\nReceived MT_FORWARD_SHORT_MESSAGE_REQUEST = " + evt);
+		this.logger.severe("Received MT_FORWARD_SHORT_MESSAGE_REQUEST = " + evt);
 	}
 
 	/**
@@ -754,7 +754,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 	 */
 	public void onMtForwardShortMessageResponse(MtForwardShortMessageResponse evt, ActivityContextInterface aci) {
 		if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nReceived MT_FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
+			this.logger.fine("Received MT_FORWARD_SHORT_MESSAGE_RESPONSE = " + evt);
 		}
 
 		this.setResponseReceived(1);
@@ -765,7 +765,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 
     public void setupMtForwardShortMessageRequest(ISDNAddressString networkNode, String imsiData, LMSI lmsi, int networkId) {
 	    if (this.logger.isFineEnabled()) {
-			this.logger.fine("\nmperforming setupMtForwardShortMessageRequest ISDNAddressString= " + networkNode);
+			this.logger.fine("mperforming setupMtForwardShortMessageRequest ISDNAddressString= " + networkNode);
 		}
 
         SmsSet smsSet = getSmsSet();
@@ -1218,7 +1218,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				invokeId = mapDialogSms.addMtForwardShortMessageRequest(sm_RP_DA, sm_RP_OA, smsSignalInfo,
 						moreMessagesToSend, null);
 				if (this.logger.isInfoEnabled()) {
-					this.logger.info("\nSending: MtForwardShortMessageRequest: sm_RP_DA=" + sm_RP_DA + ", sm_RP_OA="
+					this.logger.info("Sending: MtForwardShortMessageRequest: sm_RP_DA=" + sm_RP_DA + ", sm_RP_OA="
 							+ sm_RP_OA + ", si=" + smsSignalInfo + ", moreMessagesToSend=" + moreMessagesToSend);
 				}
 				break;
@@ -1227,7 +1227,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 				invokeId = mapDialogSms.addForwardShortMessageRequest(sm_RP_DA, sm_RP_OA, smsSignalInfo,
 						moreMessagesToSend);
 				if (this.logger.isInfoEnabled()) {
-					this.logger.info("\nSending: ForwardShortMessageRequest: sm_RP_DA=" + sm_RP_DA + ", sm_RP_OA="
+					this.logger.info("Sending: ForwardShortMessageRequest: sm_RP_DA=" + sm_RP_DA + ", sm_RP_OA="
 							+ sm_RP_OA + ", si=" + smsSignalInfo + ", moreMessagesToSend=" + moreMessagesToSend);
 				}
 				break;
@@ -1253,7 +1253,7 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
 		} catch (MAPException e) {
 			if (mapDialogSms != null)
 				mapDialogSms.release();
-            throw new SmscProcessingException("MAPException when sending MtForwardSM. \nSms=" + sms, -1, -1,
+            throw new SmscProcessingException("MAPException when sending MtForwardSM. Sms=" + sms, -1, -1,
                     SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e);
 		} catch (TlvConvertException e) {
 			if (mapDialogSms != null)

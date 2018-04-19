@@ -235,7 +235,7 @@ public class SipManagement implements SipManagementMBean {
 		try {
 			this.load();
 		} catch (FileNotFoundException e) {
-			logger.warn(String.format("Failed to load the SS7 configuration file. \n%s", e.getMessage()));
+			logger.warn(String.format("Failed to load the SS7 configuration file. %s", e.getMessage()));
 		}
 
 		for (FastList.Node<Sip> n = sips.head(), end = sips.tail(); (n = n.getNext()) != end;) {

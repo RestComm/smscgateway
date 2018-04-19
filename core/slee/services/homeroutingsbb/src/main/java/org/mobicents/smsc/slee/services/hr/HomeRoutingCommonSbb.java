@@ -118,18 +118,18 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
 	 */
 
 	public void onInvokeTimeout(InvokeTimeout evt, ActivityContextInterface aci) {
-		this.logger.severe("\nHome routing: Rx :  onInvokeTimeout" + evt);
+		this.logger.severe("Home routing: Rx :  onInvokeTimeout" + evt);
 	}
 
 	public void onErrorComponent(ErrorComponent event,
 			ActivityContextInterface aci) {
-		this.logger.severe("\nHome routing: Rx :  onErrorComponent " + event + " Dialog="
+		this.logger.severe("Home routing: Rx :  onErrorComponent " + event + " Dialog="
 				+ event.getMAPDialog());
 	}
 
 	public void onRejectComponent(RejectComponent event,
 			ActivityContextInterface aci) {
-		this.logger.severe("\nHome routing: Rx :  onRejectComponent" + event);
+		this.logger.severe("Home routing: Rx :  onRejectComponent" + event);
 	}
 
     protected String getRejectComponentReason(RejectComponent event) {
@@ -186,57 +186,57 @@ public abstract class HomeRoutingCommonSbb implements Sbb {
 	public void onDialogDelimiter(DialogDelimiter evt,
 			ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nHome routing: Rx :  onDialogDelimiter=" + evt);
+			this.logger.fine("Home routing: Rx :  onDialogDelimiter=" + evt);
 		}
 	}
 
 	public void onDialogAccept(DialogAccept evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nHome routing: Rx :  onDialogAccept=" + evt);
+			this.logger.fine("Home routing: Rx :  onDialogAccept=" + evt);
 		}
 	}
 
 	public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
-		this.logger.severe("\nHome routing: Rx :  onDialogReject=" + evt);
+		this.logger.severe("Home routing: Rx :  onDialogReject=" + evt);
 	}
 
 	public void onDialogUserAbort(DialogUserAbort evt,
 			ActivityContextInterface aci) {
-		this.logger.severe("\nHome routing: Rx :  onDialogUserAbort=" + evt);
+		this.logger.severe("Home routing: Rx :  onDialogUserAbort=" + evt);
 	}
 
 	public void onDialogProviderAbort(DialogProviderAbort evt,
 			ActivityContextInterface aci) {
-		this.logger.severe("\nHome routing: Rx :  onDialogProviderAbort=" + evt);
+		this.logger.severe("Home routing: Rx :  onDialogProviderAbort=" + evt);
 	}
 
 	public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nHome routing: Rx :  onDialogClose" + evt);
+			this.logger.fine("Home routing: Rx :  onDialogClose" + evt);
 		}
 	}
 
 	public void onDialogNotice(DialogNotice evt, ActivityContextInterface aci) {
 		if (logger.isWarningEnabled()) {
-			this.logger.warning("\nHome routing: Rx :  onDialogNotice" + evt);
+			this.logger.warning("Home routing: Rx :  onDialogNotice" + evt);
 		}
 	}
 
 	public void onDialogTimeout(DialogTimeout evt, ActivityContextInterface aci) {
 		if (this.logger.isWarningEnabled()) {
-			this.logger.warning("\nHome routing: Rx :  onDialogTimeout" + evt);
+			this.logger.warning("Home routing: Rx :  onDialogTimeout" + evt);
 		}
 	}
 
 	public void onDialogRequest(DialogRequest evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nHome routing: Rx :  onDialogRequest" + evt);
+			this.logger.fine("Home routing: Rx :  onDialogRequest" + evt);
 		}
 	}
 
 	public void onDialogRelease(DialogRelease evt, ActivityContextInterface aci) {
 		if (logger.isFineEnabled()) {
-			this.logger.fine("\nHome routing: Rx :  DialogRelease" + evt);
+			this.logger.fine("Home routing: Rx :  DialogRelease" + evt);
 		}
 	}
 

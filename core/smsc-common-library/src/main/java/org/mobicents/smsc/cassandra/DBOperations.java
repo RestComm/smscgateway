@@ -253,7 +253,7 @@ public class DBOperations {
             this.cluster = builder.build().init();
         } catch (Exception e) {
             logger.error(String.format(
-                    "Failure of connecting to cassandra database. : host=%s, port=%d. SMSC GW will work without database support\n",
+                    "Failure of connecting to cassandra database. : host=%s, port=%d. SMSC GW will work without database support",
                     hosts, port), e);
             this.started = true;
             return;
@@ -271,9 +271,9 @@ public class DBOperations {
         databaseAvailable = true;
 
         Metadata metadata = cluster.getMetadata();
-        logger.info(String.format("Connected to cluster: %s\n", metadata.getClusterName()));
+        logger.info(String.format("Connected to cluster: %s", metadata.getClusterName()));
         for (Host host : metadata.getAllHosts()) {
-            logger.info(String.format("Datacenter: %s; Host: %s; Rack: %s\n", host.getDatacenter(), host.getAddress(),
+            logger.info(String.format("Datacenter: %s; Host: %s; Rack: %s", host.getDatacenter(), host.getAddress(),
                     host.getRack()));
         }
         session = cluster.connect();
@@ -362,7 +362,7 @@ public class DBOperations {
         if (cluster != null && !cluster.isClosed()) {
             Metadata metadata = cluster.getMetadata();
             cluster.close();
-            logger.info(String.format("Disconnected from cluster: %s\n", metadata.getClusterName()));
+            logger.info(String.format("Disconnected from cluster: %s", metadata.getClusterName()));
         }
 
         this.started = false;

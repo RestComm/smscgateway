@@ -208,18 +208,18 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
     public void onErrorComponent(ErrorComponent event, ActivityContextInterface aci) {
         if (this.logger.isInfoEnabled()) {
-            this.logger.info("\nRx :  onErrorComponent after setupReportSMDeliveryStatusRequest " + event + " Dialog="
+            this.logger.info("Rx :  onErrorComponent after setupReportSMDeliveryStatusRequest " + event + " Dialog="
                     + event.getMAPDialog());
         }
     }
 
     public void onRejectComponent(RejectComponent event, ActivityContextInterface aci) {
-        this.logger.severe("\nRx :  onRejectComponent " + event);
+        this.logger.severe("Rx :  onRejectComponent " + event);
     }
 
     public void onInvokeTimeout(InvokeTimeout evt, ActivityContextInterface aci) {
         if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx : onInvokeTimeout " + evt);
+            this.logger.warning("Rx : onInvokeTimeout " + evt);
         }
     }   
 
@@ -228,55 +228,55 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
     public void onDialogReject(DialogReject evt, ActivityContextInterface aci) {
         if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx : onDialogReject " + evt);
+            this.logger.warning("Rx : onDialogReject " + evt);
         }
     }
 
     public void onDialogProviderAbort(DialogProviderAbort evt, ActivityContextInterface aci) {
         if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx :  onDialogProviderAbort " + evt);
+            this.logger.warning("Rx :  onDialogProviderAbort " + evt);
         }
     }
 
     public void onDialogUserAbort(DialogUserAbort evt, ActivityContextInterface aci) {
         if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx :  onDialogUserAbort " + evt);
+            this.logger.warning("Rx :  onDialogUserAbort " + evt);
         }
     }
 
     public void onDialogTimeout(DialogTimeout evt, ActivityContextInterface aci) {
         if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx :  onDialogTimeout " + evt);
+            this.logger.warning("Rx :  onDialogTimeout " + evt);
         }
     }
 
     public void onDialogDelimiter(DialogDelimiter evt, ActivityContextInterface aci) {
         if (logger.isFineEnabled()) {
-            this.logger.fine("\nRx :  onDialogDelimiter " + evt);
+            this.logger.fine("Rx :  onDialogDelimiter " + evt);
         }
     }
 
     public void onDialogAccept(DialogAccept evt, ActivityContextInterface aci) {
         if (logger.isFineEnabled()) {
-            this.logger.fine("\nRx :  onDialogAccept=" + evt);
+            this.logger.fine("Rx :  onDialogAccept=" + evt);
         }
     }
 
     public void onDialogClose(DialogClose evt, ActivityContextInterface aci) {
         if (logger.isFineEnabled()) {
-            this.logger.fine("\nRx :  onDialogClose=" + evt);
+            this.logger.fine("Rx :  onDialogClose=" + evt);
         }
     }
 
     public void onDialogNotice(DialogNotice evt, ActivityContextInterface aci) {
         if (logger.isWarningEnabled()) {
-            this.logger.warning("\nRx :  onDialogNotice " + evt);
+            this.logger.warning("Rx :  onDialogNotice " + evt);
         }
     }
 
     public void onDialogRelease(DialogRelease evt, ActivityContextInterface aci) {
         if (logger.isInfoEnabled()) {
-            this.logger.info("\nRx :  DialogRelease=" + evt);
+            this.logger.info("Rx :  DialogRelease=" + evt);
         }
     }
 
@@ -285,7 +285,7 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
     public void onReportSMDeliveryStatusResponse(ReportSMDeliveryStatusResponse evt, ActivityContextInterface aci) {
         if (this.logger.isFineEnabled()) {
-            this.logger.fine("\nReceived REPORT_SM_DELIVERY_STATUS_RESPONSE = " + evt);
+            this.logger.fine("Received REPORT_SM_DELIVERY_STATUS_RESPONSE = " + evt);
         }
 
         // TODO:
@@ -307,7 +307,7 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 //                }
 //            } catch (PersistenceException e1) {
 //                this.logger.severe(
-//                        "\nPersistenceException when setAlertingSupported() in onSendRoutingInfoForSMResponse(): "
+//                        "PersistenceException when setAlertingSupported() in onSendRoutingInfoForSMResponse(): "
 //                                + e1.getMessage(), e1);
 //            }
 //        }
@@ -320,7 +320,7 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
             SMDeliveryOutcome smDeliveryOutcome, SccpAddress destAddress, MAPApplicationContext mapApplicationContext,
             String targetId, int networkId, String mtLocalSccpGt) {
         if (this.logger.isInfoEnabled()) {
-            this.logger.info("\nReceived setupReportSMDeliveryStatus request msisdn= " + msisdn
+            this.logger.info("Received setupReportSMDeliveryStatus request msisdn= " + msisdn
                     + ", serviceCentreAddress=" + serviceCentreAddress + ", sMDeliveryOutcome=" + smDeliveryOutcome
                     + ", mapApplicationContext=" + mapApplicationContext);
         }
@@ -349,7 +349,7 @@ public abstract class RsdsSbb implements Sbb, ReportSMDeliveryStatusInterface {
 
             if (this.logger.isInfoEnabled())
                 this.logger
-                        .info("\nSending: ReportSMDeliveryStatusRequest: msisdn=" + msisdn + ", serviceCenterAddress="
+                        .info("Sending: ReportSMDeliveryStatusRequest: msisdn=" + msisdn + ", serviceCenterAddress="
                                 + serviceCentreAddress + ", smDeliveryOutcome=" + smDeliveryOutcome);
 
             mapDialogSms.send();

@@ -302,7 +302,7 @@ public class MProcManagement implements MProcManagementMBean {
                 MProcRule rule = n.getValue();
                 if (rule.isForPostArrivalState() && rule.matchesPostArrival(message)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("MRule matches at Arrival phase to a message:\nrule: " + rule + "\nmessage: " + sms);
+                        logger.debug("MRule matches at Arrival phase to a message: rule: " + rule + "message: " + sms);
                     }
                     pap.setRuleIdInProcessing(rule.getId());
                     rule.onPostArrival(anMProcRuleRa, pap, message);
@@ -356,7 +356,7 @@ public class MProcManagement implements MProcManagementMBean {
                 MProcRule rule = n.getValue();
                 if (rule.isForPostHrSriState() && rule.matchesPostHrSri(message)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("MRule matches at HrSri phase to a message:\nrule: " + rule + "\ncorrelationIdValue: "
+                        logger.debug("MRule matches at HrSri phase to a message: rule: " + rule + "correlationIdValue: "
                                 + correlationIdValue);
                     }
 
@@ -392,7 +392,7 @@ public class MProcManagement implements MProcManagementMBean {
                 MProcRule rule = n.getValue();
                 if (rule.isForPostPreDeliveryState() && rule.matchesPostPreDelivery(message)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("MRule matches at PreDelivery phase to a message:\nrule: " + rule + "\nmessage: " + sms);
+                        logger.debug("MRule matches at PreDelivery phase to a message: rule: " + rule + "message: " + sms);
                     }
                     rule.onPostPreDelivery(anMProcRuleRa, pap, message);
                 }
@@ -438,7 +438,7 @@ public class MProcManagement implements MProcManagementMBean {
                 MProcRule rule = n.getValue();
                 if (rule.isForPostImsiRequestState() && rule.matchesPostImsiRequest(message)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("MRule matches at ImsiRequest phase to a message:\nrule: " + rule + "\nmessage: " + sms);
+                        logger.debug("MRule matches at ImsiRequest phase to a message: rule: " + rule + "message: " + sms);
                     }
                     rule.onPostImsiRequest(anMProcRuleRa, pap, message);
                 }
@@ -478,7 +478,7 @@ public class MProcManagement implements MProcManagementMBean {
                 MProcRule rule = n.getValue();
                 if (rule.isForPostDeliveryState() && rule.matchesPostDelivery(message)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("MRule matches at Delivery phase to a message:\nrule: " + rule + "\nmessage: " + sms);
+                        logger.debug("MRule matches at Delivery phase to a message: rule: " + rule + "message: " + sms);
                     }
                     rule.onPostDelivery(anMProcRuleRa, pap, message);
                 }
@@ -523,7 +523,7 @@ public class MProcManagement implements MProcManagementMBean {
                 MProcRule rule = n.getValue();
                 if (rule.isForPostDeliveryTempFailureState() && rule.matchesPostDeliveryTempFailure(message)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("MRule matches at DeliveryTempFailure phase to a message:\nrule: " + rule + "\nmessage: " + sms);
+                        logger.debug("MRule matches at DeliveryTempFailure phase to a message: rule: " + rule + "message: " + sms);
                     }
                     rule.onPostDeliveryTempFailure(anMProcRuleRa, pap, message);
                 }
@@ -607,7 +607,7 @@ public class MProcManagement implements MProcManagementMBean {
         try {
             this.load();
         } catch (FileNotFoundException e) {
-            logger.warn(String.format("Failed to load the ProcRule configuration file. \n%s", e.getMessage()));
+            logger.warn(String.format("Failed to load the ProcRule configuration file. %s", e.getMessage()));
         }
 
         this.resortRules(this.mprocs);

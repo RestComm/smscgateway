@@ -407,7 +407,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
             ActivityContextInterface aci) {
         logger.fine("sendMessage");
         if (logger.isFineEnabled()) {
-            logger.fine("\nReceived sendMessage = " + incomingData);
+            logger.fine("Received sendMessage = " + incomingData);
         }
         HttpSendMessageOutgoingData outgoingData = new HttpSendMessageOutgoingData();
         outgoingData.setStatus(Status.ERROR);
@@ -550,7 +550,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
     private void getMessageIdStatus(HttpServletRequestEvent event, HttpGetMessageIdStatusIncomingData incomingData,
             ActivityContextInterface aci) throws HttpApiException {
         if (logger.isFineEnabled()) {
-            logger.fine("\nReceived getMessageIdStatus = " + incomingData);
+            logger.fine("Received getMessageIdStatus = " + incomingData);
         }
         final Long messageId = incomingData.getMsgId();
         QuerySmResponse querySmResponse = null;
@@ -772,7 +772,7 @@ public abstract class TxHttpServerSbb extends SubmitCommonSbb implements Sbb {
     private void processSms(Sms sms0, PersistenceRAInterface store, HttpSendMessageIncomingData eventSubmitMulti)
             throws SmscProcessingException {
         if (logger.isInfoEnabled()) {
-            logger.info(String.format("\nReceived sms=%s", sms0.toString()));
+            logger.info(String.format("Received sms=%s", sms0.toString()));
         }
 
         this.checkSmscState(sms0, smscCongestionControl, SubmitCommonSbb.MaxActivityCountFactor.factor_12);

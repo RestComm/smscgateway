@@ -63,7 +63,7 @@ public class PersistenceProxy extends DBOperations {
             Metadata metadata = cluster.getMetadata();
 
             for (Host host : metadata.getAllHosts()) {
-                logger.info(String.format("Datacenter: %s; Host: %s; Rack: %s\n", host.getDatacenter(), host.getAddress(), host.getRack()));
+                logger.info(String.format("Datacenter: %s; Host: %s; Rack: %s", host.getDatacenter(), host.getAddress(), host.getRack()));
             }
 
             Session session = cluster.connect();

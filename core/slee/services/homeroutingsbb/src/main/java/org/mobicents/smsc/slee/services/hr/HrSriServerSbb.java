@@ -156,7 +156,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
      */
     public void onSendRoutingInfoForSMRequest(SendRoutingInfoForSMRequest evt, ActivityContextInterface aci) {
         if (this.logger.isInfoEnabled()) {
-            this.logger.info("\nHome routing: HrSriServerSbb: Received SEND_ROUTING_INFO_FOR_SM_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
+            this.logger.info("Home routing: HrSriServerSbb: Received SEND_ROUTING_INFO_FOR_SM_REQUEST = " + evt + " Dialog=" + evt.getMAPDialog());
         }
 
         this.setInvokeId(evt.getInvokeId());
@@ -177,7 +177,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
                 MAPErrorMessage errorMessage = this.mapProvider.getMAPErrorMessageFactory().createMAPErrorMessageFacilityNotSup(null, null, null);
                 dialog.sendErrorComponent(evt.getInvokeId(), errorMessage);
                 if (this.logger.isInfoEnabled()) {
-                    this.logger.info("\nHome routing: Sent ErrorComponent = " + errorMessage);
+                    this.logger.info("Home routing: Sent ErrorComponent = " + errorMessage);
                 }
                 if (smscPropertiesManagement.isGenerateRejectionCdr()) {
                     generateCDR(dialog.getNetworkId(), CdrGenerator.CDR_SUBMIT_FAILED_HR, errorMessage.toString(), true);
@@ -416,7 +416,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
         StringBuilder sb = new StringBuilder();
         sb.append("Home routing: negative SRI response from HLR: transaction: ");
         sb.append(correlationIdValue);
-        sb.append(",\n cause=");
+        sb.append(", cause=");
         sb.append(cause);
         if (this.logger.isInfoEnabled())
             this.logger.info(sb.toString());
