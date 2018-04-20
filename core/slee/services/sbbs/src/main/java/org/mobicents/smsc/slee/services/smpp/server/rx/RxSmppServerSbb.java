@@ -330,7 +330,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private void onDeliverSmLocal(final RxSmppServerSbbUsage anSbbUsage, final SmsSetEvent event) {
         try {
             if (this.logger.isFineEnabled()) {
-                this.logger.fine("\nReceived Deliver SMS. event= " + event + "this=" + this);
+                this.logger.fine("Received Deliver SMS. event= " + event + "this=" + this);
             }
 
             SmsSet smsSet = event.getSmsSet();
@@ -369,7 +369,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             anSbbUsage.incrementCounterErrorSubmitSmRespParent(ONE);
             SmsSet smsSet = this.getSmsSet();
             logger.severe("Exception in RxSmppServerSbb.onDeliverSmResp() when fetching records and issuing events: "
-                    + e1.getMessage() + "\nsmsSet=" + smsSet, e1);
+                    + e1.getMessage() + "smsSet=" + smsSet, e1);
             if (smsSet != null) {
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
                         "Internal error - Exception in processing: " + event.getSequenceNumber() + ", SmsSet=" + smsSet,
@@ -383,7 +383,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
     private void onDeliverSmRespParentLocal(final RxSmppServerSbbUsage anSbbUsage, final DeliverSmResp event) {
         try {
             if (logger.isFineEnabled()) {
-                logger.fine(String.format("\nonDeliverSmResp : DeliverSmResp=%s", event));
+                logger.fine(String.format("onDeliverSmResp : DeliverSmResp=%s", event));
             }
 
             this.handleResponse(event);
@@ -391,7 +391,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             anSbbUsage.incrementCounterErrorDeliverSmRespParent(ONE);
             SmsSet smsSet = this.getSmsSet();
             logger.severe("Exception in RxSmppServerSbb.onDeliverSmResp() when fetching records and issuing events: "
-                    + e1.getMessage() + "\nsmsSet=" + smsSet, e1);
+                    + e1.getMessage() + "smsSet=" + smsSet, e1);
             if (smsSet != null) {
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
                         "Internal error - Exception in processing: " + event.getSequenceNumber() + ", SmsSet=" + smsSet,
@@ -447,7 +447,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             }
 
             logger.severe(String.format(
-                    "\nonRecoverablePduException : targetId=" + smsSet.getTargetId() + ", RecoverablePduException=" + event));
+                    "onRecoverablePduException : targetId=" + smsSet.getTargetId() + ", RecoverablePduException=" + event));
 
             this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, "RecoverablePduException: ",
                     EventType.OUT_SMPP_ERROR, event.getPartialPdu().getSequenceNumber());
@@ -651,7 +651,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             EsmeManagement esmeManagement = EsmeManagement.getInstance();
             Esme esme = esmeManagement.getEsmeByClusterName(smsSet.getDestClusterName());
             if (esme == null) {
-                String s = "\nRxSmppServerSbb.sendDeliverSm(): Received DELIVER_SM SmsEvent but no Esme found for destClusterName: "
+                String s = "RxSmppServerSbb.sendDeliverSm(): Received DELIVER_SM SmsEvent but no Esme found for destClusterName: "
                         + smsSet.getDestClusterName() + ", smsSet=" + smsSet;
                 logger.warning(s);
                 this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s,
@@ -787,7 +787,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         }
 
                         if (logger.isInfoEnabled()) {
-                            logger.info(String.format("\nSent submitSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
+                            logger.info(String.format("Sent submitSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                     esme.getName(), poolIndex, sms.toString()));
                         }
                         if (segmentIndex == 0) {
@@ -856,7 +856,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
                         }
 
                         if (logger.isInfoEnabled()) {
-                            logger.info(String.format("\nSent deliverSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
+                            logger.info(String.format("Sent deliverSm to ESME: %s, msgNumInSendingPool: %d, sms=%s",
                                     esme.getName(), poolIndex, sms.toString()));
                         }
                         if (segmentIndex == 0) {
@@ -905,7 +905,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
         } catch (Throwable e) {
             throw new SmscProcessingException(
                     "RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
-                            + e.getMessage() + "\nsmsSet: " + smsSet,
+                            + e.getMessage() + "smsSet: " + smsSet,
                     0, 0, SmscProcessingException.HTTP_ERROR_CODE_NOT_SET, null, e,
                     SmscProcessingException.INTERNAL_ERROR_SEND_DELIVER_SM_000008);
         }
@@ -925,7 +925,7 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             return result;
         } catch (Throwable e) {
             String s = "SmscProcessingException when sending initial sendDeliverSm()=RxSmppServerSbb.sendDeliverSm(): Exception while trying to send DELIVERY Report for received SmsEvent="
-                    + e.getMessage() + "\nsmsSet: " + smsSet + ", smsSet=" + smsSet;
+                    + e.getMessage() + "smsSet: " + smsSet + ", smsSet=" + smsSet;
             logger.severe(s, e);
             this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, s, EventType.OUT_SMPP_ERROR,
                     currItem.getPduRequest().getSequenceNumber());
