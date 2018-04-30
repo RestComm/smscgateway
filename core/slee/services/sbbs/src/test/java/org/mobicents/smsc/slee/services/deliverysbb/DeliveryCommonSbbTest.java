@@ -30,7 +30,6 @@ import static org.testng.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import javax.slee.ActivityContextInterface;
@@ -56,8 +55,6 @@ import org.restcomm.smpp.GenerateType;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.cloudhopper.smpp.pdu.PduRequest;
 
 /**
 *

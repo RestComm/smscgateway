@@ -34,7 +34,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1533,25 +1532,20 @@ public class DBOperations {
                     if (smsSet2 != null) {
                         if (smsSet2.getLastUpdateTime().after(timeOutDate)) {
                             smsSet2.addSmsSet(smsSet);
-                            // for (int i1 = 0; i1 < smsSet.getSmsCount(); i1++) {
-                            // Sms smsx = smsSet.getSms(i1);
-                            // if (!smsSet2.checkSmsPresent(smsx)) {
-                            // smsSet2.addSmsSet(smsx);
-                            // }
-                            // }
                         } else {
                             logger.warn("Timeout of SmsSet in ProcessingSmsSet: targetId=" + smsSet2.getTargetId()
                                     + ", messageCount=" + smsSet2.getSmsCount());
                             smsSet2 = smsSet;
                             SmsSetCache.getInstance().addProcessingSmsSet(smsSet2.getTargetId(), smsSet2,
                                     processingSmsSetTimeout);
+                            res2.add(smsSet2);
                         }
                     } else {
                         smsSet2 = smsSet;
                         SmsSetCache.getInstance().addProcessingSmsSet(smsSet2.getTargetId(), smsSet2, processingSmsSetTimeout);
+                        res2.add(smsSet2);
                     }
                 }
-                res2.add(smsSet2);
             } finally {
                 SmsSetCache.getInstance().removeSmsSet(lock);
             }

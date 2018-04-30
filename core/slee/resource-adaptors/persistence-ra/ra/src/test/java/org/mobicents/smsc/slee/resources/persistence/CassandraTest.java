@@ -331,7 +331,7 @@ public class CassandraTest {
 
         this.readAlertMessage();
 
-        SmsSet smsSet = this.readDueSlotMessage(dueSlot, 1);
+        SmsSet smsSet = this.readDueSlotMessage(dueSlot, 1, 1);
 
         String[] remoteMessageId = new String[3];
         long l1 = 10000000;
@@ -345,16 +345,16 @@ public class CassandraTest {
 
         this.addingNewMessages2(dueSlot + 1);
 
-        smsSet = this.readDueSlotMessage(dueSlot + 1, 2);
+        smsSet = this.readDueSlotMessage(dueSlot + 1, 2, 0);
 
         SmsSetCache.getInstance().clearProcessingSmsSet();
-        smsSet = this.readDueSlotMessage(dueSlot, 1);
+        smsSet = this.readDueSlotMessage(dueSlot, 1, 1);
         Sms sms = smsSet.getSms(0);
         assertFalse(smsSet.isAlertingSupported());
         sbb.c2_updateAlertingSupport(sms.getDueSlot(), sms.getSmsSet().getTargetId(), sms.getDbId());
 
         SmsSetCache.getInstance().clearProcessingSmsSet();
-        smsSet = this.readDueSlotMessage(dueSlot, 1);
+        smsSet = this.readDueSlotMessage(dueSlot, 1, 1);
         assertTrue(smsSet.isAlertingSupported());
 
     }
@@ -390,19 +390,19 @@ public class CassandraTest {
         TargetAddress ta = new TargetAddress(1, 1, "1111", 9);
 
         // GSM7 + UDH
-        this.testOldFormatMessage(ta, dcsGsm7, "Test eng", udh);
+        this.testOldFormatMessage(ta, dcsGsm7, "Test eng", udh, 1);
 
         // GSM7
-        this.testOldFormatMessage(ta, dcsGsm7, "Test eng", null);
+        this.testOldFormatMessage(ta, dcsGsm7, "Test eng", null, 0);
 
         // UCS2 + UDH
-        this.testOldFormatMessage(ta, dcsUcs2, "Test rus привет", udh);
+        this.testOldFormatMessage(ta, dcsUcs2, "Test rus привет", udh, 0);
 
         // UCS2
-        this.testOldFormatMessage(ta, dcsUcs2, "Test rus привет", null);
+        this.testOldFormatMessage(ta, dcsUcs2, "Test rus привет", null, 0);
 
         // GSM8
-        this.testOldFormatMessage(ta, dcsGsm8, null, udh);
+        this.testOldFormatMessage(ta, dcsGsm8, null, udh, 0);
     }
 
     @Test(groups = { "cassandra" })
@@ -444,31 +444,8 @@ public class CassandraTest {
 //        sbb.c2_deleteArchiveTablesForDate(dt);
     }
 
-//    @Test(groups = { "cassandra" })
-//    public void testingColumnAdding() throws Exception {
-//        if (!this.cassandraDbInited)
-//            return;
-//
-//        Date dt0 = new Date();
-//        Date dt = new Date(dt0.getTime() - 10 * 24 * 3600 * 1000);
-//        sbb.c2_deleteLiveTablesForDate(dt);
-//        sbb.c2_deleteArchiveTablesForDate(dt);
-//
-//        PreparedStatementCollection_C3 psc = sbb.getStatementCollection(dt);
-//        long newDueSlot = sbb.c2_getDueSlotForTime(dt);
-//        sbb.c2_updateDueSlotForTargetId("222222_1_11", newDueSlot);
-//
-//        String[] ss = sbb.getLiveTableListAsNames(sbb.getKeyspaceName());
-//        String s = ss[0];
-//        boolean res = sbb.checkFieldInTable(s, "extra_col");
-//        assertFalse(res);
-//        sbb.addFieldsToLiveTables(sbb.getKeyspaceName(), "extra_col", "text");
-//
-//        res = sbb.checkFieldInTable(s, "extra_col");
-//        assertTrue(res);
-//    }
-
-    public void testOldFormatMessage(TargetAddress ta, DataCodingScheme dcs, String msg, UserDataHeader udh) throws Exception {
+    @Test(groups = { "cassandra" })
+    public void testOldFormatMessage(TargetAddress ta, DataCodingScheme dcs, String msg, UserDataHeader udh, int size) throws Exception {
         Date dt = new Date();
         PreparedStatementCollection psc = sbb.getStatementCollection(dt);
 
@@ -534,8 +511,14 @@ public class CassandraTest {
                     sbb.c2_unregisterDueSlotWriting(dueSlot);
                 }
 
-                assertEquals(lst.size(), 1);
-                SmsSet smsSet = lst.get(0);
+                assertEquals(lst.size(), size);
+                SmsSet smsSet;
+                if (size == 0) {
+                    // messages are not in res because smsSet is already in processing
+                    smsSet = SmsSetCache.getInstance().getProcessingSmsSet(ta.getTargetId());
+                } else {
+                    smsSet = lst.get(0);
+                }
                 assertEquals(smsSet.getNetworkId(), 9);
                 assertEquals(sms.getOrigNetworkId(), 49);
                 for (Sms sms1 : smsSet.getRawListLastSegment()) {
@@ -557,22 +540,6 @@ public class CassandraTest {
             this.sbb.obtainSynchroObject(lock);
         }
     }
-
-//    @Test(groups = { "cassandra" })
-//    public void testingCorrelationId() throws Exception {
-//
-//        if (!this.cassandraDbInited)
-//            return;
-//
-//        NextCorrelationIdResult s1 = sbb.c2_getNextCorrelationId("1111");
-//        assertEquals(s1.getCorrelationId(), "222000000001001");
-//        assertNull(s1.getSmscAddress());
-//
-//        NextCorrelationIdResult s2 = sbb.c2_getNextCorrelationId("3333");
-//        assertEquals(s2.getCorrelationId(), "444444444444402");
-//        assertEquals(s2.getSmscAddress(), "00001");
-//
-//    }
 
     public long addingNewMessages() throws Exception {
         Date dt = new Date();
@@ -691,7 +658,7 @@ public class CassandraTest {
         }
     }
 
-    public SmsSet readDueSlotMessage(long dueSlot, int opt) throws Exception {
+    public SmsSet readDueSlotMessage(long dueSlot, int opt, int resSize) throws Exception {
         // reading dueSlot
         TargetAddress lock = this.sbb.obtainSynchroObject(ta2);
         try {
@@ -705,8 +672,14 @@ public class CassandraTest {
                     sbb.c2_unregisterDueSlotWriting(dueSlot);
                 }
 
-                assertEquals(lst.size(), 1);
-                SmsSet smsSet = lst.get(0);
+                assertEquals(lst.size(), resSize);
+                SmsSet smsSet;
+                if (resSize == 0) {
+                    // messages are not in res because smsSet is already in processing
+                    smsSet = SmsSetCache.getInstance().getProcessingSmsSet(ta1.getTargetId());
+                } else {
+                    smsSet = lst.get(0);
+                }
                 if (opt == 1) {
                     assertEquals(smsSet.getSmsCount(), 3);
 

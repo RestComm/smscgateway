@@ -249,4 +249,27 @@ public class RETest {
         submitDate = new Date();
         timeZone = submitDate.getTimezoneOffset();
     }
+    
+    public byte[] dataB = new byte[] { 0x20, (byte) 0xac, 
+            0x00, 0x20, 0x00, 0x39, 0x00, 0x20, 0x00, 0x78, 0x00, 0x40, 0x00, 0x68, 0x00,
+            0x6f, 0x00, 0x73, 0x00, 0x74, 0x00, 0x2e, 0x00, 0x63, 0x00, 0x6f, 0x00, 0x6d };
+    public byte[] dataB1 = new byte[] { 0x20, (byte) 0xef, (byte) 0xbf, (byte) 0xbd, 
+            0x00, 0x20, 0x00, 0x39, 0x00, 0x20, 0x00, 0x78, 0x00, 0x40, 0x00, 0x68, 0x00,
+            0x6f, 0x00, 0x73, 0x00, 0x74, 0x00, 0x2e, 0x00, 0x63, 0x00, 0x6f, 0x00, 0x6d };
+    // 0000   20 ef bf bd 
+    //        00 20 00 39 00 20 00 78 00 40 00 68
+    // 0010   00 6f 00 73 00 74 00 2e 00 63 00 6f 00 6d
+    public String dataS = "ˆ 9 x@host.com";
+
+    @Test(groups = { "TimeZone" })
+    public void testEncoding() {
+        Charset ucs2Charset = Charset.forName("UTF-16BE");
+
+        byte[] res1 = dataS.getBytes(ucs2Charset);
+        // 32, -84, 0, 32, 0, 57, 0, 32, 0, 120, 0, 64, 0, 104, 0, 111, 0, 115, 0, 116, 0, 46, 0, 99, 0, 111, 0, 109
+
+        String x1 = new String(dataB, ucs2Charset);
+        String x12 = new String(dataB1, ucs2Charset);
+    }
+
 }
