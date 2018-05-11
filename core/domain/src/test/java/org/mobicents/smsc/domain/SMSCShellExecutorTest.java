@@ -22,17 +22,21 @@
 
 package org.mobicents.smsc.domain;
 
-import static org.testng.Assert.*;
-
-import javax.slee.facilities.FacilityException;
-import javax.slee.facilities.TraceLevel;
-
-import org.mobicents.smsc.domain.SMSCShellExecutor;
 import org.mobicents.smsc.mproc.OrigType;
 import org.mobicents.smsc.mproc.impl.MProcRuleDefaultImpl;
 import org.mobicents.smsc.mproc.impl.MProcRuleFactoryDefault;
 import org.restcomm.smpp.SmppManagement;
 import org.testng.annotations.Test;
+
+import javax.slee.facilities.FacilityException;
+import javax.slee.facilities.TraceLevel;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  *
@@ -40,6 +44,137 @@ import org.testng.annotations.Test;
  *
  */
 public class SMSCShellExecutorTest {
+
+    private static final String EXPECTED_GET_PROPERTIES_LIST = "scgt = networkId=0 - GT=0\n" +
+            "scssn = -1\n" +
+            "hlrssn = -1\n" +
+            "mscssn = -1\n" +
+            "maxmapv = 3\n" +
+            "gti = 0100\n" +
+            "tt = 0\n" +
+            "defaultvalidityperiodhours = 72\n" +
+            "maxvalidityperiodhours = 240\n" +
+            "defaultton = 1\n" +
+            "defaultnpi = 1\n" +
+            "subscriberbusyduedelay = 120\n" +
+            "firstduedelay = 20\n" +
+            "secondduedelay = 300\n" +
+            "maxduedelay = 86400\n" +
+            "duedelaymultiplicator = 200\n" +
+            "maxmessagelengthreducer = 6\n" +
+            "smppencodingforgsm7 = Utf8\n" +
+            "smppencodingforucs2 = Utf8\n" +
+            "dbhosts = 127.0.0.1\n" +
+            "dbport = 9042\n" +
+            "keyspaceName = RestCommSMSC\n" +
+            "clustername = RestCommSMSC\n" +
+            "fetchperiod = 200\n" +
+            "fetchmaxrows = 100\n" +
+            "maxactivitycount = 500\n" +
+            "deliverytimeout = 120\n" +
+            "deliverytimeoutdeltapermessage = 1\n" +
+            "vpprolong = 120\n" +
+            "esmedefaultcluster = null\n" +
+            "correlationidlivetime = 60\n" +
+            "sriresponselivetime = 0\n" +
+            "revisesecondsonsmscstart = 60\n" +
+            "processingsmssettimeout = 600\n" +
+            "generatereceiptcdr = false\n" +
+            "generatetempfailurecdr = true\n" +
+            "calculatemsgpartslencdr = false\n" +
+            "delayparametersincdr = false\n" +
+            "receiptsdisabling = false\n" +
+            "enableintermediatereceipts = false\n" +
+            "incomereceiptsprocessing = false\n" +
+            "orignetworkidforreceipts = false\n" +
+            "generatecdr = 7\n" +
+            "generatearchivetable = 7\n" +
+            "storeandforwordmode = fast\n" +
+            "mocharging = accept\n" +
+            "hrcharging = accept\n" +
+            "txsmppcharging = None\n" +
+            "txsipcharging = None\n" +
+            "txhttpcharging = accept\n" +
+            "diameterdestrealm = telestax.com\n" +
+            "diameterdesthost = 127.0.0.1\n" +
+            "diameterdestport = 3868\n" +
+            "diameterusername = \n" +
+            "removinglivetablesdays = 3\n" +
+            "removingarchivetablesdays = 3\n" +
+            "hrhlrnumber = networkId=0 - hrhlrnumber=\n" +
+            "hrsribypass = networkId=0 - hrsribypass=false\n" +
+            "nationallanguagesingleshift = 0\n" +
+            "nationallanguagelockingshift = 0\n" +
+            "httpdefaultsourceton = -2\n" +
+            "httpdefaultsourcenpi = -2\n" +
+            "httpdefaultdestton = 1\n" +
+            "httpdefaultdestnpi = 1\n" +
+            "httpdefaultnetworkid = 0\n" +
+            "httpdefaultmessagingmode = 1\n" +
+            "modefaultmessagingmode = 3\n" +
+            "hrdefaultmessagingmode = 3\n" +
+            "sipdefaultmessagingmode = 3\n" +
+            "httpdefaultrddeliveryreceipt = 0\n" +
+            "httpdefaultrdintermediatenotification = 0\n" +
+            "httpdefaultdatacoding = 0\n" +
+            "httpencodingforgsm7 = Utf8\n" +
+            "httpencodingforucs2 = Utf8\n" +
+            "minmessageid = 1\n" +
+            "maxmessageid = 10000000000\n" +
+            "deliverypause = false\n" +
+            "cassandrauser = cassandra\n" +
+            "cassandrapass = cassandra\n" +
+            "smdeliveryfailure_dlr_withtpuserdata = false\n" +
+            "markTimeoutAsPermanentFailure = false";
+
+    @Test(groups = { "ShellExecutor" })
+    public void testShellExecutor_get() throws Exception {
+        SmscManagement smscManagement = SmscManagement.getInstance("Test");
+        SMSCShellExecutor exec = new SMSCShellExecutor();
+        exec.setSmscManagement(smscManagement);
+        exec.start();
+
+        String[] args = new String[2];
+        args[0] = "smsc";
+        args[1] = "get";
+        final String actualResult = exec.execute(args);
+        assertEquals(actualResult.trim(), EXPECTED_GET_PROPERTIES_LIST);
+    }
+
+    @Test(groups = { "ShellExecutor" })
+    public void testShellExecutor_getIndividualProperty() throws Exception {
+        SmscManagement smscManagement = SmscManagement.getInstance("Test");
+        SMSCShellExecutor exec = new SMSCShellExecutor();
+        exec.setSmscManagement(smscManagement);
+        exec.start();
+
+        final List<String> propertyNames = listProperties();
+        for (String propertyName : propertyNames) {
+            String[] args = new String[3];
+            args[0] = "smsc";
+            args[1] = "get";
+            args[2] = propertyName;
+            final String actualResult = exec.execute(args);
+            assertEquals(actualResult.trim(), findExpectedLine(propertyName));
+        }
+    }
+
+    private String findExpectedLine(String propertyName) throws Exception {
+        for (String line : EXPECTED_GET_PROPERTIES_LIST.split("\n")) {
+            if (line.contains(propertyName)) {
+                return line.trim();
+            }
+        }
+        throw new Exception("No line for '" + propertyName + "' found");
+    }
+
+    private List<String> listProperties() {
+        List<String> res = new ArrayList<>();
+        for (String line : EXPECTED_GET_PROPERTIES_LIST.split("\n")) {
+            res.add(line.split("=")[0].trim());
+        }
+        return res;
+    }
 
     @Test(groups = { "ShellExecutor" })
     public void testShellExecutor_DatabaseRoutingRules() throws Exception {

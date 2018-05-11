@@ -430,7 +430,8 @@ public abstract class SriSbb extends MtCommonSbb implements ReportSMDeliveryStat
                 return;
             }
 
-            this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.HLR_REJECT_AFTER_ROUTING_INFO,
+            ErrorAction timeoutFailureType = smscPropertiesManagement.isMarkTimeoutAsPermanentFailure() ? ErrorAction.permanentFailure : ErrorAction.temporaryFailure;
+            this.onDeliveryError(smsSet, timeoutFailureType, ErrorCode.HLR_REJECT_AFTER_ROUTING_INFO,
                     "onDialogTimeout after SRI Request", true, null, false, ProcessingType.SS7_SRI);
         } catch (Throwable e1) {
             logger.severe("Exception in SriSbb.onDialogTimeout() when fetching records and issuing events: " + e1.getMessage(), e1);

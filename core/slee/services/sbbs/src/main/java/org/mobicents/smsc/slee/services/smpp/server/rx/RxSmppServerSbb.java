@@ -420,7 +420,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
             logger.severe(
                     String.format("onPduRequestTimeout : targetId=" + smsSet.getTargetId() + ", PduRequestTimeout=" + event));
 
-            this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, "PduRequestTimeout: ",
+            ErrorAction timeoutFailureType = smscPropertiesManagement.isMarkTimeoutAsPermanentFailure() ? ErrorAction.permanentFailure : ErrorAction.temporaryFailure;
+            this.onDeliveryError(smsSet, timeoutFailureType, ErrorCode.SC_SYSTEM_ERROR, "PduRequestTimeout: ",
                     EventType.OUT_SMPP_ERROR, event.getPduRequest().getSequenceNumber());
         } catch (Throwable e1) {
             anSbbUsage.incrementCounterErrorPduRequestTimeoutParent(ONE);
@@ -989,7 +990,8 @@ public abstract class RxSmppServerSbb extends DeliveryCommonSbb implements Sbb {
      */
     @Override
     protected void onDeliveryTimeout(SmsSet smsSet, String reason) {
-        this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason,
+        ErrorAction timeoutFailureType = smscPropertiesManagement.isMarkTimeoutAsPermanentFailure() ? ErrorAction.permanentFailure : ErrorAction.temporaryFailure;
+        this.onDeliveryError(smsSet, timeoutFailureType, ErrorCode.SC_SYSTEM_ERROR, reason,
                 EventType.OUT_SMPP_TIMEOUT, -1);
     }
 
