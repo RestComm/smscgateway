@@ -365,11 +365,12 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 
 	@Override
     protected void onDeliveryTimeout(SmsSet smsSet, String reason) {
-        this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason, true, null, false,
+        ErrorAction failureType = smscPropertiesManagement.isMarkTimeoutAsPermanentFailure() ? ErrorAction.permanentFailure : ErrorAction.temporaryFailure;
+        this.onDeliveryError(smsSet, failureType, ErrorCode.SC_SYSTEM_ERROR, reason, true, null, false,
                 ProcessingType.SS7_MT);
     }
-	
-	@Override
+
+    @Override
     protected Integer getMaxMessagesPerStep() {
         return null;
     }
@@ -642,9 +643,9 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 
     /**
      * TODO: This should be configurable and static as well
-     * 
+     *
      * This is our (Service Center) SCCP Address for GT
-     * 
+     *
      * @return
      */
     protected SccpAddress getServiceCenterSccpAddress(int networkId) {
@@ -672,7 +673,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
                 mtLocalSccpGt = smscPropertiesManagement.getServiceCenterGt(networkId);
             }
         }
-        
+
         return MessageUtil.getSccpAddress(sccpParameterFact, mtLocalSccpGt, AddressNature.international_number.getIndicator(), NumberingPlan.ISDN.getIndicator(),
                 smscPropertiesManagement.getServiceCenterSsn(), smscPropertiesManagement.getGlobalTitleIndicator(), smscPropertiesManagement.getTranslationType());
     }
@@ -685,7 +686,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
     protected SccpAddress convertAddressFieldToSCCPAddress(String address, int ton, int npi) {
         return convertAddressFieldToSCCPAddress(address, ton, npi, null);
     }
-    
+
     protected SccpAddress convertAddressFieldToSCCPAddress(String address, int ton, int npi, Integer mtRemoteSccpTt) {
         return MessageUtil.getSccpAddress(sccpParameterFact, address, ton, npi, smscPropertiesManagement.getHlrSsn(),
                 smscPropertiesManagement.getGlobalTitleIndicator(), mtRemoteSccpTt != null ? mtRemoteSccpTt 

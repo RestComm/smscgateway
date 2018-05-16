@@ -140,6 +140,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private static final String MIN_MESSAGE_ID = "minMessageId";
     private static final String MAX_MESSAGE_ID = "maxMessageId";
 
+    private static final String MARK_TIMEOUT_AS_PERMANENT_FAILURE = "markTimeoutAsPermanentFailure";
+
     private static final String DELIVERY_PAUSE = "deliveryPause";
 
     private static final String CASSANDRA_USER = "cassandraUser";
@@ -352,6 +354,8 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
     private int diameterDestPort = 3868;
     // Diameter UserName for connection to OCS
     private String diameterUserName = "";
+
+    private boolean markTimeoutAsPermanentFailure = false;
 
     // Days after which old cassandra live tables will be removed
     // min value is 3 days (this means at least 2 days before today tables must be alive),
@@ -1692,6 +1696,17 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
         return this.smDeliveryFailureDlrWithTpdu;
     }
 
+    @Override
+    public boolean isMarkTimeoutAsPermanentFailure() {
+        return markTimeoutAsPermanentFailure;
+    }
+
+    @Override
+    public void setMarkTimeoutAsPermanentFailure(boolean markTimeoutAsPermanentFailure) {
+        this.markTimeoutAsPermanentFailure = markTimeoutAsPermanentFailure;
+        this.store();
+    }
+
     public void start() throws Exception {
 
         this.persistFile.clear();
@@ -1771,6 +1786,7 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
             writer.write(this.fetchMaxRows, FETCH_MAX_ROWS, Integer.class);
 
             writer.write(this.deliveryPause, DELIVERY_PAUSE, Boolean.class);
+            writer.write(this.markTimeoutAsPermanentFailure, MARK_TIMEOUT_AS_PERMANENT_FAILURE, Boolean.class);
 
             writer.write(this.removingLiveTablesDays, REMOVING_LIVE_TABLES_DAYS, Integer.class);
             writer.write(this.removingArchiveTablesDays, REMOVING_ARCHIVE_TABLES_DAYS, Integer.class);
@@ -2269,6 +2285,10 @@ public class SmscPropertiesManagement implements SmscPropertiesManagementMBean {
                 this.diameterDestPort = val;
 
             this.diameterUserName = reader.read(DIAMETER_USER_NAME, String.class);
+
+            valB = reader.read(MARK_TIMEOUT_AS_PERMANENT_FAILURE, Boolean.class);
+            if (valB != null)
+                this.markTimeoutAsPermanentFailure = valB;
 
             reader.close();
         } catch (XMLStreamException ex) {

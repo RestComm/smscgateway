@@ -466,4 +466,7 @@ public interface SmscPropertiesManagementMBean {
 
     public Map<Integer, PermanentTemporaryFailure> getSmDeliveryFailureTpCause();
 
+    public boolean isMarkTimeoutAsPermanentFailure();
+
+    public void setMarkTimeoutAsPermanentFailure(boolean markTimeoutAsPermanentFailure);
 }

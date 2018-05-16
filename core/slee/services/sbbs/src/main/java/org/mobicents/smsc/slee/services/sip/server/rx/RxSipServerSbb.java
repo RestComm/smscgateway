@@ -347,7 +347,8 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
             return;
         }
 
-		this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR,
+        ErrorAction timeoutFailureType = smscPropertiesManagement.isMarkTimeoutAsPermanentFailure() ? ErrorAction.permanentFailure : ErrorAction.temporaryFailure;
+		this.onDeliveryError(smsSet, timeoutFailureType, ErrorCode.SC_SYSTEM_ERROR,
 				"SIP Exception TRANSACTION_TIMEOUT received.");
 	}
 
@@ -508,7 +509,8 @@ public abstract class RxSipServerSbb extends DeliveryCommonSbb implements Sbb {
 
     @Override
     protected void onDeliveryTimeout(SmsSet smsSet, String reason) {
-        this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.SC_SYSTEM_ERROR, reason);
+        ErrorAction failureType = smscPropertiesManagement.isMarkTimeoutAsPermanentFailure() ? ErrorAction.permanentFailure : ErrorAction.temporaryFailure;
+        this.onDeliveryError(smsSet, failureType, ErrorCode.SC_SYSTEM_ERROR, reason);
     }
     
     @Override

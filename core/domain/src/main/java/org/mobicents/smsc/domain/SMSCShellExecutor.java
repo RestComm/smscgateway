@@ -22,20 +22,11 @@
 
 package org.mobicents.smsc.domain;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import javolution.util.FastList;
 import javolution.util.FastMap;
-
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
-import org.mobicents.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCause;
-import org.mobicents.smsc.cassandra.SmsRoutingRuleType;
 import org.mobicents.smsc.library.DbSmsRoutingRule;
 import org.mobicents.smsc.library.PermanentTemporaryFailure;
 import org.mobicents.smsc.library.SmsSetCache;
@@ -43,6 +34,15 @@ import org.mobicents.smsc.mproc.MProcRule;
 import org.mobicents.smsc.mproc.impl.MProcRuleOamMessages;
 import org.mobicents.ss7.management.console.ShellExecutor;
 import org.restcomm.smpp.SmppEncoding;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author amit bhayani
@@ -63,14 +63,30 @@ public class SMSCShellExecutor implements ShellExecutor {
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final String MAP_CACHE_KEY_VALUE_SEPARATOR = " : ";
 
+    private Map<String, Method> smscPropertiesManagementGetters;
+
     public SMSCShellExecutor() {
 
     }
 
     public void start() throws Exception {
         smscPropertiesManagement = SmscPropertiesManagement.getInstance(this.getSmscManagement().getName());
+        initSmscPropertiesManagementGetters();
         if (logger.isInfoEnabled()) {
             logger.info("Started SMSCShellExecutor " + this.getSmscManagement().getName());
+        }
+    }
+
+    private void initSmscPropertiesManagementGetters() {
+        smscPropertiesManagementGetters = new HashMap<>();
+        Class c = smscPropertiesManagement.getClass();
+        for (Method method : c.getMethods()) {
+            String methodName = method.getName();
+            if (methodName.startsWith("get")) {
+                smscPropertiesManagementGetters.put(methodName.substring(3).toLowerCase(), method);
+            } else if (methodName.startsWith("is")) {
+                smscPropertiesManagementGetters.put(methodName.substring(2).toLowerCase(), method);
+            }
         }
     }
 
@@ -180,7 +196,7 @@ public class SMSCShellExecutor implements ShellExecutor {
      * indicator> destdigmask <regular expression - destination number digits mask> originatingmask <mo | hr | esme | sip>
      * networkidmask <networkId value> percent <percent value> newnetworkid <new networkId value> newdestton <new destination
      * type of number> newdestnpi <new destination numbering plan indicator> addestdigprefix <prefix> mtlocalsccpgt 
-     * <new gt of a local sccp address of an mt message> mtremotesccptt <new tt for remote sccp address for mt message> 
+     * <new gt of a local sccp address of an mt message> mtremotesccptt <new tt for remote sccp address for mt message>
      * makecopy <false | true> droponarrival <true | false> rejectonarrival <NONE | DEFAULT | UNEXPECTED_DATA_VALUE 
      * | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key> removedestdigprefix <value>
      * 
@@ -227,7 +243,7 @@ public class SMSCShellExecutor implements ShellExecutor {
      * destdigmask <regular expression - destination number digits mask> originatingmask <mo | hr | esme | sip> networkidmask
      * <networkId value> percent <percent value> newnetworkid <new networkId value> newdestton <new destination type of number>
      * newdestnpi <new destination numbering plan indicator> addestdigprefix <prefix> mtlocalsccpgt 
-     * <new gt of a local sccp address of an mt message> mtremotesccptt <new tt for remote sccp address for mt message> 
+     * <new gt of a local sccp address of an mt message> mtremotesccptt <new tt for remote sccp address for mt message>
      * makecopy <false | true> droponarrival <true | false> rejectonarrival <NONE | DEFAULT |
      * UNEXPECTED_DATA_VALUE | SYSTEM_FAILURE | THROTTLING | FACILITY_NOT_SUPPORTED> remove_tlv <tlv tag key> 
      * removedestdigprefix <value>
@@ -1036,8 +1052,11 @@ public class SMSCShellExecutor implements ShellExecutor {
             } else if (parName.equals("smdeliveryfailure_dlr_withtpuserdata")) {
                 String s1 = options[3].toLowerCase();
                 if (options.length == 4) {
-                        smscPropertiesManagement.setSmDeliveryFailureDlrWithTpdu(s1);
-                    }
+                    smscPropertiesManagement.setSmDeliveryFailureDlrWithTpdu(s1);
+                }
+            } else if (parName.equals("marktimeoutaspermanentfailure")) {
+                boolean v = Boolean.parseBoolean(options[3]);
+                smscPropertiesManagement.setMarkTimeoutAsPermanentFailure(v);
             } else {
                 return SMSCOAMMessages.INVALID_COMMAND;
             }
@@ -1109,6 +1128,12 @@ public class SMSCShellExecutor implements ShellExecutor {
             StringBuilder sb = new StringBuilder();
             sb.append(options[2]);
             sb.append(" = ");
+            // if property name has common name and getter, ex.:
+            // someVarName
+            // getSomeVarName() or isSomeVarName()
+            //
+            // it will be automatically discovered by initSmscPropertiesManagementGetters
+            // otherwise define matching name and signature
             if (parName.equals("scgt")) {
                 sb.append("networkId=0 - GT=");
                 sb.append(smscPropertiesManagement.getServiceCenterGt());
@@ -1120,10 +1145,6 @@ public class SMSCShellExecutor implements ShellExecutor {
                 }
             } else if (parName.equals("scssn")) {
                 sb.append(smscPropertiesManagement.getServiceCenterSsn());
-            } else if (parName.equals("hlrssn")) {
-                sb.append(smscPropertiesManagement.getHlrSsn());
-            } else if (parName.equals("mscssn")) {
-                sb.append(smscPropertiesManagement.getMscSsn());
             } else if (parName.equals("maxmapv")) {
                 sb.append(smscPropertiesManagement.getMaxMapVersion());
             } else if (parName.equals("gti")) {
@@ -1143,107 +1164,16 @@ public class SMSCShellExecutor implements ShellExecutor {
                 }
             } else if (parName.equals("tt")) {
                 sb.append(smscPropertiesManagement.getTranslationType());
-
-            } else if (parName.equals("defaultvalidityperiodhours")) {
-                sb.append(smscPropertiesManagement.getDefaultValidityPeriodHours());
-            } else if (parName.equals("maxvalidityperiodhours")) {
-                sb.append(smscPropertiesManagement.getMaxValidityPeriodHours());
-            } else if (parName.equals("defaultton")) {
-                sb.append(smscPropertiesManagement.getDefaultTon());
-            } else if (parName.equals("defaultnpi")) {
-                sb.append(smscPropertiesManagement.getDefaultNpi());
-            } else if (parName.equals("subscriberbusyduedelay")) {
-                sb.append(smscPropertiesManagement.getSubscriberBusyDueDelay());
-            } else if (parName.equals("firstduedelay")) {
-                sb.append(smscPropertiesManagement.getFirstDueDelay());
-            } else if (parName.equals("secondduedelay")) {
-                sb.append(smscPropertiesManagement.getSecondDueDelay());
-            } else if (parName.equals("maxduedelay")) {
-                sb.append(smscPropertiesManagement.getMaxDueDelay());
-            } else if (parName.equals("duedelaymultiplicator")) {
-                sb.append(smscPropertiesManagement.getDueDelayMultiplicator());
-            } else if (parName.equals("maxmessagelengthreducer")) {
-                sb.append(smscPropertiesManagement.getMaxMessageLengthReducer());
-            } else if (parName.equals("smppencodingforgsm7")) {
-                sb.append(smscPropertiesManagement.getSmppEncodingForGsm7());
-            } else if (parName.equals("smppencodingforucs2")) {
-                sb.append(smscPropertiesManagement.getSmppEncodingForUCS2());
-            } else if (parName.equals("dbhosts")) {
-                sb.append(smscPropertiesManagement.getDbHosts());
-            } else if (parName.equals("dbport")) {
-                sb.append(smscPropertiesManagement.getDbPort());
-            } else if (parName.equals("keyspacename")) {
-                sb.append(smscPropertiesManagement.getKeyspaceName());
-            } else if (parName.equals("clustername")) {
-                sb.append(smscPropertiesManagement.getClusterName());
-            } else if (parName.equals("fetchperiod")) {
-                sb.append(smscPropertiesManagement.getFetchPeriod());
-            } else if (parName.equals("fetchmaxrows")) {
-                sb.append(smscPropertiesManagement.getFetchMaxRows());
-            } else if (parName.equals("maxactivitycount")) {
-                sb.append(smscPropertiesManagement.getMaxActivityCount());
-            } else if (parName.equals("deliverytimeout")) {
-                sb.append(smscPropertiesManagement.getDeliveryTimeout());
-            } else if (parName.equals("deliverytimeoutdeltapermessage")) {
-                sb.append(smscPropertiesManagement.getDeliveryTimeoutDeltaPerMessage());
-            } else if (parName.equals("vpprolong")) {
-                sb.append(smscPropertiesManagement.getVpProlong());
             } else if (parName.equals("esmedefaultcluster")) {
                 sb.append(smscPropertiesManagement.getEsmeDefaultClusterName());
-            } else if (parName.equals("correlationidlivetime")) {
-                sb.append(smscPropertiesManagement.getCorrelationIdLiveTime());
-            } else if (parName.equals("sriresponselivetime")) {
-                sb.append(smscPropertiesManagement.getSriResponseLiveTime());
-            } else if (parName.equals("revisesecondsonsmscstart")) {
-                sb.append(smscPropertiesManagement.getReviseSecondsOnSmscStart());
-            } else if (parName.equals("processingsmssettimeout")) {
-                sb.append(smscPropertiesManagement.getProcessingSmsSetTimeout());
-            } else if (parName.equals("generatereceiptcdr")) {
-                sb.append(smscPropertiesManagement.getGenerateReceiptCdr());
-            } else if (parName.equals("generatetempfailurecdr")) {
-                sb.append(smscPropertiesManagement.getGenerateTempFailureCdr());
-            } else if (parName.equals("generaterejectioncdr")) {
-                sb.append(smscPropertiesManagement.isGenerateRejectionCdr());
-            } else if (parName.equals("calculatemsgpartslencdr")) {
-                sb.append(smscPropertiesManagement.getCalculateMsgPartsLenCdr());
-            } else if (parName.equals("delayparametersincdr")) {
-                sb.append(smscPropertiesManagement.getDelayParametersInCdr());
-            } else if (parName.equals("receiptsdisabling")) {
-                sb.append(smscPropertiesManagement.getReceiptsDisabling());
-            } else if (parName.equals("enableintermediatereceipts")) {
-                sb.append(smscPropertiesManagement.getEnableIntermediateReceipts());
-            } else if (parName.equals("orignetworkidforreceipts")) {
-                sb.append(smscPropertiesManagement.getOrigNetworkIdForReceipts());
-            } else if (parName.equals("incomereceiptsprocessing")) {
-                sb.append(smscPropertiesManagement.getIncomeReceiptsProcessing());
             } else if (parName.equals("generatearchivetable")) {
                 sb.append(smscPropertiesManagement.getGenerateArchiveTable().getValue());
-
-            } else if (parName.equals("storeandforwordmode")) {
-                sb.append(smscPropertiesManagement.getStoreAndForwordMode());
-            } else if (parName.equals("mocharging")) {
-                sb.append(smscPropertiesManagement.getMoCharging());
-            } else if (parName.equals("hrcharging")) {
-                sb.append(smscPropertiesManagement.getHrCharging());
+            } else if (parName.equals("generatecdr")) {
+                sb.append(smscPropertiesManagement.getGenerateCdr().getValue());
             } else if (parName.equals("txsmppcharging")) {
                 sb.append(smscPropertiesManagement.getTxSmppChargingType());
             } else if (parName.equals("txsipcharging")) {
                 sb.append(smscPropertiesManagement.getTxSipChargingType());
-            } else if (parName.equals("txhttpcharging")) {
-                sb.append(smscPropertiesManagement.getTxHttpCharging());
-            } else if (parName.equals("diameterdestrealm")) {
-                sb.append(smscPropertiesManagement.getDiameterDestRealm());
-            } else if (parName.equals("diameterdesthost")) {
-                sb.append(smscPropertiesManagement.getDiameterDestHost());
-            } else if (parName.equals("diameterdestport")) {
-                sb.append(smscPropertiesManagement.getDiameterDestPort());
-            } else if (parName.equals("diameterusername")) {
-                sb.append(smscPropertiesManagement.getDiameterUserName());
-            } else if (parName.equals("removinglivetablesdays")) {
-                sb.append(smscPropertiesManagement.getRemovingLiveTablesDays());
-            } else if (parName.equals("removingarchivetablesdays")) {
-                sb.append(smscPropertiesManagement.getRemovingArchiveTablesDays());
-
             } else if (parName.equals("hrhlrnumber")) {
                 sb.append("networkId=0 - hrhlrnumber=");
                 sb.append(smscPropertiesManagement.getHrHlrNumber());
@@ -1262,54 +1192,6 @@ public class SMSCShellExecutor implements ShellExecutor {
                     sb.append(" - hrsribypass=");
                     sb.append(smscPropertiesManagement.getNetworkIdVsHrSriBypass().get(key));
                 }
-
-            } else if (parName.equals("nationallanguagesingleshift")) {
-                sb.append(smscPropertiesManagement.getNationalLanguageSingleShift());
-            } else if (parName.equals("nationallanguagelockingshift")) {
-                sb.append(smscPropertiesManagement.getNationalLanguageLockingShift());
-
-            } else if (parName.equals("httpdefaultsourceton")) {
-                sb.append(smscPropertiesManagement.getHttpDefaultSourceTon());
-            } else if (parName.equals("httpdefaultsourcenpi")) {
-                sb.append(smscPropertiesManagement.getHttpDefaultSourceNpi());
-            } else if (parName.equals("httpdefaultdestton")) {
-                sb.append(smscPropertiesManagement.getHttpDefaultDestTon());
-            } else if (parName.equals("httpdefaultdestnpi")) {
-                sb.append(smscPropertiesManagement.getHttpDefaultDestNpi());
-            } else if (parName.equals("httpdefaultnetworkid")) {
-                sb.append(smscPropertiesManagement.getHttpDefaultNetworkId());
-
-            } else if (parName.equals("httpdefaultmessagingmode")) {
-                sb.append(smscPropertiesManagement.getHttpDefaultMessagingMode());
-            } else if (parName.equals("modefaultmessagingmode")) {
-                sb.append(smscPropertiesManagement.getMoDefaultMessagingMode());
-            } else if (parName.equals("hrdefaultmessagingmode")) {
-                sb.append(smscPropertiesManagement.getHrDefaultMessagingMode());
-            } else if (parName.equals("sipdefaultmessagingmode")) {
-                sb.append(smscPropertiesManagement.getSipDefaultMessagingMode());
-
-            } else if (parName.equals("httpdefaultrddeliveryreceipt")) {
-                sb.append(smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt());
-            } else if (parName.equals("httpdefaultrdintermediatenotification")) {
-                sb.append(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification());
-            } else if (parName.equals("httpdefaultdatacoding")) {
-                sb.append(smscPropertiesManagement.getHttpDefaultDataCoding());
-            } else if (parName.equals("httpencodingforgsm7")) {
-                sb.append(smscPropertiesManagement.getHttpEncodingForGsm7());
-            } else if (parName.equals("httpencodingforucs2")) {
-                sb.append(smscPropertiesManagement.getHttpEncodingForUCS2());
-
-            } else if (parName.equals("minmessageid")) {
-                sb.append(smscPropertiesManagement.getMinMessageId());
-            } else if (parName.equals("maxmessageid")) {
-                sb.append(smscPropertiesManagement.getMaxMessageId());
-
-            } else if (parName.equals("deliverypause")) {
-                sb.append(smscPropertiesManagement.isDeliveryPause());
-            } else if (parName.equals("cassandrauser")) {
-                sb.append(smscPropertiesManagement.getCassandraUser());
-            } else if (parName.equals("cassandrapass")) {
-                sb.append(smscPropertiesManagement.getCassandraPass());
             } else if (parName.equals("smdeliveryfailure")) {
                 for (Integer key : smscPropertiesManagement.getSmDeliveryFailure().keySet()) {
                     sb.append(" \n causeCode = ");
@@ -1327,13 +1209,17 @@ public class SMSCShellExecutor implements ShellExecutor {
             } else if (parName.equals("smdeliveryfailure_dlr_withtpuserdata")) {
                 sb.append(smscPropertiesManagement.getSmDeliveryFailureDlrWithTpdu());
             } else {
-                return SMSCOAMMessages.INVALID_COMMAND;
+                Method method = smscPropertiesManagementGetters.get(parName);
+                if (method == null) {
+                    return SMSCOAMMessages.INVALID_COMMAND;
+                }
+                sb.append(method.invoke(smscPropertiesManagement));
             }
 
             return sb.toString();
         } else {
             StringBuilder sb = new StringBuilder();
-            sb.append("scgt : ");
+            sb.append("scgt = ");
             sb.append("networkId=0 - GT=");
             sb.append(smscPropertiesManagement.getServiceCenterGt());
             for (Integer key : smscPropertiesManagement.getNetworkIdVsServiceCenterGt().keySet()) {
@@ -1346,21 +1232,10 @@ public class SMSCShellExecutor implements ShellExecutor {
             }
             sb.append("\n");
 
-            sb.append("scssn = ");
-            sb.append(smscPropertiesManagement.getServiceCenterSsn());
-            sb.append("\n");
-
-            sb.append("hlrssn = ");
-            sb.append(smscPropertiesManagement.getHlrSsn());
-            sb.append("\n");
-
-            sb.append("mscssn = ");
-            sb.append(smscPropertiesManagement.getMscSsn());
-            sb.append("\n");
-
-            sb.append("maxmapv = ");
-            sb.append(smscPropertiesManagement.getMaxMapVersion());
-            sb.append("\n");
+            addProperty(sb, "servicecenterssn", "scssn");
+            addProperty(sb, "hlrssn");
+            addProperty(sb, "mscssn");
+            addProperty(sb, "maxmapversion", "maxmapv");
 
             sb.append("gti = ");
             switch (smscPropertiesManagement.getGlobalTitleIndicator()) {
@@ -1379,161 +1254,57 @@ public class SMSCShellExecutor implements ShellExecutor {
             }
             sb.append("\n");
 
-            sb.append("tt = ");
-            sb.append(smscPropertiesManagement.getTranslationType());
-            sb.append("\n");
-
-            sb.append("defaultvalidityperiodhours = ");
-            sb.append(smscPropertiesManagement.getDefaultValidityPeriodHours());
-            sb.append("\n");
-
-            sb.append("maxvalidityperiodhours = ");
-            sb.append(smscPropertiesManagement.getMaxValidityPeriodHours());
-            sb.append("\n");
-
-            sb.append("defaultton = ");
-            sb.append(smscPropertiesManagement.getDefaultTon());
-            sb.append("\n");
-
-            sb.append("defaultnpi = ");
-            sb.append(smscPropertiesManagement.getDefaultNpi());
-            sb.append("\n");
-
-            sb.append("subscriberbusyduedelay = ");
-            sb.append(smscPropertiesManagement.getSubscriberBusyDueDelay());
-            sb.append("\n");
-
-            sb.append("firstduedelay = ");
-            sb.append(smscPropertiesManagement.getFirstDueDelay());
-            sb.append("\n");
-
-            sb.append("secondduedelay = ");
-            sb.append(smscPropertiesManagement.getSecondDueDelay());
-            sb.append("\n");
-
-            sb.append("maxduedelay = ");
-            sb.append(smscPropertiesManagement.getMaxDueDelay());
-            sb.append("\n");
-
-            sb.append("duedelaymultiplicator = ");
-            sb.append(smscPropertiesManagement.getDueDelayMultiplicator());
-            sb.append("\n");
-
-            sb.append("maxmessagelengthreducer = ");
-            sb.append(smscPropertiesManagement.getMaxMessageLengthReducer());
-            sb.append("\n");
-
-            sb.append("smppencodingforgsm7 = ");
-            sb.append(smscPropertiesManagement.getSmppEncodingForGsm7());
-            sb.append("\n");
-
-            sb.append("smppencodingforucs2 = ");
-            sb.append(smscPropertiesManagement.getSmppEncodingForUCS2());
-            sb.append("\n");
+            addProperty(sb, "translationtype", "tt");
+            addProperty(sb, "defaultvalidityperiodhours");
+            addProperty(sb, "maxvalidityperiodhours");
+            addProperty(sb, "defaultton");
+            addProperty(sb, "defaultnpi");
+            addProperty(sb, "subscriberbusyduedelay");
+            addProperty(sb, "firstduedelay");
+            addProperty(sb, "secondduedelay");
+            addProperty(sb, "maxduedelay");
+            addProperty(sb, "duedelaymultiplicator");
+            addProperty(sb, "maxmessagelengthreducer");
+            addProperty(sb, "smppencodingforgsm7");
+            addProperty(sb, "smppencodingforucs2");
 
             // sb.append("hosts = ");
             // sb.append(smscPropertiesManagement.getHosts());
             // sb.append("\n");
 
-            sb.append("dbhosts = ");
-            sb.append(smscPropertiesManagement.getDbHosts());
-            sb.append("\n");
-
-            sb.append("dbport = ");
-            sb.append(smscPropertiesManagement.getDbPort());
-            sb.append("\n");
-
-            sb.append("keyspaceName = ");
-            sb.append(smscPropertiesManagement.getKeyspaceName());
-            sb.append("\n");
-
-            sb.append("clustername = ");
-            sb.append(smscPropertiesManagement.getClusterName());
-            sb.append("\n");
-
-            sb.append("fetchperiod = ");
-            sb.append(smscPropertiesManagement.getFetchPeriod());
-            sb.append("\n");
-
-            sb.append("fetchmaxrows = ");
-            sb.append(smscPropertiesManagement.getFetchMaxRows());
-            sb.append("\n");
-
-            sb.append("maxactivitycount = ");
-            sb.append(smscPropertiesManagement.getMaxActivityCount());
-            sb.append("\n");
-
-            sb.append("deliverytimeout = ");
-            sb.append(smscPropertiesManagement.getDeliveryTimeout());
-            sb.append("\n");
-            
-            sb.append("deliverytimeoutdeltapermessage = ");
-            sb.append(smscPropertiesManagement.getDeliveryTimeoutDeltaPerMessage());
-            sb.append("\n");
-
-            sb.append("vpprolong = ");
-            sb.append(smscPropertiesManagement.getVpProlong());
-            sb.append("\n");
+            addProperty(sb, "dbhosts");
+            addProperty(sb, "dbport");
+            addProperty(sb, "keyspaceName");
+            addProperty(sb, "clustername");
+            addProperty(sb, "fetchperiod");
+            addProperty(sb, "fetchmaxrows");
+            addProperty(sb, "maxactivitycount");
+            addProperty(sb, "deliverytimeout");
+            addProperty(sb, "deliverytimeoutdeltapermessage");
+            addProperty(sb, "vpprolong");
 
             // sb.append("cdrDatabaseExportDuration = ");
             // sb.append(smscPropertiesManagement.getCdrDatabaseExportDuration());
             // sb.append("\n");
 
-            sb.append("esmedefaultcluster = ");
-            sb.append(smscPropertiesManagement.getEsmeDefaultClusterName());
-            sb.append("\n");
+            addProperty(sb, "esmedefaultclustername", "esmedefaultcluster");
 
             // sb.append("smshomerouting = ");
             // sb.append(smscPropertiesManagement.getSMSHomeRouting());
             // sb.append("\n");
 
-            sb.append("correlationidlivetime = ");
-            sb.append(smscPropertiesManagement.getCorrelationIdLiveTime());
-            sb.append("\n");
-
-            sb.append("sriresponselivetime = ");
-            sb.append(smscPropertiesManagement.getSriResponseLiveTime());
-            sb.append("\n");
-
-            sb.append("revisesecondsonsmscstart = ");
-            sb.append(smscPropertiesManagement.getReviseSecondsOnSmscStart());
-            sb.append("\n");
-
-            sb.append("processingsmssettimeout = ");
-            sb.append(smscPropertiesManagement.getProcessingSmsSetTimeout());
-            sb.append("\n");
-
-            sb.append("generatereceiptcdr = ");
-            sb.append(smscPropertiesManagement.getGenerateReceiptCdr());
-            sb.append("\n");
-
-            sb.append("generatetempfailurecdr = ");
-            sb.append(smscPropertiesManagement.getGenerateTempFailureCdr());
-            sb.append("\n");
-
-            sb.append("calculatemsgpartslencdr = ");
-            sb.append(smscPropertiesManagement.getCalculateMsgPartsLenCdr());
-            sb.append("\n");
-
-            sb.append("delayparametersincdr = ");
-            sb.append(smscPropertiesManagement.getDelayParametersInCdr());
-            sb.append("\n");
-
-            sb.append("receiptsdisabling = ");
-            sb.append(smscPropertiesManagement.getReceiptsDisabling());
-            sb.append("\n");
-
-            sb.append("enableintermediatereceipts = ");
-            sb.append(smscPropertiesManagement.getEnableIntermediateReceipts());
-            sb.append("\n");
-
-            sb.append("incomereceiptsprocessing = ");
-            sb.append(smscPropertiesManagement.getIncomeReceiptsProcessing());
-            sb.append("\n");
-
-            sb.append("orignetworkidforreceipts = ");
-            sb.append(smscPropertiesManagement.getOrigNetworkIdForReceipts());
-            sb.append("\n");
+            addProperty(sb, "correlationidlivetime");
+            addProperty(sb, "sriresponselivetime");
+            addProperty(sb, "revisesecondsonsmscstart");
+            addProperty(sb, "processingsmssettimeout");
+            addProperty(sb, "generatereceiptcdr");
+            addProperty(sb, "generatetempfailurecdr");
+            addProperty(sb, "calculatemsgpartslencdr");
+            addProperty(sb, "delayparametersincdr");
+            addProperty(sb, "receiptsdisabling");
+            addProperty(sb, "enableintermediatereceipts");
+            addProperty(sb, "incomereceiptsprocessing");
+            addProperty(sb, "orignetworkidforreceipts");
 
             sb.append("generatecdr = ");
             sb.append(smscPropertiesManagement.getGenerateCdr().getValue());
@@ -1543,55 +1314,20 @@ public class SMSCShellExecutor implements ShellExecutor {
             sb.append(smscPropertiesManagement.getGenerateArchiveTable().getValue());
             sb.append("\n");
 
-            sb.append("storeandforwordmode = ");
-            sb.append(smscPropertiesManagement.getStoreAndForwordMode());
-            sb.append("\n");
+            addProperty(sb, "storeandforwordmode");
+            addProperty(sb, "mocharging");
+            addProperty(sb, "hrcharging");
+            addProperty(sb, "txsmppchargingtype", "txsmppcharging");
+            addProperty(sb, "txsipchargingtype", "txsipcharging");
+            addProperty(sb, "txhttpcharging");
+            addProperty(sb, "diameterdestrealm");
+            addProperty(sb, "diameterdesthost");
+            addProperty(sb, "diameterdestport");
+            addProperty(sb, "diameterusername");
+            addProperty(sb, "removinglivetablesdays");
+            addProperty(sb, "removingarchivetablesdays");
 
-            sb.append("mocharging = ");
-            sb.append(smscPropertiesManagement.getMoCharging());
-            sb.append("\n");
-
-            sb.append("hrcharging = ");
-            sb.append(smscPropertiesManagement.getHrCharging());
-            sb.append("\n");
-
-            sb.append("txsmppcharging = ");
-            sb.append(smscPropertiesManagement.getTxSmppChargingType());
-            sb.append("\n");
-
-            sb.append("txsipcharging = ");
-            sb.append(smscPropertiesManagement.getTxSipChargingType());
-            sb.append("\n");
-
-            sb.append("txhttpcharging = ");
-            sb.append(smscPropertiesManagement.getTxHttpCharging());
-            sb.append("\n");
-
-            sb.append("diameterdestrealm = ");
-            sb.append(smscPropertiesManagement.getDiameterDestRealm());
-            sb.append("\n");
-
-            sb.append("diameterdesthost = ");
-            sb.append(smscPropertiesManagement.getDiameterDestHost());
-            sb.append("\n");
-
-            sb.append("diameterdestport = ");
-            sb.append(smscPropertiesManagement.getDiameterDestPort());
-            sb.append("\n");
-
-            sb.append("diameterusername = ");
-            sb.append(smscPropertiesManagement.getDiameterUserName());
-            sb.append("\n");
-
-            sb.append("removinglivetablesdays = ");
-            sb.append(smscPropertiesManagement.getRemovingLiveTablesDays());
-            sb.append("\n");
-
-            sb.append("removingarchivetablesdays = ");
-            sb.append(smscPropertiesManagement.getRemovingArchiveTablesDays());
-            sb.append("\n");
-
-            sb.append("hrhlrnumber : ");
+            sb.append("hrhlrnumber = ");
             sb.append("networkId=0 - hrhlrnumber=");
             sb.append(smscPropertiesManagement.getHrHlrNumber());
             for (Integer key : smscPropertiesManagement.getNetworkIdVsHrHlrNumber().keySet()) {
@@ -1604,7 +1340,7 @@ public class SMSCShellExecutor implements ShellExecutor {
             }
             sb.append("\n");
 
-            sb.append("hrsribypass : ");
+            sb.append("hrsribypass = ");
             sb.append("networkId=0 - hrsribypass=");
             sb.append(smscPropertiesManagement.getHrSriBypass());
             for (Integer key : smscPropertiesManagement.getNetworkIdVsHrSriBypass().keySet()) {
@@ -1617,89 +1353,27 @@ public class SMSCShellExecutor implements ShellExecutor {
             }
             sb.append("\n");
 
-            sb.append("nationallanguagesingleshift = ");
-            sb.append(smscPropertiesManagement.getNationalLanguageSingleShift());
-            sb.append("\n");
-
-            sb.append("nationallanguagelockingshift = ");
-            sb.append(smscPropertiesManagement.getNationalLanguageLockingShift());
-            sb.append("\n");
-
-            sb.append("httpdefaultsourceton = ");
-            sb.append(smscPropertiesManagement.getHttpDefaultSourceTon());
-            sb.append("\n");
-
-            sb.append("httpdefaultsourcenpi = ");
-            sb.append(smscPropertiesManagement.getHttpDefaultSourceNpi());
-            sb.append("\n");
-
-            sb.append("httpdefaultdestton = ");
-            sb.append(smscPropertiesManagement.getHttpDefaultDestTon());
-            sb.append("\n");
-
-            sb.append("httpdefaultdestnpi = ");
-            sb.append(smscPropertiesManagement.getHttpDefaultDestNpi());
-            sb.append("\n");
-
-            sb.append("httpdefaultnetworkid = ");
-            sb.append(smscPropertiesManagement.getHttpDefaultNetworkId());
-            sb.append("\n");
-
-            sb.append("httpdefaultmessagingmode = ");
-            sb.append(smscPropertiesManagement.getHttpDefaultMessagingMode());
-            sb.append("\n");
-
-            sb.append("modefaultmessagingmode = ");
-            sb.append(smscPropertiesManagement.getMoDefaultMessagingMode());
-            sb.append("\n");
-
-            sb.append("hrdefaultmessagingmode = ");
-            sb.append(smscPropertiesManagement.getHrDefaultMessagingMode());
-            sb.append("\n");
-
-            sb.append("sipdefaultmessagingmode = ");
-            sb.append(smscPropertiesManagement.getSipDefaultMessagingMode());
-            sb.append("\n");
-
-            sb.append("httpdefaultrddeliveryreceipt = ");
-            sb.append(smscPropertiesManagement.getHttpDefaultRDDeliveryReceipt());
-            sb.append("\n");
-
-            sb.append("httpdefaultrdintermediatenotification = ");
-            sb.append(smscPropertiesManagement.getHttpDefaultRDIntermediateNotification());
-            sb.append("\n");
-
-            sb.append("httpdefaultdatacoding = ");
-            sb.append(smscPropertiesManagement.getHttpDefaultDataCoding());
-            sb.append("\n");
-
-            sb.append("httpencodingforgsm7 = ");
-            sb.append(smscPropertiesManagement.getHttpEncodingForGsm7());
-            sb.append("\n");
-
-            sb.append("httpencodingforucs2 = ");
-            sb.append(smscPropertiesManagement.getHttpEncodingForUCS2());
-            sb.append("\n");
-
-            sb.append("minmessageid = ");
-            sb.append(smscPropertiesManagement.getMinMessageId());
-            sb.append("\n");
-
-            sb.append("maxmessageid = ");
-            sb.append(smscPropertiesManagement.getMaxMessageId());
-            sb.append("\n");
-
-            sb.append("deliverypause = ");
-            sb.append(smscPropertiesManagement.isDeliveryPause());
-            sb.append("\n");
-
-            sb.append("cassandrauser = ");
-            sb.append(smscPropertiesManagement.getCassandraUser());
-            sb.append("\n");
-
-            sb.append("cassandrapass = ");
-            sb.append(smscPropertiesManagement.getCassandraPass());
-            sb.append("\n");
+            addProperty(sb, "nationallanguagesingleshift");
+            addProperty(sb, "nationallanguagelockingshift");
+            addProperty(sb, "httpdefaultsourceton");
+            addProperty(sb, "httpdefaultsourcenpi");
+            addProperty(sb, "httpdefaultdestton");
+            addProperty(sb, "httpdefaultdestnpi");
+            addProperty(sb, "httpdefaultnetworkid");
+            addProperty(sb, "httpdefaultmessagingmode");
+            addProperty(sb, "modefaultmessagingmode");
+            addProperty(sb, "hrdefaultmessagingmode");
+            addProperty(sb, "sipdefaultmessagingmode");
+            addProperty(sb, "httpdefaultrddeliveryreceipt");
+            addProperty(sb, "httpdefaultrdintermediatenotification");
+            addProperty(sb, "httpdefaultdatacoding");
+            addProperty(sb, "httpencodingforgsm7");
+            addProperty(sb, "httpencodingforucs2");
+            addProperty(sb, "minmessageid");
+            addProperty(sb, "maxmessageid");
+            addProperty(sb, "deliverypause");
+            addProperty(sb, "cassandrauser");
+            addProperty(sb, "cassandrapass");
 
             for (Integer key : smscPropertiesManagement.getSmDeliveryFailure().keySet()) {
                 sb.append("smdeliveryfailure - causeCode = ");
@@ -1717,17 +1391,52 @@ public class SMSCShellExecutor implements ShellExecutor {
                 sb.append("\n");
             }
 
-            sb.append("smdeliveryfailure_dlr_withtpuserdata = ");
-            sb.append(smscPropertiesManagement.getSmDeliveryFailureDlrWithTpdu());
-            sb.append("\n");
+            addProperty(sb, "smdeliveryfailuredlrwithtpdu", "smdeliveryfailure_dlr_withtpuserdata");
+            addProperty(sb, "marktimeoutaspermanentfailure");
 
             return sb.toString();
         }
     }
 
     /**
+     * adds property, which will be printed in shell
+     *
+     * very important that propertyName is same as getter method name in SmscPropertiesManagement,
+     * because function will discover method name via reflection
+     *
+     *             if (methodName.startsWith("get")) {
+     *                 smscPropertiesManagementGetters.put(methodName.substring(3).toLowerCase(), method);
+     *             } else if (methodName.startsWith("is")) {
+     *                 smscPropertiesManagementGetters.put(methodName.substring(2).toLowerCase(), method);
+     *             }
+     *
+     * @param sb
+     * @param propertyName - name of getter in SmscPropertiesManagement, getter should begin from getXXX or isXXX
+     * @param displayName - name what will be displayed in shell
+     */
+    private void addProperty(StringBuilder sb, String propertyName, String displayName) throws InvocationTargetException, IllegalAccessException {
+        sb.append(displayName);
+        sb.append(" = ");
+        Object invocationResult = findAndInvokeGetter(propertyName);
+        sb.append(invocationResult);
+        sb.append("\n");
+    }
+
+    private void addProperty(StringBuilder sb, String propertyName) throws InvocationTargetException, IllegalAccessException {
+        addProperty(sb, propertyName, propertyName);
+    }
+
+    private Object findAndInvokeGetter(String propertyName) throws IllegalAccessException, InvocationTargetException {
+        Method method = smscPropertiesManagementGetters.get(propertyName.toLowerCase());
+        if (method == null) {
+            throw new RuntimeException("No getter for property '" + propertyName + "'. Check name or getter name - naming matters.");
+        }
+        return method.invoke(smscPropertiesManagement);
+    }
+
+    /**
      * smsc databaseRule update <address> <systemId> <SMPP|SIP> networkid <network-id>
-     * 
+     *
      * @param args
      * @return
      */

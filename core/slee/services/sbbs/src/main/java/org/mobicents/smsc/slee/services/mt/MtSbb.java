@@ -592,7 +592,8 @@ public abstract class MtSbb extends MtCommonSbb implements MtForwardSmsInterface
                 return;
             }
 
-			this.onDeliveryError(smsSet, ErrorAction.temporaryFailure, ErrorCode.MSC_REFUSES_SM,
+			ErrorAction timeoutFailureType = smscPropertiesManagement.isMarkTimeoutAsPermanentFailure() ? ErrorAction.permanentFailure : ErrorAction.temporaryFailure;
+			this.onDeliveryError(smsSet, timeoutFailureType, ErrorCode.MSC_REFUSES_SM,
 					"onDialogTimeout after MtForwardSM Request", true, null, false, ProcessingType.SS7_MT);
 		} catch (Throwable e1) {
 			logger.severe(
