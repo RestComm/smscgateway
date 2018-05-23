@@ -24,13 +24,13 @@ package org.mobicents.smsc.slee.services.mo;
 
 import javax.slee.facilities.Tracer;
 
-import org.mobicents.protocols.ss7.map.api.MAPProvider;
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageSMDeliveryFailure;
-import org.mobicents.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCause;
-import org.mobicents.protocols.ss7.map.api.primitives.NetworkResource;
-import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
-import org.mobicents.protocols.ss7.map.api.service.sms.SmsMessage;
+import org.restcomm.protocols.ss7.map.api.MAPProvider;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageSMDeliveryFailure;
+import org.restcomm.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCause;
+import org.restcomm.protocols.ss7.map.api.primitives.NetworkResource;
+import org.restcomm.protocols.ss7.map.api.service.sms.MAPDialogSms;
+import org.restcomm.protocols.ss7.map.api.service.sms.SmsMessage;
 import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 

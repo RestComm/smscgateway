@@ -22,7 +22,7 @@
 
 package org.mobicents.smsc.library;
 
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
 
 /**
  *

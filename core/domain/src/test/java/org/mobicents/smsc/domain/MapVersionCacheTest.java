@@ -24,7 +24,7 @@ package org.mobicents.smsc.domain;
 
 import static org.testng.Assert.*;
 
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion;
 import org.testng.annotations.Test;
 
 /**

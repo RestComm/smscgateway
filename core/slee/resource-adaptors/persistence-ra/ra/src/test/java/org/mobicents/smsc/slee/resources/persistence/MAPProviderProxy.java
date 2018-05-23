@@ -22,21 +22,21 @@
 
 package org.mobicents.smsc.slee.resources.persistence;
 
-import org.mobicents.protocols.ss7.map.MAPParameterFactoryImpl;
-import org.mobicents.protocols.ss7.map.api.MAPDialog;
-import org.mobicents.protocols.ss7.map.api.MAPDialogListener;
-import org.mobicents.protocols.ss7.map.api.MAPParameterFactory;
-import org.mobicents.protocols.ss7.map.api.MAPProvider;
-import org.mobicents.protocols.ss7.map.api.MAPSmsTpduParameterFactory;
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageFactory;
-import org.mobicents.protocols.ss7.map.api.service.callhandling.MAPServiceCallHandling;
-import org.mobicents.protocols.ss7.map.api.service.lsm.MAPServiceLsm;
-import org.mobicents.protocols.ss7.map.api.service.mobility.MAPServiceMobility;
-import org.mobicents.protocols.ss7.map.api.service.oam.MAPServiceOam;
-import org.mobicents.protocols.ss7.map.api.service.pdpContextActivation.MAPServicePdpContextActivation;
-import org.mobicents.protocols.ss7.map.api.service.sms.MAPServiceSms;
-import org.mobicents.protocols.ss7.map.api.service.supplementary.MAPServiceSupplementary;
-import org.mobicents.protocols.ss7.map.errors.MAPErrorMessageFactoryImpl;
+import org.restcomm.protocols.ss7.map.MAPParameterFactoryImpl;
+import org.restcomm.protocols.ss7.map.api.MAPDialog;
+import org.restcomm.protocols.ss7.map.api.MAPDialogListener;
+import org.restcomm.protocols.ss7.map.api.MAPParameterFactory;
+import org.restcomm.protocols.ss7.map.api.MAPProvider;
+import org.restcomm.protocols.ss7.map.api.MAPSmsTpduParameterFactory;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageFactory;
+import org.restcomm.protocols.ss7.map.api.service.callhandling.MAPServiceCallHandling;
+import org.restcomm.protocols.ss7.map.api.service.lsm.MAPServiceLsm;
+import org.restcomm.protocols.ss7.map.api.service.mobility.MAPServiceMobility;
+import org.restcomm.protocols.ss7.map.api.service.oam.MAPServiceOam;
+import org.restcomm.protocols.ss7.map.api.service.pdpContextActivation.MAPServicePdpContextActivation;
+import org.restcomm.protocols.ss7.map.api.service.sms.MAPServiceSms;
+import org.restcomm.protocols.ss7.map.api.service.supplementary.MAPServiceSupplementary;
+import org.restcomm.protocols.ss7.map.errors.MAPErrorMessageFactoryImpl;
 
 /**
  * 

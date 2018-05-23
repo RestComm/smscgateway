@@ -46,9 +46,9 @@ import javolution.xml.XMLObjectWriter;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
-import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.restcomm.protocols.ss7.map.api.smstpdu.CharacterSet;
+import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.restcomm.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.library.DbSmsRoutingRule;
 import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageState;

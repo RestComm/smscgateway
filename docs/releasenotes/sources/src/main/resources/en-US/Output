@@ -35,7 +35,7 @@ Total time: 0 seconds
 10:22:13,528 INFO  [SccpStackImpl-SccpStack] Starting MSU handler...
 10:22:13,546 INFO  [ShellExecutor] Starting SS7 management shell environment
 10:22:13,553 INFO  [ShellExecutor] ShellExecutor listening at /127.0.0.1:3435
-10:22:13,581 INFO  [TCAPStackImpl] Starting ...org.mobicents.protocols.ss7.tcap.TCAPProviderImpl@113ebcc
+10:22:13,581 INFO  [TCAPStackImpl] Starting ...org.restcomm.protocols.ss7.tcap.TCAPProviderImpl@113ebcc
 10:22:13,581 INFO  [TCAPProviderImpl] Starting TCAP Provider
 10:22:13,581 INFO  [TCAPProviderImpl] Registered SCCP listener with address 8
 10:22:13,718 INFO  [SS7Service]  [[[[[[[[[ Mobicents SS7 2.0.0-SNAPSHOT service started ]]]]]]]]] 

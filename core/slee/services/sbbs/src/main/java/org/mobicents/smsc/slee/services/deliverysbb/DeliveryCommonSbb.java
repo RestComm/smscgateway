@@ -38,8 +38,8 @@ import javax.slee.facilities.TimerOptions;
 import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
-import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.restcomm.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.DBOperations;
 import org.mobicents.smsc.cassandra.PersistenceException;

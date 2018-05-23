@@ -22,9 +22,9 @@
 
 package org.mobicents.smsc.slee.services.smpp.server.tx;
 
-import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingGroup;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.restcomm.protocols.ss7.map.api.smstpdu.CharacterSet;
+import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingGroup;
+import org.restcomm.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.smsc.library.Sms;
 import org.mobicents.smsc.library.SmscProcessingException;

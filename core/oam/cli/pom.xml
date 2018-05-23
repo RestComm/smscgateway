@@ -16,7 +16,7 @@
 			<version>${log4j.version}</version> </dependency> -->
 		<!-- MTP3 -->
 		<dependency>
-			<groupId>org.mobicents.protocols.ss7.management</groupId>
+			<groupId>org.restcomm.protocols.ss7.management</groupId>
 			<artifactId>shell-client</artifactId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>

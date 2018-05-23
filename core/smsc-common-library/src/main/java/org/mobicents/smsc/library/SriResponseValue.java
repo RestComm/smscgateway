@@ -24,7 +24,7 @@ package org.mobicents.smsc.library;
 
 import java.io.Serializable;
 
-import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
+import org.restcomm.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
 
 /**
 *

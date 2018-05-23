@@ -35,8 +35,8 @@
 
 		<dependency>
 			<artifactId>statistics-oam-api</artifactId>
-			<groupId>org.mobicents.protocols.ss7.oam.common</groupId>
-			<version>${jss7.restcomm.version}</version>
+			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
+			<version>${common.oam.jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.restcomm.commons</groupId>
@@ -52,8 +52,8 @@
 		<!-- jss7 -->
 		<dependency>
 			<artifactId>jmxss7</artifactId>
-			<groupId>org.mobicents.protocols.ss7.oam.common</groupId>
-			<version>${jss7.restcomm.version}</version>
+			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
+			<version>${common.oam.jss7.restcomm.version}</version>
 		</dependency>
 
 		<!-- smpp -->

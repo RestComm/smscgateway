@@ -30,7 +30,7 @@ import javolution.util.FastMap;
 import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
 
-import org.mobicents.protocols.ss7.map.primitives.ArrayListSerializingBase;
+import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 
 /**
  * 

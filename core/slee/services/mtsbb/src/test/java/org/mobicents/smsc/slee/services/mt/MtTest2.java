@@ -4,18 +4,18 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
-import org.mobicents.protocols.ss7.map.api.smstpdu.AbsoluteTimeStamp;
-import org.mobicents.protocols.ss7.map.api.smstpdu.AddressField;
-import org.mobicents.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
-import org.mobicents.protocols.ss7.map.api.smstpdu.ProtocolIdentifier;
-import org.mobicents.protocols.ss7.map.api.smstpdu.TypeOfNumber;
-import org.mobicents.protocols.ss7.map.service.sms.SmsSignalInfoImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.AbsoluteTimeStampImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.AddressFieldImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.ProtocolIdentifierImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.SmsDeliverTpduImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.UserDataImpl;
+import org.restcomm.protocols.ss7.map.api.smstpdu.AbsoluteTimeStamp;
+import org.restcomm.protocols.ss7.map.api.smstpdu.AddressField;
+import org.restcomm.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
+import org.restcomm.protocols.ss7.map.api.smstpdu.ProtocolIdentifier;
+import org.restcomm.protocols.ss7.map.api.smstpdu.TypeOfNumber;
+import org.restcomm.protocols.ss7.map.service.sms.SmsSignalInfoImpl;
+import org.restcomm.protocols.ss7.map.smstpdu.AbsoluteTimeStampImpl;
+import org.restcomm.protocols.ss7.map.smstpdu.AddressFieldImpl;
+import org.restcomm.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.restcomm.protocols.ss7.map.smstpdu.ProtocolIdentifierImpl;
+import org.restcomm.protocols.ss7.map.smstpdu.SmsDeliverTpduImpl;
+import org.restcomm.protocols.ss7.map.smstpdu.UserDataImpl;
 import org.testng.annotations.Test;
 
 public class MtTest2 {

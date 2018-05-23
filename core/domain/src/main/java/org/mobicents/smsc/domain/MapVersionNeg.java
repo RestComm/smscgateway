@@ -22,7 +22,7 @@
 
 package org.mobicents.smsc.domain;
 
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion;
 
 /**
  * @author sergey vetyutnev

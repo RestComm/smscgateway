@@ -23,7 +23,7 @@
 package org.mobicents.smsc.slee.services.smpp.server.events;
 
 import java.io.Serializable;
-import org.mobicents.protocols.ss7.map.api.service.sms.MWStatus;
+import org.restcomm.protocols.ss7.map.api.service.sms.MWStatus;
 
 /**
  * 

@@ -37,11 +37,11 @@ import javax.slee.TransactionRequiredLocalException;
 import javax.slee.TransactionRolledbackLocalException;
 import javax.slee.facilities.TimerID;
 
-import org.mobicents.protocols.ss7.map.MAPParameterFactoryImpl;
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
-import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
-import org.mobicents.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
+import org.restcomm.protocols.ss7.map.MAPParameterFactoryImpl;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.restcomm.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbLocalObjectExt;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;

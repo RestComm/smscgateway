@@ -6,14 +6,14 @@
 	<!-- Shell Service -->
 	<!-- ==================================================================== -->
 	<!-- Define Shell Executor -->
-	<bean name="ShellExecutor" class="org.mobicents.ss7.management.console.ShellServer">
+	<bean name="ShellExecutor" class="org.restcomm.ss7.management.console.ShellServer">
 		<constructor>
 			<parameter>
 				<inject bean="SS7Scheduler" />
 			</parameter>
 			<parameter>
 				<list class="javolution.util.FastList"
-					elementClass="org.mobicents.ss7.management.console.ShellExecutor">
+					elementClass="org.restcomm.ss7.management.console.ShellExecutor">
 					<inject bean="SccpExecutor" />
 					<inject bean="M3UAShellExecutor" />
 					<inject bean="SCTPShellExecutor" />

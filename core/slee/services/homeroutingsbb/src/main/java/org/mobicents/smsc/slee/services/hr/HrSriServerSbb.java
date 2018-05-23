@@ -30,33 +30,33 @@ import javax.slee.ServiceID;
 import javax.slee.serviceactivity.ServiceActivity;
 import javax.slee.serviceactivity.ServiceStartedEvent;
 
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
-import org.mobicents.protocols.ss7.map.api.MAPException;
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
-import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
-import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
-import org.mobicents.protocols.ss7.map.api.primitives.IMSI;
-import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
-import org.mobicents.protocols.ss7.map.api.primitives.NetworkResource;
-import org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan;
-import org.mobicents.protocols.ss7.map.api.service.sms.InformServiceCentreRequest;
-import org.mobicents.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
-import org.mobicents.protocols.ss7.map.api.service.sms.MAPDialogSms;
-import org.mobicents.protocols.ss7.map.api.service.sms.MWStatus;
-import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMRequest;
-import org.mobicents.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
-import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContextName;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.restcomm.protocols.ss7.map.api.MAPException;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.restcomm.protocols.ss7.map.api.primitives.AddressNature;
+import org.restcomm.protocols.ss7.map.api.primitives.AddressString;
+import org.restcomm.protocols.ss7.map.api.primitives.IMSI;
+import org.restcomm.protocols.ss7.map.api.primitives.ISDNAddressString;
+import org.restcomm.protocols.ss7.map.api.primitives.NetworkResource;
+import org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan;
+import org.restcomm.protocols.ss7.map.api.service.sms.InformServiceCentreRequest;
+import org.restcomm.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
+import org.restcomm.protocols.ss7.map.api.service.sms.MAPDialogSms;
+import org.restcomm.protocols.ss7.map.api.service.sms.MWStatus;
+import org.restcomm.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMRequest;
+import org.restcomm.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
+import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 import org.mobicents.slee.ChildRelationExt;
-import org.mobicents.slee.resource.map.events.DialogDelimiter;
-import org.mobicents.slee.resource.map.events.DialogNotice;
-import org.mobicents.slee.resource.map.events.DialogProviderAbort;
-import org.mobicents.slee.resource.map.events.DialogReject;
-import org.mobicents.slee.resource.map.events.DialogRequest;
-import org.mobicents.slee.resource.map.events.DialogTimeout;
-import org.mobicents.slee.resource.map.events.DialogUserAbort;
-import org.mobicents.slee.resource.map.events.ErrorComponent;
-import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.restcomm.slee.resource.map.events.DialogDelimiter;
+import org.restcomm.slee.resource.map.events.DialogNotice;
+import org.restcomm.slee.resource.map.events.DialogProviderAbort;
+import org.restcomm.slee.resource.map.events.DialogReject;
+import org.restcomm.slee.resource.map.events.DialogRequest;
+import org.restcomm.slee.resource.map.events.DialogTimeout;
+import org.restcomm.slee.resource.map.events.DialogUserAbort;
+import org.restcomm.slee.resource.map.events.ErrorComponent;
+import org.restcomm.slee.resource.map.events.RejectComponent;
 import org.mobicents.smsc.domain.MoChargingType;
 import org.mobicents.smsc.domain.NextCorrelationIdResult;
 import org.mobicents.smsc.library.*;
@@ -361,7 +361,7 @@ public abstract class HrSriServerSbb extends HomeRoutingCommonSbb implements HrS
             }
         }
 
-        dlg.addSendRoutingInfoForSMResponse(invokeId, imsi, li, null, mwdSet);
+        dlg.addSendRoutingInfoForSMResponse(invokeId, imsi, li, null, mwdSet, null);
 
         InformServiceCentreRequest isc = correlationIdValue.getInformServiceCentreRequest();
         if (mwStatus != null && isc != null) {

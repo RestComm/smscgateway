@@ -29,7 +29,7 @@ import javolution.util.FastMap;
 import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
 
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
 import org.mobicents.smsc.mproc.HttpCode;
 import org.mobicents.smsc.mproc.MProcMessage;

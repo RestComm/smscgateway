@@ -24,7 +24,7 @@ package org.mobicents.smsc.domain;
 
 import java.util.Map;
 
-import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
+import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.mobicents.smsc.library.PermanentTemporaryFailure;
 import org.restcomm.smpp.GenerateType;
 import org.restcomm.smpp.SmppEncoding;

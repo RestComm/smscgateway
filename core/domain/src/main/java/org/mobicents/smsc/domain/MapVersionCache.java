@@ -4,7 +4,7 @@
 package org.mobicents.smsc.domain;
 
 import javolution.util.FastMap;
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion;
 
 /**
  * @author Amit Bhayani
@@ -70,7 +70,7 @@ public class MapVersionCache implements MapVersionCacheMBean {
      * @see
      * org.mobicents.smsc.smpp.MapVersionCacheMBean#setMAPApplicationContextVersion
      * (java.lang.String,
-     * org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion)
+     * org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion)
      */
     @Override
     public void forceMAPApplicationContextVersion(String globalTitleDigits, MAPApplicationContextVersion version) {

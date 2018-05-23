@@ -22,7 +22,7 @@
 
 package org.mobicents.smsc.slee.services.smpp.server.tx;
 
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.mobicents.smsc.library.CdrDetailedGenerator;
 import org.mobicents.smsc.library.MessageDeliveryResultResponseInterface;
 import org.restcomm.slee.resource.smpp.SmppSessions;

@@ -25,10 +25,10 @@ package org.mobicents.smsc.domain;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.mobicents.protocols.ss7.statistics.StatDataCollectionImpl;
-import org.mobicents.protocols.ss7.statistics.api.StatDataCollection;
-import org.mobicents.protocols.ss7.statistics.api.StatDataCollectorType;
-import org.mobicents.protocols.ss7.statistics.api.StatResult;
+import org.restcomm.protocols.ss7.statistics.StatDataCollectionImpl;
+import org.restcomm.protocols.ss7.statistics.api.StatDataCollection;
+import org.restcomm.protocols.ss7.statistics.api.StatDataCollectorType;
+import org.restcomm.protocols.ss7.statistics.api.StatResult;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.library.UpdateMessagesInProcessListener;
 

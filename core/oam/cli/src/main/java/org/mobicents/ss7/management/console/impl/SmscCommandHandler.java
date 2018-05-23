@@ -20,12 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.mobicents.ss7.management.console.impl;
+package org.restcomm.ss7.management.console.impl;
 
-import org.mobicents.ss7.management.console.CommandContext;
-import org.mobicents.ss7.management.console.CommandHandlerWithHelp;
-import org.mobicents.ss7.management.console.Tree;
-import org.mobicents.ss7.management.console.Tree.Node;
+import org.restcomm.ss7.management.console.CommandContext;
+import org.restcomm.ss7.management.console.CommandHandlerWithHelp;
+import org.restcomm.ss7.management.console.Tree;
+import org.restcomm.ss7.management.console.Tree.Node;
 
 /**
  * @author amit bhayani
@@ -277,7 +277,7 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.mobicents.ss7.management.console.CommandHandler#isValid(java.lang
+	 * org.restcomm.ss7.management.console.CommandHandler#isValid(java.lang
 	 * .String)
 	 */
 	@Override
@@ -295,7 +295,7 @@ public class SmscCommandHandler extends CommandHandlerWithHelp {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.mobicents.ss7.management.console.CommandHandler#isAvailable(org.mobicents
+	 * org.restcomm.ss7.management.console.CommandHandler#isAvailable(org.mobicents
 	 * .ss7.management.console.CommandContext)
 	 */
 	@Override

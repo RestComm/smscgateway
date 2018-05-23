@@ -38,8 +38,8 @@ import javolution.xml.XMLObjectWriter;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
-import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
-import org.mobicents.protocols.ss7.map.primitives.ArrayListSerializingBase;
+import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
+import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 import org.mobicents.smsc.library.PermanentTemporaryFailure;
 import org.restcomm.smpp.GenerateType;
 import org.restcomm.smpp.SmppEncoding;

@@ -32,44 +32,44 @@ import javax.slee.Sbb;
 import javax.slee.SbbContext;
 import javax.xml.bind.DatatypeConverter;
 
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextName;
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
-import org.mobicents.protocols.ss7.map.api.MAPException;
-import org.mobicents.protocols.ss7.map.api.MAPParameterFactory;
-import org.mobicents.protocols.ss7.map.api.MAPProvider;
-import org.mobicents.protocols.ss7.map.api.MAPSmsTpduParameterFactory;
-import org.mobicents.protocols.ss7.map.api.dialog.MAPUserAbortChoice;
-import org.mobicents.protocols.ss7.map.api.dialog.ProcedureCancellationReason;
-import org.mobicents.protocols.ss7.map.api.dialog.ResourceUnavailableReason;
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessage;
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorMessageSMDeliveryFailure;
-import org.mobicents.protocols.ss7.map.api.primitives.AddressNature;
-import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
-import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
-import org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan;
-import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
-import org.mobicents.protocols.ss7.map.api.smstpdu.SmsDeliverReportTpdu;
-import org.mobicents.protocols.ss7.map.api.smstpdu.UserData;
-import org.mobicents.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
-import org.mobicents.protocols.ss7.sccp.parameter.ParameterFactory;
-import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
-import org.mobicents.protocols.ss7.tcap.asn.comp.Problem;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContext;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContextName;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.restcomm.protocols.ss7.map.api.MAPException;
+import org.restcomm.protocols.ss7.map.api.MAPParameterFactory;
+import org.restcomm.protocols.ss7.map.api.MAPProvider;
+import org.restcomm.protocols.ss7.map.api.MAPSmsTpduParameterFactory;
+import org.restcomm.protocols.ss7.map.api.dialog.MAPUserAbortChoice;
+import org.restcomm.protocols.ss7.map.api.dialog.ProcedureCancellationReason;
+import org.restcomm.protocols.ss7.map.api.dialog.ResourceUnavailableReason;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageSMDeliveryFailure;
+import org.restcomm.protocols.ss7.map.api.primitives.AddressNature;
+import org.restcomm.protocols.ss7.map.api.primitives.AddressString;
+import org.restcomm.protocols.ss7.map.api.primitives.ISDNAddressString;
+import org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan;
+import org.restcomm.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
+import org.restcomm.protocols.ss7.map.api.smstpdu.SmsDeliverReportTpdu;
+import org.restcomm.protocols.ss7.map.api.smstpdu.UserData;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
+import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
+import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
+import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 import org.mobicents.slee.ChildRelationExt;
-import org.mobicents.slee.resource.map.MAPContextInterfaceFactory;
-import org.mobicents.slee.resource.map.events.DialogAccept;
-import org.mobicents.slee.resource.map.events.DialogClose;
-import org.mobicents.slee.resource.map.events.DialogDelimiter;
-import org.mobicents.slee.resource.map.events.DialogNotice;
-import org.mobicents.slee.resource.map.events.DialogProviderAbort;
-import org.mobicents.slee.resource.map.events.DialogReject;
-import org.mobicents.slee.resource.map.events.DialogRelease;
-import org.mobicents.slee.resource.map.events.DialogRequest;
-import org.mobicents.slee.resource.map.events.DialogTimeout;
-import org.mobicents.slee.resource.map.events.DialogUserAbort;
-import org.mobicents.slee.resource.map.events.ErrorComponent;
-import org.mobicents.slee.resource.map.events.InvokeTimeout;
-import org.mobicents.slee.resource.map.events.RejectComponent;
+import org.restcomm.slee.resource.map.MAPContextInterfaceFactory;
+import org.restcomm.slee.resource.map.events.DialogAccept;
+import org.restcomm.slee.resource.map.events.DialogClose;
+import org.restcomm.slee.resource.map.events.DialogDelimiter;
+import org.restcomm.slee.resource.map.events.DialogNotice;
+import org.restcomm.slee.resource.map.events.DialogProviderAbort;
+import org.restcomm.slee.resource.map.events.DialogReject;
+import org.restcomm.slee.resource.map.events.DialogRelease;
+import org.restcomm.slee.resource.map.events.DialogRequest;
+import org.restcomm.slee.resource.map.events.DialogTimeout;
+import org.restcomm.slee.resource.map.events.DialogUserAbort;
+import org.restcomm.slee.resource.map.events.ErrorComponent;
+import org.restcomm.slee.resource.map.events.InvokeTimeout;
+import org.restcomm.slee.resource.map.events.RejectComponent;
 import org.mobicents.smsc.domain.SmscPropertiesManagement;
 import org.mobicents.smsc.domain.SmscStatAggregator;
 import org.mobicents.smsc.library.CdrGenerator;
@@ -602,12 +602,12 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         if (networkId == 0) {
             if (this.serviceCenterAddress == null) {
                 this.serviceCenterAddress = this.mapParameterFactory.createAddressString(AddressNature.international_number,
-                        org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, smscPropertiesManagement.getServiceCenterGt());
+                        org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, smscPropertiesManagement.getServiceCenterGt());
             }
             return this.serviceCenterAddress;
         } else {
             return this.mapParameterFactory.createAddressString(AddressNature.international_number,
-                    org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, smscPropertiesManagement.getServiceCenterGt(networkId));
+                    org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, smscPropertiesManagement.getServiceCenterGt(networkId));
         }
     }
     
@@ -631,12 +631,12 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
         if (networkId == 0) {
             if (this.serviceCenterAddress == null) {
                 this.serviceCenterAddress = this.mapParameterFactory.createAddressString(AddressNature.international_number,
-                        org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, mtLocalSccpGt);
+                        org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, mtLocalSccpGt);
             }
             return this.serviceCenterAddress;
         } else {
             return this.mapParameterFactory.createAddressString(AddressNature.international_number,
-                    org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, mtLocalSccpGt);
+                    org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, mtLocalSccpGt);
         }
     }
 
@@ -679,7 +679,7 @@ public abstract class MtCommonSbb extends DeliveryCommonSbb implements Sbb, Repo
 
     protected ISDNAddressString getCalledPartyISDNAddressString(String destinationAddress, int ton, int npi) {
         return this.mapParameterFactory.createISDNAddressString(AddressNature.getInstance(ton),
-                org.mobicents.protocols.ss7.map.api.primitives.NumberingPlan.getInstance(npi), destinationAddress);
+                org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.getInstance(npi), destinationAddress);
     }
 
     protected SccpAddress convertAddressFieldToSCCPAddress(String address, int ton, int npi) {

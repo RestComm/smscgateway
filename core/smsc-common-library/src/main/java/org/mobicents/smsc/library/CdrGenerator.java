@@ -25,8 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.restcomm.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.mproc.DeliveryReceiptData;
 
 /**

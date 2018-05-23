@@ -13,7 +13,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.mobicents.resources</groupId>
+			<groupId>org.restcomm.resources</groupId>
 			<artifactId>restcomm-slee-ra-map-ratype</artifactId>
 			<version>${restcomm.resources.map.version}</version>
 		</dependency>

@@ -32,7 +32,7 @@ import javax.slee.SbbContext;
 import javax.slee.facilities.Tracer;
 import javax.slee.resource.ResourceAdaptorTypeID;
 
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;

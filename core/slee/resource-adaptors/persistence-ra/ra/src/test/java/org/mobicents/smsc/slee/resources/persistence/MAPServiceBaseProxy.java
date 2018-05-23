@@ -22,14 +22,14 @@
 
 package org.mobicents.smsc.slee.resources.persistence;
 
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
-import org.mobicents.protocols.ss7.map.api.MAPDialog;
-import org.mobicents.protocols.ss7.map.api.MAPException;
-import org.mobicents.protocols.ss7.map.api.MAPProvider;
-import org.mobicents.protocols.ss7.map.api.MAPServiceBase;
-import org.mobicents.protocols.ss7.map.api.dialog.ServingCheckData;
-import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
-import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContext;
+import org.restcomm.protocols.ss7.map.api.MAPDialog;
+import org.restcomm.protocols.ss7.map.api.MAPException;
+import org.restcomm.protocols.ss7.map.api.MAPProvider;
+import org.restcomm.protocols.ss7.map.api.MAPServiceBase;
+import org.restcomm.protocols.ss7.map.api.dialog.ServingCheckData;
+import org.restcomm.protocols.ss7.map.api.primitives.AddressString;
+import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 
 
 /**

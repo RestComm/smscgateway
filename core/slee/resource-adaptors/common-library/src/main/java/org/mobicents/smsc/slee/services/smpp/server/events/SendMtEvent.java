@@ -26,8 +26,8 @@ import java.io.Serializable;
 
 import javax.slee.facilities.TimerID;
 
-import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
-import org.mobicents.protocols.ss7.map.api.primitives.LMSI;
+import org.restcomm.protocols.ss7.map.api.primitives.ISDNAddressString;
+import org.restcomm.protocols.ss7.map.api.primitives.LMSI;
 import org.mobicents.smsc.library.SmsSet;
 
 /**

@@ -25,7 +25,7 @@ package org.mobicents.smsc.slee.services.http.server.tx;
 import com.cloudhopper.smpp.SmppConstants;
 
 import net.java.slee.resource.http.events.HttpServletRequestEvent;
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.*;
 import org.mobicents.smsc.library.*;

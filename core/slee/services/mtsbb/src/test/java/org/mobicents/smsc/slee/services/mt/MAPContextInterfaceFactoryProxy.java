@@ -30,8 +30,8 @@ import javax.slee.TransactionRequiredLocalException;
 import javax.slee.TransactionRolledbackLocalException;
 import javax.slee.UnrecognizedActivityException;
 
-import org.mobicents.protocols.ss7.map.api.MAPDialog;
-import org.mobicents.slee.resource.map.MAPContextInterfaceFactory;
+import org.restcomm.protocols.ss7.map.api.MAPDialog;
+import org.restcomm.slee.resource.map.MAPContextInterfaceFactory;
 
 /**
  * 

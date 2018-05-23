@@ -29,19 +29,19 @@ import org.apache.log4j.Logger;
 
 import javolution.util.FastMap;
 
-import org.mobicents.protocols.ss7.oam.common.jmx.MBeanHost;
-import org.mobicents.protocols.ss7.oam.common.jmx.MBeanType;
-import org.mobicents.protocols.ss7.oam.common.jmxss7.Ss7Layer;
-import org.mobicents.protocols.ss7.oam.common.statistics.CounterDefImpl;
-import org.mobicents.protocols.ss7.oam.common.statistics.CounterDefSetImpl;
-import org.mobicents.protocols.ss7.oam.common.statistics.SourceValueCounterImpl;
-import org.mobicents.protocols.ss7.oam.common.statistics.SourceValueObjectImpl;
-import org.mobicents.protocols.ss7.oam.common.statistics.SourceValueSetImpl;
-import org.mobicents.protocols.ss7.oam.common.statistics.api.CounterDef;
-import org.mobicents.protocols.ss7.oam.common.statistics.api.CounterDefSet;
-import org.mobicents.protocols.ss7.oam.common.statistics.api.CounterMediator;
-import org.mobicents.protocols.ss7.oam.common.statistics.api.CounterType;
-import org.mobicents.protocols.ss7.oam.common.statistics.api.SourceValueSet;
+import org.restcomm.protocols.ss7.oam.common.jmx.MBeanHost;
+import org.restcomm.protocols.ss7.oam.common.jmx.MBeanType;
+import org.restcomm.protocols.ss7.oam.common.jmxss7.Ss7Layer;
+import org.restcomm.protocols.ss7.oam.common.statistics.CounterDefImpl;
+import org.restcomm.protocols.ss7.oam.common.statistics.CounterDefSetImpl;
+import org.restcomm.protocols.ss7.oam.common.statistics.SourceValueCounterImpl;
+import org.restcomm.protocols.ss7.oam.common.statistics.SourceValueObjectImpl;
+import org.restcomm.protocols.ss7.oam.common.statistics.SourceValueSetImpl;
+import org.restcomm.protocols.ss7.oam.common.statistics.api.CounterDef;
+import org.restcomm.protocols.ss7.oam.common.statistics.api.CounterDefSet;
+import org.restcomm.protocols.ss7.oam.common.statistics.api.CounterMediator;
+import org.restcomm.protocols.ss7.oam.common.statistics.api.CounterType;
+import org.restcomm.protocols.ss7.oam.common.statistics.api.SourceValueSet;
 import org.mobicents.smsc.server.bootstrap.Version;
 import org.restcomm.commons.statistics.reporter.RestcommStatsReporter;
 

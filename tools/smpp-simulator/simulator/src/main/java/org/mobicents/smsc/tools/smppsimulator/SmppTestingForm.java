@@ -50,12 +50,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JButton;
 
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetEncoder;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetEncodingData;
-import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.restcomm.protocols.ss7.map.datacoding.GSMCharset;
+import org.restcomm.protocols.ss7.map.datacoding.GSMCharsetEncoder;
+import org.restcomm.protocols.ss7.map.datacoding.GSMCharsetEncodingData;
+import org.restcomm.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
+import org.restcomm.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.library.MessageUtil;
 import org.mobicents.smsc.tools.smppsimulator.SmppSimulatorParameters.EncodingType;
 import org.mobicents.smsc.tools.smppsimulator.SmppSimulatorParameters.SendingMessageType;

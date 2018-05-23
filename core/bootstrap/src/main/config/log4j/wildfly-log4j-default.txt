@@ -47,14 +47,14 @@
 		<handler name="CDR_DETAILED" />
 	</handlers>
 </logger>
-<logger category="org.mobicents.protocols.ss7.oam.common.statistics.StatsPrinter">
+<logger category="org.restcomm.protocols.ss7.oam.common.statistics.StatsPrinter">
 	<level name="DEBUG" />
 	<handlers>
 		<handler name="STATS" />
 	</handlers>
 </logger>
 <logger
-	category="org.mobicents.protocols.ss7.oam.common.statistics.CsvStatsPrinter">
+	category="org.restcomm.protocols.ss7.oam.common.statistics.CsvStatsPrinter">
 	<level name="DEBUG" />
 	<handlers>
 		<handler name="CSVSTATS" />

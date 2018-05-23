@@ -26,17 +26,17 @@
 		</dependency>
 		<dependency>
 			<artifactId>restcomm-slee-ra-map-library</artifactId>
-			<groupId>org.mobicents.resources</groupId>
+			<groupId>org.restcomm.resources</groupId>
 			<version>${restcomm.resources.map.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mobicents.protocols.ss7.map</groupId>
+			<groupId>org.restcomm.protocols.ss7.map</groupId>
 			<artifactId>map-api</artifactId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.mobicents.protocols.ss7.map</groupId>
+			<groupId>org.restcomm.protocols.ss7.map</groupId>
 			<artifactId>map-impl</artifactId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>

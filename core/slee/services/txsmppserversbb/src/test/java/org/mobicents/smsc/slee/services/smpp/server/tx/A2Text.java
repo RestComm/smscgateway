@@ -2,12 +2,12 @@ package org.mobicents.smsc.slee.services.smpp.server.tx;
 
 import java.nio.charset.Charset;
 
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.api.smstpdu.UserDataHeader;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
-import org.mobicents.protocols.ss7.map.smstpdu.ConcatenatedShortMessagesIdentifierImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
-import org.mobicents.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
+import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.restcomm.protocols.ss7.map.api.smstpdu.UserDataHeader;
+import org.restcomm.protocols.ss7.map.datacoding.GSMCharset;
+import org.restcomm.protocols.ss7.map.smstpdu.ConcatenatedShortMessagesIdentifierImpl;
+import org.restcomm.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.restcomm.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
 import org.mobicents.smsc.library.MessageUtil;
 import org.testng.annotations.Test;
 

@@ -24,11 +24,11 @@ package org.mobicents.smsc.slee.services.smpp.server.events;
 
 import java.io.Serializable;
 
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContext;
-import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
-import org.mobicents.protocols.ss7.map.api.primitives.ISDNAddressString;
-import org.mobicents.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
-import org.mobicents.protocols.ss7.sccp.parameter.SccpAddress;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContext;
+import org.restcomm.protocols.ss7.map.api.primitives.AddressString;
+import org.restcomm.protocols.ss7.map.api.primitives.ISDNAddressString;
+import org.restcomm.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
+import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 
 /**
  *

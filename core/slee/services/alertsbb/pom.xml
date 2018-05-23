@@ -14,7 +14,7 @@
 	<dependencies>
 		<dependency>
 			<artifactId>map-api</artifactId>
-			<groupId>org.mobicents.protocols.ss7.map</groupId>
+			<groupId>org.restcomm.protocols.ss7.map</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
 
@@ -25,7 +25,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.mobicents.resources</groupId>
+			<groupId>org.restcomm.resources</groupId>
 			<artifactId>restcomm-slee-ra-map-ratype</artifactId>
 			<version>${restcomm.resources.map.version}</version>
 		</dependency>

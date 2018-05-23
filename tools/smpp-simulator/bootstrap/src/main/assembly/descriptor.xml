@@ -43,9 +43,9 @@
 				<include>org.restcomm.slee.resource.smpp:smpp-server-ra-ra</include>
 
                 <!-- SS7 library -->
-                <include>org.mobicents.protocols.ss7.map:map-api</include>
-                <include>org.mobicents.protocols.ss7.map:map-impl</include>
-                <include>org.mobicents.protocols.ss7.sccp:sccp-api</include>
+                <include>org.restcomm.protocols.ss7.map:map-api</include>
+                <include>org.restcomm.protocols.ss7.map:map-impl</include>
+                <include>org.restcomm.protocols.ss7.sccp:sccp-api</include>
 
 
 
@@ -64,24 +64,24 @@
 				<include>org.mobicents.commons:commons</include>
 				<include>org.mobicents.protocols.stream:stream</include>
 				<include>org.mobicents.protocols.asn:asn</include>
-				<include>org.mobicents.protocols.ss7.sccp:sccp-api</include>
-				<include>org.mobicents.protocols.ss7.sccp:sccp-impl</include>
-				<include>org.mobicents.protocols.ss7.tcap:tcap-api</include>
-				<include>org.mobicents.protocols.ss7.tcap:tcap-impl</include>
-				<include>org.mobicents.protocols.ss7.isup:isup-api</include>
-				<include>org.mobicents.protocols.ss7.isup:isup-impl</include>				
-				<include>org.mobicents.protocols.ss7.map:map-api</include>
-				<include>org.mobicents.protocols.ss7.map:map-impl</include>
-				<include>org.mobicents.protocols.ss7.cap:cap-api</include>
-				<include>org.mobicents.protocols.ss7.cap:cap-impl</include>
-				<include>org.mobicents.protocols.ss7.inap:inap-api</include>
-				<include>org.mobicents.protocols.ss7.inap:inap-impl</include>				
-				<include>org.mobicents.protocols.ss7.m3ua:m3ua-api</include>
-				<include>org.mobicents.protocols.ss7.m3ua:m3ua-impl</include>
-				<include>org.mobicents.protocols.ss7.mtp:mtp</include>
-				<include>org.mobicents.protocols.ss7.mtp:mtp-api</include>
-				<include>org.mobicents.protocols.ss7.hardware:mobicents-dialogic</include>
-				<include>org.mobicents.protocols.ss7.congestion:congestion</include>
+				<include>org.restcomm.protocols.ss7.sccp:sccp-api</include>
+				<include>org.restcomm.protocols.ss7.sccp:sccp-impl</include>
+				<include>org.restcomm.protocols.ss7.tcap:tcap-api</include>
+				<include>org.restcomm.protocols.ss7.tcap:tcap-impl</include>
+				<include>org.restcomm.protocols.ss7.isup:isup-api</include>
+				<include>org.restcomm.protocols.ss7.isup:isup-impl</include>				
+				<include>org.restcomm.protocols.ss7.map:map-api</include>
+				<include>org.restcomm.protocols.ss7.map:map-impl</include>
+				<include>org.restcomm.protocols.ss7.cap:cap-api</include>
+				<include>org.restcomm.protocols.ss7.cap:cap-impl</include>
+				<include>org.restcomm.protocols.ss7.inap:inap-api</include>
+				<include>org.restcomm.protocols.ss7.inap:inap-impl</include>				
+				<include>org.restcomm.protocols.ss7.m3ua:m3ua-api</include>
+				<include>org.restcomm.protocols.ss7.m3ua:m3ua-impl</include>
+				<include>org.restcomm.protocols.ss7.mtp:mtp</include>
+				<include>org.restcomm.protocols.ss7.mtp:mtp-api</include>
+				<include>org.restcomm.protocols.ss7.hardware:mobicents-dialogic</include>
+				<include>org.restcomm.protocols.ss7.congestion:congestion</include>
 -->
 
 			</includes>

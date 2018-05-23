@@ -42,7 +42,7 @@
 			<outputDirectory>/lib</outputDirectory>
 			<outputFileNameMapping>mobicents-ss7-shell.jar</outputFileNameMapping>
 			<includes>
-				<include>org.mobicents.protocols.ss7.management:shell-client</include>
+				<include>org.restcomm.protocols.ss7.management:shell-client</include>
 			</includes>
 		</dependencySet>
 		<dependencySet>
@@ -80,32 +80,32 @@
 				<include>org.mobicents.protocols.asn:asn</include>
 
 				<!-- SS7 Libraries -->
-				<include>org.mobicents.protocols.ss7.statistics:statistics-api</include>
-				<include>org.mobicents.protocols.ss7.statistics:statistics-impl</include>				
-				<include>org.mobicents.protocols.ss7.scheduler:scheduler</include>
-				<include>org.mobicents.protocols.ss7.sccp:sccp-api</include>
-				<include>org.mobicents.protocols.ss7.sccp:sccp-impl</include>
-				<include>org.mobicents.protocols.ss7.tcap:tcap-api</include>
-				<include>org.mobicents.protocols.ss7.tcap:tcap-impl</include>
-				<include>org.mobicents.protocols.ss7.map:map-api</include>
-				<include>org.mobicents.protocols.ss7.map:map-impl</include>
-				<include>org.mobicents.protocols.ss7.m3ua:m3ua-api</include>
-				<include>org.mobicents.protocols.ss7.m3ua:m3ua-impl</include>
-				<include>org.mobicents.protocols.ss7.mtp:mtp</include>
-				<include>org.mobicents.protocols.ss7.mtp:mtp-api</include>
-				<include>org.mobicents.protocols.ss7.hardware:linkset</include>
-				<include>org.mobicents.protocols.ss7.management:shell-transport</include>
-				<include>org.mobicents.protocols.ss7.management:shell-server-api</include>
-				<include>org.mobicents.protocols.ss7.management:shell-server-impl</include>
-				<!-- <include>org.mobicents.protocols.ss7.hardware:mobicents-dahdi</include> -->
-				<include>org.mobicents.protocols.ss7.hardware:mobicents-dialogic</include>
-				<include>org.mobicents.protocols.ss7.congestion:congestion</include>
+				<include>org.restcomm.protocols.ss7.statistics:statistics-api</include>
+				<include>org.restcomm.protocols.ss7.statistics:statistics-impl</include>				
+				<include>org.restcomm.protocols.ss7.scheduler:scheduler</include>
+				<include>org.restcomm.protocols.ss7.sccp:sccp-api</include>
+				<include>org.restcomm.protocols.ss7.sccp:sccp-impl</include>
+				<include>org.restcomm.protocols.ss7.tcap:tcap-api</include>
+				<include>org.restcomm.protocols.ss7.tcap:tcap-impl</include>
+				<include>org.restcomm.protocols.ss7.map:map-api</include>
+				<include>org.restcomm.protocols.ss7.map:map-impl</include>
+				<include>org.restcomm.protocols.ss7.m3ua:m3ua-api</include>
+				<include>org.restcomm.protocols.ss7.m3ua:m3ua-impl</include>
+				<include>org.restcomm.protocols.ss7.mtp:mtp</include>
+				<include>org.restcomm.protocols.ss7.mtp:mtp-api</include>
+				<include>org.restcomm.protocols.ss7.hardware:linkset</include>
+				<include>org.restcomm.protocols.ss7.management:shell-transport</include>
+				<include>org.restcomm.protocols.ss7.management:shell-server-api</include>
+				<include>org.restcomm.protocols.ss7.management:shell-server-impl</include>
+				<!-- <include>org.restcomm.protocols.ss7.hardware:mobicents-dahdi</include> -->
+				<include>org.restcomm.protocols.ss7.hardware:mobicents-dialogic</include>
+				<include>org.restcomm.protocols.ss7.congestion:congestion</include>
 				
 				<!-- SS7 OAM Cli Libraries -->
 				<include>org.jboss.jreadline:jreadline</include>
-				<include>org.mobicents.protocols.ss7.m3ua:m3ua-cli-sctp</include>
-				<include>org.mobicents.protocols.ss7.m3ua:m3ua-cli-m3ua</include>
-				<include>org.mobicents.protocols.ss7.sccp:sccp-cli</include>
+				<include>org.restcomm.protocols.ss7.m3ua:m3ua-cli-sctp</include>
+				<include>org.restcomm.protocols.ss7.m3ua:m3ua-cli-m3ua</include>
+				<include>org.restcomm.protocols.ss7.sccp:sccp-cli</include>
 				
 			  	<!-- RestComm licensing lib -->
 <!--

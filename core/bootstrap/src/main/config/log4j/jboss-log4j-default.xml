@@ -95,12 +95,12 @@
 		<appender-ref ref="CDR_DETAILED" />
 	</category>	
 
-	<category name="org.mobicents.protocols.ss7.oam.common.statistics.StatsPrinter" additivity="false">
+	<category name="org.restcomm.protocols.ss7.oam.common.statistics.StatsPrinter" additivity="false">
 		<priority value="DEBUG" /> 
 		<appender-ref ref="STATS"/> 
 	</category> 	
 
-	<category name="org.mobicents.protocols.ss7.oam.common.statistics.CsvStatsPrinter" additivity="false">
+	<category name="org.restcomm.protocols.ss7.oam.common.statistics.CsvStatsPrinter" additivity="false">
 		<priority value="DEBUG" />
 		<appender-ref ref="CSVSTATS"/>
 	</category>

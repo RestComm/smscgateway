@@ -65,7 +65,7 @@ import net.java.slee.resource.diameter.ro.events.RoCreditControlAnswer;
 import net.java.slee.resource.diameter.ro.events.RoCreditControlRequest;
 import net.java.slee.resource.diameter.ro.events.avp.ServiceInformation;
 
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.smsc.cassandra.PersistenceException;
 import org.mobicents.smsc.domain.MProcManagement;

@@ -30,12 +30,12 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingScheme;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharset;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecoder;
-import org.mobicents.protocols.ss7.map.datacoding.GSMCharsetDecodingData;
-import org.mobicents.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingScheme;
+import org.restcomm.protocols.ss7.map.datacoding.GSMCharset;
+import org.restcomm.protocols.ss7.map.datacoding.GSMCharsetDecoder;
+import org.restcomm.protocols.ss7.map.datacoding.GSMCharsetDecodingData;
+import org.restcomm.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
+import org.restcomm.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.library.ErrorCode;
 import org.mobicents.smsc.library.MessageState;
 import org.mobicents.smsc.library.MessageUtil;

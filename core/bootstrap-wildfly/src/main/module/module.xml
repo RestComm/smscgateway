@@ -37,9 +37,9 @@
         <module name="org.slf4j"/>
         <module name="org.apache.commons.logging"/>
         <module name="org.restcomm.smpp.bootstrap" />
-        <module name="org.mobicents.ss7.extension" />
-        <module name="org.mobicents.ss7.modules" export="true" />
-        <module name="org.mobicents.ss7.commons" export="true" />        	
+        <module name="org.restcomm.ss7.extension" />
+        <module name="org.restcomm.ss7.modules" export="true" />
+        <module name="org.restcomm.ss7.commons" export="true" />        	
 		<module name="org.omg.api" export="true" />
     </dependencies>
 </module>

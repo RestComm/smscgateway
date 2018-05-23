@@ -9,16 +9,16 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.InjectedValue;
-import org.mobicents.protocols.ss7.scheduler.DefaultClock;
-import org.mobicents.protocols.ss7.scheduler.Scheduler;
+import org.restcomm.protocols.ss7.scheduler.DefaultClock;
+import org.restcomm.protocols.ss7.scheduler.Scheduler;
 import org.mobicents.smsc.domain.SMSCShellExecutor;
 import org.mobicents.smsc.domain.SmscManagement;
 import org.mobicents.smsc.domain.SmscStatProviderJmx;
 import org.mobicents.smsc.mproc.MProcRuleFactory;
-import org.mobicents.ss7.management.console.ShellExecutor;
-import org.mobicents.ss7.management.console.ShellServer;
-import org.mobicents.ss7.management.console.ShellServerWildFly;
-import org.mobicents.ss7.service.SS7ServiceInterface;
+import org.restcomm.ss7.management.console.ShellExecutor;
+//import org.restcomm.ss7.management.console.ShellServer;
+//import org.restcomm.ss7.management.console.ShellServerWildFly;
+import org.restcomm.ss7.service.SS7ServiceInterface;
 import org.restcomm.smpp.SmppManagement;
 import org.restcomm.smpp.service.SmppServiceInterface;
 
@@ -68,7 +68,8 @@ public class SmscService implements Service<SmscService> {
     private SMSCShellExecutor smscShellExecutor = null;
     private SmscStatProviderJmx statsProviderJmx=null;
     
-    private ShellServer shellExecutorMBean = null;
+//    // only available in commercial version
+//    private ShellServer shellExecutorMBean = null;
 
     public void setModel(ModelNode model) {
         this.fullModel = model;
@@ -144,7 +145,7 @@ public class SmscService implements Service<SmscService> {
             this.schedulerMBean = initSchedulerMBean();
             this.smscShellExecutor = initSmscShellExecutor();
 
-            shellExecutorMBean = null;
+//            shellExecutorMBean = null;
             try {
                 FastList<ShellExecutor> shellExecutors = new FastList<ShellExecutor>();
                 shellExecutors.add(smscShellExecutor);
@@ -152,16 +153,16 @@ public class SmscService implements Service<SmscService> {
                 shellExecutors.add(ss7Service.getValue().getBeanM3uaShellExecutor());
                 shellExecutors.add(ss7Service.getValue().getBeanSctpShellExecutor());
                 shellExecutors.add(ss7Service.getValue().getBeanSccpExecutor());
-                shellExecutors.add(smppService.getValue().getSmppShellExecutor());
+                shellExecutors.add((ShellExecutor)smppService.getValue().getSmppShellExecutor());
 
                 String address = getPropertyString("ShellExecutor", "address", "127.0.0.1");
                 int port = getPropertyInt("ShellExecutor", "port", 3435);
                 String securityDomain = getPropertyString("ShellExecutor", "securityDomain", "jmx-console");
 
-                shellExecutorMBean = new ShellServerWildFly(schedulerMBean, shellExecutors);
-                shellExecutorMBean.setAddress(address);
-                shellExecutorMBean.setPort(port);
-                shellExecutorMBean.setSecurityDomain(securityDomain);
+//                shellExecutorMBean = new ShellServerWildFly(schedulerMBean, shellExecutors);
+//                shellExecutorMBean.setAddress(address);
+//                shellExecutorMBean.setPort(port);
+//                shellExecutorMBean.setSecurityDomain(securityDomain);
             } catch (Exception e) {
                 throw new StartException("ShellExecutor MBean creating is failed: " + e.getMessage(), e);
             }
@@ -169,7 +170,7 @@ public class SmscService implements Service<SmscService> {
             // starting
             try {
                 schedulerMBean.start();
-                shellExecutorMBean.start();
+//                shellExecutorMBean.start();
             } catch (Exception e) {
                 throw new StartException("MBeans starting is failed: " + e.getMessage(), e);
             }
@@ -269,8 +270,8 @@ public class SmscService implements Service<SmscService> {
 
         // scheduler - stop
         try {
-            if (shellExecutorMBean != null)
-                shellExecutorMBean.stop();
+//            if (shellExecutorMBean != null)
+//                shellExecutorMBean.stop();
             if (schedulerMBean != null)
                 schedulerMBean.stop();
             if(statsProviderJmx != null)

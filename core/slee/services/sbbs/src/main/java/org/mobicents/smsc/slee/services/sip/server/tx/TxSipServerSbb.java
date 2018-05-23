@@ -50,10 +50,10 @@ import javax.slee.serviceactivity.ServiceStartedEvent;
 
 import net.java.slee.resource.sip.SleeSipProvider;
 
-import org.mobicents.protocols.ss7.map.api.errors.MAPErrorCode;
-import org.mobicents.protocols.ss7.map.api.smstpdu.CharacterSet;
-import org.mobicents.protocols.ss7.map.api.smstpdu.DataCodingGroup;
-import org.mobicents.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
+import org.restcomm.protocols.ss7.map.api.errors.MAPErrorCode;
+import org.restcomm.protocols.ss7.map.api.smstpdu.CharacterSet;
+import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingGroup;
+import org.restcomm.protocols.ss7.map.smstpdu.DataCodingSchemeImpl;
 import org.mobicents.smsc.domain.Sip;
 import org.mobicents.smsc.domain.SipManagement;
 import org.mobicents.smsc.domain.SipXHeaders;

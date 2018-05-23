@@ -58,13 +58,13 @@
                     <handler name="CDR_DETAILED"/>
                 </handlers>
             </logger>
-            <logger category="org.mobicents.protocols.ss7.oam.common.statistics.StatsPrinter" use-parent-handlers="false">
+            <logger category="org.restcomm.protocols.ss7.oam.common.statistics.StatsPrinter" use-parent-handlers="false">
                 <level name="DEBUG"/>
                 <handlers>
                     <handler name="STATS"/>
                 </handlers>
             </logger>
-            <logger category="org.mobicents.protocols.ss7.oam.common.statistics.CsvStatsPrinter" use-parent-handlers="false">
+            <logger category="org.restcomm.protocols.ss7.oam.common.statistics.CsvStatsPrinter" use-parent-handlers="false">
                 <level name="DEBUG"/>
                     <handlers>
                         <handler name="CSVSTATS"/>

@@ -58,7 +58,7 @@ import javax.slee.serviceactivity.ServiceActivityContextInterfaceFactory;
 import javax.slee.serviceactivity.ServiceActivityFactory;
 
 import org.jboss.netty.channel.Channel;
-import org.mobicents.protocols.ss7.map.MAPSmsTpduParameterFactoryImpl;
+import org.restcomm.protocols.ss7.map.MAPSmsTpduParameterFactoryImpl;
 import org.mobicents.slee.ChildRelationExt;
 import org.mobicents.slee.SbbContextExt;
 import org.mobicents.slee.SbbLocalObjectExt;

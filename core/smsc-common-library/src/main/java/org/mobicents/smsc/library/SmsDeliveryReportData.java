@@ -24,7 +24,7 @@ package org.mobicents.smsc.library;
 
 import java.util.Date;
 
-import org.mobicents.protocols.ss7.map.api.smstpdu.StatusReportQualifier;
+import org.restcomm.protocols.ss7.map.api.smstpdu.StatusReportQualifier;
 
 /**
  * 

@@ -32,16 +32,16 @@ import javolution.util.FastList;
 import javolution.util.FastMap;
 
 import org.apache.log4j.Logger;
-import org.mobicents.protocols.ss7.indicator.GlobalTitleIndicator;
-import org.mobicents.protocols.ss7.map.api.MAPApplicationContextVersion;
-import org.mobicents.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCause;
+import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
+import org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion;
+import org.restcomm.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCause;
 import org.mobicents.smsc.cassandra.SmsRoutingRuleType;
 import org.mobicents.smsc.library.DbSmsRoutingRule;
 import org.mobicents.smsc.library.PermanentTemporaryFailure;
 import org.mobicents.smsc.library.SmsSetCache;
 import org.mobicents.smsc.mproc.MProcRule;
 import org.mobicents.smsc.mproc.impl.MProcRuleOamMessages;
-import org.mobicents.ss7.management.console.ShellExecutor;
+import org.restcomm.ss7.management.console.ShellExecutor;
 import org.restcomm.smpp.SmppEncoding;
 
 /**

@@ -1557,7 +1557,7 @@ Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" an
 
 [source,xml]
 ----
-	<bean name="TcapStack" class="org.mobicents.protocols.ss7.tcap.TCAPStackImpl">
+	<bean name="TcapStack" class="org.restcomm.protocols.ss7.tcap.TCAPStackImpl">
 		<constructor>
 			<parameter>TcapStack</parameter>
 			<parameter>
@@ -1578,7 +1578,7 @@ Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" an
 
 [source,xml]
 ----
-	<mbean class="org.mobicents.protocols.ss7.tcap.TCAPStackImpl" enabled="true" name="TcapStackMap" reflection="false" type="TcapStack">
+	<mbean class="org.restcomm.protocols.ss7.tcap.TCAPStackImpl" enabled="true" name="TcapStackMap" reflection="false" type="TcapStack">
                 <property name="sccpStack" type="Bean" value="SccpStack"/>
                 <property name="ssn" type="int" value="8"/>
                 <property name="previewMode" type="bool" value="false"/>
