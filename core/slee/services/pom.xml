@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>slee</artifactId>
 		<groupId>org.mobicents.smsc</groupId>
-		<version>7.4.0-SNAPSHOT</version>
+		<version>7.4.0-148</version>
 	</parent>
 
 	<artifactId>services-parent</artifactId>
