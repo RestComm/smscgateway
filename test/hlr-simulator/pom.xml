@@ -95,26 +95,6 @@
 			<groupId>org.restcomm.protocols.ss7.management</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
-		
-		<!-- Management linkset -->
-		<dependency>
-			<artifactId>linkset</artifactId>
-			<groupId>org.restcomm.protocols.ss7.hardware</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-
-		<!-- Hardware Dialogic Java -->
-		<dependency>
-			<artifactId>restcomm-dialogic</artifactId>
-			<groupId>org.restcomm.protocols.ss7.hardware</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.vendor.dialogic</groupId>
-					<artifactId>gctapi</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 
 		<!-- MTP -->
 		<dependency>

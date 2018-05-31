@@ -150,26 +150,6 @@
 			<groupId>org.restcomm.protocols.ss7.management</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
-
-		<!-- Management linkset -->
-		<dependency>
-			<artifactId>linkset</artifactId>
-			<groupId>org.restcomm.protocols.ss7.hardware</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-
-		<!-- Hardware Dialogic Java -->
-		<dependency>
-			<artifactId>restcomm-dialogic</artifactId>
-			<groupId>org.restcomm.protocols.ss7.hardware</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.vendor.dialogic</groupId>
-					<artifactId>gctapi</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 <!--
 		<dependency>
 			<groupId>com.vendor.dialogic</groupId>
@@ -264,61 +244,10 @@
 
 		<!-- RestComm jSS7 -->
 		<dependency>
-			<artifactId>jmx</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		<dependency>
 			<artifactId>shell-server-impl</artifactId>
 			<groupId>org.restcomm.protocols.ss7.management</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
-		<dependency>
-			<artifactId>alarm</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>jmxss7</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>sctp-oam</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>m3ua-oam</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>sccp-oam</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>linkset-oam</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		
-		<dependency>
-			<artifactId>statistics-oam-api</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>statistics-oam-impl</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		<dependency>
-			<artifactId>tcap-oam</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>	
 
 		<!-- RestComm statistics -->
 		<dependency>

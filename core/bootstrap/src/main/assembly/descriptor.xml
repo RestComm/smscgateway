@@ -73,18 +73,6 @@
 				<!-- <include>org.restcomm.protocols.ss7.hardware:restcomm-dahdi</include> -->
 				<include>org.restcomm.protocols.ss7.hardware:restcomm-dialogic</include>
 				<include>org.restcomm.protocols.ss7.congestion:congestion</include>
-				
-				<!-- RestComm SS7 Libs -->
-				<include>org.restcomm.protocols.ss7.oam.common:jmx</include>
-				<include>org.restcomm.protocols.ss7.oam.common:jmxss7</include>
-				<include>org.restcomm.protocols.ss7.oam.common:alarm</include>
-				<include>org.restcomm.protocols.ss7.oam.common:statistics-oam-api</include>
-				<include>org.restcomm.protocols.ss7.oam.common:statistics-oam-impl</include>
-				<include>org.restcomm.protocols.ss7.oam.common:sctp-oam</include>
-				<include>org.restcomm.protocols.ss7.oam.common:m3ua-oam</include>
-				<include>org.restcomm.protocols.ss7.oam.common:linkset-oam</include>
-				<include>org.restcomm.protocols.ss7.oam.common:sccp-oam</include>
-				<include>org.restcomm.protocols.ss7.oam.common:tcap-oam</include>
 
 				<!-- RestComm statistics -->
 				<include>org.restcomm.commons:restcomm-statistics</include>

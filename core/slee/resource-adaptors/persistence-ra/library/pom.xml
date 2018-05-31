@@ -104,8 +104,8 @@
 					<library-vendor>telestax</library-vendor>
 					<library-version>1.0</library-version>
 					<library-ref>
-						<library-name>org.mobicents.smsc</library-name>
-						<library-vendor>common</library-vendor>
+						<library-name>common</library-name>
+						<library-vendor>org.mobicents.smsc</library-vendor>
 						<library-version>1.0.0</library-version>
 					</library-ref>
 					<library-ref>

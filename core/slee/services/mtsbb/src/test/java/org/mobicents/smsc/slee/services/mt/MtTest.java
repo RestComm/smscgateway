@@ -306,7 +306,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -467,7 +467,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -633,7 +633,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -862,7 +862,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -1016,7 +1016,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -1179,7 +1179,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -1415,7 +1415,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
 
@@ -1787,7 +1787,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
 
@@ -2108,7 +2108,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -2338,7 +2338,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -2559,7 +2559,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -2708,7 +2708,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, true, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -3522,7 +3522,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -3653,7 +3653,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -3746,7 +3746,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -3816,7 +3816,7 @@ public class MtTest {
         networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number, org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN,
                 nnnDig);
         locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
         this.sriSbb.onSendRoutingInfoForSMResponse(evt1, null);
         this.sriSbb.onDialogDelimiter(null, null);
@@ -3911,7 +3911,7 @@ public class MtTest {
         ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number,
                 org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan.ISDN, nnnDig);
         LocationInfoWithLMSI locationInfoWithLMSI = new LocationInfoWithLMSIImpl(networkNodeNumber, null, null, false, null);
-        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null);
+        SendRoutingInfoForSMResponse evt1 = new SendRoutingInfoForSMResponseImpl(imsi, locationInfoWithLMSI, null, null, null);
         evt1.setMAPDialog(dlg);
 
 //        MAPErrorMessage mapErrorMessage = new MAPErrorMessageAbsentSubscriberSMImpl(null, null, null);

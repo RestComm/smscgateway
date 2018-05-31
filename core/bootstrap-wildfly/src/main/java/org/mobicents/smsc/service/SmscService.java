@@ -138,7 +138,6 @@ public class SmscService implements Service<SmscService> {
         log.info("Starting SmscService");
 
         this.smscManagementMBean = initSmscManagementMBean(smppService.getValue().getSmppManagementMBean());
-        this.statsProviderJmx=new SmscStatProviderJmx(ss7Service.getValue().getSs7Management());
 
         if (shellExecutorExists()) {
 

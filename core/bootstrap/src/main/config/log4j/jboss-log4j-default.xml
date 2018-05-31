@@ -95,16 +95,6 @@
 		<appender-ref ref="CDR_DETAILED" />
 	</category>	
 
-	<category name="org.restcomm.protocols.ss7.oam.common.statistics.StatsPrinter" additivity="false">
-		<priority value="DEBUG" /> 
-		<appender-ref ref="STATS"/> 
-	</category> 	
-
-	<category name="org.restcomm.protocols.ss7.oam.common.statistics.CsvStatsPrinter" additivity="false">
-		<priority value="DEBUG" />
-		<appender-ref ref="CSVSTATS"/>
-	</category>
-
 	<category name="org.mobicents">
 		<priority value="INFO" />
 	</category>

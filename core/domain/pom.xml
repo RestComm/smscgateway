@@ -34,11 +34,6 @@
 		</dependency>
 
 		<dependency>
-			<artifactId>statistics-oam-api</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.restcomm.commons</groupId>
 			<artifactId>restcomm-statistics</artifactId>
 			<version>${restcomm.commons.version}</version>
@@ -47,13 +42,6 @@
 			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-core</artifactId>
 			<version>${metrics.version}</version>
-		</dependency>
-
-		<!-- jss7 -->
-		<dependency>
-			<artifactId>jmxss7</artifactId>
-			<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
-			<version>${common.oam.jss7.restcomm.version}</version>
 		</dependency>
 
 		<!-- smpp -->

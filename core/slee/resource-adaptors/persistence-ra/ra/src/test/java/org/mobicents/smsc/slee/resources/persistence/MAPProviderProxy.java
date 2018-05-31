@@ -37,6 +37,9 @@ import org.restcomm.protocols.ss7.map.api.service.pdpContextActivation.MAPServic
 import org.restcomm.protocols.ss7.map.api.service.sms.MAPServiceSms;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.MAPServiceSupplementary;
 import org.restcomm.protocols.ss7.map.errors.MAPErrorMessageFactoryImpl;
+import org.restcomm.protocols.ss7.sccp.NetworkIdState;
+
+import javolution.util.FastMap;
 
 /**
  * 
@@ -126,6 +129,42 @@ public class MAPProviderProxy implements MAPProvider {
     public int getCurrentDialogsCount() {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    @Override
+    public int getCumulativeCongestionLevel() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int getExecutorCongestionLevel() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int getMemoryCongestionLevel() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public NetworkIdState getNetworkIdState(int arg0) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public FastMap<Integer, NetworkIdState> getNetworkIdStateList() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setUserPartCongestionLevel(String arg0, int arg1) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

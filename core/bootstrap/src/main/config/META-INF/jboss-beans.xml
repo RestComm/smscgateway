@@ -22,6 +22,12 @@
 			</map>
 		</property>
 	</bean>
+	
+	<bean name="Ss7Ext" class="org.restcomm.protocols.ss7.ss7ext.Ss7ExtInterfaceDefault">
+        <constructor>
+        </constructor>
+    </bean>
+	
 	<!-- ==================================================================== -->
 	<!-- M3UA -->
 	<!-- M3UAManagement is managing the m3ua side commands -->
@@ -39,11 +45,14 @@
 		<constructor>
 			<parameter>Mtp3UserPart</parameter>
 			<parameter>RestComm-SMSC</parameter>
+			<parameter>
+                <inject bean="Ss7Ext"/>
+            </parameter>
 		</constructor>
 		<property name="persistDir">${jboss.server.data.dir}</property>
 		<property name="maxSequenceNumber">256</property>
 		<property name="maxAsForRoute">2</property>
-		<property name="useLsbForLinksetSelection">false</property>
+		<!-- <property name="useLsbForLinksetSelection">false</property> -->
 		<property name="deliveryMessageThreadCount">8</property>
 		<property name="transportManagement">
 			<inject bean="SCTPManagement" />
@@ -103,6 +112,9 @@
 	<bean name="SccpStack" class="org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl">
 		<constructor>
 			<parameter>SccpStack</parameter>
+			<parameter>
+                <inject bean="Ss7Ext"/>
+            </parameter>
 		</constructor>
 		<property name="persistDir">${jboss.server.data.dir}</property>
 		<property name="mtp3UserParts">
@@ -206,7 +218,7 @@
 	<!-- RestComm SS7 Service -->
 	<!-- ==================================================================== -->
 	<bean name="MAPSS7Service" class="org.mobicents.smsc.server.bootstrap.SS7Service">
-		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.ss7:service=MAPSS7Service",exposedInterface=org.mobicents.smsc.server.bootstrap.SS7ServiceMBean.class,registerDirectly=true)
+		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.restcomm.ss7:service=MAPSS7Service",exposedInterface=org.mobicents.smsc.server.bootstrap.SS7ServiceMBean.class,registerDirectly=true)
 		</annotation>
 		<constructor>
 			<parameter>MAP</parameter>
@@ -277,57 +289,9 @@
 	<!-- ==================================================================== -->
 	<!-- RestComm jSS7 Managemenet Service -->
 	<!-- ==================================================================== -->
-	<bean name="Ss7Management" class="org.restcomm.protocols.ss7.oam.common.jmxss7.Ss7Management">
-		<annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.mobicents.ss7:service=Ss7Management",exposedInterface=org.restcomm.protocols.ss7.oam.common.jmxss7.Ss7ManagementMBean.class,registerDirectly=true)
-		</annotation>
-		<property name="agentId">jboss</property>
-	</bean>
-
-	<bean name="RestCommAlarmManagement" class="org.restcomm.protocols.ss7.oam.common.alarm.AlarmProvider">
-		<constructor>
-			<parameter><inject bean="Ss7Management" /></parameter>
-			<parameter><inject bean="Ss7Management" /></parameter>
-		</constructor>
-	</bean>			
-	
-	<bean name="RestCommStatisticManagement" class="org.restcomm.protocols.ss7.oam.common.statistics.CounterProviderManagement">
-		<constructor>
-			<parameter><inject bean="Ss7Management" /></parameter>
-		</constructor>
-		<property name="persistDir">${jboss.server.data.dir}</property>
-	</bean>			
-
- 	<bean name="RestCommSctpManagement" class="org.restcomm.protocols.ss7.oam.common.sctp.SctpManagementJmx">
-		<constructor>
-			<parameter><inject bean="Ss7Management" /></parameter>
-			<parameter><inject bean="SCTPManagement" /></parameter>
-		</constructor>
-	</bean>	
-	
-	<bean name="RestCommM3uaManagement" class="org.restcomm.protocols.ss7.oam.common.m3ua.M3uaManagementJmx">
-		<constructor>
-			<parameter><inject bean="Ss7Management" /></parameter>
-			<parameter><inject bean="Mtp3UserPart" /></parameter>
-		</constructor>
-	</bean>	
-
-	<bean name="RestCommSccpManagement" class="org.restcomm.protocols.ss7.oam.common.sccp.SccpManagementJmx">
-		<constructor>
-			<parameter><inject bean="Ss7Management" /></parameter>
-			<parameter><inject bean="SccpStack" /></parameter>
-		</constructor>
-	</bean>	
-
-	<bean name="RestCommTcapManagement" class="org.restcomm.protocols.ss7.oam.common.tcap.TcapManagementJmx">
-		<constructor>
-			<parameter><inject bean="Ss7Management" /></parameter>
-			<parameter><inject bean="TcapStack" /></parameter>
-		</constructor>
-	</bean>	
 
 	<bean name="SmscStatProviderJmx" class="org.mobicents.smsc.domain.SmscStatProviderJmx">
 		<constructor>
-			<parameter><inject bean="Ss7Management" /></parameter>
 		</constructor>
 	</bean>	
 </deployment>
