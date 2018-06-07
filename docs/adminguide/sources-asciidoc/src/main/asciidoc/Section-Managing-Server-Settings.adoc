@@ -3213,40 +3213,41 @@ Use this option with extreme caution.
 . You must click on the button 'Apply Changes' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
-[[_receiptsdisabling]]
+[[_deliveryreceiptslevel]]
 === Disabling of Reciepts generating
 
-[[_receiptsdisabling_cli]]
+[[_deliveryreceiptslevel_cli]]
 ==== Using CLI
 
-SMCS can generate receipts of messages delivering results (success / error). See chapter "Appendix B.
-Delivery Receipt Format" of "Short Message Peer to Peer.
-Protocol Specification v3.4." You can set the 'receiptsdisabling' value to true/false by issuing the command `smsc set receiptsdisabling` with appropriate parameters as described below.
-You can verify this by issuing the command `smsc get receiptsdisabling` which will display the value set for this property.
+SMCS can generate receipts of messages delivering results (success / error). See chapter "Appendix B. Delivery Receipt Format" of "Short Message Peer to Peer. Protocol Specification v3.4."
+You can set the 'deliveryreceiptslevel' value to "NONE | FAILURE | ALL" by issuing the command `smsc set deliveryreceiptslevel` with appropriate parameters as described below.
+You can verify this by issuing the command `smsc get deliveryreceiptslevel` which will display the value set for this property.
 
 ----
 
 Name
-    smsc set receiptsdisabling
+	smsc set deliveryreceiptslevel
 
 SYNOPSIS
-    smsc set receiptsdisabling <true | false>
+	smsc set deliveryreceiptslevel <NONE | FAILURE | ALL>
 
 DESCRIPTION
-    The SMSC can be configured to generat or not delivery receipts.
-     Setting of receiptsdisabling to false enables of receipts generation.
-     Setting of receiptsdisabling to true disables of receipts generation.
-     Default value: false (receipts will be generated).
+	The SMSC can be configured to generate or not delivery receipts.
+	Possible values:
+	NONE - SMSC GW will not generate any delivery receipts
+	FAILURE - SMSC GW will generate delivery receipts only for failures
+	ALL - SMSC GW will generate delivery receipts for successful and failures cases
+	Default value: ALL (receipts will be generated for all cases).
 ----
 
-[[_receiptsdisabling_gui]]
+[[_deliveryreceiptslevel_gui]]
 ==== Using GUI
 
 .Procedure: Disabling of Reciepts generating using the GUI
 . In the GUI Management Console for SMSC Gateway, click on 'Server Settings' in the left panel.
 . The main panel will display the existing Settings, segregated into eight horizontal tabs: Properties, SS7 Settings, Cassandra, Scheduler, Diameter, Processing, CDR and Home Routing.
   Switch to the 'Processing' tab in the GUI.
-. You can specify if the SMSC should disable of receipt generating by setting the value for the field 'Disable Delivery Receipt' to true or false accordingly.
+. You can specify if the SMSC should disable of receipt generating by setting the value for the field 'Delivery Receipts Level' to true or false accordingly.
   For more details of this parameter, please refer to the description of the CLI command for the same in the preceding section.
 . You must click on the button 'Save' at the top of the window to save your settings.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
