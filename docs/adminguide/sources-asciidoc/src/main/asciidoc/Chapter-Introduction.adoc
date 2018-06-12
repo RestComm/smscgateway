@@ -12,7 +12,7 @@ Since it is built on a modern and extensible JSLEE platform it automatically pro
 The database is used for storing unsent messages, messages successfully sent and messages that failed to be sent. 
 
 {this-platform} {this-application} is cloud-ready.
-It can be deployed on dedicated hardware, private cloud infrastructure or public laaS such as AWS. {this-platform} {this-application} supports TDM hardware offered by major vendors in the market, namely Intel family boards (Dialogic) and  Zaptel/Dahdi (Digium, Sangoma). 
+It can be deployed on dedicated hardware, private cloud infrastructure or public laaS such as AWS. Restcomm SMSC supports TDM hardware offered by major vendors in the market, namely Intel family boards (Dialogic).
 
 {this-platform} {this-application} is based on the robust and proven {this-platform} JAIN SLEE 1.1 Server and {this-platform} jSS7 Stack. {this-platform} JAIN SLEE Server is a highly scalable event-driven application server with a robust component model and fault tolerant execution environment.
 It provides a set of connectors to a variety of networks elements: SS7 MAP, TCAP, INAP, ISUP, SMPP, XMPP, SIP, MGCP, HTTP, XDM, XCAP, Diameter and many others.
