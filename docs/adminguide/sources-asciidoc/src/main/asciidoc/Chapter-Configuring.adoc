@@ -1590,6 +1590,17 @@ Pay also attention that SMSC GW in Home Routing mode usually plays "HLR role" an
             </mbean>
 ----
 
+== SMS Routing By SMPP Optional TLV Fields
+Telscale SMSC has supprted special routing by using special SMPP TLV field, there are 4 fiels (you need to fill these tag in your SMPP client and send to Telscale SMSC as a submit_sm or deliver_sm), in this case, Telscale SMSC will not send SRIforSM and use these values for sending MtForwardSM:
+
+* TAG_IMSI: value 1403, it's IMSI of destination, C-Octec String and mandatory
+* TAG_NNN_DIGITS: value 1404, it's Network Node Number (MSC/VLR GT numbers), C-Octec String and mandatory
+* TAG_NNN_TON: value 1405, it's TON number, Interger and optional
+* TAG_NNN_NPI: value 1406, it's NPI number, Interger and optional
+
+If TAG_IMSI or TAG_NNN_DIGITS has empty or bad value, SMSC will ignore other TAGs and accept SMS as normal SMS.
+If TAG_NNN_TON or TAG_NNN_NPI has empty or bad value, SMSC will fill with 1
+This feature only support by Telscale SMSC version 
 
 [[_smpp_interface_description]]
 == SMPP interface description
