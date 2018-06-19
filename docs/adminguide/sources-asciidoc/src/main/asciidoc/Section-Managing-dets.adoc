@@ -1,0 +1,166 @@
+
+[[_det_tables]]
+= Delivery Error Translation tables
+
+You can read information how Delivery Error Translation can be used in the chapter <<_smpp_dlivery_receipt_transit>>.
+Here we will describe how to manage Delivery Error Translation tables.
+
+[[_det_tables_create]]
+== Create a Delivery Error Translation table.
+
+[[_det_tables_create_cli]]
+=== Using CLI
+
+You can configure a new Delivery Error Translation table by issuing the command `smsc det add` with appropriate parameters as described below.
+
+----
+
+Name
+	smsc det add
+
+SYNOPSIS
+	smsc det add <rule name> <rule content>
+
+DESCRIPTION
+	This command is used for adding a new DLR error translation rule.
+	This rule is used for changing of an error code of a DLR
+	that has come from a ESME that is marked for error code
+	translation (ESME parameter detRule="rule name").
+
+PARAMETERS
+
+	rule name     - A unique Delivery Error Translation table name that identifies an rule. 
+	                ESME will refer it.
+	rule content  - Content of error code translation rule. A format example is:
+	                "001:002,005:010,*:011". This example will change all incoming
+	                the ESME DLR error code from 001 to 002, 005 to 011 and
+	                all other error codes to 011. An item with "*" is not mandatory.
+	                If it is absent then non-configured error codes will be left as
+	                they have been.
+EXAMPLE:
+	smsc det add rule1 001:002,005:010,*:011
+----
+
+[[_det_tables_create_gui]]
+=== Using GUI
+
+Under construction .........
+
+[[_det_tables_modify]]
+== Modify a Delivery Error Translation table.
+
+[[_det_tables_modify_cli]]
+=== Using CLI
+
+You can modify an existent Delivery Error Translation table by issuing the command `smsc det modify` with appropriate parameters as described below.
+
+----
+
+Name
+	smsc det modify
+
+SYNOPSIS
+	smsc det modify <rule name> <rule content>
+
+DESCRIPTION
+	This command is used for modifying of an existing DLR error translation rule.
+	This rule is used for changing of an error code of a DLR
+	that has come from a ESME that is marked for error code
+	translation (ESME parameter detRule="rule name").
+
+PARAMETERS
+
+	rule name     - A unique rule name that identifies a Delivery Error Translation table.
+	                ESME will refer it.
+	rule content  - Content of error code translation rule. A format example is:
+	                "001:002,005:010,*:011". This example will change all incoming
+	                the ESME DLR error code from 001 to 002, 005 to 011 and
+	                all other error codes to 011. An item with "*" is not mandatory.
+	                If it is absent then non-configured error codes will be left as
+	                they have been.
+
+EXAMPLE:
+	smsc det modify rule1 001:002,005:010,*:011
+----
+
+[[_det_tables_modify_gui]]
+=== Using GUI
+
+Under construction .........
+
+
+[[_det_tables_view]]
+== View a Delivery Error Translation table details.
+
+[[_det_tables_view_cli]]
+=== Using CLI
+
+You can view the details of all configured Delivery Error Translation tables or a specified Delivery Error Translation table by issuing the command `smsc det show` as described below.
+
+----
+
+Name
+	smsc det show
+
+SYNOPSIS
+	smsc det show <rule name>
+
+DESCRIPTION
+	This command is used for displaying of DLR error translation rule(s).
+	This rule is used for changing of an error code of a DLR
+	that has come from a ESME that is marked for error code
+	translation (ESME parameter detRule="rule name").
+
+PARAMETERS
+
+	rule name     - A unique rule name that identifies
+	     a Delivery Error Translation table.
+	     If <rule name> parameter is not specified all existing rules
+	     will be displayed.
+
+EXAMPLES:
+	smsc det show rule1
+	smsc det show
+----
+
+[[_det_tables_view_gui]]
+=== Using GUI
+
+Under construction .........
+
+[[_det_tables_remove]]
+== Remove an existing Delivery Error Translation table.
+
+[[_det_tables_remove_cli]]
+=== Using CLI
+
+You can remove an existent Delivery Error Translation table by issuing the command `smsc det remove` with appropriate parameters as described below.
+
+----
+
+Name
+	smsc det remove
+
+SYNOPSIS
+	smsc det remove <rule name>
+
+DESCRIPTION
+	This command is used for removing of an existing DLR error translation rule.
+	This rule is used for changing of an error code of a DLR
+	that has come from a ESME that is marked for error code
+	translation (ESME parameter detRule="rule name").
+
+PARAMETERS
+
+	rule name     - A unique rule name that identifies
+	             a Delivery Error Translation table.
+
+EXAMPLE:
+	smsc det remove rule1
+----
+
+[[_det_tables_remove_gui]]
+=== Using GUI
+
+Under construction .........
+
