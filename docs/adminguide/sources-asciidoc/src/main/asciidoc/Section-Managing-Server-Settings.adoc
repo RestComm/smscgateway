@@ -3214,7 +3214,7 @@ Use this option with extreme caution.
   If there is an error in setting the value, then you will find the details of the error in the Management Console Log section below.
 
 [[_deliveryreceiptslevel]]
-=== Disabling of Reciepts generating
+=== Delivery reciepts generating level
 
 [[_deliveryreceiptslevel_cli]]
 ==== Using CLI

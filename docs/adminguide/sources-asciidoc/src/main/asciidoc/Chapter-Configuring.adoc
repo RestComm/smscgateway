@@ -1617,7 +1617,9 @@ DCS parameter means the encoding that will be used when a message will be transf
 * 8 - UCS2 encoding (all characters are supported). 2-bytes encoding is used at SS7 network message transferring.
 
 For DCS 0 (GSM7 encdoing) and 8 (UCS2 encoding) SMSC GW decodes messages when receiving from SMPP connector and encode messages before sending them into SMPP connector. For this task it is important which data coding schema will be used for messages decoding / encoding.
-SMSC GW has two configurable parameters for decoding / encodoing, one for GSM 7 ancoding and another for UCS2 encoding (SMPP Encoding for GSM7 / SMPP Encoding for UCS2). See following chapter for configuring details: <<_smpp_encoding_for_ucs2>>. A user schould configure these parameters before of SMSC GW usage depending on which encoding are used by user's SMPP applications for message body encoding.
+SMSC GW has two configurable parameters for decoding / encodoing, one for GSM 7 encoding and another for UCS2 encoding (SMPP Encoding for GSM7 / SMPP Encoding for UCS2).
+See following chapter for configuring details: <<_smpp_encoding_for_ucs2>> for server level configuring and parameters `smppEncodingForGsm7` and `smppEncodingForUCS2` for configuring per ESME in "External Short Messaging Entities (ESMEs)" chapter of "Restcomm SMPP Extensions User Guide". 
+A user schould configure these parameters before of SMSC GW usage depending on which encoding are used by user's SMPP applications for message body encoding.
 
 One of indication that says that message encoding parameters are wrongly configured is messages in server.log like `Message length in bytes is too big for solid message: 268>134`. This may mean that SMPP application sends messages to SMSC GW in UCS2 encoding and SMSC GW decodes them in UTF8 encodoing and a message bode becomes too big length after it. Another reason for `Message length in bytes is too big` message may be that you are trying to use GSM7 encoding and your message contains characters from GSM7 extended table (like '[' or ']'). Such characters demands 2 septets for encdoning and so a message / message segment (if it contains such characters) must contain lower character count.
 
@@ -1626,14 +1628,20 @@ One of indication that says that message encoding parameters are wrongly configu
 
 SMSC GW can generate delivery receipts after a message is delivered / failed to some destination. For this a SMPP application must set suitable values in the `registered_delivery` field. After a message is delivered / failed to some destionation, then SMSC GW will generate a delivery receipt. For simple routing such receipts back to an original ESME we can just assign to each ESME a separate networkId value and turn on the following option: <<_smsc_gateway_server_routing_dlv>>.
 
-But sometimes SMSC GW plays a role of a transit node and SMSC GW customers interest in delivery receipts from upper  SMSC GW nodes (nodes that deliver messages directly to customers) an not from a transit SMSC GW itself. {this-platform} SMSC GW can play such role and this case is more complicated. SMSC GW must accept delivery receipts from upper SMSC GW nodes, replace messageId values in these receipts by a messageId which SMSC GW used in submit_sm_response to a lower node that has sumbitted an original message and sends an updated receipt to an original ESME. We call such process as a delivery receipt transit.
+But sometimes SMSC GW plays a role of a transit node and SMSC GW customers interest in delivery receipts from upper  SMSC GW nodes (nodes that deliver messages directly to customers) an not from a transit SMSC GW itself. {this-platform} SMSC GW can play such role and this case is more complicated. SMSC GW must accept delivery receipts from upper SMSC GW nodes, replace messageId values in these receipts by a messageId which SMSC GW used in submit_sm_response to a lower node that has sumbitted an original message and sends an updated receipt to an original ESME.
+
+Another possible option - SMSC GW can replace an error code in an incoming delivery receipt (DLR) to another error code (that may fit to SMSC GW error codes set). This functionality is configurable per ESME and allows us to have an error code translation table per ESME.
+Delivery Error Translation tables have a name and a list of matching between original error codes and translated error code like `*:012,101:014,102:015`. In the example code 101 will be translated to 014, 102 to 015 and all other codes to 012 (this part is optional, if no syntax like `*:012` was added then other error codes will not be changed).   
+
+We call such process as a delivery receipt transit.
 
 To achieve this functionality we must make following configuring:
 
-* Turn on the option <<_deliveryreceiptslevel>> (by this we prevent SMSC GW from generating of its own delivery receipts)
+* Switch the option <<_deliveryreceiptslevel>> to "FAILURE" (by this we prevent SMSC GW from generating of its own delivery receipts for success delivery and generate it only for delivery errors)
 * Turn on the option <<_incomereceiptsprocessing>>. This will force SMSC GW to store extra info for each received and resent original message into extra tables of cassandra database and then when a delivery receipt comes from an upper node then SMSC GW will replace messageID in the receipt to the proper messageId that was sent to the originator of submit_sm (to lower SMSC GW).
 * A sent message and a received delivery receipt must be at the same ESME cluster.
 * Then we have to force that the updated delivery receipt will be routed back to the original ESME. <<_smsc_gateway_server_routing_dlv>> will not help us in this case. There may be several approaches for it. The recommended one - put each ESME at the separate networkID area and then add mproc rules for rerouting that will use the parameter "receiptnetworkidmask" (check the chapter <<_mproc_rules_default>>). For example a mproc rule `smsc mproc add mproc 1 receiptnetworkidmask 1 newnetworkid 1` will be applied only for delivery receipts and only for that delivery receipt an original message for which has come from netoworkId 1 area. And in this case the delivery receipt will be routed into networokId area 1.
+* If we need of DLR error code changing then we need to configure Delivery Error Translation tables by <<_det_tables>> and specify a needed Delivery Error Translation table by specifying of option "detRule" for ESME via which a DLR has come to SMSC GW.  
 
 
 [[_http_interface_description]]

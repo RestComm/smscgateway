@@ -70,6 +70,12 @@ include::Section-Managing-mproc-rules.adoc[]
 
 :leveloffset: +1
 
+include::Section-Managing-dets.adoc[]
+
+:leveloffset: -1
+
+:leveloffset: +1
+
 include::Section-Managing-gsd.adoc[]
 
 :leveloffset: -1
