@@ -42,7 +42,7 @@ PARAMETERS
 . The main panel will display the existing HTTP user accounts (if any), one each in a row with corresponding actions (remove, update) for each row.
   Below this you will find the button 'Create HTTP user account'. 
 . You can create a new HTTP user account by launching the 'Create HTTP user account' window by clicking on the blue coloured 'Create HTTP user account' button.
-  The 'Create HTTP user account' window will display all HTTP user account paramters that must be defined by you.
+  The 'Create HTTP user account' window will display all HTTP user account parameters that must be defined by you.
   For more details of these parameters please refer to the descriptions of the CLI commands for the same in the preceding section.
 . Enter appropriate values for all the parameters and then click on the 'Create' button at the bottom of this 'HTTP user account' window.
   This action will create a new HTTP user account with parameters as defined by you. 
@@ -86,7 +86,7 @@ PARAMETERS
 . In the GUI Management Console for SMSC Gateway, click on 'HTTP user accounts' in the left panel. 
 . The main panel will display the existing HTTP user accounts (if any), one each in a row with corresponding actions (remove, update) for each row.
 . You can update an existing by launching the 'HTTP user account <name> properties' window by clicking on the blue coloured 'Update HTTP user account' button.
-  The 'HTTP user account <name> properties' window will display all HTTP user account paramters that can be updated by you.
+  The 'HTTP user account <name> properties' window will display all HTTP user account parameters that can be updated by you.
   For more details of these parameters please refer to the descriptions of the CLI commands  for the same in the preceding section.
 . Update appropriate values for all the parameters and then click on the 'Close' button.
   This action will modify a new HTTP user account with parameters as defined by you. 

@@ -44,7 +44,16 @@ EXAMPLE:
 [[_det_tables_create_gui]]
 === Using GUI
 
-Under construction .........
+.Procedure: Create new DLR error translation rule using GUI
+. In the GUI Management Console for SMSC Gateway, click on 'DLR error translation rules' in the left panel. 
+. The main panel will display the existing DLR error translation rules (if any), one each in a row with corresponding actions (remove, update) for each row.
+  Below this you will find the button 'Create DLR error translation rule'. 
+. You can create a new DLR error translation rules by launching the 'DLR error translation rules' window by clicking on the blue coloured 'DLR error translation rules' button.
+  The 'Create DLR error translation rule' window will display all DLR error translation rule parameters that must be defined by you.
+  For more details of these parameters please refer to the descriptions of the CLI commands for the same in the preceding section.
+. Enter appropriate values for all the parameters and then click on the 'Create' button at the bottom of this 'Create DLR error translation rule' window.
+  This action will create a new Create DLR error translation rule with parameters as defined by you. 
+. If there is an error in defining the Create DLR error translation rule, then you will find the details of the error in the Management Console Log section below. 
 
 [[_det_tables_modify]]
 == Modify a Delivery Error Translation table.
@@ -86,8 +95,15 @@ EXAMPLE:
 [[_det_tables_modify_gui]]
 === Using GUI
 
-Under construction .........
-
+.Procedure: Modify an existing DLR error translation rule using GUI
+. In the GUI Management Console for SMSC Gateway, click on 'DLR error translation rules' in the left panel. 
+. The main panel will display the existing DLR error translation rules (if any), one each in a row with corresponding actions (remove, update) for each row.
+. You can update an existing by launching the 'DLR error translation rule <name> properties' window by clicking on the blue coloured 'Update DLR error translation rule' button.
+  The 'DLR error translation rule <name> properties' window will display all DLR error translation rules parameters that can be updated by you.
+  For more details of these parameters please refer to the descriptions of the CLI commands  for the same in the preceding section.
+. Update appropriate values for all the parameters and then click on the 'Close' button.
+  This action will modify a new DLR error translation rule with parameters as defined by you. 
+. If there is an error in defining the DLR error translation rule, then you will find the details of the error in the Management Console Log section below. 
 
 [[_det_tables_view]]
 == View a Delivery Error Translation table details.
@@ -126,7 +142,11 @@ EXAMPLES:
 [[_det_tables_view_gui]]
 === Using GUI
 
-Under construction .........
+.Procedure: View DLR error translation rules using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'DLR error translation rules' in the left panel. 
+. The main panel will display the existing HTTP user accounts (if any), one each in a row with corresponding actions (remove, update) for each row.
+. You can view the details of an DLR error translation rule by clicking on the row corresponding to the DLR error translation rule.
+  All relevant details of the DLR error translation rule will be displayed in an expanded format. 
 
 [[_det_tables_remove]]
 == Remove an existing Delivery Error Translation table.
@@ -162,5 +182,8 @@ EXAMPLE:
 [[_det_tables_remove_gui]]
 === Using GUI
 
-Under construction .........
+.Procedure: Delete DLR error translation rule using the GUI
+. In the GUI Management Console for SMSC Gateway, click on 'DLR error translation rules' in the left panel. 
+. The main panel will display the existing DLR error translation rules (if any), one each in a row with corresponding actions (remove, update) for each row.
+. To delete an existing DLR error translation rule click on the delete icon marked 'x' in red, for the row corresponding to the DLR error translation rule.
 
