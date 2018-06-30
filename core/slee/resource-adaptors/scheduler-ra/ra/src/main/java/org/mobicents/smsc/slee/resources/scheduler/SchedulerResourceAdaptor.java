@@ -950,7 +950,7 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
             return new OneWaySmsSetCollection();
         }
 
-        ArrayList<SmsSet> lstS = dbOperations_C2.c2_getRecordList(processedDueSlot);
+        ArrayList<SmsSet> lstS = filterOut(dbOperations_C2.c2_getRecordList(processedDueSlot));
         ArrayList<SmsSet> lst = dbOperations_C2.c2_sortRecordList(lstS);
         OneWaySmsSetCollection res = new OneWaySmsSetCollection();
         res.setListSmsSet(lst);
@@ -1030,4 +1030,17 @@ public class SchedulerResourceAdaptor implements ResourceAdaptor {
 			return lst.size() - uploadedCount;
 		}
 	}
+
+	private static ArrayList<SmsSet> filterOut(final List<SmsSet> anInputList) {
+        final ArrayList<SmsSet> result = new ArrayList<SmsSet>(0);
+        final long min = SmscPropertiesManagement.getInstance().getMinMessageId();
+        final long max = SmscPropertiesManagement.getInstance().getMaxMessageId();
+        for (final SmsSet set : anInputList) {
+            if (set.isMessageIdOk(min, max)) {
+                result.add(set);
+            }
+        }
+        return result;
+    }
+
 }
