@@ -406,14 +406,6 @@ public class TxSmppServerSbbTest {
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1",
                 true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8,SmppEncodingWithDefault.Utf8, false);
-        /*
-        Error:(403, 21) java: no suitable constructor found for Esme(java.lang.String,java.lang.String,java.lang.String,java.lang.String,int,boolean,<nulltype>,org.restcomm.smpp.SmppInterfaceVersionType,int,int,<nulltype>,com.cloudhopper.smpp.SmppBindType,com.cloudhopper.smpp.SmppSession.Type,int,long,long,long,long,long,java.lang.String,boolean,int,int,int,int,int,java.lang.String,int,int,java.lang.String,int,boolean,int,int,int,int,int,int,int,int,int,int,int)
-    constructor org.restcomm.smpp.Esme.Esme() is not applicable
-      (actual and formal argument lists differ in length)
-    constructor org.restcomm.smpp.Esme.Esme(java.lang.String,java.lang.String,java.lang.String,java.lang.String,int,boolean,java.lang.String,org.restcomm.smpp.SmppInterfaceVersionType,int,int,java.lang.String,com.cloudhopper.smpp.SmppBindType,com.cloudhopper.smpp.SmppSession.Type,int,long,long,long,long,long,java.lang.String,boolean,int,int,long,int,int,java.lang.String,int,int,java.lang.String,int,boolean,long,long,long,long,int,int,int,int,int,int,int,org.restcomm.smpp.SmppEncodingWithDefault,org.restcomm.smpp.SmppEncodingWithDefault,boolean) is not applicable
-      (actual and formal argument lists differ in length)
-      Esme(org.restcomm.smpp.SmppEncodingWithDefault,org.restcomm.smpp.SmppEncodingWithDefault,boolean) is not applicable
-         */
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitMulti event = new SubmitMulti();
