@@ -65,6 +65,7 @@ import org.restcomm.slee.resource.smpp.SmppSessions;
 import org.restcomm.slee.resource.smpp.SmppTransaction;
 import org.restcomm.smpp.Esme;
 import org.restcomm.smpp.SmppEncoding;
+import org.restcomm.smpp.SmppEncodingWithDefault;
 import org.restcomm.smpp.SmppInterfaceVersionType;
 import org.restcomm.smpp.SmppManagement;
 import org.testng.annotations.AfterMethod;
@@ -86,7 +87,8 @@ import com.cloudhopper.smpp.type.Address;
 
 /**
  * 
- * @author sergey vetyutnev
+ * @author <a href="mailto:serg.vetyutnev@gmail.com"> Sergey Vetyutnev </a>
+ * @modified <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  * 
  */
 public class TxSmppServerSbbTest {
@@ -210,7 +212,7 @@ public class TxSmppServerSbbTest {
 		Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
 				SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
 				windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
+				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8,SmppEncodingWithDefault.Utf8, false);
 		ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
 		SubmitSm event = new SubmitSm();
@@ -264,7 +266,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
+                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8,SmppEncodingWithDefault.Utf8, false);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitSm event = new SubmitSm();
@@ -339,7 +341,7 @@ public class TxSmppServerSbbTest {
 		Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
 				SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
 				windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
+				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8,SmppEncodingWithDefault.Utf8, false);
 		ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
 		DataSm event = new DataSm();
@@ -403,7 +405,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1",
-                true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
+                true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8,SmppEncodingWithDefault.Utf8, false);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitMulti event = new SubmitMulti();
@@ -539,7 +541,7 @@ public class TxSmppServerSbbTest {
 		Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
 				SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
 				windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
+				"Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8,SmppEncodingWithDefault.Utf8, false);
 		ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
 		SubmitSm event = new SubmitSm();
@@ -725,7 +727,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
+                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8,SmppEncodingWithDefault.Utf8, false);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitSm event = new SubmitSm();
@@ -809,7 +811,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
+                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8,SmppEncodingWithDefault.Utf8, false);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitSm event = new SubmitSm();
@@ -865,7 +867,7 @@ public class TxSmppServerSbbTest {
         Esme esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null,
                 SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER, SmppSession.Type.CLIENT,
                 windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout,
-                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
+                "Esme_1", true, 30000, 0, 0, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8,SmppEncodingWithDefault.Utf8, false);
         ActivityContextInterface aci = new SmppTransactionProxy(esme);
 
         SubmitSm event = new SubmitSm();
