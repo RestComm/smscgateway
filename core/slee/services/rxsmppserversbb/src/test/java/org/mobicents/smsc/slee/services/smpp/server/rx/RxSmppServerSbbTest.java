@@ -89,6 +89,7 @@ import org.restcomm.smpp.Esme;
 import org.restcomm.smpp.EsmeManagement;
 import org.restcomm.smpp.EsmeManagementProxy;
 import org.restcomm.smpp.SmppEncoding;
+import org.restcomm.smpp.SmppEncodingWithDefault;
 import org.restcomm.smpp.SmppInterfaceVersionType;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -184,7 +185,7 @@ public class RxSmppServerSbbTest {
 //
         esme = new Esme("Esme_1", "Esme_systemId_1", "pwd", "host", 0, false, null, SmppInterfaceVersionType.SMPP34, -1, -1, null, SmppBindType.TRANSCEIVER,
                 SmppSession.Type.CLIENT, windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval, windowWaitTimeout, "Esme_1", true, 30000, 0,
-                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1);
+                0L, -1, -1, "^[0-9a-zA-Z]*", -1, -1, "^[0-9a-zA-Z]*", 0, false, 0, 0, 0, 0, -1, -1, 0, -1, -1, -1, -1, SmppEncodingWithDefault.Utf8, SmppEncodingWithDefault.Utf8, false);
 
         SmsSetCache.getInstance().clearProcessingSmsSet();
 
