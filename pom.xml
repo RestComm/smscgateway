@@ -317,7 +317,7 @@
 		<repository>
 			<id>jboss-public-repository-group</id>
 			<name>JBoss Public Maven Repository Group</name>
-			<url>http://repository.jboss.org/nexus/content/groups/public</url>
+			<url>https://repository.jboss.org/nexus/content/groups/public</url>
 			<layout>default</layout>
 			<releases>
 				<enabled>true</enabled>
@@ -331,7 +331,7 @@
 		<repository>
 			<id>jboss-3rd-party-repository-group</id>
 			<name>JBoss ThirdParty Releases Repository Group</name>
-			<url>http://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
+			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
 			<layout>default</layout>
 			<releases>
 				<enabled>true</enabled>
@@ -345,7 +345,7 @@
 		<repository>
 			<id>jboss-3rd-party-upload-repository-group</id>
 			<name>JBoss ThirdParty Upload Repository Group</name>
-			<url>http://repository.jboss.org/nexus/content/repositories/thirdparty-upload</url>
+			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-upload</url>
 			<layout>default</layout>
 			<releases>
 				<enabled>true</enabled>
@@ -359,7 +359,7 @@
 		<repository>
 			<id>java.net-Public</id>
 			<name>Maven Java Net Snapshots and Releases</name>
-			<url>http://download.java.net/maven/2/</url>
+			<url>https://download.java.net/maven/2/</url>
 			<releases>
 				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
@@ -372,7 +372,7 @@
 		<repository>
 			<id>backup.repository.jboss.org</id>
 			<name>JBoss Repository Backup</name>
-			<url>http://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
+			<url>https://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
