@@ -4,8 +4,14 @@
 </h3>
 <hr style="margin: 10 0px;" />
 <span style="float: right;">
+	<button id="stopAll" style="float: right; margin-right: 20px; margin-left: 5px; height: 30px;" class="btn btn-medium btn-danger" data-toggle="tooltip" data-placement="left" title="Stop all ESME List" onclick="confirmStopAllEsmeAccounts();">
+		<i class="icon-stop"></i>
+	</button>
 	<button id="refresh" style="float: right; margin-right: 20px; margin-left: 20px; height: 30px;" class="btn btn-medium btn-success" data-toggle="tooltip" data-placement="left" title="Refresh ESME List" onclick="updateEsmes();">
 		<i class="icon-refresh"></i>
+	</button>
+	<button id="startAll" style="float: right; margin-right: 5px; margin-left: 5px; height: 30px;" class="btn btn-medium btn-success" data-toggle="tooltip" data-placement="left" title="Start all ESME List" onclick="confirmStartAllEsmeAccounts();">
+		<i class="icon-play"></i>
 	</button>
 </span>
 <span id="esmes-table-wrapper">
@@ -453,6 +459,7 @@
 </div>
 
 <script type="text/javascript">
+	var allEsmeNames = [];
 	function clientServerFunction(){
 		
 		var e1 = document.getElementById("smppSessionType");
@@ -673,7 +680,9 @@
 		
 		var overloadThreshold = response.value.OverloadThreshold;
 		var normalThreshold = response.value.NormalThreshold;
-				
+
+		allEsmeNames.push(name);
+
 		if(systemType == null || systemType==""){
 			systemType = "null";
 		}
@@ -2293,7 +2302,55 @@
 				});		
 		
 	}
-	
+
+	function confirmStartAllEsmeAccounts() {
+		if (confirm("Do you want to start all ESME accounts?")) {
+			startAllEsmeAccounts();
+		}
+	}
+
+	function startAllEsmeAccounts(){
+		for (var i = 0; i < allEsmeNames.length; i++) {
+			mbeanSearch = "org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement";
+			jolokia.execute(mbeanSearch, 'startEsme', allEsmeNames[i],
+					{
+						success: function (value) {
+
+						},
+						error: function (value) {
+							errorUID = ("st" + new Date().getTime()).hashCode();
+							createStackTrace(errorUID, value.stacktrace);
+						}
+					});
+		}
+		updateEsmes();
+		logToConsole('INFO', 'Successfully started all Esme accounts');
+	}
+
+	function confirmStopAllEsmeAccounts() {
+		if (confirm("Do you want to stop all ESME accounts?")) {
+			stopAllEsmeAccounts();
+		}
+	}
+
+	function stopAllEsmeAccounts(){
+		for (var i = 0; i < allEsmeNames.length; i++) {
+			mbeanSearch = "org.mobicents.smpp:layer=EsmeManagement,name=SmppManagement";
+			jolokia.execute(mbeanSearch, 'stopEsme', allEsmeNames[i],
+					{
+						success: function (value) {
+
+						},
+						error: function (value) {
+							errorUID = ("st" + new Date().getTime()).hashCode();
+							createStackTrace(errorUID, value.stacktrace);
+						}
+					});
+		}
+		updateEsmes();
+		logToConsole('INFO', 'Successfully stopped all Esme accounts');
+	}
+
 	function onModifyEsmeOk(mbeanName, propertyName, spanId){
 		var skipCheck = false;
 		onModifyEsmeOk(mbeanName, propertyName, spanId, skipCheck)
