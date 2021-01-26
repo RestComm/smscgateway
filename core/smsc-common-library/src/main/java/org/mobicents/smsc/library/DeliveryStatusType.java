@@ -4,8 +4,7 @@ public enum DeliveryStatusType {
 
     DELIVERY_ACK_STATE_DELIVERED("DELIVRD"),
     DELIVERY_ACK_STATE_UNDELIVERABLE("UNDELIV"),
-    DELIVERY_ACK_STATE_ENROUTE("ENROUTE"),
-    DELIVERY_ACK_STATE_EXPIRED("EXPIRED");
+    DELIVERY_ACK_STATE_ENROUTE("ENROUTE");
 
     private String value;
     DeliveryStatusType(String value) {
