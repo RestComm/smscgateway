@@ -405,7 +405,8 @@ public class MessageUtil {
     /**
      * Returns now many bytes occupies this charCount
      * @param dataCodingScheme
-     * @param charCount
+     * @param msg
+	 * @param udh
      * @return
      */
     public static int getMessageLengthInBytes(DataCodingScheme dataCodingScheme, String msg, UserDataHeader udh) {
@@ -583,9 +584,6 @@ public class MessageUtil {
     public static final String DELIVERY_ACK_STAT = " stat:";
     public static final String DELIVERY_ACK_ERR = " err:";
     public static final String DELIVERY_ACK_TEXT = " text:";
-    public static final String DELIVERY_ACK_STATE_DELIVERED = "DELIVRD";
-    public static final String DELIVERY_ACK_STATE_UNDELIVERABLE = "UNDELIV";
-    public static final String DELIVERY_ACK_STATE_ENROUTE = "ENROUTE";
     public static final byte ESME_DELIVERY_ACK = 0x04;
     public static final SimpleDateFormat DELIVERY_ACK_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmm");
 
@@ -613,18 +611,9 @@ public class MessageUtil {
             return false;
     }
 
-    public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts,
+    public static Sms createReceiptSms(Sms sms, DeliveryStatusType deliveryStatus, TargetAddress ta, boolean origNetworkIdForReceipts,
             String extraString) {
-        return createReceiptSms(sms, delivered, ta, origNetworkIdForReceipts, extraString, false);
-    }
-
-    public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts) {
-        return createReceiptSms(sms, delivered, ta, origNetworkIdForReceipts, null, false);
-    }
-
-    public static Sms createReceiptSms(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts,
-            String extraString, boolean tempFailure) {
-        Sms receipt = createReceiptSms(sms, delivered, extraString, tempFailure);
+        Sms receipt = createReceiptSms(sms, deliveryStatus, extraString);
         SmsSet backSmsSet = new SmsSet();
         backSmsSet.setDestAddr(ta.getAddr());
         backSmsSet.setDestAddrNpi(ta.getAddrNpi());
@@ -638,15 +627,7 @@ public class MessageUtil {
         return receipt;
     }
 
-    public static Sms createReceiptSms(Sms sms, boolean delivered) {
-        return createReceiptSms(sms, delivered, null);
-    }
-
-    public static Sms createReceiptSms(Sms sms, boolean delivered, String extraString) {
-            return createReceiptSms(sms, delivered, extraString, false);
-    }
-
-    public static Sms createReceiptSms(Sms sms, boolean delivered, String extraString, boolean tempFailure) {
+    public static Sms createReceiptSms(Sms sms, DeliveryStatusType deliveryStatus, String extraString) {
         Sms receipt = new Sms();
         receipt.setDbId(UUID.randomUUID());
         receipt.setSourceAddr(sms.getSmsSet().getDestAddr());
@@ -661,7 +642,7 @@ public class MessageUtil {
 
         String rcpt = createDeliveryReceiptMessage(sms.getMessageIdText(), sms.getSubmitDate(),
                 new Timestamp(System.currentTimeMillis()), sms.getSmsSet().getStatus().getCode(), sms.getShortMessageText(),
-                delivered, extraString, tempFailure);
+				deliveryStatus, extraString);
 
         // TODO: now we are sending all in GSM7 encoding
         receipt.setDataCoding(0);
@@ -676,7 +657,7 @@ public class MessageUtil {
     }
 
     public static String createDeliveryReceiptMessage(String messageId, Date submitDate, Date deliveryDate,
-            int errorCode, String origMsgText, boolean delivered, String extraString, boolean tempFailure) {
+            int errorCode, String origMsgText, DeliveryStatusType deliveryStatus, String extraString) {
         StringBuffer sb = new StringBuffer();
 
         sb.append(DELIVERY_ACK_ID);
@@ -684,7 +665,7 @@ public class MessageUtil {
         sb.append(DELIVERY_ACK_SUB);
         sb.append("001");
         sb.append(DELIVERY_ACK_DLVRD);
-        if (delivered) {
+        if (deliveryStatus.equals(DeliveryStatusType.DELIVERY_ACK_STATE_DELIVERED)){
             sb.append("001");
         } else {
             sb.append("000");
@@ -694,16 +675,12 @@ public class MessageUtil {
         sb.append(DELIVERY_ACK_DONE_DATE);
         sb.append(DELIVERY_ACK_DATE_FORMAT.format(deliveryDate)); // new Timestamp(System.currentTimeMillis())
         sb.append(DELIVERY_ACK_STAT);
-        if (delivered) {
-            sb.append(DELIVERY_ACK_STATE_DELIVERED);
+        if (deliveryStatus.equals(DeliveryStatusType.DELIVERY_ACK_STATE_DELIVERED)) {
+            sb.append(DeliveryStatusType.DELIVERY_ACK_STATE_DELIVERED.toString());
             sb.append(DELIVERY_ACK_ERR);
             sb.append("000");
         } else {
-            if (!tempFailure) {
-                sb.append(DELIVERY_ACK_STATE_UNDELIVERABLE);
-            } else {
-                sb.append(DELIVERY_ACK_STATE_ENROUTE);
-            }
+			sb.append(deliveryStatus.toString());
             sb.append(DELIVERY_ACK_ERR);
             // sb.append(errorCode != null ? errorCode.getCodeText() : "null");
             sb.append(String.format("%03d", errorCode));
@@ -861,7 +838,7 @@ public class MessageUtil {
         return deliveryReceiptData;
     }
 
-    public static Sms createSmsStatusReport(Sms sms, boolean delivered, TargetAddress ta, boolean origNetworkIdForReceipts) {
+    public static Sms createSmsStatusReport(Sms sms, DeliveryStatusType deliveryStatus, TargetAddress ta, boolean origNetworkIdForReceipts) {
         Sms smsStatusReport = new Sms();
         smsStatusReport.setDbId(UUID.randomUUID());
         smsStatusReport.setSourceAddr(sms.getSmsSet().getDestAddr());
@@ -878,7 +855,7 @@ public class MessageUtil {
         smsDeliveryReportData.setDeliveryDate(new Date());
         smsDeliveryReportData.setStatusReportQualifier(StatusReportQualifier.SmsSubmitResult);
         int statusVal;
-        if (delivered)
+        if (deliveryStatus.equals(DeliveryStatusType.DELIVERY_ACK_STATE_DELIVERED))
             statusVal = Status.SMS_RECEIVED;
         else {
             // TODO: fill statusVal with proper values (after experience)

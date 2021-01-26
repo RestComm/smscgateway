@@ -1604,8 +1604,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
             if (MessageUtil.isReceiptOnSuccess(registeredDelivery)) {
                 TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
                         smsSet.getNetworkId());
-                Sms receipt = MessageUtil.createReceiptSms(sms, true, ta,
-                        smscPropertiesManagement.getOrigNetworkIdForReceipts());
+                Sms receipt = MessageUtil.createReceiptSms(sms, DeliveryStatusType.DELIVERY_ACK_STATE_DELIVERED, ta,
+                        smscPropertiesManagement.getOrigNetworkIdForReceipts(), null);
                 this.sendNewGeneratedMessage(receipt, ta);
             }
 
@@ -1613,7 +1613,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
             if (sms.isStatusReportRequest()) {
                 TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
                         smsSet.getNetworkId());
-                Sms smsStatusReport = MessageUtil.createSmsStatusReport(sms, true, ta,
+                Sms smsStatusReport = MessageUtil.createSmsStatusReport(sms, DeliveryStatusType.DELIVERY_ACK_STATE_DELIVERED, ta,
                         smscPropertiesManagement.getOrigNetworkIdForReceipts());
                 this.sendNewGeneratedMessage(smsStatusReport, ta);
             }
@@ -1635,8 +1635,8 @@ public abstract class DeliveryCommonSbb implements Sbb {
                     TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
                             smsSet.getNetworkId());
 
-                    Sms receipt = MessageUtil.createReceiptSms(sms, false, ta,
-                            smscPropertiesManagement.getOrigNetworkIdForReceipts(), null, true);
+                    Sms receipt = MessageUtil.createReceiptSms(sms, DeliveryStatusType.DELIVERY_ACK_STATE_ENROUTE, ta,
+                            smscPropertiesManagement.getOrigNetworkIdForReceipts(), null);
                     this.sendNewGeneratedMessage(receipt, ta);
 
                     this.logger.info("Adding an intermediate failure receipt: source=" + receipt.getSourceAddr() + ", dest="
@@ -1660,7 +1660,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 if (MessageUtil.isReceiptOnFailure(registeredDelivery)) {
                     TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
                             smsSet.getNetworkId());
-                    Sms receipt = MessageUtil.createReceiptSms(sms, false, ta,
+                    Sms receipt = MessageUtil.createReceiptSms(sms, DeliveryStatusType.DELIVERY_ACK_STATE_UNDELIVERABLE, ta,
                             smscPropertiesManagement.getOrigNetworkIdForReceipts(), extraString);
                     this.sendNewGeneratedMessage(receipt, ta);
 
@@ -1672,7 +1672,7 @@ public abstract class DeliveryCommonSbb implements Sbb {
                 if (sms.isStatusReportRequest()) {
                     TargetAddress ta = new TargetAddress(sms.getSourceAddrTon(), sms.getSourceAddrNpi(), sms.getSourceAddr(),
                             smsSet.getNetworkId());
-                    Sms smsStatusReport = MessageUtil.createSmsStatusReport(sms, false, ta,
+                    Sms smsStatusReport = MessageUtil.createSmsStatusReport(sms, DeliveryStatusType.DELIVERY_ACK_STATE_UNDELIVERABLE, ta,
                             smscPropertiesManagement.getOrigNetworkIdForReceipts());
                     this.sendNewGeneratedMessage(smsStatusReport, ta);
 

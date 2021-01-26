@@ -1606,11 +1606,11 @@ public abstract class TxSmppServerSbb extends SubmitCommonSbb implements Sbb {
                     sms0.setReceiptLocalMessageId(messageId);
 
                     String messageIdStr = MessageUtil.createMessageIdString(messageId);
+                    DeliveryStatusType deliveryStatus = DeliveryStatusType.valueOf(deliveryReceiptData.getStatus());
                     String updatedReceiptText = MessageUtil.createDeliveryReceiptMessage(messageIdStr,
                             deliveryReceiptData.getSubmitDate(), deliveryReceiptData.getDoneDate(),
                             deliveryReceiptData.getError(), deliveryReceiptData.getText(),
-                            deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_DELIVERED), null,
-                            deliveryReceiptData.getStatus().equals(MessageUtil.DELIVERY_ACK_STATE_ENROUTE));
+                            deliveryStatus, null);
                     sms0.setShortMessageText(updatedReceiptText);
                 } else {
                     // we have not found a local message - marking as unrecognized receipt
