@@ -32,6 +32,7 @@ import javolution.util.FastList;
 import javolution.util.FastMap;
 
 import org.apache.log4j.Logger;
+import org.mobicents.smsc.library.SmsSet;
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion;
 import org.restcomm.protocols.ss7.map.api.errors.SMEnumeratedDeliveryFailureCause;
@@ -592,6 +593,10 @@ public class SMSCShellExecutor implements ShellExecutor {
                 return this.updateCcMccmnstable(args);
             } else if (args[1].toLowerCase().equals("hrccmccmnc")) {
                 return this.ccMccmnsValueUpdate(args);
+            } else if (args[1].toLowerCase().equals("deletesmsset")) {
+                if (args.length < 3)
+                    return SMSCOAMMessages.INVALID_COMMAND;
+                return this.deleteSmsSets(Arrays.copyOfRange(args, 2, args.length));
             }
 
             return SMSCOAMMessages.INVALID_COMMAND;
@@ -599,6 +604,32 @@ public class SMSCShellExecutor implements ShellExecutor {
             logger.error(String.format("Error while executing comand %s", Arrays.toString(args)), e);
             return e.toString();
         }
+    }
+
+    /**
+     * Delete all SMS sets for specified targetIds from SmsSetCache
+     * @param targetIds
+     * @return
+     */
+    private String deleteSmsSets(String[] targetIds) {
+        SmsSetCache smsSetCache = SmsSetCache.getInstance();
+        StringBuilder report = new StringBuilder();
+        report.append("SmsSetCache size: ").append(smsSetCache.getProcessingSmsSetSize());
+        report.append("\nDeleting message sets:");
+        for (String targetId: targetIds) {
+            SmsSet deletedSmsSet = smsSetCache.removeProcessingSmsSet(targetId);
+            if (deletedSmsSet == null) {
+                report.append("\n\tno messages for targetId=").append(targetId);
+            } else {
+                report.append("\n\tmessage deleted: ").append(formatSmsSet(deletedSmsSet));
+            }
+        }
+        return report.toString();
+    }
+
+
+    private String formatSmsSet(SmsSet smsSet) {
+        return String.format("SMS targetId=%s, destAdd=%s, count=%d", smsSet.getTargetId(), smsSet.getDestAddr(), smsSet.getSmsCount());
     }
 
     /**
