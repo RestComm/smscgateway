@@ -611,15 +611,6 @@ public class MessageUtil {
             return false;
     }
 
-//    public static Sms createReceiptSms(Sms sms, DeliveryStatusType deliveryStatus, TargetAddress ta, boolean origNetworkIdForReceipts,
-//            String extraString) {
-//        return createReceiptSms(sms, deliveryStatus, ta, origNetworkIdForReceipts, extraString);
-//    }
-//
-//    public static Sms createReceiptSms(Sms sms, DeliveryStatusType deliveryStatus, TargetAddress ta, boolean origNetworkIdForReceipts) {
-//        return createReceiptSms(sms, deliveryStatus, ta, origNetworkIdForReceipts, null);
-//    }
-
     public static Sms createReceiptSms(Sms sms, DeliveryStatusType deliveryStatus, TargetAddress ta, boolean origNetworkIdForReceipts,
             String extraString) {
         Sms receipt = createReceiptSms(sms, deliveryStatus, extraString);
@@ -635,14 +626,6 @@ public class MessageUtil {
         // receipt.setStored(true);
         return receipt;
     }
-
-//    public static Sms createReceiptSms(Sms sms, DeliveryStatusType deliveryStatus) {
-//        return createReceiptSms(sms, deliveryStatus, null);
-//    }
-//
-//    public static Sms createReceiptSms(Sms sms, DeliveryStatusType deliveryStatus, String extraString) {
-//            return createReceiptSms(sms, deliveryStatus, extraString);
-//    }
 
     public static Sms createReceiptSms(Sms sms, DeliveryStatusType deliveryStatus, String extraString) {
         Sms receipt = new Sms();
@@ -697,11 +680,6 @@ public class MessageUtil {
             sb.append(DELIVERY_ACK_ERR);
             sb.append("000");
         } else {
-//            if (!tempFailure) {
-//                sb.append(DeliveryStatusType.DELIVERY_ACK_STATE_UNDELIVERABLE.toString());
-//            } else {
-//                sb.append(DeliveryStatusType.DELIVERY_ACK_STATE_ENROUTE.toString());
-//            }
 			sb.append(deliveryStatus.toString());
             sb.append(DELIVERY_ACK_ERR);
             // sb.append(errorCode != null ? errorCode.getCodeText() : "null");
