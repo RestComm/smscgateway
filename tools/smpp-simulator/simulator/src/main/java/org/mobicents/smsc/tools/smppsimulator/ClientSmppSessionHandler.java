@@ -30,6 +30,7 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.mobicents.smsc.library.DeliveryStatusType;
 import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.restcomm.protocols.ss7.map.datacoding.GSMCharset;
 import org.restcomm.protocols.ss7.map.datacoding.GSMCharsetDecoder;
@@ -373,16 +374,15 @@ public class ClientSmppSessionHandler extends DefaultSmppSessionHandler {
             pdu.setDataCoding((byte) 0);
             pdu.setRegisteredDelivery((byte) 0);
 
-            boolean tempFailure = false;
-            boolean delivered = true;
+            DeliveryStatusType delivered = DeliveryStatusType.DELIVERY_ACK_STATE_DELIVERED;
             ErrorCode errorCode = ErrorCode.SUCCESS;
             if (deliveryResponseGenerating == DeliveryResponseGenerating.Error8) {
-                delivered = false;
+                delivered = DeliveryStatusType.DELIVERY_ACK_STATE_UNDELIVERABLE;
                 errorCode = ErrorCode.ABSENT_SUBSCRIBER;
             }
 
             String rcpt = MessageUtil.createDeliveryReceiptMessage(messageId, submitDate, new Date(), errorCode.getCode(), "origMsgText",
-                    delivered, null, tempFailure);
+                    delivered, null);
             byte[] buf = rcpt.getBytes(utf8Charset);
 
             if (messageIdTlv != null) {

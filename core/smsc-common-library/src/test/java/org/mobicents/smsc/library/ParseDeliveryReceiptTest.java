@@ -143,7 +143,7 @@ public class ParseDeliveryReceiptTest {
     public void testEncodeDeliveryReceipt() {
         String mId = MessageUtil.createMessageIdString(201);
         String s1 = MessageUtil.createDeliveryReceiptMessage(mId, new Date(), new Date(), ErrorCode.REJECT_INCOMING_MPROC.getCode(),
-                "www www eee", true, null, false);
+                "www www eee", DeliveryStatusType.DELIVERY_ACK_STATE_ENROUTE, null);
     }
 
 }
