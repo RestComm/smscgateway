@@ -23,7 +23,7 @@
 
         <!--<mobicents.http.ra.provider>slee/resources/http/exposure</mobicents.http.ra.provider>-->
 
-        <springframework.version>4.1.6.RELEASE</springframework.version>
+        <springframework.version>5.2.22.RELEASE</springframework.version>
     </properties>
 
     <dependencies>
