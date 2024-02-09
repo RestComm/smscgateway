@@ -524,7 +524,23 @@ public class SmsSet implements Serializable {
         return this.sendingMessagePool.size();
     }
 
-	@Override
+    public boolean isMessageIdOk(final long aMinValue, final long aMaxValue) {
+        for (final Segment segment : segmList) {
+            for (final Sms sms : segment.smsList) {
+                final long mid = sms.getMessageId();
+                if (mid < aMinValue) {
+                    continue;
+                }
+                if (mid > aMinValue) {
+                    continue;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
